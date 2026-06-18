@@ -31,15 +31,22 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         {/* Shared Navigation Component */}
         <nav className="w-full flex justify-center gap-8 p-6 border-b border-gray-800">
-          <Link href="/" className="hover:text-blue-400 transition-colors">Home</Link>
-          <Link href="/about" className="hover:text-blue-400 transition-colors">About</Link>
-          <Link href="/contact" className="hover:text-blue-400 transition-colors">Contact</Link>
+          <Link href="/" className="hover:text-blue-400 transition-colors">
+            Home
+          </Link>
+          <Link href="/about" className="hover:text-blue-400 transition-colors">
+            About
+          </Link>
+          <Link
+            href="/contact"
+            className="hover:text-blue-400 transition-colors"
+          >
+            Contact
+          </Link>
         </nav>
-        
+
         {/* Dynamic Route Payload */}
-        <main className="flex-grow">
-          {children}
-        </main>
+        <main className="flex-grow">{children}</main>
       </body>
     </html>
   );

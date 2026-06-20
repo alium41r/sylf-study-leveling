@@ -43,6 +43,9 @@ export default function RootLayout({
           >
             Contact
           </Link>
+          <Link href="/users" className="hover:text-blue-400 transition-colors">
+            Users
+          </Link>
         </nav>
 
         {/* Dynamic Route Payload */}
@@ -51,3 +54,4 @@ export default function RootLayout({
     </html>
   );
 }
+

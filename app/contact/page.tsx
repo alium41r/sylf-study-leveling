@@ -68,10 +68,11 @@ export default function Contact() {
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-400">
+            <label htmlFor="name" className="block text-sm font-medium mb-1.5 text-gray-400">
               Name
             </label>
             <input
+              id="name"
               type="text"
               className="w-full p-2.5 rounded bg-zinc-900 border border-gray-800 focus:border-blue-500 focus:outline-none text-white transition-colors"
               value={formData.name}
@@ -87,10 +88,11 @@ export default function Contact() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-400">
+            <label htmlFor="email" className="block text-sm font-medium mb-1.5 text-gray-400">
               Email Address
             </label>
             <input
+              id="email"
               type="email"
               className="w-full p-2.5 rounded bg-zinc-900 border border-gray-800 focus:border-blue-500 focus:outline-none text-white transition-colors"
               value={formData.email}
@@ -106,10 +108,11 @@ export default function Contact() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-gray-400">
+            <label htmlFor="message" className="block text-sm font-medium mb-1.5 text-gray-400">
               Message
             </label>
             <textarea
+              id="message"
               rows={4}
               className="w-full p-2.5 rounded bg-zinc-900 border border-gray-800 focus:border-blue-500 focus:outline-none text-white transition-colors resize-none"
               value={formData.message}

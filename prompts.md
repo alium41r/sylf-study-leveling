@@ -29,3 +29,39 @@
   - **Application & Learning:** Investigated the hot-reloading mechanism. Discovered that the local server requires explicit physical disk writes to trigger a state change. Executing a save (`Cmd + S`) resolves the read error by pushing the code into the compiler loop.
 - **Prompt:** "i need to build a small SPA with at least 3 routes and a shared layout. guide me through todays task step by step. also define what an SPA is and how i keep the layout.tsx fonts safe."
   - **Application & Learning:** Initialized the `/contact` route. Decoded the difference between client-side routing and traditional full-page HTTP reloads. Injected a persistent `<nav>` wrapper utilizing the Next.js `<Link>` component directly into `app/layout.tsx`. Verified that this architecture isolates the static navigation UI while dynamically swapping the `{children}` component payload, successfully preserving the default `Geist` typography engine and anti-aliased rendering classes.
+
+---
+
+## Day 3 & Day 4: Interactive State Validation & Linter Tooling Integration
+
+**Objective:** Build a contact form that validates user input on the client, and configure Prettier alongside ESLint so code formatting and lint rules stay consistent without conflicting.
+
+**AI Interaction Log:**
+
+- **Prompt:** "i need to build the contact form for day 3 with name, email, and message fields. im used to python scripts where i read input once at the end also how does react actually keep track of what the user is typing?"
+  - **Application & Learning:** Built the form with controlled inputs and `useState`. Learned that React stores field values in state and re-renders the page when they change, so the UI stays in sync on every keystroke instead of reading the inputs only when the user clicks submit.
+- **Prompt:** "i added useState to contact/page.tsx and got this error: 'useState only works in a Client Component'. whats the difference between a server and client component, and what do i need to change?"
+  - **Application & Learning:** Added `"use client"` at the top of the file. Learned that files in the App Router are Server Components by default, which run on the server and cannot use hooks or browser events — interactive pages need the client directive.
+- **Prompt:** "explain the contact form code in app/contact/page.tsx line by line. im new to coding — especially validateForm. how does it check for empty fields and validate the email?"
+  - **Application & Learning:** Walked through the validation flow: `trim()` catches blank fields, a regex checks the email format, and a length check enforces a minimum message size. Errors are stored in an `activeErrors` object, passed to state with `setErrors`, and shown under each field before `handleSubmit` clears the form and shows the success message.
+- **Prompt:** "day 4 asks for prettier with eslint. how do i set them up so they dont fight each other? what should go in the prettier config?"
+  - **Application & Learning:** Installed `prettier` and `eslint-config-prettier`. Created `.prettierrc.json` with 2-space indents, double quotes, semicolons, and ES5 trailing commas. Added `eslint-config-prettier` to `eslint.config.mjs` so ESLint skips formatting rules that Prettier already handles.
+- **Prompt:** "my .prettierrc file has no syntax highlighting in cursor — it just looks like plain text. is the file broken or do i need a different extension?"
+  - **Application & Learning:** Renamed the config to `.prettierrc.json` so the editor treats it as JSON and applies syntax highlighting. Ran format and lint to confirm everything passes cleanly.
+
+---
+
+## Day 5: Automated Unit Testing & Asynchronous API Integration
+
+**Objective:** Install Vitest to build an automated testing suite for the frontend form, and implement an asynchronous HTTP `fetch` request to pull and render external data.
+
+**AI Interaction Log:**
+
+- **Prompt:** "day 5 syllabus says i need to do unit testing. how do i install vitest into next.js and what are the exact terminal commands?"
+  - **Application & Learning:** Installed Vitest, jsdom, and React Testing Library. Learned how to configure `vitest.config.ts` and update package scripts to create an isolated virtual DOM environment for testing components without opening a browser.
+- **Prompt:** "the test failed with 'TestingLibraryElementError: Found a label... however no form control was found'. why can't it see my input boxes and how do i fix it?"
+  - **Application & Learning:** Diagnosed an accessibility flaw. Discovered that testing libraries read the DOM like screen readers. Fixed the error by explicitly linking `<label>` elements to `<input>` fields using matching `htmlFor` and `id` tags, resulting in a clean test pass.
+- **Prompt:** "i need to do the http api fetch task now. how do i request data from an external json server and handle errors?"
+  - **Application & Learning:** Built an asynchronous `fetchUsers` function inside a `useEffect` hook. Learned how to manage loading states, intercept HTTP status errors, and map the returned JSON array into UI elements.
+- **Prompt:** "i added the users page but it isn't showing up on localhost. how do i fix the routing and put it in the nav bar?"
+  - **Application & Learning:** Investigated Next.js App Router architecture. Verified the exact physical directory paths (`app/users/page.tsx`) and injected the new `<Link>` route into the persistent `layout.tsx` navigation bar to resolve the 404 error.

@@ -65,3 +65,24 @@
   - **Application & Learning:** Built an asynchronous `fetchUsers` function inside a `useEffect` hook. Learned how to manage loading states, intercept HTTP status errors, and map the returned JSON array into UI elements.
 - **Prompt:** "i added the users page but it isn't showing up on localhost. how do i fix the routing and put it in the nav bar?"
   - **Application & Learning:** Investigated Next.js App Router architecture. Verified the exact physical directory paths (`app/users/page.tsx`) and injected the new `<Link>` route into the persistent `layout.tsx` navigation bar to resolve the 404 error.
+
+---
+
+## Week 2, Day 1: Building a Backend to Save Data
+
+**Objective:** Figure out how to connect the app to a real database so information doesn't delete when the page reloads.
+
+**AI Interaction Log:**
+
+- **Prompt 1:** "Every time I refresh my app, my form data disappears. How do I save it permanently? What exactly is a 'backend' and a 'database'?"
+  - **Application & Learning:** Learned the difference between temporary frontend memory (React state) and permanent backend memory (databases). A database is like a digital filing cabinet, and an API is the waiter that carries data between the website and the cabinet.
+- **Prompt 2:** "You mentioned using tools called 'Prisma' and 'SQLite'. What do they actually do, and what are the exact terminal commands to install them?"
+  - **Application & Learning:** Learned that SQLite is a simple, local database file. Prisma is an ORM, which acts as an automatic translator so I don't have to write complex SQL database code myself. Installed the tools and learned to hide my `.env` file so secret credentials don't end up on GitHub.
+- **Prompt 3:** "I followed the setup, but the terminal gave a red error: 'P1012 The datasource property url is no longer supported'. What did I do wrong and how do I fix it?"
+  - **Application & Learning:** Discovered that software updates change how tools work. Prisma v7.8.0 removed the old way of connecting to databases. I had to delete the URL string from my `schema.prisma` file and rely on the `.env` file to handle the connection.
+- **Prompt 4:** "Now when I try to run the app, my server crashes with 'PrismaClientConstructorValidationError'. Why is it broken?"
+  - **Application & Learning:** Learned about server "cache" (temporary memory). Because I was creating database files while the server was actively running, the server got confused and was reading outdated files. I learned to stop the server and run `rm -rf .next` to delete the broken memory.
+- **Prompt 5:** "I have no idea how to actually write the API code. What exact files do I need to make, and what code goes inside them to save and read notes?"
+  - **Application & Learning:** Built my first REST API by creating `app/api/notes/route.ts`. Wrote a `POST` function to create new notes and a `GET` function to read them. Learned about Zod, a tool that checks if the user's data is valid (not empty) before saving it to the database.
+- **Prompt 6:** "The code is pasted in, but how do I actually test if the database is saving my notes? You mentioned a command called 'curl', what is that?"
+  - **Application & Learning:** Learned that `curl` is a terminal command used to send data to an API without needing a physical website button. Used it to send a test note to my `POST` route, and verified it was permanently saved in the SQLite database.

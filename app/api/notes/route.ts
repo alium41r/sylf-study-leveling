@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 // Prisma v7.8.0 Driver Adapter Instantiation
-const adapter = new PrismaBetterSqlite3({ 
-  url: process.env.DATABASE_URL || "file:./dev.db" 
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || "file:./dev.db"
 });
 const prisma = new PrismaClient({ adapter });
 
@@ -21,7 +21,7 @@ export async function GET() {
       include: { user: true },
     });
     return NextResponse.json(notes, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Database retrieval failed" },
       { status: 500 }
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(newNote, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error or foreign key violation" },
       { status: 500 }

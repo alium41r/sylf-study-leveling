@@ -29,7 +29,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: "Note deleted" }, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Delete failed. Record may not exist." },
       { status: 500 }
@@ -63,7 +63,7 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedNote, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Update failed. Record may not exist." },
       { status: 500 }

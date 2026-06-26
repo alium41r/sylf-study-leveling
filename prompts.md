@@ -86,3 +86,24 @@
   - **Application & Learning:** Built my first REST API by creating `app/api/notes/route.ts`. Wrote a `POST` function to create new notes and a `GET` function to read them. Learned about Zod, a tool that checks if the user's data is valid (not empty) before saving it to the database.
 - **Prompt 6:** "The code is pasted in, but how do I actually test if the database is saving my notes? You mentioned a command called 'curl', what is that?"
   - **Application & Learning:** Learned that `curl` is a terminal command used to send data to an API without needing a physical website button. Used it to send a test note to my `POST` route, and verified it was permanently saved in the SQLite database.
+
+
+  ---
+
+  ## Week 2, Day 2: Cleaning the Code and Automated Testing
+
+**Objective:** Learn how to use a "linter" to automatically find messy code, and write automated tests so I don't have to manually check the database every time I make a change.
+
+**AI Interaction Log:**
+
+- **Prompt 7:** "My internship guide says I need to 'configure a linter on the backend'. What exactly is a linter, and how do I use it on my new API routes?"
+  - **Application & Learning:** I learned that a linter (like ESLint) is basically an automatic spell-checker for code. Instead of checking for spelling mistakes, it scans the code to find messy formatting, broken rules, or things that might cause bugs later. I ran the command `npm run lint` in my terminal to check my files.
+
+- **Prompt 8:** "I ran the linter, but it gave me warnings about 'unused variables' in my error catch blocks. Why is this a problem and how do I fix it to get a clean pass?"
+  - **Application & Learning:** I learned that if you define a variable but never actually use it, the linter gets mad because it clutters the code. I fixed the catch blocks in my API routes to clean up the code. I learned that committing a "clean pass" means fixing all these warnings before saving the code to GitHub.
+
+- **Prompt 9:** "Now I need to write unit tests for my API using Vitest. But I have a question: if the tests automatically create and delete notes, won't that fill my real database with fake junk data?"
+  - **Application & Learning:** I learned a really cool concept called "mocking". Instead of letting the tests talk to my real SQLite database, we set up a fake, temporary database in the computer's memory. The tests run against the fake database, so my real data stays perfectly safe.
+
+- **Prompt 10:** "Can you help me write the actual Vitest code to test my POST and GET routes? How do we check if the API is returning the right HTTP status codes?"
+  - **Application & Learning:** I used AI to help generate the test files. I learned how unit tests work: they send a fake request to the API, and then check the response. For example, the test checks if sending good data returns a `201 Created` status, and if sending bad data (which Zod blocks) correctly returns a `400 Bad Request` status.

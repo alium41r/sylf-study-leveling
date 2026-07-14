@@ -46,6 +46,16 @@ export default function RootLayout({
           <Link href="/users" className="hover:text-blue-400 transition-colors">
             Users
           </Link>
+          <Link href="/notes" className="hover:text-blue-400 transition-colors">
+            Notes
+          </Link>
+          <Link href="/register" className="hover:text-blue-400 transition-colors">
+            Register
+          </Link>
+          <Link href="/login" className="hover:text-blue-400 transition-colors">
+            Log In
+          </Link>
+
         </nav>
 
         {/* Dynamic Route Payload */}

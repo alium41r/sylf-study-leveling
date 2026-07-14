@@ -107,3 +107,99 @@
 
 - **Prompt 10:** "Can you help me write the actual Vitest code to test my POST and GET routes? How do we check if the API is returning the right HTTP status codes?"
   - **Application & Learning:** I used AI to help generate the test files. I learned how unit tests work: they send a fake request to the API, and then check the response. For example, the test checks if sending good data returns a `201 Created` status, and if sending bad data (which Zod blocks) correctly returns a `400 Bad Request` status.
+
+
+  ---
+
+  ## Week 3, Day 1: Locking down the API with JWT Authentication
+
+**Objective:** Learn how to restrict access to the backend so that only logged-in users with a valid "VIP pass" (Token) can create or modify notes.
+
+**AI Interaction Log:**
+
+- **Prompt 11:** "It's Week 3 Day 1 and I need to add JWT Authentication to my API. What exactly is a JWT and how do I do this? Please guide me step-by-step so I can learn."
+  - **Application & Learning:** I learned that a JWT (JSON Web Token) is like a digital VIP pass. We started by updating the `schema.prisma` file to add a required `password` field to the User model, then pushed the changes to the SQLite database.
+
+- **Prompt 12:** "When I pushed the changes, it gave an error about adding a required column without a default value. Also, how do I actually write the code to let a user register?"
+  - **Application & Learning:** I learned that adding a required column to a database with existing data causes a conflict. I fixed it by running `npx prisma db push --force-reset` to safely wipe the local test database. Then, I installed `bcryptjs` and `jose`, and created an `/api/auth/register` route. I learned how `bcrypt.hash()` scrambles passwords into gibberish so we never save raw text in the database.
+
+- **Prompt 13:** "My IDE is throwing a 'password does not exist' error in my code even though I added it to the database! Also, how do I create the login route?"
+  - **Application & Learning:** I learned that code editors cache old database blueprints. Running `npx prisma generate` and restarting the TypeScript server fixed the errors! I then built the `/api/auth/login` route. I learned how to use `bcrypt.compare()` to check passwords, and the `jose` library to sign and create a secure JWT token.
+
+- **Prompt 14:** "Now that users can register and login, how do I actually protect my Notes API so only logged-in users can post notes?"
+  - **Application & Learning:** I learned about separating logic into helper files (the industry standard). I created a `lib/auth.ts` file with a `verifyToken` function. Then, I updated my `app/api/notes/route.ts` to check the `Authorization` header for a "Bearer" token before allowing any notes to be created!
+
+
+  ---
+
+  ## Week 3, Day 2: Role-Based Authorization (RBAC)
+
+**Objective:** Learn how to enforce different rules for different types of users so that some users have more power than others (like an "ADMIN").
+
+**AI Interaction Log:**
+
+- **Prompt 15:** "It's day 2, I need to do this task: Add at least one role-based authorization rule. Guide me the same way you did yesterday."
+  - **Application & Learning:** I learned that while Authentication proves *who* you are, Authorization proves *what you are allowed to do*. I started by trying to add a `role` field to my database, but I accidentally put it outside the `User` model, which caused a Prisma error.
+
+- **Prompt 16:** "I got an error: 'This line is invalid. It does not start with any known Prisma schema keyword.' How do I fix this?"
+  - **Application & Learning:** I learned that database schemas require strict placement. I moved `role String @default("USER")` inside the `User` block, successfully ran the `npx prisma db push` and `generate` commands, and then added the `role` into my JWT token payload when users log in.
+
+- **Prompt 17:** "My IDE is throwing a 'Property role does not exist' error again! How do I fix this, and how do we enforce the rule?"
+  - **Application & Learning:** I hit the same IDE caching bug as yesterday, and fixed it by restarting my TypeScript Server. Finally, I updated the `DELETE` function in my Notes API to enforce the rule: it reads the token, checks the user's role, and returns a `403 Forbidden` error if the user is not an `ADMIN`!
+
+
+---
+
+## Week 3, Day 3: Frontend to Backend Integration (Full Stack CRUD)
+
+**Objective:** Connect the frontend to the backend so users can register, login, and manage their own notes using a secure token.
+
+**AI Interaction Log:**
+
+- **Prompt 18:** "ok its day 3 now, i need to do this task: Connect Week 1 frontend to the backend — full end-to-end CRUD with login"
+  - **Application & Learning:** Built the `/register` and `/login` pages with forms that send data to our new API. Learned how to save the JWT token in the browser's `localStorage` so it persists even when I navigate to other pages.
+- **Prompt 19:** "an issue is ocurring, the website is getting an error"
+  - **Application & Learning:** Discovered that Next.js treats anything inside the `app/api` folder as strictly backend code. I accidentally created my visual frontend Notes dashboard inside `app/api/notes/page.tsx`, causing a huge route conflict! I learned to keep frontend pages safely outside of the `api` directory.
+- **Prompt 20:** "its still saying Validation failed when trying to create a note. fix this"
+  - **Application & Learning:** Learned a massive security lesson! Our old API required the frontend to send a `userId`. But since we now have JWT tokens, relying on the frontend to send the user ID is a huge security flaw (hackers could spoof it). We updated the API to securely extract the `userId` directly out of the verified token payload instead.
+- **Prompt 21:** "there is no edit option here"
+  - **Application & Learning:** Added the final piece of CRUD functionality (Update/PUT). Learned how to structure my React state to smoothly switch between "Create" mode (POST) and "Edit" mode (PUT). Also saw our backend RBAC rule in action when the server correctly rejected my request to delete a note because I wasn't an Admin!
+
+
+---
+
+## Week 3, Day 4: Automated API Integration Testing
+
+**Objective:** Write automated tests using Vitest to test the API routes instead of clicking through the website manually.
+
+**AI Interaction Log:**
+
+- **Prompt 22:** "ok its done. now i want to do this task: Write at least 5 API tests covering auth + CRUD + error paths. tell me whats the purpose of this and guide me through this"
+  - **Application & Learning:** Learned the power of API integration testing. Instead of testing visual buttons, we wrote a test robot that automatically sends `fetch` requests directly to our local server.
+- **Prompt 23:** "take a look at the terminal, it passed a few tests an failed a few"
+  - **Application & Learning:** Realized that Vitest automatically runs all old test files by default. Learned how to isolate tests by running `npm run test api.test.ts`. Wrote 5 powerful tests to verify the "Happy Path" (creating notes successfully) and the "Error Path" (getting kicked out for missing a token or lacking Admin privileges).
+- **Prompt 24:** "i need to do this last task for the week: Add at least 1 integration test that runs the happy path end-to-end. but wait, didnt we already do the happy and error path?"
+  - **Application & Learning:** Learned the crucial difference between isolated API unit tests and End-to-End (E2E) integration tests. An E2E test proves that all the individual pieces connect together to form a working product. I wrote a massive final test script that simulated a user's entire journey in one continuous flow: Registering, Logging in, Creating a Note, and Updating that Note!
+
+---
+
+## Week 4: Building an Autonomous AI Agent
+
+**Objective:** Pivot from traditional web development to Artificial Intelligence by building a standalone Node.js Agent capable of searching the web, reading files, and using memory.
+
+**AI Interaction Log:**
+
+- **Prompt 25:** "Alright, it's week 4! My first task is to build a research agent with a web-search skill. But wait, what exactly is the difference between an AI Agent, a Chatbot, and a Copilot?"
+  - **Application & Learning:** Learned the difference between a Chatbot (passive text generator) and an Agent (an autonomous system that acts using a Planner, Executor, and Memory). Set up a brand new `ai-agent` directory, installed the Google GenAI SDK, and wrote my first script. I also learned how to use a hidden `.env` file to securely store my API key.
+- **Prompt 26:** "I ran the script and the terminal said 'AI WANTS TO USE A TOOL', but it didn't actually answer my question about the Superbowl. Why did it stop, and how do I make it actually search?"
+  - **Application & Learning:** Learned about "Function Calling". We gave the AI a `searchWeb` tool definition so instead of replying with text, it returns a request for *me* to run a function. I built an "Executor" function to run the search on my computer, and learned how to feed the result back into the AI's memory so it could generate the final answer.
+- **Prompt 27:** "Okay, the web search is working perfectly! The next task on my list is 'Add memory'. Do I have to manually send the whole chat history every time, or does the AI remember things automatically?"
+  - **Application & Learning:** Learned about "In-Context Memory". We switched to the `chat.sendMessage` method which automatically saves the chat history behind the scenes. I proved the memory worked by asking "Who did they beat?" without explicitly mentioning the team name, and the AI correctly remembered the context of our conversation!
+- **Prompt 28:** "It remembered the 49ers! My next task is about 'Hooks'. What exactly is a hook, and how do I make the terminal print a timestamp log every time the AI decides to use a tool?"
+  - **Application & Learning:** Learned about "Hooks" (interceptors). I built a "Pre-Action Hook" that prints a timestamp and the tool's name to the terminal right before the AI uses a tool. This is super important for security and tracking exactly what autonomous bots are doing on a live server.
+- **Prompt 29:** "The hook logs are working. For the final demo, I need the AI to read a text file AND do a web search. How do I let it use multiple tools in a row without stopping?"
+  - **Application & Learning:** Learned the "ReAct" pattern (Multi-Hop Reasoning). We created a `secret.txt` file and built a `readFile` tool using Node's `fs` module. Then, we wrapped the Executor in a `while` loop! The AI successfully read the text file to find the year 2024, and then autonomously executed a second tool to search the web for the 2024 Superbowl winner without me holding its hand.
+- **Prompt 30:** "Can we make it so that I can ask it questions directly in the terminal, instead of hardcoding my question into the script? Would a Python-style `input()` function work here?"
+  - **Application & Learning:** Learned that Node.js is asynchronous and doesn't have a simple synchronous `input()` function like Python. Instead, I used the built-in `readline/promises` library to open an interactive text-stream in the terminal, allowing me to chat with my agent live!
+- **Prompt 31:** "Haha look at this! I asked it how many goals Ronaldo scored, but it just kept searching for the Superbowl three times and then gave up. Why did it do that?"
+  - **Application & Learning:** Discovered the limitations of mocked data! Because we hardcoded the `executeSearch` function to always return "The Chiefs won the Superbowl", the AI got incredibly confused when trying to research Ronaldo. This proved exactly why we need to upgrade our mock search to a real live internet Search API (like SerpAPI or DuckDuckGo) for production environments!

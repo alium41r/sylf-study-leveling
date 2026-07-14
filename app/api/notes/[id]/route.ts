@@ -2,10 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { verifyToken } from "../../../../lib/auth"; // Put this at the very top of the file!
+
 
 // Prisma v7.8.0 Driver Adapter Instantiation
-const adapter = new PrismaBetterSqlite3({ 
-  url: process.env.DATABASE_URL || "file:./dev.db" 
+const adapter = new PrismaBetterSqlite3({
+  url: process.env.DATABASE_URL || "file:./dev.db"
 });
 const prisma = new PrismaClient({ adapter });
 
@@ -16,10 +18,30 @@ const updateSchema = z.object({
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const noteId = parseInt(params.id);
+    // Put this inside the DELETE function:
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Missing VIP Pass" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const userPayload = await verifyToken(token);
+
+    if (!userPayload) {
+      return NextResponse.json({ error: "Invalid VIP Pass" }, { status: 401 });
+    }
+
+    // --- HERE IS THE NEW RULE! ---
+    // We check the role we just added to the token!
+    if (userPayload.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden: You are not an Admin!" }, { status: 403 });
+    }
+
+    const { id } = await params;
+    const noteId = parseInt(id);
     if (isNaN(noteId)) {
       return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }
@@ -39,10 +61,11 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const noteId = parseInt(params.id);
+    const { id } = await params;
+    const noteId = parseInt(id);
     if (isNaN(noteId)) {
       return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }

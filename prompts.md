@@ -202,4 +202,23 @@
 - **Prompt 30:** "Can we make it so that I can ask it questions directly in the terminal, instead of hardcoding my question into the script? Would a Python-style `input()` function work here?"
   - **Application & Learning:** Learned that Node.js is asynchronous and doesn't have a simple synchronous `input()` function like Python. Instead, I used the built-in `readline/promises` library to open an interactive text-stream in the terminal, allowing me to chat with my agent live!
 - **Prompt 31:** "Haha look at this! I asked it how many goals Ronaldo scored, but it just kept searching for the Superbowl three times and then gave up. Why did it do that?"
-  - **Application & Learning:** Discovered the limitations of mocked data! Because we hardcoded the `executeSearch` function to always return "The Chiefs won the Superbowl", the AI got incredibly confused when trying to research Ronaldo. This proved exactly why we need to upgrade our mock search to a real live internet Search API (like SerpAPI or DuckDuckGo) for production environments!
+   - **Application & Learning:** Discovered the limitations of mocked data! Because we hardcoded the `executeSearch` function to always return "The Chiefs won the Superbowl", the AI got incredibly confused when trying to research Ronaldo. This proved exactly why we need to upgrade our mock search to a real live internet Search API (like SerpAPI or DuckDuckGo) for production environments!
+
+---
+
+## Week 5: Distributed AI Architecture (Model Context Protocol & Multi-Agent Orchestration)
+
+**Objective:** Upgrade from a single standalone script to a distributed architecture by building a custom MCP Server, connecting an MCP Client, and orchestrating multiple specialized AI Workers under a single Supervisor.
+
+**AI Interaction Log:**
+
+- **Prompt 32:** "I need to do Week 5's tasks right now: Build a custom MCP server exposing one app resource and one tool. Guide me through these and also explain the concepts side by side slowly step by step."
+  - **Application & Learning:** Learned about the Model Context Protocol (MCP), a universal standard that lets AI safely connect to local resources. Built `mcp-server.ts` using the `@modelcontextprotocol/sdk`. Exposed a passive "Resource" (`notes://memo`) and an active "Tool" (`calculate_sum`). Learned that instead of HTTP, MCP communicates securely and instantly over `stdio` (Standard Input/Output) by piping JSON messages directly in the terminal, meaning `console.log` would corrupt the protocol so we had to use `console.error` to debug.
+- **Prompt 33:** "Phase 1 is done, next task. How do we connect to this server?"
+  - **Application & Learning:** Built `mcp-client.ts`. Learned how AI IDEs like Cursor or Claude Code secretly spawn background processes to securely read local files without internet access. Ran the client which spawned the server in the background, negotiated capabilities, listed the tools, and remotely executed the `calculate_sum` math tool.
+- **Prompt 34:** "It's done, move to the next phase: Implement a supervisor + worker agent that routes tasks to >= 2 sub-agents."
+  - **Application & Learning:** Built `multi-agent.ts`, a true distributed Multi-Agent system. Implemented the "Supervisor + Worker" pattern. Created a Supervisor boss that isn't allowed to answer questions directly due to a strict `systemInstruction` (Guardrail). Instead, the Supervisor dynamically routes tasks to either a Math Worker or a Research Worker depending on the user's prompt. 
+- **Prompt 35:** "Look at this error: '429 RESOURCE_EXHAUSTED'. Why did this happen?"
+  - **Application & Learning:** Learned a massive lesson in "Cost & Latency Strategy". Because multi-agent systems trigger huge chain reactions of API calls (User -> Supervisor -> Worker -> Tool -> Supervisor), we instantly hit Google's free-tier rate limits! We fixed it by injecting a `sleep(2000)` pace-limiter. In production, this proves why you only use expensive, smart models for the Supervisor routing, and tiny, cheap, fast models for the Workers.
+- **Prompt 36:** "What's left? How do I debug this if something breaks?"
+  - **Application & Learning:** Implemented Phase 4: A Tracing Layer. When 3 different agents are talking back and forth, debugging is a nightmare. Built an `AgentTracer` class to act as a centralized wiretap that logs the exact timestamp, Agent ID, action, and JSON payload every time a tool is used.

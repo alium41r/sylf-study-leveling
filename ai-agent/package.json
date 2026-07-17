@@ -12,7 +12,9 @@
   "type": "commonjs",
   "dependencies": {
     "@google/genai": "^2.10.0",
-    "dotenv": "^17.4.2"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^26.1.0",

@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const conversations = participantRecords.map((pr) => {
+    const conversations = participantRecords.map((pr: any) => {
       const conv = pr.conversation;
       const lastMessage = conv.messages[0] || null;
 
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
       // For DMs, use the other person's name
       let displayName = conv.name;
       if (!conv.isGroup) {
-        const otherParticipant = conv.participants.find((p) => p.userId !== userId);
+        const otherParticipant = conv.participants.find((p: any) => p.userId !== userId);
         displayName = otherParticipant?.user.name || otherParticipant?.user.username || "Unknown";
       }
 
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
         id: conv.id,
         name: displayName,
         isGroup: conv.isGroup,
-        participants: conv.participants.map((p) => ({
+        participants: conv.participants.map((p: any) => ({
           id: p.user.id,
           name: p.user.name,
           username: p.user.username,

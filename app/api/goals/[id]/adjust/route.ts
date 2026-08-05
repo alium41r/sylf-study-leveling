@@ -118,7 +118,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     if (adjustedPlan.quests.length > 0) {
       const today = new Date();
       await prisma.quest.createMany({
-        data: adjustedPlan.quests.map((q) => {
+        data: adjustedPlan.quests.map((q: any) => {
           const scheduledDate = new Date(today);
           scheduledDate.setDate(today.getDate() + q.scheduledDay);
           return {

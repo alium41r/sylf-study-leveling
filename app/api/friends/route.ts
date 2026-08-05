@@ -50,9 +50,9 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const friends = friendships.map((f) => {
+    const friends = friendships.map((f: any) => {
       const friendData = f.userId === userId ? f.friend : f.user;
-      const todayMinutes = friendData.sessions.reduce((sum, s) => sum + s.durationMinutes, 0);
+      const todayMinutes = friendData.sessions.reduce((sum: any, s: any) => sum + s.durationMinutes, 0);
       const isOnline = friendData.lastSeenAt ? friendData.lastSeenAt >= twoMinAgo : false;
 
       return {

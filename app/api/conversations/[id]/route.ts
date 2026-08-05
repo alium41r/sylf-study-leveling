@@ -81,7 +81,7 @@ export async function GET(
         name: conversation.name,
         isGroup: conversation.isGroup,
         createdBy: conversation.createdBy,
-        participants: conversation.participants.map((p) => ({
+        participants: conversation.participants.map((p: any) => ({
           id: p.user.id,
           name: p.user.name,
           username: p.user.username,

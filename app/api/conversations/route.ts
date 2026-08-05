@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Sort by most recent activity
-    conversations.sort((a, b) => {
+    conversations.sort((a: any, b: any) => {
       const aTime = a.lastMessage?.createdAt || a.updatedAt;
       const bTime = b.lastMessage?.createdAt || b.updatedAt;
       return new Date(bTime).getTime() - new Date(aTime).getTime();

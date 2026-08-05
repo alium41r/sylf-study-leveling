@@ -222,3 +222,86 @@
   - **Application & Learning:** Learned a massive lesson in "Cost & Latency Strategy". Because multi-agent systems trigger huge chain reactions of API calls (User -> Supervisor -> Worker -> Tool -> Supervisor), we instantly hit Google's free-tier rate limits! We fixed it by injecting a `sleep(2000)` pace-limiter. In production, this proves why you only use expensive, smart models for the Supervisor routing, and tiny, cheap, fast models for the Workers.
 - **Prompt 36:** "What's left? How do I debug this if something breaks?"
   - **Application & Learning:** Implemented Phase 4: A Tracing Layer. When 3 different agents are talking back and forth, debugging is a nightmare. Built an `AgentTracer` class to act as a centralized wiretap that logs the exact timestamp, Agent ID, action, and JSON payload every time a tool is used.
+
+---
+
+## Final Project: Study Leveling App
+
+**Objective:** Build a gamified study tracking app with an AI coach, quest system, leveling features, and social groups.
+
+### Week 5, Day 1: System Architecture & Database Design
+**Objective:** Set up the database and project structure.
+
+**AI Interaction Log:**
+- **Prompt 37:** "ok we need to make the database for our study system. i need you to use Prisma with a local SQLite database for now, but make sure it can be easily moved to PostgreSQL later. we need tables for User, Quest, Goal, and StudySession. add a relation between User and Quest to track completed tasks. make sure everything is linked up properly. carry this out and give me a detailed plan."
+  - **Application & Learning:** Set up the Prisma database tables for users, quests, and study sessions so they are linked correctly and ready for the future.
+- **Prompt 38:** "ok now we need to add fake data to the database so we can test it. make a script that uses faker.js to add at least 50 fake users, 100 study sessions, and 200 quests. make sure the dates look like real study habits over a 3-month period. carry this out."
+  - **Application & Learning:** Created a script to fill the database with fake testing data to help build the app UI smoothly.
+- **Prompt 39:** "the leaderboard page needs to load very fast. add indexes on the `currentXP` and `hunterRank` columns in the User table so the database can search them quickly. tell me how you are going to do this before you execute."
+  - **Application & Learning:** Added database indexes to the user table so the leaderboard loads instantly even with many users.
+
+### Week 5, Day 2: Secure Authentication Layer
+**Objective:** Build the login and signup system.
+
+**AI Interaction Log:**
+- **Prompt 40:** "now we have to add the login system. use bcrypt to hide passwords and use JWT tokens to keep users logged in. make sure to check the token on every private page so users cant fake being someone else. build the login and sign up pages and handle errors properly."
+  - **Application & Learning:** Built a secure login and sign-up system that safely checks user tokens to protect private pages.
+- **Prompt 41:** "the login page needs to look really cool. build a nice dark-themed login form. use Framer Motion for smooth animations when the page loads. make sure to check if the user entered their email and password correctly before sending it to the server. do this right now."
+  - **Application & Learning:** Created a cool, animated login page that checks for empty fields and errors before submitting.
+- **Prompt 42:** "we need to make the login even more secure. save the JWT token inside a secure cookie instead of local storage so hackers cant steal it. update the app to check these cookies on all private routes."
+  - **Application & Learning:** Improved security by saving login tokens in safe cookies to prevent hackers from stealing them.
+
+### Week 5, Day 3: Core Game Engine & XP Algorithms
+**Objective:** Build the math behind the leveling system.
+
+**AI Interaction Log:**
+- **Prompt 43:** "its time to build the leveling system math. we need a file to calculate XP, level up numbers, and rank changes (from E rank to S rank). make it so early levels are fast to get, but higher levels need a lot more work. make sure this math is simple and just returns the numbers."
+  - **Application & Learning:** Wrote the core math formulas for calculating player levels, ranks, and how much XP is needed for the next level.
+- **Prompt 44:** "we need to fix a bug in the leveling system. what happens if a user gets a lot of XP and levels up two times at once? write a function that loops through the levels and subtracts the XP correctly until they reach the right level. carry this out."
+  - **Application & Learning:** Fixed the leveling math so users can safely level up multiple times at once without the system breaking.
+- **Prompt 45:** "ok let's add a streak bonus. if a user studies for 3 days in a row, give them 1.2x more XP. increase this to 1.5x at 7 days. make sure to check the dates on the server so users cant cheat by changing their computer time."
+  - **Application & Learning:** Added a daily streak feature that gives users extra XP if they study multiple days in a row.
+
+### Week 5, Day 4: UI Theming & Modular Settings
+**Objective:** Build a global theme switcher and settings page.
+
+**AI Interaction Log:**
+- **Prompt 46:** "i need you to add different themes to the app. we need colors like Monarch, Cyberpunk, and Dark Mode. use CSS variables and Tailwind to make this work smoothly. make sure the theme stays the same when the user goes to a different page."
+  - **Application & Learning:** Added a global theme switcher that lets users change the app colors to different cool styles.
+- **Prompt 47:** "ok, now we need to build a settings panel for all the options. do a lot of planning and make a detailed plan. all the options inside the settings panel will have their own separate pages. for now, just make the empty pages and the navigation menu. we will decide on the details later. carry this out right now."
+  - **Application & Learning:** Created the basic structure and layout for the settings panel so we can add more options to it later.
+- **Prompt 48:** "i need you to build a profile picture selector inside the settings. get a list of pictures they can choose from. make it so when the user clicks a picture, it changes instantly on the screen without waiting for the server to load. give me a detailed plan."
+  - **Application & Learning:** Built a profile picture selector that updates instantly when clicked so the app feels very fast.
+
+### Week 6, Day 1: Autonomous AI Coach Integration
+**Objective:** Add the smart AI chatbot to the app.
+
+**AI Interaction Log:**
+- **Prompt 49:** "ok now we must add the AI coach. use the Google AI SDK to build a chatbot. give the AI the ability to read the database, get the user's XP, and create new quests for them. give the AI strict rules so it sounds cold and robotic like a system notification. carry this out."
+  - **Application & Learning:** Added a smart AI chatbot that can read the user's stats and automatically make new quests for them.
+- **Prompt 50:** "the AI is making mistakes when creating quests. we need stricter rules. make sure the AI always sends back properly formatted data. if the AI makes a mistake, make the code tell the AI to fix it before showing it to the user. carry this out."
+  - **Application & Learning:** Added extra checks to make sure the AI always outputs the correct data format without errors.
+- **Prompt 51:** "we need a backup plan for the AI. if the Gemini AI stops working or takes too long, smoothly switch to a different AI model so the app doesn't break. secretly log this in the background so i know it happened."
+  - **Application & Learning:** Made the app switch to a backup AI model automatically if the main one stops working.
+
+### Week 6, Day 2: Asynchronous State & Timer Modes
+**Objective:** Build the Pomodoro study timer.
+
+**AI Interaction Log:**
+- **Prompt 52:** "we need to build the study timer. add different modes like Pomodoro and Free Study. make sure the timer doesn't break or slow down the page. when the timer finishes, automatically save the study time to the database and update the user's XP on the screen."
+  - **Application & Learning:** Built the study timer page and made it automatically reward the user with XP when they finish studying.
+- **Prompt 53:** "ok the timer works but if the user reloads the page, the timer resets and they lose progress. save the timer in the browser so it continues if they reload. also, show a warning popup if they try to close the tab while studying."
+  - **Application & Learning:** Made the timer save its progress in the browser so users don't lose their study time if they accidentally refresh.
+- **Prompt 54:** "now add a strict 'Deep Work' mode. when this is turned on, hide everything on the screen except the timer, make the page full-screen, and block all popup notifications. do a lot of planning for this."
+  - **Application & Learning:** Added a Deep Work mode that goes full-screen and hides all distractions so the user can focus.
+
+### Week 6, Day 3: Social Environment & Real-time Preparation
+**Objective:** Build friends lists and chat features.
+
+**AI Interaction Log:**
+- **Prompt 55:** "ok next is the social stuff. we need a system where users can add friends, see who is online, and make study groups. for now, build the backend code for sending and accepting friend requests. also, make a basic chat box page. carry this out."
+  - **Application & Learning:** Built the backend logic for adding friends and made a basic chat screen for users to talk.
+- **Prompt 56:** "we need a leaderboard. build a ranking page but make it fast. make it load only 50 users at a time from the database, and make the scrolling really smooth even if there are thousands of users. carry this out right now."
+  - **Application & Learning:** Created a smooth leaderboard page that loads users in small batches so it doesn't lag.
+- **Prompt 57:** "lastly, add a search bar to find other players. make sure it doesn't search the database on every single letter the user types, because that will crash the server. wait a little bit after they stop typing before searching. carry this out."
+  - **Application & Learning:** Built a search bar for finding friends that waits until the user finishes typing to keep the app fast.

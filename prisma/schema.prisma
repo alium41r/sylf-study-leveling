@@ -7,21 +7,218 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
-  notes     Note[]
-  createdAt DateTime @default(now())
-  role      String   @default("USER")
+  id                Int             @id @default(autoincrement())
+  email             String          @unique
+  username          String          @unique
+  password          String
+  name              String?
+  hunterRank        String          @default("E")
+  level             Int             @default(1)
+  currentXP         Int             @default(0)
+  xpToNextLevel     Int             @default(100)
+  hp                Int             @default(100)
+  maxHp             Int             @default(100)
+  streakDays        Int             @default(0)
+  totalStudyMinutes Int             @default(0)
+  lastActiveDate    String          @default("")
+  lastSeenAt        DateTime?
+  sylph             Int             @default(0)
+  createdAt         DateTime        @default(now())
+  
+  goals             Goal[]
+  quests            Quest[]
+  sessions          StudySession[]
+  systemMessages    SystemMessage[]
+  subjects          Subject[]
+  inventoryItems    InventoryItem[]
+  sylphLedger       SylphLedger[]
+  chatSessions      ChatSession[]
+
+  // Social
+  friendshipsAsUser    Friendship[]              @relation("friendshipsAsUser")
+  friendshipsAsFriend  Friendship[]              @relation("friendshipsAsFriend")
+  sentRequests         FriendRequest[]            @relation("sentRequests")
+  receivedRequests     FriendRequest[]            @relation("receivedRequests")
+  conversations        ConversationParticipant[]
+  messagesSent         Message[]
+  sentInvites          SessionInvite[]            @relation("sentInvites")
+  receivedInvites      SessionInvite[]            @relation("receivedInvites")
+
+  @@index([currentXP, hunterRank])
 }
 
-model Note {
+model Goal {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  targetWeeks Int
+  effortLevel String   @default("NORMAL")
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+
+  quests      Quest[]
+}
+
+model Quest {
+  id              Int            @id @default(autoincrement())
+  userId          Int
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goalId          Int?
+  goal            Goal?          @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  title           String
+  description     String?
+  status          String         @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, FAILED
+  requiredMinutes    Int
+  xpReward           Int
+  sylphReward        Int            @default(0)
+  isKamishWardActive Boolean        @default(false)
+  isGateKeyApplied   Boolean        @default(false)
+  scheduledFor       String         // YYYY-MM-DD
+  createdAt          DateTime       @default(now())
+  completedAt        DateTime?
+
+  sessions        StudySession[]
+}
+
+model Subject {
   id        Int      @id @default(autoincrement())
-  title     String
-  content   String
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  color     String?  @default("#7c3aed")
+  createdAt DateTime @default(now())
+
+  sessions  StudySession[]
+  invites   SessionInvite[]
+}
+
+model StudySession {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questId         Int?
+  quest           Quest?    @relation(fields: [questId], references: [id], onDelete: SetNull)
+  subjectId       Int?
+  subject         Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  durationMinutes Int
+  startedAt       DateTime  @default(now())
+  endedAt         DateTime?
+}
+
+model SystemMessage {
+  id            Int          @id @default(autoincrement())
+  userId        Int
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId     Int?
+  session       ChatSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  content       String
+  type          String       // INFO, QUEST, REWARD, WARNING, LEVEL_UP, USER
+  read          Boolean      @default(false)
+  attachmentUrl String?      // Optional URL for uploaded files (images, pdfs, etc)
+  createdAt     DateTime     @default(now())
+}
+
+model ChatSession {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String   @default("New Chat")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  messages  SystemMessage[]
+}
+
+// ─── Social Models ───────────────────────────────────────────
+
+model Friendship {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  friendId   Int
+  user       User     @relation("friendshipsAsUser", fields: [userId], references: [id], onDelete: Cascade)
+  friend     User     @relation("friendshipsAsFriend", fields: [friendId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, friendId])
+}
+
+model FriendRequest {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  sender     User     @relation("sentRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("receivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+  status     String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt  DateTime @default(now())
+
+  @@unique([senderId, receiverId])
+}
+
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  name      String?
+  isGroup   Boolean   @default(false)
+  createdBy Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  conversationId Int
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  joinedAt       DateTime     @default(now())
+  lastReadAt     DateTime     @default(now())
+
+  @@unique([userId, conversationId])
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  senderId       Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content        String
+  createdAt      DateTime     @default(now())
+}
+
+model SessionInvite {
+  id          Int      @id @default(autoincrement())
+  senderId    Int
+  receiverId  Int
+  subjectId   Int?
+  sender      User     @relation("sentInvites", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("receivedInvites", fields: [receiverId], references: [id], onDelete: Cascade)
+  subject     Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  status      String   @default("PENDING") // PENDING, ACCEPTED, DECLINED
+  createdAt   DateTime @default(now())
+}
+
+// ─── Economy Models ──────────────────────────────────────────
+
+model InventoryItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemKey   String   // MONARCHS_DECREE, SHADOW_EXTRACTION, GATE_KEY, KAMISH_WARD, ELIXIR_OF_INSIGHT
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SylphLedger {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int      // Positive for income, negative for expense
+  source    String   // QUEST, TIMER, LEVEL_UP, SHOP, SYSTEM
+  createdAt DateTime @default(now())
 }

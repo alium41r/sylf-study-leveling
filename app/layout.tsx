@@ -1,21 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Rajdhani } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
+import { AuthProvider } from "./components/AuthProvider";
+import { ThemeProvider } from "./components/ThemeProvider";
+import SidebarWrapper from "./components/SidebarWrapper";
+import { GlobalSystemWrapper } from "./components/GlobalSystemWrapper";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const rajdhani = Rajdhani({
+  variable: "--font-rajdhani",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Arbisoft Internship SPA",
-  description: "Phase 1 Web Application",
+  title: "The System | Study Leveling",
+  description:
+    "An AI-driven gamified study tracker inspired by Solo Leveling. Level up your knowledge. The System is watching.",
 };
 
 export default function RootLayout({
@@ -26,42 +33,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${rajdhani.variable} h-full`}
     >
-      <body className="min-h-full flex flex-col">
-        {/* Shared Navigation Component */}
-        <nav className="w-full flex justify-center gap-8 p-6 border-b border-gray-800">
-          <Link href="/" className="hover:text-blue-400 transition-colors">
-            Home
-          </Link>
-          <Link href="/about" className="hover:text-blue-400 transition-colors">
-            About
-          </Link>
-          <Link
-            href="/contact"
-            className="hover:text-blue-400 transition-colors"
-          >
-            Contact
-          </Link>
-          <Link href="/users" className="hover:text-blue-400 transition-colors">
-            Users
-          </Link>
-          <Link href="/notes" className="hover:text-blue-400 transition-colors">
-            Notes
-          </Link>
-          <Link href="/register" className="hover:text-blue-400 transition-colors">
-            Register
-          </Link>
-          <Link href="/login" className="hover:text-blue-400 transition-colors">
-            Log In
-          </Link>
-
-        </nav>
-
-        {/* Dynamic Route Payload */}
-        <main className="flex-grow">{children}</main>
+      <body className="min-h-full flex">
+        <ThemeProvider>
+          <AuthProvider>
+            <GlobalSystemWrapper>
+              <SidebarWrapper />
+              <main className="flex-grow min-h-screen">{children}</main>
+            </GlobalSystemWrapper>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
-

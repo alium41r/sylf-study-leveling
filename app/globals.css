@@ -1,26 +1,704 @@
 @import "tailwindcss";
 
+/* ============================================================
+   THE SYSTEM — Solo Leveling Design System
+   ============================================================
+   Dark, atmospheric aesthetic inspired by Solo Leveling manhwa.
+   Deep blacks/navy, electric purple/blue accents, gold highlights.
+   ============================================================ */
+
+/* ─── CSS Custom Properties (Design Tokens) ─────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core backgrounds */
+  --bg-void: #05050f;        /* Deepest black — page background */
+  --bg-abyss: #0a0a1a;      /* Card backgrounds */
+  --bg-shadow: #0f0f2a;     /* Elevated surfaces */
+  --bg-panel: #141432;       /* Panel/sidebar background */
+
+  /* ─── Unified Theme Accent ─────────────────────────────
+     All UI chrome derives from these. Override these to re-theme
+     the entire app with a single color family (like iPhone tinting).
+     ──────────────────────────────────────────────────────── */
+  --accent-primary: #7c3aed;        /* The main tint — used everywhere */
+  --accent-primary-light: #a78bfa;  /* Lighter shade — text, labels */
+  --accent-primary-dim: rgba(124, 58, 237, 0.15);  /* Ultra-subtle — backgrounds */
+  --accent-primary-mid: rgba(124, 58, 237, 0.4);   /* Medium — active borders */
+
+  /* Legacy aliases — kept so existing code doesn't break */
+  --accent-purple: var(--accent-primary);
+  --accent-cyan: var(--accent-primary-light);
+  --accent-blue: var(--accent-primary);
+
+  /* Semantic Colors — these DON'T change with themes */
+  --accent-gold: #f59e0b;    /* Gold/XP/rewards */
+  --accent-red: #ef4444;     /* HP loss / danger / failed */
+  --accent-green: #22c55e;   /* Success / completed / HP high */
+
+  /* Text */
+  --text-primary: #e2e8f0;   /* Main text */
+  --text-secondary: #94a3b8; /* Muted text */
+  --text-muted: #475569;     /* Very subtle text */
+  --text-system: var(--accent-primary-light); /* System message text */
+
+  /* Glow Effects — derived from accent-primary */
+  --glow-purple: 0 0 20px var(--accent-primary-dim), 0 0 60px rgba(124, 58, 237, 0.08);
+  --glow-blue: 0 0 20px var(--accent-primary-dim), 0 0 60px rgba(124, 58, 237, 0.08);
+  --glow-gold: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 60px rgba(245, 158, 11, 0.1);
+  --glow-red: 0 0 20px rgba(239, 68, 68, 0.3);
+  --glow-green: 0 0 15px rgba(34, 197, 94, 0.3);
+
+  /* Borders — derived from accent-primary */
+  --border-subtle: var(--accent-primary-dim);
+  --border-active: var(--accent-primary-mid);
+
+  /* Spacing */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 72px;
+
+  /* Tailwind overrides */
+  --background: var(--bg-void);
+  --foreground: var(--text-primary);
 }
+
+/* ─── Theme Variants ────────────────────────────────────────── */
+[data-theme="monarch"] {
+  --bg-void: #000000;
+  --bg-abyss: #0a0510;
+  --bg-shadow: #100a1a;
+  --bg-panel: #140c24;
+  
+  --accent-primary: #facc15;       /* Yellow-400 */
+  --accent-primary-light: #fef08a; /* Yellow-200 */
+  --accent-primary-dim: rgba(250, 204, 21, 0.15);
+  --accent-primary-mid: rgba(250, 204, 21, 0.4);
+
+  --text-system: var(--accent-primary-light);
+  --glow-purple: 0 0 20px rgba(250, 204, 21, 0.2), 0 0 60px rgba(250, 204, 21, 0.08);
+}
+
+[data-theme="cyberpunk"] {
+  --bg-void: #050b14;
+  --bg-abyss: #0a192f;
+  --bg-shadow: #112240;
+  --bg-panel: #172a45;
+  
+  --accent-primary: #06b6d4;       /* Cyan-500 */
+  --accent-primary-light: #67e8f9; /* Cyan-300 */
+  --accent-primary-dim: rgba(6, 182, 212, 0.15);
+  --accent-primary-mid: rgba(6, 182, 212, 0.4);
+
+  --text-system: var(--accent-primary-light);
+  --glow-purple: 0 0 20px rgba(6, 182, 212, 0.2), 0 0 60px rgba(6, 182, 212, 0.08);
+}
+
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-rajdhani), var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base Styles ───────────────────────────────────────────── */
+html, body {
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  overscroll-behavior-y: none;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ─── System Window Card ────────────────────────────────────── */
+/* The signature UI element — translucent panels like Solo Leveling */
+.system-card {
+  background: linear-gradient(135deg, var(--bg-abyss) 0%, var(--bg-shadow) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.system-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+  opacity: 0.6;
+}
+
+.system-card:hover {
+  border-color: var(--border-active);
+  box-shadow: var(--glow-purple);
+}
+
+/* ─── Rank Badges ──────────────────────────────────────────── */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  border: 2px solid;
+}
+
+.rank-E { border-color: #6b7280; color: #6b7280; background: rgba(107, 114, 128, 0.1); }
+.rank-D { border-color: #22c55e; color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+.rank-C { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.rank-B { border-color: #a855f7; color: #a855f7; background: rgba(168, 85, 247, 0.1); }
+.rank-A { border-color: #f59e0b; color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.rank-S { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.1); box-shadow: var(--glow-red); }
+
+/* ─── Progress Bars ──────────────────────────────────────────── */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+  animation: shimmer 2s infinite;
+}
+
+.xp-fill {
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+  box-shadow: var(--glow-purple);
+}
+
+.hp-fill {
+  background: linear-gradient(90deg, var(--accent-red), #f97316);
+}
+
+.hp-fill.hp-low {
+  animation: hp-pulse 1.5s ease-in-out infinite;
+}
+
+/* ─── Stat Display ───────────────────────────────────────────── */
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* ─── Quest Status Badges ────────────────────────────────────── */
+.quest-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.quest-pending   { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+.quest-progress  { background: rgba(59, 130, 246, 0.15);  color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+.quest-completed { background: rgba(34, 197, 94, 0.15);   color: #22c55e; }
+.quest-failed    { background: rgba(239, 68, 68, 0.15);   color: #ef4444; }
+
+/* ─── Buttons ────────────────────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  box-shadow: var(--glow-purple);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--border-active);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: var(--accent-primary-dim);
+  box-shadow: var(--glow-purple);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--accent-red), #dc2626);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover {
+  box-shadow: var(--glow-red);
+}
+
+/* ─── Form Inputs ────────────────────────────────────────────── */
+.input-field {
+  background: var(--bg-abyss);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-primary-dim);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+/* ─── System Message Bubbles ────────────────────────────────── */
+.system-message {
+  padding: 16px;
+  border-radius: 4px;
+  border-left: 3px solid;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  animation: message-fade-in 0.4s ease-out;
+}
+
+.msg-info    { border-color: var(--accent-blue);   background: rgba(59, 130, 246, 0.08); }
+.msg-quest   { border-color: var(--accent-purple); background: rgba(124, 58, 237, 0.08); }
+.msg-warning { border-color: var(--accent-red);    background: rgba(239, 68, 68, 0.08); }
+.msg-reward  { border-color: var(--accent-gold);   background: rgba(245, 158, 11, 0.08); }
+.msg-levelup { border-color: var(--accent-cyan);   background: rgba(6, 182, 212, 0.08); box-shadow: var(--glow-blue); }
+
+/* ─── Animations ─────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { opacity: 0; transform: translateX(-20px); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(20px); }
+}
+
+@keyframes hp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: var(--glow-purple); }
+  50% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.5), 0 0 80px rgba(124, 58, 237, 0.2); }
+}
+
+@keyframes message-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes level-up-flash {
+  0% { opacity: 0; transform: scale(0.8); }
+  20% { opacity: 1; transform: scale(1.05); }
+  40% { transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ─── Settings Panel ─────────────────────────────────────────── */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(5, 5, 15, 0.92);
+  backdrop-filter: blur(12px);
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.settings-overlay.settings-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-close-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 65;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 20, 50, 0.7);
+  border: 1px solid var(--accent-primary-mid);
+  border-radius: 8px;
+  color: var(--accent-primary-light);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.settings-close-btn:hover {
+  background: var(--accent-primary-dim);
+  box-shadow: 0 0 20px var(--accent-primary-mid);
+}
+
+.settings-category-card {
+  background: linear-gradient(135deg, rgba(10, 10, 26, 0.8) 0%, rgba(15, 15, 42, 0.6) 100%);
+  border: 1px solid var(--accent-primary-dim);
+  border-radius: 8px;
+  padding: 20px;
+  position: relative;
+}
+
+.settings-category-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary-mid), transparent);
+}
+
+.settings-category-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent-cyan);
+  margin-bottom: 16px;
+}
+
+.settings-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px;
+  background: rgba(15, 20, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  min-height: 100px;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: settings-tile-in 0.4s ease forwards;
+}
+
+.settings-tile:hover {
+  background: rgba(20, 30, 60, 0.8);
+  border-color: var(--accent-primary-mid);
+  box-shadow: 0 0 20px var(--accent-primary-dim), inset 0 0 20px rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
+}
+
+.settings-tile-icon {
+  color: var(--text-secondary);
+  transition: color 0.25s ease;
+}
+
+.settings-tile:hover .settings-tile-icon {
+  color: var(--accent-cyan);
+}
+
+.settings-tile-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  transition: color 0.25s ease;
+}
+
+.settings-tile:hover .settings-tile-label {
+  color: var(--text-primary);
+}
+
+.settings-tile-danger {
+  background: rgba(60, 15, 25, 0.4);
+  border-color: rgba(239, 68, 68, 0.1);
+}
+
+.settings-tile-danger:hover {
+  background: rgba(80, 20, 30, 0.6);
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.settings-tile-danger .settings-tile-icon {
+  color: rgba(239, 68, 68, 0.6);
+}
+
+.settings-tile-danger:hover .settings-tile-icon {
+  color: var(--accent-red);
+}
+
+.settings-tile-danger:hover .settings-tile-label {
+  color: var(--accent-red);
+}
+
+/* Staggered tile animation */
+@keyframes settings-tile-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Settings page (stub pages) */
+.settings-page-container {
+  min-height: 100vh;
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.settings-page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(20, 20, 50, 0.5);
+  color: var(--text-secondary);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  margin-bottom: 32px;
+}
+
+.settings-page-back:hover {
+  color: var(--accent-primary-light);
+  border-color: var(--accent-primary-mid);
+  background: var(--accent-primary-dim);
+}
+
+.settings-page-header {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.settings-page-breadcrumb {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent-cyan);
+  margin-bottom: 24px;
+}
+
+.settings-page-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, var(--bg-abyss) 0%, var(--bg-shadow) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.settings-page-placeholder-icon {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.settings-page-placeholder-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+/* ─── Utility Classes ────────────────────────────────────────── */
+.text-system   { color: var(--text-system); }
+.text-gold     { color: var(--accent-gold); }
+.text-danger   { color: var(--accent-red); }
+.text-success  { color: var(--accent-green); }
+.text-muted    { color: var(--text-secondary); }
+.glow-purple   { box-shadow: var(--glow-purple); }
+.glow-gold     { box-shadow: var(--glow-gold); }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-glow  { animation: glow-pulse 3s ease-in-out infinite; }
+
+/* ─── Theme-Aware Utilities ──────────────────────────────────── */
+/* Use these instead of hardcoded Tailwind purple/cyan classes */
+.text-accent        { color: var(--accent-primary) !important; }
+.text-accent-light  { color: var(--accent-primary-light) !important; }
+.bg-accent-dim      { background-color: var(--accent-primary-dim) !important; }
+.bg-accent-mid      { background-color: var(--accent-primary-mid) !important; }
+.border-accent-dim  { border-color: var(--accent-primary-dim) !important; }
+.border-accent-mid  { border-color: var(--accent-primary-mid) !important; }
+.dot-accent         { background-color: var(--accent-primary-light) !important; }
+
+/* ─── Custom Scrollbar for Chat ──────────────────────────────── */
+.chat-scroll {
+  overflow-y: scroll; /* Forces a permanent scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-primary-mid) rgba(255, 255, 255, 0.02);
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: var(--accent-primary-mid);
+  border-radius: 8px;
+  border: 2px solid var(--bg-abyss);
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.3s ease-out forwards;
+}
+
+@keyframes streak-bounce {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.15) rotate(-5deg); }
+  50% { transform: scale(1.25) rotate(5deg); }
+  70% { transform: scale(1.1) rotate(-3deg); }
+}
+
+.animate-streak-bounce {
+  animation: streak-bounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2;
+}
+
+/* Custom Scrollbar for Notifications Dropdown */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes exp-glow {
+  0% { box-shadow: 0 0 5px rgba(167, 139, 250, 0.4); }
+  50% { box-shadow: 0 0 15px rgba(34, 211, 238, 0.6); }
+  100% { box-shadow: 0 0 5px rgba(167, 139, 250, 0.4); }
+}
+
+.animate-exp-glow {
+  animation: exp-glow 3s infinite;
 }

@@ -106,8 +106,8 @@ export default function TimerPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="mb-8">
         <p
-          className="text-xs tracking-widest mb-1"
-          style={{ color: "var(--accent-cyan)", fontFamily: "'Rajdhani', sans-serif" }}
+          className="text-xs tracking-widest mb-1 text-accent-light"
+          style={{ fontFamily: "'Rajdhani', sans-serif" }}
         >
           STUDY TIMER
         </p>
@@ -118,16 +118,16 @@ export default function TimerPage() {
 
       {/* ─── Cumulative Timer Display ──────────────────────────── */}
       <div className="system-card p-10 text-center mb-10 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50" />
+        <div className="absolute top-0 left-0 w-full h-1 opacity-50" style={{ background: "linear-gradient(to right, transparent, var(--accent-primary-light), transparent)" }} />
         
         <p className="text-sm font-bold tracking-widest uppercase mb-4 text-gray-400" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
           DAILY FOCUS - {new Date().toISOString().split("T")[0].replace(/-/g, ".")}
         </p>
         
         <p
-          className="text-6xl md:text-8xl font-bold font-mono tracking-wider mb-2 text-cyan-400"
+          className="text-6xl md:text-8xl font-bold font-mono tracking-wider mb-2 text-accent-light"
           style={{
-            textShadow: "0 0 30px rgba(6, 182, 212, 0.4)",
+            textShadow: "0 0 30px var(--accent-primary-mid)",
           }}
         >
           {formatTime(cumulativeSeconds)}
@@ -147,12 +147,12 @@ export default function TimerPage() {
           subjects.map((subject) => (
             <div 
               key={subject.id} 
-              className="system-card p-4 flex items-center justify-between hover:border-cyan-400/30 transition-colors"
+              className="system-card p-4 flex items-center justify-between hover:border-accent-dim transition-colors"
             >
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => handleStartFocus(subject.id, subject.name)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center bg-cyan-900/30 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-colors"
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-accent-dim text-accent-light hover:bg-accent-mid hover:text-white transition-colors"
                 >
                   <svg className="w-5 h-5 ml-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
@@ -173,7 +173,7 @@ export default function TimerPage() {
         {!showAddSubject ? (
           <button
             onClick={() => setShowAddSubject(true)}
-            className="w-full system-card p-6 flex flex-col items-center justify-center text-gray-400 hover:text-cyan-400 hover:border-cyan-400/50 transition-colors border-dashed"
+            className="w-full system-card p-6 flex flex-col items-center justify-center text-gray-400 hover:text-accent-light hover:border-accent-dim transition-colors border-dashed"
           >
             <div className="w-12 h-12 rounded border border-current flex items-center justify-center mb-3">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,7 +198,7 @@ export default function TimerPage() {
                 value={newSubjectName}
                 onChange={(e) => setNewSubjectName(e.target.value)}
                 placeholder="e.g. Mathematics, History"
-                className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-cyan-400"
+                className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-accent-mid transition-colors"
               />
             </div>
             <div className="flex justify-end gap-3">
@@ -212,7 +212,7 @@ export default function TimerPage() {
               <button
                 type="submit"
                 disabled={isAdding}
-                className="px-6 py-2 bg-cyan-900/50 text-cyan-400 border border-cyan-400/30 rounded hover:bg-cyan-400 hover:text-black transition-colors font-bold tracking-wider text-sm uppercase"
+                className="px-6 py-2 bg-accent-dim text-accent-light border border-accent-dim rounded hover:bg-accent-mid hover:text-white transition-colors font-bold tracking-wider text-sm uppercase"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 {isAdding ? "Adding..." : "Add Subject"}

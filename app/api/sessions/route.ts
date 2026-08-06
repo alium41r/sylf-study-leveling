@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { calculateStreak, awardXP, calculateTimerSylph, getStreakMultiplier } from "@/lib/game-engine";
+import { calculateStreak, awardXP, calculateTimerSylph, getStreakMultiplier, getLongSessionMultiplier } from "@/lib/game-engine";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
@@ -11,7 +11,9 @@ const startSessionSchema = z.object({
 
 const endSessionSchema = z.object({
   id: z.number().int(),
-  durationMinutes: z.number().int().min(1),
+  durationMinutes: z.number().int().min(0),
+  durationSeconds: z.number().int().min(0).optional(),
+  questId: z.number().int().optional(),
 });
 
 /**
@@ -45,6 +47,7 @@ export async function POST(req: NextRequest) {
         questId: validation.data.questId || null,
         subjectId: validation.data.subjectId || null,
         durationMinutes: 0,
+        durationSeconds: 0,
         startedAt: new Date(),
       },
     });
@@ -88,7 +91,8 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const { id, durationMinutes } = validation.data;
+    const { id, durationMinutes, durationSeconds, questId } = validation.data;
+    const actualSeconds = durationSeconds ?? (durationMinutes * 60);
 
     // Verify session ownership
     const existing = await prisma.studySession.findFirst({
@@ -102,6 +106,7 @@ export async function PATCH(req: NextRequest) {
       where: { id },
       data: {
         durationMinutes,
+        durationSeconds: actualSeconds,
         endedAt: new Date(),
       },
     });
@@ -144,17 +149,36 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    // Calculate XP based on cumulative daily minutes to prevent rounding losses
-    const previousTodayMinutes = Math.max(0, todayMinutes - durationMinutes);
-    const totalXpForToday = Math.floor(todayMinutes * 1.5);
-    const previousXpForToday = Math.floor(previousTodayMinutes * 1.5);
-    const xpGained = totalXpForToday - previousXpForToday;
-    const result = awardXP(user!.level, user!.currentXP, user!.xpToNextLevel, xpGained);
+    // Meaningful Focus System: Exact second-based rewards, 0 rewards if < 60s
+    let xpGained = 0;
+    let finalSylph = 0;
+    let result = { 
+      newLevel: user!.level, 
+      newCurrentXP: user!.currentXP, 
+      newXPToNextLevel: user!.xpToNextLevel, 
+      newRank: user!.hunterRank, 
+      previousRank: user!.hunterRank, 
+      levelsGained: 0, 
+      didRankUp: false 
+    };
 
-    // Calculate Sylph for this session
-    const baseSylph = calculateTimerSylph(durationMinutes);
-    const multiplier = getStreakMultiplier(newStreak);
-    const finalSylph = Math.floor(baseSylph * multiplier);
+    if (actualSeconds >= 60) {
+      const exactMinutes = actualSeconds / 60;
+      
+      // Base rewards
+      const baseXp = exactMinutes * 1.5;
+      const baseSylph = calculateTimerSylph(exactMinutes);
+      
+      // Multipliers
+      const sessionMultiplier = getLongSessionMultiplier(exactMinutes);
+      const streakMult = getStreakMultiplier(newStreak);
+      
+      // Final applied rewards (rounded down to integer)
+      xpGained = Math.floor(baseXp * sessionMultiplier);
+      finalSylph = Math.floor(baseSylph * streakMult * sessionMultiplier);
+      
+      result = awardXP(user!.level, user!.currentXP, user!.xpToNextLevel, xpGained);
+    }
     
     // Level-up stipend
     const levelUpSylph = result.levelsGained > 0 ? result.newLevel * 300 : 0;
@@ -166,6 +190,7 @@ export async function PATCH(req: NextRequest) {
         where: { id: user!.id },
         data: {
           totalStudyMinutes: { increment: durationMinutes },
+          totalStudySeconds: { increment: actualSeconds },
           streakDays: newStreak,
           lastActiveDate: newLastActiveDate,
           level: result.newLevel,
@@ -201,15 +226,64 @@ export async function PATCH(req: NextRequest) {
         });
       }
       
-      // Sylph reward message if earned
-      if (finalSylph > 0) {
-         await tx.systemMessage.create({
+      // Handle Quest Completion
+      if (questId) {
+        const quest = await tx.quest.findFirst({ where: { id: questId, userId: user!.id } });
+        if (quest && quest.status !== "COMPLETED" && actualSeconds >= quest.requiredMinutes * 60) {
+          const qXp = quest.xpReward;
+          const qSylph = quest.sylphReward;
+          
+          const qResult = awardXP(result.newLevel, result.newCurrentXP, result.newXPToNextLevel, qXp);
+          
+          await tx.quest.update({
+            where: { id: quest.id },
+            data: { status: "COMPLETED", completedAt: new Date() }
+          });
+
+          await tx.user.update({
+            where: { id: user!.id },
             data: {
-               userId: user!.id,
-               content: `**Focus Complete**\n\nYou studied for ${durationMinutes} minutes.\n\nRewards Obtained:\n• +${xpGained} XP\n• +${finalSylph} Sylph${multiplier > 1 ? ` (Streak x${multiplier})` : ""}`,
-               type: "REWARD"
+              level: qResult.newLevel,
+              currentXP: qResult.newCurrentXP,
+              xpToNextLevel: qResult.newXPToNextLevel,
+              hunterRank: qResult.newRank,
+              sylph: { increment: qSylph }
             }
-         });
+          });
+
+          if (qSylph > 0) {
+            await tx.sylphLedger.create({
+              data: { userId: user!.id, amount: qSylph, source: "QUEST" }
+            });
+          }
+
+          await tx.systemMessage.create({
+            data: {
+              userId: user!.id,
+              content: `**Quest Complete**\n\n"${quest.title}"\n\nRewards:\n• +${qXp} XP\n• +${qSylph} Sylph`,
+              type: "REWARD"
+            }
+          });
+
+          if (qResult.levelsGained > 0) {
+            const qLevelUpSylph = qResult.newLevel * 300;
+            await tx.user.update({
+              where: { id: user!.id },
+              data: { sylph: { increment: qLevelUpSylph } }
+            });
+            await tx.sylphLedger.create({
+              data: { userId: user!.id, amount: qLevelUpSylph, source: "LEVEL_UP" }
+            });
+            const qRankUpText = qResult.didRankUp ? `\n\nRank Up! You are now a ${qResult.newRank}-Rank Hunter.` : "";
+            await tx.systemMessage.create({
+              data: {
+                userId: user!.id,
+                content: `**Level Up**\n\nYou have reached Level ${qResult.newLevel}.${qRankUpText}\n\nStipend: +${qLevelUpSylph} Sylph\n\nYou have grown stronger.`,
+                type: "LEVEL_UP",
+              },
+            });
+          }
+        }
       }
     });
 

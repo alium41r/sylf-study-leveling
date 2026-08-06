@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { SignJWT } from "jose";
 import { prisma } from "@/lib/prisma";
+import { xpForNextLevel } from "@/lib/game-engine";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
           hunterRank: user.hunterRank,
           level: user.level,
           currentXP: user.currentXP,
-          xpToNextLevel: user.xpToNextLevel,
+          xpToNextLevel: xpForNextLevel(user.level),
           hp: user.hp,
           maxHp: user.maxHp,
           streakDays: user.streakDays,

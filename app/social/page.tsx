@@ -248,7 +248,9 @@ export default function SocialPage() {
                           {req.sender.hunterRank}
                         </div>
                         <div>
-                          <p className="text-sm font-medium">{req.sender.name || req.sender.username}</p>
+                          <Link href={`/profile/${req.sender.username}`} className="text-sm font-medium hover:underline hover:text-white transition-colors block">
+                            {req.sender.name || req.sender.username}
+                          </Link>
                           <p className="text-xs text-gray-400">@{req.sender.username} • Lv. {req.sender.level}</p>
                         </div>
                       </div>
@@ -284,7 +286,9 @@ export default function SocialPage() {
                           <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[#050505] ${friend.isOnline ? 'bg-green-500' : 'bg-gray-500'}`} />
                         </div>
                         <div>
-                          <p className="font-medium">{friend.name || friend.username}</p>
+                          <Link href={`/profile/${friend.username}`} className="font-medium hover:underline hover:text-white transition-colors block">
+                            {friend.name || friend.username}
+                          </Link>
                           <p className="text-xs text-gray-400">@{friend.username} • Lv. {friend.level} • {friend.todayMinutes}m study today</p>
                         </div>
                       </div>

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
+import { xpForNextLevel } from "@/lib/game-engine";
+
 /**
  * GET /api/user/stats
  * Returns the authenticated user's full RPG stats.
@@ -30,21 +32,25 @@ export async function GET(req: NextRequest) {
         hunterRank: true,
         level: true,
         currentXP: true,
-        xpToNextLevel: true,
         hp: true,
         maxHp: true,
         streakDays: true,
         totalStudyMinutes: true,
         lastActiveDate: true,
         createdAt: true,
+        sylph: true,
       },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    
+    // Always calculate the exact XP to next level based on the engine
+    // to instantly sync any formula changes without requiring a DB migration.
+    const xpToNextLevel = xpForNextLevel(user.level);
 
-    return NextResponse.json(user, { status: 200 });
+    return NextResponse.json({ ...user, xpToNextLevel }, { status: 200 });
   } catch {
     return NextResponse.json(
       { error: "Internal server error" },

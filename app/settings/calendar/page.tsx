@@ -104,7 +104,7 @@ function DayCell({
           fontFamily: "'Rajdhani', sans-serif",
           fontWeight: isToday ? 700 : 500,
           fontSize: "0.85rem",
-          color: isToday ? "var(--accent-cyan)" : minutes > 0 ? "var(--text-primary)" : "var(--text-muted)",
+          color: isToday ? "var(--accent-cyan)" : (minutes > 0 || (dayData?.quests ?? 0) > 0) ? "var(--text-primary)" : "var(--text-muted)",
         }}
       >
         {day}
@@ -121,8 +121,20 @@ function DayCell({
           {minutes < 60 ? `${minutes}m` : `${Math.floor(minutes / 60)}h`}
         </span>
       )}
+      {(dayData?.quests ?? 0) > 0 && minutes === 0 && (
+        <span
+          style={{
+            fontFamily: "'Rajdhani', sans-serif",
+            fontSize: "0.55rem",
+            color: "var(--accent-green)",
+            fontWeight: 600,
+          }}
+        >
+          {dayData!.questsCompleted}/{dayData!.quests} Q
+        </span>
+      )}
       {/* Streak indicator dot */}
-      {minutes > 0 && (
+      {(minutes > 0 || (dayData?.quests ?? 0) > 0) && (
         <div
           style={{
             position: "absolute",
@@ -131,7 +143,7 @@ function DayCell({
             width: "4px",
             height: "4px",
             borderRadius: "50%",
-            background: minutes >= 60 ? "var(--accent-gold)" : "var(--accent-purple)",
+            background: minutes >= 60 ? "var(--accent-gold)" : (dayData?.quests ?? 0) > 0 ? "var(--accent-green)" : "var(--accent-purple)",
             boxShadow: minutes >= 60 ? "0 0 4px var(--accent-gold)" : "none",
           }}
         />
@@ -254,11 +266,11 @@ export default function CalendarSettingsPage() {
       fetch("/api/user/detailed-stats", {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => r.json()),
-      fetch(`/api/quests?date=${startDate}`, {
+      fetch(`/api/quests?all=true`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => r.json()).catch(() => []),
     ])
-      .then(([statsData]) => {
+      .then(([statsData, allQuests]) => {
         // Build day map from sessions data
         const daysInMonth = getDaysInMonth(year, month);
         const dayMap: Record<string, DayData> = {};
@@ -278,8 +290,20 @@ export default function CalendarSettingsPage() {
           }
         }
 
+        // Map Quests to days
+        if (Array.isArray(allQuests)) {
+          for (const quest of allQuests) {
+            if (quest.scheduledFor && dayMap[quest.scheduledFor]) {
+              dayMap[quest.scheduledFor].quests += 1;
+              if (quest.status === "COMPLETED") {
+                dayMap[quest.scheduledFor].questsCompleted += 1;
+              }
+            }
+          }
+        }
+
         const days = Object.values(dayMap);
-        const activeDays = days.filter((d) => d.minutes > 0).length;
+        const activeDays = days.filter((d) => d.minutes > 0 || d.quests > 0).length;
         const totalMinutes = days.reduce((sum, d) => sum + d.minutes, 0);
         const totalSessions = days.reduce((sum, d) => sum + d.sessions, 0);
 

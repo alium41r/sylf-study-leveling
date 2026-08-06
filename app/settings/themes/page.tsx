@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import BackToSettings from "../../components/BackToSettings";
 import { THEME_MAP } from "../../components/GlobalSystemWrapper";
+import { useAuth } from "../../components/AuthProvider";
+import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -125,31 +127,77 @@ function MiniPreview({ theme }: { theme: ThemeOption }) {
 /* ─── Main Page ─────────────────────────────────────────────── */
 
 export default function ThemesSettingsPage() {
+  const { user, token, mutateUser } = useAuth();
   const [appliedThemeId, setAppliedThemeId] = useState<string>("cyberpunk");
   const [showApplied, setShowApplied] = useState(false);
+  const [cosmetics, setCosmetics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("app_theme");
-    if (saved && THEMES.find((t) => t.id === saved)) {
-      setAppliedThemeId(saved);
-    }
-  }, []);
+    if (!token) return;
+    
+    fetch("/api/cosmetics", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setCosmetics(data.cosmetics || []);
+        if (data.active?.activeTheme) {
+          setAppliedThemeId(data.active.activeTheme);
+        } else {
+          const saved = localStorage.getItem("app_theme");
+          if (saved && THEMES.find((t) => t.id === saved)) {
+            setAppliedThemeId(saved);
+          }
+        }
+      })
+      .catch(console.error);
+  }, [token]);
 
-  const handleApplyTheme = (theme: ThemeOption) => {
-    setAppliedThemeId(theme.id);
-    localStorage.setItem("app_theme", theme.id);
-
-    // Apply CSS variables globally
-    const vars = THEME_MAP[theme.id];
-    if (vars) {
-      for (const [prop, val] of Object.entries(vars)) {
-        document.documentElement.style.setProperty(prop, val);
-      }
-    }
-
-    setShowApplied(true);
-    setTimeout(() => setShowApplied(false), 2000);
+  const hasCosmetic = (itemKey: string) => {
+    if (itemKey === "cyberpunk") return true;
+    return cosmetics.some(c => c.category === "THEME" && c.itemKey === itemKey);
   };
+
+  const handleApplyTheme = async (theme: ThemeOption) => {
+    if (!hasCosmetic(theme.id)) return;
+    if (loading) return;
+    
+    setLoading(true);
+    try {
+      const res = await fetch("/api/cosmetics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ category: "THEME", itemKey: theme.id })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setAppliedThemeId(theme.id);
+        localStorage.setItem("app_theme", theme.id);
+        mutateUser(data.user);
+
+        // Apply CSS variables globally
+        const vars = THEME_MAP[theme.id];
+        if (vars) {
+          for (const [prop, val] of Object.entries(vars)) {
+            document.documentElement.style.setProperty(prop, val);
+          }
+        }
+
+        setShowApplied(true);
+        setTimeout(() => setShowApplied(false), 2000);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) return <div className="p-8 text-center text-gray-400">Loading...</div>;
 
   return (
     <div className="settings-page-container">
@@ -168,7 +216,7 @@ export default function ThemesSettingsPage() {
         }}
       >
         Choose one accent colour. Every button, glow, border, and highlight across the
-        entire app transforms to match — like iPhone tinting.
+        entire app transforms to match — like iPhone tinting. Complete achievements to unlock more!
       </p>
 
       {/* Applied Toast */}
@@ -215,6 +263,8 @@ export default function ThemesSettingsPage() {
       >
         {THEMES.map((theme, i) => {
           const isApplied = theme.id === appliedThemeId;
+          const unlocked = hasCosmetic(theme.id);
+          const catalogInfo = COSMETICS_CATALOG.THEME.find(t => t.id === theme.id);
 
           return (
             <div
@@ -227,18 +277,21 @@ export default function ThemesSettingsPage() {
                   ? `2px solid ${theme.color}`
                   : "2px solid rgba(255,255,255,0.04)",
                 boxShadow: isApplied ? `0 0 25px ${theme.color}30` : "none",
-                cursor: "pointer",
+                cursor: unlocked ? "pointer" : "not-allowed",
                 transition: "all 0.3s ease",
                 animation: `fadeInUp 0.4s ease forwards ${i * 0.06}s`,
                 opacity: 0,
+                position: "relative"
               }}
             >
               {/* Gradient Banner */}
-              <div style={{ height: "5px", background: theme.color }} />
+              <div style={{ height: "5px", background: unlocked ? theme.color : "#444" }} />
 
               <div style={{ padding: "16px", background: "rgba(10,10,18,0.95)" }}>
                 {/* Mini Preview */}
-                <MiniPreview theme={theme} />
+                <div style={{ opacity: unlocked ? 1 : 0.2, filter: unlocked ? "none" : "grayscale(100%) blur(1px)" }}>
+                  <MiniPreview theme={theme} />
+                </div>
 
                 {/* Theme Info */}
                 <div style={{ marginTop: "14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -248,7 +301,7 @@ export default function ThemesSettingsPage() {
                         fontFamily: "'Rajdhani', sans-serif",
                         fontWeight: 700,
                         fontSize: "1rem",
-                        color: isApplied ? theme.color : "var(--text-primary)",
+                        color: isApplied ? theme.color : (unlocked ? "var(--text-primary)" : "var(--text-muted)"),
                         textTransform: "uppercase",
                         letterSpacing: "0.05em",
                         marginBottom: "2px",
@@ -268,14 +321,15 @@ export default function ThemesSettingsPage() {
                     </p>
                   </div>
 
-                  {/* Color swatch + check */}
+                  {/* Status Indicator */}
                   <div
                     style={{
                       width: "32px",
                       height: "32px",
                       borderRadius: "50%",
-                      background: theme.color,
-                      border: "3px solid rgba(0,0,0,0.4)",
+                      background: unlocked ? theme.color : "transparent",
+                      border: "3px solid",
+                      borderColor: unlocked ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.1)",
                       flexShrink: 0,
                       display: "flex",
                       alignItems: "center",
@@ -288,8 +342,21 @@ export default function ThemesSettingsPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     )}
+                    {!unlocked && (
+                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    )}
                   </div>
                 </div>
+                
+                {!unlocked && catalogInfo && (
+                  <div style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                    <p style={{ fontSize: "0.7rem", fontFamily: "'Rajdhani', sans-serif", fontWeight: "bold", letterSpacing: "0.05em", color: "var(--text-muted)" }}>
+                      REQ: {catalogInfo.unlockCondition}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           );

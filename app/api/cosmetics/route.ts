@@ -1,0 +1,86 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
+
+export async function GET(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = await verifyToken(authHeader.split(" ")[1]);
+    if (!payload) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    // @ts-ignore - Prisma types are cached in IDE
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId as number },
+      // @ts-ignore
+      include: { cosmetics: true },
+    }) as any;
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      cosmetics: user.cosmetics,
+      active: {
+        activeTheme: user.activeTheme,
+        activeBackground: user.activeBackground,
+        activeAvatar: user.activeAvatar,
+        activeFrame: user.activeFrame,
+        activeTitle: user.activeTitle,
+        activeNameColor: user.activeNameColor,
+      },
+    }, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/cosmetics error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = await verifyToken(authHeader.split(" ")[1]);
+    if (!payload) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { category, itemKey } = body;
+    
+    if (!category || !itemKey) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Determine the field to update based on category
+    let updateData: any = {};
+    if (category === "THEME") updateData.activeTheme = itemKey;
+    else if (category === "BACKGROUND") updateData.activeBackground = itemKey;
+    else if (category === "AVATAR") updateData.activeAvatar = itemKey;
+    else if (category === "FRAME") updateData.activeFrame = itemKey;
+    else if (category === "TITLE") updateData.activeTitle = itemKey;
+    else if (category === "NAME_COLOR") updateData.activeNameColor = itemKey;
+    else {
+      return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+    }
+
+    const user = await prisma.user.update({
+      where: { id: payload.userId as number },
+      data: updateData,
+    });
+
+    return NextResponse.json({ success: true, user }, { status: 200 });
+  } catch (error) {
+    console.error("POST /api/cosmetics error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

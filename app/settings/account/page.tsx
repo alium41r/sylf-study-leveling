@@ -1,6 +1,14 @@
 "use client";
 
 import BackToSettings from "../../components/BackToSettings";
+import SettingsSectionCard from "../../components/SettingsSectionCard";
+import AccountInformation from "./AccountInformation";
+import SecurityInformation from "./SecurityInformation";
+import PrivacyInformation from "./PrivacyInformation";
+import ConnectedAccounts from "./ConnectedAccounts";
+import DataManagement from "./DataManagement";
+import SessionsInformation from "./SessionsInformation";
+import DangerZone from "./DangerZone";
 
 export default function AccountSettingsPage() {
   return (
@@ -10,15 +18,56 @@ export default function AccountSettingsPage() {
       <p className="settings-page-breadcrumb">Config → Account</p>
       <h1 className="settings-page-header">Account</h1>
 
-      <div className="settings-page-placeholder">
-        <div className="settings-page-placeholder-icon">
-          <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-        </div>
-        <p className="settings-page-placeholder-text">
-          Account management & profile — Coming Soon
-        </p>
+      <div className="flex flex-col gap-2 mt-8">
+        <SettingsSectionCard
+          title="Account Information"
+          description="Manage your basic profile details, email address, and personal information."
+        >
+          <AccountInformation />
+        </SettingsSectionCard>
+
+        <SettingsSectionCard
+          title="Security"
+          description="Update your password, configure two-factor authentication, and secure your account."
+        >
+          <SecurityInformation />
+        </SettingsSectionCard>
+
+        <SettingsSectionCard
+          title="Privacy"
+          description="Control who can see your profile, stats, and achievements."
+        >
+          <PrivacyInformation />
+        </SettingsSectionCard>
+
+        <SettingsSectionCard
+          title="Connected Accounts"
+          description="Manage your linked social accounts and third-party integrations."
+        >
+          <ConnectedAccounts />
+        </SettingsSectionCard>
+
+        <SettingsSectionCard
+          title="Data Management"
+          description="Export your data, download your history, or manage your data sharing preferences."
+        >
+          <DataManagement />
+        </SettingsSectionCard>
+
+        <SettingsSectionCard
+          title="Sessions"
+          description="Manage devices that are currently logged into your account."
+        >
+          <SessionsInformation />
+        </SettingsSectionCard>
+
+        <SettingsSectionCard
+          title="Danger Zone"
+          description="Irreversible actions regarding your account data and access."
+          danger={true}
+        >
+          <DangerZone />
+        </SettingsSectionCard>
       </div>
     </div>
   );

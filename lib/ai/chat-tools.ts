@@ -264,6 +264,19 @@ export const deleteGoalTool = {
 };
 
 /**
+ * Tool: deleteAllTasks
+ * Delete all quests and goals.
+ */
+export const deleteAllTasksTool = {
+  name: "deleteAllTasks",
+  description: "Delete ALL quests and goals for the user. Call this ONLY when the user explicitly asks to delete 'everything', 'all quests', or 'all goals'.",
+  parameters: {
+    type: Type.OBJECT,
+    properties: {},
+  },
+};
+
+/**
  * Tool: completeQuest
  * Mark a quest as completed.
  */
@@ -307,13 +320,11 @@ export const chatToolsDeclaration = {
     createGoalTool,
     getQuestsTool,
     getStudySessionsTool,
-    createQuestTool,
-    createMultipleQuestsTool,
     updateQuestTool,
     deleteQuestTool,
-    completeQuestTool,
     updateGoalTool,
     deleteGoalTool,
+    deleteAllTasksTool,
     getWeeklySummaryTool,
   ],
 };

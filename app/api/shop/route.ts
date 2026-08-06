@@ -3,18 +3,10 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
-export const SHOP_ITEMS = {
-  MONARCHS_DECREE: { name: "Monarch's Decree", cost: 150 },
-  SHADOW_EXTRACTION: { name: "Shadow Extraction", cost: 350 },
-  GATE_KEY: { name: "Gate Key (Red)", cost: 450 },
-  KAMISH_WARD: { name: "Kamish's Ward", cost: 600 },
-  ELIXIR_OF_INSIGHT: { name: "Elixir of Insight", cost: 900 },
-} as const;
-
-export type ShopItemKey = keyof typeof SHOP_ITEMS;
+import { SHOP_ITEMS } from "@/lib/shop-items";
 
 const purchaseSchema = z.object({
-  itemKey: z.enum(["MONARCHS_DECREE", "SHADOW_EXTRACTION", "GATE_KEY", "KAMISH_WARD", "ELIXIR_OF_INSIGHT"]),
+  itemKey: z.string(),
   quantity: z.number().int().min(1).default(1),
 });
 
@@ -40,8 +32,11 @@ export async function POST(req: NextRequest) {
     }
 
     const { itemKey, quantity } = validation.data;
-    const itemDefinition = SHOP_ITEMS[itemKey as ShopItemKey];
-    const totalCost = itemDefinition.cost * quantity;
+    const itemDefinition = SHOP_ITEMS.find(item => item.itemKey === itemKey);
+    if (!itemDefinition) {
+      return NextResponse.json({ error: "Item not found in shop" }, { status: 404 });
+    }
+    const totalCost = itemDefinition.price * quantity;
     const userId = payload.userId as number;
 
     // Use a transaction for atomic purchase

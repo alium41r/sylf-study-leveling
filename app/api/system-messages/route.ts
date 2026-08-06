@@ -94,3 +94,48 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+/**
+ * POST /api/system-messages
+ * Create a new message in a chat session directly (useful for system alerts).
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = await verifyToken(authHeader.split(" ")[1]);
+    if (!payload) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    
+    let sessionId = body.sessionId;
+    if (!sessionId) {
+      const session = await prisma.chatSession.create({
+        data: { 
+          userId: payload.userId as number, 
+          title: "Study Planner Updates" 
+        }
+      });
+      sessionId = session.id;
+    }
+
+    const message = await prisma.systemMessage.create({
+      data: {
+        userId: payload.userId as number,
+        sessionId: sessionId,
+        content: body.content,
+        type: body.type || "SYSTEM (Gemini)",
+        read: false,
+      }
+    });
+
+    return NextResponse.json({ message, sessionId }, { status: 200 });
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

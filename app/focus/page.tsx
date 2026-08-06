@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../components/AuthProvider";
+import TopRightBar from "../components/TopRightBar";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -30,6 +31,7 @@ function FocusContent() {
 
   const subjectId = searchParams.get("subjectId");
   const subjectName = searchParams.get("subjectName") || "Focus Session";
+  const questId = searchParams.get("questId");
 
   // Timer state
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -48,9 +50,13 @@ function FocusContent() {
   const [currentSession, setCurrentSession] = useState(1);
   const [totalSessions, setTotalSessions] = useState(1);
   const [phaseLabel, setPhaseLabel] = useState("FOCUS");
-
+  const [questData, setQuestData] = useState<any>(null);
+  const [showQuestPopup, setShowQuestPopup] = useState(false);
+  
+  const questPopupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastTickRef = useRef<number>(typeof window !== 'undefined' ? Date.now() : 0);
+  const sessionStartedRef = useRef(false);
 
   // ─── Load Mode Config ──────────────────────────────
   useEffect(() => {
@@ -70,9 +76,33 @@ function FocusContent() {
     }
   }, []);
 
+  // ─── Fetch Quest Data if questId is present ────────
+  useEffect(() => {
+    if (!questId || !token) return;
+    fetch(`/api/quests/${questId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.id) setQuestData(data);
+      })
+      .catch(console.error);
+  }, [questId, token]);
+
   // ─── Initialize Timer Based on Mode ────────────────
   useEffect(() => {
-    if (activeMode === null) return; // wait for mode to load
+    if (activeMode === null && !questData) return; // wait for mode or quest
+
+    if (questData) {
+      setRemainingSeconds(questData.requiredMinutes * 60);
+      setPhase("focus");
+      setPhaseLabel(`QUEST: ${questData.title.toUpperCase()}`);
+      setTotalSessions(1);
+      return;
+    }
+
+    if (activeMode === null) return;
+
 
     const get = (key: string, fallback: number) =>
       Number(getSetting(activeMode, key, fallback));
@@ -124,7 +154,7 @@ function FocusContent() {
         // ignore if not allowed by browser
       }
     }
-  }, [activeMode]);
+  }, [activeMode, questData]);
 
   // ─── Notification chime (uses Web Audio API) ───────
   const playChime = useCallback(() => {
@@ -145,6 +175,16 @@ function FocusContent() {
 
   // ─── Handle Phase Transition ───────────────────────
   const transitionPhase = useCallback(() => {
+    if (questData) {
+      playChime();
+      setShowQuestPopup(true);
+      questPopupTimeoutRef.current = setTimeout(() => {
+        setShowQuestPopup(false);
+        setRemainingSeconds(null); // switch to stopwatch (Free Flow)
+      }, 10000);
+      return;
+    }
+
     if (!activeMode) return;
 
     const get = (key: string, fallback: number) =>
@@ -212,12 +252,12 @@ function FocusContent() {
         setRemainingSeconds(null);
       }
     }
-  }, [activeMode, phase, currentSession, totalSessions, playChime]);
+  }, [activeMode, phase, currentSession, totalSessions, playChime, questData]);
 
   // ─── Start API session on mount ────────────────────
   useEffect(() => {
-    if (!token) return;
-    let mounted = true;
+    if (!token || sessionStartedRef.current) return;
+    sessionStartedRef.current = true;
 
     async function startSessionAndFetchData() {
       try {
@@ -234,10 +274,8 @@ function FocusContent() {
               currentSubjectTime = sub.todaySeconds;
             }
           });
-          if (mounted) {
-            setInitialTotalSeconds(total);
-            setInitialSubjectSeconds(currentSubjectTime);
-          }
+          setInitialTotalSeconds(total);
+          setInitialSubjectSeconds(currentSubjectTime);
         }
 
         const res = await fetch("/api/sessions", {
@@ -248,12 +286,13 @@ function FocusContent() {
           },
           body: JSON.stringify({
             subjectId: subjectId ? parseInt(subjectId) : undefined,
+            questId: questId ? parseInt(questId) : undefined,
           }),
         });
 
         if (res.ok) {
           const data = await res.json();
-          if (mounted) setSessionId(data.id);
+          setSessionId(data.id);
         }
       } catch (err) {
         console.error("Failed to start session or fetch data:", err);
@@ -261,8 +300,6 @@ function FocusContent() {
     }
 
     startSessionAndFetchData();
-
-    return () => { mounted = false; };
   }, [token, subjectId]);
 
   // ─── Main Timer Loop ───────────────────────────────
@@ -323,7 +360,8 @@ function FocusContent() {
     if (!token || !sessionId || isEnding) return;
     setIsEnding(true);
 
-    const durationMinutes = Math.max(1, Math.floor(elapsedSeconds / 60));
+    const durationMinutes = Math.floor(elapsedSeconds / 60);
+    const durationSeconds = elapsedSeconds;
 
     try {
       await fetch("/api/sessions", {
@@ -332,7 +370,7 @@ function FocusContent() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: sessionId, durationMinutes }),
+        body: JSON.stringify({ id: sessionId, durationMinutes, durationSeconds, questId: questId ? parseInt(questId) : undefined }),
       });
 
       sessionStorage.removeItem("runningTimerSeconds");
@@ -359,7 +397,7 @@ function FocusContent() {
     ? "var(--accent-green)"
     : phase === "done"
     ? "var(--accent-gold)"
-    : "var(--accent-cyan)";
+    : "var(--accent-primary-light)";
 
   // Mode display name
   const modeDisplayName = activeMode?.name || "Free Flow";
@@ -376,19 +414,21 @@ function FocusContent() {
     >
       {/* Mode Indicator */}
       <div className="absolute top-8 left-0 right-0 text-center">
-        <p
-          style={{
-            fontFamily: "'Rajdhani', sans-serif",
-            fontSize: "0.65rem",
-            letterSpacing: "0.2em",
-            color: phaseColor,
-            textTransform: "uppercase",
-            fontWeight: 700,
-            marginBottom: "4px",
-          }}
-        >
-          {modeDisplayName}
-        </p>
+        {modeDisplayName.toUpperCase() !== phaseLabel.toUpperCase() && (
+          <p
+            style={{
+              fontFamily: "'Rajdhani', sans-serif",
+              fontSize: "0.65rem",
+              letterSpacing: "0.2em",
+              color: phaseColor,
+              textTransform: "uppercase",
+              fontWeight: 700,
+              marginBottom: "4px",
+            }}
+          >
+            {modeDisplayName}
+          </p>
+        )}
         <p
           style={{
             fontFamily: "'Rajdhani', sans-serif",
@@ -494,7 +534,7 @@ function FocusContent() {
           >
             {isPaused ? (
               <>
-                <svg className="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-accent-light" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
                 <span
@@ -506,7 +546,7 @@ function FocusContent() {
               </>
             ) : (
               <>
-                <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gold" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                 </svg>
                 <span
@@ -574,6 +614,43 @@ function FocusContent() {
           50% { opacity: 0.4; }
         }
       `}</style>
+      <TopRightBar />
+
+      {/* Quest Completion Popup */}
+      {showQuestPopup && questData && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="bg-white/10 border border-white/20 p-8 rounded-xl text-center max-w-md w-full animate-in zoom-in duration-300">
+            <h2 className="text-3xl font-bold text-[var(--accent-purple)] mb-2" style={{ fontFamily: "'Rajdhani', sans-serif" }}>QUEST COMPLETED!</h2>
+            <p className="text-white/80 mb-8">{questData.title}</p>
+            
+            <p className="text-sm text-gold mb-6 animate-pulse">Choose an action or wait to continue...</p>
+
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={() => {
+                  setShowQuestPopup(false);
+                  if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
+                  setRemainingSeconds(null); // Switch to stopwatch
+                }}
+                className="w-full py-3 rounded bg-white/10 hover:bg-white/20 font-bold transition-colors"
+              >
+                Continue Studying
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowQuestPopup(false);
+                  if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
+                  handleEndSession();
+                }}
+                className="w-full py-3 rounded bg-[var(--accent-red)]/20 hover:bg-[var(--accent-red)]/40 text-[var(--accent-red)] font-bold transition-colors border border-[var(--accent-red)]/30"
+              >
+                End Session Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

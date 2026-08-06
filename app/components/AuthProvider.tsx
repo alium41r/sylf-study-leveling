@@ -26,6 +26,7 @@ export interface UserStats {
   streakDays: number;
   totalStudyMinutes: number;
   sylph: number;
+  createdAt: string;
 }
 
 interface AuthContextType {

@@ -53,6 +53,9 @@ export async function POST(req: NextRequest) {
         username: username.toLowerCase(),
         password: hashedPassword,
         name,
+        privacy: {
+          create: {} // Generates default privacy settings automatically
+        }
       },
     });
 

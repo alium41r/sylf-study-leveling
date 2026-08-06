@@ -14,6 +14,40 @@ const updateQuestSchema = z.object({
 
 type RouteParams = { params: Promise<{ id: string }> };
 
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = await verifyToken(authHeader.split(" ")[1]);
+    if (!payload) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const quest = await prisma.quest.findFirst({
+      where: {
+        id: parseInt(id),
+        userId: payload.userId as number,
+      },
+    });
+
+    if (!quest) {
+      return NextResponse.json({ error: "Quest not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(quest, { status: 200 });
+  } catch (error) {
+    console.error("GET quest error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
+
 /**
  * PATCH /api/quests/[id]
  * Update a quest's status. Handles reward/penalty logic:
@@ -82,6 +116,49 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (status === "COMPLETED") {
       let finalXP = quest.xpReward;
       let finalSylph = quest.sylphReward;
+      
+      // Determine if early, late, or on time
+      let isLate = false;
+      let isEarly = false;
+      if (quest.scheduledFor) {
+        if (today > quest.scheduledFor) {
+          isLate = true;
+        } else if (today < quest.scheduledFor) {
+          isEarly = true;
+        }
+      }
+
+      // If late, redirect to FAILED logic
+      if (isLate) {
+        let penalty = hpPenalty(quest.requiredMinutes);
+        if (quest.isGateKeyApplied) penalty *= 3;
+        if (quest.isKamishWardActive) penalty = 0;
+        
+        const newHp = Math.max(0, user.hp - penalty);
+        await prisma.$transaction(async (tx) => {
+          await tx.quest.update({ where: { id: parseInt(id) }, data: { status: "FAILED" } });
+          await tx.user.update({ where: { id: user.id }, data: { hp: newHp } });
+          
+          await tx.systemMessage.create({
+            data: {
+              userId: user.id,
+              content: `**Quest Failed (Late)**\n\n"${quest.title}" was completed past its deadline of ${quest.scheduledFor}.\n\nPenalty: -${penalty} HP`,
+              type: "WARNING",
+            },
+          });
+        });
+        
+        return NextResponse.json({
+          quest: { ...updatedQuest, status: "FAILED" },
+          penalty: { hpLost: penalty, currentHp: newHp },
+        }, { status: 200 });
+      }
+
+      // If Early, apply 20% bonus
+      if (isEarly) {
+        finalXP = Math.floor(finalXP * 1.2);
+        finalSylph = Math.floor(finalSylph * 1.2);
+      }
 
       // Gate Key modifier
       if (quest.isGateKeyApplied) {
@@ -132,11 +209,13 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
           });
         }
 
+        const earlyBonusText = isEarly ? `\n(Includes 20% Early Completion Bonus!)` : "";
+
         // System messages
         await tx.systemMessage.create({
           data: {
             userId: user.id,
-            content: `**Quest Complete**\n\n"${quest.title}"\n\nRewards Obtained:\n• +${finalXP} XP\n• +${finalSylph} Sylph${multiplier > 1 ? ` (Streak x${multiplier})` : ""}`,
+            content: `**Quest Complete**\n\n"${quest.title}"\n\nRewards Obtained:\n• +${finalXP} XP\n• +${finalSylph} Sylph${multiplier > 1 ? ` (Streak x${multiplier})` : ""}${earlyBonusText}`,
             type: "REWARD",
           },
         });

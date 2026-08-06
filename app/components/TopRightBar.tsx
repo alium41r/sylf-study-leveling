@@ -22,8 +22,8 @@ export default function TopRightBar() {
     }
   }, [user?.streakDays]);
 
-  const PUBLIC_PATHS = ["/", "/login", "/register"];
-  if (!user || PUBLIC_PATHS.includes(pathname)) return null;
+  const ALLOWED_PATHS = ["/dashboard", "/inventory"];
+  if (!user || !ALLOWED_PATHS.includes(pathname)) return null;
 
   const handleTestAnimation = () => {
     setTestAnimation(true);
@@ -35,9 +35,7 @@ export default function TopRightBar() {
 
   return (
     <div 
-      className={`fixed top-6 right-6 z-40 flex flex-row items-center gap-4 pointer-events-none transition-opacity duration-300 ${
-        isDashboard ? "opacity-100" : "opacity-30 hover:opacity-100"
-      }`}
+      className={`fixed top-6 right-6 z-40 flex flex-row items-center gap-4 transition-opacity duration-300 opacity-100`}
     >
       
       {/* ─── Sylph Badge ───────────────────────────────────── */}
@@ -53,25 +51,27 @@ export default function TopRightBar() {
         </span>
       </div>
 
-      {/* ─── Streak Badge ───────────────────────────────────── */}
-      <div 
-        onClick={handleTestAnimation}
-        title="Click to test animation!"
-        className={`pointer-events-auto cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-full border bg-black/40 backdrop-blur-md shadow-lg transition-all ${
-          isAnimating ? "animate-streak-bounce border-yellow-400/80 shadow-yellow-500/50" : "border-white/10 hover:border-yellow-400/50 hover:shadow-lg"
-        }`}
-      >
-        <svg 
-          className={`w-5 h-5 ${user.streakDays > 0 || isAnimating ? "text-yellow-400" : "text-gray-500"} ${isAnimating ? "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" : ""}`} 
-          fill="currentColor" 
-          viewBox="0 0 24 24"
+      {/* ─── Streak Badge (Only on Dashboard) ───────────────── */}
+      {pathname === "/dashboard" && (
+        <div 
+          onClick={handleTestAnimation}
+          title="Click to test animation!"
+          className={`pointer-events-auto cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-full border bg-black/40 backdrop-blur-md shadow-lg transition-all ${
+            isAnimating ? "animate-streak-bounce border-yellow-400/80 shadow-yellow-500/50" : "border-white/10 hover:border-yellow-400/50 hover:shadow-lg"
+          }`}
         >
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-        <span className={`font-bold font-['Rajdhani'] tracking-wide ${user.streakDays > 0 ? "text-yellow-400" : "text-gray-400"}`}>
-          {user.streakDays}
-        </span>
-      </div>
+          <svg 
+            className={`w-5 h-5 ${user.streakDays > 0 || isAnimating ? "text-yellow-400" : "text-gray-500"} ${isAnimating ? "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" : ""}`} 
+            fill="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
+          <span className={`font-bold font-['Rajdhani'] tracking-wide ${user.streakDays > 0 ? "text-yellow-400" : "text-gray-400"}`}>
+            {user.streakDays}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

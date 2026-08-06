@@ -3,6 +3,7 @@
 import { useAuth } from "../components/AuthProvider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Quest {
   id: number;
@@ -24,6 +25,7 @@ interface Friend {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user, token, isLoading } = useAuth();
   const [quests, setQuests] = useState<Quest[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -94,9 +96,11 @@ export default function DashboardPage() {
           </div>
           <div className="h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/10 relative">
             <div 
-              className="h-full bg-gradient-to-r from-[#a78bfa] to-[#22d3ee] transition-all duration-1000 ease-out animate-exp-glow"
+              className="h-full bg-gradient-to-r from-[#a78bfa] via-[#60a5fa] to-[#22d3ee] transition-all duration-1000 ease-out animate-exp-glow relative overflow-hidden rounded-full"
               style={{ width: `${Math.min(100, Math.max(0, (user.currentXP / user.xpToNextLevel) * 100))}%` }}
-            />
+            >
+              <div className="absolute top-0 bottom-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-[150%] skew-x-[-20deg] animate-exp-shimmer"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -117,7 +121,7 @@ export default function DashboardPage() {
         </div>
         <div className="system-card p-4 text-center">
           <p className="stat-label">Today&apos;s Quests</p>
-          <p className="stat-value" style={{ color: "var(--accent-green)" }}>
+          <p className="stat-value text-accent-light">
             {completedToday}/{totalToday}
           </p>
         </div>
@@ -159,19 +163,30 @@ export default function DashboardPage() {
                       {quest.requiredMinutes} min • +{quest.xpReward} XP
                     </p>
                   </div>
-                  <span
-                    className={`quest-status quest-${
-                      quest.status === "COMPLETED"
-                        ? "completed"
-                        : quest.status === "FAILED"
-                        ? "failed"
-                        : quest.status === "IN_PROGRESS"
-                        ? "progress"
-                        : "pending"
-                    }`}
-                  >
-                    {quest.status}
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <span
+                      className={`quest-status quest-${
+                        quest.status === "COMPLETED"
+                          ? "completed"
+                          : quest.status === "FAILED"
+                          ? "failed"
+                          : quest.status === "IN_PROGRESS"
+                          ? "progress"
+                          : "pending"
+                      }`}
+                    >
+                      {quest.status}
+                    </span>
+                    {quest.status === "PENDING" && (
+                      <button
+                        onClick={() => router.push(`/focus?questId=${quest.id}&subjectName=${encodeURIComponent(quest.title)}`)}
+                        className="px-3 py-1 text-xs font-bold rounded bg-[var(--accent-purple)] text-white hover:opacity-90 transition-opacity"
+                        style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                      >
+                        START
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -235,7 +250,9 @@ export default function DashboardPage() {
                       <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-black" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{friend.name || friend.username}</p>
+                      <Link href={`/profile/${friend.username}`} className="text-sm font-medium hover:underline hover:text-white transition-colors block">
+                        {friend.name || friend.username}
+                      </Link>
                       <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                         Lv. {friend.level} • {friend.todayMinutes}m today
                       </p>
@@ -264,7 +281,9 @@ export default function DashboardPage() {
                       <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-gray-600 border-2 border-black" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{friend.name || friend.username}</p>
+                      <Link href={`/profile/${friend.username}`} className="text-sm font-medium hover:underline hover:text-white transition-colors block">
+                        {friend.name || friend.username}
+                      </Link>
                       <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                         Lv. {friend.level}
                       </p>

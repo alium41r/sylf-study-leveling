@@ -33,7 +33,7 @@ export type EffortLevel = keyof typeof EFFORT_CONFIG;
  * Level 1 → 100 XP, Level 5 → 280 XP, Level 10 → 650 XP, etc.
  */
 export function xpForNextLevel(level: number): number {
-  return Math.floor(100 * Math.pow(level, 1.2));
+  return Math.floor(200 * Math.pow(level, 1.2));
 }
 
 // ─── Rank Calculation ────────────────────────────────────────
@@ -198,9 +198,10 @@ export function getStreakMultiplier(streakDays: number): number {
  * Base: 1 Sylph per minute.
  * Bonus: +10 Sylph per continuous 30-min block.
  */
-export function calculateTimerSylph(minutes: number): number {
-  const base = minutes;
-  const bonus = Math.floor(minutes / 30) * 10;
+export function calculateTimerSylph(exactMinutes: number): number {
+  const base = exactMinutes;
+  // Bonus: +10 Sylph for every full 30-minute block completed
+  const bonus = Math.floor(exactMinutes / 30) * 10;
   return base + bonus;
 }
 
@@ -254,4 +255,17 @@ export function previewEffortAdjustment(
     suggestedEffortLevel,
     intensityWarning,
   };
+}
+
+// ─── Long-Session Bonus Logic ───────────────────────────────
+
+/**
+ * Global multiplier for EXP and Sylph based on continuous session duration.
+ * This rewards users for deeper, unbroken focus sessions.
+ */
+export function getLongSessionMultiplier(sessionMinutes: number): number {
+  if (sessionMinutes >= 120) return 1.3;
+  if (sessionMinutes >= 60) return 1.2;
+  if (sessionMinutes >= 30) return 1.1;
+  return 1.0;
 }

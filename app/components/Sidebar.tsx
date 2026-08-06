@@ -34,21 +34,20 @@ const NAV_ITEMS = [
     ),
   },
   {
-    href: "/system",
-    label: "The System",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-      </svg>
-    ),
-
-  },
-  {
     href: "/social",
     label: "Social",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/system",
+    label: "The System",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
       </svg>
     ),
   },
@@ -72,7 +71,7 @@ const NAV_ITEMS = [
   },
   {
     href: "/inventory",
-    label: "Inventory",
+    label: "Shop",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -152,6 +151,18 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     }
   };
 
+  const handleClearNotifications = async () => {
+    try {
+      await fetch("/api/notifications", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications([]);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const renderFormattedText = (text: string) => {
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, i) => {
@@ -208,9 +219,19 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               {/* ─── Notifications Dropdown ────────────────────────── */}
               {showNotifications && (
                 <div className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} w-80 max-h-96 overflow-y-auto bg-[#0a0a0f] border border-[#1f1f3a] shadow-2xl rounded-lg p-2 custom-scrollbar animate-fade-in-down z-[100]`}>
-                  <h3 className="text-xs tracking-widest text-[#a78bfa] font-['Rajdhani'] p-2 mb-1 border-b border-white/5">
-                    SYSTEM NOTIFICATIONS
-                  </h3>
+                  <div className="flex items-center justify-between p-2 mb-1 border-b border-white/5">
+                    <h3 className="text-xs tracking-widest text-[#a78bfa] font-['Rajdhani']">
+                      SYSTEM NOTIFICATIONS
+                    </h3>
+                    {notifications.length > 0 && (
+                      <button 
+                        onClick={handleClearNotifications}
+                        className="text-[10px] text-gray-500 hover:text-red-400 transition-colors font-bold tracking-wider"
+                      >
+                        CLEAR ALL
+                      </button>
+                    )}
+                  </div>
                   {notifications.length === 0 ? (
                     <p className="text-sm text-gray-500 p-4 text-center">No recent messages.</p>
                   ) : (

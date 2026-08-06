@@ -38,6 +38,12 @@ export default function GoalsPage() {
   const [description, setDescription] = useState("");
   const [targetWeeks, setTargetWeeks] = useState(4);
   const [effortLevel, setEffortLevel] = useState("NORMAL");
+  
+  // Edit deadline state
+  const [editingDeadlineId, setEditingDeadlineId] = useState<number | null>(null);
+  const [newDeadline, setNewDeadline] = useState("");
+
+  const [isNewGoalPanelOpen, setIsNewGoalPanelOpen] = useState(false);
 
   const fetchGoals = () => {
     if (!token) return;
@@ -72,6 +78,7 @@ export default function GoalsPage() {
         setDescription("");
         setTargetWeeks(4);
         setEffortLevel("NORMAL");
+        setIsNewGoalPanelOpen(false);
         fetchGoals();
       }
     } catch (err) {
@@ -179,139 +186,81 @@ export default function GoalsPage() {
         <div className="flex gap-2">
           {isSelectMode ? (
             <>
+              <button 
+                onClick={() => { setIsSelectMode(false); setSelectedGoalIds([]); }}
+                className="py-2.5 px-4 bg-[#11111f] hover:bg-[#1a1a2e] border border-[#2a2a4a] hover:border-gray-500 rounded-lg text-gray-400 font-bold transition-all flex items-center justify-center shrink-0"
+              >
+                Done
+              </button>
               {selectedGoalIds.length > 0 && (
                 <button 
                   onClick={handleBulkDelete}
-                  className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/50 rounded hover:bg-red-500/30 transition-colors text-sm font-bold"
+                  className="py-2.5 px-4 bg-red-900/40 hover:bg-red-800/60 border border-red-500/30 hover:border-red-400 rounded-lg text-red-400 text-sm font-bold tracking-wide transition-all"
                 >
-                  Delete ({selectedGoalIds.length})
+                  DELETE SELECTED ({selectedGoalIds.length})
                 </button>
               )}
-              <button 
-                onClick={() => { setIsSelectMode(false); setSelectedGoalIds([]); }}
-                className="px-4 py-2 bg-white/5 text-gray-300 border border-white/10 rounded hover:bg-white/10 transition-colors text-sm font-bold"
-              >
-                Cancel
-              </button>
             </>
           ) : (
-            goals.length > 0 && (
+            <div className="flex items-center gap-3">
               <button 
-                onClick={() => setIsSelectMode(true)}
-                className="px-4 py-2 bg-accent-primary/20 text-accent-primary border border-accent-primary/50 rounded hover:bg-accent-primary/30 transition-colors text-sm font-bold"
+                onClick={() => setIsNewGoalPanelOpen(true)}
+                className="px-4 py-2 bg-[var(--accent-purple)] text-white font-bold rounded hover:opacity-90 transition-opacity text-sm shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+                style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
-                Select
+                + NEW OBJECTIVE
               </button>
-            )
+              {goals.length > 0 && (
+                <button 
+                  onClick={() => setIsSelectMode(true)}
+                  className="py-2.5 px-4 bg-[#11111f] hover:bg-[#1a1a2e] border border-[#2a2a4a] hover:border-gray-500 rounded-lg text-gray-400 font-bold transition-all"
+                >
+                  Select
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Create Goal Form */}
-        <div className="system-card p-6 md:col-span-1 h-fit">
-          <h2 className="text-lg font-bold mb-4" style={{ fontFamily: "'Rajdhani', sans-serif", color: "var(--accent-primary)" }}>
-            SET NEW OBJECTIVE
-          </h2>
-          <form onSubmit={handleCreateGoal} className="flex flex-col gap-4">
-            <div>
-              <label className="stat-label block mb-1">Title</label>
-              <input
-                type="text"
-                required
-                className="input-field"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title"
-              />
-            </div>
-            <div>
-              <label className="stat-label block mb-1">Description (Optional)</label>
-              <textarea
-                className="input-field min-h-20"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Details about the goal..."
-              />
-            </div>
-            <div>
-              <label className="stat-label block mb-1">Target Weeks: {targetWeeks}</label>
-              <input
-                type="range"
-                min="1"
-                max="52"
-                className="w-full"
-                value={targetWeeks}
-                onChange={(e) => setTargetWeeks(parseInt(e.target.value))}
-              />
-            </div>
-            <div>
-              <label className="stat-label block mb-1">Base Effort Level</label>
-              <select
-                className="input-field"
-                value={effortLevel}
-                onChange={(e) => setEffortLevel(e.target.value)}
-              >
-                <option value="RELAXED">Casual (30m/day)</option>
-                <option value="NORMAL">Standard (1h/day)</option>
-                <option value="INTENSE">Focused (2h/day)</option>
-                <option value="EXTREME">Hardcore (4h/day)</option>
-              </select>
-            </div>
-            <button type="submit" className="btn-primary mt-2">
-              Commit Objective
-            </button>
-          </form>
-        </div>
-
+      <div className="w-full flex flex-col gap-4">
         {/* Goals List */}
-        <div className="md:col-span-2 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {goals.length === 0 ? (
             <div className="system-card p-6 text-center text-muted">
               You have no active objectives. Set one to begin.
             </div>
           ) : (
             <>
-              {isSelectMode && (
-                <div className="flex items-center gap-3 px-4 pb-2 border-b border-white/10 mt-1">
-                  <input 
-                    type="checkbox" 
-                    className="w-4 h-4 cursor-pointer accent-accent-primary"
-                    checked={goals.length > 0 && selectedGoalIds.length === goals.length}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedGoalIds(goals.map(g => g.id));
-                      } else {
-                        setSelectedGoalIds([]);
-                      }
-                    }}
-                  />
-                  <span className="text-sm text-muted">Select All</span>
-                </div>
-              )}
               {goals.map((goal) => (
               <div 
                 key={goal.id} 
-                className="system-card p-6"
+                className={`system-card p-6 ${isSelectMode ? 'cursor-pointer' : ''} transition-all ${
+                  isSelectMode && selectedGoalIds.includes(goal.id)
+                    ? "bg-red-900/20 border-red-500/50"
+                    : ""
+                }`}
                 style={{
                   borderLeft: `4px solid ${goal.status === "ACTIVE" ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+                }}
+                onClick={() => {
+                  if (isSelectMode) {
+                    setSelectedGoalIds(prev => 
+                      prev.includes(goal.id) ? prev.filter(id => id !== goal.id) : [...prev, goal.id]
+                    );
+                  }
                 }}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1 mr-4 flex gap-4">
                     {isSelectMode && (
-                      <input 
-                        type="checkbox" 
-                        className="mt-2 shrink-0 w-4 h-4 cursor-pointer accent-accent-primary"
-                        checked={selectedGoalIds.includes(goal.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedGoalIds(prev => [...prev, goal.id]);
-                          } else {
-                            setSelectedGoalIds(prev => prev.filter(id => id !== goal.id));
-                          }
-                        }}
-                      />
+                      <div className={`mt-1.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedGoalIds.includes(goal.id) ? 'bg-red-500 border-red-500' : 'border-gray-500'}`}>
+                        {selectedGoalIds.includes(goal.id) && (
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
                     )}
                     <div className="flex-1">
                       {editingGoalId === goal.id ? (
@@ -383,25 +332,149 @@ export default function GoalsPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <button 
-                    className="btn-secondary text-xs py-1.5 px-3"
-                    onClick={() => handleAdjustEffort(goal.id, Math.max(1, goal.targetWeeks - 1))}
-                  >
-                    Compress timeline (-1w)
-                  </button>
-                  <button 
-                    className="btn-secondary text-xs py-1.5 px-3"
-                    onClick={() => handleAdjustEffort(goal.id, goal.targetWeeks + 1)}
-                  >
-                    Extend timeline (+1w)
-                  </button>
+                  {editingDeadlineId === goal.id ? (
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="date"
+                        min={new Date().toISOString().split("T")[0]}
+                        className="input-field py-1 px-2 text-xs"
+                        style={{ colorScheme: "dark" }}
+                        value={newDeadline}
+                        onChange={(e) => setNewDeadline(e.target.value)}
+                      />
+                      <button 
+                        className="text-xs text-green-400 hover:text-green-300 font-bold"
+                        onClick={() => {
+                          if (newDeadline) {
+                            const diffTime = Math.abs(new Date(newDeadline).getTime() - new Date().getTime());
+                            const diffWeeks = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)));
+                            handleAdjustEffort(goal.id, diffWeeks);
+                          }
+                          setEditingDeadlineId(null);
+                        }}
+                      >
+                        Save
+                      </button>
+                      <button 
+                        className="text-xs text-gray-400 hover:text-gray-300 font-bold"
+                        onClick={() => setEditingDeadlineId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button 
+                      className="btn-secondary text-xs py-1.5 px-3"
+                      style={{ textTransform: 'none' }}
+                      onClick={() => {
+                        setEditingDeadlineId(goal.id);
+                        const d = new Date();
+                        d.setDate(d.getDate() + goal.targetWeeks * 7);
+                        setNewDeadline(d.toISOString().split("T")[0]);
+                      }}
+                    >
+                      Edit deadline
+                    </button>
+                  )}
                 </div>
-              </div>
-            ))}
+                </div>
+              ))}
             </>
           )}
         </div>
       </div>
+
+      {/* Slide-over Panel for New Objective */}
+      {isNewGoalPanelOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-opacity">
+          <div 
+            className="w-full max-w-md h-full bg-[#0a0a16] border-l border-[#2a2a4a] p-8 overflow-y-auto shadow-2xl flex flex-col gap-6"
+            style={{ animation: 'slideInRight 0.3s ease-out forwards' }}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold tracking-wide" style={{ fontFamily: "'Rajdhani', sans-serif", color: "var(--accent-primary)" }}>
+                SET NEW OBJECTIVE
+              </h2>
+              <button 
+                onClick={() => setIsNewGoalPanelOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors p-2"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleCreateGoal} className="flex flex-col gap-5 flex-1">
+              <div>
+                <label className="stat-label block mb-2 text-sm">Title</label>
+                <input
+                  type="text"
+                  required
+                  className="input-field bg-[#111122] border-[#2a2a4a] focus:border-[var(--accent-primary)] py-3"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter objective title..."
+                />
+              </div>
+              
+              <div>
+                <label className="stat-label block mb-2 text-sm">Description (Optional)</label>
+                <textarea
+                  className="input-field min-h-32 bg-[#111122] border-[#2a2a4a] focus:border-[var(--accent-primary)] py-3 resize-none"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Details about what you want to achieve..."
+                />
+              </div>
+              
+              <div className="bg-[#111122] p-4 rounded-lg border border-[#2a2a4a]">
+                <div className="flex justify-between items-center mb-4">
+                  <label className="stat-label text-sm m-0">Target Timeline</label>
+                  <span className="text-[var(--accent-primary)] font-bold font-['Rajdhani'] text-lg">{targetWeeks} Weeks</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="52"
+                  className="w-full accent-[var(--accent-primary)]"
+                  value={targetWeeks}
+                  onChange={(e) => setTargetWeeks(parseInt(e.target.value))}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-2 font-['Rajdhani']">
+                  <span>1 Week</span>
+                  <span>1 Year</span>
+                </div>
+              </div>
+              
+              <div>
+                <label className="stat-label block mb-2 text-sm">Base Effort Level</label>
+                <select
+                  className="input-field bg-[#111122] border-[#2a2a4a] focus:border-[var(--accent-primary)] py-3"
+                  value={effortLevel}
+                  onChange={(e) => setEffortLevel(e.target.value)}
+                >
+                  <option value="RELAXED">Casual (30 mins/day)</option>
+                  <option value="NORMAL">Standard (1 hour/day)</option>
+                  <option value="INTENSE">Focused (2 hours/day)</option>
+                  <option value="EXTREME">Hardcore (4 hours/day)</option>
+                </select>
+              </div>
+              
+              <div className="mt-auto pt-6">
+                <button type="submit" className="w-full py-4 bg-[var(--accent-purple)] hover:opacity-90 rounded-lg text-white font-bold tracking-widest transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
+                  COMMIT OBJECTIVE
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+      `}} />
     </div>
   );
 }

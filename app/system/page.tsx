@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../components/AuthProvider";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import AiPlannerModal from "../components/AiPlannerModal";
 
 interface SystemMsg {
   id: number;
@@ -41,6 +42,11 @@ export default function SystemPage() {
   const [editTitle, setEditTitle] = useState("");
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  
+  // Select mode state
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedChats, setSelectedChats] = useState<number[]>([]);
 
   // Rate limit tracking (15 requests per minute)
   const [apiRequests, setApiRequests] = useState<number[]>([]);
@@ -158,22 +164,44 @@ export default function SystemPage() {
       });
       setEditingSessionId(null);
       fetchSessions();
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim() && !selectedFile) return;
+  const deleteSelectedChats = async () => {
+    if (!token || selectedChats.length === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedChats.length} chat(s)?`)) return;
+
+    try {
+      for (const id of selectedChats) {
+         await fetch(`/api/chats/${id}`, {
+           method: "DELETE",
+           headers: { Authorization: `Bearer ${token}` },
+         });
+      }
+      setSessions(prev => prev.filter(s => !selectedChats.includes(s.id)));
+      if (activeSessionId && selectedChats.includes(activeSessionId)) {
+        setActiveSessionId(null);
+        setMessages([]);
+      }
+      setIsSelectMode(false);
+      setSelectedChats([]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const sendMessage = async (text: string, file: File | null) => {
+    if (!text.trim() && !file) return;
     if (!token) return;
 
     const optimisticUserMsg: SystemMsg = {
       id: Date.now(),
-      content: inputText || "Sent an attachment.",
+      content: text || "Sent an attachment.",
       type: "USER",
       read: true,
-      attachmentUrl: selectedFile ? URL.createObjectURL(selectedFile) : undefined,
+      attachmentUrl: file ? URL.createObjectURL(file) : undefined,
       createdAt: new Date().toISOString(),
       sessionId: activeSessionId || undefined,
     };
@@ -183,14 +211,10 @@ export default function SystemPage() {
     scrollToBottom();
 
     const formData = new FormData();
-    if (inputText.trim()) formData.append("message", inputText);
-    if (selectedFile) formData.append("file", selectedFile);
+    if (text.trim()) formData.append("message", text);
+    if (file) formData.append("file", file);
     formData.append("modelPreference", modelPref);
     if (activeSessionId) formData.append("sessionId", activeSessionId.toString());
-
-    const currentInput = inputText;
-    setInputText("");
-    setSelectedFile(null);
 
     try {
       setApiRequests((prev) => [...prev, Date.now()]);
@@ -220,23 +244,32 @@ export default function SystemPage() {
         scrollToBottom();
       } else {
         console.error("Chat error", await res.text());
-        setInputText(currentInput);
         setMessages((prev) => prev.filter((m) => m.id !== optimisticUserMsg.id));
       }
     } catch (err) {
       console.error(err);
-      setInputText(currentInput);
       setMessages((prev) => prev.filter((m) => m.id !== optimisticUserMsg.id));
     } finally {
       setIsSending(false);
     }
   };
 
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const currentInput = inputText;
+    const currentFile = selectedFile;
+    setInputText("");
+    setSelectedFile(null);
+    await sendMessage(currentInput, currentFile);
+  };
+
+
+
   return (
     <div className="flex w-full h-[100vh] overflow-hidden">
       {/* ── Main Chat Area ── */}
-      <div className="flex-1 flex flex-col relative min-w-0 pr-12 md:pr-14">
-        <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col p-4 md:p-8 min-h-0">
+      <div className="flex-1 flex flex-col relative min-w-0">
+        <div className="max-w-[98%] mx-auto w-full flex-1 flex flex-col p-4 md:p-8 min-h-0">
           
             <div className="flex justify-between items-end mb-4 shrink-0">
               <div>
@@ -403,6 +436,15 @@ export default function SystemPage() {
               >
                 📎
               </button>
+              <button
+                type="button"
+                onClick={() => setIsPlannerOpen(true)}
+                className="px-4 py-2 system-card flex-shrink-0 hover:bg-white/5 transition-colors text-indigo-400 rounded-xl font-bold tracking-wide flex items-center gap-2"
+                style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                title="Open Planner"
+              >
+                Planner
+              </button>
               <input
                 type="text"
                 value={inputText}
@@ -490,7 +532,7 @@ export default function SystemPage() {
         {/* Toggle Button outside the border */}
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className={`absolute top-[95px] -left-10 w-10 h-11 text-cyan-400 rounded-l-lg hover:bg-cyan-900/40 transition-colors flex items-center justify-center shrink-0 z-50 bg-[#06080d] border-[#2a2a4a] border-y border-l ${!isSidebarOpen ? 'border-r' : 'border-r-0'}`}
+          className={`absolute top-4 -left-10 w-10 h-11 text-cyan-400 rounded-l-lg hover:bg-cyan-900/40 transition-colors flex items-center justify-center shrink-0 z-50 bg-[#06080d] border-[#2a2a4a] border-y border-l ${!isSidebarOpen ? 'border-r' : 'border-r-0'}`}
           title="Toggle History"
         >
           <svg className={`w-5 h-5 transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -498,17 +540,39 @@ export default function SystemPage() {
           </svg>
         </button>
 
-        {/* Inner wrapper that shortens the vertical line via mt-24 */}
-        <div className={`mt-24 w-full flex-1 border-[#2a2a4a] bg-[#06080d] flex flex-col overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 border-l' : 'opacity-0 border-l-0'}`}>
+        {/* Inner wrapper that fills the vertical space */}
+        <div className={`w-full flex-1 border-[#2a2a4a] bg-[#06080d] flex flex-col overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 border-l' : 'opacity-0 border-l-0'}`}>
           <div className="w-64 flex-1 flex flex-col">
-            <div className="p-4 border-t border-b border-[#2a2a4a] flex items-center justify-center">
-              <button
-                onClick={createNewChat}
-                className="flex-1 py-2.5 px-4 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 hover:border-cyan-400 rounded-lg text-cyan-400 font-bold tracking-wide transition-all shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] flex items-center justify-center gap-2 whitespace-nowrap"
-                style={{ fontFamily: "'Rajdhani', sans-serif" }}
-              >
-                <span className="text-xl leading-none">+</span> NEW CHAT
-              </button>
+            <div className="p-4 border-b border-[#2a2a4a] flex flex-col gap-3">
+              <div className="flex gap-2">
+                <button
+                  onClick={createNewChat}
+                  className="flex-1 py-2.5 px-4 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 hover:border-cyan-400 rounded-lg text-cyan-400 font-bold tracking-wide transition-all shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] flex items-center justify-center gap-2 whitespace-nowrap"
+                  style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                >
+                  <span className="text-xl leading-none">+</span> NEW CHAT
+                </button>
+                <button
+                  onClick={() => {
+                    setIsSelectMode(!isSelectMode);
+                    setSelectedChats([]);
+                    setOpenMenuId(null);
+                  }}
+                  className="py-2.5 px-3 bg-[#11111f] hover:bg-[#1a1a2e] border border-[#2a2a4a] hover:border-gray-500 rounded-lg text-gray-400 font-bold transition-all flex items-center justify-center shrink-0"
+                  title={isSelectMode ? "Cancel Selection" : "Select Chats"}
+                >
+                  {isSelectMode ? "Done" : "Select"}
+                </button>
+              </div>
+              
+              {isSelectMode && selectedChats.length > 0 && (
+                <button 
+                  onClick={deleteSelectedChats}
+                  className="w-full py-1.5 px-4 bg-red-900/40 hover:bg-red-800/60 border border-red-500/30 hover:border-red-400 rounded-lg text-red-400 text-sm font-bold tracking-wide transition-all"
+                >
+                  DELETE SELECTED ({selectedChats.length})
+                </button>
+              )}
             </div>
 
           <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 system-scrollbar">
@@ -518,16 +582,35 @@ export default function SystemPage() {
               sessions.map((session) => (
                 <div
                   key={session.id}
-                  className={`group relative flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
-                    activeSessionId === session.id
+                  className={`group relative flex items-center p-3 rounded-lg cursor-pointer transition-all ${
+                    isSelectMode && selectedChats.includes(session.id)
+                      ? "bg-red-900/20 border border-red-500/50 text-red-300"
+                      : activeSessionId === session.id && !isSelectMode
                       ? "bg-blue-900/20 border border-blue-500/30 text-blue-300"
                       : "hover:bg-white/5 text-gray-400 border border-transparent"
                   }`}
                   onClick={() => {
-                    setActiveSessionId(session.id);
+                    if (isSelectMode) {
+                      setSelectedChats(prev => 
+                        prev.includes(session.id) ? prev.filter(id => id !== session.id) : [...prev, session.id]
+                      );
+                    } else {
+                      setActiveSessionId(session.id);
+                    }
                   }}
                 >
-                  {editingSessionId === session.id ? (
+                  {isSelectMode && (
+                    <div className={`w-4 h-4 rounded border mr-3 flex items-center justify-center shrink-0 transition-colors ${selectedChats.includes(session.id) ? 'bg-red-500 border-red-500' : 'border-gray-500'}`}>
+                      {selectedChats.includes(session.id) && (
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex-1 min-w-0 flex items-center justify-between">
+                    {editingSessionId === session.id ? (
                     <input
                       type="text"
                       value={editTitle}
@@ -544,20 +627,22 @@ export default function SystemPage() {
                   ) : (
                     <span className="truncate text-sm pr-6 font-medium">{session.title}</span>
                   )}
-
-                  {/* Actions Menu Trigger */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(openMenuId === session.id ? null : session.id);
-                    }}
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-white transition-colors rounded ${openMenuId === session.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                  >
-                    ⋮
-                  </button>
+                    {/* Actions Menu Trigger */}
+                    {!isSelectMode && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(openMenuId === session.id ? null : session.id);
+                        }}
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-white transition-colors rounded ${openMenuId === session.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                      >
+                        ⋮
+                      </button>
+                    )}
+                  </div>
 
                   {/* Dropdown Menu */}
-                  {openMenuId === session.id && (
+                  {openMenuId === session.id && !isSelectMode && (
                     <div className="absolute right-2 top-10 bg-[#11111f] border border-[#2a2a4a] rounded-lg shadow-xl z-50 py-1 w-28 overflow-hidden">
                       <button
                         onClick={(e) => {
@@ -589,6 +674,54 @@ export default function SystemPage() {
           </div>
         </div>
       </div>
+
+      <AiPlannerModal
+        isOpen={isPlannerOpen}
+        onClose={() => setIsPlannerOpen(false)}
+        onPlanCreated={async (plan) => {
+          const planTitle = plan?.title || "New Study Plan";
+          const text = `I just created a new study plan: "${planTitle}". Please review the generated quests and let me know if we should adjust anything.`;
+          
+          // Optimistically add AI message to UI
+          const optimisticMsg: SystemMsg = {
+            id: Date.now(),
+            content: text,
+            type: "SYSTEM (Gemini)",
+            read: true,
+            createdAt: new Date().toISOString(),
+            sessionId: activeSessionId || undefined,
+          };
+          setMessages(prev => [...prev, optimisticMsg]);
+          scrollToBottom();
+
+          // Save to backend
+          try {
+            const res = await fetch("/api/system-messages", {
+              method: "POST",
+              headers: { 
+                "Content-Type": "application/json", 
+                Authorization: `Bearer ${token}` 
+              },
+              body: JSON.stringify({ 
+                content: text, 
+                type: "SYSTEM (Gemini)", 
+                sessionId: activeSessionId 
+              })
+            });
+            
+            if (res.ok) {
+              const data = await res.json();
+              // If a new session was created because none existed
+              if (data.sessionId && !activeSessionId) {
+                setActiveSessionId(data.sessionId);
+                fetchSessions();
+              }
+            }
+          } catch (e) {
+            console.error("Failed to save AI planner message:", e);
+          }
+        }}
+      />
     </div>
   );
 }

@@ -7,42 +7,53 @@ datasource db {
 }
 
 model User {
-  id                Int             @id @default(autoincrement())
-  email             String          @unique
-  username          String          @unique
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  username          String    @unique
   password          String
   name              String?
-  hunterRank        String          @default("E")
-  level             Int             @default(1)
-  currentXP         Int             @default(0)
-  xpToNextLevel     Int             @default(100)
-  hp                Int             @default(100)
-  maxHp             Int             @default(100)
-  streakDays        Int             @default(0)
-  totalStudyMinutes Int             @default(0)
-  lastActiveDate    String          @default("")
+  hunterRank        String    @default("E")
+  level             Int       @default(1)
+  currentXP         Int       @default(0)
+  xpToNextLevel     Int       @default(200)
+  hp                Int       @default(100)
+  maxHp             Int       @default(100)
+  streakDays        Int       @default(0)
+  totalStudyMinutes Int       @default(0)
+  totalStudySeconds Int       @default(0)
+  lastActiveDate    String    @default("")
   lastSeenAt        DateTime?
-  sylph             Int             @default(0)
-  createdAt         DateTime        @default(now())
-  
-  goals             Goal[]
-  quests            Quest[]
-  sessions          StudySession[]
-  systemMessages    SystemMessage[]
-  subjects          Subject[]
-  inventoryItems    InventoryItem[]
-  sylphLedger       SylphLedger[]
-  chatSessions      ChatSession[]
+  sylph             Int       @default(0)
+  activeTheme       String    @default("default")
+  activeBackground  String    @default("none")
+  activeAvatar      String    @default("default")
+  activeFrame       String    @default("none")
+  activeTitle       String    @default("Novice")
+  activeNameColor   String    @default("default")
+  createdAt         DateTime  @default(now())
+
+  goals          Goal[]
+  quests         Quest[]
+  sessions       StudySession[]
+  systemMessages SystemMessage[]
+  subjects       Subject[]
+  inventoryItems InventoryItem[]
+  sylphLedger    SylphLedger[]
+  chatSessions   ChatSession[]
+  cosmetics      UserCosmetic[]
+  achievements   UserAchievement[]
+  privacy        UserPrivacy?
+  connectedAccounts ConnectedAccount[]
 
   // Social
-  friendshipsAsUser    Friendship[]              @relation("friendshipsAsUser")
-  friendshipsAsFriend  Friendship[]              @relation("friendshipsAsFriend")
-  sentRequests         FriendRequest[]            @relation("sentRequests")
-  receivedRequests     FriendRequest[]            @relation("receivedRequests")
-  conversations        ConversationParticipant[]
-  messagesSent         Message[]
-  sentInvites          SessionInvite[]            @relation("sentInvites")
-  receivedInvites      SessionInvite[]            @relation("receivedInvites")
+  friendshipsAsUser   Friendship[]              @relation("friendshipsAsUser")
+  friendshipsAsFriend Friendship[]              @relation("friendshipsAsFriend")
+  sentRequests        FriendRequest[]           @relation("sentRequests")
+  receivedRequests    FriendRequest[]           @relation("receivedRequests")
+  conversations       ConversationParticipant[]
+  messagesSent        Message[]
+  sentInvites         SessionInvite[]           @relation("sentInvites")
+  receivedInvites     SessionInvite[]           @relation("receivedInvites")
 
   @@index([currentXP, hunterRank])
 }
@@ -58,28 +69,28 @@ model Goal {
   status      String   @default("ACTIVE")
   createdAt   DateTime @default(now())
 
-  quests      Quest[]
+  quests Quest[]
 }
 
 model Quest {
-  id              Int            @id @default(autoincrement())
-  userId          Int
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  goalId          Int?
-  goal            Goal?          @relation(fields: [goalId], references: [id], onDelete: SetNull)
-  title           String
-  description     String?
-  status          String         @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, FAILED
+  id                 Int       @id @default(autoincrement())
+  userId             Int
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goalId             Int?
+  goal               Goal?     @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  title              String
+  description        String?
+  status             String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, FAILED
   requiredMinutes    Int
   xpReward           Int
-  sylphReward        Int            @default(0)
-  isKamishWardActive Boolean        @default(false)
-  isGateKeyApplied   Boolean        @default(false)
-  scheduledFor       String         // YYYY-MM-DD
-  createdAt          DateTime       @default(now())
+  sylphReward        Int       @default(0)
+  isKamishWardActive Boolean   @default(false)
+  isGateKeyApplied   Boolean   @default(false)
+  scheduledFor       String // YYYY-MM-DD
+  createdAt          DateTime  @default(now())
   completedAt        DateTime?
 
-  sessions        StudySession[]
+  sessions StudySession[]
 }
 
 model Subject {
@@ -90,8 +101,8 @@ model Subject {
   color     String?  @default("#7c3aed")
   createdAt DateTime @default(now())
 
-  sessions  StudySession[]
-  invites   SessionInvite[]
+  sessions StudySession[]
+  invites  SessionInvite[]
 }
 
 model StudySession {
@@ -103,6 +114,8 @@ model StudySession {
   subjectId       Int?
   subject         Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   durationMinutes Int
+  durationSeconds Int       @default(0)
+  focusRate       Int       @default(80) // Added for AI study planning
   startedAt       DateTime  @default(now())
   endedAt         DateTime?
 }
@@ -114,9 +127,9 @@ model SystemMessage {
   sessionId     Int?
   session       ChatSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   content       String
-  type          String       // INFO, QUEST, REWARD, WARNING, LEVEL_UP, USER
+  type          String // INFO, QUEST, REWARD, WARNING, LEVEL_UP, USER
   read          Boolean      @default(false)
-  attachmentUrl String?      // Optional URL for uploaded files (images, pdfs, etc)
+  attachmentUrl String? // Optional URL for uploaded files (images, pdfs, etc)
   createdAt     DateTime     @default(now())
 }
 
@@ -128,18 +141,18 @@ model ChatSession {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  messages  SystemMessage[]
+  messages SystemMessage[]
 }
 
 // ─── Social Models ───────────────────────────────────────────
 
 model Friendship {
-  id         Int      @id @default(autoincrement())
-  userId     Int
-  friendId   Int
-  user       User     @relation("friendshipsAsUser", fields: [userId], references: [id], onDelete: Cascade)
-  friend     User     @relation("friendshipsAsFriend", fields: [friendId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  friendId  Int
+  user      User     @relation("friendshipsAsUser", fields: [userId], references: [id], onDelete: Cascade)
+  friend    User     @relation("friendshipsAsFriend", fields: [friendId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 
   @@unique([userId, friendId])
 }
@@ -157,12 +170,12 @@ model FriendRequest {
 }
 
 model Conversation {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String?
-  isGroup   Boolean   @default(false)
+  isGroup   Boolean  @default(false)
   createdBy Int?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   participants ConversationParticipant[]
   messages     Message[]
@@ -191,15 +204,15 @@ model Message {
 }
 
 model SessionInvite {
-  id          Int      @id @default(autoincrement())
-  senderId    Int
-  receiverId  Int
-  subjectId   Int?
-  sender      User     @relation("sentInvites", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver    User     @relation("receivedInvites", fields: [receiverId], references: [id], onDelete: Cascade)
-  subject     Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  status      String   @default("PENDING") // PENDING, ACCEPTED, DECLINED
-  createdAt   DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  subjectId  Int?
+  sender     User     @relation("sentInvites", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("receivedInvites", fields: [receiverId], references: [id], onDelete: Cascade)
+  subject    Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  status     String   @default("PENDING") // PENDING, ACCEPTED, DECLINED
+  createdAt  DateTime @default(now())
 }
 
 // ─── Economy Models ──────────────────────────────────────────
@@ -208,7 +221,7 @@ model InventoryItem {
   id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  itemKey   String   // MONARCHS_DECREE, SHADOW_EXTRACTION, GATE_KEY, KAMISH_WARD, ELIXIR_OF_INSIGHT
+  itemKey   String // MONARCHS_DECREE, SHADOW_EXTRACTION, GATE_KEY, KAMISH_WARD, ELIXIR_OF_INSIGHT
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -218,7 +231,63 @@ model SylphLedger {
   id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount    Int      // Positive for income, negative for expense
-  source    String   // QUEST, TIMER, LEVEL_UP, SHOP, SYSTEM
+  amount    Int // Positive for income, negative for expense
+  source    String // QUEST, TIMER, LEVEL_UP, SHOP, SYSTEM
   createdAt DateTime @default(now())
+}
+
+model UserCosmetic {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String // THEME, BACKGROUND, AVATAR, FRAME, TITLE, NAME_COLOR
+  itemKey   String // The unique identifier for the cosmetic
+  createdAt DateTime @default(now())
+
+  @@unique([userId, category, itemKey])
+}
+
+model UserAchievement {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  claimedAt     DateTime @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+model UserPrivacy {
+  id                  Int    @id @default(autoincrement())
+  userId              Int    @unique
+  user                User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  profileVisibility   String @default("PUBLIC")
+  showOnlineStatus    String @default("PUBLIC")
+  showCurrentSession  String @default("PUBLIC")
+  showStudyHours      String @default("PUBLIC")
+  showRank            String @default("PUBLIC")
+  showAchievements    String @default("PUBLIC")
+  
+  allowFriendRequests String @default("PUBLIC")
+  allowDirectMessages String @default("FRIENDS")
+}
+
+model ConnectedAccount {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  provider          String   // Google, GitHub, Discord, Instagram
+  providerAccountId String   // The unique ID given by the provider
+  providerEmail     String?  // The email associated with that specific provider
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // 1. Prevent one provider account from being linked to multiple users
+  @@unique([provider, providerAccountId])
+  
+  // 2. Prevent one user from linking multiple accounts from the same provider
+  @@unique([userId, provider])
 }

@@ -28,20 +28,16 @@ export async function executeChatTool(
         return await executeUpdateGoal(userId, args);
       case "deleteGoal":
         return await executeDeleteGoal(userId, args);
+      case "deleteAllTasks":
+        return await executeDeleteAllTasks(userId);
       case "getQuests":
         return await executeGetQuests(userId, args);
       case "getStudySessions":
         return await executeGetStudySessions(userId, args);
-      case "createQuest":
-        return await executeCreateQuest(userId, args);
-      case "createMultipleQuests":
-        return await executeCreateMultipleQuests(userId, args);
       case "updateQuest":
         return await executeUpdateQuest(userId, args);
       case "deleteQuest":
         return await executeDeleteQuest(userId, args);
-      case "completeQuest":
-        return await executeCompleteQuest(userId, args);
       case "getWeeklySummary":
         return await executeGetWeeklySummary(userId);
       default:
@@ -185,6 +181,16 @@ async function executeDeleteGoal(userId: number, args: Record<string, any>) {
   await prisma.quest.deleteMany({ where: { goalId } });
   await prisma.goal.delete({ where: { id: goalId } });
   return { success: true, message: `Goal and associated quests deleted.` };
+}
+
+async function executeDeleteAllTasks(userId: number) {
+  // Delete all quests and goals for the user
+  const questCount = await prisma.quest.deleteMany({ where: { userId } });
+  const goalCount = await prisma.goal.deleteMany({ where: { userId } });
+  return { 
+    success: true, 
+    message: `Mass deletion complete. Removed ${questCount.count} quests and ${goalCount.count} goals.` 
+  };
 }
 
 async function executeGetQuests(

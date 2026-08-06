@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import BackToSettings from "../../components/BackToSettings";
 import { BG_MAP } from "../../components/GlobalSystemWrapper";
+import { useAuth } from "@/app/components/AuthProvider";
+import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -73,38 +75,86 @@ const CATEGORY_LABELS: Record<string, string> = {
 /* ─── Main Page ─────────────────────────────────────────────── */
 
 export default function BackgroundsSettingsPage() {
+  const { user, token, mutateUser } = useAuth();
   const [activeBgId, setActiveBgId] = useState<string>("void");
   const [appliedBgId, setAppliedBgId] = useState<string>("void");
   const [showApplied, setShowApplied] = useState(false);
   const [hoveredBg, setHoveredBg] = useState<string | null>(null);
+  
+  const [cosmetics, setCosmetics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("app_background");
-    if (saved && BG_MAP[saved]) {
-      setActiveBgId(saved);
-      setAppliedBgId(saved);
+    if (!token) return;
+    
+    fetch("/api/cosmetics", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setCosmetics(data.cosmetics || []);
+        if (data.active?.activeBackground) {
+          setActiveBgId(data.active.activeBackground);
+          setAppliedBgId(data.active.activeBackground);
+        } else {
+          const saved = localStorage.getItem("app_background");
+          if (saved && BG_MAP[saved]) {
+            setActiveBgId(saved);
+            setAppliedBgId(saved);
+          }
+        }
+      })
+      .catch(console.error);
+  }, [token]);
+
+  const hasCosmetic = (itemKey: string) => {
+    if (itemKey === "void") return true;
+    return cosmetics.some(c => c.category === "BACKGROUND" && c.itemKey === itemKey);
+  };
+
+  const handleApplyBackground = async (bg: BackgroundOption) => {
+    if (!hasCosmetic(bg.id)) return;
+    if (loading) return;
+    
+    setLoading(true);
+    try {
+      const res = await fetch("/api/cosmetics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ category: "BACKGROUND", itemKey: bg.id })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setActiveBgId(bg.id);
+        setAppliedBgId(bg.id);
+        localStorage.setItem("app_background", bg.id);
+        mutateUser(data.user);
+
+        // Apply globally
+        const bgData = BG_MAP[bg.id];
+        if (bgData) {
+          document.body.style.background = bgData.value;
+          document.body.style.backgroundSize = bgData.size || "cover";
+          document.body.style.backgroundAttachment = "fixed";
+        }
+
+        setShowApplied(true);
+        setTimeout(() => setShowApplied(false), 2000);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  }, []);
-
-  const handleApplyBackground = (bg: BackgroundOption) => {
-    setActiveBgId(bg.id);
-    setAppliedBgId(bg.id);
-    localStorage.setItem("app_background", bg.id);
-
-    // Apply globally
-    const bgData = BG_MAP[bg.id];
-    if (bgData) {
-      document.body.style.background = bgData.value;
-      document.body.style.backgroundSize = bgData.size || "cover";
-      document.body.style.backgroundAttachment = "fixed";
-    }
-
-    setShowApplied(true);
-    setTimeout(() => setShowApplied(false), 2000);
   };
 
   // Group backgrounds by category
   const categories = ["gradient", "pattern", "ambient"];
+
+  if (!user) return <div className="p-8 text-center text-gray-400">Loading...</div>;
 
   return (
     <div className="settings-page-container">
@@ -122,7 +172,7 @@ export default function BackgroundsSettingsPage() {
           lineHeight: 1.6,
         }}
       >
-        Set the atmosphere. Each wallpaper applies a subtle environmental backdrop across the entire app.
+        Set the atmosphere. Each wallpaper applies a subtle environmental backdrop across the entire app. Unlocked by reaching higher Hunter ranks.
       </p>
 
       {/* Applied Toast */}
@@ -191,6 +241,8 @@ export default function BackgroundsSettingsPage() {
                 const isApplied = bg.id === appliedBgId;
                 const isHovered = bg.id === hoveredBg;
                 const bgData = BG_MAP[bg.id];
+                const unlocked = hasCosmetic(bg.id);
+                const catalogInfo = COSMETICS_CATALOG.BACKGROUND.find(c => c.id === bg.id);
 
                 return (
                   <div
@@ -222,18 +274,22 @@ export default function BackgroundsSettingsPage() {
                         backgroundSize: bgData?.size || "cover",
                         position: "relative",
                         overflow: "hidden",
+                        opacity: unlocked ? 1 : 0.2,
+                        filter: unlocked ? "none" : "grayscale(100%)",
                       }}
                     >
                       {/* Animated overlay shimmer on hover */}
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%, rgba(255,255,255,0.02) 100%)",
-                          opacity: isHovered ? 1 : 0,
-                          transition: "opacity 0.4s ease",
-                        }}
-                      />
+                      {unlocked && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%, rgba(255,255,255,0.02) 100%)",
+                            opacity: isHovered ? 1 : 0,
+                            transition: "opacity 0.4s ease",
+                          }}
+                        />
+                      )}
 
                       {/* Category Chip */}
                       <div
@@ -285,6 +341,24 @@ export default function BackgroundsSettingsPage() {
                           </svg>
                         </div>
                       )}
+                      
+                      {/* Locked Icon overlay */}
+                      {!unlocked && (
+                         <div style={{
+                           position: "absolute",
+                           top: "50%",
+                           left: "50%",
+                           transform: "translate(-50%, -50%)",
+                           display: "flex",
+                           flexDirection: "column",
+                           alignItems: "center",
+                           color: "rgba(255,255,255,0.6)"
+                         }}>
+                           <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                         </div>
+                      )}
                     </div>
 
                     {/* Info + Apply */}
@@ -302,7 +376,7 @@ export default function BackgroundsSettingsPage() {
                             fontFamily: "'Rajdhani', sans-serif",
                             fontWeight: 700,
                             fontSize: "1rem",
-                            color: isApplied ? "var(--accent-cyan)" : "var(--text-primary)",
+                            color: isApplied ? "var(--accent-cyan)" : (unlocked ? "var(--text-primary)" : "var(--text-muted)"),
                             textTransform: "uppercase",
                             letterSpacing: "0.05em",
                           }}
@@ -323,26 +397,41 @@ export default function BackgroundsSettingsPage() {
                         {bg.description}
                       </p>
 
-                      <button
-                        onClick={() => handleApplyBackground(bg)}
-                        style={{
+                      {unlocked ? (
+                        <button
+                          onClick={() => handleApplyBackground(bg)}
+                          style={{
+                            width: "100%",
+                            padding: "9px",
+                            borderRadius: "6px",
+                            border: isApplied ? "none" : "1px solid rgba(6, 182, 212, 0.25)",
+                            background: isApplied ? "var(--accent-cyan)" : "rgba(6, 182, 212, 0.08)",
+                            color: isApplied ? "#000" : "var(--accent-cyan)",
+                            fontFamily: "'Rajdhani', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "0.78rem",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.1em",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                          }}
+                        >
+                          {isApplied ? "✓ Applied" : "Apply Wallpaper"}
+                        </button>
+                      ) : (
+                        <div style={{
                           width: "100%",
                           padding: "9px",
                           borderRadius: "6px",
-                          border: isApplied ? "none" : "1px solid rgba(6, 182, 212, 0.25)",
-                          background: isApplied ? "var(--accent-cyan)" : "rgba(6, 182, 212, 0.08)",
-                          color: isApplied ? "#000" : "var(--accent-cyan)",
-                          fontFamily: "'Rajdhani', sans-serif",
-                          fontWeight: 700,
-                          fontSize: "0.78rem",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.1em",
-                          cursor: "pointer",
-                          transition: "all 0.3s ease",
-                        }}
-                      >
-                        {isApplied ? "✓ Applied" : "Apply Wallpaper"}
-                      </button>
+                          background: "rgba(255,255,255,0.03)",
+                          border: "1px solid rgba(255,255,255,0.05)",
+                          textAlign: "center"
+                        }}>
+                          <p style={{ fontSize: "0.75rem", fontFamily: "'Rajdhani', sans-serif", fontWeight: "bold", letterSpacing: "0.1em", color: "var(--text-muted)" }}>
+                            REQ: {catalogInfo?.unlockCondition || "Unknown"}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

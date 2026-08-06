@@ -105,26 +105,26 @@ export default function QuestsPage() {
         <div className="flex gap-2">
           {isSelectMode ? (
             <>
+              <button 
+                onClick={() => { setIsSelectMode(false); setSelectedQuestIds([]); }}
+                className="py-2.5 px-4 bg-[#11111f] hover:bg-[#1a1a2e] border border-[#2a2a4a] hover:border-gray-500 rounded-lg text-gray-400 font-bold transition-all flex items-center justify-center shrink-0"
+              >
+                Done
+              </button>
               {selectedQuestIds.length > 0 && (
                 <button 
                   onClick={handleBulkDelete}
-                  className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/50 rounded hover:bg-red-500/30 transition-colors text-sm font-bold"
+                  className="py-2.5 px-4 bg-red-900/40 hover:bg-red-800/60 border border-red-500/30 hover:border-red-400 rounded-lg text-red-400 text-sm font-bold tracking-wide transition-all"
                 >
-                  Delete ({selectedQuestIds.length})
+                  DELETE SELECTED ({selectedQuestIds.length})
                 </button>
               )}
-              <button 
-                onClick={() => { setIsSelectMode(false); setSelectedQuestIds([]); }}
-                className="px-4 py-2 bg-white/5 text-gray-300 border border-white/10 rounded hover:bg-white/10 transition-colors text-sm font-bold"
-              >
-                Cancel
-              </button>
             </>
           ) : (
             quests.length > 0 && (
               <button 
                 onClick={() => setIsSelectMode(true)}
-                className="px-4 py-2 bg-accent-primary/20 text-accent-primary border border-accent-primary/50 rounded hover:bg-accent-primary/30 transition-colors text-sm font-bold"
+                className="py-2.5 px-4 bg-[#11111f] hover:bg-[#1a1a2e] border border-[#2a2a4a] hover:border-gray-500 rounded-lg text-gray-400 font-bold transition-all"
               >
                 Select
               </button>
@@ -140,27 +140,14 @@ export default function QuestsPage() {
           </p>
         ) : (
           <div className="flex flex-col gap-4">
-            {isSelectMode && (
-              <div className="flex items-center gap-3 px-4 pb-2 border-b border-white/10">
-                <input 
-                  type="checkbox" 
-                  className="w-4 h-4 cursor-pointer accent-accent-primary"
-                  checked={quests.length > 0 && selectedQuestIds.length === quests.length}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedQuestIds(quests.map(q => q.id));
-                    } else {
-                      setSelectedQuestIds([]);
-                    }
-                  }}
-                />
-                <span className="text-sm text-muted">Select All</span>
-              </div>
-            )}
             {quests.map((quest) => (
               <div 
                 key={quest.id} 
-                className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded bg-white/5 border border-white/10"
+                className={`flex flex-col md:flex-row md:items-center justify-between p-4 rounded bg-white/5 border border-white/10 ${isSelectMode ? 'cursor-pointer' : ''} transition-all ${
+                  isSelectMode && selectedQuestIds.includes(quest.id)
+                    ? "!bg-red-900/20 !border-red-500/50"
+                    : ""
+                }`}
                 style={{
                   borderLeft: `4px solid ${
                     quest.status === "COMPLETED"
@@ -172,21 +159,23 @@ export default function QuestsPage() {
                       : "var(--accent-primary)"
                   }`
                 }}
+                onClick={() => {
+                  if (isSelectMode) {
+                    setSelectedQuestIds(prev => 
+                      prev.includes(quest.id) ? prev.filter(id => id !== quest.id) : [...prev, quest.id]
+                    );
+                  }
+                }}
               >
                 <div className="flex-1 mr-4 flex items-start gap-4">
                   {isSelectMode && (
-                    <input 
-                      type="checkbox" 
-                      className="mt-1 shrink-0 w-4 h-4 cursor-pointer accent-accent-primary"
-                      checked={selectedQuestIds.includes(quest.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedQuestIds(prev => [...prev, quest.id]);
-                        } else {
-                          setSelectedQuestIds(prev => prev.filter(id => id !== quest.id));
-                        }
-                      }}
-                    />
+                    <div className={`mt-1.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedQuestIds.includes(quest.id) ? 'bg-red-500 border-red-500' : 'border-gray-500'}`}>
+                      {selectedQuestIds.includes(quest.id) && (
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
                   )}
                   <div className="flex-1">
                     {editingQuestId === quest.id ? (

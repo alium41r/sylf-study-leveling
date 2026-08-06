@@ -142,41 +142,70 @@ export async function POST(req: NextRequest) {
 
       while (iterations < MAX_TOOL_ITERATIONS) {
         iterations++;
-        const completion = await groq.chat.completions.create({
-          model: "llama-3.3-70b-versatile",
-          messages,
-          tools: groqToolsDeclaration,
-          tool_choice: "auto",
-        });
+        try {
+          const completion = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages,
+            tools: groqToolsDeclaration,
+            tool_choice: "auto",
+          });
 
-        const responseMessage = completion.choices[0].message;
-        if (responseMessage.content === null) {
-          responseMessage.content = "";
-        }
-        messages.push(responseMessage);
-
-        if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
-          for (const toolCall of responseMessage.tool_calls) {
-            console.log(`[Groq] Tool call: ${toolCall.function.name}(${toolCall.function.arguments})`);
-            let args = {};
-            let result;
-            try {
-              args = JSON.parse(toolCall.function.arguments || "{}");
-              result = await executeChatTool(toolCall.function.name, args, userId);
-            } catch (err: any) {
-              console.error("[Groq] Tool parsing or execution failed:", err);
-              result = { error: "Failed to parse arguments or execute tool. Check syntax.", details: err.message };
-            }
-            messages.push({
-              tool_call_id: toolCall.id,
-              role: "tool",
-              name: toolCall.function.name,
-              content: JSON.stringify(result),
-            });
+          const responseMessage = completion.choices[0].message;
+          if (responseMessage.content === null) {
+            responseMessage.content = "";
           }
-        } else {
-          responseText = responseMessage.content || "Action completed successfully!";
-          break;
+          messages.push(responseMessage);
+
+          if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
+            for (const toolCall of responseMessage.tool_calls) {
+              console.log(`[Groq] Tool call: ${toolCall.function.name}(${toolCall.function.arguments})`);
+              let args = {};
+              let result;
+              try {
+                args = JSON.parse(toolCall.function.arguments || "{}");
+                result = await executeChatTool(toolCall.function.name, args, userId);
+              } catch (err: any) {
+                console.error("[Groq] Tool parsing or execution failed:", err);
+                result = { error: "Failed to parse arguments or execute tool. Check syntax.", details: err.message };
+              }
+              messages.push({
+                tool_call_id: toolCall.id,
+                role: "tool",
+                name: toolCall.function.name,
+                content: JSON.stringify(result),
+              });
+            }
+          } else {
+            responseText = responseMessage.content || "Action completed successfully!";
+            break;
+          }
+        } catch (groqApiError: any) {
+          // Robust error recovery: Llama 3 often outputs raw <function> tags which causes a 400 error in Groq.
+          const groqInnerError = groqApiError.error?.error;
+          if (groqInnerError?.code === "tool_use_failed" && groqInnerError?.failed_generation) {
+            const failedGen = groqInnerError.failed_generation;
+            const match = failedGen.match(/<function=(\w+)[=\s]*([\s\S]*?)<\/function>/i);
+            if (match) {
+              const toolName = match[1];
+              const rawArgs = match[2];
+              console.log(`[Groq Recovery] Recovered tool call: ${toolName}(${rawArgs})`);
+              let args = {};
+              let result;
+              try {
+                const cleanedArgs = rawArgs.replace(/^[=\s]+/, "").trim(); // Remove leading = or space
+                args = JSON.parse(cleanedArgs || "{}");
+                result = await executeChatTool(toolName, args, userId);
+              } catch (err: any) {
+                console.error("[Groq Recovery] Tool parsing failed:", err);
+                result = { error: "Failed to parse recovered arguments." };
+              }
+              // Push the user's attempt and the tool result back into context
+              messages.push({ role: "assistant", content: `I tried to call ${toolName} with arguments ${rawArgs}.` });
+              messages.push({ role: "user", content: `System: Tool execution result: ${JSON.stringify(result)}` });
+              continue; // loop again with new context
+            }
+          }
+          throw groqApiError; // Bubble up if it's unrecoverable
         }
       }
       return responseText || "Action completed successfully!";
@@ -242,11 +271,12 @@ export async function POST(req: NextRequest) {
     } catch (apiError: any) {
       console.error("API Error:", apiError);
       
+      const isRateLimit = apiError.message && (apiError.message.includes("quota") || apiError.message.includes("429"));
+      
       // Auto-fallback logic for Gemini 429 errors
       if (
         modelPreference === "auto" &&
-        apiError.message &&
-        (apiError.message.includes("quota") || apiError.message.includes("429"))
+        isRateLimit
       ) {
         console.log("[Auto-Fallback] Gemini limit reached. Falling back to Groq...");
         try {
@@ -257,9 +287,10 @@ export async function POST(req: NextRequest) {
           aiResponseText = "⚠️ **SYSTEM OVERLOAD** ⚠️\n\nThe System's rate limit quota has been exceeded on all models. Please wait a minute before sending another request.";
         }
       } else {
-        aiResponseText = "SYSTEM ERROR: The request could not be processed due to an internal error.";
-        if (apiError.message && (apiError.message.includes("quota") || apiError.message.includes("429"))) {
+        if (isRateLimit || (apiError.error?.error?.code === "rate_limit_exceeded")) {
           aiResponseText = "⚠️ **SYSTEM OVERLOAD** ⚠️\n\nThe System's rate limit quota has been exceeded. Please wait a minute before sending another request.";
+        } else {
+          aiResponseText = "SYSTEM ERROR: The request could not be processed due to an internal error.";
         }
       }
     }

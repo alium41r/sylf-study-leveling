@@ -1,8 +1,14 @@
+require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
+const { Pool } = require('pg');
+const { PrismaPg } = require('@prisma/adapter-pg');
 const { faker } = require('@faker-js/faker');
 const bcrypt = require('bcryptjs');
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_POOL_URL || process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Starting database seed...');
@@ -61,7 +67,7 @@ async function main() {
           title: faker.lorem.words({ min: 2, max: 5 }),
           description: faker.lorem.sentence(),
           targetWeeks: faker.number.int({ min: 1, max: 12 }),
-          effortLevel: faker.helpers.arrayElement(['RELAXED', 'NORMAL', 'INTENSE', 'EXTREME']),
+          effortLevel: faker.helpers.arrayElement(['EASY', 'NORMAL', 'HARD']),
         }
       });
 

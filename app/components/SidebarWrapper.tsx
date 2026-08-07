@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 
-const PUBLIC_PATHS = ["/", "/login", "/register", "/focus"];
+const PUBLIC_PATHS = ["/", "/login", "/register", "/focus", "/onboarding"];
 
 /**
  * Conditionally renders the Sidebar only on authenticated (non-public) pages.

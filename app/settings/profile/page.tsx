@@ -100,7 +100,7 @@ export default function ScholarProfilePage() {
     <div className="settings-page-container flex flex-col h-screen max-h-screen overflow-hidden max-w-[1400px] w-full">
       <div className="shrink-0">
         <BackToSettings />
-        <p className="settings-page-breadcrumb">Identity → Scholar Profile</p>
+        <p className="settings-page-breadcrumb">Appearance → Scholar Profile</p>
       </div>
 
       <div className="flex flex-1 gap-8 mt-4 min-h-0">

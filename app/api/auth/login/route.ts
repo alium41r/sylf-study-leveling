@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
           maxHp: user.maxHp,
           streakDays: user.streakDays,
           totalStudyMinutes: user.totalStudyMinutes,
+          hasCompletedOnboarding: user.hasCompletedOnboarding,
         },
       },
       { status: 200 }

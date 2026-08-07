@@ -26,6 +26,7 @@ export interface UserStats {
   streakDays: number;
   totalStudyMinutes: number;
   sylph: number;
+  hasCompletedOnboarding: boolean;
   createdAt: string;
 }
 
@@ -89,11 +90,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshStats]);
 
   // Redirect unauthenticated users away from protected routes
+  // and handle onboarding flow
   useEffect(() => {
-    if (!isLoading && !token && !PUBLIC_PATHS.includes(pathname)) {
+    if (isLoading) return;
+
+    if (!token && !PUBLIC_PATHS.includes(pathname)) {
       router.push("/login");
+      return;
     }
-  }, [isLoading, token, pathname, router]);
+
+    if (token && user) {
+      if (!user.hasCompletedOnboarding && pathname !== "/onboarding") {
+        router.push("/onboarding");
+      } else if (user.hasCompletedOnboarding && pathname === "/onboarding") {
+        router.push("/dashboard");
+      }
+    }
+  }, [isLoading, token, user, pathname, router]);
 
   const login = useCallback((newToken: string, userData: UserStats) => {
     localStorage.setItem("token", newToken);

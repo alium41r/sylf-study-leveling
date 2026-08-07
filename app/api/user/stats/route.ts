@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
         lastActiveDate: true,
         createdAt: true,
         sylph: true,
+        hasCompletedOnboarding: true,
       },
     });
 

@@ -97,6 +97,7 @@ model User {
   activeTitle       String    @default("Novice")
   activeNameColor   String    @default("default")
   createdAt         DateTime  @default(now())
+  hasCompletedOnboarding Boolean @default(false)
 
   goals          Goal[]
   quests         Quest[]

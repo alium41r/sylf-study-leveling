@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import { TimezoneService } from "@/lib/timezone-service";
 
 async function getUserId(req: NextRequest): Promise<number | null> {
   const authHeader = req.headers.get("Authorization");
@@ -24,6 +25,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { timezone: true },
+    });
+    const timezone = user?.timezone || "UTC";
+    const todayStart = TimezoneService.getStartOfDayUTC(timezone);
+
     // We want to fetch subjects and calculate today's duration for each
     const subjects = await prisma.subject.findMany({
       where: { userId },
@@ -31,8 +39,7 @@ export async function GET(req: NextRequest) {
         sessions: {
           where: {
             startedAt: {
-              // Very simple today check for demo
-              gte: new Date(new Date().setHours(0, 0, 0, 0)),
+              gte: todayStart,
             },
           },
         },

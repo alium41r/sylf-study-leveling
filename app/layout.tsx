@@ -1,23 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Rajdhani } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./components/AuthProvider";
 import { ThemeProvider } from "./components/ThemeProvider";
 import SidebarWrapper from "./components/SidebarWrapper";
 import { GlobalSystemWrapper } from "./components/GlobalSystemWrapper";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const rajdhani = Rajdhani({
-  variable: "--font-rajdhani",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "The System | Study Leveling",
@@ -33,9 +19,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${rajdhani.variable} h-full`}
+      className="h-full"
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex">
+      <body className="min-h-full flex" suppressHydrationWarning>
         <ThemeProvider>
           <AuthProvider>
             <GlobalSystemWrapper>

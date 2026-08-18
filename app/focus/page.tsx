@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../components/AuthProvider";
-import TopRightBar from "../components/TopRightBar";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -82,7 +82,7 @@ function FocusContent() {
     fetch(`/api/quests/${questId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
       .then(data => {
         if (data.id) setQuestData(data);
       })
@@ -94,9 +94,15 @@ function FocusContent() {
     if (activeMode === null && !questData) return; // wait for mode or quest
 
     if (questData) {
-      setRemainingSeconds(questData.requiredMinutes * 60);
+      const remaining = Math.max(0, (questData.requiredMinutes * 60) - (questData.elapsedSeconds || 0));
+      if (remaining === 0) {
+        setRemainingSeconds(null); // Already reached time, straight to overtime
+        setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+      } else {
+        setRemainingSeconds(remaining);
+        setPhaseLabel(`QUEST: ${questData.title.toUpperCase()}`);
+      }
       setPhase("focus");
-      setPhaseLabel(`QUEST: ${questData.title.toUpperCase()}`);
       setTotalSessions(1);
       return;
     }
@@ -181,7 +187,8 @@ function FocusContent() {
       questPopupTimeoutRef.current = setTimeout(() => {
         setShowQuestPopup(false);
         setRemainingSeconds(null); // switch to stopwatch (Free Flow)
-      }, 10000);
+        setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+      }, 15000);
       return;
     }
 
@@ -314,11 +321,14 @@ function FocusContent() {
       const deltaSec = Math.round(deltaMs / 1000);
 
       if (deltaSec >= 1) {
-        setElapsedSeconds((prev) => {
-          const newSeconds = prev + deltaSec;
-          sessionStorage.setItem("runningTimerSeconds", newSeconds.toString());
-          return newSeconds;
-        });
+        // Only increment focus study elapsed time when in "focus" phase (pause during breaks)
+        if (phase === "focus") {
+          setElapsedSeconds((prev) => {
+            const newSeconds = prev + deltaSec;
+            sessionStorage.setItem("runningTimerSeconds", newSeconds.toString());
+            return newSeconds;
+          });
+        }
 
         if (remainingSeconds !== null) {
           setRemainingSeconds((prev) => {
@@ -530,7 +540,7 @@ function FocusContent() {
         {isCountdown && phase !== "done" && (
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className="flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 transition-all border border-white/10"
+            className="flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/10 shadow-lg"
           >
             {isPaused ? (
               <>
@@ -564,7 +574,7 @@ function FocusContent() {
         <button
           onClick={handleEndSession}
           disabled={isEnding}
-          className="flex items-center gap-3 px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 transition-all border border-white/20 hover:border-red-400/50"
+          className="flex items-center gap-3 px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20 hover:border-red-400/50 shadow-xl"
         >
           {isEnding ? (
             <span className="text-lg uppercase tracking-wider font-bold">
@@ -587,26 +597,32 @@ function FocusContent() {
       </div>
 
       {/* Paused Overlay */}
-      {isPaused && (
-        <div
-          className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
-          style={{ background: "rgba(0,0,0,0.4)" }}
-        >
-          <p
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              fontSize: "2rem",
-              fontWeight: 700,
-              color: "var(--accent-gold)",
-              textTransform: "uppercase",
-              letterSpacing: "0.2em",
-              animation: "pulse 2s ease-in-out infinite",
-            }}
+      <AnimatePresence>
+        {isPaused && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
+            style={{ background: "rgba(0,0,0,0.5)" }}
           >
-            PAUSED
-          </p>
-        </div>
-      )}
+            <p
+              style={{
+                fontFamily: "'Rajdhani', sans-serif",
+                fontSize: "2.5rem",
+                fontWeight: 700,
+                color: "var(--accent-gold)",
+                textTransform: "uppercase",
+                letterSpacing: "0.25em",
+                animation: "pulse 2s ease-in-out infinite",
+              }}
+            >
+              PAUSED
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style>{`
         @keyframes pulse {
@@ -614,43 +630,74 @@ function FocusContent() {
           50% { opacity: 0.4; }
         }
       `}</style>
-      <TopRightBar />
 
       {/* Quest Completion Popup */}
-      {showQuestPopup && questData && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-white/10 border border-white/20 p-8 rounded-xl text-center max-w-md w-full animate-in zoom-in duration-300">
-            <h2 className="text-3xl font-bold text-[var(--accent-purple)] mb-2" style={{ fontFamily: "'Rajdhani', sans-serif" }}>QUEST COMPLETED!</h2>
-            <p className="text-white/80 mb-8">{questData.title}</p>
-            
-            <p className="text-sm text-gold mb-6 animate-pulse">Choose an action or wait to continue...</p>
+      <AnimatePresence>
+        {showQuestPopup && questData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              onClick={() => setShowQuestPopup(false)}
+            />
 
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={() => {
-                  setShowQuestPopup(false);
-                  if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
-                  setRemainingSeconds(null); // Switch to stopwatch
-                }}
-                className="w-full py-3 rounded bg-white/10 hover:bg-white/20 font-bold transition-colors"
-              >
-                Continue Studying
-              </button>
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 12 }}
+              transition={{ type: "spring", damping: 28, stiffness: 380 }}
+              className="relative z-10 bg-bg-panel/90 backdrop-blur-xl border border-border-active p-8 rounded-2xl text-center max-w-md w-full shadow-2xl mx-4"
+            >
+              <h2 className="text-3xl font-bold text-accent-primary-light mb-2" style={{ fontFamily: "'Rajdhani', sans-serif" }}>TIME&apos;S UP</h2>
+              <p className="text-text-primary mb-8 font-medium">{questData.title}</p>
               
-              <button
-                onClick={() => {
-                  setShowQuestPopup(false);
-                  if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
-                  handleEndSession();
-                }}
-                className="w-full py-3 rounded bg-[var(--accent-red)]/20 hover:bg-[var(--accent-red)]/40 text-[var(--accent-red)] font-bold transition-colors border border-[var(--accent-red)]/30"
-              >
-                End Session Now
-              </button>
-            </div>
+              <p className="text-sm text-yellow-400 mb-6 animate-pulse font-['Rajdhani'] font-bold tracking-wider uppercase">Did you successfully complete this quest?</p>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={async () => {
+                    try {
+                      await fetch(`/api/quests/${questData.id}`, {
+                        method: "PATCH",
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ status: "COMPLETED" }),
+                      });
+                    } catch (e) {
+                       console.error(e);
+                    }
+                    setShowQuestPopup(false);
+                    if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
+                    setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+                    setRemainingSeconds(null);
+                  }}
+                  className="w-full py-3.5 rounded-xl bg-green-500/20 hover:bg-green-500/30 text-green-400 font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-green-500/40 shadow-lg"
+                >
+                  Yes, Quest Completed!
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowQuestPopup(false);
+                    if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
+                    setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+                    setRemainingSeconds(null);
+                  }}
+                  className="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-text-primary font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-white/10"
+                >
+                  No, I Need More Time (Overtime)
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

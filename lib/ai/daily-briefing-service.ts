@@ -1,0 +1,134 @@
+import { prisma } from "@/lib/prisma";
+import { LLMFactory } from "./providers/factory";
+import { buildCoreContext, formatCoreContext } from "./context-engine";
+import { getSituationalFlags } from "./planning-engine";
+
+export interface GenerateBriefingResult {
+  success: boolean;
+  message?: string;
+}
+
+export class DailyBriefingService {
+  /**
+   * Generates a daily briefing for the specified user and dateKey.
+   * This is a STRICTLY READ-ONLY LLM execution with tools: [].
+   */
+  public static async generateDailyBriefing(
+    userId: number,
+    dateKey: string,
+    timezone: string
+  ): Promise<GenerateBriefingResult> {
+    try {
+      // 1. Fetch user data
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      // 2. Compute Yesterday's DateKey
+      // We parse dateKey "YYYY-MM-DD" as UTC noon to safely subtract 24 hours without DST issues
+      const todayDate = new Date(`${dateKey}T12:00:00Z`);
+      const yesterdayDate = new Date(todayDate.getTime() - 24 * 60 * 60 * 1000);
+      const yesterdayDateKey = yesterdayDate.toISOString().split("T")[0];
+
+      // 3. Build Deterministic DB Context
+      const coreContext = await buildCoreContext(userId);
+      
+      const yesterdayQuests = await prisma.quest.findMany({
+        where: {
+          userId,
+          scheduledFor: yesterdayDateKey,
+        },
+      });
+
+      const todayQuests = await prisma.quest.findMany({
+        where: {
+          userId,
+          scheduledFor: dateKey,
+        },
+      });
+
+      const completedYesterday = yesterdayQuests.filter((q) => q.status === "COMPLETED").length;
+      const failedYesterday = yesterdayQuests.filter((q) => q.status === "FAILED").length;
+      const totalYesterday = yesterdayQuests.length;
+
+      const totalToday = todayQuests.length;
+      const todayMinutes = todayQuests.reduce((acc, q) => acc + q.requiredMinutes, 0);
+
+      // We use situational flags which are backend-authoritative (from Phase 4)
+      const flags = await getSituationalFlags(userId);
+
+      // 4. Construct the prompt
+      const systemInstruction = `
+You are the Solo Leveling AI System assigned to provide a brief Morning System Notification for the Hunter.
+This is a Daily Briefing. 
+Your output MUST be strictly under 800 characters. Be extremely concise.
+Do not invent stats, do not invent quests. 
+Use the provided data to give a realistic summary of yesterday and what is expected today.
+
+[Situational Context]
+Burnout Risk: ${flags.isBurnoutRisk}
+Struggling: ${flags.isStruggling}
+Overloaded: ${flags.isOverloaded}
+
+[Yesterday (${yesterdayDateKey})]
+Total Quests: ${totalYesterday}
+Completed: ${completedYesterday}
+Failed/Skipped: ${failedYesterday}
+
+[Today (${dateKey})]
+Scheduled Quests: ${totalToday}
+Total Estimated Minutes: ${todayMinutes}
+
+[Core State]
+${formatCoreContext(coreContext)}
+
+Write the notification. Make it feel like an authoritative system prompt, but motivating if they are doing well, or cautious if they are at risk. Do not use markdown headers.
+      `.trim();
+
+      // 5. LLM Execution (Read-Only)
+      const adapter = LLMFactory.getAdapter("gemini"); // Defaulting to Gemini
+
+      const response = await adapter.generateResponse(
+        [{ role: "user", content: "Generate my daily briefing." }],
+        systemInstruction,
+        [] // STRICT ENFORCEMENT: No tools
+      );
+
+      let generatedText = response.text || "";
+
+      // We can also fallback to searching parts if Groq sends something differently, but usually text is populated.
+      if (!generatedText && response.toolCalls) {
+        throw new Error("Agent attempted to use tools despite empty tool list.");
+      }
+
+      // 6. Hard backend output bounds
+      if (generatedText.length > 800) {
+        // Enforce max bounds rigorously. Alternatively, we could truncate, but failing ensures model obeys.
+        throw new Error("Generated briefing exceeded maximum allowed length of 800 characters.");
+      }
+
+      if (generatedText.trim().length === 0) {
+        throw new Error("Generated briefing was empty.");
+      }
+
+      // 7. Save to DB (SessionId = null enforces chat history isolation)
+      await prisma.systemMessage.create({
+        data: {
+          userId,
+          content: generatedText,
+          type: "DAILY_BRIEFING",
+          read: false,
+        },
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      console.error(`[DailyBriefingService] Failed for user ${userId}:`, error);
+      return { success: false, message: error.message };
+    }
+  }
+}

@@ -110,63 +110,148 @@ export function awardXP(
   };
 }
 
-// ─── Quest Reward Calculation ────────────────────────────────
+// Note: questRewards and hpPenalty have been moved to lib/difficulty-engine.ts
 
-/**
- * Calculate XP and Sylph rewards for a quest based on its required
- * study minutes and the goal's effort level.
- */
-export function questRewards(
-  requiredMinutes: number,
-  effortLevel: EffortLevel,
-  userLevel: number = 1
-): { xp: number; sylph: number } {
-  const config = EFFORT_CONFIG[effortLevel];
-  const baseXP = Math.floor(requiredMinutes * 1.5);
-  let xp = Math.floor(baseXP * config.xpMultiplier);
-  
-  // Scale XP based on user level to keep up with leveling curve
-  // A modest 15% bonus per level
-  xp = Math.floor(xp * (1 + (userLevel - 1) * 0.15));
-  
-  // Sylph calculation based on intensity
-  let sylph = 25; // Casual
-  if (effortLevel === "EXTREME" || requiredMinutes >= 120) sylph = 250;
-  else if (effortLevel === "INTENSE" || requiredMinutes >= 90) sylph = 130;
-  else if (effortLevel === "NORMAL" || requiredMinutes >= 60) sylph = 60;
+import { TimezoneService } from "./timezone-service";
 
-  return { xp, sylph };
+// ─── Weekly Quest & Streak Calculations ──────────────────────
+
+export interface WeeklyBounds {
+  weekKey: string; // e.g. "2026-W33"
+  weekStart: Date; // Monday 00:00:00.000 in user's timezone
+  weekEnd: Date; // Sunday 23:59:59.999 in user's timezone
+  timeRemainingMs: number;
+  daysRemaining: number;
 }
 
-// ─── HP Penalty ──────────────────────────────────────────────
-
 /**
- * Calculate HP penalty for a failed/missed quest based on intensity tiers.
+ * Compute the ISO week boundaries and remaining time for a given reference date and timezone.
+ * Weeks run Monday 00:00:00.000 to Sunday 23:59:59.999 in the user's local timezone.
  */
-export function hpPenalty(requiredMinutes: number): number {
-  if (requiredMinutes >= 120) return 50; // Hardcore
-  if (requiredMinutes >= 90) return 35;  // Focused
-  if (requiredMinutes >= 60) return 20;  // Standard
-  return 10; // Casual
+export function getWeeklyBounds(refDate: Date = new Date(), timezone: string = "UTC"): WeeklyBounds {
+  const safeTz = TimezoneService.validateTimezone(timezone) ? timezone : "UTC";
+  const localTodayStr = TimezoneService.getUserLocalDate(safeTz, refDate);
+  const [yearNum, monthNum, dayNum] = localTodayStr.split("-").map(Number);
+  
+  // Find local day of week using local noon date (safe from boundary/DST distortion)
+  const localNoon = new Date(Date.UTC(yearNum, monthNum - 1, dayNum, 12, 0, 0));
+  const dayOfWeek = localNoon.getUTCDay(); // 0 is Sunday, 1 is Monday ... 6 is Saturday
+  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const diffToSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+  const diffToNextMonday = diffToSunday + 1;
+
+  const localMondayStr = TimezoneService.getUserLocalDateOffset(safeTz, diffToMonday, refDate);
+  const localNextMondayStr = TimezoneService.getUserLocalDateOffset(safeTz, diffToNextMonday, refDate);
+
+  const mondayNoon = new Date(`${localMondayStr}T12:00:00Z`);
+  const nextMondayNoon = new Date(`${localNextMondayStr}T12:00:00Z`);
+
+  const weekStart = TimezoneService.getStartOfDayUTC(safeTz, mondayNoon);
+  const nextMondayStart = TimezoneService.getStartOfDayUTC(safeTz, nextMondayNoon);
+  const weekEnd = new Date(nextMondayStart.getTime() - 1);
+
+  // ISO Week Key calculation based on local Monday date
+  const [monYear, monMonth, monDay] = localMondayStr.split("-").map(Number);
+  const target = new Date(Date.UTC(monYear, monMonth - 1, monDay));
+  const dayNr = (target.getUTCDay() + 6) % 7;
+  target.setUTCDate(target.getUTCDate() - dayNr + 3);
+  const firstThursday = target.valueOf();
+  target.setUTCMonth(0, 1);
+  if (target.getUTCDay() !== 4) {
+    target.setUTCMonth(0, 1 + ((4 - target.getUTCDay()) + 7) % 7);
+  }
+  const weekNum = 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
+  const year = monYear;
+  const weekKey = `${year}-W${weekNum.toString().padStart(2, "0")}`;
+
+  const timeRemainingMs = Math.max(0, weekEnd.getTime() - refDate.getTime());
+  const daysRemaining = Math.ceil(timeRemainingMs / (1000 * 60 * 60 * 24));
+
+  return {
+    weekKey,
+    weekStart,
+    weekEnd,
+    timeRemainingMs,
+    daysRemaining,
+  };
 }
 
-// ─── Streak Logic ────────────────────────────────────────────
+/**
+ * Calculate level-scaled XP and Sylph payout for completing the 3-hour weekly quest.
+ * EXP is calibrated to ~100% of current level capacity (200 XP at Level 1),
+ * while Sylph is a tight, balanced currency reward (65 Sylph at Level 1).
+ */
+export function calculateWeeklyQuestReward(level: number): { xpReward: number; sylphReward: number } {
+  const nextLevelCapacity = xpForNextLevel(level);
+  // Milestone XP payout for 3-hour weekly focus (200 XP at Level 1)
+  const xpReward = Math.max(200, Math.round(nextLevelCapacity * 1.0));
+  // Balanced currency reward (50 Sylph base + 15 per level)
+  const sylphReward = Math.round(50 + level * 15);
+  return { xpReward, sylphReward };
+}
 
 /**
- * Determine the new streak count based on today's date and the user's
- * last active date.
+ * Determine weekly streak count based on the current week and last completed week.
  *
- * @param lastActiveDate  ISO date string (e.g., "2026-07-21") or null
- * @param todayDate       ISO date string (e.g., "2026-07-22")
- * @param currentStreak   The user's current streak count
- * @returns               Updated streak count
+ * @param lastActiveWeek  ISO week string (e.g. "2026-W32") or date string or null
+ * @param currentWeek     ISO week string (e.g. "2026-W33")
+ * @param currentStreak   Current consecutive weeks count
+ * @param hasFreeze       Whether the user has a Streak Freeze to absorb a missed week
+ * @returns               { newStreak: number, freezeUsed: boolean }
+ */
+export function calculateWeeklyStreak(
+  lastActiveWeek: string | null,
+  currentWeek: string,
+  currentStreak: number,
+  hasFreeze: boolean = false
+): { newStreak: number; freezeUsed: boolean } {
+  if (!lastActiveWeek) {
+    return { newStreak: 1, freezeUsed: false };
+  }
+
+  // If same week, maintain current streak
+  if (lastActiveWeek === currentWeek) {
+    return { newStreak: Math.max(1, currentStreak), freezeUsed: false };
+  }
+
+  const parseWeek = (w: string) => {
+    if (w.includes("-W")) {
+      const parts = w.split("-W");
+      return { year: parseInt(parts[0], 10), week: parseInt(parts[1], 10) };
+    }
+    const d = new Date(w);
+    const bounds = getWeeklyBounds(isNaN(d.getTime()) ? new Date() : d);
+    const parts = bounds.weekKey.split("-W");
+    return { year: parseInt(parts[0], 10), week: parseInt(parts[1], 10) };
+  };
+
+  const last = parseWeek(lastActiveWeek);
+  const curr = parseWeek(currentWeek);
+
+  const weekDiff = (curr.year - last.year) * 52 + (curr.week - last.week);
+
+  if (weekDiff === 0) {
+    return { newStreak: currentStreak, freezeUsed: false };
+  }
+  if (weekDiff === 1) {
+    return { newStreak: currentStreak + 1, freezeUsed: false };
+  }
+  if (weekDiff === 2 && hasFreeze) {
+    return { newStreak: currentStreak + 1, freezeUsed: true };
+  }
+
+  return { newStreak: 1, freezeUsed: false };
+}
+
+/**
+ * Determine the new streak count (legacy compatibility wrapper).
  */
 export function calculateStreak(
   lastActiveDate: string | null,
   todayDate: string,
   currentStreak: number
 ): number {
-  if (!lastActiveDate) return 1; // First session ever
+  if (!lastActiveDate) return 1;
 
   const last = new Date(lastActiveDate);
   const today = new Date(todayDate);
@@ -174,22 +259,22 @@ export function calculateStreak(
     (today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24)
   );
 
-  if (diffDays === 0) return currentStreak;      // Same day — no change
-  if (diffDays === 1) return currentStreak + 1;   // Consecutive day — streak grows
-  if (diffDays === 2) return currentStreak + 1;   // Forgiveness: missed 1 day, didn't break
-  return 1;                                        // Missed > 1 day — streak resets
+  if (diffDays === 0) return currentStreak;
+  if (diffDays === 1 || diffDays === 2) return currentStreak + 1;
+  return 1;
 }
 
 // ─── Sylph System Math ────────────────────────────────────────
 
 /**
- * Global Sylph multiplier based on consecutive days active.
+ * Global Sylph multiplier based on consecutive weekly streaks.
  * Capped strictly at 1.5x.
  */
-export function getStreakMultiplier(streakDays: number): number {
-  if (streakDays >= 7) return 1.5;
-  if (streakDays >= 5) return 1.25;
-  if (streakDays >= 3) return 1.1;
+export function getStreakMultiplier(streakWeeks: number): number {
+  if (streakWeeks >= 8) return 1.5;
+  if (streakWeeks >= 4) return 1.3;
+  if (streakWeeks >= 2) return 1.15;
+  if (streakWeeks >= 1) return 1.05;
   return 1.0;
 }
 

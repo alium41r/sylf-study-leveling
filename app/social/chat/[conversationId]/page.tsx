@@ -182,7 +182,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
   if (isLoading || !user || !conversation) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-400">Loading Chat...</p>
+        <p className="text-text-muted">Loading Chat...</p>
       </div>
     );
   }
@@ -200,14 +200,14 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
       {/* Header */}
       <div className="system-card p-4 flex items-center justify-between mb-4 shrink-0 relative z-20">
         <div className="flex items-center gap-4">
-          <Link href="/social" className="text-gray-400 hover:text-white transition-colors">
+          <Link href="/social" className="text-text-muted hover:text-text-primary transition-colors">
             ← Back
           </Link>
           <div>
             <h1 className="font-bold text-lg" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
               {displayName}
             </h1>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-text-muted">
               {conversation.isGroup 
                 ? `${conversation.participants.length} members • ${onlineCount} online`
                 : `${conversation.participants.find(p => p.id !== user.id)?.isOnline ? 'Online' : 'Offline'}`
@@ -233,7 +233,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
-                <p className="text-gray-500 text-sm">No messages yet. Say hello!</p>
+                <p className="text-text-secondary text-sm">No messages yet. Say hello!</p>
               </div>
             ) : (
               messages.map((msg, i) => {
@@ -247,19 +247,19 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
                         <div className={`rank-badge rank-${msg.sender.hunterRank} w-6 h-6 text-[10px]`}>
                           {msg.sender.hunterRank}
                         </div>
-                        <span className="text-xs text-gray-400">{msg.sender.name || msg.sender.username}</span>
+                        <span className="text-xs text-text-muted">{msg.sender.name || msg.sender.username}</span>
                       </div>
                     )}
                     <div 
                       className={`px-4 py-2 rounded-2xl max-w-[75%] break-words text-sm ${
                         isMe 
                           ? 'bg-accent-mid text-white rounded-tr-none' 
-                          : 'bg-gray-800 text-gray-100 rounded-tl-none border border-gray-700'
+                          : 'bg-bg-panel text-text-primary rounded-tl-none border border-border-subtle'
                       }`}
                     >
                       {msg.content}
                     </div>
-                    <span className="text-[10px] text-gray-500 mt-1">
+                    <span className="text-[10px] text-text-secondary mt-1">
                       {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
@@ -295,7 +295,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
         {conversation.isGroup && showMembers && (
           <div className="system-card w-72 shrink-0 flex flex-col min-h-0 absolute right-0 top-0 bottom-0 z-20 md:relative md:w-80 border-l border-white/5 shadow-2xl">
             <div className="p-4 border-b border-white/10">
-              <h2 className="font-bold text-sm" style={{ color: "var(--accent-purple)", fontFamily: "'Rajdhani', sans-serif" }}>
+              <h2 className="font-bold text-sm" style={{ color: "var(--accent-text-light)", fontFamily: "'Rajdhani', sans-serif" }}>
                 GROUP MEMBERS
               </h2>
             </div>
@@ -344,7 +344,7 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
                       <span className="text-sm truncate pr-2">{res.name || res.username}</span>
                       <button 
                         onClick={() => handleAddMember(res.id)}
-                        className="text-xs text-blue-400 hover:text-blue-300 whitespace-nowrap"
+                        className="text-xs text-accent-primary hover:text-accent-primary-light whitespace-nowrap"
                       >
                         + Add
                       </button>

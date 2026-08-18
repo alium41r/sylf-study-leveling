@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "../AuthProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -43,7 +43,7 @@ const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 /* ─── Intensity color based on study minutes ────────────────── */
 
 function getIntensityColor(minutes: number): string {
-  if (minutes === 0) return "rgba(255,255,255,0.02)";
+  if (minutes === 0) return "transparent";
   if (minutes < 15) return "var(--accent-primary-dim)";
   if (minutes < 30) return "var(--accent-primary-mid)";
   if (minutes < 60) return "var(--accent-primary-mid)";
@@ -52,7 +52,7 @@ function getIntensityColor(minutes: number): string {
 }
 
 function getIntensityBorder(minutes: number): string {
-  if (minutes === 0) return "rgba(255,255,255,0.04)";
+  if (minutes === 0) return "var(--border-subtle)";
   if (minutes < 30) return "var(--accent-primary-dim)";
   if (minutes < 60) return "var(--accent-primary-mid)";
   return "var(--accent-primary-mid)";
@@ -87,10 +87,10 @@ function DayCell({
         gap: "2px",
         borderRadius: "6px",
         background: isToday
-          ? "rgba(6, 182, 212, 0.15)"
+          ? "var(--accent-primary-dim)"
           : getIntensityColor(minutes),
         border: isToday
-          ? "1px solid rgba(6, 182, 212, 0.4)"
+          ? "1px solid var(--accent-primary-mid)"
           : `1px solid ${getIntensityBorder(minutes)}`,
         cursor: "pointer",
         transition: "all 0.2s ease",
@@ -104,7 +104,7 @@ function DayCell({
           fontFamily: "'Rajdhani', sans-serif",
           fontWeight: isToday ? 700 : 500,
           fontSize: "0.85rem",
-          color: isToday ? "var(--accent-cyan)" : (minutes > 0 || (dayData?.quests ?? 0) > 0) ? "var(--text-primary)" : "var(--text-muted)",
+          color: isToday ? "var(--accent-text-light)" : (minutes > 0 || (dayData?.quests ?? 0) > 0) ? "var(--text-primary)" : "var(--text-muted)",
         }}
       >
         {day}
@@ -114,7 +114,7 @@ function DayCell({
           style={{
             fontFamily: "'Rajdhani', sans-serif",
             fontSize: "0.55rem",
-            color: isToday ? "var(--accent-cyan)" : "var(--accent-purple)",
+            color: isToday ? "var(--accent-text-light)" : "var(--accent-text-light)",
             fontWeight: 600,
           }}
         >
@@ -143,7 +143,7 @@ function DayCell({
             width: "4px",
             height: "4px",
             borderRadius: "50%",
-            background: minutes >= 60 ? "var(--accent-gold)" : (dayData?.quests ?? 0) > 0 ? "var(--accent-green)" : "var(--accent-purple)",
+            background: minutes >= 60 ? "var(--accent-gold)" : (dayData?.quests ?? 0) > 0 ? "var(--accent-green)" : "var(--accent-primary)",
             boxShadow: minutes >= 60 ? "0 0 4px var(--accent-gold)" : "none",
           }}
         />
@@ -205,19 +205,19 @@ function DayDetailPanel({
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginTop: "16px" }}>
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--accent-cyan)" }}>
+          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--text-primary)" }}>
             {hours > 0 ? `${hours}h ${mins}m` : `${mins}m`}
           </p>
           <p className="stat-label">Study Time</p>
         </div>
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--accent-purple)" }}>
+          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--text-primary)" }}>
             {dayData.sessions}
           </p>
           <p className="stat-label">Sessions</p>
         </div>
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--accent-green)" }}>
+          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--text-primary)" }}>
             {dayData.questsCompleted}/{dayData.quests}
           </p>
           <p className="stat-label">Quests Done</p>
@@ -243,7 +243,7 @@ function DayDetailPanel({
 /* ─── Main Component ─────────────────────────────────────────────── */
 
 export default function StudyCalendar() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
@@ -251,7 +251,19 @@ export default function StudyCalendar() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<DayData | null>(null);
 
-  const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = useMemo(() => {
+    try {
+      const tz = user?.timezone || "UTC";
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: tz,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+    } catch {
+      return new Date().toISOString().split("T")[0];
+    }
+  }, [user?.timezone]);
 
   // Fetch calendar data from sessions and quests
   useEffect(() => {
@@ -265,12 +277,20 @@ export default function StudyCalendar() {
     Promise.all([
       fetch("/api/user/detailed-stats", {
         headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => r.json()),
+      })
+        .then(async (r) => (r.ok ? r.json().catch(() => null) : null))
+        .catch(() => null),
       fetch(`/api/quests?all=true`, {
         headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => r.json()).catch(() => []),
+      })
+        .then(async (r) => (r.ok ? r.json().catch(() => []) : []))
+        .catch(() => []),
     ])
       .then(([statsData, allQuests]) => {
+        if (!statsData) {
+          setIsLoading(false);
+          return;
+        }
         // Build day map from sessions data
         const daysInMonth = getDaysInMonth(year, month);
         const dayMap: Record<string, DayData> = {};
@@ -388,7 +408,7 @@ export default function StudyCalendar() {
         <button
           onClick={() => navigateMonth(-1)}
           style={{
-            background: "rgba(255,255,255,0.03)",
+            background: "var(--bg-panel)",
             border: "1px solid var(--border-subtle)",
             borderRadius: "6px",
             padding: "8px 12px",
@@ -396,7 +416,7 @@ export default function StudyCalendar() {
             cursor: "pointer",
             transition: "all 0.2s ease",
           }}
-          className="hover:bg-white/10 hover:text-white"
+          className="hover:bg-bg-panel hover:text-text-primary"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -421,7 +441,7 @@ export default function StudyCalendar() {
               style={{
                 fontFamily: "'Rajdhani', sans-serif",
                 fontSize: "0.75rem",
-                color: "var(--accent-cyan)",
+                color: "var(--accent-text-light)",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
@@ -429,7 +449,7 @@ export default function StudyCalendar() {
                 letterSpacing: "0.1em",
                 marginTop: "2px",
               }}
-              className="hover:text-white transition-colors"
+              className="hover:text-text-primary transition-colors"
             >
               ← Back to Today
             </button>
@@ -439,7 +459,7 @@ export default function StudyCalendar() {
         <button
           onClick={() => navigateMonth(1)}
           style={{
-            background: "rgba(255,255,255,0.03)",
+            background: "var(--bg-panel)",
             border: "1px solid var(--border-subtle)",
             borderRadius: "6px",
             padding: "8px 12px",
@@ -447,7 +467,7 @@ export default function StudyCalendar() {
             cursor: "pointer",
             transition: "all 0.2s ease",
           }}
-          className="hover:bg-white/10 hover:text-white"
+          className="hover:bg-bg-panel hover:text-text-primary"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -459,19 +479,19 @@ export default function StudyCalendar() {
       {calendarData && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
           <div className="system-card" style={{ padding: "16px", textAlign: "center" }}>
-            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-cyan)" }}>
+            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-text-light)" }}>
               {Math.floor(calendarData.monthStats.totalMinutes / 60)}h {calendarData.monthStats.totalMinutes % 60}m
             </p>
             <p className="stat-label">Total Study</p>
           </div>
           <div className="system-card" style={{ padding: "16px", textAlign: "center" }}>
-            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-purple)" }}>
+            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-primary)" }}>
               {calendarData.monthStats.activeDays}
             </p>
             <p className="stat-label">Active Days</p>
           </div>
           <div className="system-card" style={{ padding: "16px", textAlign: "center" }}>
-            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-gold)" }}>
+            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-primary)" }}>
               {calendarData.monthStats.totalDays > 0
                 ? Math.round((calendarData.monthStats.activeDays / calendarData.monthStats.totalDays) * 100)
                 : 0}%

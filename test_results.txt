@@ -1,0 +1,99 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.9 [39m[90m/Users/aliumair/Desktop/arbisoft-internship[39m
+
+ [31m❯[39m __tests__/api.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 45[2mms[22m[39m
+[31m     [31m×[31m should register and log in a test user[39m[32m 30[2mms[22m[39m
+[31m     [31m×[31m should create a note when logged in (Happy Path)[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should fail to create a note when NOT logged in (Error Path)[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should fetch all notes (Read)[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should block a normal user from deleting a note (Admin Rule)[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should run the entire Happy Path End-to-End[39m[32m 2[2mms[22m[39m
+ [32m✓[39m __tests__/ai/agent-router.test.ts [2m([22m[2m54 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m __tests__/ai/daily-briefing-cron.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+ [31m❯[39m __tests__/ai/planner-integration.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 33[2mms[22m[39m
+[31m     [31m×[31m successfully generates and saves a plan within limits[39m[32m 27[2mms[22m[39m
+ [31m❯[39m __tests__/ai/provider-contract.test.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31m❯[39m __tests__/ai/calendar-tools.test.ts [2m([22m[2m12 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 71[2mms[22m[39m
+       [32m✓[39m fails if quest is not found or unauthorized[32m 3[2mms[22m[39m
+       [32m✓[39m fails if targetDate is malformed[32m 0[2mms[22m[39m
+       [32m✓[39m fails if quest is already completed or failed[32m 0[2mms[22m[39m
+[31m       [31m×[31m fails if target date is overloaded[39m[32m 28[2mms[22m[39m
+[31m       [31m×[31m successfully moves quest if capacity allows[39m[32m 4[2mms[22m[39m
+       [32m✓[39m fails if swapping the same quest[32m 1[2mms[22m[39m
+       [32m✓[39m fails if either quest is completed or failed[32m 0[2mms[22m[39m
+[31m       [31m×[31m fails if swapping overloads a day[39m[32m 3[2mms[22m[39m
+[31m       [31m×[31m successfully swaps if capacity allows[39m[32m 23[2mms[22m[39m
+       [32m✓[39m fails if date is malformed[32m 1[2mms[22m[39m
+[31m       [31m×[31m successfully clears day when there is enough future capacity[39m[32m 2[2mms[22m[39m
+[31m       [31m×[31m fails and prompts user when future capacity is exhausted[39m[32m 2[2mms[22m[39m
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m1. Complete Flow & Tool Result Propagation
+[22m[39m[Agent Router] → general (conf: 1.00) | Sections: core + memories
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m1. Complete Flow & Tool Result Propagation
+[22m[39m[GEMINI] Tool call: getAppState({})
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m2 & 3. Explicit vs Conversational Routing & Tool Isolation
+[22m[39m[Agent Router] → coach (conf: 1.00) | Sections: core + memories, subjects, health, trends
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m2 & 3. Explicit vs Conversational Routing & Tool Isolation
+[22m[39m[Agent Router] → calendar (conf: 1.00) | Sections: core + calendar
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m4. Failed tool calls are handled and final response reflects failure
+[22m[39m[Agent Router] → general (conf: 1.00) | Sections: core + memories
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m4. Failed tool calls are handled and final response reflects failure
+[22m[39m[GEMINI] Tool call: generateInsight({"category":"trend","content":"test"})
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m6. Prompt boundary explicitly prevents invented trends and mutations
+[22m[39m[Agent Router] → coach (conf: 1.00) | Sections: core + memories, subjects, health, trends
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m7 & 11. Context Isolation and Routing Verification
+[22m[39m[Agent Router] → calendar (conf: 1.00) | Sections: core + calendar
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m8. Memory Authority: DB overrides inferred memory
+[22m[39m[Agent Router] → general (conf: 1.00) | Sections: core + memories
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m9. Token/Context bounds
+[22m[39m[Agent Router] → general (conf: 1.00) | Sections: core + memories
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m10. Proactive Insight Full Flow
+[22m[39m[Agent Router] → general (conf: 1.00) | Sections: core + memories
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m10. Proactive Insight Full Flow
+[22m[39m[GEMINI] Tool call: generateInsight({"category":"trend","content":"Math dropped 20%"})
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m12. Valid Handoff: Coach -> Planner with tool execution and context swap
+[22m[39m[Agent Router] → coach (conf: 1.00) | Sections: core + memories, subjects, health, trends
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m12. Valid Handoff: Coach -> Planner with tool execution and context swap
+[22m[39m[GEMINI] Tool call: handoff({"target_agent":"planner","reason":"User wants to make a schedule"})
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m12. Valid Handoff: Coach -> Planner with tool execution and context swap
+[22m[39m[GEMINI] Tool call: getQuests({"date":"2099-01-01"})
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m13. Handoff security: Unauthorized targets, invalid targets, and max handoffs enforced
+[22m[39m[Agent Router] → planner (conf: 1.00) | Sections: core + goals, memories, subjects, calendar
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m13. Handoff security: Unauthorized targets, invalid targets, and max handoffs enforced
+[22m[39m[GEMINI] Tool call: handoff({"target_agent":"analyst","reason":"Need stats"})
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m13. Handoff security: Unauthorized targets, invalid targets, and max handoffs enforced
+[22m[39m[GEMINI] Tool call: handoff({"target_agent":"coach","reason":"Needs motivation"})
+
+[90mstdout[2m | __tests__/ai/e2e-conversation.test.ts[2m > [22m[2mPhase 4D: E2E Conversational Intelligence[2m > [22m[2m13. Handoff security: Unauthorized targets, invalid targets, and max handoffs enforced
+[22m[39m[GEMINI] Tool call: handoff({"target_agent":"planner","reason":"Back to planner"})
+
+ [32m✓[39m __tests__/ai/e2e-conversation.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 132[2mms[22m[39m
+ [32m✓[39m __tests__/ai/planning-engine.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m __tests__/ai/analytics-tools.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m __tests__/ai/app-state-tools.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m __tests__/ai/memory-tools.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m __tests__/ai/context-builder.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m __tests__/ai/daily-briefing.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m __tests__/ai/context-engine.test.ts [2m([22m[2m27 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (14)[39m
+[2m      Tests [22m [1m[31m13 failed[39m[22m[2m | [22m[1m[32m161 passed[39m[22m[90m (174)[39m
+[2m   Start at [22m 22:45:03
+[2m   Duration [22m 4.72s[2m (transform 2.66s, setup 2.28s, import 3.93s, tests 568ms, environment 19.77s)[22m
+

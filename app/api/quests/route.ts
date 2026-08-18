@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import { TimezoneService } from "@/lib/timezone-service";
+import { getUserTimezone } from "@/lib/timezone-server";
 
 /**
  * GET /api/quests
@@ -23,7 +25,12 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const isAll = searchParams.get("all") === "true";
-    const date = searchParams.get("date") || new Date().toISOString().split("T")[0];
+    
+    let date = searchParams.get("date");
+    if (!date) {
+      const tz = await getUserTimezone(payload.userId as number);
+      date = TimezoneService.getUserLocalDate(tz);
+    }
     const goalId = searchParams.get("goalId");
 
     const where: Record<string, unknown> = {

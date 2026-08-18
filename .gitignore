@@ -45,4 +45,9 @@ next-env.d.ts
 # database
 dev.db
 
+# vim swap files
+*.swp
+*.swo
+
+
 

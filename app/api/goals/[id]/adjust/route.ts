@@ -71,40 +71,15 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
-    const recentSessions = await prisma.studySession.findMany({
-      where: {
-        userId: payload.userId as number,
-        startedAt: { gte: sevenDaysAgo },
-      },
-      include: { quest: true },
-      orderBy: { startedAt: 'desc' },
-    });
-
-    let pastSessionsContext = "No sessions logged in the last 7 days.";
-    if (recentSessions.length > 0) {
-      const totalMins = recentSessions.reduce((acc, s) => acc + s.durationMinutes, 0);
-      pastSessionsContext = `User completed ${recentSessions.length} sessions totaling ${totalMins} minutes in the last week.`;
-    }
-
-    // Call the AI agent's adjustQuestPlan tool
-    const { adjustQuests } = await import("@/lib/ai/system-agent");
-    const adjustedPlan = await adjustQuests(
-      goal.title,
-      goal.description,
-      goal.targetWeeks,
-      newWeeks,
-      currentConfig.dailyMinutes,
-      preview.newDailyMinutes,
-      goal.effortLevel as EffortLevel,
-      pastSessionsContext
-    );
+    // We update the timeline, but we let the chat system handle quest regeneration.
+    const newEffortLevelStr = preview.suggestedEffortLevel; 
 
     // Update the goal timeline and effort in DB
     await prisma.goal.update({
       where: { id: goal.id },
       data: {
         targetWeeks: newWeeks,
-        effortLevel: adjustedPlan.newEffortLevel,
+        effortLevel: newEffortLevelStr,
       },
     });
 
@@ -114,32 +89,11 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       where: { goalId: goal.id, status: "PENDING" },
     });
 
-    // Save new quests to the database
-    if (adjustedPlan.quests.length > 0) {
-      const today = new Date();
-      await prisma.quest.createMany({
-        data: adjustedPlan.quests.map((q: any) => {
-          const scheduledDate = new Date(today);
-          scheduledDate.setDate(today.getDate() + q.scheduledDay);
-          return {
-            userId: payload.userId as number,
-            goalId: goal.id,
-            title: q.title,
-            description: q.description,
-            requiredMinutes: q.requiredMinutes,
-            xpReward: q.xpReward,
-            goldReward: q.goldReward,
-            scheduledFor: scheduledDate.toISOString().split("T")[0],
-          };
-        }),
-      });
-    }
-
     // Add system message
     await prisma.systemMessage.create({
       data: {
         userId: payload.userId as number,
-        content: `[TIMELINE COMPRESSED]\n\nGoal: "${goal.title}"\nNew Timeline: ${newWeeks} weeks\nNew Effort Level: ${adjustedPlan.newEffortLevel}\n\nThe System has re-evaluated your tasks. Your daily burden has increased. Do not fail.`,
+        content: `[TIMELINE COMPRESSED]\n\nGoal: "${goal.title}"\nNew Timeline: ${newWeeks} weeks\nNew Effort Level: ${newEffortLevelStr}\n\nThe System has re-evaluated your timeline. Please talk to The System in the chat to regenerate your quests.`,
         type: "WARNING",
       },
     });
@@ -149,7 +103,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         goalId: goal.id,
         goalTitle: goal.title,
         preview,
-        newEffortLevel: adjustedPlan.newEffortLevel,
+        newEffortLevel: newEffortLevelStr,
         message: `Adjusting "${goal.title}" from ${goal.targetWeeks} weeks to ${newWeeks} weeks.`,
       },
       { status: 200 }

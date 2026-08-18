@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "./AuthProvider";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SearchResult {
   id: number;
@@ -76,22 +77,34 @@ export function AddFriendModal({ onClose }: AddFriendModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div className="system-card relative w-full max-w-md p-6 z-10 flex flex-col max-h-[80vh]">
-        <button 
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 10 }}
+        transition={{ type: "spring", damping: 28, stiffness: 380 }}
+        className="system-card relative w-full max-w-md p-6 z-10 flex flex-col max-h-[80vh] shadow-2xl"
+      >
+        <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+          className="absolute top-4 right-4 text-text-muted hover:text-text-primary transition-colors"
         >
           ✕
         </button>
-        
-        <h2 className="text-xl font-bold mb-4" style={{ fontFamily: "'Rajdhani', sans-serif", color: "var(--accent-cyan)" }}>
-          ADD SCHOLAR
+
+        <h2
+          className="text-xl font-bold mb-4 font-['Rajdhani'] uppercase tracking-wide text-accent-text-light"
+        >
+          ADD FRIEND
         </h2>
 
         {error && (
@@ -106,63 +119,74 @@ export function AddFriendModal({ onClose }: AddFriendModalProps) {
             placeholder="Search by username..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="input-field w-full"
+            className="input-field w-full text-xs font-['Rajdhani']"
             autoFocus
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-2 min-h-[200px]">
+        <div className="flex-1 overflow-y-auto space-y-2 min-h-[200px] custom-scrollbar">
           {isSearching ? (
-            <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>Searching...</p>
+            <p className="text-center text-sm font-['Rajdhani'] text-text-muted">
+              Searching...
+            </p>
           ) : results.length > 0 ? (
             results.map((user) => (
-              <div 
-                key={user.id} 
-                className="flex items-center justify-between p-3 rounded"
-                style={{ background: "rgba(255,255,255,0.02)" }}
+              <motion.div
+                key={user.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-white/[0.04] bg-bg-panel border border-border-subtle"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`rank-badge rank-${user.hunterRank} w-8 h-8 text-xs`}>
-                    {user.hunterRank}
-                  </div>
+                  <span className="px-2 py-0.5 rounded bg-accent-primary-dim/30 border border-accent-primary-mid/40 text-[10px] font-mono font-bold text-accent-text-light">
+                    Rank {user.hunterRank}
+                  </span>
                   <div>
-                    <p className="text-sm font-medium">{user.name || user.username}</p>
-                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    <p className="text-sm font-bold font-['Rajdhani'] text-text-primary">{user.name || user.username}</p>
+                    <p className="text-xs font-mono text-text-muted">
                       @{user.username} • Lv. {user.level}
                     </p>
                   </div>
                 </div>
-                
+
                 {user.isFriend ? (
-                  <span className="text-xs px-2 py-1 rounded" style={{ background: "var(--accent-primary-dim)", color: "var(--accent-primary)" }}>
+                  <span
+                    className="text-xs px-2.5 py-1 rounded-lg font-['Rajdhani'] font-bold uppercase tracking-wider bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid"
+                  >
                     Friend
                   </span>
                 ) : sentRequests.has(user.username) ? (
-                  <span className="text-xs px-2 py-1 rounded" style={{ background: "rgba(34, 197, 94, 0.2)", color: "var(--accent-green)" }}>
+                  <span
+                    className="text-xs px-2.5 py-1 rounded-lg font-['Rajdhani'] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                  >
                     Request Sent ✓
                   </span>
                 ) : (
                   <button
                     onClick={() => handleSendRequest(user.username)}
-                    className="text-xs px-3 py-1 rounded transition-colors"
-                    style={{ 
-                      background: "rgba(59, 130, 246, 0.2)", 
-                      color: "var(--accent-blue)",
-                      border: "1px solid rgba(59, 130, 246, 0.4)"
+                    className="btn-primary text-xs px-3 py-1 rounded-lg font-['Rajdhani'] font-bold uppercase tracking-wider"
+                    style={{
+                      background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
+                      border: "none",
+                      color: "var(--text-primary)",
                     }}
                   >
                     Add
                   </button>
                 )}
-              </div>
+              </motion.div>
             ))
           ) : query.length >= 2 ? (
-            <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>No scholars found.</p>
+            <p className="text-center text-sm font-['Rajdhani'] text-text-muted">
+              No users found.
+            </p>
           ) : (
-            <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>Type at least 2 characters to search.</p>
+            <p className="text-center text-sm font-['Rajdhani'] text-text-muted">
+              Type at least 2 characters to search.
+            </p>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

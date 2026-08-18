@@ -471,8 +471,8 @@ export default function StatsSettingsPage() {
           }
         />
         <StatCard
-          label="Day Streak"
-          value={`🔥 ${user.streakDays}`}
+          label="Weekly Streak"
+          value={`🔥 ${user.streakDays} wks`}
           color="var(--accent-gold)"
           delay={200}
           icon={

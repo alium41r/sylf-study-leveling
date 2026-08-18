@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
         userId: payload.userId as number,
         sessionId: sessionId,
         content: body.content,
-        type: body.type || "SYSTEM (Gemini)",
+        type: body.type || "SYSTEM",
         read: false,
       }
     });

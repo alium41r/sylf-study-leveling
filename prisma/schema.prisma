@@ -7,9 +7,10 @@ datasource db {
 }
 
 enum EffortLevel {
-  EASY
+  RELAXED
   NORMAL
-  HARD
+  INTENSE
+  EXTREME
 }
 
 enum GoalStatus {
@@ -25,6 +26,13 @@ enum QuestStatus {
   FAILED
 }
 
+enum QuestDifficulty {
+  EASY
+  NORMAL
+  HARD
+  EXPERT
+}
+
 enum SystemMessageType {
   INFO
   QUEST
@@ -34,6 +42,7 @@ enum SystemMessageType {
   USER
   STREAK
   SYSTEM
+  DAILY_BRIEFING
 }
 
 enum RequestStatus {
@@ -72,13 +81,27 @@ enum PrivacyLevel {
   PRIVATE
 }
 
+enum BriefingStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  VERIFIED
+}
+
 model User {
-  id                Int       @id @default(autoincrement())
-  email             String    @unique
-  username          String    @unique
-  password          String
+  id                Int                @id @default(autoincrement())
+  email             String             @unique
+  username          String             @unique
+  password          String?
   name              String?
-  hunterRank        String    @default("E")
+  scholarId         String?            @unique
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  avatarUrl         String?
+  hunterRank        String             @default("E")
   level             Int       @default(1)
   currentXP         Int       @default(0)
   xpToNextLevel     Int       @default(200)
@@ -92,11 +115,26 @@ model User {
   sylph             Int       @default(0)
   activeTheme       String    @default("default")
   activeBackground  String    @default("none")
-  activeAvatar      String    @default("default")
+  activeAvatar      String    @default("class_scholar")
+  tokenVersion      Int       @default(1)
   activeFrame       String    @default("none")
   activeTitle       String    @default("Novice")
   activeNameColor   String    @default("default")
+  activeAura        String    @default("none")
+  bannerUrl         String?
+  bio               String?
+  characterConfig   Json?
+  socialLinks       Json?
+
+  // Academic Cognitive Stats Matrix (Attributes 0-100+)
+  statEndurance     Int       @default(10) // END: Long-duration unbroken focus blocks (>60m)
+  statTenacity      Int       @default(10) // TEN: Weekly streak stability & consistency
+  statVelocity      Int       @default(10) // VEL: Daily quest & milestone completion throughput
+  statSynthesis     Int       @default(10) // SYN: Problem sets & STEM deep work focus
+  statDiscipline    Int       @default(10) // DIS: Punctuality, early start, low pause frequency
+
   createdAt         DateTime  @default(now())
+  timezone          String    @default("UTC")
   hasCompletedOnboarding Boolean @default(false)
 
   goals          Goal[]
@@ -106,11 +144,19 @@ model User {
   subjects       Subject[]
   inventoryItems InventoryItem[]
   sylphLedger    SylphLedger[]
+  hpLedger       HpLedger[]
   chatSessions   ChatSession[]
   cosmetics      UserCosmetic[]
   achievements   UserAchievement[]
   privacy        UserPrivacy?
   connectedAccounts ConnectedAccount[]
+  verificationTokens VerificationToken[]
+  authSessions   AuthSession[]
+
+  // AI
+  aiMemories     AiMemory[]
+  aiInsights     AiInsight[]
+  dailyBriefings DailyBriefingLog[]
 
   // Social
   friendshipsAsUser   Friendship[]              @relation("friendshipsAsUser")
@@ -140,21 +186,24 @@ model Goal {
 }
 
 model Quest {
-  id                 Int         @id @default(autoincrement())
+  id                 Int             @id @default(autoincrement())
   userId             Int
-  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   goalId             Int?
-  goal               Goal?       @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  goal               Goal?           @relation(fields: [goalId], references: [id], onDelete: SetNull)
   title              String
   description        String?
-  status             QuestStatus @default(PENDING)
+  status             QuestStatus     @default(PENDING)
+  difficulty         QuestDifficulty @default(NORMAL)
   requiredMinutes    Int
+  elapsedSeconds     Int             @default(0)
   xpReward           Int
-  sylphReward        Int         @default(0)
-  isKamishWardActive Boolean     @default(false)
-  isGateKeyApplied   Boolean     @default(false)
+  sylphReward        Int             @default(0)
+  isKamishWardActive Boolean         @default(false)
+  isGateKeyApplied   Boolean         @default(false)
   scheduledFor       String // YYYY-MM-DD
-  createdAt          DateTime    @default(now())
+  createdByAi        Boolean         @default(false)
+  createdAt          DateTime        @default(now())
   completedAt        DateTime?
 
   sessions StudySession[]
@@ -303,6 +352,15 @@ model SylphLedger {
   createdAt DateTime     @default(now())
 }
 
+model HpLedger {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int      // Negative for damage, positive for heal
+  source    String   // e.g., "QUEST_FAILED", "ELIXIR"
+  createdAt DateTime @default(now())
+}
+
 model UserCosmetic {
   id        Int              @id @default(autoincrement())
   userId    Int
@@ -357,3 +415,93 @@ model ConnectedAccount {
   // 2. Prevent one user from linking multiple accounts from the same provider
   @@unique([userId, provider])
 }
+
+// ─── AI Models ───────────────────────────────────────────────
+
+model AiMemory {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key        String   // e.g., "exam_dates", "preferred_study_time", "career_goal"
+  value      String   // JSON string for flexible storage
+  confidence Float    @default(1.0) // How confident the AI is (0-1)
+  source     String   @default("inferred") // "user_stated", "inferred", "observed"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, key])
+}
+
+model AiInsight {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String   // "coaching", "trend", "recommendation", "warning"
+  content   String   // The insight text
+  metadata  String?  // JSON with supporting data
+  dismissed Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model DailyBriefingLog {
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateKey   String         // "YYYY-MM-DD" in user's local time
+  status    BriefingStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([userId, dateKey])
+}
+
+model VerificationToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  action    String   @default("VERIFY_EMAIL")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ─── Acoustics & Soundscapes ──────────────────────────────────
+
+model AcousticTrack {
+  id            Int      @id @default(autoincrement())
+  title         String
+  category      String   // "BINAURAL", "NOISE", "AMBIENT", "LOFI"
+  frequency     String?  // e.g. "40Hz Gamma", "10Hz Alpha", "Broadband"
+  audioUrl      String   // URL or synthetic generator id (e.g. "synth:gamma-40", "synth:brown-noise")
+  duration      Int      @default(0) // in seconds (0 = infinite ambient loop)
+  defaultVolume Float    @default(0.75)
+  description   String?
+  tags          String[] @default([])
+  isPreset      Boolean  @default(true)
+  orderIndex    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+}
+
+model AuthSession {
+  id           String    @id @default(cuid())
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash    String?   @unique
+  device       String    @default("Desktop Device")
+  platform     String    @default("Web Browser")
+  location     String    @default("Current Location")
+  ipAddress    String?
+  userAgent    String?
+  lastActiveAt DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  expiresAt    DateTime?
+
+  @@index([userId])
+}
+
+

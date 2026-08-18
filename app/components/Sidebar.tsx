@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SystemMessage {
   id: number;
@@ -53,7 +54,7 @@ const NAV_ITEMS = [
   },
   {
     href: "/goals",
-    label: "Goals",
+    label: "Objectives",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -61,11 +62,11 @@ const NAV_ITEMS = [
     ),
   },
   {
-    href: "/quests",
-    label: "Quests",
+    href: "/locker",
+    label: "Locker",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
       </svg>
     ),
   },
@@ -139,7 +140,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, [token, user]);
+  }, [token]);
 
   if (!user) return null;
 
@@ -176,7 +177,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, i) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i} className="text-white font-bold">{part.slice(2, -2)}</strong>;
+        return <strong key={i} className="text-text-primary font-bold">{part.slice(2, -2)}</strong>;
       }
       return <span key={i}>{part}</span>;
     });
@@ -189,7 +190,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         width: isCollapsed ? "var(--sidebar-collapsed-width)" : "var(--sidebar-width)",
         background: "var(--bg-panel)",
         borderRight: "1px solid var(--border-subtle)",
-        transition: "width 0.3s ease",
+        transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
       }}
     >
       {/* Top: Toggle + Profile Badge */}
@@ -197,23 +198,22 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         {/* Controls: Settings, Notifications, Toggle Button */}
         <div className={`flex ${isCollapsed ? "flex-col-reverse items-center gap-4" : "flex-row justify-between items-center"} mb-4 relative`}>
           <div className={`flex ${isCollapsed ? "flex-col gap-3" : "flex-row gap-2"}`}>
-            {/* ─── Settings Gear ──────────────────────────────────── */}
+            {/* ─── System Hub Icon Button ───────────────────────── */}
             <button
-              className="pointer-events-auto w-10 h-10 flex items-center justify-center bg-[#141432]/70 backdrop-blur-md border border-white/10 rounded-lg text-gray-400 hover:text-[#a78bfa] hover:border-[#a78bfa] hover:shadow-[0_0_16px_rgba(124,58,237,0.15)] hover:rotate-45 transition-all duration-300"
+              className="pointer-events-auto w-10 h-10 flex items-center justify-center bg-bg-panel/70 backdrop-blur-md border border-border-subtle rounded-lg text-text-secondary hover:text-accent-primary-light hover:border-accent-primary-light hover:shadow-[0_0_16px_var(--accent-primary-dim)] hover:scale-105 active:scale-95 transition-all duration-200"
               onClick={openSettings}
-              aria-label="Open settings"
-              title="Settings"
+              aria-label="Open System Hub"
+              title="System Hub"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             {/* ─── Notification Bell ──────────────────────────────── */}
             <div className="relative pointer-events-auto" ref={notifRef}>
               <button
-                className={`w-10 h-10 flex items-center justify-center bg-[#141432]/70 backdrop-blur-md border rounded-lg transition-all duration-300 ${
-                  showNotifications ? "border-cyan-400 text-cyan-400" : "border-white/10 text-gray-400 hover:text-cyan-400 hover:border-cyan-400 hover:shadow-[0_0_16px_rgba(6,182,212,0.15)]"
+                className={`w-10 h-10 flex items-center justify-center bg-bg-panel/70 backdrop-blur-md border rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
+                  showNotifications ? "border-accent-primary text-accent-text-light" : "border-border-subtle text-text-secondary hover:text-accent-primary hover:border-accent-primary hover:shadow-lg"
                 }`}
                 onClick={handleOpenNotifications}
               >
@@ -226,58 +226,67 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               </button>
 
               {/* ─── Notifications Dropdown ────────────────────────── */}
-              {showNotifications && (
-                <div className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} w-80 max-h-96 overflow-y-auto bg-[#0a0a0f] border border-[#1f1f3a] shadow-2xl rounded-lg p-2 custom-scrollbar animate-fade-in-down z-[100]`}>
-                  <div className="flex items-center justify-between p-2 mb-1 border-b border-white/5">
-                    <h3 className="text-xs tracking-widest text-[#a78bfa] font-['Rajdhani']">
-                      SYSTEM NOTIFICATIONS
-                    </h3>
-                    {notifications.length > 0 && (
-                      <button 
-                        onClick={handleClearNotifications}
-                        className="text-[10px] text-gray-500 hover:text-red-400 transition-colors font-bold tracking-wider"
-                      >
-                        CLEAR ALL
-                      </button>
-                    )}
-                  </div>
-                  {notifications.length === 0 ? (
-                    <p className="text-sm text-gray-500 p-4 text-center">No recent messages.</p>
-                  ) : (
-                    <div className="flex flex-col">
-                      {notifications.map((n, idx) => (
-                        <div key={n.id}>
-                          <div className={`p-3 rounded border-transparent text-sm ${!n.read ? "bg-cyan-900/10" : "bg-transparent"}`}>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                                n.type === "WARNING" ? "bg-red-500/20 text-red-400" : 
-                                n.type === "REWARD" ? "bg-yellow-500/20 text-yellow-400" :
-                                n.type === "LEVEL_UP" ? "bg-purple-500/20 text-purple-400" :
-                                n.type === "STREAK" ? "bg-yellow-500/20 text-yellow-400" :
-                                "bg-blue-500/20 text-blue-400"
-                              }`}>
-                                {n.type}
-                              </span>
-                              <span className="text-xs text-gray-500">{new Date(n.createdAt).toLocaleDateString()}</span>
-                            </div>
-                            <p className="text-gray-300 whitespace-pre-wrap leading-tight">{renderFormattedText(n.content)}</p>
-                          </div>
-                          {idx < notifications.length - 1 && (
-                            <hr className="border-white/10 my-1 mx-2" />
-                          )}
-                        </div>
-                      ))}
+              <AnimatePresence>
+                {showNotifications && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -6 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 380 }}
+                    className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} w-80 max-h-96 overflow-y-auto bg-bg-abyss border border-border-subtle shadow-2xl rounded-lg p-2 custom-scrollbar z-[100]`}
+                  >
+                    <div className="flex items-center justify-between p-2 mb-1 border-b border-border-subtle">
+                      <h3 className="text-xs tracking-widest text-accent-light font-['Rajdhani']">
+                        SYSTEM NOTIFICATIONS
+                      </h3>
+                      {notifications.length > 0 && (
+                        <button 
+                          onClick={handleClearNotifications}
+                          className="text-[10px] text-text-muted hover:text-red-400 transition-colors font-bold tracking-wider"
+                        >
+                          CLEAR ALL
+                        </button>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
+                    {notifications.length === 0 ? (
+                      <p className="text-sm text-text-muted p-4 text-center">No recent messages.</p>
+                    ) : (
+                      <div className="flex flex-col">
+                        {notifications.map((n, idx) => (
+                          <div key={n.id}>
+                            <div className={`p-3 rounded border-transparent text-sm transition-colors ${!n.read ? "bg-accent-primary-dim" : "bg-transparent hover:bg-bg-shadow/50"}`}>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                  n.type === "WARNING" ? "bg-red-500/20 text-red-400" : 
+                                  n.type === "REWARD" ? "bg-yellow-500/20 text-yellow-400" :
+                                  n.type === "LEVEL_UP" ? "bg-accent-primary-dim text-accent-text-light" :
+                                  n.type === "STREAK" ? "bg-yellow-500/20 text-yellow-400" :
+                                  "bg-blue-500/20 text-blue-400"
+                                }`}>
+                                  {n.type}
+                                </span>
+                                <span className="text-xs text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
+                              </div>
+                              <p className="text-text-primary whitespace-pre-wrap leading-tight">{renderFormattedText(n.content)}</p>
+                            </div>
+                            {idx < notifications.length - 1 && (
+                              <hr className="border-border-subtle my-1 mx-2" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
           
           {/* Toggle Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-text-secondary hover:text-text-primary transition-transform duration-200 hover:scale-110 active:scale-95"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <svg
               className="w-6 h-6"
@@ -287,7 +296,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               xmlns="http://www.w3.org/2000/svg"
               style={{
                 transform: isCollapsed ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 0.3s ease",
+                transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
               }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -304,15 +313,15 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
-              <div className={`rank-badge rank-${user.hunterRank}`}>
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className={`rank-badge rank-${user.hunterRank} shrink-0`}>
                 {user.hunterRank}
               </div>
-              <div>
-                <p className="font-bold text-sm truncate w-32" style={{ color: "var(--text-primary)" }}>
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-sm truncate" style={{ color: "var(--text-primary)" }}>
                   {user.name || "Scholar"}
                 </p>
-                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                <p className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>
                   {user.hunterRank}-Rank • Lv. {user.level}
                 </p>
               </div>
@@ -324,12 +333,12 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       {/* ─── Navigation ────────── */}
       <nav className="flex-1 flex flex-col justify-start mt-8 gap-1 px-4">
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || (item.href === "/goals" && pathname === "/quests");
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center rounded transition-all duration-200 ${
+              className={`flex items-center rounded transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
                 isCollapsed ? "justify-center p-2" : "gap-3 px-3 py-2.5"
               }`}
               style={{
@@ -339,11 +348,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               }}
               title={isCollapsed ? item.label : undefined}
             >
-              <span className="flex items-center justify-center" style={isActive && isCollapsed ? { color: 'var(--accent-primary-light)' } : undefined}>
+              <span className="flex items-center justify-center transition-colors" style={isActive ? { color: 'var(--accent-primary-light)' } : undefined}>
                 {item.icon}
               </span>
               {!isCollapsed && (
-                <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 600 }}>
+                <span className="truncate" style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 600 }}>
                   {item.label}
                 </span>
               )}
@@ -356,7 +365,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       <div className="px-4">
         <button
           onClick={logout}
-          className={`flex items-center text-sm transition-all duration-200 w-full hover:bg-white/5 rounded ${
+          className={`flex items-center text-sm transition-all duration-200 w-full hover:bg-bg-shadow/50 hover:scale-[1.02] active:scale-[0.98] rounded ${
             isCollapsed ? "justify-center p-2" : "gap-2 px-3 py-2"
           }`}
           style={{

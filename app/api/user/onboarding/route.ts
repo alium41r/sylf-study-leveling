@@ -1,108 +1,222 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession, signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
 import { xpForNextLevel } from "@/lib/game-engine";
+import { formatScholarId } from "@/lib/scholar-id";
+import { TimezoneService } from "@/lib/timezone-service";
+import { hash } from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const token = authHeader.split(" ")[1];
-    const payload = await verifyToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
+    const userId = session.userId;
 
-    // Parse the payload
-    const body = await req.json();
-    const { themeId, backgroundId, avatarId } = body;
-
-    if (!themeId || !backgroundId || !avatarId) {
-      return NextResponse.json(
-        { error: "Missing required onboarding selections (theme, background, avatar)." },
-        { status: 400 }
-      );
-    }
-
-    // 1. Check idempotency: Ensure the user hasn't already completed onboarding
+    // 1. Fetch user from database
     const currentUser = await prisma.user.findUnique({
-      where: { id: payload.userId as number },
-      select: { hasCompletedOnboarding: true },
+      where: { id: userId },
     });
 
     if (!currentUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const scholarId = currentUser.scholarId || formatScholarId(currentUser.id);
+
+    // If user has already completed onboarding, smoothly refresh token and cookie
     if (currentUser.hasCompletedOnboarding) {
-      return NextResponse.json(
-        { error: "Onboarding already completed. State is locked." },
-        { status: 403 }
+      const tokenPayload: AuthTokenPayload = {
+        userId: currentUser.id,
+        email: currentUser.email,
+        username: currentUser.username,
+        name: currentUser.name,
+        scholarId,
+        verificationStatus: currentUser.verificationStatus,
+        hunterRank: currentUser.hunterRank,
+        level: currentUser.level,
+        hasCompletedOnboarding: true,
+        timezone: currentUser.timezone || "UTC",
+      };
+
+      const freshToken = await signToken(tokenPayload);
+      const response = NextResponse.json(
+        {
+          success: true,
+          message: "Onboarding already completed.",
+          token: freshToken,
+          user: {
+            id: currentUser.id,
+            email: currentUser.email,
+            username: currentUser.username,
+            name: currentUser.name,
+            scholarId,
+            verificationStatus: currentUser.verificationStatus,
+            hunterRank: currentUser.hunterRank,
+            level: currentUser.level,
+            currentXP: currentUser.currentXP,
+            xpToNextLevel: xpForNextLevel(currentUser.level),
+            hp: currentUser.hp,
+            maxHp: currentUser.maxHp,
+            streakDays: currentUser.streakDays,
+            totalStudyMinutes: currentUser.totalStudyMinutes,
+            hasCompletedOnboarding: true,
+            createdAt: currentUser.createdAt,
+            avatarUrl: currentUser.avatarUrl,
+            timezone: currentUser.timezone || "UTC",
+          },
+        },
+        { status: 200 }
       );
+
+      response.cookies.set({
+        ...AUTH_COOKIE_OPTIONS,
+        value: freshToken,
+      });
+
+      return response;
     }
 
-    // 2. Perform the update in a transaction
+    // Parse the payload
+    const body = await req.json();
+    const { themeId, backgroundId, avatarId, classId, username, name, password, timezone } = body;
+
+    const safeThemeId = themeId || "cyberpunk";
+    const safeBackgroundId = backgroundId || "void";
+    const safeClassId = classId || avatarId || "class_scholar";
+
+    const userUpdates: any = {
+      activeTheme: safeThemeId,
+      activeBackground: safeBackgroundId,
+      activeAvatar: safeClassId,
+      hasCompletedOnboarding: true,
+    };
+
+    // Optional timezone detection / configuration
+    if (timezone && typeof timezone === "string" && TimezoneService.validateTimezone(timezone)) {
+      userUpdates.timezone = timezone;
+    }
+
+    // Optional customized username during onboarding
+    if (username) {
+      const cleanUsername = String(username).toLowerCase().trim();
+      if (!/^[a-z0-9_]{3,20}$/.test(cleanUsername)) {
+        return NextResponse.json(
+          { error: "Username must be 3-20 characters long and contain only lowercase letters, numbers, and underscores." },
+          { status: 400 }
+        );
+      }
+      if (cleanUsername !== currentUser.username) {
+        const existing = await prisma.user.findUnique({ where: { username: cleanUsername } });
+        if (existing) {
+          return NextResponse.json(
+            { error: "This username is already taken. Please choose another." },
+            { status: 409 }
+          );
+        }
+        userUpdates.username = cleanUsername;
+      }
+    }
+
+    // Optional customized display name
+    if (name && typeof name === "string" && name.trim().length > 0) {
+      userUpdates.name = name.trim().slice(0, 30);
+    }
+
+    // Optional password configuration for OAuth users
+    if (password && typeof password === "string" && password.length >= 6) {
+      userUpdates.password = await hash(password, 10);
+    }
+
+    // 2. Perform update in a transaction
     const updatedUser = await prisma.$transaction(async (tx) => {
-      // Unlock the selected cosmetics permanently
+      // Unlock selected cosmetics permanently
       const cosmeticsToUnlock = [
-        { category: "THEME" as const, itemKey: themeId },
-        { category: "BACKGROUND" as const, itemKey: backgroundId },
-        { category: "AVATAR" as const, itemKey: avatarId },
+        { category: "THEME" as const, itemKey: safeThemeId },
+        { category: "BACKGROUND" as const, itemKey: safeBackgroundId },
+        { category: "AVATAR" as const, itemKey: safeClassId },
       ];
 
       for (const cosmetic of cosmeticsToUnlock) {
         await tx.userCosmetic.upsert({
           where: {
             userId_category_itemKey: {
-              userId: payload.userId as number,
+              userId,
               category: cosmetic.category,
               itemKey: cosmetic.itemKey,
             },
           },
-          update: {}, // Do nothing if it exists
+          update: {},
           create: {
-            userId: payload.userId as number,
+            userId,
             category: cosmetic.category,
             itemKey: cosmetic.itemKey,
           },
         });
       }
 
-      // Update the user record to equip the selections and mark onboarding as complete
+      // Update user record
       return tx.user.update({
-        where: { id: payload.userId as number },
-        data: {
-          activeTheme: themeId,
-          activeBackground: backgroundId,
-          activeAvatar: avatarId,
-          hasCompletedOnboarding: true,
-        },
-        select: {
-          id: true,
-          email: true,
-          username: true,
-          name: true,
-          hunterRank: true,
-          level: true,
-          currentXP: true,
-          hp: true,
-          maxHp: true,
-          streakDays: true,
-          totalStudyMinutes: true,
-          lastActiveDate: true,
-          createdAt: true,
-          sylph: true,
-          hasCompletedOnboarding: true,
-        }
+        where: { id: userId },
+        data: userUpdates,
       });
     });
 
-    const xpToNextLevel = xpForNextLevel(updatedUser.level);
+    const updatedScholarId = updatedUser.scholarId || formatScholarId(updatedUser.id);
 
-    return NextResponse.json({ success: true, user: { ...updatedUser, xpToNextLevel } }, { status: 200 });
+    // 3. Issue fresh signed JWT with hasCompletedOnboarding: true and updated timezone
+    const tokenPayload: AuthTokenPayload = {
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      username: updatedUser.username,
+      name: updatedUser.name,
+      scholarId: updatedScholarId,
+      verificationStatus: updatedUser.verificationStatus,
+      hunterRank: updatedUser.hunterRank,
+      level: updatedUser.level,
+      hasCompletedOnboarding: true,
+      timezone: updatedUser.timezone || "UTC",
+    };
+
+    const newToken = await signToken(tokenPayload);
+
+    const response = NextResponse.json(
+      {
+        success: true,
+        token: newToken,
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          username: updatedUser.username,
+          name: updatedUser.name,
+          scholarId: updatedScholarId,
+          verificationStatus: updatedUser.verificationStatus,
+          hunterRank: updatedUser.hunterRank,
+          level: updatedUser.level,
+          currentXP: updatedUser.currentXP,
+          xpToNextLevel: xpForNextLevel(updatedUser.level),
+          hp: updatedUser.hp,
+          maxHp: updatedUser.maxHp,
+          streakDays: updatedUser.streakDays,
+          totalStudyMinutes: updatedUser.totalStudyMinutes,
+          hasCompletedOnboarding: true,
+          createdAt: updatedUser.createdAt,
+          avatarUrl: updatedUser.avatarUrl,
+          timezone: updatedUser.timezone || "UTC",
+        },
+      },
+      { status: 200 }
+    );
+
+    // Set updated session cookie
+    response.cookies.set({
+      ...AUTH_COOKIE_OPTIONS,
+      value: newToken,
+    });
+
+    return response;
   } catch (error) {
     console.error("POST /api/user/onboarding error:", error);
     return NextResponse.json(

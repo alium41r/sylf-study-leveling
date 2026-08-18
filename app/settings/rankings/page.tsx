@@ -141,7 +141,7 @@ function LeaderboardRow({
       case "studyHours":
         return `${entry.studyHours}h`;
       case "streak":
-        return `🔥 ${entry.streakDays}`;
+        return `🔥 ${entry.streakDays} wks`;
       case "quests":
         return `${entry.questsCompleted} done`;
       case "level":
@@ -246,8 +246,8 @@ export default function RankingsSettingsPage() {
     fetch(`/api/user/rankings?sortBy=${sortBy}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((r) => r.json())
-      .then((d) => setData(d))
+      .then(async (r) => (r.ok ? r.json().catch(() => null) : null))
+      .then((d) => { if (d) setData(d); })
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, [token, sortBy]);
@@ -349,7 +349,7 @@ export default function RankingsSettingsPage() {
               letterSpacing: "0.05em",
               background: sortBy === opt.key ? "var(--accent-primary-dim)" : "transparent",
               border: sortBy === opt.key ? "1px solid var(--accent-primary-mid)" : "1px solid var(--border-subtle)",
-              color: sortBy === opt.key ? "var(--accent-purple)" : "var(--text-secondary)",
+              color: sortBy === opt.key ? "var(--accent-text-light)" : "var(--text-secondary)",
               cursor: "pointer",
               transition: "all 0.2s ease",
             }}

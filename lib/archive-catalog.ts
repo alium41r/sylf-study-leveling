@@ -86,14 +86,16 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
   {
     id: "qst_daily",
     categoryId: "Quests",
-    title: "Daily Quests",
+    title: "Weekly Quest & Streaks",
     requirement: { type: "NONE" },
     related: ["qst_penalties"],
     content: [
-      { type: "p", text: "Every 24 hours, the System assigns you a set of Daily Quests. These are mandatory tasks designed to ensure consistent growth." },
-      { type: "p", text: "Failing to complete your Daily Quests will result in an HP penalty, risking your streak." },
-      { type: "h3", text: "Quest Rerolls" },
-      { type: "p", text: "If a quest does not fit your schedule, you may use a 'Quest Reroll' item (purchasable with Sylph) to generate a new objective." }
+      { type: "p", text: "Each week, the System assigns a Weekly Focus Quest: log 3 hours (180 minutes) of focus-timer study between Monday and Sunday." },
+      { type: "p", text: "Completing the Weekly Quest earns level-scaled XP and Sylph rewards. Consecutive weeks of completion build your Weekly Streak, which multiplies your Sylph earnings." },
+      { type: "h3", text: "Streak Multipliers" },
+      { type: "p", text: "1 week = 1.05×, 2 weeks = 1.15×, 4 weeks = 1.3×, 8+ weeks = 1.5× Sylph. Missing a week resets your streak unless you use a Streak Freeze item." },
+      { type: "h3", text: "Study Quests" },
+      { type: "p", text: "In addition to the weekly focus target, the AI planner generates study quests tied to your goals. These are scheduled tasks that you complete to earn XP and Sylph independently of the focus timer." }
     ]
   },
   {
@@ -129,7 +131,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     content: [
       { type: "p", text: "Items grant temporary advantages or protections." },
       { type: "list", items: [
-        "Streak Freeze: Protects your streak for one missed day.",
+        "Weekly Streak Freeze: Protects your weekly streak if you miss the 3-hour weekly study milestone.",
         "XP Boost: 1.5x multiplier to XP gains for 24 hours.",
         "Kamish's Ward: Negates HP penalty if you fail a quest.",
         "Gate Key: Doubles rewards but triples penalties."

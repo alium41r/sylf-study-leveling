@@ -1,58 +1,129 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
+import { useAuth } from "../../components/AuthProvider";
+import { useRouter } from "next/navigation";
+
+interface SessionItem {
+  id: string;
+  device: string;
+  platform: string;
+  location: string;
+  lastActive: string;
+  isCurrent: boolean;
+  icon: string;
+  createdAt: string;
+}
 
 export default function SessionsInformation() {
+  const { token, logout } = useAuth();
+  const router = useRouter();
+
+  const [sessions, setSessions] = useState<SessionItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRevoking, setIsRevoking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [modalState, setModalState] = useState<{ isOpen: boolean; sessionId: string | null }>({
     isOpen: false,
-    sessionId: null
+    sessionId: null,
   });
 
-  const sessions = [
-    {
-      id: "current",
-      device: "MacBook Pro",
-      platform: "macOS • Chrome",
-      location: "Islamabad, PK",
-      lastActive: "Active Now",
-      isCurrent: true,
-      icon: "💻"
-    },
-    {
-      id: "device_2",
-      device: "iPhone 15",
-      platform: "iOS • Safari",
-      location: "Islamabad, PK",
-      lastActive: "2 hours ago",
-      isCurrent: false,
-      icon: "📱"
-    },
-    {
-      id: "device_3",
-      device: "Windows Desktop",
-      platform: "Windows 11 • Edge",
-      location: "Lahore, PK",
-      lastActive: "Yesterday",
-      isCurrent: false,
-      icon: "🖥️"
+  const fetchSessions = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await fetch("/api/user/sessions", {
+        headers,
+        credentials: "include",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSessions(data.sessions || []);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to load sessions");
+      }
+    } catch (err) {
+      console.error("Error fetching sessions:", err);
+      setError("Unable to connect to session registry.");
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  }, [token]);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
 
   const handleRevoke = (id: string) => {
     setModalState({ isOpen: true, sessionId: id });
   };
 
-  const confirmRevoke = () => {
-    // Placeholder for API integration
-    console.log(`Revoked session: ${modalState.sessionId}`);
-    setModalState({ isOpen: false, sessionId: null });
+  const confirmRevoke = async () => {
+    if (!modalState.sessionId) return;
+    setIsRevoking(true);
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await fetch("/api/user/sessions", {
+        method: "DELETE",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ sessionId: modalState.sessionId }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.isCurrent) {
+          await logout();
+          router.push("/login");
+          return;
+        }
+        // Remove revoked session from list
+        setSessions((prev) => prev.filter((s) => s.id !== modalState.sessionId));
+        setModalState({ isOpen: false, sessionId: null });
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to revoke session");
+      }
+    } catch (err) {
+      console.error("Failed to revoke session:", err);
+      alert("Failed to revoke session. Please try again.");
+    } finally {
+      setIsRevoking(false);
+    }
   };
+
+  if (isLoading && sessions.length === 0) {
+    return (
+      <div className="py-8 text-center text-xs font-['Rajdhani'] font-bold text-text-muted uppercase tracking-wider animate-pulse">
+        Loading active sessions...
+      </div>
+    );
+  }
 
   return (
     <div className="pt-2 space-y-4">
+      {error && (
+        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-['Rajdhani']">
+          {error}
+        </div>
+      )}
+
       <SettingsRowGroup>
         {sessions.map((session) => (
           <SettingsRow
@@ -66,30 +137,42 @@ export default function SessionsInformation() {
               <>
                 {session.device}
                 {session.isCurrent && (
-                  <span className="text-[0.6rem] px-2 py-0.5 rounded bg-accent-green/20 text-accent-green uppercase tracking-widest border border-accent-green/30 shrink-0">Current</span>
+                  <span className="text-[0.6rem] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 uppercase tracking-widest border border-emerald-500/30 shrink-0 font-mono font-bold">
+                    Current
+                  </span>
                 )}
               </>
             }
             description={
               <>
-                <p className="truncate">{session.platform} • {session.location}</p>
-                <p className="text-[0.65rem] font-rajdhani uppercase tracking-widest mt-1 truncate">
-                  Last Active: <span className={session.isCurrent ? "text-accent-green" : "text-primary"}>{session.lastActive}</span>
+                <p className="truncate text-text-secondary">{session.platform} • {session.location}</p>
+                <p className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest mt-1 truncate">
+                  Last Active:{" "}
+                  <span className={session.isCurrent ? "text-emerald-400 font-bold" : "text-text-primary"}>
+                    {session.lastActive}
+                  </span>
                 </p>
               </>
             }
           >
             {!session.isCurrent && (
-              <button 
+              <button
+                type="button"
                 onClick={() => handleRevoke(session.id)}
-                className="btn-secondary !border-red-900/50 hover:!bg-red-900/20 hover:!border-red-500/50 text-danger"
-                style={{ padding: "6px 16px", fontSize: "0.75rem" }}
+                className="btn-secondary !border-rose-900/50 hover:!bg-rose-900/20 hover:!border-rose-500/50 text-rose-400 text-xs px-3.5 py-1.5 rounded-lg transition-all"
+                style={{ fontSize: "0.75rem" }}
               >
                 Revoke
               </button>
             )}
           </SettingsRow>
         ))}
+
+        {sessions.length === 0 && !isLoading && (
+          <div className="py-6 text-center text-text-muted text-xs font-['Rajdhani']">
+            No active sessions found.
+          </div>
+        )}
       </SettingsRowGroup>
 
       <ConfirmationModal
@@ -98,15 +181,12 @@ export default function SessionsInformation() {
         onConfirm={confirmRevoke}
         title="Revoke Session"
         danger={true}
-        confirmText="Revoke"
+        confirmText={isRevoking ? "Revoking..." : "Revoke"}
         message={
           <div className="space-y-4">
-            <p className="text-gray-300">
-              Are you sure you want to sign out of this device? It will be disconnected immediately and any unsaved progress may be lost.
+            <p className="text-gray-300 text-sm">
+              Are you sure you want to sign out of this device? It will be disconnected immediately and require logging in again.
             </p>
-            <div className="p-3 bg-black/40 border border-white/10 rounded text-center italic text-xs text-accent-primary-light">
-              <span className="opacity-70">Session management coming soon...</span>
-            </div>
           </div>
         }
       />

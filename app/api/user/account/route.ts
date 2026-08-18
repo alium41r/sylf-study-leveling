@@ -1,32 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession, signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
+import { formatScholarId } from "@/lib/scholar-id";
+import { xpForNextLevel } from "@/lib/game-engine";
+import { TimezoneService } from "@/lib/timezone-service";
 
 export async function PATCH(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const token = authHeader.split(" ")[1];
-    const payload = await verifyToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const body = await req.json();
-    let { username, name, email } = body;
+    let { username, name, email, timezone } = body;
 
     // Sanitize inputs
-    username = username?.trim();
+    username = username?.trim().toLowerCase();
     name = name?.trim();
-    email = email?.trim();
+    email = email?.trim().toLowerCase();
+    timezone = timezone?.trim();
 
     // Validate Username
     if (username !== undefined) {
-      if (!username || !/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+      if (!username || !/^[a-z0-9_]{3,20}$/.test(username)) {
         return NextResponse.json(
           { error: "Username must be 3-20 characters long and can only contain letters, numbers, and underscores." },
           { status: 400 }
@@ -55,9 +53,19 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
+    // Validate Timezone
+    if (timezone !== undefined) {
+      if (!timezone || !TimezoneService.validateTimezone(timezone)) {
+        return NextResponse.json(
+          { error: "Invalid timezone identifier. Please select a valid IANA timezone." },
+          { status: 400 }
+        );
+      }
+    }
+
     // Get current user to compare
     const currentUser = await prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
     });
 
     if (!currentUser) {
@@ -82,24 +90,82 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: "This email address is already registered." }, { status: 409 });
       }
       updates.email = email;
+      // Requirement 3: Reset verificationStatus to UNVERIFIED if email changes
+      updates.verificationStatus = "UNVERIFIED";
     }
 
     if (name !== undefined && name !== currentUser.name) {
       updates.name = name;
     }
 
-    // If nothing changed
+    if (timezone !== undefined && timezone !== currentUser.timezone) {
+      updates.timezone = timezone;
+    }
+
+    // If nothing changed, return current user
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ message: "No changes detected." }, { status: 200 });
     }
 
-    // Apply updates
-    await prisma.user.update({
+    // Apply updates and fetch updated user
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: updates
+      data: updates,
     });
 
-    return NextResponse.json({ message: "Account information updated successfully." }, { status: 200 });
+    const scholarId = updatedUser.scholarId || formatScholarId(updatedUser.id);
+
+    // Requirement 1: Generate a fresh signed token containing updated profile data
+    const tokenPayload: AuthTokenPayload = {
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      username: updatedUser.username,
+      name: updatedUser.name,
+      scholarId,
+      verificationStatus: updatedUser.verificationStatus,
+      hunterRank: updatedUser.hunterRank,
+      level: updatedUser.level,
+      hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
+      timezone: updatedUser.timezone || "UTC",
+    };
+
+    const newToken = await signToken(tokenPayload);
+
+    const response = NextResponse.json(
+      {
+        message: "Account information updated successfully.",
+        token: newToken,
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          username: updatedUser.username,
+          name: updatedUser.name,
+          scholarId,
+          verificationStatus: updatedUser.verificationStatus,
+          hunterRank: updatedUser.hunterRank,
+          level: updatedUser.level,
+          currentXP: updatedUser.currentXP,
+          xpToNextLevel: xpForNextLevel(updatedUser.level),
+          hp: updatedUser.hp,
+          maxHp: updatedUser.maxHp,
+          streakDays: updatedUser.streakDays,
+          totalStudyMinutes: updatedUser.totalStudyMinutes,
+          hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
+          createdAt: updatedUser.createdAt,
+          avatarUrl: updatedUser.avatarUrl,
+          timezone: updatedUser.timezone || "UTC",
+        },
+      },
+      { status: 200 }
+    );
+
+    // Set updated session cookie
+    response.cookies.set({
+      ...AUTH_COOKIE_OPTIONS,
+      value: newToken,
+    });
+
+    return response;
   } catch (error) {
     console.error("Error updating account:", error);
     return NextResponse.json(

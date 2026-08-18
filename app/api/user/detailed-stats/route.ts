@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import { TimezoneService } from "@/lib/timezone-service";
 
 /**
  * GET /api/user/detailed-stats
@@ -38,6 +39,7 @@ export async function GET(req: NextRequest) {
         streakDays: true,
         totalStudyMinutes: true,
         createdAt: true,
+        timezone: true,
       },
     });
 
@@ -45,14 +47,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get sessions from the last 30 days
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const timezone = user.timezone || "UTC";
+
+    // Get sessions from the last 35 days UTC to cover timezone offsets safely
+    const thirtyFiveDaysAgo = new Date();
+    thirtyFiveDaysAgo.setDate(thirtyFiveDaysAgo.getDate() - 35);
 
     const sessions = await prisma.studySession.findMany({
       where: {
         userId,
-        startedAt: { gte: thirtyDaysAgo },
+        startedAt: { gte: thirtyFiveDaysAgo },
       },
       select: {
         id: true,
@@ -63,17 +67,17 @@ export async function GET(req: NextRequest) {
       orderBy: { startedAt: "asc" },
     });
 
-    // Aggregate daily study minutes for the last 30 days
+    // Aggregate daily study minutes for the last 30 local calendar days
+    const last30Days = TimezoneService.getDateRangeInUserTimezone(timezone, -29, 0);
     const dailyMap: Record<string, number> = {};
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      dailyMap[d.toISOString().split("T")[0]] = 0;
+    for (const dateStr of last30Days) {
+      dailyMap[dateStr] = 0;
     }
+
     for (const s of sessions) {
-      const day = s.startedAt.toISOString().split("T")[0];
-      if (dailyMap[day] !== undefined) {
-        dailyMap[day] += s.durationMinutes;
+      const localDay = TimezoneService.getUserLocalDate(timezone, s.startedAt);
+      if (dailyMap[localDay] !== undefined) {
+        dailyMap[localDay] += s.durationMinutes;
       }
     }
     const dailyStudy = Object.entries(dailyMap).map(([date, minutes]) => ({

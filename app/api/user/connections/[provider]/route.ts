@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { AuthProviderType } from "@/lib/provider-types";
 
 export async function DELETE(
@@ -8,17 +8,11 @@ export async function DELETE(
   props: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const token = authHeader.split(" ")[1];
-    const payload = await verifyToken(token);
-    if (!payload) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const userId = payload.userId as number;
+    const userId = session.userId;
 
     const params = await props.params;
     const providerStr = params.provider.toUpperCase();
@@ -48,20 +42,16 @@ export async function DELETE(
       );
     }
 
-    // Safety check: Prevent removing the last authentication method
-    // In this schema, password is required, but if they signed up via OAuth it might be a dummy hash.
-    // We assume if password is empty or a specific dummy value (e.g., "OAUTH_USER"), they rely on OAuth.
-    // Right now, any password length < 10 might be considered unsafe if it's a dummy, but standard bcrypt is 60 chars.
-    // Let's assume if password exists and is valid length, it's a real password.
-    const hasPassword = user.password && user.password.length > 0 && user.password !== "OAUTH_ONLY";
+    // Safety check: Prevent removing the sole authentication method
+    const hasPassword = user.password !== null && user.password.length > 0;
     const otherProviders = user.connectedAccounts.filter((acc) => acc.provider !== provider);
 
     if (!hasPassword && otherProviders.length === 0) {
       return NextResponse.json(
-        { 
-          error: "Action denied: You cannot disconnect your only login method. Please set a password or link another account first." 
+        {
+          error: "Action denied: You cannot disconnect your only login method. Please set a password or link another account first.",
         },
-        { status: 403 }
+        { status: 400 }
       );
     }
 
@@ -70,7 +60,10 @@ export async function DELETE(
       where: { id: targetAccount.id },
     });
 
-    return NextResponse.json({ success: true, message: `${provider} account disconnected successfully.` }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: `${provider} account disconnected successfully.` },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Disconnect Provider Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { awardXP, hpPenalty, getStreakMultiplier } from "@/lib/game-engine";
+import { awardXP, getStreakMultiplier } from "@/lib/game-engine";
+import { DIFFICULTY_CONFIG } from "@/lib/difficulty-engine";
+import { TimezoneService } from "@/lib/timezone-service";
+import { getUserTimezone } from "@/lib/timezone-server";
 
 const updateQuestSchema = z.object({
   title: z.string().min(1).optional(),
@@ -10,6 +13,8 @@ const updateQuestSchema = z.object({
   requiredMinutes: z.number().int().min(1).optional(),
   scheduledFor: z.string().optional(),
   status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED", "FAILED"]).optional(),
+  elapsedSeconds: z.number().int().min(0).optional(),
+  difficulty: z.enum(["EASY", "NORMAL", "HARD", "EXPERT"]).optional(),
 });
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -76,7 +81,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const { status, title, description, requiredMinutes, scheduledFor } = validation.data;
+    const { status, title, description, requiredMinutes, scheduledFor, elapsedSeconds, difficulty } = validation.data;
 
     // Verify quest ownership
     const quest = await prisma.quest.findFirst({
@@ -99,6 +104,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (description !== undefined) dataToUpdate.description = description;
     if (requiredMinutes !== undefined) dataToUpdate.requiredMinutes = requiredMinutes;
     if (scheduledFor !== undefined) dataToUpdate.scheduledFor = scheduledFor;
+    if (elapsedSeconds !== undefined) dataToUpdate.elapsedSeconds = elapsedSeconds;
+    if (difficulty !== undefined) dataToUpdate.difficulty = difficulty;
     if (status !== undefined) {
       dataToUpdate.status = status;
       dataToUpdate.completedAt = status === "COMPLETED" ? new Date() : null;
@@ -110,10 +117,14 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       data: dataToUpdate,
     });
 
-    const today = new Date().toISOString().split("T")[0];
+    const tz = await getUserTimezone(payload.userId as number);
+    const today = TimezoneService.getUserLocalDate(tz);
+
+    const isNewlyCompleted = status === "COMPLETED" && quest.status !== "COMPLETED";
+    const isNewlyFailed = status === "FAILED" && quest.status !== "FAILED";
 
     // ─── Handle COMPLETED ─────────────────────────────────────
-    if (status === "COMPLETED") {
+    if (isNewlyCompleted) {
       let finalXP = quest.xpReward;
       let finalSylph = quest.sylphReward;
       
@@ -130,7 +141,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
       // If late, redirect to FAILED logic
       if (isLate) {
-        let penalty = hpPenalty(quest.requiredMinutes);
+        let penalty: number = DIFFICULTY_CONFIG[quest.difficulty as keyof typeof DIFFICULTY_CONFIG].hpPenalty;
         if (quest.isGateKeyApplied) penalty *= 3;
         if (quest.isKamishWardActive) penalty = 0;
         
@@ -139,6 +150,12 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
           await tx.quest.update({ where: { id: parseInt(id) }, data: { status: "FAILED" } });
           await tx.user.update({ where: { id: user.id }, data: { hp: newHp } });
           
+          if (penalty > 0) {
+            await tx.hpLedger.create({
+              data: { userId: user.id, amount: -penalty, source: "QUEST_FAILED_LATE" },
+            });
+          }
+
           await tx.systemMessage.create({
             data: {
               userId: user.id,
@@ -248,8 +265,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     }
 
     // ─── Handle FAILED ────────────────────────────────────────
-    if (status === "FAILED") {
-      let penalty = hpPenalty(quest.requiredMinutes);
+    if (isNewlyFailed) {
+      let penalty: number = DIFFICULTY_CONFIG[quest.difficulty as keyof typeof DIFFICULTY_CONFIG].hpPenalty;
       
       // Item overrides
       if (quest.isGateKeyApplied) {
@@ -267,6 +284,12 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
           where: { id: user.id },
           data: { hp: newHp },
         });
+
+        if (penalty > 0) {
+          await tx.hpLedger.create({
+            data: { userId: user.id, amount: -penalty, source: "QUEST_FAILED" },
+          });
+        }
 
         const shieldText = quest.isKamishWardActive 
           ? `\n\nKamish's Ward intercepted all damage.` 

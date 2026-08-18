@@ -23,8 +23,8 @@ export default function CalendarPage() {
     <div className="p-8 pb-20 max-w-5xl mx-auto animate-fade-in">
       <div className="flex flex-col justify-between items-start mb-10 gap-6 mt-4">
         <div>
-          <p className="text-xs tracking-widest mb-1 text-cyan-400 font-['Rajdhani'] uppercase">SCHOLAR DASHBOARD</p>
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500 mb-4 md:mb-0">
+          <p className="text-xs tracking-widest mb-1 text-accent-text-light font-['Rajdhani'] uppercase font-bold">SCHOLAR DASHBOARD</p>
+          <h1 className="text-4xl font-bold text-text-primary font-['Rajdhani'] mb-4 md:mb-0">
             Study Calendar
           </h1>
         </div>

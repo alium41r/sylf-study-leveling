@@ -47,7 +47,7 @@ function executeReadFile(filePath: string) {
 // --- 4. MAIN AGENT LOOP ---
 async function main() {
     const chat = ai.chats.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.7-flash",
         config: { tools: [webSearchTool, readFileTool] }, // Give it BOTH tools!
     });
 

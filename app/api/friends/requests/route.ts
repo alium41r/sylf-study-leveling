@@ -24,7 +24,19 @@ export async function GET(req: NextRequest) {
       },
       include: {
         sender: {
-          select: { id: true, name: true, username: true, hunterRank: true, level: true },
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            hunterRank: true,
+            level: true,
+            avatarUrl: true,
+            activeAvatar: true,
+            activeFrame: true,
+            activeTitle: true,
+            characterConfig: true,
+            createdAt: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },

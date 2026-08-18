@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { initializeUserProfile } from "@/lib/auth-service";
+import { AUTH_COOKIE_OPTIONS } from "@/lib/auth";
 
-// Zod Schema to validate incoming data
 const registerSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   name: z.string().min(1, "Name is required"),
-  username: z.string().min(3, "Username must be at least 3 characters").max(20).regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be at most 20 characters")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  timezone: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -23,60 +27,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { email, password, name, username } = validation.data;
+    const { email, password, name, username, timezone } = validation.data;
 
-    // Check if a user with this email already exists
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "A scholar with this email already exists" },
-        { status: 400 }
-      );
-    }
-
-    // Check if username is taken
-    const existingUsername = await prisma.user.findUnique({ where: { username } });
-    if (existingUsername) {
-      return NextResponse.json(
-        { error: "This username is already taken" },
-        { status: 400 }
-      );
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the user with default RPG stats
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        username: username.toLowerCase(),
-        password: hashedPassword,
-        name,
-        privacy: {
-          create: {} // Generates default privacy settings automatically
-        }
-      },
+    const { user, token } = await initializeUserProfile({
+      email,
+      username,
+      name,
+      password,
+      timezone,
+      isOAuth: false,
     });
 
-    // Send a welcome system message from "The System"
-    await prisma.systemMessage.create({
-      data: {
-        userId: newUser.id,
-        content:
-          "[SYSTEM NOTIFICATION]\n\nYou have been granted the qualifications of a Player.\nWelcome, E-Rank Scholar. Your journey begins now.\n\nSet your first Goal to receive your Daily Quests.",
-        type: "INFO",
+    const response = NextResponse.json(
+      {
+        message: "Scholar registered successfully!",
+        token,
+        user,
       },
-    });
-
-    return NextResponse.json(
-      { message: "Scholar registered successfully!" },
       { status: 201 }
     );
-  } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+
+    response.cookies.set({
+      ...AUTH_COOKIE_OPTIONS,
+      value: token,
+    });
+
+    return response;
+  } catch (error: any) {
+    const errorMessage = error?.message || "Internal server error";
+    const status = errorMessage.includes("already exists") || errorMessage.includes("taken") ? 400 : 500;
+    return NextResponse.json({ error: errorMessage }, { status });
   }
 }

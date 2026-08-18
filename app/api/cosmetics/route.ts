@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
@@ -10,7 +12,7 @@ export async function GET(req: NextRequest) {
     }
 
     const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
+    if (!payload || !payload.userId) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
@@ -26,14 +28,15 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
-      cosmetics: user.cosmetics,
+      cosmetics: user.cosmetics || [],
       active: {
-        activeTheme: user.activeTheme,
-        activeBackground: user.activeBackground,
-        activeAvatar: user.activeAvatar,
-        activeFrame: user.activeFrame,
-        activeTitle: user.activeTitle,
-        activeNameColor: user.activeNameColor,
+        activeTheme: user.activeTheme || "cyberpunk",
+        activeBackground: user.activeBackground || "default",
+        activeAvatar: user.activeAvatar || "class_scholar",
+        activeFrame: user.activeFrame || "none",
+        activeTitle: user.activeTitle || "title_novice",
+        activeAura: user.activeAura || "aura_monarch",
+        activeNameColor: user.activeNameColor || "default",
       },
     }, { status: 200 });
   } catch (error) {
@@ -50,7 +53,7 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
+    if (!payload || !payload.userId) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
@@ -65,9 +68,10 @@ export async function POST(req: NextRequest) {
     let updateData: any = {};
     if (category === "THEME") updateData.activeTheme = itemKey;
     else if (category === "BACKGROUND") updateData.activeBackground = itemKey;
-    else if (category === "AVATAR") updateData.activeAvatar = itemKey;
+    else if (category === "CLASS" || category === "AVATAR") updateData.activeAvatar = itemKey;
     else if (category === "FRAME") updateData.activeFrame = itemKey;
     else if (category === "TITLE") updateData.activeTitle = itemKey;
+    else if (category === "AURA") updateData.activeAura = itemKey;
     else if (category === "NAME_COLOR") updateData.activeNameColor = itemKey;
     else {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });

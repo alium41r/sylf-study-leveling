@@ -17,6 +17,7 @@ export default function TimerPage() {
   const router = useRouter();
   
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [quests, setQuests] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   const [showAddSubject, setShowAddSubject] = useState(false);
@@ -40,15 +41,22 @@ export default function TimerPage() {
     }
   }, [user]); // Removed prevLevel from dependency array to avoid loop
 
-  const fetchSubjects = async () => {
+  const fetchSubjectsAndQuests = async () => {
     if (!token) return;
     try {
-      const res = await fetch("/api/subjects", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const [subRes, questRes] = await Promise.all([
+        fetch("/api/subjects", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/quests", { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      
+      if (subRes.ok) {
+        const data = await subRes.json();
         setSubjects(data);
+      }
+      
+      if (questRes.ok) {
+        const data = await questRes.json();
+        setQuests(Array.isArray(data) ? data : []);
       }
     } catch (err) {
       console.error(err);
@@ -58,7 +66,7 @@ export default function TimerPage() {
   };
 
   useEffect(() => {
-    fetchSubjects();
+    fetchSubjectsAndQuests();
   }, [token]);
 
   const handleAddSubject = async (e: React.FormEvent) => {
@@ -106,7 +114,7 @@ export default function TimerPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="mb-8">
         <p
-          className="text-xs tracking-widest mb-1 text-accent-light"
+          className="text-xs tracking-widest mb-1 text-accent-text-light font-bold"
           style={{ fontFamily: "'Rajdhani', sans-serif" }}
         >
           STUDY TIMER
@@ -120,106 +128,167 @@ export default function TimerPage() {
       <div className="system-card p-10 text-center mb-10 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 opacity-50" style={{ background: "linear-gradient(to right, transparent, var(--accent-primary-light), transparent)" }} />
         
-        <p className="text-sm font-bold tracking-widest uppercase mb-4 text-gray-400" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
+        <p className="text-sm font-bold tracking-widest uppercase mb-4 text-text-muted" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
           DAILY FOCUS - {new Date().toISOString().split("T")[0].replace(/-/g, ".")}
         </p>
         
         <p
-          className="text-6xl md:text-8xl font-bold font-mono tracking-wider mb-2 text-accent-light"
+          className="text-6xl md:text-8xl font-bold font-mono tabular-nums tracking-wider mb-2 text-accent-text-light"
           style={{
-            textShadow: "0 0 30px var(--accent-primary-mid)",
+            textShadow: "var(--text-glow)",
           }}
         >
           {formatTime(cumulativeSeconds)}
         </p>
-        <p className="text-sm text-gray-500 mt-2">Total time across all subjects today</p>
+        <p className="text-sm text-text-muted mt-2">Total time across all subjects today</p>
       </div>
 
-      {/* ─── Subject List ─────────────────────────── */}
-      <div className="space-y-4">
-        {isLoading ? (
-          <p className="text-center text-gray-500 py-8">Loading subjects...</p>
-        ) : subjects.length === 0 ? (
-          <div className="text-center py-10 border border-dashed border-white/10 rounded-lg">
-            <p className="text-gray-400 mb-4">No subjects added yet.</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* ─── Quests Timer Section ──────────────────────────── */}
+        <div>
+          <div className="flex items-center h-8 mb-6">
+            <h2 className="text-xl font-bold text-accent-text-light font-['Rajdhani']">
+              Active Quests
+            </h2>
           </div>
-        ) : (
-          subjects.map((subject) => (
-            <div 
-              key={subject.id} 
-              className="system-card p-4 flex items-center justify-between hover:border-accent-dim transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => handleStartFocus(subject.id, subject.name)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center bg-accent-dim text-accent-light hover:bg-accent-mid hover:text-white transition-colors"
+          {isLoading ? (
+            <p className="text-text-muted py-4">Loading quests...</p>
+          ) : quests.filter(q => q.status === "PENDING" || q.status === "IN_PROGRESS").length === 0 ? (
+            <div className="text-center py-10 border border-dashed border-border-subtle rounded-lg">
+              <p className="text-sm text-text-secondary italic">No active quests today.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {quests.filter(q => q.status === "PENDING" || q.status === "IN_PROGRESS").map((quest) => (
+                <div 
+                  key={quest.id} 
+                  className="system-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-accent-dim transition-colors relative hover:z-50"
+                  style={{ borderLeft: `3px solid var(--accent-primary)` }}
                 >
-                  <svg className="w-5 h-5 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </button>
-                <span className="font-medium tracking-wide uppercase text-sm" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
-                  {subject.name}
-                </span>
-              </div>
-              <div className="font-mono text-lg text-gray-300">
-                {formatTime(subject.todaySeconds)}
-              </div>
+                  <div className="flex items-center gap-4 min-w-0 flex-1 pr-4">
+                    <button
+                      onClick={() => router.push(`/focus?questId=${quest.id}&subjectName=${encodeURIComponent(quest.title)}`)}
+                      className="w-12 h-12 shrink-0 rounded-full flex items-center justify-center bg-accent-dim text-accent-light hover:bg-accent-mid hover:text-white transition-colors"
+                    >
+                      <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </button>
+                    <div className="min-w-0 flex-1">
+                      <div className="relative group/title cursor-default inline-block max-w-full">
+                        <span className="font-medium tracking-wide text-base block truncate transition-colors" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
+                          {quest.title}
+                        </span>
+                        {/* Glassmorphism Tooltip */}
+                        <div className="absolute left-0 top-full mt-1 hidden group-hover/title:block z-[100] bg-bg-abyss/95 backdrop-blur-xl text-text-primary text-sm p-3 rounded-lg shadow-2xl border border-border-subtle whitespace-normal min-w-[200px] w-max max-w-[300px]">
+                          {quest.title}
+                        </div>
+                      </div>
+                      <span className="text-sm text-text-muted block truncate mt-0.5">
+                        Target: {quest.requiredMinutes} min • {quest.difficulty || "Normal"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="font-mono tabular-nums tracking-tight text-xl text-text-primary shrink-0">
+                    {formatTime(quest.elapsedSeconds || 0)} <span className="text-text-muted text-lg">/ {formatTime(quest.requiredMinutes * 60)}</span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))
-        )}
+          )}
+        </div>
 
-        {/* Add Subject Card */}
-        {!showAddSubject ? (
-          <button
-            onClick={() => setShowAddSubject(true)}
-            className="w-full system-card p-6 flex flex-col items-center justify-center text-gray-400 hover:text-accent-light hover:border-accent-dim transition-colors border-dashed"
-          >
-            <div className="w-12 h-12 rounded border border-current flex items-center justify-center mb-3">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <p className="text-sm font-bold tracking-widest uppercase mb-1" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
-              INITIALIZE NEW QUEST
-            </p>
-            <p className="text-xs">Add a subject to begin leveling</p>
-          </button>
-        ) : (
-          <form onSubmit={handleAddSubject} className="system-card p-6 flex flex-col gap-4">
-            <div>
-              <label className="text-xs uppercase tracking-widest text-gray-400 mb-2 block" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
-                Subject Name
-              </label>
-              <input
-                type="text"
-                autoFocus
-                required
-                value={newSubjectName}
-                onChange={(e) => setNewSubjectName(e.target.value)}
-                placeholder="e.g. Mathematics, History"
-                className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:outline-none focus:border-accent-mid transition-colors"
-              />
-            </div>
-            <div className="flex justify-end gap-3">
+        {/* ─── Subject List ─────────────────────────── */}
+        <div>
+          <div className="flex items-center justify-between h-8 mb-6">
+            <h2 className="text-xl font-bold text-accent-text-light font-['Rajdhani']">
+              Subjects
+            </h2>
+            {!showAddSubject && (
               <button
-                type="button"
-                onClick={() => setShowAddSubject(false)}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                onClick={() => setShowAddSubject(true)}
+                className="text-sm font-medium tracking-wide text-accent-text-light hover:text-text-primary transition-colors flex items-center gap-1 bg-accent-dim/30 px-3 py-1.5 rounded-full hover:bg-accent-dim/50"
               >
-                Cancel
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Subject
               </button>
-              <button
-                type="submit"
-                disabled={isAdding}
-                className="px-6 py-2 bg-accent-dim text-accent-light border border-accent-dim rounded hover:bg-accent-mid hover:text-white transition-colors font-bold tracking-wider text-sm uppercase"
-                style={{ fontFamily: "'Rajdhani', sans-serif" }}
-              >
-                {isAdding ? "Adding..." : "Add Subject"}
-              </button>
-            </div>
-          </form>
-        )}
+            )}
+          </div>
+          <div className="space-y-4">
+            {isLoading ? (
+              <p className="text-center text-text-muted py-8">Loading subjects...</p>
+            ) : subjects.length === 0 ? (
+              <div className="text-center py-10 border border-dashed border-border-subtle rounded-lg">
+                <p className="text-text-secondary">No subjects added yet.</p>
+              </div>
+            ) : (
+              subjects.map((subject) => (
+                <div 
+                  key={subject.id} 
+                  className="system-card p-5 flex items-center justify-between gap-4 hover:border-accent-dim transition-colors"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <button
+                      onClick={() => handleStartFocus(subject.id, subject.name)}
+                      className="w-12 h-12 shrink-0 rounded-full flex items-center justify-center bg-accent-dim text-accent-light hover:bg-accent-mid hover:text-text-primary transition-colors"
+                    >
+                      <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </button>
+                    <div className="min-w-0">
+                      <span className="font-medium tracking-wide text-base truncate block" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
+                        {subject.name}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="font-mono tabular-nums tracking-tight text-xl text-text-primary shrink-0">
+                    {formatTime(subject.todaySeconds)}
+                  </div>
+                </div>
+              ))
+            )}
+
+            {/* Add Subject Inline Form */}
+            {showAddSubject && (
+              <form onSubmit={handleAddSubject} className="system-card p-6 flex flex-col gap-4">
+                <div>
+                  <label className="text-sm tracking-wide text-text-primary mb-2 block" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
+                    Subject Name
+                  </label>
+                  <input
+                    type="text"
+                    autoFocus
+                    required
+                    value={newSubjectName}
+                    onChange={(e) => setNewSubjectName(e.target.value)}
+                    placeholder="e.g. Mathematics, History"
+                    className="w-full bg-bg-void/50 border border-border-subtle rounded p-3 text-text-primary focus:outline-none focus:border-accent-mid transition-colors"
+                  />
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddSubject(false)}
+                    className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isAdding}
+                    className="px-6 py-2.5 bg-accent-dim text-accent-light border border-accent-dim rounded hover:bg-accent-mid hover:text-text-primary transition-colors font-bold tracking-wide text-sm"
+                    style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                  >
+                    {isAdding ? "Adding..." : "Add Subject"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
       </div>
       
       <LevelUpOverlay 

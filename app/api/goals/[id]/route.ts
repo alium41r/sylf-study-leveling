@@ -4,11 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
 const updateGoalSchema = z.object({
-  title: z.string().min(1).optional(),
+  title: z.string().min(3, "Title must be at least 3 characters").optional(),
   description: z.string().optional(),
   targetWeeks: z.number().int().min(1).max(52).optional(),
   effortLevel: z.enum(["RELAXED", "NORMAL", "INTENSE", "EXTREME"]).optional(),
-  status: z.enum(["ACTIVE", "COMPLETED", "ABANDONED"]).optional(),
+  status: z.enum(["ACTIVE", "COMPLETED", "FAILED"]).optional(),
 });
 
 type RouteParams = { params: Promise<{ id: string }> };

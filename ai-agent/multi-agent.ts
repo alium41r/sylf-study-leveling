@@ -50,7 +50,7 @@ const searchTool = {
 async function runMathWorker(task: string): Promise<string> {
     console.log(`\n  [Worker: Math] Received task: "${task}"`);
     const chat = ai.chats.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.7-flash",
         config: { tools: [calculateTool] },
     });
     
@@ -76,7 +76,7 @@ async function runMathWorker(task: string): Promise<string> {
 async function runResearchWorker(task: string): Promise<string> {
     console.log(`\n  [Worker: Research] Received task: "${task}"`);
     const chat = ai.chats.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.7-flash",
         config: { tools: [searchTool] },
     });
     
@@ -134,7 +134,7 @@ async function main() {
     console.log("\n👔 [Supervisor] Analyzing query and determining routing...");
     
     const supervisorChat = ai.chats.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.7-flash",
         config: { 
             tools: [delegateTool],
             // A System Instruction acts as a strict guardrail for the agent's behavior

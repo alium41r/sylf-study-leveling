@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import BackToSettings from "../../components/BackToSettings";
-import { THEME_MAP } from "../../components/GlobalSystemWrapper";
+import { THEME_MAP, BG_MAP } from "../../components/GlobalSystemWrapper";
 import { useAuth } from "../../components/AuthProvider";
 import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 
@@ -129,18 +129,26 @@ function MiniPreview({ theme }: { theme: ThemeOption }) {
 export default function ThemesSettingsPage() {
   const { user, token, mutateUser } = useAuth();
   const [appliedThemeId, setAppliedThemeId] = useState<string>("cyberpunk");
+  const [mode, setMode] = useState<"light" | "dark">("dark");
   const [showApplied, setShowApplied] = useState(false);
   const [cosmetics, setCosmetics] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const savedMode = localStorage.getItem("app_mode") as "light" | "dark";
+    if (savedMode) setMode(savedMode);
+
     if (!token) return;
     
     fetch("/api/cosmetics", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return res.json().catch(() => null);
+      })
+      .then((data) => {
+        if (!data) return;
         setCosmetics(data.cosmetics || []);
         if (data.active?.activeTheme) {
           setAppliedThemeId(data.active.activeTheme);
@@ -155,8 +163,24 @@ export default function ThemesSettingsPage() {
   }, [token]);
 
   const hasCosmetic = (itemKey: string) => {
-    if (itemKey === "cyberpunk") return true;
-    return cosmetics.some(c => c.category === "THEME" && c.itemKey === itemKey);
+    return true; // Temporarily unlocked for testing Light Mode
+  };
+
+  const handleToggleMode = (newMode: "light" | "dark") => {
+    setMode(newMode);
+    localStorage.setItem("app_mode", newMode);
+    document.documentElement.setAttribute("data-mode", newMode);
+
+    const savedBg = localStorage.getItem("app_background");
+    if (savedBg && BG_MAP[savedBg]) {
+      document.body.style.background = newMode === "light" ? BG_MAP[savedBg].lightValue : BG_MAP[savedBg].value;
+      document.body.style.backgroundSize = BG_MAP[savedBg].size || "cover";
+      document.body.style.backgroundAttachment = "fixed";
+    } else {
+      document.body.style.background = newMode === "light" ? BG_MAP["void"].lightValue : BG_MAP["void"].value;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundAttachment = "fixed";
+    }
   };
 
   const handleApplyTheme = async (theme: ThemeOption) => {
@@ -173,11 +197,13 @@ export default function ThemesSettingsPage() {
         },
         body: JSON.stringify({ category: "THEME", itemKey: theme.id })
       });
-      const data = await res.json();
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
         setAppliedThemeId(theme.id);
         localStorage.setItem("app_theme", theme.id);
-        mutateUser(data.user);
+        if (data.user) {
+          mutateUser(data.user);
+        }
 
         // Apply CSS variables globally
         const vars = THEME_MAP[theme.id];
@@ -191,7 +217,7 @@ export default function ThemesSettingsPage() {
         setTimeout(() => setShowApplied(false), 2000);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Theme apply error:", err);
     } finally {
       setLoading(false);
     }
@@ -204,6 +230,62 @@ export default function ThemesSettingsPage() {
       <BackToSettings />
 
       <p className="settings-page-breadcrumb">Appearance → Themes</p>
+      
+      {/* Mode Toggle Section */}
+      <h1 className="settings-page-header" style={{ marginBottom: "16px" }}>App Mode</h1>
+      <div style={{ display: "flex", gap: "12px", marginBottom: "40px" }}>
+        <button
+          onClick={() => handleToggleMode("dark")}
+          style={{
+            flex: 1,
+            padding: "16px",
+            background: mode === "dark" ? "var(--accent-primary-dim)" : "var(--bg-panel)",
+            border: `2px solid ${mode === "dark" ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+            borderRadius: "12px",
+            color: "var(--text-primary)",
+            fontFamily: "'Rajdhani', sans-serif",
+            fontWeight: 700,
+            fontSize: "1.1rem",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px"
+          }}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          DARK
+        </button>
+        <button
+          onClick={() => handleToggleMode("light")}
+          style={{
+            flex: 1,
+            padding: "16px",
+            background: mode === "light" ? "var(--accent-primary-dim)" : "var(--bg-panel)",
+            border: `2px solid ${mode === "light" ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+            borderRadius: "12px",
+            color: "var(--text-primary)",
+            fontFamily: "'Rajdhani', sans-serif",
+            fontWeight: 700,
+            fontSize: "1.1rem",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px"
+          }}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          LIGHT
+        </button>
+      </div>
+
       <h1 className="settings-page-header">App Tint</h1>
 
       <p
@@ -275,7 +357,7 @@ export default function ThemesSettingsPage() {
                 overflow: "hidden",
                 border: isApplied
                   ? `2px solid ${theme.color}`
-                  : "2px solid rgba(255,255,255,0.04)",
+                  : "2px solid var(--border-subtle)",
                 boxShadow: isApplied ? `0 0 25px ${theme.color}30` : "none",
                 cursor: unlocked ? "pointer" : "not-allowed",
                 transition: "all 0.3s ease",
@@ -287,7 +369,7 @@ export default function ThemesSettingsPage() {
               {/* Gradient Banner */}
               <div style={{ height: "5px", background: unlocked ? theme.color : "#444" }} />
 
-              <div style={{ padding: "16px", background: "rgba(10,10,18,0.95)" }}>
+              <div style={{ padding: "16px", background: "var(--bg-abyss)" }}>
                 {/* Mini Preview */}
                 <div style={{ opacity: unlocked ? 1 : 0.2, filter: unlocked ? "none" : "grayscale(100%) blur(1px)" }}>
                   <MiniPreview theme={theme} />

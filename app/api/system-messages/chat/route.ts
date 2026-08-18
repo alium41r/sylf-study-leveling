@@ -3,17 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import fs from "fs/promises";
 import path from "path";
-import { GoogleGenAI } from "@google/genai";
-import { CHAT_PERSONA } from "@/lib/ai/prompts";
-import { chatToolsDeclaration, groqToolsDeclaration } from "@/lib/ai/chat-tools";
+import { getToolsForAgent, AgentType, ALLOWED_HANDOFFS } from "@/lib/ai/chat-tools";
 import { executeChatTool } from "@/lib/ai/chat-tool-executor";
-import Groq from "groq-sdk";
+import { LLMFactory } from "@/lib/ai/providers/factory";
+import { NormalizedMessage } from "@/lib/ai/providers/types";
+import { checkQuota, recordUsage } from "@/lib/ai/usage-limiter";
+import { AI_LIMITS } from "@/lib/ai/config";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-const MODEL = "gemini-2.5-flash";
-const MAX_TOOL_ITERATIONS = 5;
+const MAX_TOOL_ITERATIONS = AI_LIMITS.maxToolIterations;
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,6 +25,16 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = payload.userId as number;
+
+    // ── Quota enforcement ─────────────────────────────────
+    const quota = await checkQuota(userId, "chat");
+    if (!quota.allowed) {
+      return NextResponse.json(
+        { error: "quota_exceeded", remaining: 0, limit: quota.limit, resetsAt: quota.resetsAt },
+        { status: 429 }
+      );
+    }
+
     const formData = await req.formData();
     const messageText = formData.get("message") as string;
     const file = formData.get("file") as File | null;
@@ -83,216 +90,181 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // ── Build conversation history for context ──────────────
     const recentMessages = await prisma.systemMessage.findMany({
-      where: { userId, sessionId },
-      orderBy: { createdAt: "desc" },
+      where: { sessionId },
+      orderBy: { createdAt: "asc" },
       take: 20,
     });
-    recentMessages.reverse();
 
-    // Convert DB messages to Gemini chat history format
-    const history = recentMessages
-      .filter((m) => m.id !== userMessage.id) // exclude the message we just saved
+    // ── Build normalized history for adapter ──────────────
+    const normalizedHistory: NormalizedMessage[] = recentMessages
+      .filter((m) => m.id !== userMessage.id) 
       .map((m) => ({
-        role: m.type === "USER" ? ("user" as const) : ("model" as const),
-        parts: [{ text: m.content }],
+        role: m.type === "USER" ? "user" : "assistant",
+        content: m.content,
       }));
 
-    // ── Create Gemini chat with tools ───────────────────────
-    const chat = ai.chats.create({
-      model: MODEL,
-      history,
-      config: {
-        systemInstruction: `${CHAT_PERSONA}\n\nToday's date is ${new Date().toISOString().split("T")[0]}. Use this date when creating quests or goals unless specified otherwise.`,
-        tools: [chatToolsDeclaration],
-      },
-    });
+    // ── Build tiered AI context and route to specialist agent ──
+    const { buildCoreContext, buildRelevantContext, formatCoreContext, formatRelevantContext } = await import("@/lib/ai/context-engine");
+    const core = await buildCoreContext(userId);
+    const coreString = formatCoreContext(core);
 
-    // ── Build the user's current message parts ──────────────
-    const messageParts: any[] = [];
-    if (messageText) {
-      messageParts.push({ text: messageText });
-    } else {
-      messageParts.push({ text: "Please analyze this attachment." });
-    }
-    if (base64Data && mimeType) {
-      messageParts.push({
-        inlineData: { mimeType, data: base64Data },
-      });
-    }
-
-    // ── Function-calling loops ───────────────────────────────
-
-    // Helper to run Groq completion
-    const runGroqChat = async () => {
-      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-      const messages: any[] = [
-        { role: "system", content: `${CHAT_PERSONA}\n\nToday's date is ${new Date().toISOString().split("T")[0]}. Use this date when creating quests or goals unless specified otherwise.` }
-      ];
-      recentMessages.forEach((m) => {
-        if (m.id !== userMessage.id) {
-          messages.push({ role: m.type === "USER" ? "user" : "assistant", content: m.content });
-        }
-      });
-      messages.push({ role: "user", content: messageText || "Please analyze this attachment." });
-
-      let iterations = 0;
-      let responseText = "";
-
-      while (iterations < MAX_TOOL_ITERATIONS) {
-        iterations++;
-        try {
-          const completion = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile",
-            messages,
-            tools: groqToolsDeclaration,
-            tool_choice: "auto",
-          });
-
-          const responseMessage = completion.choices[0].message;
-          if (responseMessage.content === null) {
-            responseMessage.content = "";
-          }
-          messages.push(responseMessage);
-
-          if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
-            for (const toolCall of responseMessage.tool_calls) {
-              console.log(`[Groq] Tool call: ${toolCall.function.name}(${toolCall.function.arguments})`);
-              let args = {};
-              let result;
-              try {
-                args = JSON.parse(toolCall.function.arguments || "{}");
-                result = await executeChatTool(toolCall.function.name, args, userId);
-              } catch (err: any) {
-                console.error("[Groq] Tool parsing or execution failed:", err);
-                result = { error: "Failed to parse arguments or execute tool. Check syntax.", details: err.message };
-              }
-              messages.push({
-                tool_call_id: toolCall.id,
-                role: "tool",
-                name: toolCall.function.name,
-                content: JSON.stringify(result),
-              });
-            }
-          } else {
-            responseText = responseMessage.content || "Action completed successfully!";
-            break;
-          }
-        } catch (groqApiError: any) {
-          // Robust error recovery: Llama 3 often outputs raw <function> tags which causes a 400 error in Groq.
-          const groqInnerError = groqApiError.error?.error;
-          if (groqInnerError?.code === "tool_use_failed" && groqInnerError?.failed_generation) {
-            const failedGen = groqInnerError.failed_generation;
-            const match = failedGen.match(/<function=(\w+)[=\s]*([\s\S]*?)<\/function>/i);
-            if (match) {
-              const toolName = match[1];
-              const rawArgs = match[2];
-              console.log(`[Groq Recovery] Recovered tool call: ${toolName}(${rawArgs})`);
-              let args = {};
-              let result;
-              try {
-                const cleanedArgs = rawArgs.replace(/^[=\s]+/, "").trim(); // Remove leading = or space
-                args = JSON.parse(cleanedArgs || "{}");
-                result = await executeChatTool(toolName, args, userId);
-              } catch (err: any) {
-                console.error("[Groq Recovery] Tool parsing failed:", err);
-                result = { error: "Failed to parse recovered arguments." };
-              }
-              // Push the user's attempt and the tool result back into context
-              messages.push({ role: "assistant", content: `I tried to call ${toolName} with arguments ${rawArgs}.` });
-              messages.push({ role: "user", content: `System: Tool execution result: ${JSON.stringify(result)}` });
-              continue; // loop again with new context
-            }
-          }
-          throw groqApiError; // Bubble up if it's unrecoverable
-        }
-      }
-      return responseText || "Action completed successfully!";
+    const { routeMessage } = await import("@/lib/ai/agent-router");
+    const routerCtx = {
+      user: { hp: core.user.hp, maxHp: core.user.maxHp },
+      today: { overdueCount: core.today.overdueCount },
     };
+    const routeResult = routeMessage(messageText || "", routerCtx);
 
+    const relevant = await buildRelevantContext(userId, routeResult.agent, [], messageText);
+    const relevantString = formatRelevantContext(relevant);
+
+    const { buildSystemInstruction } = await import("@/lib/ai/prompts");
+    const systemInstruction = buildSystemInstruction(
+      routeResult.agent,
+      coreString,
+      core.localTimeContext.localDate,
+      relevantString
+    );
+    console.log(`[Agent Router] → ${routeResult.agent} (conf: ${routeResult.confidence.toFixed(2)}) | Sections: core${Object.keys(relevant).length > 0 ? " + " + Object.keys(relevant).join(", ") : ""}`);
+
+    // ── Build the user's current message ──────────────
+    const currentUserMsg: NormalizedMessage = {
+      role: "user",
+      content: messageText || "Please analyze this attachment.",
+      parts: (base64Data && mimeType) ? [{ inlineData: { mimeType, data: base64Data } }] : undefined
+    };
+    normalizedHistory.push(currentUserMsg);
+
+    // ── Function-calling loop via LLMFactory with Auto Fallback ──────────────
     let aiResponseText = "";
     let actualModelUsed = "GEMINI";
 
-    try {
-      // Force Gemini if there is an image attached, because Groq (llama-3.3) is text-only.
-      if (modelPreference === "groq" && (!base64Data || !mimeType)) {
-        actualModelUsed = "GROQ";
-        aiResponseText = await runGroqChat();
-      } else {
-        // Run Gemini
-        let response = await chat.sendMessage({ message: messageParts });
-        let iterations = 0;
+    const executeAgentLoop = async (provider: "gemini" | "groq"): Promise<string> => {
+      const adapter = LLMFactory.getAdapter(provider);
+      let currentAgent = routeResult.agent as AgentType;
+      let tools = getToolsForAgent(currentAgent);
+      let systemInstruction = buildSystemInstruction(
+        currentAgent,
+        coreString,
+        core.localTimeContext.localDate,
+        relevantString
+      );
 
-        while (
-          response.functionCalls &&
-          response.functionCalls.length > 0 &&
-          iterations < MAX_TOOL_ITERATIONS
-        ) {
-          iterations++;
-          const functionResponses = [];
+      // Deep copy history for this execution attempt so retries start with fresh history
+      const runHistory: NormalizedMessage[] = JSON.parse(JSON.stringify(normalizedHistory));
 
-          for (const fc of response.functionCalls) {
-            console.log(`[Chat] Tool call: ${fc.name}(${JSON.stringify(fc.args)})`);
-            let result;
+      let iterations = 0;
+      let handoffs = 0;
+      let response = await adapter.generateResponse(runHistory, systemInstruction, tools);
+
+      while (response.toolCalls && response.toolCalls.length > 0 && iterations < MAX_TOOL_ITERATIONS) {
+        iterations++;
+
+        runHistory.push({
+          role: "assistant",
+          toolCalls: response.toolCalls,
+          rawParts: response.rawCandidateParts,
+        });
+
+        const toolResultsMsg: NormalizedMessage = {
+          role: "tool",
+          toolResults: []
+        };
+
+        let didHandoff = false;
+
+        for (const tc of response.toolCalls) {
+          console.log(`[${provider.toUpperCase()}] Tool call: ${tc.name}(${JSON.stringify(tc.args)})`);
+          let result;
+
+          if (tc.name === "handoff") {
+            const targetAgent = tc.args.target_agent as AgentType;
+            const allowedTargets = ALLOWED_HANDOFFS[currentAgent] || [];
+
+            if (!allowedTargets.includes(targetAgent)) {
+              result = { error: `Unauthorized handoff. You cannot handoff to ${targetAgent}.` };
+            } else if (handoffs >= 1) { // MAX_HANDOFFS = 1
+              result = { error: "Handoff failed. Maximum number of handoffs reached for this request." };
+            } else {
+              handoffs++;
+              currentAgent = targetAgent;
+              didHandoff = true;
+              result = { success: true, message: `Handoff successful. You are now the ${targetAgent} agent.` };
+            }
+          } else {
             try {
-              result = await executeChatTool(
-                fc.name!,
-                (fc.args as Record<string, any>) || {},
-                userId
-              );
+              result = await executeChatTool(tc.name, tc.args, userId);
             } catch (err: any) {
-              console.error("[Gemini] Tool parsing or execution failed:", err);
+              console.error(`[${provider.toUpperCase()}] Tool execution failed:`, err);
               result = { error: "Failed to execute tool.", details: err.message };
             }
-            functionResponses.push({
-              name: fc.name!,
-              response: result,
-            });
           }
-
-          // Send tool results back to Gemini so it can formulate a response
-          response = await chat.sendMessage({
-            message: functionResponses.map((fr) => ({
-              functionResponse: {
-                name: fr.name,
-                response: fr.response,
-              },
-            })),
-          });
+          toolResultsMsg.toolResults!.push({ toolCallId: tc.id, name: tc.name, result });
         }
 
-        aiResponseText =
-          response.text ||
-          (iterations > 0
-            ? "Action completed successfully!"
-            : "I couldn't process that request. Could you try again?");
+        runHistory.push(toolResultsMsg);
+
+        if (didHandoff) {
+          const newRelevant = await buildRelevantContext(userId, currentAgent, [], messageText);
+          const newRelevantString = formatRelevantContext(newRelevant);
+          systemInstruction = buildSystemInstruction(currentAgent, coreString, core.localTimeContext.localDate, newRelevantString);
+          tools = getToolsForAgent(currentAgent);
+        }
+
+        response = await adapter.generateResponse(runHistory, systemInstruction, tools);
+      }
+
+      return (
+        response.text ||
+        (iterations >= MAX_TOOL_ITERATIONS
+          ? "Failed to complete task."
+          : iterations > 0
+          ? "Action completed successfully!"
+          : "I couldn't process that request. Could you try again?")
+      );
+    };
+
+    const withTimeout = <T>(promise: Promise<T>): Promise<T> => {
+      return Promise.race([
+        promise,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("AI_TIMEOUT")), AI_LIMITS.chatTimeoutMs)
+        ),
+      ]);
+    };
+
+    try {
+      if (modelPreference === "groq") {
+        actualModelUsed = "GROQ";
+        aiResponseText = await withTimeout(executeAgentLoop("groq"));
+      } else if (modelPreference === "gemini") {
+        actualModelUsed = "GEMINI";
+        aiResponseText = await withTimeout(executeAgentLoop("gemini"));
+      } else {
+        // "auto" mode: Default to Gemini, gracefully fall back to Groq if Gemini fails
+        actualModelUsed = "GEMINI";
+        try {
+          aiResponseText = await withTimeout(executeAgentLoop("gemini"));
+        } catch (geminiError: any) {
+          console.warn("[Chat Route] Gemini failed in auto mode. Falling back to Groq...", geminiError);
+          actualModelUsed = "GROQ";
+          aiResponseText = await withTimeout(executeAgentLoop("groq"));
+        }
       }
     } catch (apiError: any) {
       console.error("API Error:", apiError);
-      
-      const isRateLimit = apiError.message && (apiError.message.includes("quota") || apiError.message.includes("429"));
-      
-      // Auto-fallback logic for Gemini 429 errors
-      if (
-        modelPreference === "auto" &&
-        isRateLimit
-      ) {
-        console.log("[Auto-Fallback] Gemini limit reached. Falling back to Groq...");
-        try {
-          actualModelUsed = "GROQ";
-          aiResponseText = await runGroqChat();
-        } catch (groqError) {
-          console.error("Groq Fallback Error:", groqError);
-          aiResponseText = "⚠️ **SYSTEM OVERLOAD** ⚠️\n\nThe System's rate limit quota has been exceeded on all models. Please wait a minute before sending another request.";
+      let friendlyError = "The AI service is temporarily unavailable. Please try again later.";
+
+      if (apiError.name === "LLMProviderError") {
+        const pErr = apiError as any;
+        if (pErr.originalError?.status === 429 || pErr.originalError?.status === 503 || pErr.code === "rate_limit_exceeded") {
+          friendlyError = "The AI is currently overloaded with requests. Please wait a moment and try again.";
         }
-      } else {
-        if (isRateLimit || (apiError.error?.error?.code === "rate_limit_exceeded")) {
-          aiResponseText = "⚠️ **SYSTEM OVERLOAD** ⚠️\n\nThe System's rate limit quota has been exceeded. Please wait a minute before sending another request.";
-        } else {
-          aiResponseText = "SYSTEM ERROR: The request could not be processed due to an internal error.";
-        }
+      } else if (apiError.message === "AI_TIMEOUT") {
+        friendlyError = "The AI took too long to respond. Please try a simpler question or try again later.";
       }
+      aiResponseText = friendlyError;
     }
 
     // ── Save AI response to DB ──────────────────────────────
@@ -301,12 +273,15 @@ export async function POST(req: NextRequest) {
         userId,
         sessionId,
         content: aiResponseText,
-        type: "INFO_" + actualModelUsed,
+        type: "INFO",
         read: false,
       },
     });
 
-    return NextResponse.json({ userMessage, aiMessage, sessionId, session: newSession }, { status: 200 });
+    // ── Record quota usage ───────────────────────────────────
+    await recordUsage(userId, "chat");
+
+    return NextResponse.json({ userMessage, aiMessage, sessionId, session: newSession, modelUsed: actualModelUsed }, { status: 200 });
   } catch (error: any) {
     console.error("Chat API Error:", error);
     return NextResponse.json(

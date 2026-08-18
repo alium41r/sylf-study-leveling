@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ─── Settings Data ────────────────────────────────────────────── */
 
@@ -12,6 +13,7 @@ interface SettingsTile {
   icon: React.ReactNode;
   danger?: boolean;
   action?: "logout";
+  colSpan?: number;
 }
 
 interface SettingsCategory {
@@ -52,15 +54,7 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         ),
-      },
-      {
-        key: "calendar",
-        label: "Calendar",
-        icon: (
-          <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        ),
+        colSpan: 2,
       },
     ],
   },
@@ -86,22 +80,14 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
         ),
       },
       {
-        key: "badges",
-        label: "Badges",
+        key: "calendar",
+        label: "Calendar",
         icon: (
           <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         ),
-      },
-      {
-        key: "profile",
-        label: "Scholar Profile",
-        icon: (
-          <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-        ),
+        colSpan: 2,
       },
     ],
   },
@@ -134,6 +120,7 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
         ),
+        colSpan: 2,
       },
     ],
   },
@@ -146,15 +133,6 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
         icon: (
           <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-        ),
-      },
-      {
-        key: "sync",
-        label: "Sync",
-        icon: (
-          <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         ),
       },
@@ -177,6 +155,7 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
         ),
         danger: true,
         action: "logout",
+        colSpan: 2,
       },
     ],
   },
@@ -212,101 +191,111 @@ export default function SettingsPanel() {
     router.push(`/settings/${tile.key}`);
   };
 
-  // Calculate stagger delay for tile animations
-  let globalTileIndex = 0;
-
   return (
-    <>
-      {/* Gear button moved to TopRightBar */}
-
-      {/* ─── Full-Screen Overlay ──────────────────────── */}
-      <div className={`settings-overlay ${isOpen ? "settings-open" : ""}`}>
-        {/* Close button */}
-        <button
-          className="settings-close-btn"
-          onClick={handleClose}
-          aria-label="Close settings"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="fixed inset-0 z-60 bg-bg-overlay backdrop-blur-xl overflow-y-auto"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+          {/* Close button */}
+          <button
+            className="settings-close-btn"
+            onClick={handleClose}
+            aria-label="Close settings"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-        {/* ─── Settings Grid ──────────────────────────── */}
-        <div
-          style={{
-            maxWidth: "860px",
-            margin: "0 auto",
-            padding: "80px 24px 60px",
-          }}
-        >
-          {/* Panel title */}
-          <div style={{ textAlign: "center", marginBottom: "40px" }}>
-            <p
-              style={{
-                fontFamily: "'Rajdhani', sans-serif",
-                fontWeight: 600,
-                fontSize: "0.7rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.25em",
-                color: "var(--accent-cyan)",
-                marginBottom: "8px",
-              }}
-            >
-              System Interface
-            </p>
-            <h2
-              style={{
-                fontFamily: "'Rajdhani', sans-serif",
-                fontWeight: 700,
-                fontSize: "1.8rem",
-                color: "var(--text-primary)",
-                letterSpacing: "0.05em",
-              }}
-            >
-              SETTINGS
-            </h2>
-          </div>
-
-          {/* 2x2 Category Grid */}
-          <div
+          {/* ─── Settings Grid ──────────────────────────── */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
+            transition={{ type: "spring", damping: 28, stiffness: 350 }}
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "20px",
+              maxWidth: "860px",
+              margin: "0 auto",
+              padding: "80px 24px 60px",
             }}
           >
-            {SETTINGS_CATEGORIES.map((category) => (
-              <div key={category.label} className="settings-category-card">
-                <p className="settings-category-label">{category.label}</p>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(2, 1fr)",
-                    gap: "10px",
-                  }}
+            {/* Panel title */}
+            <div style={{ textAlign: "center", marginBottom: "40px" }}>
+              <p
+                style={{
+                  fontFamily: "'Rajdhani', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "0.75rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.25em",
+                  color: "var(--accent-text-light)",
+                  marginBottom: "8px",
+                }}
+              >
+                System Interface
+              </p>
+              <h2
+                style={{
+                  fontFamily: "'Rajdhani', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "1.8rem",
+                  color: "var(--text-primary)",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                SYSTEM HUB
+              </h2>
+            </div>
+
+            {/* 2x2 Category Grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "20px",
+              }}
+            >
+              {SETTINGS_CATEGORIES.map((category, catIdx) => (
+                <motion.div
+                  key={category.label}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: catIdx * 0.05, duration: 0.3 }}
+                  className="settings-category-card"
                 >
-                  {category.tiles.map((tile) => {
-                    const tileDelay = globalTileIndex * 0.04;
-                    globalTileIndex++;
-                    return (
+                  <p className="settings-category-label">{category.label}</p>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: "10px",
+                    }}
+                  >
+                    {category.tiles.map((tile) => (
                       <button
                         key={tile.key}
-                        className={`settings-tile ${tile.danger ? "settings-tile-danger" : ""}`}
+                        className={`settings-tile ${tile.danger ? "settings-tile-danger" : ""} ${tile.colSpan === 2 ? "settings-tile-wide" : ""}`}
                         onClick={() => handleTileClick(tile)}
-                        style={{ animationDelay: `${tileDelay}s` }}
+                        style={{
+                          gridColumn: tile.colSpan ? `span ${tile.colSpan}` : undefined,
+                        }}
                       >
                         <span className="settings-tile-icon">{tile.icon}</span>
                         <span className="settings-tile-label">{tile.label}</span>
                       </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

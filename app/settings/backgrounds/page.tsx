@@ -80,18 +80,26 @@ export default function BackgroundsSettingsPage() {
   const [appliedBgId, setAppliedBgId] = useState<string>("void");
   const [showApplied, setShowApplied] = useState(false);
   const [hoveredBg, setHoveredBg] = useState<string | null>(null);
+  const [mode, setMode] = useState<"light" | "dark">("dark");
   
   const [cosmetics, setCosmetics] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const savedMode = localStorage.getItem("app_mode") as "light" | "dark";
+    if (savedMode) setMode(savedMode);
+
     if (!token) return;
     
     fetch("/api/cosmetics", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return res.json().catch(() => null);
+      })
+      .then((data) => {
+        if (!data) return;
         setCosmetics(data.cosmetics || []);
         if (data.active?.activeBackground) {
           setActiveBgId(data.active.activeBackground);
@@ -108,8 +116,7 @@ export default function BackgroundsSettingsPage() {
   }, [token]);
 
   const hasCosmetic = (itemKey: string) => {
-    if (itemKey === "void") return true;
-    return cosmetics.some(c => c.category === "BACKGROUND" && c.itemKey === itemKey);
+    return true; // Temporarily unlocked for testing Light Mode
   };
 
   const handleApplyBackground = async (bg: BackgroundOption) => {
@@ -126,17 +133,19 @@ export default function BackgroundsSettingsPage() {
         },
         body: JSON.stringify({ category: "BACKGROUND", itemKey: bg.id })
       });
-      const data = await res.json();
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
         setActiveBgId(bg.id);
         setAppliedBgId(bg.id);
         localStorage.setItem("app_background", bg.id);
-        mutateUser(data.user);
+        if (data.user) {
+          mutateUser(data.user);
+        }
 
         // Apply globally
         const bgData = BG_MAP[bg.id];
         if (bgData) {
-          document.body.style.background = bgData.value;
+          document.body.style.background = mode === "light" ? bgData.lightValue : bgData.value;
           document.body.style.backgroundSize = bgData.size || "cover";
           document.body.style.backgroundAttachment = "fixed";
         }
@@ -254,11 +263,11 @@ export default function BackgroundsSettingsPage() {
                       overflow: "hidden",
                       border: isApplied
                         ? "2px solid var(--accent-cyan)"
-                        : "2px solid rgba(255,255,255,0.04)",
+                        : "2px solid var(--border-subtle)",
                       boxShadow: isApplied
                         ? "0 0 20px rgba(6, 182, 212, 0.2)"
                         : isHovered
-                        ? "0 8px 32px rgba(0,0,0,0.6)"
+                        ? "0 8px 32px rgba(0,0,0,0.2)"
                         : "none",
                       transform: isHovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
                       transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -270,7 +279,8 @@ export default function BackgroundsSettingsPage() {
                     <div
                       style={{
                         height: "180px",
-                        background: bgData?.value || "#0a0a0f",
+                        backgroundImage: mode === "light" ? bgData?.lightValue : bgData?.value,
+                        backgroundColor: mode === "light" ? "#f8fafc" : "#0a0a0f",
                         backgroundSize: bgData?.size || "cover",
                         position: "relative",
                         overflow: "hidden",
@@ -365,9 +375,8 @@ export default function BackgroundsSettingsPage() {
                     <div
                       style={{
                         padding: "16px 18px",
-                        background: "rgba(10,10,18,0.95)",
-                        backdropFilter: "blur(12px)",
-                        borderTop: "1px solid rgba(255,255,255,0.04)",
+                        background: "var(--bg-panel)",
+                        borderTop: "1px solid var(--border-subtle)",
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
@@ -389,7 +398,7 @@ export default function BackgroundsSettingsPage() {
                         style={{
                           fontFamily: "'Rajdhani', sans-serif",
                           fontSize: "0.75rem",
-                          color: "var(--text-muted)",
+                          color: "var(--text-secondary)",
                           marginBottom: "14px",
                           lineHeight: 1.4,
                         }}
@@ -404,8 +413,8 @@ export default function BackgroundsSettingsPage() {
                             width: "100%",
                             padding: "9px",
                             borderRadius: "6px",
-                            border: isApplied ? "none" : "1px solid rgba(6, 182, 212, 0.25)",
-                            background: isApplied ? "var(--accent-cyan)" : "rgba(6, 182, 212, 0.08)",
+                            border: isApplied ? "none" : "1px solid var(--accent-cyan)",
+                            background: isApplied ? "var(--accent-cyan)" : "rgba(6, 182, 212, 0.1)",
                             color: isApplied ? "#000" : "var(--accent-cyan)",
                             fontFamily: "'Rajdhani', sans-serif",
                             fontWeight: 700,
@@ -423,8 +432,8 @@ export default function BackgroundsSettingsPage() {
                           width: "100%",
                           padding: "9px",
                           borderRadius: "6px",
-                          background: "rgba(255,255,255,0.03)",
-                          border: "1px solid rgba(255,255,255,0.05)",
+                          background: "var(--bg-shadow)",
+                          border: "1px solid var(--border-subtle)",
                           textAlign: "center"
                         }}>
                           <p style={{ fontSize: "0.75rem", fontFamily: "'Rajdhani', sans-serif", fontWeight: "bold", letterSpacing: "0.1em", color: "var(--text-muted)" }}>

@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { SignJWT } from "jose";
 import { prisma } from "@/lib/prisma";
 import { xpForNextLevel } from "@/lib/game-engine";
+import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
+import { formatScholarId } from "@/lib/scholar-id";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email"),
+  identifier: z.string().min(1, "Email or username is required").optional(),
+  email: z.string().min(1, "Email is required").optional(),
   password: z.string().min(1, "Password is required"),
 });
-
-const secretKey = new TextEncoder().encode(
-  process.env.JWT_SECRET || "hunter-system-secret-key-change-in-production"
-);
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,13 +21,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid data" }, { status: 400 });
     }
 
-    const { email, password } = validation.data;
+    const { email, identifier, password } = validation.data;
+    const loginTarget = (identifier || email || "").trim();
 
-    // Find user by email
-    const user = await prisma.user.findUnique({ where: { email } });
+    if (!loginTarget) {
+      return NextResponse.json({ error: "Email or username is required" }, { status: 400 });
+    }
+
+    // Find user by email OR username (case-insensitive)
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: { equals: loginTarget, mode: "insensitive" } },
+          { username: { equals: loginTarget, mode: "insensitive" } },
+        ],
+      },
+    });
+
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
+
+    // Handle OAuth-only accounts without passwords
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "This account was registered with Google or GitHub. Please sign in with OAuth." },
         { status: 401 }
       );
     }
@@ -43,20 +62,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Build JWT with RPG stats so the frontend can render them immediately
-    const token = await new SignJWT({
+    const scholarId = user.scholarId || formatScholarId(user.id);
+
+    // Build JWT with user stats
+    const tokenPayload: AuthTokenPayload = {
       userId: user.id,
       email: user.email,
       name: user.name,
       username: user.username,
+      scholarId,
+      verificationStatus: user.verificationStatus,
       hunterRank: user.hunterRank,
       level: user.level,
-    })
-      .setProtectedHeader({ alg: "HS256" })
-      .setExpirationTime("30d")
-      .sign(secretKey);
+      hasCompletedOnboarding: user.hasCompletedOnboarding,
+    };
 
-    // Return token + full user stats (excluding password)
+    const token = await signToken(tokenPayload);
+
+    // Return token + full user stats
     const response = NextResponse.json(
       {
         message: "Login successful!",
@@ -66,6 +89,8 @@ export async function POST(req: NextRequest) {
           email: user.email,
           username: user.username,
           name: user.name,
+          scholarId,
+          verificationStatus: user.verificationStatus,
           hunterRank: user.hunterRank,
           level: user.level,
           currentXP: user.currentXP,
@@ -75,23 +100,21 @@ export async function POST(req: NextRequest) {
           streakDays: user.streakDays,
           totalStudyMinutes: user.totalStudyMinutes,
           hasCompletedOnboarding: user.hasCompletedOnboarding,
+          createdAt: user.createdAt,
+          avatarUrl: user.avatarUrl,
         },
       },
       { status: 200 }
     );
 
     response.cookies.set({
-      name: 'system_token',
+      ...AUTH_COOKIE_OPTIONS,
       value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-      path: '/',
     });
 
     return response;
-  } catch {
+  } catch (error) {
+    console.error("Login route error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { AiStudyOrchestrator, StudySessionData } from "@/lib/ai/orchestrator";
+import { checkQuota, recordUsage } from "@/lib/ai/usage-limiter";
+import { AI_LIMITS } from "@/lib/ai/config";
+
+import { TimezoneService } from "@/lib/timezone-service";
+import { getUserTimezone } from "@/lib/timezone-server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,13 +21,23 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = payload.userId as number;
-    const { topic, syllabus, effortHours, targetDate } = await req.json();
+
+    // ── Quota enforcement ─────────────────────────────────
+    const quota = await checkQuota(userId, "planner");
+    if (!quota.allowed) {
+      return NextResponse.json(
+        { error: "quota_exceeded", feature: "planner", remaining: 0, limit: quota.limit, resetsAt: quota.resetsAt },
+        { status: 429 }
+      );
+    }
+
+    const body = await req.json();
+    const { topic, syllabus, effortHours, targetDate } = body;
 
     if (!topic || !effortHours) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Prepare a ReadableStream for Server-Sent Events (SSE)
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
@@ -50,31 +65,44 @@ export async function POST(req: NextRequest) {
             sendEvent("thought", { text: msg });
           };
 
-          // Generate Plan using Multi-Agent Orchestrator
-          const planResult = await AiStudyOrchestrator.generatePlan(
-            topic, 
-            syllabus || "", 
-            effortHours, 
-            targetDate || null,
-            pastSessions,
-            onProgress
-          );
+          // Generate Plan using Multi-Agent Orchestrator (with timeout)
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error("AI_TIMEOUT")), AI_LIMITS.plannerTimeoutMs);
+          });
+
+          const planResult = await Promise.race([
+            AiStudyOrchestrator.generatePlan(
+              topic, 
+              syllabus || "", 
+              effortHours, 
+              targetDate || null,
+              pastSessions,
+              onProgress
+            ),
+            timeoutPromise,
+          ]);
 
           sendEvent("thought", { text: "[System] Plan finalized. Saving to database..." });
 
-          // Save the Goal and Quests to the Database
+          let mappedEffortLevel = "NORMAL";
+          if (effortHours >= 30) mappedEffortLevel = "EXTREME";
+          else if (effortHours >= 15) mappedEffortLevel = "INTENSE";
+          else if (effortHours <= 5) mappedEffortLevel = "RELAXED";
+
+          // Save the Goal and Quests to the Database directly to maintain control
           const goal = await prisma.goal.create({
             data: {
               userId,
               title: planResult.goalTitle,
               description: planResult.goalDescription,
               targetWeeks: targetDate ? Math.ceil((new Date(targetDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 7)) || 1 : 1,
-              effortLevel: effortHours > 20 ? "HARD" : "NORMAL",
+              effortLevel: mappedEffortLevel as any,
               status: "ACTIVE"
             }
           });
 
-          // Create the Quests
+          // Create the Quests in user's timezone
+          const tz = await getUserTimezone(userId);
           const today = new Date();
           let daysToDeadline = 7;
           if (targetDate) {
@@ -84,9 +112,8 @@ export async function POST(req: NextRequest) {
 
           const questsToCreate = planResult.quests.map((q, index) => {
             // Distribute quests across the timeline evenly
-            const scheduledDate = new Date(today);
             const offsetDays = Math.floor((index / planResult.quests.length) * daysToDeadline);
-            scheduledDate.setDate(today.getDate() + offsetDays);
+            const scheduledFor = TimezoneService.getUserLocalDateOffset(tz, offsetDays);
             
             return {
               userId,
@@ -96,8 +123,9 @@ export async function POST(req: NextRequest) {
               requiredMinutes: q.requiredMinutes,
               xpReward: q.xpReward,
               sylphReward: q.sylphReward,
-              scheduledFor: targetDate ? scheduledDate.toISOString().split("T")[0] : "", // Empty if no target date
-              status: "PENDING"
+              scheduledFor,
+              status: "PENDING" as any,
+              createdByAi: true
             };
           });
 
@@ -105,16 +133,35 @@ export async function POST(req: NextRequest) {
             data: questsToCreate
           });
 
-          sendEvent("result", { goal: { ...goal, quests: questsToCreate } });
+          // Calculate actual generated time
+          let actualTotalMinutes = 0;
+          questsToCreate.forEach(q => actualTotalMinutes += q.requiredMinutes);
+
+          // Create a system message in the AI chat
+          await prisma.systemMessage.create({
+            data: {
+              userId,
+              content: `**Study Plan Generated!**\n\nI have successfully researched **"${topic}"** and generated a structured plan.\n\n- **Goal**: ${planResult.goalTitle}\n- **Workload**: ${questsToCreate.length} quests totaling ~${Math.round(actualTotalMinutes / 60)} hours\n- **Effort Level**: ${mappedEffortLevel}\n\nYour quests have been scheduled! You can ask me to edit, reschedule, or delete any of these quests at any time.`,
+              type: "SYSTEM",
+            },
+          });
+
+          // Final response
+          sendEvent("result", { goal });
+
+          // Record quota usage after successful generation
+          await recordUsage(userId, "planner");
+
           controller.close();
-        } catch (error: any) {
-          sendEvent("error", { message: error.message || "Failed to generate plan." });
+        } catch (err: any) {
+          console.error("Planner API Error:", err);
+          sendEvent("error", { message: err.message || "Failed to generate plan." });
           controller.close();
         }
-      }
+      },
     });
 
-    return new NextResponse(stream, {
+    return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
@@ -123,7 +170,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("POST /api/ai-planner error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    console.error("Planner API wrapper error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

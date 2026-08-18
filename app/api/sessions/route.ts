@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { calculateStreak, awardXP, calculateTimerSylph, getStreakMultiplier, getLongSessionMultiplier } from "@/lib/game-engine";
+import { calculateStreak, calculateWeeklyStreak, getWeeklyBounds, calculateWeeklyQuestReward, awardXP, calculateTimerSylph, getStreakMultiplier, getLongSessionMultiplier } from "@/lib/game-engine";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
@@ -41,11 +41,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const { questId, subjectId } = validation.data;
+
     const session = await prisma.studySession.create({
       data: {
         userId: payload.userId as number,
-        questId: validation.data.questId || null,
-        subjectId: validation.data.subjectId || null,
+        questId,
+        subjectId,
         durationMinutes: 0,
         durationSeconds: 0,
         startedAt: new Date(),
@@ -53,9 +55,9 @@ export async function POST(req: NextRequest) {
     });
 
     // If linked to a quest, mark it as IN_PROGRESS
-    if (validation.data.questId) {
+    if (questId) {
       await prisma.quest.update({
-        where: { id: validation.data.questId },
+        where: { id: questId },
         data: { status: "IN_PROGRESS" },
       });
     }
@@ -115,38 +117,69 @@ export async function PATCH(req: NextRequest) {
       where: { id: payload.userId as number },
     });
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    const bounds = getWeeklyBounds(new Date(), user?.timezone || "UTC");
 
-    const todaySessions = await prisma.studySession.aggregate({
+    // Aggregate weekly focus sessions
+    const weekSessions = await prisma.studySession.aggregate({
       _sum: { durationMinutes: true },
       where: {
         userId: user!.id,
-        startedAt: { gte: todayStart },
+        startedAt: {
+          gte: bounds.weekStart,
+          lte: bounds.weekEnd,
+        },
       },
     });
 
-    // Add the current session's duration since we just updated it, wait, `todaySessions` includes this session since its duration was updated? No, `todaySessions` aggregates durationMinutes.
-    // The session was just updated with `durationMinutes`, so `aggregate` WILL include it!
-    const todayMinutes = todaySessions._sum.durationMinutes || 0;
-    const todayStr = new Date().toISOString().split("T")[0];
-
+    const weekMinutes = weekSessions._sum.durationMinutes || 0;
     let newStreak = user!.streakDays;
     let newLastActiveDate = user!.lastActiveDate;
+    let weeklyBonusXP = 0;
+    let weeklyBonusSylph = 0;
 
-    if (todayMinutes >= 30) {
-      newStreak = calculateStreak(user!.lastActiveDate, todayStr, user!.streakDays);
-      newLastActiveDate = todayStr;
-      
-      if (newStreak > user!.streakDays && newStreak > 1) {
-         await prisma.systemMessage.create({
-            data: {
-               userId: user!.id,
-               content: `**Streak Extended**\n\nYou studied for over 30 minutes today. Your streak is now ${newStreak} days. Keep it up!`,
-               type: "STREAK"
-            }
-         });
+    // Check for Streak Freeze inventory item
+    const freezeItem = await prisma.inventoryItem.findFirst({
+      where: { userId: user!.id, itemKey: "STREAK_FREEZE", quantity: { gt: 0 } },
+    });
+
+    // Weekly 3-hour milestone (180 minutes)
+    if (weekMinutes >= 180 && user!.lastActiveDate !== bounds.weekKey) {
+      const streakResult = calculateWeeklyStreak(
+        user!.lastActiveDate,
+        bounds.weekKey,
+        user!.streakDays,
+        !!freezeItem
+      );
+
+      newStreak = streakResult.newStreak;
+      newLastActiveDate = bounds.weekKey;
+
+      if (streakResult.freezeUsed && freezeItem) {
+        await prisma.inventoryItem.update({
+          where: { id: freezeItem.id },
+          data: { quantity: { decrement: 1 } },
+        });
+        await prisma.systemMessage.create({
+          data: {
+            userId: user!.id,
+            content: `**Weekly Streak Freeze Consumed**\n\nYour Streak Freeze protected your weekly streak after a missed cycle. Streak continues at **${newStreak} weeks**!`,
+            type: "STREAK",
+          },
+        });
       }
+
+      // Calculate level-scaled reward for the 3-hour weekly quest
+      const weeklyReward = calculateWeeklyQuestReward(user!.level);
+      weeklyBonusXP = weeklyReward.xpReward;
+      weeklyBonusSylph = weeklyReward.sylphReward;
+
+      await prisma.systemMessage.create({
+        data: {
+          userId: user!.id,
+          content: `**Weekly Mission Complete: 3 Hours of Focus!**\n\nYou completed the weekly 3-hour study target. Weekly streak is now **${newStreak} week${newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
+          type: "STREAK",
+        },
+      });
     }
 
     // Meaningful Focus System: Exact second-based rewards, 0 rewards if < 60s
@@ -162,7 +195,7 @@ export async function PATCH(req: NextRequest) {
       didRankUp: false 
     };
 
-    if (actualSeconds >= 60) {
+    if (actualSeconds >= 60 || weeklyBonusXP > 0) {
       const exactMinutes = actualSeconds / 60;
       
       // Base rewards
@@ -173,9 +206,9 @@ export async function PATCH(req: NextRequest) {
       const sessionMultiplier = getLongSessionMultiplier(exactMinutes);
       const streakMult = getStreakMultiplier(newStreak);
       
-      // Final applied rewards (rounded down to integer)
-      xpGained = Math.floor(baseXp * sessionMultiplier);
-      finalSylph = Math.floor(baseSylph * streakMult * sessionMultiplier);
+      // Final applied rewards (rounded down to integer) + weekly bonus rewards
+      xpGained = Math.floor(baseXp * sessionMultiplier) + weeklyBonusXP;
+      finalSylph = Math.floor(baseSylph * streakMult * sessionMultiplier) + weeklyBonusSylph;
       
       result = awardXP(user!.level, user!.currentXP, user!.xpToNextLevel, xpGained);
     }
@@ -226,64 +259,12 @@ export async function PATCH(req: NextRequest) {
         });
       }
       
-      // Handle Quest Completion
+      // Update Quest Progress
       if (questId) {
-        const quest = await tx.quest.findFirst({ where: { id: questId, userId: user!.id } });
-        if (quest && quest.status !== "COMPLETED" && actualSeconds >= quest.requiredMinutes * 60) {
-          const qXp = quest.xpReward;
-          const qSylph = quest.sylphReward;
-          
-          const qResult = awardXP(result.newLevel, result.newCurrentXP, result.newXPToNextLevel, qXp);
-          
-          await tx.quest.update({
-            where: { id: quest.id },
-            data: { status: "COMPLETED", completedAt: new Date() }
-          });
-
-          await tx.user.update({
-            where: { id: user!.id },
-            data: {
-              level: qResult.newLevel,
-              currentXP: qResult.newCurrentXP,
-              xpToNextLevel: qResult.newXPToNextLevel,
-              hunterRank: qResult.newRank,
-              sylph: { increment: qSylph }
-            }
-          });
-
-          if (qSylph > 0) {
-            await tx.sylphLedger.create({
-              data: { userId: user!.id, amount: qSylph, source: "QUEST" }
-            });
-          }
-
-          await tx.systemMessage.create({
-            data: {
-              userId: user!.id,
-              content: `**Quest Complete**\n\n"${quest.title}"\n\nRewards:\n• +${qXp} XP\n• +${qSylph} Sylph`,
-              type: "REWARD"
-            }
-          });
-
-          if (qResult.levelsGained > 0) {
-            const qLevelUpSylph = qResult.newLevel * 300;
-            await tx.user.update({
-              where: { id: user!.id },
-              data: { sylph: { increment: qLevelUpSylph } }
-            });
-            await tx.sylphLedger.create({
-              data: { userId: user!.id, amount: qLevelUpSylph, source: "LEVEL_UP" }
-            });
-            const qRankUpText = qResult.didRankUp ? `\n\nRank Up! You are now a ${qResult.newRank}-Rank Hunter.` : "";
-            await tx.systemMessage.create({
-              data: {
-                userId: user!.id,
-                content: `**Level Up**\n\nYou have reached Level ${qResult.newLevel}.${qRankUpText}\n\nStipend: +${qLevelUpSylph} Sylph\n\nYou have grown stronger.`,
-                type: "LEVEL_UP",
-              },
-            });
-          }
-        }
+        await tx.quest.update({
+          where: { id: questId },
+          data: { elapsedSeconds: { increment: actualSeconds } }
+        });
       }
     });
 

@@ -10,7 +10,7 @@ export default function SettingsInventoryPage() {
   const { user, token } = useAuth();
   
   const [activeTab, setActiveTab] = useState<"ITEMS" | "COSMETICS" | "STATS">("ITEMS");
-  const [stats, setStats] = useState({ totalEarned: 0, totalSpent: 0 });
+  const [stats, setStats] = useState({ totalEarned: 0, totalSpent: 0, totalHpLost: 0 });
   const [inventoryItems, setInventoryItems] = useState<{itemKey: string, quantity: number}[]>([]);
   const [cosmetics, setCosmetics] = useState<any[]>([]);
 
@@ -21,7 +21,7 @@ export default function SettingsInventoryPage() {
     fetch("/api/currency/stats", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
       .then(data => setStats(data))
       .catch(console.error);
 
@@ -29,7 +29,7 @@ export default function SettingsInventoryPage() {
     fetch("/api/inventory", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
       .then(data => setInventoryItems(data.inventoryItems || []))
       .catch(console.error);
       
@@ -37,15 +37,18 @@ export default function SettingsInventoryPage() {
     fetch("/api/cosmetics", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
-      .then(data => {
-        setCosmetics(data.cosmetics || []);
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return res.json().catch(() => null);
+      })
+      .then((data) => {
+        if (data?.cosmetics) setCosmetics(data.cosmetics);
       })
       .catch(console.error);
 
   }, [token]);
 
-  if (!user) return <div className="text-gray-400">Loading collection...</div>;
+  if (!user) return <div className="text-text-muted">Loading collection...</div>;
 
   const hasCosmetic = (category: string, itemKey: string) => {
     if (itemKey.includes("default")) return true;
@@ -96,14 +99,18 @@ export default function SettingsInventoryPage() {
 
       <div className="animate-fade-in-up">
         {activeTab === "STATS" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-            <div style={{ background: "rgba(10,10,18,0.6)", border: "1px solid rgba(6,182,212,0.3)", borderLeft: "4px solid #06b6d4", padding: "24px", borderRadius: "8px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
+            <div style={{ background: "var(--bg-abyss)", border: "1px solid var(--border-subtle)", borderLeft: "4px solid var(--accent-primary-light)", padding: "24px", borderRadius: "8px" }}>
               <p style={{ fontFamily: "'Rajdhani', sans-serif", letterSpacing: "0.1em", fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "8px" }}>TOTAL SYLPH EARNED</p>
-              <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#67e8f9" }}>{stats.totalEarned}</p>
+              <p style={{ fontSize: "2rem", fontWeight: "bold", color: "var(--accent-primary-light)" }}>{stats.totalEarned}</p>
             </div>
-            <div style={{ background: "rgba(10,10,18,0.6)", border: "1px solid rgba(239,68,68,0.3)", borderLeft: "4px solid #ef4444", padding: "24px", borderRadius: "8px" }}>
+            <div style={{ background: "var(--bg-abyss)", border: "1px solid rgba(239,68,68,0.3)", borderLeft: "4px solid var(--accent-red)", padding: "24px", borderRadius: "8px" }}>
               <p style={{ fontFamily: "'Rajdhani', sans-serif", letterSpacing: "0.1em", fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "8px" }}>TOTAL SYLPH SPENT</p>
-              <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#fca5a5" }}>{stats.totalSpent}</p>
+              <p style={{ fontSize: "2rem", fontWeight: "bold", color: "var(--accent-red)" }}>{stats.totalSpent}</p>
+            </div>
+            <div style={{ background: "var(--bg-abyss)", border: "1px solid rgba(220,38,38,0.3)", borderLeft: "4px solid var(--accent-red)", padding: "24px", borderRadius: "8px" }}>
+              <p style={{ fontFamily: "'Rajdhani', sans-serif", letterSpacing: "0.1em", fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "8px" }}>TOTAL HP LOST</p>
+              <p style={{ fontSize: "2rem", fontWeight: "bold", color: "var(--accent-red)" }}>{stats.totalHpLost}</p>
             </div>
           </div>
         )}
@@ -118,11 +125,11 @@ export default function SettingsInventoryPage() {
                   const shopDef = SHOP_ITEMS.find(s => s.itemKey === invItem.itemKey);
                   if (!shopDef) return null;
                   return (
-                    <div key={invItem.itemKey} style={{ background: "rgba(10,10,18,0.6)", border: "1px solid rgba(255,255,255,0.05)", padding: "16px", borderRadius: "8px", display: "flex", alignItems: "center", gap: "16px" }}>
+                    <div key={invItem.itemKey} style={{ background: "var(--bg-abyss)", border: "1px solid var(--border-subtle)", padding: "16px", borderRadius: "8px", display: "flex", alignItems: "center", gap: "16px" }}>
                       <div style={{ fontSize: "2rem" }}>{shopDef.icon}</div>
                       <div>
                         <div style={{ fontWeight: "bold", fontSize: "0.9rem" }}>{shopDef.name}</div>
-                        <div style={{ color: "#67e8f9", fontFamily: "'Rajdhani', sans-serif", fontWeight: "bold", fontSize: "0.85rem" }}>OWNED: {invItem.quantity}</div>
+                        <div style={{ color: "var(--accent-primary-light)", fontFamily: "'Rajdhani', sans-serif", fontWeight: "bold", fontSize: "0.85rem" }}>OWNED: {invItem.quantity}</div>
                       </div>
                     </div>
                   );
@@ -136,7 +143,7 @@ export default function SettingsInventoryPage() {
           <div>
             <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginBottom: "20px" }}>* To equip cosmetics, visit their respective configuration pages in Settings.</p>
             
-            {["THEME", "BACKGROUND", "AVATAR", "FRAME", "TITLE", "NAME_COLOR"].map((category) => {
+            {["THEME", "BACKGROUND", "CLASS", "FRAME", "TITLE", "NAME_COLOR"].map((category) => {
               const items = COSMETICS_CATALOG[category as keyof typeof COSMETICS_CATALOG];
               const ownedCount = items.filter(i => hasCosmetic(category, i.id)).length;
               
@@ -153,9 +160,28 @@ export default function SettingsInventoryPage() {
                       if (!unlocked) return null;
                       
                       return (
-                        <div key={item.id} style={{ background: "rgba(10,10,18,0.6)", border: "1px solid rgba(6,182,212,0.2)", padding: "12px", borderRadius: "6px" }}>
-                          <p style={{ fontWeight: "bold", fontSize: "0.85rem", marginBottom: "4px" }}>{item.name}</p>
-                          <p style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>{item.description}</p>
+                        <div key={item.id} className="relative rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss p-3 flex flex-col gap-2">
+                          {(category === "CLASS" || category === "AVATAR") && (
+                            <div className="w-full h-24 rounded overflow-hidden relative bg-black/50 border border-white/10">
+                              <img 
+                                src={item.value} 
+                                alt={item.name} 
+                                className="w-full h-full object-cover object-center"
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = "none";
+                                  const fb = (e.target as HTMLElement).nextElementSibling;
+                                  if (fb) (fb as HTMLElement).style.display = "flex";
+                                }}
+                              />
+                              <div className="absolute inset-0 hidden items-center justify-center text-3xl">
+                                {item.fallbackIcon || "👤"}
+                              </div>
+                            </div>
+                          )}
+                          <div>
+                            <p style={{ fontWeight: "bold", fontSize: "0.85rem", marginBottom: "2px", color: "var(--text-primary)" }}>{item.name}</p>
+                            <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.4 }}>{item.description}</p>
+                          </div>
                         </div>
                       )
                     })}

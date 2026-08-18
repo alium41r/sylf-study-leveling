@@ -120,7 +120,7 @@ export default function PrivacyInformation() {
       value={value}
       onChange={handleSelectChange}
       disabled={isSaving}
-      className="input-field text-sm shrink-0 bg-[#0f1115] border-white/10 focus:border-accent-cyan"
+      className="input-field text-sm shrink-0 bg-bg-void border-border-subtle focus:border-accent-cyan"
       style={{ padding: "6px 12px", width: "auto", minWidth: "140px" }}
     >
       <option value={PrivacyLevel.PUBLIC}>Public</option>
@@ -144,7 +144,7 @@ export default function PrivacyInformation() {
 
       {/* Visibility & Status */}
       <div>
-        <h3 className="text-sm font-rajdhani uppercase tracking-widest text-accent-cyan mb-4">
+        <h3 className="text-sm font-['Rajdhani'] font-bold uppercase tracking-widest text-accent-text-light mb-4">
           Visibility & Status
         </h3>
         <SettingsRowGroup>
@@ -173,20 +173,20 @@ export default function PrivacyInformation() {
 
       {/* Profile Data */}
       <div>
-        <h3 className="text-sm font-rajdhani uppercase tracking-widest text-accent-cyan mb-4">
+        <h3 className="text-sm font-['Rajdhani'] font-bold uppercase tracking-widest text-accent-text-light mb-4">
           Profile Data
         </h3>
         <SettingsRowGroup>
           <SettingsRow
             label="Show Study Hours"
-            description="Display your total accumulated study time."
+            description="Display your total accumulated study time, streak, and cognitive stats."
           >
             <PrivacySelect name="showStudyHours" value={privacyState.showStudyHours} />
           </SettingsRow>
           
           <SettingsRow
             label="Show Hunter Rank"
-            description="Make your current rank (E to S) visible to others."
+            description="Make your current rank (E to S) and Level visible to others."
           >
             <PrivacySelect name="showRank" value={privacyState.showRank} />
           </SettingsRow>
@@ -202,7 +202,7 @@ export default function PrivacyInformation() {
 
       {/* Social & Interactions */}
       <div>
-        <h3 className="text-sm font-rajdhani uppercase tracking-widest text-accent-cyan mb-4">
+        <h3 className="text-sm font-['Rajdhani'] font-bold uppercase tracking-widest text-accent-text-light mb-4">
           Social & Interactions
         </h3>
         <SettingsRowGroup>
@@ -222,10 +222,14 @@ export default function PrivacyInformation() {
         </SettingsRowGroup>
       </div>
 
-      <div className="border-t border-white/5 pt-6 flex justify-end">
+      <div className="border-t border-border-subtle pt-6 flex justify-end">
         <button 
           type="submit" 
-          className={!isDirty ? "btn-secondary opacity-50 cursor-not-allowed" : "btn-secondary"} 
+          className={`px-6 py-2.5 rounded-xl font-['Rajdhani'] font-bold tracking-wider uppercase text-white transition-all shadow-md ${
+            !isDirty || isSaving 
+              ? "bg-accent-primary-dim opacity-50 cursor-not-allowed border border-border-subtle" 
+              : "bg-accent-primary hover:bg-accent-primary-mid active:scale-95"
+          }`} 
           disabled={!isDirty || isSaving}
         >
           {isSaving ? "Saving..." : "Save Preferences"}

@@ -59,6 +59,13 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: "User not found" }, { status: 404 });
       }
 
+      if (!user.password) {
+        return NextResponse.json(
+          { error: "This account was registered using OAuth. Password cannot be changed this way." },
+          { status: 400 }
+        );
+      }
+
       // Verify current password
       const passwordMatches = await bcrypt.compare(currentPassword, user.password);
       if (!passwordMatches) {
@@ -94,7 +101,7 @@ export async function PATCH(req: NextRequest) {
       }, { status: 200 });
 
       response.cookies.set({
-        name: 'system_token',
+        name: 'hunter_token',
         value: newToken,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

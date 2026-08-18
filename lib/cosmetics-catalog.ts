@@ -1,4 +1,4 @@
-export type CosmeticCategory = "THEME" | "BACKGROUND" | "AVATAR" | "FRAME" | "TITLE" | "NAME_COLOR";
+export type CosmeticCategory = "THEME" | "BACKGROUND" | "CLASS" | "AVATAR" | "FRAME" | "TITLE" | "NAME_COLOR";
 export type Rarity = "Common" | "Rare" | "Epic" | "Legendary" | "Mythic";
 
 export interface CosmeticItem {
@@ -6,12 +6,104 @@ export interface CosmeticItem {
   category: CosmeticCategory;
   name: string;
   description: string;
-  unlockCondition: string; // e.g., "Level 5", "E-Rank", "Default"
-  value: string; // the CSS class, image URL, or hex code
-  bgCategory?: "gradient" | "pattern" | "ambient"; // for backgrounds
+  unlockCondition: string;
+  value: string; // Image path or glyph
+  fallbackIcon?: string;
+  bgCategory?: "gradient" | "pattern" | "ambient";
   rarity: Rarity;
-  source: string; // e.g., "Base System", "Level Reward", "Rank Reward", "Achievement"
+  source: string;
 }
+
+const CLASS_CATALOG: CosmeticItem[] = [
+  {
+    id: "class_scholar",
+    category: "CLASS",
+    name: "Scholar",
+    description: "The archetype of relentless dedication. Excels at knowledge retention, structured review cycles, and foundational mastery.",
+    unlockCondition: "Default",
+    value: "/classes/scholar.png",
+    fallbackIcon: "📖",
+    rarity: "Common",
+    source: "Base System",
+  },
+  {
+    id: "class_analyst",
+    category: "CLASS",
+    name: "Analyst",
+    description: "Master of dissection and data. Detects hidden patterns, optimizes study efficiency, and breaks down complex problems.",
+    unlockCondition: "Default",
+    value: "/classes/analyst.png",
+    fallbackIcon: "📊",
+    rarity: "Common",
+    source: "Base System",
+  },
+  {
+    id: "class_engineer",
+    category: "CLASS",
+    name: "Engineer",
+    description: "Architect of workflows and systems. Constructs structured learning pipelines and transforms theory into functional mechanics.",
+    unlockCondition: "Default",
+    value: "/classes/engineer.png",
+    fallbackIcon: "⚙️",
+    rarity: "Common",
+    source: "Base System",
+  },
+  {
+    id: "class_scientist",
+    category: "CLASS",
+    name: "Scientist",
+    description: "The empirical explorer. Driven by hypothesis testing, rigorous experimentation, and unyielding intellectual curiosity.",
+    unlockCondition: "Default",
+    value: "/classes/scientist.png",
+    fallbackIcon: "🔬",
+    rarity: "Common",
+    source: "Base System",
+  },
+  {
+    id: "class_researcher",
+    category: "CLASS",
+    name: "Researcher",
+    description: "The deep-diver into source literature. Synthesizes disparate knowledge domains and unearths obscure breakthroughs.",
+    unlockCondition: "Default",
+    value: "/classes/researcher.png",
+    fallbackIcon: "🧭",
+    rarity: "Common",
+    source: "Base System",
+  },
+  {
+    id: "class_psychologist",
+    category: "CLASS",
+    name: "Psychologist",
+    description: "Master of cognition and mental endurance. Regulates focus states, unlocks peak flow, and masters mental resilience.",
+    unlockCondition: "Default",
+    value: "/classes/psychologist.png",
+    fallbackIcon: "🧠",
+    rarity: "Common",
+    source: "Base System",
+  },
+  {
+    id: "class_strategist",
+    category: "CLASS",
+    name: "Strategist",
+    description: "The long-term tactician. Plans study campaigns, forecasts milestones, and executes goal trajectories with precision.",
+    unlockCondition: "Default",
+    value: "/classes/strategist.png",
+    fallbackIcon: "♟️",
+    rarity: "Common",
+    source: "Base System",
+  },
+  {
+    id: "class_creative",
+    category: "CLASS",
+    name: "Creative",
+    description: "The intuitive innovator. Bridges disparate concepts with lateral thinking, unorthodox insights, and imaginative leaps.",
+    unlockCondition: "Default",
+    value: "/classes/creative.png",
+    fallbackIcon: "✨",
+    rarity: "Common",
+    source: "Base System",
+  },
+];
 
 export const COSMETICS_CATALOG: Record<CosmeticCategory, CosmeticItem[]> = {
   THEME: [
@@ -32,11 +124,8 @@ export const COSMETICS_CATALOG: Record<CosmeticCategory, CosmeticItem[]> = {
     { id: "aurora-borealis", category: "BACKGROUND", name: "Aurora Borealis", description: "Shimmering cyan and purple light drifting across the northern sky.", unlockCondition: "B-Rank", value: "aurora-borealis", bgCategory: "ambient", rarity: "Legendary", source: "Rank Reward" },
     { id: "deep-ocean", category: "BACKGROUND", name: "Deep Ocean", description: "Cool blue bioluminescence glowing from the ocean floor.", unlockCondition: "A-Rank", value: "deep-ocean", bgCategory: "ambient", rarity: "Legendary", source: "Rank Reward" },
   ],
-  AVATAR: [
-    { id: "avatar_default", category: "AVATAR", name: "Rookie", description: "Standard issue avatar.", unlockCondition: "Default", value: "👤", rarity: "Common", source: "Base System" },
-    { id: "avatar_shadow", category: "AVATAR", name: "Shadow Soldier", description: "Arise.", unlockCondition: "Level 5", value: "🥷", rarity: "Rare", source: "Level Reward" },
-    { id: "avatar_monarch", category: "AVATAR", name: "Monarch", description: "The ruler of shadows.", unlockCondition: "S-Rank", value: "👑", rarity: "Mythic", source: "Rank Reward" },
-  ],
+  CLASS: CLASS_CATALOG,
+  AVATAR: CLASS_CATALOG, // Backward compatibility alias
   FRAME: [
     { id: "frame_default", category: "FRAME", name: "None", description: "No frame.", unlockCondition: "Default", value: "none", rarity: "Common", source: "Base System" },
     { id: "frame_iron", category: "FRAME", name: "Iron Frame", description: "A sturdy iron border.", unlockCondition: "E-Rank", value: "border-2 border-gray-400", rarity: "Rare", source: "Rank Reward" },
@@ -50,6 +139,19 @@ export const COSMETICS_CATALOG: Record<CosmeticCategory, CosmeticItem[]> = {
   NAME_COLOR: [
     { id: "color_default", category: "NAME_COLOR", name: "Standard", description: "Default name color.", unlockCondition: "Default", value: "text-gray-300", rarity: "Common", source: "Base System" },
     { id: "color_cyan", category: "NAME_COLOR", name: "System Cyan", description: "A bright cyan glow.", unlockCondition: "Level 3", value: "text-cyan-400 font-bold drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]", rarity: "Rare", source: "Level Reward" },
-    { id: "color_purple", category: "NAME_COLOR", name: "Shadow Purple", description: "Deep monarch purple.", unlockCondition: "Level 10", value: "text-purple-500 font-bold drop-shadow-[0_0_5px_rgba(168,85,247,0.8)]", rarity: "Epic", source: "Level Reward" },
+    { id: "color_purple", category: "NAME_COLOR", name: "Shadow Purple", description: "Deep monarch purple.", unlockCondition: "Level 10", value: "text-accent-primary font-bold drop-shadow-[0_0_5px_var(--accent-primary)]", rarity: "Epic", source: "Level Reward" },
   ]
 };
+
+export const LEGACY_CLASS_MAP: Record<string, string> = {
+  avatar_default: "class_scholar",
+  avatar_shadow: "class_strategist",
+  avatar_monarch: "class_analyst",
+  default: "class_scholar",
+};
+
+export function getClassInfo(id?: string | null): CosmeticItem {
+  const safeId = id ? (LEGACY_CLASS_MAP[id] || id) : "class_scholar";
+  const found = CLASS_CATALOG.find((c) => c.id === safeId);
+  return found || CLASS_CATALOG[0];
+}

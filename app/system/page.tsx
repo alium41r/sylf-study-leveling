@@ -5,6 +5,8 @@ import { useAuth } from "../components/AuthProvider";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import AiPlannerModal from "../components/AiPlannerModal";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lock, Paperclip, Calendar, Sparkles, Clock, AlertCircle, X } from "lucide-react";
 
 interface SystemMsg {
   id: number;
@@ -14,6 +16,8 @@ interface SystemMsg {
   attachmentUrl?: string;
   createdAt: string;
   sessionId?: number;
+  failed?: boolean;
+  fileObj?: File;
 }
 
 interface ChatSession {
@@ -42,25 +46,41 @@ export default function SystemPage() {
   const [editTitle, setEditTitle] = useState("");
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
   
   // Select mode state
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedChats, setSelectedChats] = useState<number[]>([]);
 
-  // Rate limit tracking (15 requests per minute)
-  const [apiRequests, setApiRequests] = useState<number[]>([]);
+  // Daily quota tracking (server-backed)
+  const [chatQuota, setChatQuota] = useState<{ used: number; limit: number; remaining: number; resetsAt: string } | null>(null);
+  const [plannerQuota, setPlannerQuota] = useState<{ used: number; limit: number; remaining: number; resetsAt: string } | null>(null);
   
   // Model Preference
   const [modelPref, setModelPref] = useState<"auto" | "gemini" | "groq">("auto");
 
+  // Planner Modal
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+
+  // Fetch AI usage quotas from server
+  const fetchQuotas = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch("/api/ai-usage", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setChatQuota(data.chat);
+        setPlannerQuota(data.planner);
+      }
+    } catch (e) {
+      console.error("Failed to fetch quotas:", e);
+    }
+  };
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      setApiRequests(prev => prev.filter(time => now - time < 60000));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    fetchQuotas();
+  }, [token]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -80,7 +100,7 @@ export default function SystemPage() {
     fetch(`/api/chats?_t=${Date.now()}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((r) => r.json())
+      .then(async (r) => (r.ok ? r.json().catch(() => ({})) : {}))
       .then((data) => {
         setSessions(data.sessions || []);
         // If we have sessions but no active one, auto-select the first one
@@ -104,7 +124,7 @@ export default function SystemPage() {
       fetch(`/api/system-messages?limit=100&sessionId=${activeSessionId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((r) => r.json())
+        .then(async (r) => (r.ok ? r.json().catch(() => ({})) : {}))
         .then((data) => {
           const sorted = (data.messages || []).sort(
             (a: SystemMsg, b: SystemMsg) =>
@@ -202,6 +222,7 @@ export default function SystemPage() {
       type: "USER",
       read: true,
       attachmentUrl: file ? URL.createObjectURL(file) : undefined,
+      fileObj: file || undefined,
       createdAt: new Date().toISOString(),
       sessionId: activeSessionId || undefined,
     };
@@ -217,14 +238,32 @@ export default function SystemPage() {
     if (activeSessionId) formData.append("sessionId", activeSessionId.toString());
 
     try {
-      setApiRequests((prev) => [...prev, Date.now()]);
       const res = await fetch("/api/system-messages/chat", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
-      if (res.ok) {
+      if (res.status === 429) {
+        // Quota exhausted
+        const data = await res.json();
+        setChatQuota(prev => prev ? { ...prev, remaining: 0, used: prev.limit, resetsAt: data.resetsAt || prev.resetsAt } : prev);
+        setMessages((prev) => {
+          const updated = prev.map(m => m.id === optimisticUserMsg.id ? { ...m, failed: true } : m);
+          return [
+            ...updated,
+            {
+              id: Date.now() + 1,
+              content: `**Daily Limit Reached**\n\nYou've used all ${data.limit || 15} AI messages for today. Your quota resets at midnight.`,
+              type: "INFO",
+              read: true,
+              createdAt: new Date().toISOString(),
+              sessionId: activeSessionId || undefined,
+            }
+          ];
+        });
+        scrollToBottom();
+      } else if (res.ok) {
         const data = await res.json();
         
         // If this was a new chat, update our active session and refetch the sidebar
@@ -242,17 +281,67 @@ export default function SystemPage() {
           return [...withoutOptimistic, data.userMessage, data.aiMessage];
         });
         scrollToBottom();
+        // Refresh quota after successful send
+        fetchQuotas();
       } else {
         console.error("Chat error", await res.text());
-        setMessages((prev) => prev.filter((m) => m.id !== optimisticUserMsg.id));
+        setMessages((prev) => {
+          const updated = prev.map(m => m.id === optimisticUserMsg.id ? { ...m, failed: true } : m);
+          return [
+            ...updated,
+            {
+              id: Date.now() + 1,
+              content: "The system is temporarily unavailable. Please try again.",
+              type: "INFO",
+              read: true,
+              createdAt: new Date().toISOString(),
+              sessionId: activeSessionId || undefined,
+            }
+          ];
+        });
+        scrollToBottom();
       }
     } catch (err) {
       console.error(err);
-      setMessages((prev) => prev.filter((m) => m.id !== optimisticUserMsg.id));
+      setMessages((prev) => {
+        const updated = prev.map(m => m.id === optimisticUserMsg.id ? { ...m, failed: true } : m);
+        return [
+          ...updated,
+          {
+            id: Date.now() + 1,
+            content: "The system is temporarily unavailable. Please try again.",
+            type: "INFO",
+            read: true,
+            createdAt: new Date().toISOString(),
+            sessionId: activeSessionId || undefined,
+          }
+        ];
+      });
+      scrollToBottom();
     } finally {
       setIsSending(false);
     }
   };
+
+  // Auto-unlock isSending after 45 seconds as a safety net
+  useEffect(() => {
+    if (!isSending) return;
+    const timeout = setTimeout(() => {
+      setIsSending(false);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: Date.now() + 2,
+          content: "The request timed out. Please try again.",
+          type: "INFO",
+          read: true,
+          createdAt: new Date().toISOString(),
+          sessionId: activeSessionId || undefined,
+        }
+      ]);
+    }, 45000);
+    return () => clearTimeout(timeout);
+  }, [isSending]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -275,7 +364,7 @@ export default function SystemPage() {
               <div>
                 <div className="flex items-center gap-4 mb-1">
                   <p
-                    className="text-xs tracking-widest text-accent-light"
+                    className="text-xs tracking-widest text-accent-text-light font-bold"
                     style={{ fontFamily: "'Rajdhani', sans-serif" }}
                   >
                     THE SYSTEM
@@ -285,12 +374,12 @@ export default function SystemPage() {
                   <select
                     value={modelPref}
                     onChange={(e) => setModelPref(e.target.value as any)}
-                    className="bg-[#141432]/70 text-xs text-gray-300 border border-white/10 rounded px-2 py-1 outline-none focus:border-accent-light"
+                    className="bg-bg-panel text-xs text-text-primary border border-white/10 rounded px-2 py-1 outline-none focus:border-accent-light"
                     style={{ fontFamily: "'Rajdhani', sans-serif" }}
                   >
                     <option value="auto">Auto (Gemini → Groq)</option>
                     <option value="gemini">Gemini</option>
-                    <option value="groq">Groq (Llama-3)</option>
+                    <option value="groq">Groq (Qwen 3.6)</option>
                   </select>
                 </div>
                 
@@ -309,8 +398,8 @@ export default function SystemPage() {
           {/* Chat History */}
           <div className="flex-1 min-h-0 mb-4 system-card p-4 rounded-xl chat-scroll relative">
             {isLoadingMessages && (
-              <div className="absolute inset-0 z-10 bg-[#0d1117]/50 backdrop-blur-sm flex items-center justify-center rounded-xl">
-                <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 z-10 bg-bg-void/50 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
             
@@ -323,86 +412,117 @@ export default function SystemPage() {
                 </p>
               </div>
             ) : (
-              messages.map((msg) => {
-                const isUser = msg.type === "USER";
-                return (
-                  <div
-                    key={msg.id}
-                    className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-xl p-4 ${
-                        isUser
-                          ? "bg-accent-dim border border-accent-mid shadow-[0_0_10px_rgba(124,58,237,0.1)]"
-                          : "border border-cyan-500/20 bg-[#06080d] shadow-[0_0_10px_rgba(6,182,212,0.05)]"
-                      }`}
-                      style={{ animation: "message-fade-in 0.3s ease-out" }}
+              <AnimatePresence initial={false}>
+                {messages.map((msg) => {
+                  const isUser = msg.type === "USER";
+                  return (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ type: "spring", damping: 25, stiffness: 350 }}
+                      className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}
                     >
-                      <div className="flex justify-between items-start mb-2 gap-4">
-                        <span className={`text-[10px] font-bold uppercase tracking-wider opacity-90 ${isUser ? 'text-accent-light' : 'text-cyan-400'}`}>
-                          {isUser ? "You" : `The System${msg.type.includes('GEMINI') ? ' (Gemini)' : msg.type.includes('GROQ') ? ' (Groq)' : ''}`}
-                        </span>
-                        <span className="text-[10px] opacity-40">
-                          {new Date(msg.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
+                      <div
+                        className={`max-w-[80%] rounded-xl p-4 ${
+                          isUser
+                            ? "bg-accent-dim border border-accent-mid shadow-sm"
+                            : "border border-border-subtle bg-bg-abyss shadow-sm"
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2 gap-4">
+                          <span className={`text-[10px] font-bold uppercase tracking-wider opacity-90 ${isUser ? 'text-accent-text-light' : 'text-accent-primary'}`}>
+                            {isUser ? "You" : `The System${msg.type.includes('GEMINI') ? ' (Gemini)' : msg.type.includes('GROQ') ? ' (Groq)' : ''}`}
+                          </span>
+                          <span className="text-[10px] opacity-40">
+                            {new Date(msg.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </div>
+
+                        {msg.attachmentUrl && (
+                          <div className="mb-3">
+                            {msg.attachmentUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
+                              <img
+                                src={msg.attachmentUrl}
+                                alt="attachment"
+                                className="max-w-full h-auto max-h-[200px] rounded-md object-contain border border-white/10"
+                              />
+                            ) : (
+                              <a
+                                href={msg.attachmentUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-accent-primary underline text-sm break-all"
+                              >
+                                📎 Attached File
+                              </a>
+                            )}
+                          </div>
+                        )}
+
+                        {isUser ? (
+                          <div className="flex flex-col gap-2">
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                              {msg.content}
+                            </p>
+                            {msg.failed && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[10px] text-red-400 font-bold">⚠ Failed to send</span>
+                                <button 
+                                  onClick={() => {
+                                    setMessages(prev => prev.filter(m => m.id !== msg.id));
+                                    sendMessage(msg.content, msg.fileObj || null);
+                                  }} 
+                                  className="text-[10px] bg-red-900/30 hover:bg-red-800/50 text-red-300 px-2 py-1 rounded border border-red-500/30 transition-colors"
+                                >
+                                  Retry
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-sm leading-relaxed prose dark:prose-invert text-text-primary prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:mt-3 prose-headings:mb-1">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {msg.content}
+                            </ReactMarkdown>
+                          </div>
+                        )}
                       </div>
-
-                      {msg.attachmentUrl && (
-                        <div className="mb-3">
-                          {msg.attachmentUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
-                            <img
-                              src={msg.attachmentUrl}
-                              alt="attachment"
-                              className="max-w-full h-auto max-h-[200px] rounded-md object-contain border border-white/10"
-                            />
-                          ) : (
-                            <a
-                              href={msg.attachmentUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-blue-400 underline text-sm break-all"
-                            >
-                              📎 Attached File
-                            </a>
-                          )}
-                        </div>
-                      )}
-
-                      {isUser ? (
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                          {msg.content}
-                        </p>
-                      ) : (
-                        <div className="text-sm leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:mt-3 prose-headings:mb-1">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {msg.content}
-                          </ReactMarkdown>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             )}
 
             {/* Typing indicator */}
-            {isSending && (
-              <div className="flex justify-start">
-                <div className="border border-cyan-500/20 bg-[#06080d] rounded-xl p-4 flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 mr-2">
-                    The System
-                  </span>
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce shadow-[0_0_5px_rgba(6,182,212,0.8)]" style={{ animationDelay: "0ms" }} />
-                    <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce shadow-[0_0_5px_rgba(6,182,212,0.8)]" style={{ animationDelay: "150ms" }} />
-                    <span className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce shadow-[0_0_5px_rgba(6,182,212,0.8)]" style={{ animationDelay: "300ms" }} />
+            <AnimatePresence>
+              {isSending && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
+                  transition={{ type: "spring", damping: 25, stiffness: 350 }}
+                  className="flex justify-start"
+                >
+                  <div className="border border-border-subtle bg-bg-abyss rounded-xl p-4 flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text-light mr-2">
+                      The System
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-accent-primary italic font-medium">Working on it</span>
+                      <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce shadow-sm" style={{ animationDelay: "0ms" }} />
+                        <span className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce shadow-sm" style={{ animationDelay: "150ms" }} />
+                        <span className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce shadow-sm" style={{ animationDelay: "300ms" }} />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div ref={messagesEndRef} />
             </div>
@@ -410,14 +530,31 @@ export default function SystemPage() {
 
           {/* Chat Input */}
           <div className="shrink-0">
+            {/* Quota Exhausted Alert Banner */}
+            {chatQuota?.remaining === 0 && (
+              <div className="mb-2 px-3.5 py-2 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between text-xs font-['Rajdhani'] text-rose-300 shadow-sm animate-pulse">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>
+                    Daily prompt limit reached (15/15 messages). Free tier chat quota refreshes at midnight.
+                  </span>
+                </div>
+                <span className="font-mono text-[11px] text-rose-400 font-bold hidden sm:inline-block">
+                  Resets: {chatQuota?.resetsAt ? new Date(chatQuota.resetsAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "00:00"}
+                </span>
+              </div>
+            )}
+
             {selectedFile && (
               <div className="mb-2 px-3 py-2 bg-blue-900/30 border border-blue-500/30 rounded-lg inline-flex items-center gap-2 text-sm text-blue-200">
-                📎 {selectedFile.name}
+                <Paperclip className="w-4 h-4" />
+                <span>{selectedFile.name}</span>
                 <button
+                  type="button"
                   onClick={() => setSelectedFile(null)}
                   className="text-red-400 hover:text-red-300 ml-2 font-bold"
                 >
-                  ✕
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
@@ -431,50 +568,79 @@ export default function SystemPage() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-3 system-card flex-shrink-0 text-xl hover:bg-white/5 transition-colors text-accent-light rounded-xl"
+                disabled={chatQuota?.remaining === 0}
+                className="p-3 system-card flex-shrink-0 text-xl hover:bg-bg-panel transition-colors text-accent-text-light rounded-xl border border-border-subtle disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center"
                 title="Attach file"
               >
-                📎
+                <Paperclip className="w-4 h-4" />
               </button>
+
+              {/* AI Planner Modal Trigger Button with Lock Indicator */}
               <button
                 type="button"
                 onClick={() => setIsPlannerOpen(true)}
-                className="px-4 py-2 system-card flex-shrink-0 hover:bg-white/5 transition-colors text-indigo-400 rounded-xl font-bold tracking-wide flex items-center gap-2"
+                className={`px-4 py-3 system-card flex-shrink-0 text-xs font-bold transition-all rounded-xl border tracking-wide flex items-center gap-1.5 ${
+                  plannerQuota?.remaining === 0
+                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+                    : "hover:bg-bg-panel text-accent-text-light border-border-subtle"
+                }`}
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
-                title="Open Planner"
+                title={
+                  plannerQuota?.remaining === 0
+                    ? "AI Study Planner (Daily limit reached: 0/1)"
+                    : "AI Study Planner (1 free plan remaining today)"
+                }
               >
-                Planner
+                {plannerQuota?.remaining === 0 ? (
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                ) : (
+                  <Calendar className="w-3.5 h-3.5 text-accent-text-light" />
+                )}
+                <span>Planner</span>
               </button>
+
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask anything..."
-                className="flex-1 bg-[#0d1117] border border-blue-500/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]"
-                disabled={isSending}
+                placeholder={
+                  chatQuota?.remaining === 0
+                    ? "Daily chat quota reached (0 messages remaining)..."
+                    : "Ask anything..."
+                }
+                className="flex-1 bg-bg-void border border-border-subtle rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent-primary transition-colors shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSending || chatQuota?.remaining === 0}
               />
               <button
                 type="submit"
-                disabled={isSending || (!inputText.trim() && !selectedFile)}
-                className="btn-primary rounded-xl px-6 font-bold disabled:opacity-50 disabled:cursor-not-allowed tracking-wider shrink-0"
+                disabled={isSending || (!inputText.trim() && !selectedFile) || (chatQuota?.remaining === 0)}
+                className="btn-primary rounded-xl px-6 font-bold disabled:opacity-50 disabled:cursor-not-allowed tracking-wider shrink-0 flex items-center justify-center gap-1.5"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
-                {isSending ? "..." : "SEND"}
+                {isSending ? (
+                  "..."
+                ) : chatQuota?.remaining === 0 ? (
+                  <>
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>LOCKED</span>
+                  </>
+                ) : (
+                  "SEND"
+                )}
               </button>
 
-              {/* ─── System API Rate Limit Ring ──────────────────────── */}
+              {/* ─── Daily AI Quota Ring ──────────────────────── */}
               {(() => {
-                const MAX_REQUESTS = 15;
-                const requestsUsed = Math.min(apiRequests.length, MAX_REQUESTS);
+                const MAX_REQUESTS = chatQuota?.limit || 15;
+                const requestsUsed = chatQuota?.used || 0;
+                const remaining = chatQuota?.remaining ?? MAX_REQUESTS;
                 const percentage = (requestsUsed / MAX_REQUESTS) * 100;
-                const circumference = 2 * Math.PI * 9;
-                const strokeDashoffset = circumference - (percentage / 100) * circumference;
-                const isWarning = requestsUsed >= 12;
-                const isCritical = requestsUsed >= 15;
+                const isWarning = remaining <= 3 && remaining > 0;
+                const isCritical = remaining === 0;
 
                 return (
                   <div 
-                    className="relative w-12 h-12 flex-shrink-0 flex items-center justify-center bg-[#141432]/70 backdrop-blur-md border border-white/10 rounded-xl group cursor-help ml-2"
+                    className="relative w-12 h-12 flex-shrink-0 flex items-center justify-center bg-bg-panel backdrop-blur-md border border-border-subtle rounded-xl group cursor-help ml-2"
                   >
                     {/* SVG Ring */}
                     <svg className="w-10 h-10 transform -rotate-90">
@@ -483,7 +649,7 @@ export default function SystemPage() {
                         stroke="currentColor"
                         strokeWidth="3"
                         fill="transparent"
-                        className="text-[#1f1f3a]"
+                        className="text-text-primary/20"
                       />
                       <circle
                         cx="20" cy="20" r="11"
@@ -493,29 +659,35 @@ export default function SystemPage() {
                         strokeDasharray={2 * Math.PI * 11}
                         strokeDashoffset={(2 * Math.PI * 11) - (percentage / 100) * (2 * Math.PI * 11)}
                         className={`transition-all duration-500 ease-out ${
-                          isCritical ? "text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" : 
-                          isWarning ? "text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]" : 
-                          "text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]"
+                          isCritical ? "text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" : 
+                          isWarning ? "text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]" : 
+                          "text-accent-primary drop-shadow-sm"
                         }`}
                       />
                     </svg>
                     
                     {/* Inner Icon */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <svg className={`w-4 h-4 ${isCritical ? 'text-red-500 animate-pulse' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
+                      {isCritical ? (
+                        <Lock className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                      ) : (
+                        <Sparkles className="w-3.5 h-3.5 text-text-muted" />
+                      )}
                     </div>
                     
                     {/* Tooltip on hover (opens upwards) */}
-                    <div className="absolute bottom-14 right-0 w-40 p-2 bg-[#0a0a0f] border border-[#1f1f3a] rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.8)] text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                      <p className="text-[10px] text-gray-400 font-['Rajdhani'] font-bold tracking-widest mb-1">SYSTEM CAPACITY</p>
-                      <p className={`text-xl font-bold ${isCritical ? 'text-red-500 animate-pulse' : 'text-cyan-400'}`}>
-                        {MAX_REQUESTS - requestsUsed} <span className="text-xs text-gray-500">/ {MAX_REQUESTS}</span>
+                    <div className="absolute bottom-14 right-0 w-44 p-2.5 bg-bg-shadow border border-border-subtle rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.8)] text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                      <p className="text-[10px] text-text-muted font-['Rajdhani'] font-bold tracking-widest mb-1">
+                        DAILY CHAT QUOTA
                       </p>
-                      <p className="text-[9px] text-gray-500 mt-1 uppercase">Requests per minute</p>
+                      <p className={`text-xl font-bold font-['Rajdhani'] ${isCritical ? 'text-rose-400 animate-pulse' : 'text-accent-primary'}`}>
+                        {remaining} <span className="text-xs text-text-muted">/ {MAX_REQUESTS}</span>
+                      </p>
+                      <p className="text-[9px] text-text-muted mt-1 uppercase font-['Rajdhani']">
+                        {isCritical ? "Limit reached • Resets at midnight" : "Messages remaining today"}
+                      </p>
                       {/* Tooltip arrow pointer */}
-                      <div className="absolute -bottom-2 right-4 w-4 h-4 bg-[#0a0a0f] border-b border-r border-[#1f1f3a] transform rotate-45"></div>
+                      <div className="absolute -bottom-2 right-4 w-4 h-4 bg-bg-shadow border-b border-r border-border-subtle transform rotate-45"></div>
                     </div>
                   </div>
                 );
@@ -532,7 +704,7 @@ export default function SystemPage() {
         {/* Toggle Button outside the border */}
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className={`absolute top-4 -left-10 w-10 h-11 text-cyan-400 rounded-l-lg hover:bg-cyan-900/40 transition-colors flex items-center justify-center shrink-0 z-50 bg-[#06080d] border-[#2a2a4a] border-y border-l ${!isSidebarOpen ? 'border-r' : 'border-r-0'}`}
+          className={`absolute top-4 -left-10 w-10 h-11 text-accent-text-light rounded-l-lg hover:bg-bg-panel transition-colors flex items-center justify-center shrink-0 z-50 bg-bg-abyss border-border-subtle border-y border-l ${!isSidebarOpen ? 'border-r' : 'border-r-0'}`}
           title="Toggle History"
         >
           <svg className={`w-5 h-5 transition-transform duration-300 ${!isSidebarOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -541,13 +713,13 @@ export default function SystemPage() {
         </button>
 
         {/* Inner wrapper that fills the vertical space */}
-        <div className={`w-full flex-1 border-[#2a2a4a] bg-[#06080d] flex flex-col overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 border-l' : 'opacity-0 border-l-0'}`}>
+        <div className={`w-full flex-1 border-border-subtle bg-bg-abyss flex flex-col overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'opacity-100 border-l' : 'opacity-0 border-l-0'}`}>
           <div className="w-64 flex-1 flex flex-col">
-            <div className="p-4 border-b border-[#2a2a4a] flex flex-col gap-3">
+            <div className="p-4 border-b border-border-subtle flex flex-col gap-3">
               <div className="flex gap-2">
                 <button
                   onClick={createNewChat}
-                  className="flex-1 py-2.5 px-4 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 hover:border-cyan-400 rounded-lg text-cyan-400 font-bold tracking-wide transition-all shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] flex items-center justify-center gap-2 whitespace-nowrap"
+                  className="flex-1 py-2.5 px-4 bg-accent-primary hover:brightness-110 border border-transparent rounded-lg text-white font-bold tracking-wide transition-all shadow-[var(--card-shadow)] hover:shadow-md flex items-center justify-center gap-2 whitespace-nowrap"
                   style={{ fontFamily: "'Rajdhani', sans-serif" }}
                 >
                   <span className="text-xl leading-none">+</span> NEW CHAT
@@ -558,7 +730,7 @@ export default function SystemPage() {
                     setSelectedChats([]);
                     setOpenMenuId(null);
                   }}
-                  className="py-2.5 px-3 bg-[#11111f] hover:bg-[#1a1a2e] border border-[#2a2a4a] hover:border-gray-500 rounded-lg text-gray-400 font-bold transition-all flex items-center justify-center shrink-0"
+                  className="py-2.5 px-3 bg-bg-panel hover:bg-bg-shadow border border-border-subtle hover:border-gray-500 rounded-lg text-text-secondary font-bold transition-all flex items-center justify-center shrink-0"
                   title={isSelectMode ? "Cancel Selection" : "Select Chats"}
                 >
                   {isSelectMode ? "Done" : "Select"}
@@ -577,7 +749,7 @@ export default function SystemPage() {
 
           <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 system-scrollbar">
             {sessions.length === 0 ? (
-              <p className="text-xs text-gray-500 text-center mt-6 uppercase tracking-widest font-['Rajdhani']">No previous chats</p>
+              <p className="text-xs text-text-secondary text-center mt-6 uppercase tracking-widest font-['Rajdhani']">No previous chats</p>
             ) : (
               sessions.map((session) => (
                 <div
@@ -587,7 +759,7 @@ export default function SystemPage() {
                       ? "bg-red-900/20 border border-red-500/50 text-red-300"
                       : activeSessionId === session.id && !isSelectMode
                       ? "bg-blue-900/20 border border-blue-500/30 text-blue-300"
-                      : "hover:bg-white/5 text-gray-400 border border-transparent"
+                      : "hover:bg-text-primary/5 text-text-secondary border border-transparent"
                   }`}
                   onClick={() => {
                     if (isSelectMode) {
@@ -602,7 +774,7 @@ export default function SystemPage() {
                   {isSelectMode && (
                     <div className={`w-4 h-4 rounded border mr-3 flex items-center justify-center shrink-0 transition-colors ${selectedChats.includes(session.id) ? 'bg-red-500 border-red-500' : 'border-gray-500'}`}>
                       {selectedChats.includes(session.id) && (
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-3 h-3 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
@@ -621,7 +793,7 @@ export default function SystemPage() {
                         if (e.key === "Enter") renameSession(session.id, editTitle);
                         if (e.key === "Escape") setEditingSessionId(null);
                       }}
-                      className="w-full bg-[#0d1117] border border-blue-500 text-sm px-2 py-1 rounded outline-none"
+                      className="w-full bg-bg-void border border-border-subtle text-sm px-2 py-1 rounded outline-none"
                       onClick={(e) => e.stopPropagation()}
                     />
                   ) : (
@@ -634,7 +806,7 @@ export default function SystemPage() {
                           e.stopPropagation();
                           setOpenMenuId(openMenuId === session.id ? null : session.id);
                         }}
-                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-white transition-colors rounded ${openMenuId === session.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 text-text-secondary hover:text-text-primary transition-colors rounded ${openMenuId === session.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                       >
                         ⋮
                       </button>
@@ -643,7 +815,7 @@ export default function SystemPage() {
 
                   {/* Dropdown Menu */}
                   {openMenuId === session.id && !isSelectMode && (
-                    <div className="absolute right-2 top-10 bg-[#11111f] border border-[#2a2a4a] rounded-lg shadow-xl z-50 py-1 w-28 overflow-hidden">
+                    <div className="absolute right-2 top-10 bg-bg-panel border border-border-subtle rounded-lg shadow-xl z-50 py-1 w-28 overflow-hidden">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -651,7 +823,7 @@ export default function SystemPage() {
                           setEditingSessionId(session.id);
                           setOpenMenuId(null);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                        className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-text-primary/5 hover:text-text-primary transition-colors"
                       >
                         Rename
                       </button>
@@ -678,48 +850,14 @@ export default function SystemPage() {
       <AiPlannerModal
         isOpen={isPlannerOpen}
         onClose={() => setIsPlannerOpen(false)}
-        onPlanCreated={async (plan) => {
-          const planTitle = plan?.title || "New Study Plan";
-          const text = `I just created a new study plan: "${planTitle}". Please review the generated quests and let me know if we should adjust anything.`;
-          
-          // Optimistically add AI message to UI
-          const optimisticMsg: SystemMsg = {
-            id: Date.now(),
-            content: text,
-            type: "SYSTEM (Gemini)",
-            read: true,
-            createdAt: new Date().toISOString(),
-            sessionId: activeSessionId || undefined,
-          };
-          setMessages(prev => [...prev, optimisticMsg]);
-          scrollToBottom();
-
-          // Save to backend
-          try {
-            const res = await fetch("/api/system-messages", {
-              method: "POST",
-              headers: { 
-                "Content-Type": "application/json", 
-                Authorization: `Bearer ${token}` 
-              },
-              body: JSON.stringify({ 
-                content: text, 
-                type: "SYSTEM (Gemini)", 
-                sessionId: activeSessionId 
-              })
-            });
-            
-            if (res.ok) {
-              const data = await res.json();
-              // If a new session was created because none existed
-              if (data.sessionId && !activeSessionId) {
-                setActiveSessionId(data.sessionId);
-                fetchSessions();
-              }
-            }
-          } catch (e) {
-            console.error("Failed to save AI planner message:", e);
-          }
+        quota={plannerQuota}
+        onQuotaRefresh={() => {
+          fetchQuotas();
+          fetchSessions();
+        }}
+        onPlanCreated={() => {
+          fetchQuotas();
+          fetchSessions();
         }}
       />
     </div>

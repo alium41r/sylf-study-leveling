@@ -87,49 +87,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Fetch user for level info
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId as number },
-    });
-    
-    // Generate quests using the AI Agent
-    const { generateQuests } = await import("@/lib/ai/system-agent");
-    const generatedQuests = await generateQuests(
-      title,
-      description || null,
-      targetWeeks,
-      effortLevel as any,
-      user?.level || 1
-    );
-
-    // Save quests to the database
-    if (generatedQuests.length > 0) {
-      const today = new Date();
-      await prisma.quest.createMany({
-        data: generatedQuests.map((q) => {
-          // Calculate the scheduled date by adding the day offset
-          const scheduledDate = new Date(today);
-          scheduledDate.setDate(today.getDate() + q.scheduledDay);
-          
-          return {
-            userId: payload.userId as number,
-            goalId: goal.id,
-            title: q.title,
-            description: q.description,
-            requiredMinutes: q.requiredMinutes,
-            xpReward: q.xpReward,
-            sylphReward: q.sylphReward,
-            scheduledFor: scheduledDate.toISOString().split("T")[0],
-          };
-        }),
-      });
-    }
-
     // Create a system message confirming the goal
     await prisma.systemMessage.create({
       data: {
         userId: payload.userId as number,
-        content: `**New Goal Detected**\n\nObjective: "${title}"\nTimeline: ${targetWeeks} weeks\nEffort Level: ${effortLevel}\n\nThe System is analyzing your objective. Quests will be issued shortly.`,
+        content: `**New Goal Detected**\n\nObjective: "${title}"\nTimeline: ${targetWeeks} weeks\nEffort Level: ${effortLevel}\n\nThe System has registered your objective. Talk to The System in the chat to generate and schedule quests for this goal!`,
         type: "SYSTEM",
       },
     });

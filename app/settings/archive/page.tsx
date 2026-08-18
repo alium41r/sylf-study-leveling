@@ -99,20 +99,20 @@ export default function ArchivePage() {
 
       <div className="flex flex-1 gap-6 mt-4 min-h-0">
         {/* LEFT PANE: NAVIGATION */}
-        <div className="w-1/3 max-w-[350px] flex flex-col bg-[#0a0a0f] border border-white/10 rounded-xl overflow-hidden shadow-2xl relative">
+        <div className="w-1/3 max-w-[350px] flex flex-col bg-bg-abyss border border-border-subtle rounded-xl overflow-hidden shadow-2xl relative">
           
           {/* Header & Stats */}
           <div className="p-5 border-b border-white/10 bg-black/40 relative overflow-hidden shrink-0">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--accent-cyan)] opacity-10 blur-3xl rounded-full" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--accent-primary)] opacity-10 blur-3xl rounded-full" />
             <h2 className="font-['Rajdhani'] font-bold text-xl tracking-widest uppercase text-white mb-2">The Archive</h2>
             <div className="flex justify-between items-center text-xs font-['Rajdhani'] text-gray-400 tracking-wider">
               <span>Records Unlocked</span>
-              <span className="text-[var(--accent-cyan)]">{stats.unlocked} / {stats.total} ({stats.pct}%)</span>
+              <span className="text-[var(--accent-primary)]">{stats.unlocked} / {stats.total} ({stats.pct}%)</span>
             </div>
             {/* Progress bar */}
             <div className="h-1 bg-white/10 w-full mt-2 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-[var(--accent-cyan)] shadow-[0_0_10px_var(--accent-cyan)] transition-all duration-1000"
+                className="h-full bg-[var(--accent-primary)] shadow-[0_0_10px_var(--accent-primary)] transition-all duration-1000"
                 style={{ width: `${stats.pct}%` }}
               />
             </div>
@@ -125,7 +125,7 @@ export default function ArchivePage() {
               placeholder="Search records..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-[var(--accent-cyan)] focus:ring-1 focus:ring-[var(--accent-cyan)]/50 transition-all font-['Rajdhani']"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]/50 transition-all font-['Rajdhani']"
             />
           </div>
 
@@ -156,8 +156,8 @@ export default function ArchivePage() {
                 if (catEntries.length === 0) return null;
                 return (
                   <div key={cat}>
-                    <h3 className="text-xs font-['Rajdhani'] uppercase tracking-widest text-[var(--accent-cyan)] mb-3 px-2 flex items-center gap-2">
-                      <span className="w-2 h-[1px] bg-[var(--accent-cyan)] opacity-50" />
+                    <h3 className="text-xs font-['Rajdhani'] uppercase tracking-widest text-[var(--accent-primary)] mb-3 px-2 flex items-center gap-2">
+                      <span className="w-2 h-[1px] bg-[var(--accent-primary)] opacity-50" />
                       {cat}
                     </h3>
                     <div className="space-y-1">
@@ -183,7 +183,7 @@ export default function ArchivePage() {
         </div>
 
         {/* RIGHT PANE: CONTENT */}
-        <div className="flex-1 flex flex-col bg-[#0a0a0f] border border-white/10 rounded-xl shadow-2xl relative overflow-hidden">
+        <div className="flex-1 flex flex-col bg-bg-abyss border border-border-subtle rounded-xl shadow-2xl relative overflow-hidden">
           
           {/* Header */}
           <div className="shrink-0 p-8 pb-6 border-b border-white/5 relative z-10 flex justify-between items-start">
@@ -230,14 +230,14 @@ export default function ArchivePage() {
                     return <p key={i} className="text-gray-300 text-[0.95rem] leading-relaxed font-sans">{block.text}</p>
                   }
                   if (block.type === "h3") {
-                    return <h3 key={i} className="text-[var(--accent-cyan)] font-['Rajdhani'] text-xl font-semibold tracking-wider mt-8">{block.text}</h3>
+                    return <h3 key={i} className="text-[var(--accent-primary)] font-['Rajdhani'] text-xl font-semibold tracking-wider mt-8">{block.text}</h3>
                   }
                   if (block.type === "list") {
                     return (
                       <ul key={i} className="space-y-2 ml-4">
                         {block.items?.map((item, j) => (
                           <li key={j} className="text-gray-300 text-[0.95rem] flex items-start gap-3">
-                            <span className="text-[var(--accent-cyan)] mt-1.5 text-[0.5rem]">◆</span>
+                            <span className="text-[var(--accent-primary)] mt-1.5 text-[0.5rem]">◆</span>
                             {item}
                           </li>
                         ))}
@@ -246,7 +246,7 @@ export default function ArchivePage() {
                   }
                   if (block.type === "lore") {
                     return (
-                      <div key={i} className="my-8 p-6 bg-purple-900/10 border-l-2 border-purple-500/50 rounded-r-xl italic text-purple-200/80 font-['Rajdhani'] text-lg tracking-wide relative overflow-hidden shadow-[inset_10px_0_20px_rgba(168,85,247,0.05)]">
+                      <div key={i} className="my-8 p-6 bg-accent-primary-dim border-l-2 border-accent-primary-mid rounded-r-xl italic text-accent-text-light font-['Rajdhani'] text-lg tracking-wide relative overflow-hidden shadow-[inset_10px_0_20px_var(--accent-primary-dim)]">
                         "{block.text}"
                       </div>
                     )
@@ -267,11 +267,11 @@ export default function ArchivePage() {
                           <button
                             key={rId}
                             onClick={() => setActiveId(rId)}
-                            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-[var(--accent-cyan)]/50 transition-colors text-sm font-['Rajdhani'] text-gray-300 flex items-center gap-2 group"
+                            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:border-[var(--accent-primary)]/50 transition-colors text-sm font-['Rajdhani'] text-gray-300 flex items-center gap-2 group"
                           >
                             {!rUnlocked && <svg className="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
                             {rUnlocked ? rEntry.title : "[ REDACTED ]"}
-                            <span className="text-[var(--accent-cyan)] opacity-0 group-hover:opacity-100 transition-opacity ml-1">→</span>
+                            <span className="text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transition-opacity ml-1">→</span>
                           </button>
                         )
                       })}
@@ -304,7 +304,7 @@ export default function ArchivePage() {
 
           {/* Background decoration */}
           {isActiveUnlocked && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--accent-cyan)] opacity-[0.02] blur-[100px] rounded-full pointer-events-none z-0" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[var(--accent-primary)] opacity-[0.02] blur-[100px] rounded-full pointer-events-none z-0" />
           )}
         </div>
       </div>
@@ -358,13 +358,13 @@ function NavItem({ entry, active, unlocked, isFavorite, onClick }: { entry: Arch
       onClick={onClick}
       className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between group transition-all duration-200 ${
         active 
-          ? "bg-[var(--accent-cyan)]/10 border border-[var(--accent-cyan)]/30" 
+          ? "bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30" 
           : "hover:bg-white/5 border border-transparent"
       }`}
     >
       <div className="flex items-center gap-3 overflow-hidden">
         {unlocked ? (
-          <div className={`w-1.5 h-1.5 rounded-full transition-colors ${active ? "bg-[var(--accent-cyan)] shadow-[0_0_5px_var(--accent-cyan)]" : "bg-gray-600 group-hover:bg-gray-400"}`} />
+          <div className={`w-1.5 h-1.5 rounded-full transition-colors ${active ? "bg-[var(--accent-primary)] shadow-[0_0_5px_var(--accent-primary)]" : "bg-gray-600 group-hover:bg-gray-400"}`} />
         ) : (
           <svg className="w-3 h-3 text-red-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
         )}

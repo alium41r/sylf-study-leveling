@@ -17,6 +17,18 @@ export interface UserStats {
   email: string;
   username: string;
   name: string | null;
+  scholarId?: string | null;
+  verificationStatus?: "UNVERIFIED" | "VERIFIED";
+  avatarUrl?: string | null;
+  bannerUrl?: string | null;
+  bio?: string | null;
+  activeAvatar?: string;
+  activeFrame?: string;
+  activeTitle?: string;
+  activeAura?: string;
+  activeNameColor?: string;
+  characterConfig?: any;
+  socialLinks?: any;
   hunterRank: string;
   level: number;
   currentXP: number;
@@ -27,6 +39,8 @@ export interface UserStats {
   totalStudyMinutes: number;
   sylph: number;
   hasCompletedOnboarding: boolean;
+  hasPassword?: boolean;
+  timezone?: string;
   createdAt: string;
 }
 
@@ -35,16 +49,12 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (token: string, userData: UserStats) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshStats: () => Promise<void>;
   mutateUser: (user: UserStats) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// ─── Protected Routes ────────────────────────────────────────
-
-const PUBLIC_PATHS = ["/", "/login", "/register"];
 
 // ─── Provider ────────────────────────────────────────────────
 
@@ -55,75 +65,104 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const mutateUser = useCallback((newUserData: UserStats | null) => {
+    setUser(newUserData);
+    if (typeof window !== "undefined") {
+      if (newUserData) {
+        localStorage.setItem("user_data", JSON.stringify(newUserData));
+      } else {
+        localStorage.removeItem("user_data");
+      }
+    }
+  }, []);
+
   // Fetch fresh stats from the server
   const refreshStats = useCallback(async () => {
-    const storedToken = localStorage.getItem("token");
-    if (!storedToken) return;
-
+    const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const res = await fetch("/api/user/stats", {
-        headers: { Authorization: `Bearer ${storedToken}` },
+        credentials: "include",
+        headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
       });
       if (res.ok) {
         const data = await res.json();
         setUser(data);
-      } else {
-        // Token expired or invalid
-        localStorage.removeItem("token");
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user_data", JSON.stringify(data));
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+            setToken(data.token);
+          } else if (storedToken) {
+            setToken(storedToken);
+          }
+        }
+      } else if (res.status === 401) {
+        // Explicitly unauthorized — clear everything
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user_data");
+        }
         setToken(null);
         setUser(null);
       }
+      // Other errors (500, network issues): don't nuke the session
     } catch (err) {
       console.error("Failed to refresh stats:", err);
     }
   }, []);
 
-  // On mount: check for existing token
+  // On mount: hydrate from localStorage first, then validate with server
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-      refreshStats().finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
+    // 1. Synchronously restore cached state from localStorage
+    const cachedUser = localStorage.getItem("user_data");
+    const cachedToken = localStorage.getItem("token");
+
+    if (cachedToken) {
+      setToken(cachedToken);
     }
-  }, [refreshStats]);
-
-  // Redirect unauthenticated users away from protected routes
-  // and handle onboarding flow
-  useEffect(() => {
-    if (isLoading) return;
-
-    if (!token && !PUBLIC_PATHS.includes(pathname)) {
-      router.push("/login");
-      return;
-    }
-
-    if (token && user) {
-      if (!user.hasCompletedOnboarding && pathname !== "/onboarding") {
-        router.push("/onboarding");
-      } else if (user.hasCompletedOnboarding && pathname === "/onboarding") {
-        router.push("/dashboard");
+    if (cachedUser) {
+      try {
+        const parsed = JSON.parse(cachedUser);
+        if (parsed && parsed.id) {
+          setUser(parsed);
+        }
+      } catch {
+        localStorage.removeItem("user_data");
       }
     }
-  }, [isLoading, token, user, pathname, router]);
+
+    // 2. Validate with server in the background
+    refreshStats().finally(() => setIsLoading(false));
+  }, [refreshStats]);
 
   const login = useCallback((newToken: string, userData: UserStats) => {
-    localStorage.setItem("token", newToken);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", newToken);
+      localStorage.setItem("user_data", JSON.stringify(userData));
+    }
     setToken(newToken);
     setUser(userData);
+    setIsLoading(false);
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem("token");
+  const logout = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } catch (e) {
+      console.error("Logout API error:", e);
+    }
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_data");
+    }
     setToken(null);
     setUser(null);
-    router.push("/");
-  }, [router]);
+    window.location.href = "/login";
+  }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, login, logout, refreshStats, mutateUser: setUser }}
+      value={{ user, token, isLoading, login, logout, refreshStats, mutateUser }}
     >
       {children}
     </AuthContext.Provider>

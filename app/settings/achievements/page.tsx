@@ -22,7 +22,7 @@ export default function AchievementsPage() {
     fetch("/api/achievements", {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
       .then(data => {
         if (data.achievements) {
           setAchievements(data.achievements);
@@ -272,7 +272,7 @@ export default function AchievementsPage() {
                            </span>
                         )}
                         {ach.reward.type === "ITEM" && (
-                           <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "0.85rem", color: "#a855f7" }}>
+                           <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "0.85rem", color: "var(--accent-text-light)" }}>
                              1x {ach.reward.itemKey?.replace(/_/g, " ")}
                            </span>
                         )}

@@ -1,30 +1,60 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../components/AuthProvider";
-import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
+import { COSMETICS_CATALOG, CosmeticItem } from "@/lib/cosmetics-catalog";
 import { THEME_MAP, BG_MAP } from "../components/GlobalSystemWrapper";
+import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 
 // --- Extensible Onboarding Types ---
-type OnboardingStep = "BOOT" | "AVATAR" | "BACKGROUND" | "THEME" | "INITIALIZING";
+type OnboardingStep = "BOOT" | "IDENTITY" | "CLASS" | "BACKGROUND" | "THEME" | "INITIALIZING";
 
 export default function OnboardingFlow() {
   const router = useRouter();
-  const { user, token, mutateUser } = useAuth();
+  const { user, token, mutateUser, login, refreshStats } = useAuth();
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>("BOOT");
   
-  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  // Custom Identity Details
+  const [scholarUsername, setScholarUsername] = useState("");
+  const [scholarName, setScholarName] = useState("");
+  const [scholarPassword, setScholarPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Cosmetic Selections
+  const [selectedClass, setSelectedClass] = useState<string | null>("class_scholar");
   const [selectedBackground, setSelectedBackground] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const initializedRef = useRef(false);
 
-  // Step progression logic
-  const steps: OnboardingStep[] = ["BOOT", "AVATAR", "BACKGROUND", "THEME", "INITIALIZING"];
+  // Initialize identity defaults once from loaded user
+  useEffect(() => {
+    if (user) {
+      if (user.hasCompletedOnboarding) {
+        router.push("/dashboard");
+        return;
+      }
+      if (!initializedRef.current) {
+        setScholarUsername(user.username || "");
+        setScholarName(user.name || "");
+        initializedRef.current = true;
+      }
+    }
+  }, [user, router]);
+
+  // Determine if user registered via Google (no credentials password set)
+  const isGoogleSignup = user ? user.hasPassword === false : false;
+
+  // Step progression: Manual signups skip IDENTITY step and go straight to cosmetic selection
+  const steps: OnboardingStep[] = isGoogleSignup
+    ? ["BOOT", "IDENTITY", "CLASS", "BACKGROUND", "THEME", "INITIALIZING"]
+    : ["BOOT", "CLASS", "BACKGROUND", "THEME", "INITIALIZING"];
+
   const stepIndex = steps.indexOf(currentStep);
 
   const nextStep = () => {
@@ -43,11 +73,15 @@ export default function OnboardingFlow() {
   useEffect(() => {
     if (currentStep === "BOOT") {
       const timer = setTimeout(() => {
-        nextStep();
+        if (isGoogleSignup) {
+          setCurrentStep("IDENTITY");
+        } else {
+          setCurrentStep("CLASS");
+        }
       }, 3500); // 3.5s cinematic boot
       return () => clearTimeout(timer);
     }
-  }, [currentStep]);
+  }, [currentStep, isGoogleSignup]);
 
   // Live preview logic for theme/bg
   useEffect(() => {
@@ -66,20 +100,36 @@ export default function OnboardingFlow() {
   }, [selectedTheme, selectedBackground]);
 
   const submitOnboarding = async () => {
-    if (!token || !user) return;
+    if (!token && !user) return;
     setIsSubmitting(true);
+    setError("");
     
+    let detectedTimezone = user?.timezone || "UTC";
+    try {
+      if (detectedTimezone === "UTC") {
+        detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+      }
+    } catch {
+      detectedTimezone = "UTC";
+    }
+
     try {
       const res = await fetch("/api/user/onboarding", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          avatarId: selectedAvatar || "avatar_default",
+          classId: selectedClass || "class_scholar",
+          avatarId: selectedClass || "class_scholar",
           backgroundId: selectedBackground || "void",
           themeId: selectedTheme || "cyberpunk",
+          username: isGoogleSignup ? (scholarUsername || user?.username) : undefined,
+          name: isGoogleSignup ? (scholarName || user?.name) : undefined,
+          password: isGoogleSignup ? (scholarPassword || undefined) : undefined,
+          timezone: detectedTimezone,
         }),
       });
 
@@ -93,13 +143,19 @@ export default function OnboardingFlow() {
       if (selectedTheme) localStorage.setItem("app_theme", selectedTheme);
       if (selectedBackground) localStorage.setItem("app_background", selectedBackground);
 
-      // Mutate user context so they bypass the onboarding guard
-      mutateUser(data.user);
+      // Mutate user and session token so Edge route guard allows /dashboard
+      if (data.token && data.user) {
+        login(data.token, data.user);
+      } else if (data.user) {
+        mutateUser(data.user);
+      }
       
-      // Delay redirect slightly for dramatic effect
+      await refreshStats();
+
+      // Delay redirect slightly for cinematic effect
       setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
+        window.location.href = "/dashboard";
+      }, 1000);
 
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -115,36 +171,54 @@ export default function OnboardingFlow() {
     }
   };
 
-  // Submission logic
+  // Submission trigger on reaching INITIALIZING step
   useEffect(() => {
     if (currentStep === "INITIALIZING" && !isSubmitting) {
       submitOnboarding();
     }
-  }, [currentStep, isSubmitting, submitOnboarding]);
+  }, [currentStep, isSubmitting]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden relative" style={{ backgroundColor: "#020202", zIndex: 50 }}>
       {/* Ambient Particles */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[128px] animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600 rounded-full mix-blend-screen filter blur-[128px] animate-pulse" style={{ animationDelay: "2s" }}></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-primary rounded-full mix-blend-screen filter blur-[128px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-primary-mid rounded-full mix-blend-screen filter blur-[128px] animate-pulse" style={{ animationDelay: "2s" }}></div>
       </div>
 
       <AnimatePresence mode="wait">
         {currentStep === "BOOT" && (
           <BootSequence key="boot" />
         )}
-        
-        {currentStep === "AVATAR" && (
-          <SelectionStep 
-            key="avatar"
-            title="SELECT YOUR AVATAR"
-            subtitle="The face you present to the System."
-            items={COSMETICS_CATALOG.AVATAR}
-            selectedId={selectedAvatar}
-            onSelect={setSelectedAvatar}
+
+        {currentStep === "IDENTITY" && isGoogleSignup && (
+          <IdentityStep
+            key="identity"
+            email={user?.email || ""}
+            username={scholarUsername}
+            name={scholarName}
+            password={scholarPassword}
+            showPassword={showPassword}
+            onUsernameChange={(val) => setScholarUsername(val.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20))}
+            onNameChange={setScholarName}
+            onPasswordChange={setScholarPassword}
+            onToggleShowPassword={() => setShowPassword(!showPassword)}
             onNext={nextStep}
-            canProceed={!!selectedAvatar}
+            canProceed={scholarUsername.length >= 3 && scholarName.trim().length > 0}
+          />
+        )}
+        
+        {currentStep === "CLASS" && (
+          <SelectionStep 
+            key="class"
+            title="SELECT YOUR CLASS"
+            subtitle="Choose your specialization and core cognitive domain."
+            items={COSMETICS_CATALOG.CLASS}
+            selectedId={selectedClass}
+            onSelect={setSelectedClass}
+            onNext={nextStep}
+            onPrev={isGoogleSignup ? prevStep : undefined}
+            canProceed={!!selectedClass}
           />
         )}
 
@@ -173,7 +247,7 @@ export default function OnboardingFlow() {
             onNext={nextStep}
             onPrev={prevStep}
             canProceed={!!selectedTheme}
-            nextLabel="INITIALIZE"
+            nextLabel="COMPLETE SETUP"
           />
         )}
 
@@ -188,16 +262,30 @@ export default function OnboardingFlow() {
 /* --- Sub Components --- */
 
 function BootSequence() {
-  const [text, setText] = useState("");
-  const fullText = "SYSTEM.AWAKENING...";
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("INITIALIZING SYSTEM");
 
   useEffect(() => {
-    let i = 0;
+    const start = Date.now();
+    const duration = 2800;
     const interval = setInterval(() => {
-      setText(fullText.slice(0, i));
-      i++;
-      if (i > fullText.length) clearInterval(interval);
-    }, 100);
+      const elapsed = Date.now() - start;
+      const pct = Math.min(Math.floor((elapsed / duration) * 100), 100);
+      setProgress(pct);
+
+      if (pct > 65) {
+        setStatusText("PREPARING WORKSPACE");
+      } else if (pct > 30) {
+        setStatusText("CALIBRATING INTERFACE");
+      } else {
+        setStatusText("INITIALIZING SYSTEM");
+      }
+
+      if (pct >= 100) {
+        clearInterval(interval);
+      }
+    }, 35);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -205,26 +293,230 @@ function BootSequence() {
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
-      transition={{ duration: 0.8, ease: "easeInOut" }}
-      className="flex flex-col items-center text-center z-10"
+      exit={{ opacity: 0, scale: 1.05, filter: "blur(8px)" }}
+      transition={{ duration: 0.6, ease: "easeInOut" }}
+      className="flex flex-col items-center justify-center text-center z-10 select-none"
     >
-      <motion.div 
-        animate={{ 
-          opacity: [0.5, 1, 0.2, 1, 0.8, 1],
-          x: [0, -2, 2, -1, 1, 0]
-        }}
-        transition={{ duration: 2, times: [0, 0.2, 0.4, 0.6, 0.8, 1], repeat: Infinity, repeatDelay: 1 }}
-        className="mb-6 w-24 h-24 border-4 border-cyan-400 rounded-full flex items-center justify-center relative"
+      {/* Custom Vector Emblem & Orbital HUD Rings */}
+      <div className="relative w-36 h-36 mb-8 flex items-center justify-center">
+        {/* Ambient Pulsing Glow */}
+        <div className="absolute inset-0 bg-[var(--accent-primary)] opacity-25 blur-3xl rounded-full animate-pulse" />
+
+        {/* Outer Orbiting Dashed Radar Ring */}
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-0 rounded-full border border-dashed border-[var(--accent-primary-mid)] opacity-60"
+        />
+
+        {/* Middle Dual-Arc Rotor */}
+        <motion.div 
+          animate={{ rotate: -360 }}
+          transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-2 rounded-full border-2 border-t-[var(--accent-primary-light)] border-r-transparent border-b-[var(--accent-primary)] border-l-transparent opacity-80"
+        />
+
+        {/* Inner Hexagonal Core */}
+        <motion.div 
+          animate={{ scale: [1, 1.04, 1], opacity: [0.85, 1, 0.85] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="relative w-20 h-20 flex items-center justify-center"
+        >
+          {/* Custom SVG Monogram Logo */}
+          <svg viewBox="0 0 64 64" fill="none" className="w-14 h-14 filter drop-shadow-[0_0_12px_var(--accent-primary)]">
+            <polygon 
+              points="32,4 58,18 58,46 32,60 6,46 6,18" 
+              stroke="var(--accent-primary-light)" 
+              strokeWidth="2.5" 
+              fill="rgba(0,0,0,0.5)" 
+            />
+            <path 
+              d="M42 20 L24 20 L20 30 L44 34 L40 44 L22 44" 
+              stroke="var(--accent-primary-light)" 
+              strokeWidth="3.2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+            />
+            <circle cx="32" cy="32" r="2.5" fill="var(--accent-primary-light)" />
+          </svg>
+        </motion.div>
+      </div>
+
+      {/* Primary Status Text */}
+      <motion.h1 
+        key={statusText}
+        initial={{ opacity: 0, y: 4 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-2xl sm:text-3xl font-bold tracking-[0.4em] uppercase text-white font-rajdhani drop-shadow-[0_0_12px_var(--accent-primary-dim)]"
       >
-        <div className="absolute inset-0 border-4 border-t-transparent border-purple-500 rounded-full animate-spin"></div>
-        <span className="text-3xl">👁</span>
-      </motion.div>
-      <h1 className="text-3xl font-bold tracking-[0.5em] text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" style={{ fontFamily: "var(--font-rajdhani)" }}>
-        {text}
-        <motion.span animate={{ opacity: [0, 1] }} transition={{ repeat: Infinity, duration: 0.5 }}>_</motion.span>
-      </h1>
-      <p className="mt-4 text-xs text-gray-500 tracking-widest uppercase">Connecting to the Akashic Records...</p>
+        {statusText}
+      </motion.h1>
+
+      {/* Sleek Minimal Progress Meter */}
+      <div className="w-64 sm:w-72 mt-6 flex flex-col items-center gap-2">
+        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden relative">
+          <motion.div 
+            className="h-full bg-gradient-to-r from-[var(--accent-primary-dim)] via-[var(--accent-primary)] to-[var(--accent-primary-light)] rounded-full transition-all duration-75"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="w-full flex justify-between items-center text-[10px] font-mono tracking-widest text-text-muted">
+          <span>SYSTEM_INIT</span>
+          <span className="text-[var(--accent-primary-light)] font-bold">{progress.toString().padStart(2, "0")}%</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+interface IdentityStepProps {
+  email: string;
+  username: string;
+  name: string;
+  password: string;
+  showPassword: boolean;
+  onUsernameChange: (val: string) => void;
+  onNameChange: (val: string) => void;
+  onPasswordChange: (val: string) => void;
+  onToggleShowPassword: () => void;
+  onNext: () => void;
+  canProceed: boolean;
+}
+
+function IdentityStep({
+  email,
+  username,
+  name,
+  password,
+  showPassword,
+  onUsernameChange,
+  onNameChange,
+  onPasswordChange,
+  onToggleShowPassword,
+  onNext,
+  canProceed,
+}: IdentityStepProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="w-full max-w-lg p-8 z-10 flex flex-col system-card border"
+      style={{
+        background: "var(--bg-abyss)",
+        borderColor: "var(--border-subtle)",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.6)",
+      }}
+    >
+      <div className="text-center mb-6">
+        <p
+          className="text-xs tracking-[0.2em] uppercase font-bold mb-1"
+          style={{ color: "var(--accent-primary-light)", fontFamily: "'Rajdhani', sans-serif" }}
+        >
+          CONFIRM SCHOLAR IDENTITY
+        </p>
+        <h2
+          className="text-2xl font-bold uppercase tracking-wide"
+          style={{ fontFamily: "'Rajdhani', sans-serif", color: "var(--text-primary)" }}
+        >
+          Player Registration
+        </h2>
+      </div>
+
+      <div className="space-y-4">
+        {email && (
+          <div>
+            <label className="stat-label block mb-1">Registered Email</label>
+            <input
+              type="text"
+              value={email}
+              disabled
+              className="input-field opacity-70 cursor-not-allowed"
+            />
+          </div>
+        )}
+
+        <div>
+          <label className="stat-label block mb-1">Display Name</label>
+          <input
+            type="text"
+            placeholder="Sung Jin-Woo"
+            required
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
+            className="input-field"
+            maxLength={30}
+          />
+        </div>
+
+        <div>
+          <label className="stat-label block mb-1">Scholar Username</label>
+          <input
+            type="text"
+            placeholder="shadow_monarch"
+            required
+            minLength={3}
+            maxLength={20}
+            value={username}
+            onChange={(e) => onUsernameChange(e.target.value)}
+            className="input-field font-mono text-sm"
+          />
+          <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+            3-20 characters: lowercase letters, numbers, and underscores only.
+          </p>
+        </div>
+
+        <div>
+          <label className="stat-label block mb-1">
+            Security Password <span className="text-[0.65rem] lowercase opacity-60">(optional)</span>
+          </label>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Set password for credentials login"
+              value={password}
+              onChange={(e) => onPasswordChange(e.target.value)}
+              className="input-field pr-10"
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={onToggleShowPassword}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
+              style={{ color: "var(--text-muted)" }}
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
+            </button>
+          </div>
+          {password && <PasswordStrengthMeter password={password} />}
+          <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+            Allows signing in with email & password in addition to Google.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8 pt-4 border-t flex justify-end" style={{ borderColor: "var(--border-subtle)" }}>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!canProceed}
+          className="btn-primary"
+          style={{ opacity: canProceed ? 1 : 0.5, cursor: canProceed ? "pointer" : "not-allowed" }}
+        >
+          CONFIRM IDENTITY & PROCEED
+        </button>
+      </div>
     </motion.div>
   );
 }
@@ -232,7 +524,7 @@ function BootSequence() {
 interface SelectionStepProps {
   title: string;
   subtitle: string;
-  items: any[]; // Using any here temporarily to avoid importing CosmeticItem for brevity, but let's just type it inline if possible or keep any and ignore, actually I'll use a local type
+  items: CosmeticItem[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   onNext: () => void;
@@ -250,18 +542,18 @@ function SelectionStep({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full max-w-4xl p-8 z-10 flex flex-col h-[80vh]"
+      className="w-full max-w-6xl p-6 sm:p-8 z-10 flex flex-col h-[88vh]"
     >
       <div className="text-center mb-10">
         <h2 className="text-4xl font-bold tracking-widest uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" style={{ fontFamily: "var(--font-rajdhani)" }}>
           {title}
         </h2>
-        <p className="text-gray-400 mt-2 text-sm uppercase tracking-wider">{subtitle}</p>
+        <p className="text-text-muted mt-2 text-sm uppercase tracking-wider">{subtitle}</p>
       </div>
 
       <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-2">
-          {items.map((item: { id: string, category: string, value: string, name: string, description: string }, idx: number) => {
+        <div className={`grid gap-6 p-2 ${items[0]?.category === "CLASS" || items[0]?.category === "AVATAR" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"}`}>
+          {items.map((item: CosmeticItem, idx: number) => {
             const isSelected = selectedId === item.id;
             return (
               <motion.button
@@ -273,12 +565,29 @@ function SelectionStep({
                 className={`relative p-6 text-left border rounded-xl overflow-hidden transition-all duration-300 group
                   ${isSelected 
                     ? "border-[var(--accent-primary)] bg-[var(--accent-primary-dim)] shadow-[0_0_20px_var(--accent-primary-mid)] scale-[1.03] z-10" 
-                    : "border-gray-800 bg-gray-900/50 hover:border-gray-600 hover:bg-gray-800/80 z-0 hover:z-10 hover:scale-[1.01]"}
+                    : "border-border-subtle bg-bg-abyss hover:border-border-active hover:bg-bg-panel z-0 hover:z-10 hover:scale-[1.01]"}
                 `}
               >
                 {/* Visual Preview logic based on category */}
-                {item.category === "AVATAR" && (
-                  <div className="text-5xl mb-4 text-center">{item.value}</div>
+                {(item.category === "CLASS" || item.category === "AVATAR") && (
+                  <div className="w-full h-44 sm:h-48 mb-4 rounded-lg overflow-hidden relative border border-white/10 bg-black/60 shadow-inner group-hover:border-[var(--accent-primary-light)] transition-colors duration-300">
+                    <img 
+                      src={item.value} 
+                      alt={item.name} 
+                      className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
+                        const fallback = (e.target as HTMLElement).nextElementSibling;
+                        if (fallback) (fallback as HTMLElement).style.display = "flex";
+                      }}
+                    />
+                    {/* Dark gradient overlay for manhwa card atmosphere */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-abyss)] via-black/20 to-transparent pointer-events-none opacity-80" />
+                    
+                    <div className="absolute inset-0 hidden items-center justify-center text-5xl">
+                      {item.fallbackIcon || "👤"}
+                    </div>
+                  </div>
                 )}
                 {item.category === "BACKGROUND" && (
                   <div className="w-full h-24 mb-4 rounded-lg border border-gray-700/50 relative overflow-hidden" 
@@ -301,7 +610,7 @@ function SelectionStep({
                     </motion.div>
                   )}
                 </div>
-                <p className="text-sm text-gray-400 relative z-10">{item.description}</p>
+                <p className="text-sm text-text-muted relative z-10">{item.description}</p>
                 
                 {/* Hover Glow */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500" 
@@ -317,7 +626,7 @@ function SelectionStep({
         {onPrev ? (
           <button 
             onClick={onPrev}
-            className="px-6 py-3 rounded text-gray-400 hover:text-white transition-colors tracking-widest text-sm uppercase"
+            className="px-6 py-3 rounded text-text-muted hover:text-text-primary transition-colors tracking-widest text-sm uppercase"
           >
             Go Back
           </button>
@@ -329,7 +638,7 @@ function SelectionStep({
           className={`px-8 py-3 rounded font-bold tracking-widest uppercase transition-all duration-300 relative overflow-hidden
             ${canProceed 
               ? "bg-[var(--accent-primary)] text-white shadow-[0_0_15px_var(--accent-primary-mid)] hover:scale-105" 
-              : "bg-gray-800 text-gray-600 cursor-not-allowed"}
+              : "bg-bg-shadow text-text-muted cursor-not-allowed"}
           `}
         >
           {nextLabel}
@@ -351,9 +660,9 @@ function InitializingSequence({ error }: { error: string }) {
           <div className="text-red-500 mb-4">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
           </div>
-          <h2 className="text-2xl text-red-500 font-bold mb-2">INITIALIZATION FAILED</h2>
-          <p className="text-gray-400">{error}</p>
-          <p className="text-xs text-gray-500 mt-4">Retrying logic sequence...</p>
+          <h2 className="text-2xl text-accent-red font-bold mb-2">INITIALIZATION FAILED</h2>
+          <p className="text-text-muted">{error}</p>
+          <p className="text-xs text-text-muted mt-4">Please try again.</p>
         </>
       ) : (
         <>
@@ -368,7 +677,7 @@ function InitializingSequence({ error }: { error: string }) {
           <h2 className="text-3xl font-bold tracking-[0.3em] text-[var(--accent-primary)] drop-shadow-[0_0_8px_var(--accent-primary-dim)] uppercase" style={{ fontFamily: "var(--font-rajdhani)" }}>
             Synchronizing
           </h2>
-          <motion.div className="w-64 h-1 bg-gray-800 mt-6 rounded overflow-hidden relative">
+          <motion.div className="w-64 h-1 bg-bg-shadow mt-6 rounded overflow-hidden relative">
             <motion.div 
               initial={{ x: "-100%" }}
               animate={{ x: "0%" }}
@@ -376,7 +685,7 @@ function InitializingSequence({ error }: { error: string }) {
               className="absolute inset-y-0 left-0 bg-[var(--accent-primary)] w-full"
             ></motion.div>
           </motion.div>
-          <p className="mt-4 text-xs text-gray-500 tracking-widest uppercase animate-pulse">Injecting configurations...</p>
+          <p className="mt-4 text-xs text-text-muted tracking-widest uppercase animate-pulse">Applying system configuration...</p>
         </>
       )}
     </motion.div>

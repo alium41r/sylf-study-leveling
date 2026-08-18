@@ -15,13 +15,13 @@ export default function CalendarSettingsPage() {
           width: "64px",
           height: "64px",
           borderRadius: "50%",
-          background: "rgba(6, 182, 212, 0.1)",
-          border: "1px solid rgba(6, 182, 212, 0.3)",
+          background: "var(--accent-primary-dim)",
+          border: "1px solid var(--accent-primary-mid)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           margin: "0 auto 24px",
-          color: "var(--accent-cyan)"
+          color: "var(--accent-primary)"
         }}>
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

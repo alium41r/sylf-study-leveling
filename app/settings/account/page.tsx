@@ -6,7 +6,6 @@ import AccountInformation from "./AccountInformation";
 import SecurityInformation from "./SecurityInformation";
 import PrivacyInformation from "./PrivacyInformation";
 import ConnectedAccounts from "./ConnectedAccounts";
-import DataManagement from "./DataManagement";
 import SessionsInformation from "./SessionsInformation";
 import DangerZone from "./DangerZone";
 
@@ -45,13 +44,6 @@ export default function AccountSettingsPage() {
           description="Manage your linked social accounts and third-party integrations."
         >
           <ConnectedAccounts />
-        </SettingsSectionCard>
-
-        <SettingsSectionCard
-          title="Data Management"
-          description="Export your data, download your history, or manage your data sharing preferences."
-        >
-          <DataManagement />
         </SettingsSectionCard>
 
         <SettingsSectionCard

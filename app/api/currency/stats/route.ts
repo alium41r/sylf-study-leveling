@@ -33,15 +33,29 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    const hpLedgers = await prisma.hpLedger.findMany({
+      where: { userId },
+    });
+
+    let totalHpLost = 0;
+    for (const entry of hpLedgers) {
+      if (entry.amount < 0) {
+        totalHpLost += Math.abs(entry.amount);
+      }
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { sylph: true }
+      select: { sylph: true, hp: true, maxHp: true }
     });
 
     return NextResponse.json({
       currentBalance: user?.sylph || 0,
       totalEarned,
       totalSpent,
+      totalHpLost,
+      currentHp: user?.hp || 0,
+      maxHp: user?.maxHp || 100,
     }, { status: 200 });
 
   } catch (error) {

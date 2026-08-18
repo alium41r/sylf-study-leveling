@@ -31,7 +31,7 @@ export default function Home() {
       />
       
       {/* ─── Background Overlays (Dim & Purple) ────────── */}
-      <div className="absolute inset-0 bg-black/60 z-0" />
+      <div className="absolute inset-0 bg-bg-void/80 z-0" />
       <div className="absolute inset-0 bg-accent-dim mix-blend-overlay z-0" />
 
       {/* ─── Background Effects ──────────────────────── */}
@@ -60,8 +60,8 @@ export default function Home() {
         <div
           className="inline-block mb-6 px-4 py-1.5 rounded text-xs tracking-widest"
           style={{
-            background: "rgba(124, 58, 237, 0.1)",
-            border: "1px solid rgba(124, 58, 237, 0.3)",
+            background: "var(--accent-primary-dim)",
+            border: "1px solid var(--accent-primary-mid)",
             color: "var(--accent-primary)",
             fontFamily: "'Rajdhani', sans-serif",
             fontWeight: 600,
@@ -118,7 +118,7 @@ export default function Home() {
 
         {/* ─── Feature Cards ───────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-20 w-full">
-          <div className="system-card p-6 text-left bg-black/40 backdrop-blur-sm border-accent-mid border">
+          <div className="system-card p-6 text-left bg-bg-abyss/80 backdrop-blur-sm border-accent-mid border">
             <div className="text-3xl mb-3">🤖</div>
             <h3
               className="text-base font-bold mb-2 tracking-wide"
@@ -131,7 +131,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="system-card p-6 text-left bg-black/40 backdrop-blur-sm border-accent-mid border">
+          <div className="system-card p-6 text-left bg-bg-abyss/80 backdrop-blur-sm border-accent-mid border">
             <div className="text-3xl mb-3">📈</div>
             <h3
               className="text-base font-bold mb-2 tracking-wide"
@@ -144,7 +144,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="system-card p-6 text-left bg-black/40 backdrop-blur-sm border-accent-mid border">
+          <div className="system-card p-6 text-left bg-bg-abyss/80 backdrop-blur-sm border-accent-mid border">
             <div className="text-3xl mb-3">⚡</div>
             <h3
               className="text-base font-bold mb-2 tracking-wide"
@@ -157,7 +157,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="system-card p-6 text-left bg-black/40 backdrop-blur-sm border-accent-mid border">
+          <div className="system-card p-6 text-left bg-bg-abyss/80 backdrop-blur-sm border-accent-mid border">
             <div className="text-3xl mb-3">⏱️</div>
             <h3
               className="text-base font-bold mb-2 tracking-wide"

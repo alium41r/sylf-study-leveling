@@ -6,7 +6,18 @@
 // ============================================================
 
 import { prisma } from "@/lib/prisma";
-import { questRewards } from "@/lib/game-engine";
+import { calculateQuestRewards, calculateRecommendedDifficulty, QuestDifficulty } from "@/lib/difficulty-engine";
+import {
+  calculateDailyCapacity,
+  getHighestEffortLevel,
+  normalizeDifficulty,
+  scheduleQuestsDeterministically,
+} from "@/lib/ai/planning-engine";
+import { TimezoneService } from "@/lib/timezone-service";
+import { getUserTimezone } from "@/lib/timezone-server";
+import { EffortLevel } from "@/lib/game-engine";
+import { buildRelevantContext } from "@/lib/ai/context-engine";
+import { SHOP_ITEMS } from "@/lib/shop-items";
 
 /**
  * Execute a tool call from the AI and return the result as a JSON-serializable object.
@@ -32,6 +43,10 @@ export async function executeChatTool(
         return await executeDeleteAllTasks(userId);
       case "getQuests":
         return await executeGetQuests(userId, args);
+      case "createQuest":
+        return await executeCreateQuest(userId, args);
+      case "createMultipleQuests":
+        return await executeCreateMultipleQuests(userId, args);
       case "getStudySessions":
         return await executeGetStudySessions(userId, args);
       case "updateQuest":
@@ -40,6 +55,32 @@ export async function executeChatTool(
         return await executeDeleteQuest(userId, args);
       case "getWeeklySummary":
         return await executeGetWeeklySummary(userId);
+      case "moveQuest":
+        return await executeMoveQuest(userId, args);
+      case "swapQuests":
+        return await executeSwapQuests(userId, args);
+      case "clearDay":
+        return await executeClearDay(userId, args);
+      case "getSubjectAnalytics":
+        return await executeGetSubjectAnalytics(userId);
+      case "getPerformanceTrends":
+        return await executeGetPerformanceTrends(userId);
+      case "getDailyPattern":
+        return await executeGetDailyPattern(userId);
+      case "saveMemory":
+        return await executeSaveMemory(userId, args);
+      case "getMemory":
+        return await executeGetMemory(userId, args);
+      case "forgetMemory":
+        return await executeForgetMemory(userId, args);
+      case "generateInsight":
+        return await executeGenerateInsight(userId, args);
+      case "completeQuest":
+        return await executeCompleteQuest(userId, args);
+      case "getAppState":
+        return await executeGetAppState(userId);
+      case "getShopInventory":
+        return await executeGetShopInventory();
       default:
         return { error: `Unknown tool: ${toolName}` };
     }
@@ -151,12 +192,19 @@ async function executeCreateGoal(
 }
 
 async function executeUpdateGoal(userId: number, args: Record<string, any>) {
-  const goalId = Number(args.goalId);
-  if (!goalId) return { error: "Missing goalId" };
+  let existing;
+  if (args.goalId) {
+    existing = await prisma.goal.findFirst({ where: { id: Number(args.goalId), userId } });
+  } else if (args.searchTitle) {
+    existing = await prisma.goal.findFirst({
+      where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
+      orderBy: { createdAt: "desc" },
+    });
+  }
 
-  const existing = await prisma.goal.findFirst({ where: { id: goalId, userId } });
-  if (!existing) return { error: "Goal not found" };
+  if (!existing) return { error: "Goal not found. Please verify the ID or title." };
 
+  const goalId = existing.id;
   const dataToUpdate: any = {};
   if (args.title !== undefined) dataToUpdate.title = args.title;
   if (args.description !== undefined) dataToUpdate.description = args.description;
@@ -171,16 +219,54 @@ async function executeUpdateGoal(userId: number, args: Record<string, any>) {
 }
 
 async function executeDeleteGoal(userId: number, args: Record<string, any>) {
-  const goalId = Number(args.goalId);
-  if (!goalId) return { error: "Missing goalId" };
+  if (args.deleteAll) {
+    // Note: deleting a goal deletes its associated quests via schema cascade (SetNull or Cascade depending on setup)
+    // Actually our schema uses SetNull for goalId on quests, so deleting the goal orphans them unless we delete them too.
+    // Let's delete all goals and quests to be safe.
+    await prisma.quest.deleteMany({ where: { userId } });
+    const deleted = await prisma.goal.deleteMany({ where: { userId } });
+    return { success: true, message: `Successfully deleted all ${deleted.count} goals and their associated quests.` };
+  }
 
-  const existing = await prisma.goal.findFirst({ where: { id: goalId, userId } });
-  if (!existing) return { error: "Goal not found" };
+  const idsToDelete: number[] = [];
+  
+  if (args.goalId) {
+    const existing = await prisma.goal.findFirst({ where: { id: Number(args.goalId), userId } });
+    if (existing) idsToDelete.push(existing.id);
+  }
+  
+  if (args.searchTitle) {
+    const existing = await prisma.goal.findFirst({
+      where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
+      orderBy: { createdAt: "desc" },
+    });
+    if (existing) idsToDelete.push(existing.id);
+  }
 
-  // Delete all associated quests since onDelete is SetNull in schema
-  await prisma.quest.deleteMany({ where: { goalId } });
-  await prisma.goal.delete({ where: { id: goalId } });
-  return { success: true, message: `Goal and associated quests deleted.` };
+  if (args.searchTitles && Array.isArray(args.searchTitles)) {
+    for (const title of args.searchTitles) {
+      if (typeof title === 'string') {
+        const existing = await prisma.goal.findFirst({
+          where: { userId, title: { contains: title, mode: "insensitive" } },
+          orderBy: { createdAt: "desc" },
+        });
+        if (existing) idsToDelete.push(existing.id);
+      }
+    }
+  }
+  
+  if (idsToDelete.length === 0) {
+    return { error: "No matching goals found to delete. Please verify the IDs or titles." };
+  }
+  
+  // Delete associated quests first since they are tied to these goals
+  await prisma.quest.deleteMany({ where: { goalId: { in: idsToDelete } } });
+  
+  const deleted = await prisma.goal.deleteMany({
+    where: { id: { in: idsToDelete } }
+  });
+  
+  return { success: true, message: `Successfully deleted ${deleted.count} goal(s) and their associated quests.` };
 }
 
 async function executeDeleteAllTasks(userId: number) {
@@ -203,7 +289,8 @@ async function executeGetQuests(
     where.scheduledFor = args.date;
   } else if (!args.status && !args.goalId) {
     // Default to today
-    where.scheduledFor = new Date().toISOString().split("T")[0];
+    const tz = await getUserTimezone(userId);
+    where.scheduledFor = TimezoneService.getUserLocalDate(tz);
   }
 
   if (args.status) where.status = args.status;
@@ -268,9 +355,39 @@ async function executeCreateQuest(
   const title = args.title || "New Quest";
   const description = args.description || null;
   const requiredMinutes = Number(args.requiredMinutes) || 30;
+  const tz = await getUserTimezone(userId);
   const scheduledFor =
-    args.scheduledFor || new Date().toISOString().split("T")[0];
+    args.scheduledFor || TimezoneService.getUserLocalDate(tz);
   let goalId = args.goalId ? Number(args.goalId) : null;
+
+  // ─── ANTI-EXPLOIT & LIMITS ──────────────────────────────────
+  const MAX_AI_QUESTS_PER_DAY = 3;
+
+  // 1. Check for duplicates
+  const existingDuplicate = await prisma.quest.findFirst({
+    where: { userId, title, scheduledFor }
+  });
+  if (existingDuplicate) {
+    return { error: `Duplicate quest detected: A quest titled "${title}" is already scheduled for ${scheduledFor}. Please suggest editing it instead.` };
+  }
+
+  // 2. Check rate limit
+  // Use timezone-correct start of day for accurate daily counting
+  const startOfDayUtc = TimezoneService.getStartOfDayUTC(tz);
+
+  const aiQuestsToday = await prisma.quest.count({
+    where: {
+      userId,
+      // @ts-ignore
+      createdByAi: true,
+      createdAt: { gte: startOfDayUtc }
+    }
+  });
+
+  if (aiQuestsToday >= MAX_AI_QUESTS_PER_DAY) {
+    return { error: `The daily limit of ${MAX_AI_QUESTS_PER_DAY} AI-created quests has been reached. Please politely explain this to the user and suggest editing their existing quests instead.` };
+  }
+  // ────────────────────────────────────────────────────────────
 
   if (goalId) {
     const goalExists = await prisma.goal.findFirst({ where: { id: goalId, userId } });
@@ -281,7 +398,8 @@ async function executeCreateQuest(
   const userLevel = user?.level || 1;
 
   // Calculate rewards using the game engine
-  const rewards = questRewards(requiredMinutes, "NORMAL", userLevel);
+  const diff = calculateRecommendedDifficulty(requiredMinutes);
+  const rewards = calculateQuestRewards(requiredMinutes, diff, userLevel);
 
   const quest = await prisma.quest.create({
     data: {
@@ -294,6 +412,8 @@ async function executeCreateQuest(
       sylphReward: rewards.sylph,
       scheduledFor,
       status: "PENDING",
+      // @ts-ignore
+      createdByAi: true,
     },
   });
 
@@ -324,12 +444,36 @@ async function executeCreateMultipleQuests(userId: number, args: Record<string, 
 }
 
 async function executeUpdateQuest(userId: number, args: Record<string, any>) {
-  const questId = Number(args.questId);
-  if (!questId) return { error: "Missing questId" };
+  let existing;
+  if (args.questId) {
+    const questId = Number(args.questId);
+    existing = await prisma.quest.findFirst({ where: { id: questId, userId } });
+  } else if (args.searchTitle) {
+    existing = await prisma.quest.findFirst({
+      where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
+      orderBy: { createdAt: "desc" },
+    });
+  } else if (args.title) {
+    // If the model passed `title` to identify the quest rather than `searchTitle`
+    existing = await prisma.quest.findFirst({
+      where: { userId, title: { contains: args.title, mode: "insensitive" } },
+      orderBy: { createdAt: "desc" },
+    });
+  }
 
-  const existing = await prisma.quest.findFirst({ where: { id: questId, userId } });
-  if (!existing) return { error: "Quest not found" };
+  // Fallback: If still not found and user has a pending quest created recently
+  let usedFallback = false;
+  if (!existing && (args.requiredMinutes !== undefined || args.scheduledFor !== undefined || args.description !== undefined)) {
+    existing = await prisma.quest.findFirst({
+      where: { userId, status: "PENDING" },
+      orderBy: { createdAt: "desc" },
+    });
+    if (existing) usedFallback = true;
+  }
 
+  if (!existing) return { error: "Quest not found. Please verify the ID or title." };
+
+  const questId = existing.id;
   const dataToUpdate: any = {};
   if (args.title !== undefined) dataToUpdate.title = args.title;
   if (args.description !== undefined) dataToUpdate.description = args.description;
@@ -337,7 +481,10 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
     dataToUpdate.requiredMinutes = Number(args.requiredMinutes);
     const user = await prisma.user.findUnique({ where: { id: userId } });
     const userLevel = user?.level || 1;
-    const rewards = questRewards(dataToUpdate.requiredMinutes, "NORMAL", userLevel);
+    const reqMins = dataToUpdate.requiredMinutes;
+    const diff = calculateRecommendedDifficulty(reqMins);
+    const rewards = calculateQuestRewards(reqMins, diff, userLevel);
+    dataToUpdate.difficulty = diff;
     dataToUpdate.xpReward = rewards.xp;
     dataToUpdate.sylphReward = rewards.sylph;
   }
@@ -347,18 +494,55 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
     where: { id: questId },
     data: dataToUpdate,
   });
-  return { success: true, quest: updated };
+  const result: any = { success: true, quest: updated };
+  if (usedFallback) {
+    result.warning = `No exact match found. Updated the most recent pending quest: "${existing.title}" (ID: ${existing.id}). Confirm this was the intended quest.`;
+  }
+  return result;
 }
 
 async function executeDeleteQuest(userId: number, args: Record<string, any>) {
-  const questId = Number(args.questId);
-  if (!questId) return { error: "Missing questId" };
+  if (args.deleteAll) {
+    const deleted = await prisma.quest.deleteMany({ where: { userId } });
+    return { success: true, message: `Successfully deleted all ${deleted.count} quests.` };
+  }
 
-  const existing = await prisma.quest.findFirst({ where: { id: questId, userId } });
-  if (!existing) return { error: "Quest not found" };
+  const idsToDelete: number[] = [];
+  
+  if (args.questId) {
+    const existing = await prisma.quest.findFirst({ where: { id: Number(args.questId), userId } });
+    if (existing) idsToDelete.push(existing.id);
+  }
+  
+  if (args.searchTitle) {
+    const existing = await prisma.quest.findFirst({
+      where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
+      orderBy: { createdAt: "desc" },
+    });
+    if (existing) idsToDelete.push(existing.id);
+  }
 
-  await prisma.quest.delete({ where: { id: questId } });
-  return { success: true, message: "Quest deleted." };
+  if (args.searchTitles && Array.isArray(args.searchTitles)) {
+    for (const title of args.searchTitles) {
+      if (typeof title === 'string') {
+        const existing = await prisma.quest.findFirst({
+          where: { userId, title: { contains: title, mode: "insensitive" } },
+          orderBy: { createdAt: "desc" },
+        });
+        if (existing) idsToDelete.push(existing.id);
+      }
+    }
+  }
+  
+  if (idsToDelete.length === 0) {
+    return { error: "No matching quests found to delete. Please verify the IDs or titles." };
+  }
+  
+  const deleted = await prisma.quest.deleteMany({
+    where: { id: { in: idsToDelete } }
+  });
+  
+  return { success: true, message: `Successfully deleted ${deleted.count} quest(s).` };
 }
 
 async function executeCompleteQuest(
@@ -433,5 +617,376 @@ async function executeGetWeeklySummary(userId: number) {
     currentStreak: user?.streakDays || 0,
     currentLevel: user?.level || 1,
     currentRank: user?.hunterRank || "E",
+  };
+}
+
+// --- Phase 3A: Calendar Tools ---
+
+async function executeMoveQuest(userId: number, args: Record<string, any>) {
+  const questId = Number(args.questId);
+  const targetDate = String(args.targetDate);
+  if (!questId || !targetDate) return { error: "Missing questId or targetDate" };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) return { error: "Invalid targetDate format. Must be YYYY-MM-DD" };
+
+  const quest = await prisma.quest.findUnique({ where: { id: questId, userId } });
+  if (!quest) return { error: "Quest not found or unauthorized." };
+  if (quest.status !== "PENDING" && quest.status !== "IN_PROGRESS") return { error: "Only PENDING or IN_PROGRESS quests can be moved." };
+
+  const effortLevel = await getHighestEffortLevel(userId);
+  const matrix = await calculateDailyCapacity(userId, effortLevel, targetDate, targetDate);
+  
+  if (matrix[targetDate] < quest.requiredMinutes) {
+    return { 
+      error: "Target date is overloaded.", 
+      capacityRemaining: matrix[targetDate], 
+      required: quest.requiredMinutes 
+    };
+  }
+
+  await prisma.quest.update({
+    where: { id: questId },
+    data: { scheduledFor: targetDate }
+  });
+
+  return { success: true, message: `Moved quest to ${targetDate}` };
+}
+
+async function executeSwapQuests(userId: number, args: Record<string, any>) {
+  const questIdA = Number(args.questIdA);
+  const questIdB = Number(args.questIdB);
+  if (!questIdA || !questIdB) return { error: "Missing quest IDs" };
+  if (questIdA === questIdB) return { error: "Cannot swap a quest with itself." };
+
+  const questA = await prisma.quest.findUnique({ where: { id: questIdA, userId } });
+  const questB = await prisma.quest.findUnique({ where: { id: questIdB, userId } });
+
+  if (!questA || !questB) return { error: "One or both quests not found or unauthorized." };
+  if (
+    (questA.status !== "PENDING" && questA.status !== "IN_PROGRESS") ||
+    (questB.status !== "PENDING" && questB.status !== "IN_PROGRESS")
+  ) {
+    return { error: "Only PENDING or IN_PROGRESS quests can be swapped." };
+  }
+  
+  const dateA = questA.scheduledFor;
+  const dateB = questB.scheduledFor;
+  
+  if (dateA === dateB) return { error: "Quests are already on the same date." };
+
+  const effortLevel = await getHighestEffortLevel(userId);
+  
+  // Calculate capacity for both dates
+  const matrixA = await calculateDailyCapacity(userId, effortLevel, dateA, dateA);
+  const matrixB = await calculateDailyCapacity(userId, effortLevel, dateB, dateB);
+
+  // When A moves to B's date, B's old date regains B's minutes, but loses A's minutes
+  const newBudgetA = matrixA[dateA] + questA.requiredMinutes - questB.requiredMinutes;
+  const newBudgetB = matrixB[dateB] + questB.requiredMinutes - questA.requiredMinutes;
+
+  if (newBudgetA < 0) return { error: `Cannot swap: ${dateA} would be overloaded.` };
+  if (newBudgetB < 0) return { error: `Cannot swap: ${dateB} would be overloaded.` };
+
+  await prisma.$transaction([
+    prisma.quest.update({ where: { id: questIdA }, data: { scheduledFor: dateB } }),
+    prisma.quest.update({ where: { id: questIdB }, data: { scheduledFor: dateA } })
+  ]);
+
+  return { success: true, message: `Swapped dates between ${questA.title} and ${questB.title}` };
+}
+
+async function executeClearDay(userId: number, args: Record<string, any>) {
+  const dateStr = String(args.date);
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return { error: "Invalid date format. Must be YYYY-MM-DD" };
+
+  const pendingQuests = await prisma.quest.findMany({
+    where: {
+      userId,
+      scheduledFor: dateStr,
+      status: { in: ["PENDING", "IN_PROGRESS"] }
+    }
+  });
+
+  if (pendingQuests.length === 0) return { success: true, message: "Day is already clear." };
+
+  const targetDate = new Date(`${dateStr}T00:00:00Z`);
+  const nextDay = new Date(targetDate);
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+  const nextDayStr = nextDay.toISOString().split("T")[0];
+
+  // Look ahead up to 14 days for capacity
+  const searchEnd = new Date(targetDate);
+  searchEnd.setUTCDate(searchEnd.getUTCDate() + 14);
+  const searchEndStr = searchEnd.toISOString().split("T")[0];
+
+  const effortLevel = await getHighestEffortLevel(userId);
+  const matrix = await calculateDailyCapacity(userId, effortLevel, nextDayStr, searchEndStr);
+
+  const updates = [];
+  const unplaced = [];
+  
+  for (const q of pendingQuests) {
+    let placed = false;
+    for (const [day, cap] of Object.entries(matrix)) {
+      if (cap >= q.requiredMinutes) {
+        updates.push({ id: q.id, newDate: day });
+        matrix[day] -= q.requiredMinutes; // Deduct capacity
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) unplaced.push(q.title);
+  }
+
+  if (unplaced.length > 0) {
+    return { 
+      error: "Cannot clear day: Not enough capacity in the next 14 days to reschedule quests.",
+      unplacedQuests: unplaced 
+    };
+  }
+
+  await prisma.$transaction(
+    updates.map(u => prisma.quest.update({ where: { id: u.id }, data: { scheduledFor: u.newDate } }))
+  );
+
+  return { 
+    success: true, 
+    message: `Cleared ${dateStr}. Pushed ${updates.length} quests forward safely.` 
+  };
+}
+
+// --- Phase 3B: Analytics Tools ---
+
+async function executeGetSubjectAnalytics(userId: number) {
+  // Use "calendar" agent base as it's lightweight, then explicitly ask for subjects
+  const context = await buildRelevantContext(userId, "calendar" as any, ["subjects"]);
+  return context.subjects || { error: "No subject data available." };
+}
+
+async function executeGetPerformanceTrends(userId: number) {
+  const context = await buildRelevantContext(userId, "calendar" as any, ["trends"]);
+  return context.trends || { error: "No trends data available." };
+}
+
+async function executeGetDailyPattern(userId: number) {
+  const context = await buildRelevantContext(userId, "calendar" as any, ["trends"]);
+  const trends = context.trends;
+  if (!trends) return { error: "No pattern data available." };
+  
+  return {
+    bestDayOfWeek: trends.bestDayOfWeek || "Unknown",
+    avgDailyMinutes: trends.avgDailyMinutes,
+    currentStreakDays: trends.currentStreakDays,
+    longestRecentStreak: trends.longestRecentStreak,
+  };
+}
+
+// --- Phase 3C: Memory Tools ---
+
+async function executeSaveMemory(userId: number, args: Record<string, any>) {
+  const { key, value, source, confidence } = args;
+  if (!key || !value) return { error: "Missing key or value." };
+  
+  let conf = Number(confidence) || 1.0;
+  conf = Math.max(0, Math.min(1, conf)); // Clamp between 0 and 1
+  const src = source === "user_stated" ? "user_stated" : "inferred";
+
+  // Prevent storing excessively large memories
+  if (value.length > 500) return { error: "Memory value too long (max 500 chars)." };
+  if (key.length > 100) return { error: "Memory key too long (max 100 chars)." };
+
+  const existing = await prisma.aiMemory.findUnique({
+    where: { userId_key: { userId, key } }
+  });
+
+  if (existing && existing.source === "user_stated" && src === "inferred") {
+    return { error: "Cannot overwrite a user_stated memory with an inferred assumption. The user's explicit statement takes precedence." };
+  }
+
+  await prisma.aiMemory.upsert({
+    where: { userId_key: { userId, key } },
+    update: { value: String(value), source: src, confidence: conf },
+    create: { userId, key: String(key), value: String(value), source: src, confidence: conf }
+  });
+
+  return { success: true, message: `I'll remember this: "${key}" -> "${value}"` };
+}
+
+async function executeGetMemory(userId: number, args: Record<string, any>) {
+  const { key } = args;
+  if (!key) return { error: "Missing key." };
+
+  const mem = await prisma.aiMemory.findUnique({
+    where: { userId_key: { userId, key } }
+  });
+
+  if (!mem) return { error: "Memory not found." };
+  return { key: mem.key, value: mem.value, source: mem.source, confidence: mem.confidence };
+}
+
+async function executeForgetMemory(userId: number, args: Record<string, any>) {
+  const { key } = args;
+  if (!key) return { error: "Missing key." };
+
+  const mem = await prisma.aiMemory.findUnique({
+    where: { userId_key: { userId, key } }
+  });
+
+  if (!mem) return { error: "Memory not found." };
+
+  await prisma.aiMemory.delete({
+    where: { userId_key: { userId, key } }
+  });
+
+  return { success: true, message: `I have forgotten: "${key}"` };
+}
+
+// --- Phase 3D: App-State & Recommendations ---
+
+const INSIGHT_SIMILARITY_THRESHOLD = 0.5;
+const STOP_WORDS = new Set(["the", "a", "an", "is", "are", "you", "your", "to", "and", "should", "for", "in", "of", "on", "with", "have", "has", "been", "this", "that", "it", "at", "by", "from", "be", "do", "not", "we", "can", "will"]);
+const OPPOSING_PAIRS = [
+  new Set(["improving", "declining"]),
+  new Set(["improving", "worsening"]),
+  new Set(["increasing", "decreasing"]),
+  new Set(["increasing", "dropping"]),
+  new Set(["falling", "recovering"]),
+  new Set(["falling", "rising"]),
+  new Set(["better", "worse"]),
+  new Set(["up", "down"]),
+  new Set(["higher", "lower"]),
+  new Set(["dropped", "recovered"]),
+  new Set(["dropped", "rose"]),
+];
+
+export function calculateSemanticSimilarity(text1: string, text2: string): number {
+  const normalize = (t: string) => t.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 0 && !STOP_WORDS.has(w));
+  const words1 = new Set(normalize(text1));
+  const words2 = new Set(normalize(text2));
+  
+  for (const pair of OPPOSING_PAIRS) {
+    const arr = Array.from(pair);
+    if ((words1.has(arr[0]) && words2.has(arr[1])) || (words1.has(arr[1]) && words2.has(arr[0]))) {
+      return 0; // Materially different meaning
+    }
+  }
+
+  const intersection = new Set([...words1].filter(x => words2.has(x)));
+  const union = new Set([...words1, ...words2]);
+  
+  if (union.size === 0) return 0;
+  
+  const jaccard = intersection.size / union.size;
+  if (union.size < 4 && jaccard <= 0.66) return 0; // Safe-guard short strings
+  
+  return jaccard;
+}
+
+async function executeGenerateInsight(userId: number, args: Record<string, any>) {
+  const { category, content } = args;
+  if (!category || !content) return { error: "Missing category or content." };
+  
+  if (content.length > 200) return { error: "Content too long (max 200 chars)." };
+
+  const validCategories = ["coaching", "trend", "recommendation", "warning"];
+  if (!validCategories.includes(category)) {
+    return { error: `Invalid category. Must be one of: ${validCategories.join(", ")}` };
+  }
+
+  const now = new Date();
+  
+  // 1. Cooldown check (60 minutes)
+  const cooldownThreshold = new Date(now.getTime() - 60 * 60 * 1000);
+  const recentInsight = await prisma.aiInsight.findFirst({
+    where: { userId, createdAt: { gte: cooldownThreshold } },
+    select: { id: true }
+  });
+  if (recentInsight) {
+    return { error: "Cooldown active. An insight was already generated in the last 60 minutes." };
+  }
+
+  // 2. Daily limit check (3 per day)
+  const tz = await getUserTimezone(userId);
+  const todayStartUtc = TimezoneService.getStartOfDayUTC(tz, now);
+  const todaysInsightsCount = await prisma.aiInsight.count({
+    where: { userId, createdAt: { gte: todayStartUtc } }
+  });
+  if (todaysInsightsCount >= 3) {
+    return { error: "Daily insight limit reached." };
+  }
+
+  // 3. Exact Duplicate check
+  const strictExactDuplicate = await prisma.aiInsight.findFirst({
+    where: { userId, content }
+  });
+  if (strictExactDuplicate) {
+    return { error: "An identical insight has already been saved previously." };
+  }
+
+  // 4. Bounded Semantic Deduplication
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const recentHistory = await prisma.aiInsight.findMany({
+    where: { userId, createdAt: { gte: sevenDaysAgo } },
+    orderBy: { createdAt: 'desc' },
+    take: 20,
+    select: { content: true }
+  });
+
+  const normalizedNew = content.trim().toLowerCase().replace(/[^\w\s]/g, "");
+  for (const past of recentHistory) {
+    // Check normalized exact duplicate first
+    if (past.content.trim().toLowerCase().replace(/[^\w\s]/g, "") === normalizedNew) {
+      return { error: "An identical insight has already been saved previously." };
+    }
+    
+    // Check Jaccard similarity
+    const similarity = calculateSemanticSimilarity(content, past.content);
+    if (similarity > INSIGHT_SIMILARITY_THRESHOLD) {
+      return { error: "A semantically similar insight was recently generated." };
+    }
+  }
+
+  await prisma.aiInsight.create({
+    data: { userId, category, content }
+  });
+
+  return { success: true, message: "Insight successfully saved to user dashboard." };
+}
+
+async function executeGetAppState(userId: number) {
+  const [user, goals] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        level: true,
+        hunterRank: true,
+        currentXP: true,
+        xpToNextLevel: true,
+        sylph: true,
+        hp: true,
+        maxHp: true,
+        streakDays: true,
+      }
+    }),
+    prisma.goal.findMany({
+      where: { userId, status: "ACTIVE" },
+      select: { title: true, effortLevel: true }
+    })
+  ]);
+
+  if (!user) return { error: "User not found." };
+  return { 
+    ...user, 
+    activeGoals: goals 
+  };
+}
+
+async function executeGetShopInventory() {
+  return {
+    items: SHOP_ITEMS.map(item => ({
+      key: item.itemKey,
+      name: item.name,
+      cost: item.price,
+      effect: item.description
+    }))
   };
 }

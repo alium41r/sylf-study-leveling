@@ -29,7 +29,7 @@ export default function SidebarWrapper() {
           minWidth: isCollapsed
             ? "var(--sidebar-collapsed-width)"
             : "var(--sidebar-width)",
-          transition: "width 0.3s ease, min-width 0.3s ease",
+          transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
           flexShrink: 0,
         }}
       />

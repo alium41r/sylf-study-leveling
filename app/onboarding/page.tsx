@@ -7,6 +7,7 @@ import { useAuth } from "../components/AuthProvider";
 import { COSMETICS_CATALOG, CosmeticItem } from "@/lib/cosmetics-catalog";
 import { THEME_MAP, BG_MAP } from "../components/GlobalSystemWrapper";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import { Moon, Sun, Sparkles, Check } from "lucide-react";
 
 // --- Extensible Onboarding Types ---
 type OnboardingStep = "BOOT" | "IDENTITY" | "CLASS" | "BACKGROUND" | "THEME" | "INITIALIZING";
@@ -23,10 +24,16 @@ export default function OnboardingFlow() {
   const [scholarPassword, setScholarPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Cosmetic Selections
+  // Live Username Availability Check (Identity Step)
+  const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
+  const [usernameMsg, setUsernameMsg] = useState("");
+  const usernameDebounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cosmetic & Mode Selections
   const [selectedClass, setSelectedClass] = useState<string | null>("class_scholar");
   const [selectedBackground, setSelectedBackground] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
+  const [selectedMode, setSelectedMode] = useState<"dark" | "light">("dark");
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -46,6 +53,79 @@ export default function OnboardingFlow() {
       }
     }
   }, [user, router]);
+
+  // Read initial saved mode from localStorage if any
+  useEffect(() => {
+    const savedMode = (localStorage.getItem("app_mode") as "dark" | "light") || "dark";
+    setSelectedMode(savedMode);
+    document.documentElement.setAttribute("data-mode", savedMode);
+  }, []);
+
+  // Debounced check username availability for Identity Step
+  useEffect(() => {
+    if (usernameDebounceRef.current) {
+      clearTimeout(usernameDebounceRef.current);
+    }
+
+    if (!scholarUsername) {
+      setUsernameStatus("idle");
+      setUsernameMsg("");
+      return;
+    }
+
+    if (scholarUsername.length < 3) {
+      setUsernameStatus("invalid");
+      setUsernameMsg("Username must be at least 3 characters.");
+      return;
+    }
+
+    if (!/^[a-z0-9_]+$/.test(scholarUsername)) {
+      setUsernameStatus("invalid");
+      setUsernameMsg("Only lowercase letters, numbers, and underscores allowed.");
+      return;
+    }
+
+    setUsernameStatus("checking");
+    setUsernameMsg("Checking availability...");
+
+    usernameDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(scholarUsername)}`);
+        const data = await res.json();
+        if (data.available) {
+          setUsernameStatus("available");
+          setUsernameMsg("✓ Username is available");
+        } else {
+          setUsernameStatus("taken");
+          setUsernameMsg(data.error || "This username is already taken.");
+        }
+      } catch {
+        setUsernameStatus("idle");
+        setUsernameMsg("");
+      }
+    }, 350);
+
+    return () => {
+      if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current);
+    };
+  }, [scholarUsername]);
+
+  // Mode selection toggle
+  const handleModeChange = (newMode: "dark" | "light") => {
+    setSelectedMode(newMode);
+    localStorage.setItem("app_mode", newMode);
+    document.documentElement.setAttribute("data-mode", newMode);
+
+    if (selectedBackground && BG_MAP[selectedBackground]) {
+      document.body.style.background = newMode === "light" ? BG_MAP[selectedBackground].lightValue : BG_MAP[selectedBackground].value;
+      document.body.style.backgroundSize = BG_MAP[selectedBackground].size || "cover";
+      document.body.style.backgroundAttachment = "fixed";
+    } else {
+      document.body.style.background = newMode === "light" ? BG_MAP["void"].lightValue : BG_MAP["void"].value;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundAttachment = "fixed";
+    }
+  };
 
   // Determine if user registered via Google (no credentials password set)
   const isGoogleSignup = user ? user.hasPassword === false : false;
@@ -93,11 +173,11 @@ export default function OnboardingFlow() {
     }
     
     if (selectedBackground && BG_MAP[selectedBackground]) {
-      document.body.style.background = BG_MAP[selectedBackground].value;
+      document.body.style.background = selectedMode === "light" ? BG_MAP[selectedBackground].lightValue : BG_MAP[selectedBackground].value;
       document.body.style.backgroundSize = BG_MAP[selectedBackground].size || "cover";
       document.body.style.backgroundAttachment = "fixed";
     }
-  }, [selectedTheme, selectedBackground]);
+  }, [selectedTheme, selectedBackground, selectedMode]);
 
   const submitOnboarding = async () => {
     if (!token && !user) return;
@@ -142,6 +222,7 @@ export default function OnboardingFlow() {
       // Pre-save preferences to localStorage for GlobalSystemWrapper
       if (selectedTheme) localStorage.setItem("app_theme", selectedTheme);
       if (selectedBackground) localStorage.setItem("app_background", selectedBackground);
+      localStorage.setItem("app_mode", selectedMode);
 
       // Mutate user and session token so Edge route guard allows /dashboard
       if (data.token && data.user) {
@@ -199,12 +280,18 @@ export default function OnboardingFlow() {
             name={scholarName}
             password={scholarPassword}
             showPassword={showPassword}
+            usernameStatus={usernameStatus}
+            usernameMsg={usernameMsg}
             onUsernameChange={(val) => setScholarUsername(val.toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20))}
             onNameChange={setScholarName}
             onPasswordChange={setScholarPassword}
             onToggleShowPassword={() => setShowPassword(!showPassword)}
             onNext={nextStep}
-            canProceed={scholarUsername.length >= 3 && scholarName.trim().length > 0}
+            canProceed={
+              scholarUsername.length >= 3 &&
+              usernameStatus === "available" &&
+              scholarName.trim().length > 0
+            }
           />
         )}
         
@@ -237,13 +324,15 @@ export default function OnboardingFlow() {
         )}
 
         {currentStep === "THEME" && (
-          <SelectionStep 
+          <ThemeAndModeStep 
             key="theme"
             title="CALIBRATE RESONANCE"
-            subtitle="Choose your core system aura."
+            subtitle="Choose your core system aura and interface appearance."
             items={COSMETICS_CATALOG.THEME}
-            selectedId={selectedTheme}
-            onSelect={setSelectedTheme}
+            selectedThemeId={selectedTheme}
+            selectedMode={selectedMode}
+            onSelectTheme={setSelectedTheme}
+            onSelectMode={handleModeChange}
             onNext={nextStep}
             onPrev={prevStep}
             canProceed={!!selectedTheme}
@@ -375,6 +464,8 @@ interface IdentityStepProps {
   name: string;
   password: string;
   showPassword: boolean;
+  usernameStatus: "idle" | "checking" | "available" | "taken" | "invalid";
+  usernameMsg: string;
   onUsernameChange: (val: string) => void;
   onNameChange: (val: string) => void;
   onPasswordChange: (val: string) => void;
@@ -389,6 +480,8 @@ function IdentityStep({
   name,
   password,
   showPassword,
+  usernameStatus,
+  usernameMsg,
   onUsernameChange,
   onNameChange,
   onPasswordChange,
@@ -452,19 +545,46 @@ function IdentityStep({
 
         <div>
           <label className="stat-label block mb-1">Scholar Username</label>
-          <input
-            type="text"
-            placeholder="shadow_monarch"
-            required
-            minLength={3}
-            maxLength={20}
-            value={username}
-            onChange={(e) => onUsernameChange(e.target.value)}
-            className="input-field font-mono text-sm"
-          />
-          <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
-            3-20 characters: lowercase letters, numbers, and underscores only.
-          </p>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="shadow_monarch"
+              required
+              minLength={3}
+              maxLength={20}
+              value={username}
+              onChange={(e) => onUsernameChange(e.target.value)}
+              className={`input-field font-mono text-sm pr-8 ${
+                usernameStatus === "taken" || usernameStatus === "invalid"
+                  ? "border-red-500/70 focus:border-red-500"
+                  : usernameStatus === "available"
+                  ? "border-green-500/70 focus:border-green-500"
+                  : ""
+              }`}
+            />
+            {usernameStatus === "checking" && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
+            )}
+          </div>
+
+          {/* Real-time username feedback */}
+          {usernameMsg ? (
+            <p
+              className={`text-xs mt-1 font-['Rajdhani'] font-semibold ${
+                usernameStatus === "taken" || usernameStatus === "invalid"
+                  ? "text-red-400"
+                  : usernameStatus === "available"
+                  ? "text-green-400"
+                  : "text-text-muted"
+              }`}
+            >
+              {usernameMsg}
+            </p>
+          ) : (
+            <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+              3-20 characters: lowercase letters, numbers, and underscores only.
+            </p>
+          )}
         </div>
 
         <div>
@@ -594,13 +714,6 @@ function SelectionStep({
                        style={{ background: BG_MAP[item.value]?.value || "#000" }}>
                   </div>
                 )}
-                {item.category === "THEME" && (
-                  <div className="w-full h-24 mb-4 rounded-lg flex items-center justify-center border border-gray-700/50"
-                       style={{ backgroundColor: THEME_MAP[item.value]?.["--accent-primary-dim"] || "#222" }}>
-                    <div className="w-8 h-8 rounded-full shadow-lg" 
-                         style={{ backgroundColor: THEME_MAP[item.value]?.["--accent-primary"] || "#fff" }}></div>
-                  </div>
-                )}
 
                 <div className="flex justify-between items-start mb-2 relative z-10">
                   <h3 className="font-bold text-lg text-white font-rajdhani tracking-wide">{item.name}</h3>
@@ -631,6 +744,207 @@ function SelectionStep({
             Go Back
           </button>
         ) : <div></div>}
+
+        <button 
+          onClick={onNext}
+          disabled={!canProceed}
+          className={`px-8 py-3 rounded font-bold tracking-widest uppercase transition-all duration-300 relative overflow-hidden
+            ${canProceed 
+              ? "bg-[var(--accent-primary)] text-white shadow-[0_0_15px_var(--accent-primary-mid)] hover:scale-105" 
+              : "bg-bg-shadow text-text-muted cursor-not-allowed"}
+          `}
+        >
+          {nextLabel}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+interface ThemeAndModeStepProps {
+  title: string;
+  subtitle: string;
+  items: CosmeticItem[];
+  selectedThemeId: string | null;
+  selectedMode: "dark" | "light";
+  onSelectTheme: (id: string) => void;
+  onSelectMode: (mode: "dark" | "light") => void;
+  onNext: () => void;
+  onPrev?: () => void;
+  canProceed: boolean;
+  nextLabel?: string;
+}
+
+function ThemeAndModeStep({
+  title,
+  subtitle,
+  items,
+  selectedThemeId,
+  selectedMode,
+  onSelectTheme,
+  onSelectMode,
+  onNext,
+  onPrev,
+  canProceed,
+  nextLabel = "COMPLETE SETUP",
+}: ThemeAndModeStepProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="w-full max-w-6xl p-6 sm:p-8 z-10 flex flex-col h-[88vh]"
+    >
+      <div className="text-center mb-6">
+        <h2
+          className="text-4xl font-bold tracking-widest uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+          style={{ fontFamily: "var(--font-rajdhani)" }}
+        >
+          {title}
+        </h2>
+        <p className="text-text-muted mt-2 text-sm uppercase tracking-wider">{subtitle}</p>
+      </div>
+
+      <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 pb-8 flex flex-col gap-6">
+        {/* ─── Mode Selection (Dark vs Light) ─── */}
+        <div className="bg-bg-abyss/80 border border-white/10 p-5 rounded-2xl flex flex-col gap-3 shadow-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>INTERFACE MODE</span>
+            </span>
+            <span className="text-[11px] text-text-muted font-['Rajdhani']">
+              Select daylight or stealth contrast
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Dark Mode Card */}
+            <button
+              type="button"
+              onClick={() => onSelectMode("dark")}
+              className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between group ${
+                selectedMode === "dark"
+                  ? "bg-accent-primary-dim/30 border-accent-primary shadow-[0_0_15px_rgba(124,58,237,0.3)] scale-[1.02]"
+                  : "bg-bg-panel/60 border-white/10 hover:border-white/20 hover:bg-bg-panel"
+              }`}
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-black border border-white/10 flex items-center justify-center text-accent-primary shadow-inner">
+                  <Moon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm font-['Rajdhani'] text-white">Dark Mode (Default)</h4>
+                  <p className="text-xs text-text-muted font-['Rajdhani']">Stealth black & glowing neon atmosphere</p>
+                </div>
+              </div>
+              <div
+                className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                  selectedMode === "dark" ? "border-accent-primary bg-accent-primary text-white" : "border-white/20"
+                }`}
+              >
+                {selectedMode === "dark" && <Check className="w-3 h-3 stroke-[3]" />}
+              </div>
+            </button>
+
+            {/* Light Mode Card */}
+            <button
+              type="button"
+              onClick={() => onSelectMode("light")}
+              className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between group ${
+                selectedMode === "light"
+                  ? "bg-accent-primary-dim/30 border-accent-primary shadow-[0_0_15px_rgba(124,58,237,0.3)] scale-[1.02]"
+                  : "bg-bg-panel/60 border-white/10 hover:border-white/20 hover:bg-bg-panel"
+              }`}
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-amber-500 shadow-inner">
+                  <Sun className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm font-['Rajdhani'] text-white">Light Mode</h4>
+                  <p className="text-xs text-text-muted font-['Rajdhani']">High-contrast clean daylight interface</p>
+                </div>
+              </div>
+              <div
+                className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                  selectedMode === "light" ? "border-accent-primary bg-accent-primary text-white" : "border-white/20"
+                }`}
+              >
+                {selectedMode === "light" && <Check className="w-3 h-3 stroke-[3]" />}
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* ─── Themes Grid ─── */}
+        <div>
+          <div className="mb-3">
+            <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-text-muted">
+              SYSTEM RESONANCE AURAS
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {items.map((item: CosmeticItem, idx: number) => {
+              const isSelected = selectedThemeId === item.id;
+              return (
+                <motion.button
+                  key={item.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  onClick={() => onSelectTheme(item.id)}
+                  className={`relative p-6 text-left border rounded-xl overflow-hidden transition-all duration-300 group
+                    ${
+                      isSelected
+                        ? "border-[var(--accent-primary)] bg-[var(--accent-primary-dim)] shadow-[0_0_20px_var(--accent-primary-mid)] scale-[1.03] z-10"
+                        : "border-border-subtle bg-bg-abyss hover:border-border-active hover:bg-bg-panel z-0 hover:z-10 hover:scale-[1.01]"
+                    }
+                  `}
+                >
+                  <div
+                    className="w-full h-24 mb-4 rounded-lg flex items-center justify-center border border-gray-700/50"
+                    style={{ backgroundColor: THEME_MAP[item.value]?.["--accent-primary-dim"] || "#222" }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-full shadow-lg"
+                      style={{ backgroundColor: THEME_MAP[item.value]?.["--accent-primary"] || "#fff" }}
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-start mb-2 relative z-10">
+                    <h3 className="font-bold text-lg text-white font-rajdhani tracking-wide">{item.name}</h3>
+                    {isSelected && (
+                      <motion.div layoutId="selectedThemeBadge" className="text-[var(--accent-primary)]">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      </motion.div>
+                    )}
+                  </div>
+                  <p className="text-sm text-text-muted relative z-10">{item.description}</p>
+
+                  {/* Hover Glow */}
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500"
+                    style={{ background: "radial-gradient(circle at center, var(--accent-primary-dim) 0%, transparent 70%)" }}
+                  />
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between mt-6 pt-6 border-t border-gray-800">
+        {onPrev ? (
+          <button 
+            onClick={onPrev}
+            className="px-6 py-3 rounded text-text-muted hover:text-text-primary transition-colors tracking-widest text-sm uppercase"
+          >
+            Go Back
+          </button>
+        ) : <div />}
 
         <button 
           onClick={onNext}

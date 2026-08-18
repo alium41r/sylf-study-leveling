@@ -46,7 +46,18 @@ export async function POST(
           content: body.content.trim(),
         },
         include: {
-          sender: { select: { id: true, name: true, username: true, hunterRank: true } },
+          sender: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              hunterRank: true,
+              level: true,
+              avatarUrl: true,
+              activeAvatar: true,
+              activeTitle: true,
+            },
+          },
         },
       }),
       prisma.conversation.update({

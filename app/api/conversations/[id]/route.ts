@@ -49,7 +49,22 @@ export async function GET(
           participants: {
             include: {
               user: {
-                select: { id: true, name: true, username: true, hunterRank: true, lastSeenAt: true },
+                select: {
+                  id: true,
+                  name: true,
+                  username: true,
+                  hunterRank: true,
+                  level: true,
+                  avatarUrl: true,
+                  activeAvatar: true,
+                  activeFrame: true,
+                  activeTitle: true,
+                  characterConfig: true,
+                  bio: true,
+                  bannerUrl: true,
+                  createdAt: true,
+                  lastSeenAt: true,
+                },
               },
             },
           },
@@ -58,7 +73,18 @@ export async function GET(
       prisma.message.findMany({
         where: whereClause,
         include: {
-          sender: { select: { id: true, name: true, username: true, hunterRank: true } },
+          sender: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              hunterRank: true,
+              level: true,
+              avatarUrl: true,
+              activeAvatar: true,
+              activeTitle: true,
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
         take: limit,
@@ -81,14 +107,25 @@ export async function GET(
         name: conversation.name,
         isGroup: conversation.isGroup,
         createdBy: conversation.createdBy,
+        createdAt: conversation.createdAt,
         participants: conversation.participants.map((p: any) => ({
           id: p.user.id,
           name: p.user.name,
           username: p.user.username,
           hunterRank: p.user.hunterRank,
+          level: p.user.level || 1,
+          avatarUrl: p.user.avatarUrl,
+          activeAvatar: p.user.activeAvatar || "class_scholar",
+          activeFrame: p.user.activeFrame || "frame_default",
+          activeTitle: p.user.activeTitle,
+          characterConfig: p.user.characterConfig,
+          bio: p.user.bio,
+          bannerUrl: p.user.bannerUrl,
+          createdAt: p.user.createdAt,
           isOnline: p.user.lastSeenAt
             ? p.user.lastSeenAt >= new Date(Date.now() - 2 * 60 * 1000)
             : false,
+          lastSeenAt: p.user.lastSeenAt,
         })),
       },
       messages: messages.reverse(), // Return in chronological order

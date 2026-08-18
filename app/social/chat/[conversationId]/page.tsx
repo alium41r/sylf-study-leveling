@@ -1,68 +1,67 @@
 "use client";
 
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef, use, useMemo } from "react";
 import { useAuth } from "../../../components/AuthProvider";
-import Link from "next/link";
+import { useProfileModal } from "@/app/components/ProfileModalContext";
 import { useRouter } from "next/navigation";
+import { ChatHeader, ConversationDetail } from "../../components/ChatHeader";
+import { MessageItem, ChatMessage } from "../../components/MessageItem";
+import { ChatInputBar } from "../../components/ChatInputBar";
+import { ChatDetailsDrawer } from "../../components/ChatDetailsDrawer";
+import { ChatEmptyState } from "../../components/ChatEmptyState";
+import { AlertCircle, X } from "lucide-react";
 
-interface Participant {
-  id: number;
-  name: string | null;
-  username: string;
-  hunterRank: string;
-  isOnline: boolean;
-}
-
-interface Conversation {
-  id: number;
-  name: string;
-  isGroup: boolean;
-  createdBy: number;
-  participants: Participant[];
-}
-
-interface Message {
-  id: number;
-  content: string;
-  createdAt: string;
-  senderId: number;
-  sender: {
-    id: number;
-    name: string | null;
-    username: string;
-    hunterRank: string;
-  };
-}
-
-export default function ChatPage({ params }: { params: Promise<{ conversationId: string }> }) {
+export default function ModernChatPage({
+  params,
+}: {
+  params: Promise<{ conversationId: string }>;
+}) {
   const { user, token, isLoading } = useAuth();
+  const { openProfile } = useProfileModal();
   const router = useRouter();
   const { conversationId } = use(params);
 
-  const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [conversation, setConversation] = useState<ConversationDetail | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
-  const [showMembers, setShowMembers] = useState(false);
-  
-  // Member management
+  const [showDetails, setShowDetails] = useState(false);
+  const [errorToast, setErrorToast] = useState<string | null>(null);
+
+  // In-Chat Search
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<{id: number, username: string, name: string | null}[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
 
+  // Smart Scrolling Refs
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const hasInitialScrolled = useRef(false);
+  const isNearBottomRef = useRef(true);
+  const hasInitialScrolledRef = useRef(false);
+  const justSentMessageRef = useRef(false);
 
+  // Auto-dismiss error toast
+  useEffect(() => {
+    if (errorToast) {
+      const t = setTimeout(() => setErrorToast(null), 4000);
+      return () => clearTimeout(t);
+    }
+  }, [errorToast]);
+
+  // Fetch chat data
   const fetchChat = async (silent = false) => {
     if (!token) return;
     try {
       const res = await fetch(`/api/conversations/${conversationId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = await res.json();
         setConversation(data.conversation);
-        setMessages(data.messages);
+        setMessages((prev) => {
+          // Keep any pending optimistic messages that haven't resolved yet
+          const pendingOptimistic = prev.filter((m) => m.isOptimistic);
+          const serverMsgs: ChatMessage[] = data.messages || [];
+          return [...serverMsgs, ...pendingOptimistic];
+        });
       } else if (!silent) {
         router.push("/social");
       }
@@ -79,285 +78,343 @@ export default function ChatPage({ params }: { params: Promise<{ conversationId:
     }
   }, [token, conversationId]);
 
+  // Track if user is near bottom of scroll window (within 100px)
+  const handleScroll = () => {
+    if (!messagesContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    isNearBottomRef.current = distanceFromBottom <= 100;
+  };
+
+  // Smart Scroll Anchoring
   useEffect(() => {
-    if (messages.length > 0 && !hasInitialScrolled.current) {
+    if (messages.length === 0) return;
+
+    if (!hasInitialScrolledRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-      hasInitialScrolled.current = true;
-    } else if (messages.length > 0) {
-      // Auto-scroll on new message if already near bottom (simplified to just scroll)
+      hasInitialScrolledRef.current = true;
+    } else if (justSentMessageRef.current || isNearBottomRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      justSentMessageRef.current = false;
     }
   }, [messages]);
 
-  useEffect(() => {
-    if (!searchQuery || searchQuery.length < 2 || !token) {
-      setSearchResults([]);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          // filter out people who are already in the group
-          const currentMemberIds = conversation?.participants.map(p => p.id) || [];
-          setSearchResults(data.filter((u: any) => !currentMemberIds.includes(u.id)));
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchQuery, token, conversation?.participants]);
+  // Send Message with Optimistic Delivery
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || isSending || !user) return;
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || isSending) return;
+    const tempId = -Date.now();
+    const optimisticMsg: ChatMessage = {
+      id: tempId,
+      content,
+      createdAt: new Date().toISOString(),
+      senderId: user.id,
+      sender: {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        hunterRank: user.hunterRank || "E",
+        level: user.level,
+        avatarUrl: user.avatarUrl,
+        activeAvatar: user.activeAvatar,
+      },
+      isOptimistic: true,
+    };
 
+    justSentMessageRef.current = true;
+    setMessages((prev) => [...prev, optimisticMsg]);
     setIsSending(true);
+
     try {
       const res = await fetch(`/api/conversations/${conversationId}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ content: newMessage })
+        body: JSON.stringify({ content }),
       });
-      if (res.ok) {
-        const newMsg = await res.json();
-        setMessages(prev => [...prev, newMsg]);
-        setNewMessage("");
+
+      if (!res.ok) {
+        throw new Error("Failed to deliver message");
       }
-    } catch (err) {
-      console.error("Failed to send message", err);
+
+      const realMsg = await res.json();
+      setMessages((prev) => prev.map((m) => (m.id === tempId ? realMsg : m)));
+    } catch (err: any) {
+      console.error("Send message error:", err);
+      // Rollback optimistic message
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      setErrorToast("Failed to send message. Please try again.");
     } finally {
       setIsSending(false);
     }
   };
 
+  // Edit Message with Optimistic Rollback
+  const handleEditMessage = async (messageId: number, newContent: string) => {
+    const prevMessages = [...messages];
+
+    // Optimistically update
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, content: newContent } : m))
+    );
+
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/messages/${messageId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: newContent }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to edit message");
+      }
+
+      const updatedMsg = await res.json();
+      setMessages((prev) => prev.map((m) => (m.id === messageId ? updatedMsg : m)));
+    } catch (err: any) {
+      console.error("Edit message error:", err);
+      setMessages(prevMessages); // Rollback
+      setErrorToast("Unable to edit message. Reverting changes.");
+    }
+  };
+
+  // Delete Message with Optimistic Rollback
+  const handleDeleteMessage = async (messageId: number) => {
+    const prevMessages = [...messages];
+
+    // Optimistically remove
+    setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/messages/${messageId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete message");
+      }
+    } catch (err: any) {
+      console.error("Delete message error:", err);
+      setMessages(prevMessages); // Rollback
+      setErrorToast("Unable to delete message. Reverting.");
+    }
+  };
+
+  // Group Management Actions
   const handleAddMember = async (memberId: number) => {
     try {
       const res = await fetch(`/api/conversations/${conversationId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ addMemberIds: [memberId] })
+        body: JSON.stringify({ addMemberIds: [memberId] }),
       });
       if (res.ok) {
-        setSearchQuery("");
-        fetchChat();
+        fetchChat(true);
+      } else {
+        setErrorToast("Failed to add member to group.");
       }
     } catch (err) {
-      console.error("Failed to add member", err);
+      setErrorToast("Network error adding member.");
     }
   };
 
   const handleRemoveMember = async (memberId: number) => {
-    if (memberId === user?.id) return; // Can't remove self this way (needs leave feature)
     try {
       const res = await fetch(`/api/conversations/${conversationId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ removeMemberIds: [memberId] })
+        body: JSON.stringify({ removeMemberIds: [memberId] }),
       });
       if (res.ok) {
-        fetchChat();
+        fetchChat(true);
+      } else {
+        setErrorToast("Failed to remove member.");
       }
     } catch (err) {
-      console.error("Failed to remove member", err);
+      setErrorToast("Network error removing member.");
     }
   };
 
+  const handleUpdateGroupName = async (name: string) => {
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name }),
+      });
+      if (res.ok) {
+        fetchChat(true);
+      } else {
+        setErrorToast("Failed to rename group.");
+      }
+    } catch (err) {
+      setErrorToast("Network error renaming group.");
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    if (!user) return;
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ removeMemberIds: [user.id] }),
+      });
+      if (res.ok) {
+        router.push("/social");
+      } else {
+        setErrorToast("Failed to leave group.");
+      }
+    } catch (err) {
+      setErrorToast("Network error leaving group.");
+    }
+  };
+
+  const filteredMessages = useMemo(() => {
+    if (!searchQuery.trim()) return messages;
+    const q = searchQuery.toLowerCase();
+    return messages.filter((m) => m.content.toLowerCase().includes(q));
+  }, [messages, searchQuery]);
+
   if (isLoading || !user || !conversation) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-text-muted">Loading Chat...</p>
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
+          <p className="text-xs font-['Rajdhani'] uppercase tracking-widest text-text-muted">
+            Initializing Encrypted Frequency...
+          </p>
+        </div>
       </div>
     );
   }
 
-  const onlineCount = conversation.participants.filter(p => p.isOnline).length;
+  const otherParticipant = !conversation.isGroup
+    ? conversation.participants.find((p) => p.id !== user.id)
+    : null;
 
-  let displayName = conversation.name;
-  if (!conversation.isGroup) {
-    const otherParticipant = conversation.participants.find(p => p.id !== user.id);
-    displayName = otherParticipant?.name || otherParticipant?.username || "Unknown";
-  }
+  const displayName = conversation.isGroup
+    ? conversation.name || "Group Chat"
+    : otherParticipant?.name || otherParticipant?.username || "Scholar";
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)] max-w-5xl mx-auto p-4 sm:p-8">
-      {/* Header */}
-      <div className="system-card p-4 flex items-center justify-between mb-4 shrink-0 relative z-20">
-        <div className="flex items-center gap-4">
-          <Link href="/social" className="text-text-muted hover:text-text-primary transition-colors">
-            ← Back
-          </Link>
-          <div>
-            <h1 className="font-bold text-lg" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
-              {displayName}
-            </h1>
-            <p className="text-xs text-text-muted">
-              {conversation.isGroup 
-                ? `${conversation.participants.length} members • ${onlineCount} online`
-                : `${conversation.participants.find(p => p.id !== user.id)?.isOnline ? 'Online' : 'Offline'}`
-              }
-            </p>
-          </div>
-        </div>
-        {conversation.isGroup && (
-          <button 
-            onClick={() => setShowMembers(!showMembers)}
-            className="text-sm px-4 py-2 rounded transition-colors"
-            style={{ background: showMembers ? "var(--accent-primary-dim)" : "rgba(255,255,255,0.05)", color: "var(--text-primary)" }}
+    <div className="flex flex-col h-[calc(100vh-2rem)] max-w-5xl mx-auto p-2 sm:p-6 gap-3 relative">
+      {/* Floating Error Toast */}
+      {errorToast && (
+        <div className="fixed top-4 right-4 z-50 p-3.5 rounded-xl bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs font-['Rajdhani'] flex items-center gap-2 shadow-2xl backdrop-blur-md animate-fade-in-down">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>{errorToast}</span>
+          <button
+            type="button"
+            onClick={() => setErrorToast(null)}
+            className="p-1 hover:text-white ml-2 text-rose-400"
           >
-            Members
+            <X className="w-3.5 h-3.5" />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="flex flex-1 min-h-0 gap-4 relative">
-        {/* Main Chat Area */}
-        <div className="system-card flex-1 flex flex-col min-h-0 relative z-10 overflow-hidden">
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-text-secondary text-sm">No messages yet. Say hello!</p>
+      {/* ─── Interactive Chat Header ───────────────────────────── */}
+      <ChatHeader
+        conversation={conversation}
+        currentUserId={user.id}
+        onOpenDetails={() => setShowDetails(true)}
+        isSearchOpen={isSearchOpen}
+        onToggleSearch={() => {
+          setIsSearchOpen((prev) => !prev);
+          if (isSearchOpen) setSearchQuery("");
+        }}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+
+      {/* ─── Main Chat Viewport ────────────────────────────────── */}
+      <div className="system-card flex-1 flex flex-col min-h-0 rounded-2xl bg-bg-panel/70 border border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden relative">
+        {/* Message Stream Container */}
+        <div
+          ref={messagesContainerRef}
+          onScroll={handleScroll}
+          className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 space-y-3"
+        >
+          {filteredMessages.length === 0 ? (
+            searchQuery ? (
+              <div className="h-full flex items-center justify-center text-center p-8">
+                <p className="text-xs font-['Rajdhani'] text-text-muted">
+                  No messages matched &ldquo;{searchQuery}&rdquo;.
+                </p>
               </div>
             ) : (
-              messages.map((msg, i) => {
-                const isMe = msg.senderId === user.id;
-                const showHeader = i === 0 || messages[i - 1].senderId !== msg.senderId;
-                
-                return (
-                  <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                    {showHeader && (
-                      <div className={`flex items-center gap-2 mb-1 ${isMe ? 'flex-row-reverse' : ''}`}>
-                        <div className={`rank-badge rank-${msg.sender.hunterRank} w-6 h-6 text-[10px]`}>
-                          {msg.sender.hunterRank}
-                        </div>
-                        <span className="text-xs text-text-muted">{msg.sender.name || msg.sender.username}</span>
-                      </div>
-                    )}
-                    <div 
-                      className={`px-4 py-2 rounded-2xl max-w-[75%] break-words text-sm ${
-                        isMe 
-                          ? 'bg-accent-mid text-white rounded-tr-none' 
-                          : 'bg-bg-panel text-text-primary rounded-tl-none border border-border-subtle'
-                      }`}
-                    >
-                      {msg.content}
-                    </div>
-                    <span className="text-[10px] text-text-secondary mt-1">
-                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                );
-              })
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Area */}
-          <div className="p-4 border-t border-white/10 shrink-0">
-            <form onSubmit={handleSendMessage} className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                value={newMessage}
-                onChange={e => setNewMessage(e.target.value)}
-                className="input-field flex-1"
-                disabled={isSending}
+              <ChatEmptyState
+                isGroup={conversation.isGroup}
+                displayName={displayName}
+                onSelectPrompt={handleSendMessage}
               />
-              <button 
-                type="submit" 
-                disabled={!newMessage.trim() || isSending}
-                className="btn-primary px-6 disabled:opacity-50"
-              >
-                Send
-              </button>
-            </form>
-          </div>
+            )
+          ) : (
+            filteredMessages.map((msg, idx) => {
+              const isMe = msg.senderId === user.id;
+              const prevMsg = idx > 0 ? filteredMessages[idx - 1] : null;
+              
+              // Group consecutive messages from same sender within 5 minutes
+              const isSameSenderAsPrev = prevMsg?.senderId === msg.senderId;
+              const timeDiff = prevMsg
+                ? Math.abs(new Date(msg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime())
+                : Infinity;
+              const showHeader = !isSameSenderAsPrev || timeDiff > 5 * 60 * 1000;
+
+              return (
+                <MessageItem
+                  key={msg.id}
+                  message={msg}
+                  isMe={isMe}
+                  showHeader={showHeader}
+                  isGroup={conversation.isGroup}
+                  onEdit={handleEditMessage}
+                  onDelete={handleDeleteMessage}
+                  onOpenProfile={openProfile}
+                />
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Group Members Panel (Slide-in or inline side panel) */}
-        {conversation.isGroup && showMembers && (
-          <div className="system-card w-72 shrink-0 flex flex-col min-h-0 absolute right-0 top-0 bottom-0 z-20 md:relative md:w-80 border-l border-white/5 shadow-2xl">
-            <div className="p-4 border-b border-white/10">
-              <h2 className="font-bold text-sm" style={{ color: "var(--accent-text-light)", fontFamily: "'Rajdhani', sans-serif" }}>
-                GROUP MEMBERS
-              </h2>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {conversation.participants.map(p => (
-                <div key={p.id} className="flex items-center justify-between p-2 rounded hover:bg-white/5 group">
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className={`rank-badge rank-${p.hunterRank} w-8 h-8 text-xs`}>
-                        {p.hunterRank}
-                      </div>
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-[#050505] ${p.isOnline ? 'bg-green-500' : 'bg-gray-500'}`} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{p.name || p.username}</p>
-                    </div>
-                  </div>
-                  {p.id !== user.id && conversation.createdBy === user.id && (
-                    <button 
-                      onClick={() => handleRemoveMember(p.id)}
-                      className="text-xs text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="p-4 border-t border-white/10 bg-black/20">
-              <h3 className="text-xs tracking-widest text-gray-400 mb-2">ADD MEMBER</h3>
-              <input
-                type="text"
-                placeholder="Search scholar..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="input-field w-full text-sm mb-2"
-              />
-              <div className="max-h-32 overflow-y-auto space-y-1">
-                {isSearching ? (
-                  <p className="text-xs text-gray-500">Searching...</p>
-                ) : searchResults.length > 0 ? (
-                  searchResults.map(res => (
-                    <div key={res.id} className="flex items-center justify-between p-2 rounded bg-white/5">
-                      <span className="text-sm truncate pr-2">{res.name || res.username}</span>
-                      <button 
-                        onClick={() => handleAddMember(res.id)}
-                        className="text-xs text-accent-primary hover:text-accent-primary-light whitespace-nowrap"
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  ))
-                ) : searchQuery.length >= 2 ? (
-                  <p className="text-xs text-gray-500">No results</p>
-                ) : null}
-              </div>
-            </div>
-          </div>
-        )}
+        {/* ─── Modern Input Bar & Emoji Picker ───────────────────── */}
+        <ChatInputBar onSendMessage={handleSendMessage} isSending={isSending} />
       </div>
+
+      {/* ─── Instagram / Telegram Style Details Drawer ─────────── */}
+      <ChatDetailsDrawer
+        conversation={conversation}
+        currentUserId={user.id}
+        isOpen={showDetails}
+        onClose={() => setShowDetails(false)}
+        onAddMember={handleAddMember}
+        onRemoveMember={handleRemoveMember}
+        onLeaveGroup={handleLeaveGroup}
+        onUpdateGroupName={handleUpdateGroupName}
+        token={token}
+      />
     </div>
   );
 }

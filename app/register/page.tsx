@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../components/AuthProvider";
@@ -29,8 +29,62 @@ function RegisterForm() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Live Username Availability State
+  const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
+  const [usernameMsg, setUsernameMsg] = useState("");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const router = useRouter();
   const { login } = useAuth();
+
+  // Debounced check username availability
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    if (!username) {
+      setUsernameStatus("idle");
+      setUsernameMsg("");
+      return;
+    }
+
+    if (username.length < 3) {
+      setUsernameStatus("invalid");
+      setUsernameMsg("Username must be at least 3 characters.");
+      return;
+    }
+
+    if (!/^[a-z0-9_]+$/.test(username)) {
+      setUsernameStatus("invalid");
+      setUsernameMsg("Only lowercase letters, numbers, and underscores allowed.");
+      return;
+    }
+
+    setUsernameStatus("checking");
+    setUsernameMsg("Checking availability...");
+
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`);
+        const data = await res.json();
+        if (data.available) {
+          setUsernameStatus("available");
+          setUsernameMsg("✓ Username is available");
+        } else {
+          setUsernameStatus("taken");
+          setUsernameMsg(data.error || "This username is already taken.");
+        }
+      } catch {
+        setUsernameStatus("idle");
+        setUsernameMsg("");
+      }
+    }, 350);
+
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [username]);
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Live sanitize to lowercase alphanumeric and underscores
@@ -41,6 +95,16 @@ function RegisterForm() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (usernameStatus === "taken") {
+      setError("This username is already taken. Please choose another.");
+      return;
+    }
+
+    if (usernameStatus === "checking") {
+      return;
+    }
+
     setIsLoading(true);
 
     const validation = registerSchema.safeParse({ name, username, email, password });
@@ -80,6 +144,13 @@ function RegisterForm() {
       setIsLoading(false);
     }
   };
+
+  const isFormValid =
+    name.trim().length > 0 &&
+    username.length >= 3 &&
+    usernameStatus === "available" &&
+    email.includes("@") &&
+    password.length >= 6;
 
   return (
     <div
@@ -149,18 +220,18 @@ function RegisterForm() {
         {/* Divider */}
         <div className="relative my-6 text-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t" style={{ borderColor: "var(--border-subtle)" }} />
+            <div className="w-full border-t border-border-subtle" />
           </div>
           <span
-            className="relative px-3 text-[0.65rem] tracking-widest uppercase font-bold font-['Rajdhani']"
+            className="relative px-4 text-xs uppercase tracking-widest font-bold"
             style={{ background: "var(--bg-abyss)", color: "var(--text-muted)" }}
           >
-            OR MANUAL INITIALIZATION
+            OR CREDENTIALS
           </span>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleRegister} className="flex flex-col gap-4">
+        <form onSubmit={handleRegister} className="space-y-4">
           <div>
             <label className="stat-label block mb-1">Display Name</label>
             <input
@@ -177,20 +248,49 @@ function RegisterForm() {
 
           <div>
             <label className="stat-label block mb-1">Scholar Username</label>
-            <input
-              type="text"
-              placeholder="shadow_monarch"
-              required
-              minLength={3}
-              maxLength={20}
-              value={username}
-              onChange={handleUsernameChange}
-              className="input-field font-mono text-sm"
-              disabled={isLoading}
-            />
-            <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
-              3-20 characters: lowercase letters, numbers, and underscores only.
-            </p>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="shadow_monarch"
+                required
+                minLength={3}
+                maxLength={20}
+                value={username}
+                onChange={handleUsernameChange}
+                className={`input-field font-mono text-sm pr-8 ${
+                  usernameStatus === "taken" || usernameStatus === "invalid"
+                    ? "border-red-500/70 focus:border-red-500"
+                    : usernameStatus === "available"
+                    ? "border-green-500/70 focus:border-green-500"
+                    : ""
+                }`}
+                disabled={isLoading}
+              />
+              {usernameStatus === "checking" && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
+              )}
+            </div>
+
+            {/* Real-time username feedback */}
+            {usernameMsg && (
+              <p
+                className={`text-xs mt-1 font-['Rajdhani'] font-semibold ${
+                  usernameStatus === "taken" || usernameStatus === "invalid"
+                    ? "text-red-400"
+                    : usernameStatus === "available"
+                    ? "text-green-400"
+                    : "text-text-muted"
+                }`}
+              >
+                {usernameMsg}
+              </p>
+            )}
+
+            {!usernameMsg && (
+              <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+                3-20 characters: lowercase letters, numbers, and underscores only.
+              </p>
+            )}
           </div>
 
           <div>
@@ -245,8 +345,8 @@ function RegisterForm() {
           <button
             type="submit"
             className="btn-primary mt-2 w-full flex items-center justify-center gap-2"
-            disabled={isLoading}
-            style={{ opacity: isLoading ? 0.7 : 1 }}
+            disabled={isLoading || !isFormValid}
+            style={{ opacity: isLoading || !isFormValid ? 0.6 : 1, cursor: isFormValid ? "pointer" : "not-allowed" }}
           >
             {isLoading ? (
               <>
@@ -259,16 +359,19 @@ function RegisterForm() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs" style={{ color: "var(--text-muted)" }}>
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="font-bold transition-colors uppercase tracking-wider"
-            style={{ color: "var(--accent-primary-light)" }}
-          >
-            Sign in
-          </Link>
-        </p>
+        {/* Footer Link */}
+        <div className="text-center mt-6">
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            Already have an active link?{" "}
+            <Link
+              href="/login"
+              className="font-bold hover:underline"
+              style={{ color: "var(--accent-primary-light)" }}
+            >
+              Access System
+            </Link>
+          </p>
+        </div>
       </motion.div>
     </div>
   );
@@ -278,8 +381,11 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-void)" }}>
-          <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: "var(--accent-primary)", borderTopColor: "transparent" }} />
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: "var(--bg-void)", color: "var(--text-muted)" }}
+        >
+          Loading System Registration...
         </div>
       }
     >

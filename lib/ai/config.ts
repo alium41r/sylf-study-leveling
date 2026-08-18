@@ -26,7 +26,8 @@ export const AI_LIMITS = {
   /** Maximum agent handoffs per single chat request */
   maxHandoffs: 1,
   /** Timeout for a single AI chat request (ms) */
-  chatTimeoutMs: 60_000,
-  /** Timeout for a single AI planner request (ms) */
-  plannerTimeoutMs: 60_000,
+  chatTimeoutMs: 90_000,
+  /** Timeout for a single AI planner request (ms) - accommodates Google Search web grounding & multi-agent generation */
+  plannerTimeoutMs: 180_000,
 } as const;
+

@@ -200,7 +200,11 @@ export default function AiPlannerModal({
                   }, 1400);
                   return;
                 } else if (data.type === "error") {
-                  setError(data.message);
+                  const displayErr =
+                    data.message === "AI_TIMEOUT" || data.message?.includes("AI_TIMEOUT")
+                      ? "Generation took longer than expected while researching multiple topics. Please try again or refine your topic scope."
+                      : data.message || "Failed to generate study plan.";
+                  setError(displayErr);
                   setIsGenerating(false);
                   setThoughts([]);
                   return;
@@ -213,7 +217,11 @@ export default function AiPlannerModal({
         }
       }
     } catch (err: any) {
-      setError(err.message);
+      const displayErr =
+        err.message === "AI_TIMEOUT" || err.message?.includes("AI_TIMEOUT")
+          ? "Generation took longer than expected while researching multiple topics. Please try again."
+          : err.message || "Failed to generate study plan.";
+      setError(displayErr);
       setIsGenerating(false);
       setThoughts([]);
     }

@@ -8,6 +8,9 @@ import { AI_LIMITS } from "@/lib/ai/config";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
 
+export const dynamic = "force-dynamic";
+export const maxDuration = 120; // Extended execution window on Vercel for multi-agent reasoning
+
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
@@ -155,7 +158,11 @@ export async function POST(req: NextRequest) {
           controller.close();
         } catch (err: any) {
           console.error("Planner API Error:", err);
-          sendEvent("error", { message: err.message || "Failed to generate plan." });
+          const errorMsg =
+            err.message === "AI_TIMEOUT"
+              ? "The AI took longer than expected to research your topics. Please try again with a slightly more concise topic or syllabus."
+              : err.message || "Failed to generate plan.";
+          sendEvent("error", { message: errorMsg });
           controller.close();
         }
       },

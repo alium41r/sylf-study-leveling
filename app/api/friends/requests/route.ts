@@ -86,6 +86,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "You cannot add yourself" }, { status: 400 });
     }
 
+    // Check if either user has blocked the other
+    const { areUsersBlocked } = await import("@/lib/block-service");
+    const isBlocked = await areUsersBlocked(userId, targetUser.id);
+    if (isBlocked) {
+      return NextResponse.json({ error: "Unable to send friend request" }, { status: 403 });
+    }
+
     // Check if already friends
     const existingFriendship = await prisma.friendship.findFirst({
       where: {
@@ -119,6 +126,21 @@ export async function POST(req: NextRequest) {
         receiverId: targetUser.id,
       },
     });
+
+    // Create system notification for the receiver
+    const sender = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, username: true },
+    }).catch(() => null);
+    const senderLabel = sender?.name ? `${sender.name} (@${sender.username})` : `@${sender?.username || "A scholar"}`;
+
+    await prisma.systemMessage.create({
+      data: {
+        userId: targetUser.id,
+        type: "INFO",
+        content: `[FRIEND_REQUEST] **${senderLabel}** sent you a friend request.`,
+      },
+    }).catch(() => null);
 
     return NextResponse.json(request, { status: 201 });
   } catch (error) {

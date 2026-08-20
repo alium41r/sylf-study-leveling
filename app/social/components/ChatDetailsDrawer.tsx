@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProfileModal } from "@/app/components/ProfileModalContext";
 import {
@@ -18,6 +18,11 @@ import {
   Edit2,
   Trash2,
   Calendar,
+  Camera,
+  Upload,
+  Link2,
+  Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 import { ParticipantProfile, ConversationDetail } from "./ChatHeader";
 
@@ -30,6 +35,7 @@ interface ChatDetailsDrawerProps {
   onRemoveMember: (userId: number) => Promise<void>;
   onLeaveGroup: () => Promise<void>;
   onUpdateGroupName: (name: string) => Promise<void>;
+  onUpdateGroupAvatar?: (avatarUrl: string | null) => Promise<void>;
   token: string | null;
 }
 
@@ -42,21 +48,94 @@ export function ChatDetailsDrawer({
   onRemoveMember,
   onLeaveGroup,
   onUpdateGroupName,
+  onUpdateGroupAvatar,
   token,
 }: ChatDetailsDrawerProps) {
   const { openProfile } = useProfileModal();
   const [isMuted, setIsMuted] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [groupNameInput, setGroupNameInput] = useState(conversation.name || "");
+  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
+  const [avatarMode, setAvatarMode] = useState<"UPLOAD" | "URL">("UPLOAD");
+  const [previewAvatarUrl, setPreviewAvatarUrl] = useState<string>(conversation.avatarUrl || "");
+  const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+  const avatarFileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<{ id: number; username: string; name: string | null; hunterRank: string }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isAddingId, setIsAddingId] = useState<number | null>(null);
 
-  const isGroupAdmin = conversation.isGroup && conversation.createdBy === currentUserId;
+  const isGroupAdmin = conversation.isGroup && (conversation.createdBy === currentUserId || !conversation.createdBy);
   const otherParticipant = !conversation.isGroup
     ? conversation.participants.find((p) => p.id !== currentUserId)
     : null;
+
+  useEffect(() => {
+    setGroupNameInput(conversation.name || "");
+    setPreviewAvatarUrl(conversation.avatarUrl || "");
+  }, [conversation.name, conversation.avatarUrl]);
+
+  // Client-side Image Compression & Resizing (Max 400px for group avatar)
+  const processImageFile = (file: File, callback: (dataUrl: string) => void, maxDim: number = 400) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const rawUrl = e.target?.result as string;
+      if (!rawUrl) return;
+
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/webp", 0.85);
+          callback(compressed);
+        } else {
+          callback(rawUrl);
+        }
+      };
+      img.onerror = () => callback(rawUrl);
+      img.src = rawUrl;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveAvatar = async () => {
+    if (!onUpdateGroupAvatar) return;
+    setIsSavingAvatar(true);
+    try {
+      await onUpdateGroupAvatar(previewAvatarUrl.trim() || null);
+      setIsEditingAvatar(false);
+    } finally {
+      setIsSavingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!onUpdateGroupAvatar) return;
+    setIsSavingAvatar(true);
+    try {
+      await onUpdateGroupAvatar(null);
+      setPreviewAvatarUrl("");
+      setIsEditingAvatar(false);
+    } finally {
+      setIsSavingAvatar(false);
+    }
+  };
 
   // Search scholars for group invite
   useEffect(() => {
@@ -235,10 +314,51 @@ export function ChatDetailsDrawer({
               {conversation.isGroup && (
                 <div className="flex flex-col gap-6">
                   {/* Group Info Card */}
-                  <div className="p-5 rounded-2xl bg-bg-abyss/80 border border-white/10 flex flex-col gap-3 shadow-inner">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light font-bold shrink-0">
-                        <Users className="w-6 h-6" />
+                  <div className="p-5 rounded-2xl bg-bg-abyss/80 border border-white/10 flex flex-col gap-4 shadow-inner">
+                    <div className="flex items-center gap-3.5">
+                      {/* Group Avatar Thumbnail with Edit Overlay */}
+                      <div className="relative group/avatar shrink-0">
+                        <div className="w-14 h-14 rounded-2xl bg-accent-primary-dim border border-accent-primary-mid/60 flex items-center justify-center text-accent-text-light font-bold overflow-hidden shadow-md">
+                          {conversation.avatarUrl ? (
+                            <img
+                              src={conversation.avatarUrl}
+                              alt={conversation.name || "Group"}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Users className="w-6 h-6 text-accent-text-light" />
+                          )}
+                        </div>
+
+                        {/* Camera Overlay Button */}
+                        {isGroupAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsEditingAvatar((prev) => !prev);
+                              setPreviewAvatarUrl(conversation.avatarUrl || "");
+                            }}
+                            className="absolute inset-0 rounded-2xl bg-black/60 opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-opacity text-white"
+                            title="Change group image"
+                          >
+                            <Camera className="w-5 h-5 drop-shadow" />
+                          </button>
+                        )}
+
+                        {/* Bottom-right Camera Badge (Mobile/Quick Click) */}
+                        {isGroupAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsEditingAvatar((prev) => !prev);
+                              setPreviewAvatarUrl(conversation.avatarUrl || "");
+                            }}
+                            className="absolute -bottom-1 -right-1 p-1 rounded-full bg-accent-primary text-white border-2 border-bg-abyss shadow hover:scale-110 transition-transform"
+                            title="Change group image"
+                          >
+                            <Camera className="w-3 h-3" />
+                          </button>
+                        )}
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -279,8 +399,184 @@ export function ChatDetailsDrawer({
                         <p className="text-xs text-text-muted font-['Rajdhani']">
                           {conversation.participants.length} total members
                         </p>
+
+                        {isGroupAdmin && !isEditingAvatar && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsEditingAvatar(true);
+                              setPreviewAvatarUrl(conversation.avatarUrl || "");
+                            }}
+                            className="mt-1.5 text-[11px] font-['Rajdhani'] font-bold text-accent-text-light hover:underline flex items-center gap-1"
+                          >
+                            <Camera className="w-3 h-3 text-accent-primary" />
+                            <span>{conversation.avatarUrl ? "Change Group Image" : "Add Group Image"}</span>
+                          </button>
+                        )}
                       </div>
                     </div>
+
+                    {/* Expandable Group Avatar Editor */}
+                    <AnimatePresence>
+                      {isEditingAvatar && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="pt-3 border-t border-white/10 flex flex-col gap-3 overflow-hidden"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted">
+                              Group Image
+                            </span>
+                            {/* Mode Switcher Tabs */}
+                            <div className="flex items-center bg-bg-panel p-0.5 rounded-lg border border-white/10">
+                              <button
+                                type="button"
+                                onClick={() => setAvatarMode("UPLOAD")}
+                                className={`px-2.5 py-1 rounded-md text-[10px] font-bold font-['Rajdhani'] uppercase transition-all flex items-center gap-1 ${
+                                  avatarMode === "UPLOAD"
+                                    ? "bg-accent-primary text-white shadow-sm"
+                                    : "text-text-muted hover:text-text-primary"
+                                }`}
+                              >
+                                <Upload className="w-3 h-3" />
+                                <span>Upload</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAvatarMode("URL")}
+                                className={`px-2.5 py-1 rounded-md text-[10px] font-bold font-['Rajdhani'] uppercase transition-all flex items-center gap-1 ${
+                                  avatarMode === "URL"
+                                    ? "bg-accent-primary text-white shadow-sm"
+                                    : "text-text-muted hover:text-text-primary"
+                                }`}
+                              >
+                                <Link2 className="w-3 h-3" />
+                                <span>URL</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Hidden File Input */}
+                          <input
+                            ref={avatarFileInputRef}
+                            type="file"
+                            accept="image/png,image/jpeg,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                processImageFile(file, (compressedUrl) => setPreviewAvatarUrl(compressedUrl), 400);
+                              }
+                              e.target.value = "";
+                            }}
+                          />
+
+                          {/* Mode: File Upload */}
+                          {avatarMode === "UPLOAD" ? (
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-xl bg-bg-panel border border-white/10 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                                {previewAvatarUrl ? (
+                                  <img src={previewAvatarUrl} alt="Group Preview" className="w-full h-full object-cover" />
+                                ) : (
+                                  <Users className="w-5 h-5 text-text-muted" />
+                                )}
+                              </div>
+
+                              <div className="flex-1 flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => avatarFileInputRef.current?.click()}
+                                  className="flex-1 py-2 px-3 rounded-xl bg-bg-panel hover:bg-bg-shadow border border-white/10 hover:border-accent-primary/60 text-xs font-['Rajdhani'] font-bold text-text-primary flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                                >
+                                  <Upload className="w-3.5 h-3.5 text-accent-primary" />
+                                  <span>{previewAvatarUrl ? "Replace Group Image" : "Upload from Computer"}</span>
+                                </button>
+                                {previewAvatarUrl && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setPreviewAvatarUrl("")}
+                                    className="p-2 rounded-xl bg-bg-panel hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                                    title="Clear chosen file"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            /* Mode: URL */
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="url"
+                                value={previewAvatarUrl}
+                                onChange={(e) => setPreviewAvatarUrl(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" && previewAvatarUrl !== (conversation.avatarUrl || "")) {
+                                    handleSaveAvatar();
+                                  }
+                                }}
+                                placeholder="https://example.com/avatar.jpg"
+                                className="flex-1 rounded-xl px-3 py-2 bg-bg-panel border border-white/10 text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-all shadow-inner"
+                              />
+                              {previewAvatarUrl && (
+                                <button
+                                  type="button"
+                                  onClick={() => setPreviewAvatarUrl("")}
+                                  className="p-2 rounded-xl bg-bg-panel hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                                  title="Clear URL"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Action Buttons: Save / Remove / Cancel */}
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            {conversation.avatarUrl ? (
+                              <button
+                                type="button"
+                                disabled={isSavingAvatar}
+                                onClick={handleRemoveAvatar}
+                                className="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all flex items-center gap-1 disabled:opacity-50"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                <span>Remove Image</span>
+                              </button>
+                            ) : <div />}
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={isSavingAvatar}
+                                onClick={() => {
+                                  setIsEditingAvatar(false);
+                                  setPreviewAvatarUrl(conversation.avatarUrl || "");
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-bg-panel hover:bg-white/10 text-text-muted hover:text-text-primary text-xs font-['Rajdhani'] font-bold uppercase transition-all"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                disabled={isSavingAvatar || previewAvatarUrl === (conversation.avatarUrl || "")}
+                                onClick={handleSaveAvatar}
+                                className="btn-primary px-3.5 py-1.5 text-xs font-['Rajdhani'] font-bold uppercase tracking-wider flex items-center gap-1.5 disabled:opacity-50"
+                              >
+                                {isSavingAvatar ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <Check className="w-3.5 h-3.5" />
+                                )}
+                                <span>Save Image</span>
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
 
                   {/* Member Roster */}

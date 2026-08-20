@@ -45,6 +45,12 @@ export async function PATCH(
       const lowId = Math.min(friendRequest.senderId, friendRequest.receiverId);
       const highId = Math.max(friendRequest.senderId, friendRequest.receiverId);
 
+      const receiver = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true, username: true },
+      }).catch(() => null);
+      const receiverLabel = receiver?.name ? `${receiver.name} (@${receiver.username})` : `@${receiver?.username || "A scholar"}`;
+
       await prisma.$transaction([
         prisma.friendRequest.update({
           where: { id: requestId },
@@ -52,6 +58,13 @@ export async function PATCH(
         }),
         prisma.friendship.create({
           data: { userId: lowId, friendId: highId },
+        }),
+        prisma.systemMessage.create({
+          data: {
+            userId: friendRequest.senderId,
+            type: "INFO",
+            content: `[FRIEND_REQUEST] **${receiverLabel}** accepted your friend request. You are now study friends!`,
+          },
         }),
       ]);
     } else {

@@ -24,6 +24,7 @@ export interface StudyPlanResult {
   goalTitle: string;
   goalDescription: string;
   quests: GeneratedQuest[];
+  modelUsed?: string;
 }
 
 export class AiStudyOrchestrator {
@@ -36,11 +37,11 @@ export class AiStudyOrchestrator {
     topic: string, 
     syllabus: string, 
     onProgress?: (msg: string) => void
-  ): Promise<string> {
+  ): Promise<{ data: string; model: string }> {
     const hasSyllabus = !!syllabus && syllabus.trim().length > 0;
     const searchTarget = hasSyllabus ? `${topic} (Scope: ${syllabus})` : topic;
     
-    onProgress?.(`[Researcher] Initiating curriculum research and web search for "${searchTarget}"...`);
+    onProgress?.(`[Researcher • Gemini 2.5 Flash] Initiating curriculum research and web search for "${searchTarget}"...`);
 
     const searchPrompt = `Search and retrieve the EXACT official curriculum / syllabus chapter breakdown for:
 Topic/Subject: "${topic}"
@@ -80,24 +81,25 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
           tools: [{ googleSearch: {} }],
         }
       });
-      onProgress?.(`[Researcher] Gathered exact curriculum and difficulty data.`);
-      return response.text || "No research data found.";
+      onProgress?.(`[Researcher • Gemini 2.5 Flash] Gathered exact curriculum and difficulty data.`);
+      return { data: response.text || "No research data found.", model: "Gemini 2.5 Flash" };
     } catch (e) {
       console.warn("[Researcher Agent] Gemini Search failed. Falling back to Groq...", e);
       try {
+        const groqModel = process.env.GROQ_MODEL || "qwen/qwen3.6-27b";
         const groqRes = await groq.chat.completions.create({
-          model: process.env.GROQ_MODEL || "qwen/qwen3.6-27b",
+          model: groqModel,
           messages: [
             { role: "system", content: systemInstruction },
             { role: "user", content: searchPrompt }
           ],
         });
-        onProgress?.(`[Researcher (Fallback)] Gathered knowledge-base curriculum data.`);
-        return groqRes.choices[0]?.message?.content || "No research data found.";
+        onProgress?.(`[Researcher • Groq (${groqModel})] Gathered knowledge-base curriculum data.`);
+        return { data: groqRes.choices[0]?.message?.content || "No research data found.", model: `Groq (${groqModel})` };
       } catch (groqErr) {
         console.error("[Researcher Agent] Groq fallback also failed:", groqErr);
         onProgress?.(`[Researcher] Web search failed. Proceeding with general knowledge.`);
-        return "Could not complete web research. Proceeding with general knowledge.";
+        return { data: "Could not complete web research. Proceeding with general knowledge.", model: "Gemini 2.5 Flash" };
       }
     }
   }
@@ -106,11 +108,11 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
    * 2. Analyst Agent
    * Reviews past study sessions and determines the user's optimal study pattern.
    */
-  private static async runAnalystAgent(pastSessions: StudySessionData[], onProgress?: (msg: string) => void): Promise<string> {
-    onProgress?.(`[Analyst] Reviewing ${pastSessions.length} past study sessions...`);
+  private static async runAnalystAgent(pastSessions: StudySessionData[], onProgress?: (msg: string) => void): Promise<{ data: string; model: string }> {
+    onProgress?.(`[Analyst • Gemini 2.5 Flash] Reviewing ${pastSessions.length} past study sessions...`);
     if (!pastSessions || pastSessions.length === 0) {
-      onProgress?.(`[Analyst] No past history. Recommending standard 45-min Pomodoro sessions.`);
-      return "User has no past study history. Assume standard 45-minute Pomodoro sessions.";
+      onProgress?.(`[Analyst • Gemini 2.5 Flash] No past history. Recommending standard 45-min Pomodoro sessions.`);
+      return { data: "User has no past study history. Assume standard 45-minute Pomodoro sessions.", model: "Gemini 2.5 Flash" };
     }
 
     const prompt = `Analyze these past study sessions and give me a 2-sentence summary of the user's ideal study duration (in minutes) and their focus rate pattern. Sessions: ${JSON.stringify(pastSessions)}`;
@@ -120,20 +122,21 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
         model: 'gemini-2.5-flash',
         contents: prompt,
       });
-      onProgress?.(`[Analyst] Extracted ideal study durations and focus patterns.`);
-      return response.text || "Assume standard 45-minute sessions.";
+      onProgress?.(`[Analyst • Gemini 2.5 Flash] Extracted ideal study durations and focus patterns.`);
+      return { data: response.text || "Assume standard 45-minute sessions.", model: "Gemini 2.5 Flash" };
     } catch (e) {
       console.warn("[Analyst Agent] Gemini failed. Falling back to Groq...", e);
       try {
+        const groqModel = process.env.GROQ_MODEL || "qwen/qwen3.6-27b";
         const groqRes = await groq.chat.completions.create({
-          model: process.env.GROQ_MODEL || "qwen/qwen3.6-27b",
+          model: groqModel,
           messages: [{ role: "user", content: prompt }],
         });
-        onProgress?.(`[Analyst (Fallback)] Extracted ideal study durations and focus patterns.`);
-        return groqRes.choices[0]?.message?.content || "Assume standard 45-minute sessions.";
+        onProgress?.(`[Analyst • Groq (${groqModel})] Extracted ideal study durations and focus patterns.`);
+        return { data: groqRes.choices[0]?.message?.content || "Assume standard 45-minute sessions.", model: `Groq (${groqModel})` };
       } catch (groqErr) {
         console.error("[Analyst Agent] Groq fallback also failed:", groqErr);
-        return "Assume standard 45-minute sessions.";
+        return { data: "Assume standard 45-minute sessions.", model: "Gemini 2.5 Flash" };
       }
     }
   }
@@ -151,9 +154,9 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
     analystData: string,
     onProgress?: (msg: string) => void
   ): Promise<StudyPlanResult> {
-    onProgress?.(`[Master Planner] Drafting ${Math.round(totalTargetMinutes / 60)} hrs plan for "${topic}"...`);
+    onProgress?.(`[Master Planner • Gemini 2.5 Flash] Drafting ${Math.round(totalTargetMinutes / 60)} hrs plan for "${topic}"...`);
     if (targetDate) {
-      onProgress?.(`[Master Planner] Aligning quests to meet deadline: ${targetDate}`);
+      onProgress?.(`[Master Planner • Gemini 2.5 Flash] Aligning quests to meet deadline: ${targetDate}`);
     }
 
     const schema: Schema = {
@@ -260,16 +263,19 @@ Remember:
 
       const resultText = response.text || "{}";
       const cleanText = resultText.replace(/```json/gi, "").replace(/```/g, "").trim();
-      onProgress?.(`[Master Planner] Finalizing plan...`);
-      return JSON.parse(cleanText) as StudyPlanResult;
+      onProgress?.(`[Master Planner • Gemini 2.5 Flash] Finalizing plan...`);
+      const parsed = JSON.parse(cleanText) as StudyPlanResult;
+      parsed.modelUsed = "Gemini 2.5 Flash";
+      return parsed;
     } catch (e: any) {
       console.warn("[Master Planner Agent] Gemini failed. Falling back to Groq...", e);
       try {
+        const groqModel = process.env.GROQ_MODEL || "qwen/qwen3.6-27b";
         const schemaString = JSON.stringify(schema, null, 2);
         const groqPrompt = prompt + `\n\nCRITICAL: You MUST return ONLY a valid JSON object matching the requested schema. No markdown. Schema:\n${schemaString}`;
 
         const groqRes = await groq.chat.completions.create({
-          model: process.env.GROQ_MODEL || "qwen/qwen3.6-27b",
+          model: groqModel,
           messages: [
             { role: "system", content: systemInstruction },
             { role: "user", content: groqPrompt }
@@ -279,8 +285,10 @@ Remember:
 
         const resultText = groqRes.choices[0]?.message?.content || "{}";
         const cleanText = resultText.replace(/```json/gi, "").replace(/```/g, "").trim();
-        onProgress?.(`[Master Planner (Fallback)] Finalizing plan...`);
-        return JSON.parse(cleanText) as StudyPlanResult;
+        onProgress?.(`[Master Planner • Groq (${groqModel})] Finalizing plan...`);
+        const parsed = JSON.parse(cleanText) as StudyPlanResult;
+        parsed.modelUsed = `Groq (${groqModel})`;
+        return parsed;
       } catch (groqErr: any) {
         console.error("[Master Planner Agent] Groq fallback also failed:", groqErr);
         throw new Error("Master Planner failed to generate the study plan: " + groqErr.message);
@@ -320,8 +328,8 @@ Remember:
       syllabus,
       totalTargetMinutes,
       targetDate,
-      researchData,
-      analystData,
+      researchData.data,
+      analystData.data,
       onProgress
     );
 

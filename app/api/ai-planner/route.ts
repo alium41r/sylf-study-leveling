@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { topic, syllabus, effortHours, targetDate } = body;
+    const { topic, syllabus, effortHours, targetDate, sessionId } = body;
 
     if (!topic || !effortHours) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -49,6 +49,27 @@ export async function POST(req: NextRequest) {
         };
 
         try {
+          // Resolve or create ChatSession for this study plan
+          let targetSessionId = typeof sessionId === "number" ? sessionId : undefined;
+          if (targetSessionId) {
+            const existing = await prisma.chatSession.findFirst({
+              where: { id: targetSessionId, userId }
+            });
+            if (!existing) {
+              targetSessionId = undefined;
+            }
+          }
+
+          if (!targetSessionId) {
+            const newSession = await prisma.chatSession.create({
+              data: {
+                userId,
+                title: `Study Plan: ${topic.slice(0, 30)}`,
+              }
+            });
+            targetSessionId = newSession.id;
+          }
+
           sendEvent("thought", { text: "[System] Fetching your past study sessions..." });
           const rawSessions = await prisma.studySession.findMany({
             where: { userId },
@@ -105,7 +126,13 @@ export async function POST(req: NextRequest) {
           });
 
           // Create the Quests in user's timezone
-          const tz = await getUserTimezone(userId);
+          const userWithSchedule = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { restDays: true, timezone: true },
+          });
+          const tz = userWithSchedule?.timezone || (await getUserTimezone(userId));
+          const restDays = userWithSchedule?.restDays || [0];
+
           const today = new Date();
           let daysToDeadline = 7;
           if (targetDate) {
@@ -115,8 +142,22 @@ export async function POST(req: NextRequest) {
 
           const questsToCreate = planResult.quests.map((q, index) => {
             // Distribute quests across the timeline evenly
-            const offsetDays = Math.floor((index / planResult.quests.length) * daysToDeadline);
-            const scheduledFor = TimezoneService.getUserLocalDateOffset(tz, offsetDays);
+            let offsetDays = Math.floor((index / planResult.quests.length) * daysToDeadline);
+            let scheduledFor = TimezoneService.getUserLocalDateOffset(tz, offsetDays);
+            
+            // Skip rest days by rolling forward to the nearest active study day
+            let attempts = 0;
+            while (attempts < 7) {
+              const parts = scheduledFor.split("-").map((n) => parseInt(n, 10));
+              const dayOfWeek = new Date(parts[0], parts[1] - 1, parts[2]).getDay();
+              if (restDays.includes(dayOfWeek)) {
+                offsetDays += 1;
+                scheduledFor = TimezoneService.getUserLocalDateOffset(tz, offsetDays);
+                attempts += 1;
+              } else {
+                break;
+              }
+            }
             
             return {
               userId,
@@ -140,17 +181,39 @@ export async function POST(req: NextRequest) {
           let actualTotalMinutes = 0;
           questsToCreate.forEach(q => actualTotalMinutes += q.requiredMinutes);
 
-          // Create a system message in the AI chat
+          // Create the User Prompt message in the chat session
           await prisma.systemMessage.create({
             data: {
               userId,
-              content: `**Study Plan Generated!**\n\nI have successfully researched **"${topic}"** and generated a structured plan.\n\n- **Goal**: ${planResult.goalTitle}\n- **Workload**: ${questsToCreate.length} quests totaling ~${Math.round(actualTotalMinutes / 60)} hours\n- **Effort Level**: ${mappedEffortLevel}\n\nYour quests have been scheduled! You can ask me to edit, reschedule, or delete any of these quests at any time.`,
-              type: "SYSTEM",
+              sessionId: targetSessionId,
+              content: `Generate an adaptive AI Study Plan for **"${topic}"**${syllabus ? `\n\n**Syllabus:**\n${syllabus}` : ""}${targetDate ? `\n**Deadline:** ${targetDate}` : ""}\n**Target Effort:** ${effortHours} hrs/week`,
+              type: "USER",
+              read: true,
             },
           });
 
-          // Final response
-          sendEvent("result", { goal });
+          // Create formatted Assistant System Message in the AI chat
+          const questsPreview = questsToCreate
+            .slice(0, 5)
+            .map((q, i) => `${i + 1}. **${q.title}** (${q.requiredMinutes}m)`)
+            .join("\n");
+          const moreQuestsNote = questsToCreate.length > 5 ? `\n*...and ${questsToCreate.length - 5} more quests scheduled across your calendar.*` : "";
+
+          const plannerModelName = planResult.modelUsed || "Gemini 2.5 Flash";
+          const assistantContent = `<!-- model: ${plannerModelName} -->\n### 🎓 Study Plan Generated: **${planResult.goalTitle}**\n\nI have researched your curriculum and generated a personalized study schedule.\n\n- **Goal**: ${planResult.goalTitle}\n- **Workload**: ${questsToCreate.length} quests totaling ~${Math.round(actualTotalMinutes / 60)} hours\n- **Effort Level**: ${mappedEffortLevel} (${effortHours} hrs/week)\n\n#### 📋 Scheduled Quests Preview:\n${questsPreview}${moreQuestsNote}\n\n✨ *Your quests are now active on your dashboard & calendar. You can ask me to modify, reschedule, split, or add new quests anytime!*`;
+
+          await prisma.systemMessage.create({
+            data: {
+              userId,
+              sessionId: targetSessionId,
+              content: assistantContent,
+              type: "SYSTEM",
+              read: true,
+            },
+          });
+
+          // Final response with targetSessionId and modelUsed
+          sendEvent("result", { goal, sessionId: targetSessionId, modelUsed: plannerModelName });
 
           // Record quota usage after successful generation
           await recordUsage(userId, "planner");

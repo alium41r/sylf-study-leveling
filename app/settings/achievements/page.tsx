@@ -24,7 +24,7 @@ export default function AchievementsPage() {
     })
       .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
       .then(data => {
-        if (data.achievements) {
+        if (data?.achievements) {
           setAchievements(data.achievements);
         }
       })
@@ -51,19 +51,31 @@ export default function AchievementsPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to claim");
+        throw new Error(data.error || "Failed to claim reward");
       }
-      mutateUser(data.user);
-      fetchAchievements(); // Refresh list to mark as claimed
+      if (data.user) {
+        mutateUser(data.user);
+      }
+      fetchAchievements(); // Refresh list to update claimed state
     } catch (err: any) {
-      setError(err.message);
-      setTimeout(() => setError(""), 3000);
+      setError(err.message || "Failed to claim reward");
+      setTimeout(() => setError(""), 3500);
     } finally {
       setClaiming(null);
     }
   };
 
-  if (!user || loading) return <div className="p-8 text-center text-gray-400">Loading...</div>;
+  if (!user || loading) {
+    return (
+      <div className="settings-page-container">
+        <BackToSettings />
+        <p className="settings-page-breadcrumb">System → Achievements</p>
+        <div className="p-12 text-center text-text-muted font-['Rajdhani'] animate-pulse">
+          Accessing System Achievements Database...
+        </div>
+      </div>
+    );
+  }
 
   // Calculate overall stats
   const totalAchievements = achievements.length;
@@ -71,7 +83,7 @@ export default function AchievementsPage() {
   const completionPercent = totalAchievements > 0 ? Math.round((claimedCount / totalAchievements) * 100) : 0;
 
   // Group by category
-  const categories = ["Study", "Subjects", "Streaks", "Rank", "Social", "Quests", "Exploration"];
+  const categories = ["Study", "Streaks", "Rank", "Social", "Quests", "Exploration"];
   const grouped: Record<string, EnrichedAchievement[]> = {};
   categories.forEach(c => {
     grouped[c] = achievements.filter(a => a.category === c);
@@ -83,45 +95,67 @@ export default function AchievementsPage() {
 
       <p className="settings-page-breadcrumb">System → Achievements</p>
       
-      {/* Overall Header */}
-      <div style={{
-        background: "linear-gradient(135deg, rgba(20,20,30,0.8) 0%, rgba(10,10,15,0.9) 100%)",
-        border: "1px solid rgba(255,255,255,0.05)",
-        borderRadius: "16px",
-        padding: "32px",
-        marginBottom: "40px",
-        position: "relative",
-        overflow: "hidden"
-      }}>
+      {/* Overall Header Card */}
+      <div
+        className="system-card relative overflow-hidden p-8 rounded-2xl mb-10"
+        style={{
+          background: "var(--bg-panel)",
+          border: "1px solid var(--border-subtle)",
+          boxShadow: "var(--card-shadow, 0 4px 20px rgba(0,0,0,0.05))"
+        }}
+      >
         {/* Glow backdrop */}
-        <div style={{ position: "absolute", top: -50, right: -50, width: 200, height: 200, background: "var(--accent-cyan)", filter: "blur(100px)", opacity: 0.15, borderRadius: "50%" }} />
+        <div
+          style={{
+            position: "absolute",
+            top: -60,
+            right: -60,
+            width: 220,
+            height: 220,
+            background: "var(--accent-primary)",
+            filter: "blur(110px)",
+            opacity: 0.12,
+            borderRadius: "50%",
+            pointerEvents: "none"
+          }}
+        />
 
-        <h1 className="settings-page-header" style={{ marginBottom: "8px" }}>Achievement Completion</h1>
+        <h1 className="settings-page-header mb-2 font-['Rajdhani'] text-2xl md:text-3xl font-bold text-text-primary">
+          Achievement Completion
+        </h1>
         
-        <div style={{ display: "flex", alignItems: "baseline", gap: "16px", marginBottom: "16px" }}>
-          <span style={{ fontSize: "2.5rem", fontWeight: 800, fontFamily: "'Rajdhani', sans-serif", color: "var(--text-primary)" }}>
+        <div className="flex items-baseline gap-4 mb-4">
+          <span className="text-4xl md:text-5xl font-extrabold font-['Rajdhani'] text-text-primary tracking-tight">
             {claimedCount} / {totalAchievements}
           </span>
-          <span style={{ fontSize: "1.2rem", fontWeight: 700, fontFamily: "'Rajdhani', sans-serif", color: "var(--accent-cyan)" }}>
+          <span className="text-xl font-bold font-['Rajdhani'] text-accent-text-light">
             {completionPercent}%
           </span>
         </div>
 
         {/* Global Progress Bar */}
-        <div style={{ width: "100%", height: "8px", background: "rgba(255,255,255,0.05)", borderRadius: "4px", overflow: "hidden" }}>
-          <div style={{
-            width: `${completionPercent}%`,
-            height: "100%",
-            background: "linear-gradient(90deg, var(--accent-cyan), #3b82f6)",
-            boxShadow: "0 0 10px var(--accent-cyan)",
-            transition: "width 1s cubic-bezier(0.4, 0, 0.2, 1)"
-          }} />
+        <div
+          className="w-full h-2.5 rounded-full overflow-hidden"
+          style={{
+            background: "var(--bg-abyss)",
+            border: "1px solid var(--border-subtle)"
+          }}
+        >
+          <div
+            style={{
+              width: `${completionPercent}%`,
+              height: "100%",
+              background: "linear-gradient(90deg, var(--accent-primary), #3b82f6)",
+              boxShadow: "0 0 10px var(--accent-primary)",
+              transition: "width 0.8s cubic-bezier(0.4, 0, 0.2, 1)"
+            }}
+          />
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-900/40 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg mb-6 flex justify-between items-center animate-fade-in">
-          <p className="font-['Rajdhani']">{error}</p>
+        <div className="bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-300 px-4 py-3 rounded-xl mb-6 flex justify-between items-center animate-fade-in font-['Rajdhani'] font-semibold">
+          <p>{error}</p>
         </div>
       )}
 
@@ -131,114 +165,94 @@ export default function AchievementsPage() {
         if (!items || items.length === 0) return null;
 
         return (
-          <div key={cat} style={{ marginBottom: "48px" }}>
-            <h2 style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              fontWeight: 700,
-              fontSize: "1.2rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.15em",
-              color: "var(--text-primary)",
-              borderBottom: "1px solid rgba(255,255,255,0.1)",
-              paddingBottom: "8px",
-              marginBottom: "20px"
-            }}>
-              {cat}
+          <div key={cat} className="mb-12">
+            <h2
+              className="font-['Rajdhani'] font-bold text-lg uppercase tracking-widest text-text-primary pb-2 mb-5 flex items-center gap-2"
+              style={{
+                borderBottom: "1px solid var(--border-subtle)"
+              }}
+            >
+              <span>{cat}</span>
+              <span className="text-xs font-normal text-text-muted">
+                ({items.filter(a => a.isClaimed).length}/{items.length})
+              </span>
             </h2>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "16px" }}>
+            <div className="grid grid-cols-1 gap-4">
               {items.map((ach) => {
-                const colors = RARITY_COLORS[ach.rarity];
+                const colors = RARITY_COLORS[ach.rarity] || RARITY_COLORS.Common;
                 const pct = Math.min(100, Math.round((ach.currentProgress / ach.target) * 100));
                 const canClaim = ach.currentProgress >= ach.target && !ach.isClaimed;
 
                 return (
                   <div
                     key={ach.id}
+                    className="relative rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300 overflow-hidden"
                     style={{
-                      background: "rgba(10,10,18,0.6)",
-                      border: `1px solid ${ach.isClaimed ? "rgba(255,255,255,0.05)" : canClaim ? colors.main : "rgba(255,255,255,0.05)"}`,
-                      borderRadius: "12px",
-                      padding: "20px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      boxShadow: canClaim ? `0 0 20px ${colors.glow}` : "none",
-                      position: "relative",
-                      overflow: "hidden",
-                      transition: "all 0.3s ease",
-                      opacity: ach.isClaimed ? 0.6 : 1,
-                      filter: ach.isClaimed ? "grayscale(50%)" : "none"
+                      background: "var(--bg-panel)",
+                      border: `1px solid ${ach.isClaimed ? "var(--border-subtle)" : canClaim ? colors.main : "var(--border-subtle)"}`,
+                      boxShadow: canClaim ? `0 0 20px ${colors.glow}` : "var(--card-shadow, 0 2px 8px rgba(0,0,0,0.03))",
+                      opacity: ach.isClaimed ? 0.75 : 1,
+                      filter: ach.isClaimed ? "grayscale(30%)" : "none"
                     }}
                   >
-                    {/* Background Rarity Glow (subtle) */}
-                    <div style={{
-                      position: "absolute",
-                      top: 0, left: 0, bottom: 0, width: "4px",
-                      background: colors.main,
-                      boxShadow: `0 0 15px ${colors.main}`
-                    }} />
+                    {/* Left Accent Bar */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        width: "4px",
+                        background: colors.main,
+                        boxShadow: `0 0 10px ${colors.main}`
+                      }}
+                    />
 
-                    {/* Left: Info */}
-                    <div style={{ paddingLeft: "16px", flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "6px" }}>
-                        <h3 style={{
-                          fontFamily: "'Rajdhani', sans-serif",
-                          fontWeight: 700,
-                          fontSize: "1.2rem",
-                          color: "var(--text-primary)",
-                          letterSpacing: "0.05em"
-                        }}>
+                    {/* Left: Info & Progress */}
+                    <div className="pl-3 flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-1.5 flex-wrap">
+                        <h3 className="font-['Rajdhani'] font-bold text-lg text-text-primary tracking-wide">
                           {ach.title}
                         </h3>
-                        <span style={{
-                          fontFamily: "'Rajdhani', sans-serif",
-                          fontWeight: 700,
-                          fontSize: "0.65rem",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.1em",
-                          padding: "2px 8px",
-                          borderRadius: "12px",
-                          background: colors.glow,
-                          color: colors.main,
-                          border: `1px solid ${colors.main}40`
-                        }}>
+                        <span
+                          className="font-['Rajdhani'] font-bold text-[11px] uppercase tracking-widest px-2.5 py-0.5 rounded-full"
+                          style={{
+                            background: colors.glow,
+                            color: colors.main,
+                            border: `1px solid ${colors.main}50`
+                          }}
+                        >
                           {ach.rarity}
                         </span>
                       </div>
                       
-                      <p style={{
-                        fontFamily: "'Rajdhani', sans-serif",
-                        fontSize: "0.85rem",
-                        color: "var(--text-muted)",
-                        marginBottom: "16px"
-                      }}>
+                      <p className="font-['Rajdhani'] text-sm text-text-secondary mb-3">
                         {ach.description}
                       </p>
 
                       {/* Progress Bar Area */}
                       {!ach.isClaimed && (
-                        <div style={{ maxWidth: "400px" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px", fontFamily: "'Rajdhani', sans-serif", fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                        <div className="max-w-md">
+                          <div className="flex justify-between mb-1 font-['Rajdhani'] text-xs text-text-secondary font-medium">
                             <span>{ach.currentProgress} / {ach.target}</span>
                             <span>{pct}%</span>
                           </div>
-                          <div style={{ display: "flex", gap: "2px", height: "8px" }}>
-                            {/* Render blocky progress bar */}
+                          <div className="flex gap-1 h-2">
                             {[...Array(10)].map((_, i) => {
                               const blockPct = i * 10;
                               const isFilled = pct > blockPct;
                               return (
                                 <div
                                   key={i}
+                                  className="flex-1 rounded-sm transition-all duration-300"
                                   style={{
-                                    flex: 1,
-                                    background: isFilled ? colors.main : "rgba(255,255,255,0.05)",
-                                    borderRadius: "1px",
-                                    boxShadow: isFilled ? `0 0 5px ${colors.main}50` : "none"
+                                    background: isFilled ? colors.main : "var(--bg-abyss)",
+                                    border: isFilled ? "none" : "1px solid var(--border-subtle)",
+                                    boxShadow: isFilled ? `0 0 4px ${colors.main}60` : "none"
                                   }}
                                 />
-                              )
+                              );
                             })}
                           </div>
                         </div>
@@ -246,92 +260,65 @@ export default function AchievementsPage() {
                     </div>
 
                     {/* Right: Reward & Claim */}
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "12px", minWidth: "160px" }}>
-                      
+                    <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 sm:min-w-[160px] pt-2 sm:pt-0 border-t sm:border-t-0 border-border-subtle">
                       {/* Reward Badge */}
-                      <div style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        background: "rgba(0,0,0,0.4)",
-                        padding: "6px 12px",
-                        borderRadius: "8px",
-                        border: "1px solid rgba(255,255,255,0.05)"
-                      }}>
+                      <div
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                        style={{
+                          background: "var(--bg-abyss)",
+                          border: "1px solid var(--border-subtle)"
+                        }}
+                      >
                         {ach.reward.type === "SYLPH" && (
-                           <>
-                             <img src="/sylph-logo.jpg" alt="Sylph" className="w-4 h-4 rounded-full" />
-                             <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "0.85rem", color: "var(--accent-cyan)" }}>
-                               {ach.reward.amount} SYLPH
-                             </span>
-                           </>
+                          <>
+                            <img src="/sylph-logo.jpg" alt="Sylph" className="w-4 h-4 rounded-full" />
+                            <span className="font-['Rajdhani'] font-bold text-sm text-accent-text-light">
+                              {ach.reward.amount} SYLPH
+                            </span>
+                          </>
                         )}
                         {ach.reward.type === "XP" && (
-                           <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "0.85rem", color: "#f59e0b" }}>
-                             +{ach.reward.amount} XP
-                           </span>
+                          <span className="font-['Rajdhani'] font-bold text-sm text-amber-500 dark:text-amber-400">
+                            +{ach.reward.amount} XP
+                          </span>
                         )}
                         {ach.reward.type === "ITEM" && (
-                           <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "0.85rem", color: "var(--accent-text-light)" }}>
-                             1x {ach.reward.itemKey?.replace(/_/g, " ")}
-                           </span>
+                          <span className="font-['Rajdhani'] font-bold text-sm text-purple-600 dark:text-purple-400">
+                            {ach.reward.amount}x {ach.reward.itemKey?.replace(/_/g, " ")}
+                          </span>
                         )}
                       </div>
 
-                      {/* Claim Button */}
+                      {/* Claim Button / Status */}
                       {ach.isClaimed ? (
-                        <div style={{
-                          padding: "8px 20px",
-                          fontFamily: "'Rajdhani', sans-serif",
-                          fontWeight: 700,
-                          fontSize: "0.85rem",
-                          letterSpacing: "0.1em",
-                          textTransform: "uppercase",
-                          color: "rgba(255,255,255,0.3)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                          borderRadius: "6px",
-                          background: "transparent"
-                        }}>
+                        <div
+                          className="px-5 py-2 font-['Rajdhani'] font-bold text-xs tracking-widest uppercase rounded-lg text-text-muted flex items-center gap-1.5"
+                          style={{
+                            background: "var(--bg-abyss)",
+                            border: "1px solid var(--border-subtle)"
+                          }}
+                        >
+                          <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
                           Claimed
                         </div>
                       ) : canClaim ? (
                         <button
                           onClick={() => handleClaim(ach.id)}
                           disabled={claiming === ach.id}
+                          className="px-5 py-2 font-['Rajdhani'] font-bold text-xs tracking-widest uppercase text-white rounded-lg transition-all duration-200 hover:brightness-110 active:scale-95 disabled:opacity-70 cursor-pointer"
                           style={{
-                            padding: "8px 20px",
-                            fontFamily: "'Rajdhani', sans-serif",
-                            fontWeight: 700,
-                            fontSize: "0.85rem",
-                            letterSpacing: "0.1em",
-                            textTransform: "uppercase",
-                            color: "#fff",
                             background: colors.main,
-                            border: "none",
-                            borderRadius: "6px",
-                            boxShadow: `0 0 15px ${colors.glow}`,
-                            cursor: "pointer",
-                            transition: "all 0.2s ease",
-                            opacity: claiming === ach.id ? 0.7 : 1
+                            boxShadow: `0 0 15px ${colors.glow}`
                           }}
                         >
                           {claiming === ach.id ? "Claiming..." : "Claim Reward"}
                         </button>
                       ) : (
-                        <div style={{
-                          padding: "8px 20px",
-                          fontFamily: "'Rajdhani', sans-serif",
-                          fontWeight: 700,
-                          fontSize: "0.85rem",
-                          letterSpacing: "0.1em",
-                          textTransform: "uppercase",
-                          color: "rgba(255,255,255,0.15)",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px"
-                        }}>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <div className="px-4 py-2 font-['Rajdhani'] font-bold text-xs tracking-widest uppercase text-text-muted flex items-center gap-1.5">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                           </svg>
                           Locked
                         </div>
@@ -342,7 +329,7 @@ export default function AchievementsPage() {
               })}
             </div>
           </div>
-        )
+        );
       })}
     </div>
   );

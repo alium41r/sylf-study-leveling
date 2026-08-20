@@ -4,7 +4,7 @@ import { useAuth } from "../components/AuthProvider";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 import { motion, AnimatePresence } from "framer-motion";
 import { CharacterRenderer } from "../components/character/CharacterRenderer";
 import { getDefaultCharacterConfig } from "@/lib/character-traits";
@@ -60,7 +60,7 @@ export default function DashboardPage() {
       fetch("/api/quests", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
       fetch("/api/quests/weekly", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
       fetch("/api/friends", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
-      fetch("/api/system-messages?global=true&limit=1&unreadOnly=true", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
+      fetch("/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
       fetch("/api/insights", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson)
     ])
       .then(([questsData, weeklyData, friendsData, briefingsData, insightsData]) => {
@@ -275,12 +275,12 @@ export default function DashboardPage() {
                 </svg>
               </button>
             </div>
-            <div className="text-sm leading-relaxed prose dark:prose-invert max-w-none text-text-primary">
-              <ReactMarkdown>
-                {(briefings[0]?.content || "")
+            <div>
+              <MarkdownRenderer
+                content={(briefings[0]?.content || "")
                   .replace(/^\[SYSTEM NOTIFICATION\]\s*/i, "")
                   .replace(/^\[SYSTEM\]\s*/i, "")}
-              </ReactMarkdown>
+              />
             </div>
           </motion.div>
         )}
@@ -307,7 +307,9 @@ export default function DashboardPage() {
                   }`}>
                     {insight.category}
                   </span>
-                  <p className="text-sm text-text-primary leading-relaxed mb-3">{insight.content}</p>
+                  <div className="mb-3">
+                    <MarkdownRenderer content={insight.content} compact />
+                  </div>
                 </div>
                 <span className="text-[10px] text-text-muted font-medium">
                   {new Date(insight.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}

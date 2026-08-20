@@ -26,11 +26,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const isAll = searchParams.get("all") === "true";
     
+    const tz = await getUserTimezone(payload.userId as number);
     let date = searchParams.get("date");
     if (!date) {
-      const tz = await getUserTimezone(payload.userId as number);
       date = TimezoneService.getUserLocalDate(tz);
     }
+    const todayStart = TimezoneService.getStartOfDayUTC(tz);
     const goalId = searchParams.get("goalId");
 
     const where: Record<string, unknown> = {
@@ -47,14 +48,60 @@ export async function GET(req: NextRequest) {
 
     const quests = await prisma.quest.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        goalId: true,
+        title: true,
+        description: true,
+        difficulty: true,
+        status: true,
+        xpReward: true,
+        sylphReward: true,
+        requiredMinutes: true,
+        elapsedSeconds: true,
+        scheduledFor: true,
+        isGateKeyApplied: true,
+        isKamishWardActive: true,
+        completedAt: true,
+        createdAt: true,
         goal: { select: { id: true, title: true } },
+        sessions: {
+          where: { startedAt: { gte: todayStart } },
+          select: {
+            durationMinutes: true,
+            durationSeconds: true,
+            startedAt: true,
+            endedAt: true,
+          },
+        },
       },
       orderBy: { createdAt: "asc" },
     });
 
-    return NextResponse.json(quests, { status: 200 });
-  } catch {
+    const now = new Date();
+    const enriched = quests.map((q) => {
+      const sessionSeconds = (q.sessions || []).reduce((acc: number, s: any) => {
+        if (!s.endedAt) {
+          const started = new Date(s.startedAt);
+          const elapsed = Math.floor((now.getTime() - started.getTime()) / 1000);
+          return acc + (elapsed >= 0 && elapsed <= 180 ? elapsed : 0);
+        }
+        return acc + (s.durationSeconds || (s.durationMinutes * 60) || 0);
+      }, 0);
+
+      const todaySeconds = sessionSeconds;
+
+      const { sessions: _, ...rest } = q;
+      return {
+        ...rest,
+        todaySeconds,
+      };
+    });
+
+    return NextResponse.json(enriched, { status: 200 });
+  } catch (error) {
+    console.error("GET /api/quests error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

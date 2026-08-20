@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
       select: {
         provider: true,
         providerEmail: true,
+        providerUsername: true,
         createdAt: true,
       },
     });
@@ -29,6 +30,7 @@ export async function GET(req: NextRequest) {
           provider,
           isLinked: true,
           email: linkedAccount.providerEmail,
+          username: linkedAccount.providerUsername,
           linkedAt: linkedAccount.createdAt,
         };
       }

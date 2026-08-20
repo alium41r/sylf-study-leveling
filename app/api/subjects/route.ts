@@ -35,12 +35,20 @@ export async function GET(req: NextRequest) {
     // We want to fetch subjects and calculate today's duration for each
     const subjects = await prisma.subject.findMany({
       where: { userId },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        color: true,
         sessions: {
           where: {
             startedAt: {
               gte: todayStart,
             },
+          },
+          select: {
+            durationMinutes: true,
+            durationSeconds: true,
+            endedAt: true,
           },
         },
       },
@@ -50,9 +58,7 @@ export async function GET(req: NextRequest) {
     const enriched = subjects.map((sub: any) => {
       const todaySeconds = sub.sessions.reduce((acc: number, session: any) => {
         if (!session.endedAt) return acc;
-        const start = session.startedAt.getTime();
-        const end = session.endedAt.getTime();
-        return acc + Math.floor((end - start) / 1000);
+        return acc + (session.durationSeconds || (session.durationMinutes * 60) || 0);
       }, 0);
 
       return {

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ACHIEVEMENTS_CATALOG, AchievementDef } from "@/lib/achievements-catalog";
+import { ACHIEVEMENTS_CATALOG } from "@/lib/achievements-catalog";
 import { verifyToken } from "@/lib/auth";
+import { awardXP } from "@/lib/game-engine";
+import { invalidateRankingsCache } from "@/lib/cache-service";
+
+export const dynamic = "force-dynamic";
 
 // Helper to authenticate
 async function getUserId(request: Request): Promise<number | null> {
@@ -25,33 +29,37 @@ export async function GET(request: Request) {
     // 1. Gather all required stats dynamically
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { totalStudyMinutes: true, streakDays: true, hunterRank: true }
+      select: { totalStudyMinutes: true, totalStudySeconds: true, streakDays: true, hunterRank: true }
     });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const questCount = await prisma.quest.count({
-      where: { userId, status: "COMPLETED" }
-    });
+    const [questCount, friendCount, cosmeticsCount, sessionCount, ledger] = await Promise.all([
+      prisma.quest.count({
+        where: { userId, status: "COMPLETED" }
+      }).catch(() => 0),
+      prisma.friendship.count({
+        where: { OR: [{ userId }, { friendId: userId }] }
+      }).catch(() => 0),
+      prisma.userCosmetic.count({
+        where: { userId }
+      }).catch(() => 0),
+      prisma.studySession.count({
+        where: { userId }
+      }).catch(() => 0),
+      prisma.sylphLedger.aggregate({
+        where: { userId, amount: { lt: 0 } },
+        _sum: { amount: true }
+      }).catch(() => ({ _sum: { amount: 0 } }))
+    ]);
 
-    const friendCount = await prisma.friendship.count({
-      where: { userId }
-    });
-
-    const cosmeticsCount = await prisma.userCosmetic.count({
-      where: { userId }
-    });
-
-    const ledger = await prisma.sylphLedger.aggregate({
-      where: { userId, amount: { lt: 0 } },
-      _sum: { amount: true }
-    });
     const totalSylphSpent = Math.abs(ledger._sum.amount || 0);
+    const studyMinutes = Math.max(user.totalStudyMinutes || 0, Math.floor((user.totalStudySeconds || 0) / 60));
 
     // 2. Fetch claimed achievements
     const claimedRecords = await prisma.userAchievement.findMany({
       where: { userId },
       select: { achievementId: true, claimedAt: true }
-    });
+    }).catch(() => []);
     const claimedSet = new Set(claimedRecords.map((r: any) => r.achievementId));
 
     // 3. Map progress
@@ -62,10 +70,14 @@ export async function GET(request: Request) {
       let progress = 0;
       switch (ach.category) {
         case "Study":
-          progress = user.totalStudyMinutes;
+          if (ach.id === "study_first_session") {
+            progress = Math.max(sessionCount, studyMinutes >= 1 ? 1 : 0);
+          } else {
+            progress = studyMinutes;
+          }
           break;
         case "Streaks":
-          progress = user.streakDays;
+          progress = user.streakDays || 0;
           break;
         case "Rank":
           progress = userRankVal;
@@ -77,8 +89,11 @@ export async function GET(request: Request) {
           progress = questCount;
           break;
         case "Exploration":
-          if (ach.id === "exploration_theme") progress = cosmeticsCount;
-          else if (ach.id.includes("spend")) progress = totalSylphSpent;
+          if (ach.id === "exploration_theme") {
+            progress = cosmeticsCount;
+          } else if (ach.id.includes("spend")) {
+            progress = totalSylphSpent;
+          }
           break;
       }
 
@@ -112,30 +127,47 @@ export async function POST(request: Request) {
     });
     if (existing) return NextResponse.json({ error: "Already claimed" }, { status: 400 });
 
-    // Validate progress (we must re-calculate the specific achievement's progress)
-    // To keep it simple, we re-run the same dynamic queries for just what is needed
-    let progress = 0;
+    // Validate progress
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+    let progress = 0;
+    const studyMinutes = Math.max(user.totalStudyMinutes || 0, Math.floor((user.totalStudySeconds || 0) / 60));
+
     switch (ach.category) {
-      case "Study": progress = user.totalStudyMinutes; break;
-      case "Streaks": progress = user.streakDays; break;
+      case "Study":
+        if (ach.id === "study_first_session") {
+          const sessionCount = await prisma.studySession.count({ where: { userId } }).catch(() => 0);
+          progress = Math.max(sessionCount, studyMinutes >= 1 ? 1 : 0);
+        } else {
+          progress = studyMinutes;
+        }
+        break;
+      case "Streaks":
+        progress = user.streakDays || 0;
+        break;
       case "Rank":
         const ranks: Record<string, number> = { "E": 1, "D": 2, "C": 3, "B": 4, "A": 5, "S": 6 };
         progress = ranks[user.hunterRank] || 1;
         break;
       case "Social":
-        progress = await prisma.friendship.count({ where: { userId } });
+        progress = await prisma.friendship.count({
+          where: { OR: [{ userId }, { friendId: userId }] }
+        }).catch(() => 0);
         break;
       case "Quests":
-        progress = await prisma.quest.count({ where: { userId, status: "COMPLETED" } });
+        progress = await prisma.quest.count({
+          where: { userId, status: "COMPLETED" }
+        }).catch(() => 0);
         break;
       case "Exploration":
         if (ach.id === "exploration_theme") {
-          progress = await prisma.userCosmetic.count({ where: { userId } });
+          progress = await prisma.userCosmetic.count({ where: { userId } }).catch(() => 0);
         } else if (ach.id.includes("spend")) {
-          const l = await prisma.sylphLedger.aggregate({ where: { userId, amount: { lt: 0 } }, _sum: { amount: true }});
+          const l = await prisma.sylphLedger.aggregate({
+            where: { userId, amount: { lt: 0 } },
+            _sum: { amount: true }
+          }).catch(() => ({ _sum: { amount: 0 } }));
           progress = Math.abs(l._sum.amount || 0);
         }
         break;
@@ -158,15 +190,33 @@ export async function POST(request: Request) {
           where: { id: userId },
           data: { sylph: { increment: ach.reward.amount } }
         });
-        await tx.sylphLedger.create({
-          data: { userId, amount: ach.reward.amount, source: "ACHIEVEMENT" }
-        });
+        try {
+          await tx.sylphLedger.create({
+            data: { userId, amount: ach.reward.amount, source: "ACHIEVEMENT" as any }
+          });
+        } catch {
+          await tx.sylphLedger.create({
+            data: { userId, amount: ach.reward.amount, source: "SYSTEM" as any }
+          });
+        }
       } else if (ach.reward.type === "XP") {
-        // Simple XP increment (level up logic is usually complex, but we'll increment currentXP)
+        const xpResult = awardXP(user.level, user.currentXP, user.xpToNextLevel, ach.reward.amount);
+        const levelUpSylph = xpResult.levelsGained > 0 ? xpResult.newLevel * 300 : 0;
         await tx.user.update({
           where: { id: userId },
-          data: { currentXP: { increment: ach.reward.amount } }
+          data: {
+            level: xpResult.newLevel,
+            currentXP: xpResult.newCurrentXP,
+            xpToNextLevel: xpResult.newXPToNextLevel,
+            hunterRank: xpResult.newRank,
+            sylph: { increment: levelUpSylph }
+          }
         });
+        if (levelUpSylph > 0) {
+          await tx.sylphLedger.create({
+            data: { userId, amount: levelUpSylph, source: "LEVEL_UP" }
+          });
+        }
       } else if (ach.reward.type === "ITEM" && ach.reward.itemKey) {
         // Add to inventory
         const existingItem = await tx.inventoryItem.findFirst({
@@ -183,8 +233,20 @@ export async function POST(request: Request) {
           });
         }
       }
+
+      // 3. Create System Notification
+      if (tx?.systemMessage?.create) {
+        await tx.systemMessage.create({
+          data: {
+            userId,
+            type: "REWARD",
+            content: `[ACHIEVEMENT] Unlocked: **${ach.title}**! Claimed +${ach.reward.amount} ${ach.reward.type}${ach.reward.itemKey ? ` (${ach.reward.itemKey.replace(/_/g, " ")})` : ""}.`,
+          },
+        }).catch(() => null);
+      }
     });
 
+    invalidateRankingsCache();
     const updatedUser = await prisma.user.findUnique({ where: { id: userId } });
     return NextResponse.json({ success: true, message: "Reward claimed!", user: updatedUser });
 

@@ -193,11 +193,11 @@ export const CURATED_SOUNDSCAPES = [
   },
 ];
 
+import { getCachedAcousticTracks } from "@/lib/cache-service";
+
 export async function GET() {
   try {
-    const tracks = await prisma.acousticTrack.findMany({
-      orderBy: { orderIndex: "asc" },
-    });
+    const tracks = await getCachedAcousticTracks();
 
     if (!tracks || tracks.length === 0) {
       return NextResponse.json({ tracks: CURATED_SOUNDSCAPES });

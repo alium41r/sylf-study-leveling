@@ -109,18 +109,17 @@ function LoginForm() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="system-card p-8 w-full max-w-md relative z-10 border"
+        className="system-card p-8 w-full max-w-md relative z-10 border rounded-2xl shadow-card"
         style={{
           background: "var(--bg-abyss)",
           borderColor: "var(--border-subtle)",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
         }}
       >
         {/* Header */}
         <div className="text-center mb-6">
           <p
             className="text-xs tracking-[0.2em] uppercase font-bold mb-2"
-            style={{ color: "var(--accent-primary-light)", fontFamily: "'Rajdhani', sans-serif" }}
+            style={{ color: "var(--accent-text-light)", fontFamily: "'Rajdhani', sans-serif" }}
           >
             THE SYSTEM • AUTHENTICATION
           </p>
@@ -257,8 +256,8 @@ function LoginForm() {
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="font-bold transition-colors uppercase tracking-wider"
-            style={{ color: "var(--accent-primary-light)" }}
+            className="font-bold transition-colors uppercase tracking-wider hover:underline"
+            style={{ color: "var(--accent-text-light)" }}
           >
             Sign up
           </Link>

@@ -35,11 +35,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const formData = await req.formData();
-    const messageText = formData.get("message") as string;
-    const file = formData.get("file") as File | null;
-    let sessionIdStr = formData.get("sessionId") as string | null;
-    const modelPreference = (formData.get("modelPreference") as string) || "auto";
+    let messageText = "";
+    let file: File | null = null;
+    let sessionIdStr: string | null = null;
+    let modelPreference = "auto";
+    let contextOverride: any = null;
+
+    const contentType = req.headers.get("content-type") || "";
+
+    if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
+      const formData = await req.formData();
+      messageText = (formData.get("message") as string) || "";
+      file = formData.get("file") as File | null;
+      sessionIdStr = formData.get("sessionId") as string | null;
+      modelPreference = (formData.get("modelPreference") as string) || "auto";
+      const overrideStr = formData.get("contextOverride") as string | null;
+      if (overrideStr) {
+        try {
+          contextOverride = JSON.parse(overrideStr);
+        } catch {}
+      }
+    } else {
+      const body = await req.json().catch(() => ({}));
+      messageText = body.message || "";
+      sessionIdStr = body.sessionId ? String(body.sessionId) : null;
+      modelPreference = body.modelPreference || "auto";
+      contextOverride = body.contextOverride || null;
+    }
 
     if (!messageText && !file) {
       return NextResponse.json({ error: "Empty message" }, { status: 400 });
@@ -150,6 +172,10 @@ export async function POST(req: NextRequest) {
         core.localTimeContext.localDate,
         relevantString
       );
+
+      if (contextOverride?.instruction) {
+        systemInstruction += `\n\n### IN-SESSION ACADEMIC STUDY TUTOR DIRECTIVE\n${contextOverride.instruction}\nActive Subject: ${contextOverride.subject || "General Focus"}\nActive Quest: ${contextOverride.quest || "Focus Session"}\nAlways format mathematical expressions with KaTeX LaTeX ($inline$ and $$display$$). Provide direct, clear, scholarly, and encouraging step-by-step guidance.`;
+      }
 
       // Deep copy history for this execution attempt so retries start with fresh history
       const runHistory: NormalizedMessage[] = JSON.parse(JSON.stringify(normalizedHistory));
@@ -267,6 +293,11 @@ export async function POST(req: NextRequest) {
       aiResponseText = friendlyError;
     }
 
+    // ── Determine exact model display name ─────────────────
+    const groqModelName = process.env.GROQ_MODEL ? `Groq (${process.env.GROQ_MODEL})` : "Groq (Qwen 3.6 27B)";
+    const geminiModelName = "Gemini 2.5 Flash";
+    const actualModelDisplayName = actualModelUsed === "GROQ" ? groqModelName : geminiModelName;
+
     // ── Save AI response to DB ──────────────────────────────
     const aiMessage = await prisma.systemMessage.create({
       data: {
@@ -281,7 +312,16 @@ export async function POST(req: NextRequest) {
     // ── Record quota usage ───────────────────────────────────
     await recordUsage(userId, "chat");
 
-    return NextResponse.json({ userMessage, aiMessage, sessionId, session: newSession, modelUsed: actualModelUsed }, { status: 200 });
+    return NextResponse.json({ 
+      userMessage, 
+      aiMessage: { ...aiMessage, modelUsed: actualModelDisplayName }, 
+      reply: aiResponseText,
+      message: aiResponseText,
+      sessionId, 
+      session: newSession, 
+      modelUsed: actualModelUsed,
+      modelDisplayName: actualModelDisplayName,
+    }, { status: 200 });
   } catch (error: any) {
     console.error("Chat API Error:", error);
     return NextResponse.json(

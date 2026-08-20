@@ -170,18 +170,17 @@ function RegisterForm() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="system-card p-8 w-full max-w-md relative z-10 border"
+        className="system-card p-8 w-full max-w-md relative z-10 border rounded-2xl shadow-card"
         style={{
           background: "var(--bg-abyss)",
           borderColor: "var(--border-subtle)",
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.5)",
         }}
       >
         {/* Header */}
         <div className="text-center mb-6">
           <p
             className="text-xs tracking-[0.2em] uppercase font-bold mb-2"
-            style={{ color: "var(--accent-primary-light)", fontFamily: "'Rajdhani', sans-serif" }}
+            style={{ color: "var(--accent-text-light)", fontFamily: "'Rajdhani', sans-serif" }}
           >
             INITIALIZE PLAYER DATA
           </p>
@@ -366,7 +365,7 @@ function RegisterForm() {
             <Link
               href="/login"
               className="font-bold hover:underline"
-              style={{ color: "var(--accent-primary-light)" }}
+              style={{ color: "var(--accent-text-light)" }}
             >
               Access System
             </Link>

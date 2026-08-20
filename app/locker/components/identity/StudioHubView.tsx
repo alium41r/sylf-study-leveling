@@ -33,7 +33,12 @@ interface StudioHubViewProps {
   bannerUrl: string;
   avatarUrl: string;
   bio: string;
-  socialLinks: Record<string, string>;
+  socialLinks?: Record<string, string>;
+  connectedAccounts?: {
+    github?: string | null;
+    discord?: string | null;
+    instagram?: string | null;
+  };
   activeCosmetics: any;
   onNavigate: (view: "character-studio" | "profile-studio") => void;
   onPreviewProfile: () => void;
@@ -49,6 +54,7 @@ export function StudioHubView({
   avatarUrl,
   bio,
   socialLinks,
+  connectedAccounts,
   activeCosmetics,
   onNavigate,
   onPreviewProfile,
@@ -62,7 +68,9 @@ export function StudioHubView({
   const hairLabel = HAIR_COLORS.find((h) => h.value === characterConfig.hairColor)?.label.split(" ")[0] || "Black";
   const auraLabel = AURA_PRESETS.find((a) => a.id === characterConfig.aura)?.label.split(" ")[0] || "None";
 
-  const connectedSocialsCount = Object.values(socialLinks || {}).filter((v) => Boolean(v?.trim())).length;
+  const connectedSocialsCount = connectedAccounts
+    ? [connectedAccounts.github, connectedAccounts.discord, connectedAccounts.instagram].filter(Boolean).length
+    : Object.values(socialLinks || {}).filter((v) => Boolean(v?.trim())).length;
 
   return (
     <div className="flex flex-col gap-8 pb-12">

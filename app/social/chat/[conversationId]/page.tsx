@@ -269,6 +269,35 @@ export default function ModernChatPage({
     }
   };
 
+  const handleUpdateGroupAvatar = async (avatarUrl: string | null) => {
+    // Optimistically update conversation state
+    setConversation((prev) => (prev ? { ...prev, avatarUrl } : prev));
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ avatarUrl }),
+      });
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data.conversation?.avatarUrl !== undefined) {
+          setConversation((prev) => (prev ? { ...prev, avatarUrl: data.conversation.avatarUrl } : prev));
+        }
+        await fetchChat(true);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setErrorToast(errData.error || "Failed to update group image.");
+        await fetchChat(true); // Rollback to actual server state
+      }
+    } catch (err) {
+      setErrorToast("Network error updating group image.");
+      await fetchChat(true);
+    }
+  };
+
   const handleLeaveGroup = async () => {
     if (!user) return;
     try {
@@ -413,6 +442,7 @@ export default function ModernChatPage({
         onRemoveMember={handleRemoveMember}
         onLeaveGroup={handleLeaveGroup}
         onUpdateGroupName={handleUpdateGroupName}
+        onUpdateGroupAvatar={handleUpdateGroupAvatar}
         token={token}
       />
     </div>

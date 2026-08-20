@@ -56,6 +56,7 @@ interface ConnectedAccountInfo {
   provider: string;
   isLinked: boolean;
   email?: string;
+  username?: string;
   linkedAt?: string;
 }
 
@@ -64,6 +65,7 @@ export default function ConnectedAccounts() {
   const [connections, setConnections] = useState<Record<string, ConnectedAccountInfo>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -75,8 +77,10 @@ export default function ConnectedAccounts() {
 
   const fetchConnections = useCallback(async () => {
     try {
+      const storedToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
       const res = await fetch("/api/user/connections", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
+        headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
       });
       if (res.ok) {
         const data = await res.json();
@@ -94,6 +98,28 @@ export default function ConnectedAccounts() {
       setIsLoading(false);
     }
   }, [token]);
+
+  // Check URL params for OAuth status (e.g. ?connected=github or ?error=...)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const connected = searchParams.get("connected");
+      const error = searchParams.get("error");
+      if (connected) {
+        setSuccessMessage(`Successfully connected your ${connected.toUpperCase()} account.`);
+        const url = new URL(window.location.href);
+        url.searchParams.delete("connected");
+        window.history.replaceState({}, "", url.toString());
+        fetchConnections();
+      }
+      if (error) {
+        setErrorMessage(decodeURIComponent(error));
+        const url = new URL(window.location.href);
+        url.searchParams.delete("error");
+        window.history.replaceState({}, "", url.toString());
+      }
+    }
+  }, [fetchConnections]);
 
   useEffect(() => {
     fetchConnections();
@@ -135,6 +161,18 @@ export default function ConnectedAccounts() {
 
   return (
     <div className="pt-2 space-y-4">
+      {successMessage && (
+        <div
+          className="p-4 rounded border text-xs flex items-center gap-2 font-['Rajdhani'] bg-emerald-950/20 border-emerald-900/50"
+          style={{ color: "var(--accent-green)" }}
+        >
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{successMessage}</span>
+        </div>
+      )}
+
       {errorMessage && (
         <div
           className="p-4 rounded border text-xs flex items-center gap-2 font-['Rajdhani'] bg-red-950/20 border-red-900/50"
@@ -151,6 +189,10 @@ export default function ConnectedAccounts() {
         {PROVIDERS.map((provider) => {
           const conn = connections[provider.id];
           const isConnected = conn?.isLinked;
+
+          const displayHandle = conn?.username
+            ? `@${conn.username}`
+            : conn?.email || "Connected";
 
           return (
             <div
@@ -178,7 +220,7 @@ export default function ConnectedAccounts() {
                       className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest mt-0.5"
                       style={{ color: "var(--accent-green)" }}
                     >
-                      {conn.email || "Connected"}
+                      {displayHandle}
                     </p>
                   ) : (
                     <p

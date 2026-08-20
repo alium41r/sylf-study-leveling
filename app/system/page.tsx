@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../components/AuthProvider";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 import AiPlannerModal from "../components/AiPlannerModal";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Paperclip, Calendar, Sparkles, Clock, AlertCircle, X } from "lucide-react";
@@ -18,6 +17,26 @@ interface SystemMsg {
   sessionId?: number;
   failed?: boolean;
   fileObj?: File;
+  modelUsed?: string;
+}
+
+function getMessageModelBadge(msg: SystemMsg, currentModelPref?: string): string {
+  if (msg.modelUsed) {
+    if (msg.modelUsed === "GEMINI") return "Gemini 2.5 Flash";
+    if (msg.modelUsed === "GROQ") return "Groq (Qwen 3.6 27B)";
+    return msg.modelUsed;
+  }
+  if (msg.content) {
+    const match = msg.content.match(/<!--\s*model:\s*([^->\n]+?)\s*-->/i);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  if (msg.type?.includes("GEMINI")) return "Gemini 2.5 Flash";
+  if (msg.type?.includes("GROQ")) return "Groq (Qwen 3.6 27B)";
+  if (msg.content?.includes("Study Plan Generated")) return "Gemini 2.5 Flash";
+  if (currentModelPref === "groq") return "Groq (Qwen 3.6 27B)";
+  return "Gemini 2.5 Flash";
 }
 
 interface ChatSession {
@@ -431,9 +450,20 @@ export default function SystemPage() {
                         }`}
                       >
                         <div className="flex justify-between items-start mb-2 gap-4">
-                          <span className={`text-[10px] font-bold uppercase tracking-wider opacity-90 ${isUser ? 'text-accent-text-light' : 'text-accent-primary'}`}>
-                            {isUser ? "You" : `The System${msg.type.includes('GEMINI') ? ' (Gemini)' : msg.type.includes('GROQ') ? ' (Groq)' : ''}`}
-                          </span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-[10px] font-bold uppercase tracking-wider opacity-90 ${isUser ? 'text-accent-text-light' : 'text-accent-primary'}`}>
+                              {isUser ? "You" : "The System"}
+                            </span>
+                            {!isUser && (() => {
+                              const modelBadge = getMessageModelBadge(msg, modelPref);
+                              if (!modelBadge) return null;
+                              return (
+                                <span className="text-[9px] font-mono font-medium px-2 py-0.5 rounded-full bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid/40 shadow-xs">
+                                  {modelBadge}
+                                </span>
+                              );
+                            })()}
+                          </div>
                           <span className="text-[10px] opacity-40">
                             {new Date(msg.createdAt).toLocaleTimeString([], {
                               hour: "2-digit",
@@ -465,9 +495,7 @@ export default function SystemPage() {
 
                         {isUser ? (
                           <div className="flex flex-col gap-2">
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                              {msg.content}
-                            </p>
+                            <MarkdownRenderer content={msg.content} />
                             {msg.failed && (
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-[10px] text-red-400 font-bold">⚠ Failed to send</span>
@@ -484,11 +512,7 @@ export default function SystemPage() {
                             )}
                           </div>
                         ) : (
-                          <div className="text-sm leading-relaxed prose dark:prose-invert text-text-primary prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:mt-3 prose-headings:mb-1">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {msg.content}
-                            </ReactMarkdown>
-                          </div>
+                          <MarkdownRenderer content={msg.content} />
                         )}
                       </div>
                     </motion.div>
@@ -851,13 +875,33 @@ export default function SystemPage() {
         isOpen={isPlannerOpen}
         onClose={() => setIsPlannerOpen(false)}
         quota={plannerQuota}
+        sessionId={activeSessionId}
         onQuotaRefresh={() => {
           fetchQuotas();
           fetchSessions();
         }}
-        onPlanCreated={() => {
+        onPlanCreated={(result) => {
           fetchQuotas();
           fetchSessions();
+          if (result?.sessionId) {
+            setActiveSessionId(result.sessionId);
+            // Fetch messages for this session so the user request and generated plan appear immediately in the chatbox
+            if (token) {
+              fetch(`/api/system-messages?limit=100&sessionId=${result.sessionId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+                .then(async (r) => (r.ok ? r.json().catch(() => ({})) : {}))
+                .then((data) => {
+                  const sorted = (data.messages || []).sort(
+                    (a: SystemMsg, b: SystemMsg) =>
+                      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                  );
+                  setMessages(sorted);
+                  scrollToBottom();
+                })
+                .catch(console.error);
+            }
+          }
         }}
       />
     </div>

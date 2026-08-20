@@ -16,13 +16,23 @@ export interface LayerGainMap {
   cafe: number;
   keyboard: number;
   whitenoise: number;
+  brownnoise?: number;
+  waves?: number;
+  crickets?: number;
+  fireplace?: number;
+  wind?: number;
 }
 
-const AMBIENT_LAYER_FILES: Record<keyof LayerGainMap, string> = {
+const AMBIENT_LAYER_FILES: Record<string, string> = {
   rain: "/audio/ambient/rain.ogg",
   cafe: "/audio/ambient/coffee-shop.ogg",
   keyboard: "/audio/ambient/keyboard.wav",
   whitenoise: "/audio/ambient/white-noise.ogg",
+  brownnoise: "/audio/soundscapes/deep-brown-noise.wav",
+  waves: "/audio/ambient/waves.ogg",
+  crickets: "/audio/ambient/summer-night.ogg",
+  fireplace: "/audio/ambient/fireplace.ogg",
+  wind: "/audio/ambient/wind.ogg",
 };
 
 class AcousticsAudioEngine {
@@ -41,18 +51,8 @@ class AcousticsAudioEngine {
   private activeTrackUrl: string | null = null;
 
   // Ambient Layer Nodes
-  private layerGains: Record<keyof LayerGainMap, GainNode | null> = {
-    rain: null,
-    cafe: null,
-    keyboard: null,
-    whitenoise: null,
-  };
-  private layerSources: Record<keyof LayerGainMap, AudioBufferSourceNode | null> = {
-    rain: null,
-    cafe: null,
-    keyboard: null,
-    whitenoise: null,
-  };
+  private layerGains: Record<string, GainNode | null> = {};
+  private layerSources: Record<string, AudioBufferSourceNode | null> = {};
 
   private isEngineRunning = false;
 
@@ -102,12 +102,14 @@ class AcousticsAudioEngine {
   private setupAmbientBuses() {
     if (!this.ctx || !this.masterCompressor) return;
 
-    const layers: (keyof LayerGainMap)[] = ["rain", "cafe", "keyboard", "whitenoise"];
+    const layers = Object.keys(AMBIENT_LAYER_FILES);
     layers.forEach((layer) => {
-      const gain = this.ctx!.createGain();
-      gain.gain.setValueAtTime(0, this.ctx!.currentTime);
-      gain.connect(this.masterCompressor!);
-      this.layerGains[layer] = gain;
+      if (!this.layerGains[layer]) {
+        const gain = this.ctx!.createGain();
+        gain.gain.setValueAtTime(0, this.ctx!.currentTime);
+        gain.connect(this.masterCompressor!);
+        this.layerGains[layer] = gain;
+      }
     });
   }
 

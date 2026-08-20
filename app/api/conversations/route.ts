@@ -28,7 +28,18 @@ export async function GET(req: NextRequest) {
             participants: {
               include: {
                 user: {
-                  select: { id: true, name: true, username: true, hunterRank: true, lastSeenAt: true },
+                  select: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    hunterRank: true,
+                    level: true,
+                    avatarUrl: true,
+                    activeAvatar: true,
+                    activeFrame: true,
+                    characterConfig: true,
+                    lastSeenAt: true,
+                  },
                 },
               },
             },
@@ -64,12 +75,18 @@ export async function GET(req: NextRequest) {
       return {
         id: conv.id,
         name: displayName,
+        avatarUrl: conv.avatarUrl,
         isGroup: conv.isGroup,
         participants: conv.participants.map((p: any) => ({
           id: p.user.id,
           name: p.user.name,
           username: p.user.username,
           hunterRank: p.user.hunterRank,
+          level: p.user.level || 1,
+          avatarUrl: p.user.avatarUrl,
+          activeAvatar: p.user.activeAvatar || "class_scholar",
+          activeFrame: p.user.activeFrame || "frame_default",
+          characterConfig: p.user.characterConfig,
           isOnline: p.user.lastSeenAt ? p.user.lastSeenAt >= twoMinAgo : false,
         })),
         lastMessage: lastMessage
@@ -118,7 +135,7 @@ export async function POST(req: NextRequest) {
 
     const userId = payload.userId as number;
     const body = await req.json();
-    const { participantIds, name, isGroup } = body;
+    const { participantIds, name, isGroup, avatarUrl } = body;
 
     if (!participantIds || !Array.isArray(participantIds) || participantIds.length === 0) {
       return NextResponse.json({ error: "At least one participant is required" }, { status: 400 });
@@ -130,6 +147,11 @@ export async function POST(req: NextRequest) {
     // For DMs (2 people, not group), check if conversation already exists
     if (!isGroup && allParticipants.length === 2) {
       const otherId = allParticipants.find((id) => id !== userId)!;
+
+      const { areUsersBlocked } = await import("@/lib/block-service");
+      if (await areUsersBlocked(userId, otherId)) {
+        return NextResponse.json({ error: "Cannot start conversation with this user" }, { status: 403 });
+      }
 
       const existingDM = await prisma.conversation.findFirst({
         where: {
@@ -155,6 +177,7 @@ export async function POST(req: NextRequest) {
     const conversation = await prisma.conversation.create({
       data: {
         name: isGroup ? name || "Group Chat" : null,
+        avatarUrl: isGroup ? (avatarUrl ? (typeof avatarUrl === "string" ? avatarUrl.trim() : avatarUrl) : null) : null,
         isGroup: !!isGroup,
         createdBy: userId,
         participants: {

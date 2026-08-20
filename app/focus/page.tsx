@@ -4,6 +4,9 @@ import { useEffect, useState, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { FocusToolsProvider } from "./components/FocusToolsContext";
+import FocusToolsDock from "./components/FocusToolsDock";
+import FocusToolWindow from "./components/FocusToolWindow";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -33,6 +36,9 @@ function FocusContent() {
   const subjectName = searchParams.get("subjectName") || "Focus Session";
   const questId = searchParams.get("questId");
 
+  const cacheKey = `runningTimerState_${subjectId || "general"}_${questId || "none"}`;
+  const timerKey = `runningTimerSeconds_${subjectId || "general"}_${questId || "none"}`;
+
   // Timer state
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null); // null = stopwatch mode
@@ -58,7 +64,27 @@ function FocusContent() {
   const lastTickRef = useRef<number>(typeof window !== 'undefined' ? Date.now() : 0);
   const sessionStartedRef = useRef(false);
 
-  // ─── Load Mode Config ──────────────────────────────
+  // Stale State Closure Protection Refs
+  const elapsedSecondsRef = useRef<number>(0);
+  const sessionIdRef = useRef<number | null>(null);
+  const tokenRef = useRef<string | null>(token || null);
+  const lastSyncedSecondsRef = useRef<number>(0);
+  const isSyncingRef = useRef<boolean>(false);
+
+  // Keep refs in sync with React state
+  useEffect(() => {
+    tokenRef.current = token || null;
+  }, [token]);
+
+  useEffect(() => {
+    sessionIdRef.current = sessionId;
+  }, [sessionId]);
+
+  useEffect(() => {
+    elapsedSecondsRef.current = elapsedSeconds;
+  }, [elapsedSeconds]);
+
+  // ─── Load Mode Config & Cached Timer State ────────
   useEffect(() => {
     try {
       const saved = localStorage.getItem("study_mode_config");
@@ -69,12 +95,95 @@ function FocusContent() {
       }
     } catch { /* default to freeflow */ }
 
-    // Load persisted elapsed seconds if any
-    const savedSeconds = sessionStorage.getItem("runningTimerSeconds");
-    if (savedSeconds) {
-      setElapsedSeconds(parseInt(savedSeconds, 10));
+    // Load persisted elapsed seconds & session ID from localStorage / sessionStorage
+    try {
+      const savedState = localStorage.getItem(cacheKey);
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        if (typeof parsed.elapsedSeconds === "number") {
+          setElapsedSeconds(parsed.elapsedSeconds);
+          elapsedSecondsRef.current = parsed.elapsedSeconds;
+          lastSyncedSecondsRef.current = parsed.lastSyncedSeconds ?? 0;
+        }
+        if (parsed.sessionId) {
+          setSessionId(parsed.sessionId);
+          sessionIdRef.current = parsed.sessionId;
+        }
+      } else {
+        const savedSeconds = sessionStorage.getItem(timerKey);
+        if (savedSeconds) {
+          const sec = parseInt(savedSeconds, 10);
+          setElapsedSeconds(sec);
+          elapsedSecondsRef.current = sec;
+        }
+      }
+    } catch {
+      setElapsedSeconds(0);
     }
-  }, []);
+  }, [cacheKey, timerKey]);
+
+  // ─── Throttled Flush Helper ────────────────────────
+  const flushSessionProgress = useCallback(
+    async (isFinal: boolean = false): Promise<boolean> => {
+      const currSeconds = elapsedSecondsRef.current;
+      const currentSessionId = sessionIdRef.current;
+      const currentToken = tokenRef.current;
+
+      if (!currentToken || !currentSessionId) return false;
+      // Skip redundant zero-delta writes if not final
+      if (!isFinal && currSeconds <= lastSyncedSecondsRef.current) return true;
+      if (isSyncingRef.current && !isFinal) return false;
+
+      isSyncingRef.current = true;
+      const durationMinutes = Math.floor(currSeconds / 60);
+      const durationSeconds = currSeconds;
+
+      try {
+        const res = await fetch("/api/sessions", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${currentToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: currentSessionId,
+            durationMinutes,
+            durationSeconds,
+            questId: questId ? parseInt(questId) : undefined,
+          }),
+          keepalive: true,
+        });
+
+        if (res.ok) {
+          lastSyncedSecondsRef.current = currSeconds;
+          if (isFinal) {
+            // Local Storage Cleanup ONLY after 200 OK
+            localStorage.removeItem(cacheKey);
+            sessionStorage.removeItem(timerKey);
+            sessionStorage.removeItem("runningTimerSeconds");
+          } else {
+            localStorage.setItem(
+              cacheKey,
+              JSON.stringify({
+                sessionId: currentSessionId,
+                elapsedSeconds: currSeconds,
+                lastSyncedSeconds: currSeconds,
+                timestamp: Date.now(),
+              })
+            );
+          }
+          return true;
+        }
+        return false;
+      } catch (err) {
+        console.error("Failed to flush session progress:", err);
+        return false;
+      } finally {
+        isSyncingRef.current = false;
+      }
+    },
+    [cacheKey, timerKey, questId]
+  );
 
   // ─── Fetch Quest Data if questId is present ────────
   useEffect(() => {
@@ -97,10 +206,10 @@ function FocusContent() {
       const remaining = Math.max(0, (questData.requiredMinutes * 60) - (questData.elapsedSeconds || 0));
       if (remaining === 0) {
         setRemainingSeconds(null); // Already reached time, straight to overtime
-        setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+        setPhaseLabel("QUEST OVERTIME");
       } else {
         setRemainingSeconds(remaining);
-        setPhaseLabel(`QUEST: ${questData.title.toUpperCase()}`);
+        setPhaseLabel("QUEST FOCUS");
       }
       setPhase("focus");
       setTotalSessions(1);
@@ -108,7 +217,6 @@ function FocusContent() {
     }
 
     if (activeMode === null) return;
-
 
     const get = (key: string, fallback: number) =>
       Number(getSetting(activeMode, key, fallback));
@@ -187,7 +295,7 @@ function FocusContent() {
       questPopupTimeoutRef.current = setTimeout(() => {
         setShowQuestPopup(false);
         setRemainingSeconds(null); // switch to stopwatch (Free Flow)
-        setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+        setPhaseLabel("QUEST OVERTIME");
       }, 15000);
       return;
     }
@@ -268,22 +376,32 @@ function FocusContent() {
 
     async function startSessionAndFetchData() {
       try {
-        const subRes = await fetch("/api/subjects", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const [subRes, statsRes] = await Promise.all([
+          fetch("/api/subjects", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("/api/user/stats", { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+
+        let total = 0;
+        if (statsRes.ok) {
+          const stats = await statsRes.json();
+          total = stats.completedTodaySeconds ?? stats.todayStudySeconds ?? 0;
+        }
+
+        let currentSubjectTime = 0;
         if (subRes.ok) {
           const subjects = await subRes.json();
-          let total = 0;
-          let currentSubjectTime = 0;
+          let subjectsTotal = 0;
           subjects.forEach((sub: { id: number; todaySeconds: number }) => {
-            total += sub.todaySeconds;
+            subjectsTotal += sub.todaySeconds;
             if (subjectId && sub.id === parseInt(subjectId)) {
               currentSubjectTime = sub.todaySeconds;
             }
           });
-          setInitialTotalSeconds(total);
-          setInitialSubjectSeconds(currentSubjectTime);
+          if (total === 0) total = subjectsTotal;
         }
+
+        setInitialTotalSeconds(total);
+        setInitialSubjectSeconds(currentSubjectTime);
 
         const res = await fetch("/api/sessions", {
           method: "POST",
@@ -300,6 +418,16 @@ function FocusContent() {
         if (res.ok) {
           const data = await res.json();
           setSessionId(data.id);
+          sessionIdRef.current = data.id;
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              sessionId: data.id,
+              elapsedSeconds: elapsedSecondsRef.current,
+              lastSyncedSeconds: lastSyncedSecondsRef.current,
+              timestamp: Date.now(),
+            })
+          );
         }
       } catch (err) {
         console.error("Failed to start session or fetch data:", err);
@@ -307,9 +435,9 @@ function FocusContent() {
     }
 
     startSessionAndFetchData();
-  }, [token, subjectId]);
+  }, [token, subjectId, cacheKey]);
 
-  // ─── Main Timer Loop ───────────────────────────────
+  // ─── Main Timer Loop (In-Memory + LocalStorage Buffering) ──
   useEffect(() => {
     if (isPaused || phase === "done") return;
 
@@ -325,7 +453,25 @@ function FocusContent() {
         if (phase === "focus") {
           setElapsedSeconds((prev) => {
             const newSeconds = prev + deltaSec;
-            sessionStorage.setItem("runningTimerSeconds", newSeconds.toString());
+            elapsedSecondsRef.current = newSeconds;
+            sessionStorage.setItem(timerKey, newSeconds.toString());
+            try {
+              localStorage.setItem(
+                cacheKey,
+                JSON.stringify({
+                  sessionId: sessionIdRef.current,
+                  elapsedSeconds: newSeconds,
+                  lastSyncedSeconds: lastSyncedSecondsRef.current,
+                  timestamp: Date.now(),
+                })
+              );
+            } catch {}
+
+            // Throttled Auto-Save Checkpoint: Flush every 3 minutes (180s) of active focus
+            if (newSeconds - lastSyncedSecondsRef.current >= 180) {
+              flushSessionProgress(false);
+            }
+
             return newSeconds;
           });
         }
@@ -347,17 +493,34 @@ function FocusContent() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isPaused, phase, remainingSeconds, transitionPhase]);
+  }, [isPaused, phase, remainingSeconds, transitionPhase, cacheKey, timerKey, flushSessionProgress]);
 
-  // Prevent accidental navigation
+  // ─── Page Lifecycle & Unload Sync ─────────────────
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
+    const handleBeforeUnload = () => {
+      flushSessionProgress(false);
     };
+
+    const handlePageHide = () => {
+      flushSessionProgress(false);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        flushSessionProgress(false);
+      }
+    };
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, []);
+    window.addEventListener("pagehide", handlePageHide);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("pagehide", handlePageHide);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [flushSessionProgress]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -366,31 +529,28 @@ function FocusContent() {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
+  const handleTogglePause = async () => {
+    const nextPaused = !isPaused;
+    setIsPaused(nextPaused);
+    // Flush on pause/resume boundary
+    await flushSessionProgress(false);
+  };
+
   const handleEndSession = async () => {
-    if (!token || !sessionId || isEnding) return;
+    if (!tokenRef.current || !sessionIdRef.current || isEnding) return;
     setIsEnding(true);
 
-    const durationMinutes = Math.floor(elapsedSeconds / 60);
-    const durationSeconds = elapsedSeconds;
-
     try {
-      await fetch("/api/sessions", {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: sessionId, durationMinutes, durationSeconds, questId: questId ? parseInt(questId) : undefined }),
-      });
-
-      sessionStorage.removeItem("runningTimerSeconds");
-      
-      if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
+      const success = await flushSessionProgress(true);
+      if (success) {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+        await refreshStats();
+        router.push("/timer");
+      } else {
+        setIsEnding(false);
       }
-
-      await refreshStats();
-      router.push("/timer");
     } catch (err) {
       console.error("Failed to end session:", err);
       setIsEnding(false);
@@ -407,70 +567,62 @@ function FocusContent() {
     ? "var(--accent-green)"
     : phase === "done"
     ? "var(--accent-gold)"
-    : "var(--accent-primary-light)";
+    : "var(--accent-primary)";
 
   // Mode display name
   const modeDisplayName = activeMode?.name || "Free Flow";
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center text-white relative"
+    <FocusToolsProvider subjectName={subjectName} questTitle={questData?.title}>
+      <div
+        className="min-h-screen flex flex-col justify-between items-center py-6 sm:py-8 px-4 select-none relative overflow-y-auto bg-bg-void text-text-primary transition-colors duration-500"
       style={{
-        background: isBreak
-          ? "linear-gradient(to bottom, #050f0a, #020503)"
-          : "linear-gradient(to bottom, #05050f, #020208)",
-        transition: "background 1s ease",
+        background: phase.includes("break") || phase === "rest"
+          ? "radial-gradient(ellipse at center, rgba(34, 197, 94, 0.08) 0%, var(--bg-void) 75%)"
+          : "radial-gradient(ellipse at center, var(--accent-primary-dim) 0%, var(--bg-void) 75%)",
       }}
     >
-      {/* Mode Indicator */}
-      <div className="absolute top-8 left-0 right-0 text-center">
-        {modeDisplayName.toUpperCase() !== phaseLabel.toUpperCase() && (
-          <p
+      {/* ─── Top Header Section ─────────────────── */}
+      <div className="w-full flex flex-col items-center text-center gap-1.5 shrink-0 z-10 max-w-2xl px-4">
+        {/* Mode / Phase Badge */}
+        <div className="flex items-center justify-center">
+          <span
+            className="text-xs tracking-[0.2em] uppercase font-bold px-3.5 py-1 rounded-full border shadow-sm transition-colors"
             style={{
               fontFamily: "'Rajdhani', sans-serif",
-              fontSize: "0.65rem",
-              letterSpacing: "0.2em",
               color: phaseColor,
-              textTransform: "uppercase",
-              fontWeight: 700,
-              marginBottom: "4px",
+              backgroundColor: "var(--accent-primary-dim)",
+              borderColor: "var(--accent-primary-mid)",
             }}
           >
-            {modeDisplayName}
-          </p>
+            {questData ? phaseLabel : (modeDisplayName.toUpperCase() === phaseLabel.toUpperCase() ? phaseLabel : `${modeDisplayName} • ${phaseLabel}`)}
+          </span>
+        </div>
+
+        {/* Main Focus Title (Quest Title or Subject Name) */}
+        <h1
+          className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide text-text-primary mt-1 leading-snug line-clamp-2"
+          style={{ fontFamily: "'Rajdhani', sans-serif" }}
+        >
+          {questData ? questData.title : subjectName}
+        </h1>
+
+        {/* Secondary Context (Subject tag if different from Quest title) */}
+        {questData && subjectName && subjectName.toLowerCase() !== questData.title.toLowerCase() && (
+          <span className="text-xs text-text-muted font-mono bg-bg-abyss/80 border border-border-subtle px-2.5 py-0.5 rounded-full mt-0.5">
+            Subject: {subjectName}
+          </span>
         )}
-        <p
-          style={{
-            fontFamily: "'Rajdhani', sans-serif",
-            fontSize: "1.1rem",
-            fontWeight: 700,
-            letterSpacing: "0.15em",
-            color: phaseColor,
-            textShadow: `0 0 20px ${phaseColor}`,
-          }}
-        >
-          {phaseLabel}
-        </p>
       </div>
 
-      {/* Subject Name */}
-      <div className="absolute top-24 text-center opacity-70">
-        <p
-          className="text-sm tracking-widest uppercase mb-2 font-bold"
-          style={{ color: "var(--text-muted)", fontFamily: "'Rajdhani', sans-serif" }}
-        >
-          Current Subject
-        </p>
-        <h1 className="text-2xl font-medium tracking-wide">{subjectName}</h1>
-      </div>
-
-      {/* Main Timer Display */}
-      <div className="text-center z-10 my-16">
+      {/* ─── Center Core: Digital Timer & Sub-stats ─ */}
+      <div className="flex-1 flex flex-col items-center justify-center my-auto py-4 z-10 w-full max-w-4xl text-center">
+        {/* Dynamic Responsive Digital Timer */}
         <div
-          className="text-7xl md:text-9xl font-bold font-mono"
+          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold font-mono tracking-tight leading-none my-2 select-none"
           style={{
             color: phaseColor,
-            textShadow: `0 0 40px ${phaseColor}40`,
+            textShadow: `0 0 35px var(--accent-primary-dim)`,
             transition: "color 0.5s ease",
           }}
         >
@@ -480,67 +632,67 @@ function FocusContent() {
         {/* Sub-timers (only in countdown modes, show elapsed) */}
         {isCountdown && (
           <p
-            className="mt-4 font-mono text-lg"
-            style={{ color: "var(--text-muted)" }}
+            className="mt-2 font-mono text-sm sm:text-base text-text-muted"
           >
             Total elapsed: {formatTime(elapsedSeconds)}
           </p>
         )}
 
-        <div className="flex gap-12 mt-8 justify-center text-gray-500 font-mono text-xl">
+        {/* Daily Cumulative Totals */}
+        <div className="flex flex-wrap gap-6 sm:gap-12 mt-6 justify-center font-mono text-base sm:text-lg text-text-secondary">
           <div className="flex flex-col items-center">
             <span
-              className="text-xs tracking-widest uppercase mb-1 text-gray-600"
+              className="text-xs tracking-widest uppercase mb-1 text-text-muted font-bold"
               style={{ fontFamily: "'Rajdhani', sans-serif" }}
             >
               Today&apos;s Subject Total
             </span>
-            <span>{formatTime(initialSubjectSeconds + elapsedSeconds)}</span>
+            <span className="font-bold text-text-primary">{formatTime(initialSubjectSeconds + elapsedSeconds)}</span>
           </div>
           <div className="flex flex-col items-center">
             <span
-              className="text-xs tracking-widest uppercase mb-1 text-gray-600"
+              className="text-xs tracking-widest uppercase mb-1 text-text-muted font-bold"
               style={{ fontFamily: "'Rajdhani', sans-serif" }}
             >
               Daily Cumulative Focus
             </span>
-            <span>{formatTime(initialTotalSeconds + elapsedSeconds)}</span>
+            <span className="font-bold text-text-primary">{formatTime(initialTotalSeconds + elapsedSeconds)}</span>
           </div>
         </div>
+
+        {/* Pomodoro Session Dots */}
+        {activeMode && (activeMode.id === "pomodoro" || activeMode.id === "sprint") && (
+          <div className="flex gap-2 mt-6">
+            {Array.from({ length: totalSessions }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  background:
+                    i + 1 < currentSession
+                      ? phaseColor
+                      : i + 1 === currentSession
+                      ? `${phaseColor}`
+                      : "var(--border-subtle)",
+                  boxShadow:
+                    i + 1 === currentSession ? `0 0 8px ${phaseColor}` : "none",
+                  transition: "all 0.3s ease",
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Pomodoro Session Dots */}
-      {activeMode && (activeMode.id === "pomodoro" || activeMode.id === "sprint") && (
-        <div className="flex gap-2 mb-8">
-          {Array.from({ length: totalSessions }).map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: "10px",
-                height: "10px",
-                borderRadius: "50%",
-                background:
-                  i + 1 < currentSession
-                    ? phaseColor
-                    : i + 1 === currentSession
-                    ? `${phaseColor}`
-                    : "rgba(255,255,255,0.1)",
-                boxShadow:
-                  i + 1 === currentSession ? `0 0 8px ${phaseColor}` : "none",
-                transition: "all 0.3s ease",
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Control Buttons */}
-      <div className="absolute bottom-16 flex gap-4">
+      {/* ─── Bottom Action Controls ──────────────── */}
+      <div className="w-full flex justify-center items-center gap-4 shrink-0 pb-2 z-10">
         {/* Pause/Resume (for countdown modes) */}
         {isCountdown && phase !== "done" && (
           <button
-            onClick={() => setIsPaused(!isPaused)}
-            className="flex items-center gap-3 px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/10 shadow-lg"
+            onClick={handleTogglePause}
+            className="flex items-center gap-3 px-6 py-3 rounded-full bg-bg-panel hover:bg-bg-shadow hover:scale-105 active:scale-95 transition-all duration-200 border border-border-subtle hover:border-accent-primary-mid shadow-lg text-text-primary"
           >
             {isPaused ? (
               <>
@@ -574,19 +726,19 @@ function FocusContent() {
         <button
           onClick={handleEndSession}
           disabled={isEnding}
-          className="flex items-center gap-3 px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-200 border border-white/20 hover:border-red-400/50 shadow-xl"
+          className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-red-500/10 hover:bg-red-500/20 hover:scale-105 active:scale-95 transition-all duration-200 border border-red-500/30 hover:border-red-500/50 shadow-xl text-red-600 dark:text-red-400"
         >
           {isEnding ? (
-            <span className="text-lg uppercase tracking-wider font-bold">
+            <span className="text-base sm:text-lg uppercase tracking-wider font-bold">
               Ending...
             </span>
           ) : (
             <>
-              <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                 <rect x="6" y="6" width="12" height="12" rx="2" />
               </svg>
               <span
-                className="text-lg uppercase tracking-wider font-bold"
+                className="text-base sm:text-lg uppercase tracking-wider font-bold text-text-primary"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 End Session
@@ -604,8 +756,7 @@ function FocusContent() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"
-            style={{ background: "rgba(0,0,0,0.5)" }}
+            className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none bg-bg-overlay backdrop-blur-sm"
           >
             <p
               style={{
@@ -640,7 +791,7 @@ function FocusContent() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              className="absolute inset-0 bg-bg-overlay backdrop-blur-md"
               onClick={() => setShowQuestPopup(false)}
             />
 
@@ -650,21 +801,22 @@ function FocusContent() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 12 }}
               transition={{ type: "spring", damping: 28, stiffness: 380 }}
-              className="relative z-10 bg-bg-panel/90 backdrop-blur-xl border border-border-active p-8 rounded-2xl text-center max-w-md w-full shadow-2xl mx-4"
+              className="relative z-10 bg-bg-abyss border border-border-subtle p-8 rounded-2xl text-center max-w-md w-full shadow-2xl mx-4"
             >
-              <h2 className="text-3xl font-bold text-accent-primary-light mb-2" style={{ fontFamily: "'Rajdhani', sans-serif" }}>TIME&apos;S UP</h2>
+              <h2 className="text-3xl font-bold text-accent-text-light mb-2" style={{ fontFamily: "'Rajdhani', sans-serif" }}>TIME&apos;S UP</h2>
               <p className="text-text-primary mb-8 font-medium">{questData.title}</p>
               
-              <p className="text-sm text-yellow-400 mb-6 animate-pulse font-['Rajdhani'] font-bold tracking-wider uppercase">Did you successfully complete this quest?</p>
+              <p className="text-sm text-amber-500 dark:text-yellow-400 mb-6 animate-pulse font-['Rajdhani'] font-bold tracking-wider uppercase">Did you successfully complete this quest?</p>
 
               <div className="flex flex-col gap-3">
                 <button
                   onClick={async () => {
                     try {
+                      await flushSessionProgress(false);
                       await fetch(`/api/quests/${questData.id}`, {
                         method: "PATCH",
                         headers: {
-                          Authorization: `Bearer ${token}`,
+                          Authorization: `Bearer ${tokenRef.current}`,
                           "Content-Type": "application/json",
                         },
                         body: JSON.stringify({ status: "COMPLETED" }),
@@ -674,10 +826,10 @@ function FocusContent() {
                     }
                     setShowQuestPopup(false);
                     if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
-                    setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+                    setPhaseLabel("QUEST OVERTIME");
                     setRemainingSeconds(null);
                   }}
-                  className="w-full py-3.5 rounded-xl bg-green-500/20 hover:bg-green-500/30 text-green-400 font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-green-500/40 shadow-lg"
+                  className="w-full py-3.5 rounded-xl bg-green-500/15 hover:bg-green-500/25 text-green-600 dark:text-green-400 font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-green-500/30 shadow-lg"
                 >
                   Yes, Quest Completed!
                 </button>
@@ -686,10 +838,10 @@ function FocusContent() {
                   onClick={() => {
                     setShowQuestPopup(false);
                     if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
-                    setPhaseLabel(`OVERTIME: ${questData.title.toUpperCase()}`);
+                    setPhaseLabel("QUEST OVERTIME");
                     setRemainingSeconds(null);
                   }}
-                  className="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-text-primary font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-white/10"
+                  className="w-full py-3.5 rounded-xl bg-bg-panel hover:bg-bg-shadow text-text-primary font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-border-subtle"
                 >
                   No, I Need More Time (Overtime)
                 </button>
@@ -698,13 +850,18 @@ function FocusContent() {
           </div>
         )}
       </AnimatePresence>
-    </div>
+
+        {/* ─── Floating Focus Tools Dock & Expandable Window ─── */}
+        <FocusToolWindow />
+        <FocusToolsDock />
+      </div>
+    </FocusToolsProvider>
   );
 }
 
 export default function FocusPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+    <Suspense fallback={<div className="min-h-screen bg-bg-void" />}>
       <FocusContent />
     </Suspense>
   );

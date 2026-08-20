@@ -25,12 +25,16 @@ export async function GET(req: NextRequest) {
     const unreadOnly = searchParams.get("unreadOnly") === "true";
     const limit = parseInt(searchParams.get("limit") || "50");
     const sessionId = searchParams.get("sessionId");
+    const type = searchParams.get("type");
 
     const where: Record<string, unknown> = {
       userId: payload.userId as number,
     };
     if (unreadOnly) {
       where.read = false;
+    }
+    if (type) {
+      where.type = type;
     }
     if (sessionId) {
       where.sessionId = parseInt(sessionId);

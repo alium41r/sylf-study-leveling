@@ -3,24 +3,34 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 // ---------------------------------------------------------------------------
-// Shared Prisma Client Singleton
+// Shared Prisma Client Singleton with Hot-Reload & Schema Invalidation
 // ---------------------------------------------------------------------------
-// Previously, every API route created its own PrismaClient instance which can
-// exhaust connections. This module exports a single global instance that is
-// reused across all server-side code (API routes, lib modules, etc.).
-//
-// In development, Next.js hot-reloads modules which would create new clients
-// on every reload. We store the client on `globalThis` to prevent that.
+// In development, Next.js dev server caches globalThis.prisma across reloads.
+// When Prisma schema fields change and prisma generate runs, we invalidate
+// stale instances using SCHEMA_BUILD_VERSION so new DMMF fields are immediately
+// recognized without requiring manual server restart.
 // ---------------------------------------------------------------------------
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   pool: Pool | undefined;
+  prismaVersion?: number;
 };
 
-function getPrismaClient(): PrismaClient {
-  if (globalForPrisma.prisma) {
+// Increment this version whenever schema fields are modified
+const SCHEMA_BUILD_VERSION = 5;
+
+export function getPrismaClient(): PrismaClient {
+  if (globalForPrisma.prisma && globalForPrisma.prismaVersion === SCHEMA_BUILD_VERSION) {
     return globalForPrisma.prisma;
+  }
+
+  // Disconnect and clear outdated dev client if schema version bumped
+  if (globalForPrisma.prisma) {
+    try {
+      globalForPrisma.prisma.$disconnect();
+    } catch {}
+    globalForPrisma.prisma = undefined;
   }
 
   const connectionString = process.env.DATABASE_POOL_URL || process.env.DATABASE_URL;
@@ -40,9 +50,11 @@ function getPrismaClient(): PrismaClient {
 
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.prisma = client;
+    globalForPrisma.prismaVersion = SCHEMA_BUILD_VERSION;
   }
 
   return client;
 }
 
 export const prisma = getPrismaClient();
+

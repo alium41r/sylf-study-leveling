@@ -37,6 +37,11 @@ export interface UserStats {
   maxHp: number;
   streakDays: number;
   totalStudyMinutes: number;
+  totalStudySeconds?: number;
+  todayStudyMinutes?: number;
+  todayStudySeconds?: number;
+  completedTodaySeconds?: number;
+  activeSessionStartedAt?: string | null;
   sylph: number;
   hasCompletedOnboarding: boolean;
   hasPassword?: boolean;

@@ -41,7 +41,11 @@ export function IdentityTab() {
   const [bannerUrl, setBannerUrl] = useState<string>(user?.bannerUrl || "");
   const [avatarUrl, setAvatarUrl] = useState<string>(user?.avatarUrl || "");
   const [bio, setBio] = useState<string>(user?.bio || "");
-  const [socialLinks, setSocialLinks] = useState<Record<string, string>>(user?.socialLinks || {});
+  const [connectedAccounts, setConnectedAccounts] = useState<{
+    github?: string | null;
+    discord?: string | null;
+    instagram?: string | null;
+  }>({});
 
   const [stats, setStats] = useState<any>(null);
   const [initialLoad, setInitialLoad] = useState(true);
@@ -59,6 +63,23 @@ export function IdentityTab() {
         if (data.active) {
           setActiveCosmetics(data.active);
         }
+      })
+      .catch(console.error);
+
+    fetch("/api/user/connections", { headers: { Authorization: `Bearer ${token}` } })
+      .then(async (res) => (res.ok ? res.json().catch(() => null) : null))
+      .then((data) => {
+        if (!data?.connections) return;
+        const accs: { github?: string | null; discord?: string | null; instagram?: string | null } = {};
+        data.connections.forEach((c: any) => {
+          if (c.isLinked) {
+            const provider = c.provider.toLowerCase();
+            if (provider === "github") accs.github = c.username || c.email?.split("@")[0] || null;
+            if (provider === "discord") accs.discord = c.username || null;
+            if (provider === "instagram") accs.instagram = c.username || null;
+          }
+        });
+        setConnectedAccounts(accs);
       })
       .catch(console.error);
 
@@ -80,7 +101,6 @@ export function IdentityTab() {
       if (user.bannerUrl !== undefined) setBannerUrl(user.bannerUrl || "");
       if (user.avatarUrl !== undefined) setAvatarUrl(user.avatarUrl || "");
       if (user.bio !== undefined) setBio(user.bio || "");
-      if (user.socialLinks) setSocialLinks(user.socialLinks);
     }
   }, [user]);
 
@@ -96,8 +116,7 @@ export function IdentityTab() {
     JSON.stringify(characterConfig) !== JSON.stringify(savedConfig) ||
     bannerUrl !== (user.bannerUrl || "") ||
     avatarUrl !== (user.avatarUrl || "") ||
-    bio !== (user.bio || "") ||
-    JSON.stringify(socialLinks) !== JSON.stringify(user.socialLinks || {});
+    bio !== (user.bio || "");
 
   const handleSaveAll = async () => {
     if (saving || !token) return;
@@ -120,7 +139,6 @@ export function IdentityTab() {
           activeTitle: activeCosmetics.activeTitle,
           activeAvatar: activeCosmetics.activeAvatar,
           activeNameColor: activeCosmetics.activeNameColor,
-          socialLinks,
         }),
       });
 
@@ -180,7 +198,7 @@ export function IdentityTab() {
               bannerUrl={bannerUrl}
               avatarUrl={avatarUrl}
               bio={bio}
-              socialLinks={socialLinks}
+              connectedAccounts={connectedAccounts}
               activeCosmetics={activeCosmetics}
               onNavigate={(view) => setViewMode(view)}
               onPreviewProfile={() => openProfile(user.username)}
@@ -231,8 +249,7 @@ export function IdentityTab() {
               setAvatarUrl={setAvatarUrl}
               bio={bio}
               setBio={setBio}
-              socialLinks={socialLinks}
-              setSocialLinks={setSocialLinks}
+              connectedAccounts={connectedAccounts}
               activeCosmetics={activeCosmetics}
               onBackToHub={() => setViewMode("hub")}
               onPreviewProfile={() => openProfile(user.username)}

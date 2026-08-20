@@ -28,6 +28,7 @@ interface AiPlannerModalProps {
   onPlanCreated?: (plan: any) => void;
   quota?: QuotaInfo | null;
   onQuotaRefresh?: () => void;
+  sessionId?: number | null;
 }
 
 export default function AiPlannerModal({
@@ -36,6 +37,7 @@ export default function AiPlannerModal({
   onPlanCreated,
   quota: propQuota,
   onQuotaRefresh,
+  sessionId,
 }: AiPlannerModalProps) {
   const [goalTitle, setGoalTitle] = useState("");
   const [syllabusText, setSyllabusText] = useState("");
@@ -49,6 +51,17 @@ export default function AiPlannerModal({
 
   const thoughtsEndRef = useRef<HTMLDivElement>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const handleClose = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsGenerating(false);
+    setError(null);
+    onClose();
+  };
 
   // Sync prop quota to local quota
   useEffect(() => {
@@ -136,10 +149,14 @@ export default function AiPlannerModal({
     setIsGenerating(true);
     setThoughts(["Initializing Multi-Agent Intelligence Engine..."]);
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       const token = localStorage.getItem("token");
       const res = await fetch("/api/ai-planner", {
         method: "POST",
+        signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -149,6 +166,7 @@ export default function AiPlannerModal({
           syllabus: syllabusText,
           effortHours: effortLevel,
           targetDate: targetDate || null,
+          sessionId: sessionId || undefined,
         }),
       });
 
@@ -190,14 +208,14 @@ export default function AiPlannerModal({
 
                   setTimeout(() => {
                     setIsGenerating(false);
-                    if (onPlanCreated) onPlanCreated(data.goal);
+                    if (onPlanCreated) onPlanCreated(data);
                     onClose();
                     setGoalTitle("");
                     setSyllabusText("");
                     setTargetDate("");
                     setEffortLevel(10);
                     setThoughts([]);
-                  }, 1400);
+                  }, 1200);
                   return;
                 } else if (data.type === "error") {
                   const displayErr =
@@ -217,6 +235,11 @@ export default function AiPlannerModal({
         }
       }
     } catch (err: any) {
+      if (err.name === "AbortError") {
+        setIsGenerating(false);
+        setThoughts([]);
+        return;
+      }
       const displayErr =
         err.message === "AI_TIMEOUT" || err.message?.includes("AI_TIMEOUT")
           ? "Generation took longer than expected while researching multiple topics. Please try again."
@@ -224,6 +247,8 @@ export default function AiPlannerModal({
       setError(displayErr);
       setIsGenerating(false);
       setThoughts([]);
+    } finally {
+      abortControllerRef.current = null;
     }
   };
 
@@ -246,11 +271,17 @@ export default function AiPlannerModal({
                 <Brain className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold font-['Rajdhani'] text-text-primary tracking-wide flex items-center gap-2">
-                  <span>AI Study Planner</span>
+                <h2 className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xl font-bold font-['Rajdhani'] text-text-primary tracking-wide">
+                    AI Study Planner
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-accent-primary-dim border border-accent-primary-mid/40 text-accent-text-light flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-accent-primary" />
+                    <span>Gemini 2.5 Flash</span>
+                  </span>
                   {localQuota && (
                     <span
-                      className={`text-[10px] uppercase font-['Rajdhani'] font-bold px-2.5 py-0.5 rounded-full border ${
+                      className={`text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded-full border ${
                         localQuota.used >= localQuota.limit
                           ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
                           : "bg-bg-abyss border-border-subtle text-text-muted"
@@ -266,16 +297,15 @@ export default function AiPlannerModal({
               </div>
             </div>
 
-            {!isGenerating && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-2 rounded-xl hover:bg-bg-abyss text-text-muted hover:text-text-primary transition-colors border border-transparent hover:border-border-subtle"
-                title="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
+            {/* Always accessible close button */}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="p-2 rounded-xl hover:bg-bg-abyss text-text-muted hover:text-text-primary transition-colors border border-transparent hover:border-border-subtle"
+              title="Close Planner"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Body */}
@@ -359,6 +389,14 @@ export default function AiPlannerModal({
                     </motion.div>
                   ))}
                   <div ref={thoughtsEndRef} />
+                </div>
+
+                {/* Generation Status Indicator */}
+                <div className="flex items-center justify-center pt-1">
+                  <span className="text-[11px] text-text-muted font-mono flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-accent-primary animate-ping" />
+                    <span>Researching syllabus & structuring quests...</span>
+                  </span>
                 </div>
               </div>
             ) : (

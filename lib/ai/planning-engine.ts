@@ -103,6 +103,13 @@ export async function calculateDailyCapacity(
     dailyBudget = Math.floor(dailyBudget * 0.75); // slight reduction to prevent further overload
   }
   
+  // Get user rest days if any
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { restDays: true }
+  });
+  const restDays = user?.restDays || [];
+
   // Find all quests the user has scheduled between startDate and endDate
   const existingQuests = await prisma.quest.findMany({
     where: {
@@ -122,7 +129,13 @@ export async function calculateDailyCapacity(
   const end = new Date(endDateStr);
   while (curr <= end) {
     const dateStr = curr.toISOString().split("T")[0];
-    matrix[dateStr] = dailyBudget;
+    const parts = dateStr.split("-").map((n) => parseInt(n, 10));
+    const dayOfWeek = new Date(parts[0], parts[1] - 1, parts[2]).getDay();
+    const isRest = restDays.includes(dayOfWeek);
+
+    // Rest days have a massive negative budget to prevent the fallback logic 
+    // from overflowing quests onto them when normal days are full.
+    matrix[dateStr] = isRest ? -999999 : dailyBudget;
     curr.setDate(curr.getDate() + 1);
   }
 

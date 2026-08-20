@@ -108,7 +108,10 @@ export default function TimerPage() {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const cumulativeSeconds = subjects.reduce((acc, sub) => acc + sub.todaySeconds, 0);
+  const subjectsSeconds = subjects.reduce((acc, sub) => acc + (sub.todaySeconds || 0), 0);
+  const cumulativeSeconds = user?.completedTodaySeconds !== undefined && user.completedTodaySeconds > 0
+    ? Math.max(subjectsSeconds, user.completedTodaySeconds)
+    : subjectsSeconds;
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -140,7 +143,7 @@ export default function TimerPage() {
         >
           {formatTime(cumulativeSeconds)}
         </p>
-        <p className="text-sm text-text-muted mt-2">Total time across all subjects today</p>
+        <p className="text-sm text-text-muted mt-2">Total focus time across quests and subjects today</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

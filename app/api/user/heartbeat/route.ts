@@ -23,6 +23,14 @@ export async function POST(req: NextRequest) {
       data: { lastSeenAt: new Date() },
     });
 
+    // Lazily evaluate day transition penalty
+    try {
+      const { HpPenaltyService } = await import("@/lib/hp-penalty-service");
+      await HpPenaltyService.reconcileDailyHpPenalty(payload.userId as number);
+    } catch {
+      // Non-critical background task
+    }
+
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

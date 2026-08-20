@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
 
     const ledgers = await prisma.sylphLedger.findMany({
       where: { userId },
+      select: { amount: true },
     });
 
     let totalEarned = 0;
@@ -35,6 +36,7 @@ export async function GET(req: NextRequest) {
 
     const hpLedgers = await prisma.hpLedger.findMany({
       where: { userId },
+      select: { amount: true },
     });
 
     let totalHpLost = 0;

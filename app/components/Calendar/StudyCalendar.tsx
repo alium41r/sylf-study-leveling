@@ -1,27 +1,10 @@
 "use client";
 
 import { useAuth } from "../AuthProvider";
-import { useEffect, useState, useMemo } from "react";
-
-/* ─── Types ────────────────────────────────────────────────── */
-
-interface DayData {
-  date: string;
-  minutes: number;
-  sessions: number;
-  quests: number;
-  questsCompleted: number;
-}
-
-interface CalendarData {
-  days: DayData[];
-  monthStats: {
-    totalMinutes: number;
-    totalSessions: number;
-    activeDays: number;
-    totalDays: number;
-  };
-}
+import { useEffect, useState, useMemo, useCallback } from "react";
+import StudyScheduleModal from "../../calendar/components/StudyScheduleModal";
+import DayInspectionPanel from "../../calendar/components/DayInspectionPanel";
+import { MonthCalendarData, DayStudySummary } from "@/lib/study-schedule-service";
 
 /* ─── Helpers ──────────────────────────────────────────────── */
 
@@ -68,12 +51,15 @@ function DayCell({
   onClick,
 }: {
   day: number;
-  dayData: DayData | null;
+  dayData: DayStudySummary | null;
   isToday: boolean;
   isCurrentMonth: boolean;
   onClick: () => void;
 }) {
-  const minutes = dayData?.minutes || 0;
+  const minutes = dayData?.totalMinutes || 0;
+  const questsCount = dayData?.questsCount || 0;
+  const questsCompleted = dayData?.questsCompleted || 0;
+  const isRest = dayData?.isRestDay;
 
   return (
     <button
@@ -88,9 +74,13 @@ function DayCell({
         borderRadius: "6px",
         background: isToday
           ? "var(--accent-primary-dim)"
+          : isRest && minutes === 0
+          ? "rgba(34, 197, 94, 0.04)"
           : getIntensityColor(minutes),
         border: isToday
           ? "1px solid var(--accent-primary-mid)"
+          : isRest
+          ? "1px dashed rgba(34, 197, 94, 0.35)"
           : `1px solid ${getIntensityBorder(minutes)}`,
         cursor: "pointer",
         transition: "all 0.2s ease",
@@ -104,24 +94,30 @@ function DayCell({
           fontFamily: "'Rajdhani', sans-serif",
           fontWeight: isToday ? 700 : 500,
           fontSize: "0.85rem",
-          color: isToday ? "var(--accent-text-light)" : (minutes > 0 || (dayData?.quests ?? 0) > 0) ? "var(--text-primary)" : "var(--text-muted)",
+          color: isToday
+            ? "var(--accent-text-light)"
+            : minutes > 0 || questsCount > 0
+            ? "var(--text-primary)"
+            : "var(--text-muted)",
         }}
       >
         {day}
       </span>
+
       {minutes > 0 && (
         <span
           style={{
             fontFamily: "'Rajdhani', sans-serif",
             fontSize: "0.55rem",
-            color: isToday ? "var(--accent-text-light)" : "var(--accent-text-light)",
+            color: "var(--accent-text-light)",
             fontWeight: 600,
           }}
         >
           {minutes < 60 ? `${minutes}m` : `${Math.floor(minutes / 60)}h`}
         </span>
       )}
-      {(dayData?.quests ?? 0) > 0 && minutes === 0 && (
+
+      {questsCount > 0 && (
         <span
           style={{
             fontFamily: "'Rajdhani', sans-serif",
@@ -130,11 +126,12 @@ function DayCell({
             fontWeight: 600,
           }}
         >
-          {dayData!.questsCompleted}/{dayData!.quests} Q
+          {questsCompleted}/{questsCount} Q
         </span>
       )}
-      {/* Streak indicator dot */}
-      {(minutes > 0 || (dayData?.quests ?? 0) > 0) && (
+
+      {/* Streak / status indicator dot */}
+      {(minutes > 0 || questsCount > 0 || isRest) && (
         <div
           style={{
             position: "absolute",
@@ -143,7 +140,14 @@ function DayCell({
             width: "4px",
             height: "4px",
             borderRadius: "50%",
-            background: minutes >= 60 ? "var(--accent-gold)" : (dayData?.quests ?? 0) > 0 ? "var(--accent-green)" : "var(--accent-primary)",
+            background:
+              minutes >= 60
+                ? "var(--accent-gold)"
+                : questsCount > 0
+                ? "var(--accent-green)"
+                : isRest
+                ? "var(--accent-green)"
+                : "var(--accent-primary)",
             boxShadow: minutes >= 60 ? "0 0 4px var(--accent-gold)" : "none",
           }}
         />
@@ -152,105 +156,18 @@ function DayCell({
   );
 }
 
-/* ─── Day Detail Panel ──────────────────────────────────────── */
-
-function DayDetailPanel({
-  dayData,
-  onClose,
-}: {
-  dayData: DayData;
-  onClose: () => void;
-}) {
-  const dateObj = new Date(dayData.date + "T12:00:00");
-  const formatted = dateObj.toLocaleDateString("en", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  const hours = Math.floor(dayData.minutes / 60);
-  const mins = dayData.minutes % 60;
-
-  return (
-    <div
-      className="system-card"
-      style={{
-        padding: "20px",
-        marginTop: "16px",
-        animation: "slideDown 0.3s ease forwards",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1rem", color: "var(--text-primary)" }}>
-            {formatted}
-          </p>
-        </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: "none",
-            border: "none",
-            color: "var(--text-muted)",
-            cursor: "pointer",
-            padding: "4px",
-          }}
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginTop: "16px" }}>
-        <div style={{ textAlign: "center" }}>
-          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--text-primary)" }}>
-            {hours > 0 ? `${hours}h ${mins}m` : `${mins}m`}
-          </p>
-          <p className="stat-label">Study Time</p>
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--text-primary)" }}>
-            {dayData.sessions}
-          </p>
-          <p className="stat-label">Sessions</p>
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.3rem", color: "var(--text-primary)" }}>
-            {dayData.questsCompleted}/{dayData.quests}
-          </p>
-          <p className="stat-label">Quests Done</p>
-        </div>
-      </div>
-
-      {dayData.minutes === 0 && (
-        <p style={{ textAlign: "center", marginTop: "12px", fontFamily: "'Rajdhani', sans-serif", fontSize: "0.8rem", color: "var(--text-muted)" }}>
-          No study activity on this day
-        </p>
-      )}
-
-      <style>{`
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-/* ─── Main Component ─────────────────────────────────────────────── */
-
 export default function StudyCalendar() {
   const { token, user } = useAuth();
-  const now = new Date();
+  const now = useMemo(() => new Date(), []);
+
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
-  const [calendarData, setCalendarData] = useState<CalendarData | null>(null);
+  const [calendarData, setCalendarData] = useState<MonthCalendarData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedDay, setSelectedDay] = useState<DayData | null>(null);
+  const [selectedDay, setSelectedDay] = useState<DayStudySummary | null>(null);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 
+  // User local today string (YYYY-MM-DD)
   const todayStr = useMemo(() => {
     try {
       const tz = user?.timezone || "UTC";
@@ -265,84 +182,40 @@ export default function StudyCalendar() {
     }
   }, [user?.timezone]);
 
-  // Fetch calendar data from sessions and quests
-  useEffect(() => {
+  // Fetch month data
+  const fetchMonthData = useCallback(async () => {
     if (!token) return;
     setIsLoading(true);
 
-    const startDate = new Date(year, month, 1).toISOString().split("T")[0];
-    const endDate = new Date(year, month + 1, 0).toISOString().split("T")[0];
-
-    // Fetch sessions for the month
-    Promise.all([
-      fetch("/api/user/detailed-stats", {
+    try {
+      const res = await fetch(`/api/calendar/month?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(async (r) => (r.ok ? r.json().catch(() => null) : null))
-        .catch(() => null),
-      fetch(`/api/quests?all=true`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(async (r) => (r.ok ? r.json().catch(() => []) : []))
-        .catch(() => []),
-    ])
-      .then(([statsData, allQuests]) => {
-        if (!statsData) {
-          setIsLoading(false);
-          return;
-        }
-        // Build day map from sessions data
-        const daysInMonth = getDaysInMonth(year, month);
-        const dayMap: Record<string, DayData> = {};
+      });
 
-        for (let d = 1; d <= daysInMonth; d++) {
-          const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-          dayMap[dateStr] = { date: dateStr, minutes: 0, sessions: 0, quests: 0, questsCompleted: 0 };
-        }
+      if (res.ok) {
+        const data = await res.json();
+        setCalendarData(data);
 
-        // Fill from dailyStudy (covers last 30 days)
-        if (statsData.dailyStudy) {
-          for (const ds of statsData.dailyStudy as { date: string; minutes: number }[]) {
-            if (dayMap[ds.date]) {
-              dayMap[ds.date].minutes = ds.minutes;
-              dayMap[ds.date].sessions = ds.minutes > 0 ? 1 : 0; // Approximation
-            }
+        // Keep selected day synchronized if one is already open
+        if (selectedDay) {
+          const matchingDay = data.days?.find((d: DayStudySummary) => d.date === selectedDay.date);
+          if (matchingDay) {
+            setSelectedDay(matchingDay);
           }
         }
-
-        // Map Quests to days
-        if (Array.isArray(allQuests)) {
-          for (const quest of allQuests) {
-            if (quest.scheduledFor && dayMap[quest.scheduledFor]) {
-              dayMap[quest.scheduledFor].quests += 1;
-              if (quest.status === "COMPLETED") {
-                dayMap[quest.scheduledFor].questsCompleted += 1;
-              }
-            }
-          }
-        }
-
-        const days = Object.values(dayMap);
-        const activeDays = days.filter((d) => d.minutes > 0 || d.quests > 0).length;
-        const totalMinutes = days.reduce((sum, d) => sum + d.minutes, 0);
-        const totalSessions = days.reduce((sum, d) => sum + d.sessions, 0);
-
-        setCalendarData({
-          days,
-          monthStats: {
-            totalMinutes,
-            totalSessions,
-            activeDays,
-            totalDays: daysInMonth,
-          },
-        });
-      })
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
+      }
+    } catch (err) {
+      console.error("Failed to load month calendar data:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [token, year, month]);
 
+  useEffect(() => {
+    fetchMonthData();
+  }, [fetchMonthData]);
+
   const navigateMonth = (direction: -1 | 1) => {
-    setSelectedDay(null);
     const newMonth = month + direction;
     if (newMonth < 0) {
       setMonth(11);
@@ -356,47 +229,81 @@ export default function StudyCalendar() {
   };
 
   const goToToday = () => {
-    setSelectedDay(null);
     setMonth(now.getMonth());
     setYear(now.getFullYear());
+    if (calendarData) {
+      const todayData = calendarData.days.find((d) => d.date === todayStr);
+      if (todayData) setSelectedDay(todayData);
+    }
   };
 
-  // Build the calendar grid
+  // Build grid padding for days
   const daysInMonth = getDaysInMonth(year, month);
-  const firstDay = getFirstDayOfMonth(year, month);
-  const dayDataMap: Record<string, DayData> = {};
-  if (calendarData) {
-    for (const d of calendarData.days) {
-      dayDataMap[d.date] = d;
+  const firstDayOfWeek = getFirstDayOfMonth(year, month);
+
+  // Map days by date
+  const dayDataMap = useMemo(() => {
+    const map: Record<string, DayStudySummary> = {};
+    if (calendarData?.days) {
+      for (const d of calendarData.days) {
+        map[d.date] = d;
+      }
     }
+    return map;
+  }, [calendarData]);
+
+  // Previous month filler days
+  const prevMonthIndex = month === 0 ? 11 : month - 1;
+  const prevMonthYear = month === 0 ? year - 1 : year;
+  const prevMonthDaysCount = getDaysInMonth(prevMonthYear, prevMonthIndex);
+
+  const gridCells: Array<{
+    dayNumber: number;
+    dateStr: string;
+    isCurrentMonth: boolean;
+    data: DayStudySummary | null;
+  }> = [];
+
+  for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+    const dNum = prevMonthDaysCount - i;
+    gridCells.push({
+      dayNumber: dNum,
+      dateStr: "",
+      isCurrentMonth: false,
+      data: null,
+    });
   }
 
-  // Build grid cells: padding from previous month + current month
-  const gridCells: { day: number; dateStr: string; isCurrentMonth: boolean }[] = [];
-
-  // Previous month padding
-  const prevMonthDays = getDaysInMonth(year, month === 0 ? 11 : month - 1);
-  for (let i = firstDay - 1; i >= 0; i--) {
-    gridCells.push({ day: prevMonthDays - i, dateStr: "", isCurrentMonth: false });
-  }
-
-  // Current month
   for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-    gridCells.push({ day: d, dateStr, isCurrentMonth: true });
+    const monthStr = String(month + 1).padStart(2, "0");
+    const dayStr = String(d).padStart(2, "0");
+    const dateStr = `${year}-${monthStr}-${dayStr}`;
+    gridCells.push({
+      dayNumber: d,
+      dateStr,
+      isCurrentMonth: true,
+      data: dayDataMap[dateStr] || null,
+    });
   }
 
-  // Next month padding (fill to complete the last row)
+  // Trailing filler days
   const remainder = gridCells.length % 7;
   if (remainder > 0) {
     for (let d = 1; d <= 7 - remainder; d++) {
-      gridCells.push({ day: d, dateStr: "", isCurrentMonth: false });
+      gridCells.push({
+        dayNumber: d,
+        dateStr: "",
+        isCurrentMonth: false,
+        data: null,
+      });
     }
   }
 
+  const [showMonthStats, setShowMonthStats] = useState(false);
+
   return (
-    <div className="w-full">
-      {/* ─── Month Navigation ────────────────────────── */}
+    <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+      {/* ─── Top Control Bar: Month Navigation & Goals Trigger ────── */}
       <div
         style={{
           display: "flex",
@@ -417,24 +324,57 @@ export default function StudyCalendar() {
             transition: "all 0.2s ease",
           }}
           className="hover:bg-bg-panel hover:text-text-primary"
+          title="Previous Month"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
-        <div style={{ textAlign: "center" }}>
-          <h2
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              fontWeight: 700,
-              fontSize: "1.5rem",
-              color: "var(--text-primary)",
-              letterSpacing: "0.05em",
-            }}
-          >
-            {MONTH_NAMES[month]} {year}
-          </h2>
+        <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+            <h2
+              style={{
+                fontFamily: "'Rajdhani', sans-serif",
+                fontWeight: 700,
+                fontSize: "1.5rem",
+                color: "var(--text-primary)",
+                letterSpacing: "0.05em",
+              }}
+            >
+              {MONTH_NAMES[month]} {year}
+            </h2>
+
+            {/* Toggle Month Stats Button */}
+            <button
+              onClick={() => setShowMonthStats(!showMonthStats)}
+              style={{
+                background: showMonthStats ? "var(--accent-dim)" : "var(--bg-panel)",
+                border: `1px solid ${showMonthStats ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+                borderRadius: "6px",
+                padding: "4px 8px",
+                color: showMonthStats ? "var(--accent-text-light)" : "var(--text-muted)",
+                fontFamily: "'Rajdhani', sans-serif",
+                fontWeight: 600,
+                fontSize: "0.7rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+              className="hover:text-text-primary"
+              title={showMonthStats ? "Hide Month Stats" : "Show Month Stats"}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              {showMonthStats ? "Hide Stats" : "Show Month Stats"}
+            </button>
+          </div>
+
           {(month !== now.getMonth() || year !== now.getFullYear()) && (
             <button
               onClick={goToToday}
@@ -456,27 +396,66 @@ export default function StudyCalendar() {
           )}
         </div>
 
-        <button
-          onClick={() => navigateMonth(1)}
-          style={{
-            background: "var(--bg-panel)",
-            border: "1px solid var(--border-subtle)",
-            borderRadius: "6px",
-            padding: "8px 12px",
-            color: "var(--text-secondary)",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}
-          className="hover:bg-bg-panel hover:text-text-primary"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button
+            onClick={() => setIsScheduleModalOpen(true)}
+            style={{
+              background: "var(--bg-panel)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "6px",
+              padding: "8px 12px",
+              color: "var(--accent-text-light)",
+              fontFamily: "'Rajdhani', sans-serif",
+              fontWeight: 600,
+              fontSize: "0.75rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+            className="hover:bg-bg-panel hover:text-text-primary"
+            title="Configure Daily Target & Rest Days"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <line x1="4" y1="21" x2="4" y2="14" />
+              <line x1="4" y1="10" x2="4" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12" y2="3" />
+              <line x1="20" y1="21" x2="20" y2="16" />
+              <line x1="20" y1="12" x2="20" y2="3" />
+              <line x1="1" y1="14" x2="7" y2="14" />
+              <line x1="9" y1="8" x2="15" y2="8" />
+              <line x1="17" y1="16" x2="23" y2="16" />
+            </svg>
+            Schedule
+          </button>
+
+          <button
+            onClick={() => navigateMonth(1)}
+            style={{
+              background: "var(--bg-panel)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "6px",
+              padding: "8px 12px",
+              color: "var(--text-secondary)",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+            className="hover:bg-bg-panel hover:text-text-primary"
+            title="Next Month"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* ─── Month Stats ─────────────────────────────── */}
-      {calendarData && (
+      {/* ─── Month Stats Cards (Revealed when showMonthStats is true) ── */}
+      {showMonthStats && calendarData && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
           <div className="system-card" style={{ padding: "16px", textAlign: "center" }}>
             <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-text-light)" }}>
@@ -558,9 +537,9 @@ export default function StudyCalendar() {
             }}
           >
             {gridCells.map((cell, i) => (
-               <DayCell
+              <DayCell
                 key={i}
-                day={cell.day}
+                day={cell.dayNumber}
                 dayData={cell.dateStr ? dayDataMap[cell.dateStr] || null : null}
                 isToday={cell.dateStr === todayStr}
                 isCurrentMonth={cell.isCurrentMonth}
@@ -568,10 +547,19 @@ export default function StudyCalendar() {
                   if (cell.isCurrentMonth && cell.dateStr) {
                     const dd = dayDataMap[cell.dateStr] || {
                       date: cell.dateStr,
-                      minutes: 0,
-                      sessions: 0,
-                      quests: 0,
+                      dayOfWeek: new Date(cell.dateStr + "T12:00:00").getDay(),
+                      isRestDay: false,
+                      totalMinutes: 0,
+                      totalSeconds: 0,
+                      sessionsCount: 0,
+                      dailyGoalMinutes: calendarData?.dailyGoalMinutes || 120,
+                      goalMet: false,
+                      completionPercentage: 0,
+                      questsCount: 0,
                       questsCompleted: 0,
+                      xpGained: 0,
+                      subjectBreakdown: [],
+                      quests: [],
                     };
                     setSelectedDay(selectedDay?.date === cell.dateStr ? null : dd);
                   }
@@ -582,8 +570,13 @@ export default function StudyCalendar() {
         )}
       </div>
 
-      {/* ─── Selected Day Detail ──────────────────────── */}
-      {selectedDay && <DayDetailPanel dayData={selectedDay} onClose={() => setSelectedDay(null)} />}
+      {/* ─── Selected Day Detail Panel ────────────────── */}
+      {selectedDay && (
+        <DayInspectionPanel
+          dayData={selectedDay}
+          onClose={() => setSelectedDay(null)}
+        />
+      )}
 
       {/* ─── Intensity Legend ─────────────────────────── */}
       <div
@@ -611,6 +604,19 @@ export default function StudyCalendar() {
         ))}
         <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>More</span>
       </div>
+
+      {/* ─── Schedule & Goals Configuration Modal ────── */}
+      <StudyScheduleModal
+        isOpen={isScheduleModalOpen}
+        onClose={() => setIsScheduleModalOpen(false)}
+        initialGoalMinutes={calendarData?.dailyGoalMinutes ?? 120}
+        initialRestDays={calendarData?.restDays ?? [0]}
+        initialEnableHpPenalty={true}
+        onSaveSuccess={() => {
+          fetchMonthData();
+        }}
+        token={token}
+      />
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

@@ -71,6 +71,26 @@ export async function POST(
       }),
     ]);
 
+    // Notify other participants
+    const otherParticipants = await prisma.conversationParticipant.findMany({
+      where: { conversationId, userId: { not: userId } },
+      include: { conversation: true },
+    }).catch(() => []);
+
+    for (const p of otherParticipants) {
+      const isGroup = p.conversation.isGroup;
+      const tag = isGroup ? "[GROUP_CHAT]" : "[DIRECT_MESSAGE]";
+      const senderLabel = message.sender.name ? `${message.sender.name} (@${message.sender.username})` : `@${message.sender.username}`;
+      const preview = body.content.trim().slice(0, 70);
+      await prisma.systemMessage.create({
+        data: {
+          userId: p.userId,
+          type: "INFO",
+          content: `${tag} **${senderLabel}**: ${preview}`,
+        },
+      }).catch(() => null);
+    }
+
     return NextResponse.json(message, { status: 201 });
   } catch (error) {
     console.error("POST message error:", error);

@@ -101,7 +101,9 @@ describe("Phase 1: OAuth Configuration & Provider Registry", () => {
   it("identifies supported OAuth providers", () => {
     expect(isOAuthProvider("google")).toBe(true);
     expect(isOAuthProvider("GOOGLE")).toBe(true);
-    expect(isOAuthProvider("github")).toBe(false);
+    expect(isOAuthProvider("github")).toBe(true);
+    expect(isOAuthProvider("discord")).toBe(true);
+    expect(isOAuthProvider("instagram")).toBe(true);
     expect(isOAuthProvider("facebook")).toBe(false);
   });
 

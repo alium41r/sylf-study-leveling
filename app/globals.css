@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+@import "katex/dist/katex.min.css";
 @import "tailwindcss";
 
 /* ============================================================
@@ -551,26 +552,50 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .settings-tile-danger {
-  background: rgba(60, 15, 25, 0.4);
-  border-color: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.dark .settings-tile-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.25);
 }
 
 .settings-tile-danger:hover {
-  background: rgba(80, 20, 30, 0.6);
-  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.4);
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+  transform: translateY(-2px);
+}
+
+.dark .settings-tile-danger:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
 }
 
 .settings-tile-danger .settings-tile-icon {
-  color: rgba(239, 68, 68, 0.6);
+  color: #ef4444;
+}
+
+.settings-tile-danger .settings-tile-label {
+  color: #ef4444;
 }
 
 .settings-tile-danger:hover .settings-tile-icon {
-  color: var(--accent-red);
+  color: #dc2626;
+}
+
+.dark .settings-tile-danger:hover .settings-tile-icon {
+  color: #f87171;
 }
 
 .settings-tile-danger:hover .settings-tile-label {
-  color: var(--accent-red);
+  color: #dc2626;
+}
+
+.dark .settings-tile-danger:hover .settings-tile-label {
+  color: #f87171;
 }
 
 .settings-tile-wide {

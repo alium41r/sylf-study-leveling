@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession, signToken, AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { invalidateRankingsCache } from "@/lib/cache-service";
 
 export async function POST(req: NextRequest) {
   try {
@@ -89,6 +90,8 @@ export async function POST(req: NextRequest) {
 
       return u;
     });
+
+    invalidateRankingsCache();
 
     // Sign fresh token with updated stats
     const newToken = await signToken({

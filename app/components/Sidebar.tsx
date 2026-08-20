@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { motion, AnimatePresence } from "framer-motion";
+import MarkdownRenderer from "./MarkdownRenderer";
 
 interface SystemMessage {
   id: number;
@@ -62,20 +63,20 @@ const NAV_ITEMS = [
     ),
   },
   {
-    href: "/locker",
-    label: "Locker",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-      </svg>
-    ),
-  },
-  {
     href: "/calendar",
     label: "Calendar",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/locker",
+    label: "Locker",
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
       </svg>
     ),
   },
@@ -97,7 +98,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout, token } = useAuth();
+  const { user, logout, token, refreshStats } = useAuth();
   const { openSettings } = useSettings();
 
   const [notifications, setNotifications] = useState<SystemMessage[]>([]);
@@ -119,18 +120,36 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     };
   }, [showNotifications]);
 
-  // Poll for notifications
+  // Poll for notifications and listen for preference updates
   useEffect(() => {
-    if (!token || !user) return;
+    if (!user) return;
     
     const fetchNotifications = async () => {
       try {
+        const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
+        const headers: Record<string, string> = {};
+        if (activeToken) {
+          headers["Authorization"] = `Bearer ${activeToken}`;
+        }
         const res = await fetch("/api/notifications", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers,
+          credentials: "include",
         });
         if (res.ok) {
           const data = await res.json();
-          setNotifications(data);
+          setNotifications(prev => {
+            // Check if there are new unread notifications compared to prev state
+            const hasNewUnread = data.some((n: SystemMessage) => 
+              !n.read && !prev.some(p => p.id === n.id)
+            );
+            
+            // If new notifications arrived (like HP penalties, level ups), sync global stats
+            if (hasNewUnread && refreshStats) {
+              refreshStats();
+            }
+            
+            return data;
+          });
         }
       } catch (e) {
         console.error("Failed to fetch notifications", e);
@@ -138,23 +157,60 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, [token]);
+    const interval = setInterval(fetchNotifications, 30000); // Check every 30 seconds
+
+    const handleUpdate = () => {
+      fetchNotifications();
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        fetchNotifications();
+      }
+    };
+
+    window.addEventListener("notification-preferences-updated", handleUpdate);
+    window.addEventListener("notifications-updated", handleUpdate);
+    window.addEventListener("focus", handleUpdate);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("notification-preferences-updated", handleUpdate);
+      window.removeEventListener("notifications-updated", handleUpdate);
+      window.removeEventListener("focus", handleUpdate);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [token, user]);
 
   if (!user) return null;
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleOpenNotifications = async () => {
-    setShowNotifications(!showNotifications);
-    if (!showNotifications && unreadCount > 0) {
+    const willOpen = !showNotifications;
+    setShowNotifications(willOpen);
+    if (willOpen) {
+      // Immediately refresh notifications on open
       try {
-        await fetch("/api/notifications", {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setNotifications(notifications.map(n => ({ ...n, read: true })));
+        const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
+        const headers: Record<string, string> = {};
+        if (activeToken) {
+          headers["Authorization"] = `Bearer ${activeToken}`;
+        }
+        fetch("/api/notifications", { headers, credentials: "include" })
+          .then(r => r.ok ? r.json() : [])
+          .then(data => Array.isArray(data) && setNotifications(data))
+          .catch(() => null);
+
+        if (unreadCount > 0) {
+          await fetch("/api/notifications", {
+            method: "PATCH",
+            headers,
+            credentials: "include",
+          });
+          setNotifications(notifications.map(n => ({ ...n, read: true })));
+        }
       } catch (e) {
         console.error(e);
       }
@@ -163,24 +219,20 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
   const handleClearNotifications = async () => {
     try {
+      const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
+      const headers: Record<string, string> = {};
+      if (activeToken) {
+        headers["Authorization"] = `Bearer ${activeToken}`;
+      }
       await fetch("/api/notifications", {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
+        headers,
+        credentials: "include",
       });
       setNotifications([]);
     } catch (e) {
       console.error(e);
     }
-  };
-
-  const renderFormattedText = (text: string) => {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, i) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i} className="text-text-primary font-bold">{part.slice(2, -2)}</strong>;
-      }
-      return <span key={i}>{part}</span>;
-    });
   };
 
   return (
@@ -252,28 +304,58 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       <p className="text-sm text-text-muted p-4 text-center">No recent messages.</p>
                     ) : (
                       <div className="flex flex-col">
-                        {notifications.map((n, idx) => (
-                          <div key={n.id}>
-                            <div className={`p-3 rounded border-transparent text-sm transition-colors ${!n.read ? "bg-accent-primary-dim" : "bg-transparent hover:bg-bg-shadow/50"}`}>
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                                  n.type === "WARNING" ? "bg-red-500/20 text-red-400" : 
-                                  n.type === "REWARD" ? "bg-yellow-500/20 text-yellow-400" :
-                                  n.type === "LEVEL_UP" ? "bg-accent-primary-dim text-accent-text-light" :
-                                  n.type === "STREAK" ? "bg-yellow-500/20 text-yellow-400" :
-                                  "bg-blue-500/20 text-blue-400"
-                                }`}>
-                                  {n.type}
-                                </span>
-                                <span className="text-xs text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
+                        {notifications.map((n, idx) => {
+                          const content = n.content || "";
+                          let badgeLabel = n.type || "SYSTEM";
+                          let badgeStyle = "bg-blue-500/20 text-blue-400 border-blue-500/30";
+
+                          if (content.includes("[FRIEND_REQUEST]") || content.toLowerCase().includes("friend request")) {
+                            badgeLabel = "FRIEND REQUEST";
+                            badgeStyle = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+                          } else if (content.includes("[DIRECT_MESSAGE]") || content.toLowerCase().includes("direct message")) {
+                            badgeLabel = "DIRECT MESSAGE";
+                            badgeStyle = "bg-sky-500/20 text-sky-400 border-sky-500/30";
+                          } else if (content.includes("[GROUP_CHAT]") || content.toLowerCase().includes("group chat")) {
+                            badgeLabel = "GROUP CHAT";
+                            badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
+                          } else if (content.includes("[ACHIEVEMENT]") || n.type === "REWARD") {
+                            badgeLabel = "ACHIEVEMENT";
+                            badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+                          } else if (n.type === "LEVEL_UP" || content.toLowerCase().includes("level up")) {
+                            badgeLabel = "LEVEL UP";
+                            badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+                          } else if (n.type === "STREAK" || content.toLowerCase().includes("streak")) {
+                            badgeLabel = "STREAK";
+                            badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+                          } else if (n.type === "QUEST" || content.toLowerCase().includes("quest")) {
+                            badgeLabel = "QUEST";
+                            badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+                          } else if (n.type === "WARNING") {
+                            badgeLabel = "ALERT";
+                            badgeStyle = "bg-red-500/20 text-red-400 border-red-500/30";
+                          }
+
+                          const cleanContent = content.replace(/^\[[A-Z_]+\]\s*/, "");
+
+                          return (
+                            <div key={n.id}>
+                              <div className={`p-3 rounded-lg text-sm transition-colors ${!n.read ? "bg-accent-primary-dim" : "bg-transparent hover:bg-bg-shadow/50"}`}>
+                                <div className="flex items-center justify-between gap-2 mb-1.5">
+                                  <span className={`text-[9px] font-bold tracking-wider px-2 py-0.5 rounded border ${badgeStyle}`}>
+                                    {badgeLabel}
+                                  </span>
+                                  <span className="text-[11px] text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="text-text-primary text-xs leading-relaxed">
+                                  <MarkdownRenderer content={cleanContent} compact />
+                                </div>
                               </div>
-                              <p className="text-text-primary whitespace-pre-wrap leading-tight">{renderFormattedText(n.content)}</p>
+                              {idx < notifications.length - 1 && (
+                                <hr className="border-border-subtle my-1 mx-2" />
+                              )}
                             </div>
-                            {idx < notifications.length - 1 && (
-                              <hr className="border-border-subtle my-1 mx-2" />
-                            )}
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </motion.div>

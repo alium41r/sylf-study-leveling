@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import { getCachedGlobalRankings } from "@/lib/cache-service";
 
 /**
  * GET /api/user/rankings
@@ -23,36 +24,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const sortBy = searchParams.get("sortBy") || "level";
 
-    // Get all users with relevant stats
-    const allUsers = await prisma.user.findMany({
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        hunterRank: true,
-        level: true,
-        currentXP: true,
-        totalStudyMinutes: true,
-        streakDays: true,
-        quests: {
-          where: { status: "COMPLETED" },
-          select: { id: true },
-        },
-      },
-    });
+    // Retrieve cached global leaderboard data
+    const cachedUsers = await getCachedGlobalRankings();
 
     // Map users to leaderboard entries
-    const leaderboard = allUsers.map((u) => ({
-      id: u.id,
-      username: u.username,
-      name: u.name,
-      hunterRank: u.hunterRank,
-      level: u.level,
-      currentXP: u.currentXP,
-      totalStudyMinutes: u.totalStudyMinutes,
-      studyHours: Math.floor(u.totalStudyMinutes / 60),
-      streakDays: u.streakDays,
-      questsCompleted: u.quests.length,
+    const leaderboard = cachedUsers.map((u) => ({
+      ...u,
       isCurrentUser: u.id === userId,
     }));
 

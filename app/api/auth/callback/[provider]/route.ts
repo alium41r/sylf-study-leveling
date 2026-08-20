@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exchangeOAuthCode, isOAuthProvider, type OAuthProvider } from "@/lib/oauth";
-import { handleOAuthSignInOrRegister } from "@/lib/auth-service";
-import { AUTH_COOKIE_OPTIONS } from "@/lib/auth";
+import { handleOAuthSignInOrRegister, linkOAuthAccountToUser } from "@/lib/auth-service";
+import { AUTH_COOKIE_OPTIONS, getSession } from "@/lib/auth";
 
 export async function GET(
   req: NextRequest,
@@ -23,33 +23,82 @@ export async function GET(
 
     const provider = providerStr as OAuthProvider;
 
+    // Check if this was a linking flow from settings
+    const linkUserIdCookie = req.cookies.get(`oauth_link_user_${provider}`)?.value;
+    const currentSession = await getSession(req);
+    const linkingUserId = linkUserIdCookie ? Number(linkUserIdCookie) : currentSession?.userId;
+
+    const failureRedirect = linkingUserId
+      ? `${origin}/settings/account`
+      : `${origin}/login`;
+
     if (errorParam) {
-      return NextResponse.redirect(
-        `${origin}/login?error=${encodeURIComponent(
-          searchParams.get("error_description") || errorParam
-        )}`
+      const errMsg = encodeURIComponent(
+        searchParams.get("error_description") || errorParam
       );
+      return NextResponse.redirect(`${failureRedirect}?error=${errMsg}`);
     }
 
     if (!code) {
-      return NextResponse.redirect(`${origin}/login?error=Missing%20authorization%20code`);
+      return NextResponse.redirect(`${failureRedirect}?error=Missing%20authorization%20code`);
     }
 
-    // Directive 3: Strict CSRF verification via state cookie
+    // Strict CSRF verification via state cookie
     const storedState = req.cookies.get(`oauth_state_${provider}`)?.value;
     if (!storedState || !state || storedState !== state) {
-      return NextResponse.redirect(`${origin}/login?error=Invalid%20or%20expired%20OAuth%20state`);
+      return NextResponse.redirect(`${failureRedirect}?error=Invalid%20or%20expired%20OAuth%20state`);
     }
 
     const redirectUri = `${origin}/api/auth/callback/${provider}`;
 
-    // Exchange authorization code for verified Google profile
+    // Exchange authorization code for verified provider profile
     const oauthUser = await exchangeOAuthCode(provider, code, redirectUri);
 
-    // Directive 2: Register, Login, or Link existing account without unique constraint crash
+    // Linking scenario (user was already logged in when clicking Connect in Settings)
+    if (linkingUserId) {
+      try {
+        await linkOAuthAccountToUser(linkingUserId, oauthUser);
+        const response = NextResponse.redirect(`${origin}/settings/account?connected=${provider}`);
+
+        // Clear state & linking cookies
+        response.cookies.set({
+          name: `oauth_state_${provider}`,
+          value: "",
+          maxAge: 0,
+          path: "/",
+        });
+        response.cookies.set({
+          name: `oauth_link_user_${provider}`,
+          value: "",
+          maxAge: 0,
+          path: "/",
+        });
+
+        return response;
+      } catch (linkError: any) {
+        console.error("Link Account Error:", linkError);
+        const response = NextResponse.redirect(
+          `${origin}/settings/account?error=${encodeURIComponent(linkError.message || "Failed to link account")}`
+        );
+        response.cookies.set({
+          name: `oauth_state_${provider}`,
+          value: "",
+          maxAge: 0,
+          path: "/",
+        });
+        response.cookies.set({
+          name: `oauth_link_user_${provider}`,
+          value: "",
+          maxAge: 0,
+          path: "/",
+        });
+        return response;
+      }
+    }
+
+    // Guest scenario: Register, Login, or Link existing account
     const { user, token } = await handleOAuthSignInOrRegister(oauthUser);
 
-    // Directive 1: New user (onboarding incomplete) -> /onboarding, Returning user -> /dashboard
     const destination = !user.hasCompletedOnboarding ? "/onboarding" : "/dashboard";
     const response = NextResponse.redirect(`${origin}${destination}`);
 
@@ -59,9 +108,15 @@ export async function GET(
       value: token,
     });
 
-    // Clear state cookie
+    // Clear state & linking cookies
     response.cookies.set({
       name: `oauth_state_${provider}`,
+      value: "",
+      maxAge: 0,
+      path: "/",
+    });
+    response.cookies.set({
+      name: `oauth_link_user_${provider}`,
       value: "",
       maxAge: 0,
       path: "/",
@@ -71,6 +126,6 @@ export async function GET(
   } catch (err: any) {
     console.error("OAuth Callback Error:", err);
     const msg = encodeURIComponent(err?.message || "Authentication failed.");
-    return NextResponse.redirect(`${origin}/login?error=${msg}`);
+    return NextResponse.redirect(`${origin}/settings/account?error=${msg}`);
   }
 }

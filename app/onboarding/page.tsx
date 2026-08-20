@@ -260,7 +260,7 @@ export default function OnboardingFlow() {
   }, [currentStep, isSubmitting]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center overflow-hidden relative" style={{ backgroundColor: "#020202", zIndex: 50 }}>
+    <div className="min-h-screen w-full flex items-center justify-center overflow-hidden relative" style={{ backgroundColor: "var(--bg-void)", zIndex: 50 }}>
       {/* Ambient Particles */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-primary rounded-full mix-blend-screen filter blur-[128px] animate-pulse"></div>
@@ -316,6 +316,7 @@ export default function OnboardingFlow() {
             subtitle="Choose the environment for your awakening."
             items={COSMETICS_CATALOG.BACKGROUND}
             selectedId={selectedBackground}
+            selectedMode={selectedMode}
             onSelect={setSelectedBackground}
             onNext={nextStep}
             onPrev={prevStep}
@@ -436,7 +437,8 @@ function BootSequence() {
         key={statusText}
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-2xl sm:text-3xl font-bold tracking-[0.4em] uppercase text-white font-rajdhani drop-shadow-[0_0_12px_var(--accent-primary-dim)]"
+        className="text-2xl sm:text-3xl font-bold tracking-[0.4em] uppercase font-rajdhani drop-shadow-[0_0_12px_var(--accent-primary-dim)]"
+        style={{ color: "var(--text-primary)" }}
       >
         {statusText}
       </motion.h1>
@@ -495,17 +497,16 @@ function IdentityStep({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full max-w-lg p-8 z-10 flex flex-col system-card border"
+      className="w-full max-w-lg p-8 z-10 flex flex-col system-card border rounded-2xl shadow-card"
       style={{
         background: "var(--bg-abyss)",
         borderColor: "var(--border-subtle)",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.6)",
       }}
     >
       <div className="text-center mb-6">
         <p
           className="text-xs tracking-[0.2em] uppercase font-bold mb-1"
-          style={{ color: "var(--accent-primary-light)", fontFamily: "'Rajdhani', sans-serif" }}
+          style={{ color: "var(--accent-text-light)", fontFamily: "'Rajdhani', sans-serif" }}
         >
           CONFIRM SCHOLAR IDENTITY
         </p>
@@ -646,6 +647,7 @@ interface SelectionStepProps {
   subtitle: string;
   items: CosmeticItem[];
   selectedId: string | null;
+  selectedMode?: "dark" | "light";
   onSelect: (id: string) => void;
   onNext: () => void;
   onPrev?: () => void;
@@ -653,8 +655,44 @@ interface SelectionStepProps {
   nextLabel?: string;
 }
 
+const BG_PREVIEWS: Record<string, { darkBg: string; lightBg: string; size?: string }> = {
+  void: {
+    darkBg: "linear-gradient(135deg, #090918 0%, #04040a 100%)",
+    lightBg: "linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)",
+  },
+  "cyber-grid": {
+    darkBg: "linear-gradient(transparent 90%, rgba(6, 182, 212, 0.4) 100%), linear-gradient(90deg, transparent 90%, rgba(6, 182, 212, 0.4) 100%), linear-gradient(135deg, #04141c 0%, #020a0e 100%)",
+    lightBg: "linear-gradient(transparent 90%, rgba(6, 182, 212, 0.35) 100%), linear-gradient(90deg, transparent 90%, rgba(6, 182, 212, 0.35) 100%), linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%)",
+    size: "18px 18px, 18px 18px, auto",
+  },
+  "sakura-fall": {
+    darkBg: "linear-gradient(135deg, #2b0b20 0%, #150510 50%, #0c0409 100%)",
+    lightBg: "linear-gradient(135deg, #fff0f5 0%, #fce7f3 50%, #fbcfe8 100%)",
+  },
+  "abyssal-glow": {
+    darkBg: "linear-gradient(135deg, #1b0d3a 0%, #0d0620 50%, #060310 100%)",
+    lightBg: "linear-gradient(135deg, #f5f0ff 0%, #ede9fe 50%, #ddd6fe 100%)",
+  },
+  "neon-sunrise": {
+    darkBg: "linear-gradient(to top, rgba(239, 68, 68, 0.4) 0%, rgba(245, 158, 11, 0.25) 50%, #100404 100%)",
+    lightBg: "linear-gradient(to top, rgba(239, 68, 68, 0.25) 0%, rgba(245, 158, 11, 0.2) 50%, #fffdf5 100%)",
+  },
+  "matrix-rain": {
+    darkBg: "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.35) 0px, transparent 1px, transparent 12px), linear-gradient(135deg, #041a10 0%, #010c07 100%)",
+    lightBg: "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.3) 0px, transparent 1px, transparent 12px), linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%)",
+  },
+  "aurora-borealis": {
+    darkBg: "linear-gradient(135deg, #09203f 0%, #0d1b2a 50%, #1b0c2a 100%)",
+    lightBg: "linear-gradient(135deg, #e0f2fe 0%, #e0e7ff 50%, #fae8ff 100%)",
+  },
+  "deep-ocean": {
+    darkBg: "linear-gradient(135deg, #071e42 0%, #04122b 50%, #020718 100%)",
+    lightBg: "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #bfdbfe 100%)",
+  },
+};
+
 function SelectionStep({ 
-  title, subtitle, items, selectedId, onSelect, onNext, onPrev, canProceed, nextLabel = "CONFIRM" 
+  title, subtitle, items, selectedId, selectedMode, onSelect, onNext, onPrev, canProceed, nextLabel = "CONFIRM" 
 }: SelectionStepProps) {
   return (
     <motion.div 
@@ -665,10 +703,10 @@ function SelectionStep({
       className="w-full max-w-6xl p-6 sm:p-8 z-10 flex flex-col h-[88vh]"
     >
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold tracking-widest uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" style={{ fontFamily: "var(--font-rajdhani)" }}>
+        <h2 className="text-4xl font-bold tracking-widest uppercase font-rajdhani drop-shadow-sm" style={{ color: "var(--text-primary)" }}>
           {title}
         </h2>
-        <p className="text-text-muted mt-2 text-sm uppercase tracking-wider">{subtitle}</p>
+        <p className="mt-2 text-sm uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>{subtitle}</p>
       </div>
 
       <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 pb-8">
@@ -690,7 +728,7 @@ function SelectionStep({
               >
                 {/* Visual Preview logic based on category */}
                 {(item.category === "CLASS" || item.category === "AVATAR") && (
-                  <div className="w-full h-44 sm:h-48 mb-4 rounded-lg overflow-hidden relative border border-white/10 bg-black/60 shadow-inner group-hover:border-[var(--accent-primary-light)] transition-colors duration-300">
+                  <div className="w-full h-44 sm:h-48 mb-4 rounded-lg overflow-hidden relative border border-border-subtle bg-black/60 shadow-inner group-hover:border-[var(--accent-primary-light)] transition-colors duration-300">
                     <img 
                       src={item.value} 
                       alt={item.name} 
@@ -709,21 +747,41 @@ function SelectionStep({
                     </div>
                   </div>
                 )}
-                {item.category === "BACKGROUND" && (
-                  <div className="w-full h-24 mb-4 rounded-lg border border-gray-700/50 relative overflow-hidden" 
-                       style={{ background: BG_MAP[item.value]?.value || "#000" }}>
-                  </div>
-                )}
+                {item.category === "BACKGROUND" && (() => {
+                  const preview = BG_PREVIEWS[item.value] || {
+                    darkBg: "#0a0a14",
+                    lightBg: "#f8fafc",
+                  };
+                  const bgGradient = selectedMode === "light" ? preview.lightBg : preview.darkBg;
+                  return (
+                    <div
+                      className="w-full h-24 mb-4 rounded-xl border border-border-subtle relative overflow-hidden shadow-inner flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300"
+                      style={{
+                        background: bgGradient,
+                        backgroundSize: preview.size || "cover",
+                      }}
+                    >
+                      {/* Category chip */}
+                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-bg-abyss/80 text-text-secondary border border-border-subtle backdrop-blur-sm">
+                        {item.bgCategory || "domain"}
+                      </span>
+                    </div>
+                  );
+                })()}
 
                 <div className="flex justify-between items-start mb-2 relative z-10">
-                  <h3 className="font-bold text-lg text-white font-rajdhani tracking-wide">{item.name}</h3>
+                  <h3 className="font-bold text-lg font-rajdhani tracking-wide" style={{ color: isSelected ? "var(--accent-text-light)" : "var(--text-primary)" }}>
+                    {item.name}
+                  </h3>
                   {isSelected && (
                     <motion.div layoutId="selectedBadge" className="text-[var(--accent-primary)]">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </motion.div>
                   )}
                 </div>
-                <p className="text-sm text-text-muted relative z-10">{item.description}</p>
+                <p className="text-sm relative z-10" style={{ color: isSelected ? "var(--text-primary)" : "var(--text-secondary)" }}>
+                  {item.description}
+                </p>
                 
                 {/* Hover Glow */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500" 
@@ -735,11 +793,11 @@ function SelectionStep({
         </div>
       </div>
 
-      <div className="flex justify-between mt-6 pt-6 border-t border-gray-800">
+      <div className="flex justify-between mt-6 pt-6 border-t border-border-subtle">
         {onPrev ? (
           <button 
             onClick={onPrev}
-            className="px-6 py-3 rounded text-text-muted hover:text-text-primary transition-colors tracking-widest text-sm uppercase"
+            className="px-6 py-3 rounded text-text-secondary hover:text-text-primary transition-colors tracking-widest text-sm uppercase font-bold"
           >
             Go Back
           </button>
@@ -798,23 +856,23 @@ function ThemeAndModeStep({
     >
       <div className="text-center mb-6">
         <h2
-          className="text-4xl font-bold tracking-widest uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-          style={{ fontFamily: "var(--font-rajdhani)" }}
+          className="text-4xl font-bold tracking-widest uppercase font-rajdhani drop-shadow-sm"
+          style={{ color: "var(--text-primary)" }}
         >
           {title}
         </h2>
-        <p className="text-text-muted mt-2 text-sm uppercase tracking-wider">{subtitle}</p>
+        <p className="mt-2 text-sm uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>{subtitle}</p>
       </div>
 
       <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 pb-8 flex flex-col gap-6">
         {/* ─── Mode Selection (Dark vs Light) ─── */}
-        <div className="bg-bg-abyss/80 border border-white/10 p-5 rounded-2xl flex flex-col gap-3 shadow-lg">
+        <div className="bg-bg-abyss/90 border border-border-subtle p-5 rounded-2xl flex flex-col gap-3 shadow-card">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>INTERFACE MODE</span>
             </span>
-            <span className="text-[11px] text-text-muted font-['Rajdhani']">
+            <span className="text-[11px] text-text-secondary font-['Rajdhani'] font-medium">
               Select daylight or stealth contrast
             </span>
           </div>
@@ -827,7 +885,7 @@ function ThemeAndModeStep({
               className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between group ${
                 selectedMode === "dark"
                   ? "bg-accent-primary-dim/30 border-accent-primary shadow-[0_0_15px_rgba(124,58,237,0.3)] scale-[1.02]"
-                  : "bg-bg-panel/60 border-white/10 hover:border-white/20 hover:bg-bg-panel"
+                  : "bg-bg-panel/60 border-border-subtle hover:border-border-active hover:bg-bg-panel"
               }`}
             >
               <div className="flex items-center gap-3.5">
@@ -835,13 +893,13 @@ function ThemeAndModeStep({
                   <Moon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm font-['Rajdhani'] text-white">Dark Mode (Default)</h4>
-                  <p className="text-xs text-text-muted font-['Rajdhani']">Stealth black & glowing neon atmosphere</p>
+                  <h4 className="font-bold text-sm font-['Rajdhani']" style={{ color: "var(--text-primary)" }}>Dark Mode (Default)</h4>
+                  <p className="text-xs text-text-secondary font-['Rajdhani']">Stealth black & glowing neon atmosphere</p>
                 </div>
               </div>
               <div
                 className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                  selectedMode === "dark" ? "border-accent-primary bg-accent-primary text-white" : "border-white/20"
+                  selectedMode === "dark" ? "border-accent-primary bg-accent-primary text-white" : "border-border-subtle"
                 }`}
               >
                 {selectedMode === "dark" && <Check className="w-3 h-3 stroke-[3]" />}
@@ -855,7 +913,7 @@ function ThemeAndModeStep({
               className={`p-4 rounded-xl border text-left transition-all flex items-center justify-between group ${
                 selectedMode === "light"
                   ? "bg-accent-primary-dim/30 border-accent-primary shadow-[0_0_15px_rgba(124,58,237,0.3)] scale-[1.02]"
-                  : "bg-bg-panel/60 border-white/10 hover:border-white/20 hover:bg-bg-panel"
+                  : "bg-bg-panel/60 border-border-subtle hover:border-border-active hover:bg-bg-panel"
               }`}
             >
               <div className="flex items-center gap-3.5">
@@ -863,13 +921,13 @@ function ThemeAndModeStep({
                   <Sun className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm font-['Rajdhani'] text-white">Light Mode</h4>
-                  <p className="text-xs text-text-muted font-['Rajdhani']">High-contrast clean daylight interface</p>
+                  <h4 className="font-bold text-sm font-['Rajdhani']" style={{ color: "var(--text-primary)" }}>Light Mode</h4>
+                  <p className="text-xs text-text-secondary font-['Rajdhani']">High-contrast clean daylight interface</p>
                 </div>
               </div>
               <div
                 className={`w-5 h-5 rounded-full border flex items-center justify-center ${
-                  selectedMode === "light" ? "border-accent-primary bg-accent-primary text-white" : "border-white/20"
+                  selectedMode === "light" ? "border-accent-primary bg-accent-primary text-white" : "border-border-subtle"
                 }`}
               >
                 {selectedMode === "light" && <Check className="w-3 h-3 stroke-[3]" />}
@@ -881,7 +939,7 @@ function ThemeAndModeStep({
         {/* ─── Themes Grid ─── */}
         <div>
           <div className="mb-3">
-            <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-text-muted">
+            <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-text-secondary font-semibold">
               SYSTEM RESONANCE AURAS
             </span>
           </div>
@@ -905,7 +963,7 @@ function ThemeAndModeStep({
                   `}
                 >
                   <div
-                    className="w-full h-24 mb-4 rounded-lg flex items-center justify-center border border-gray-700/50"
+                    className="w-full h-24 mb-4 rounded-lg flex items-center justify-center border border-border-subtle shadow-sm"
                     style={{ backgroundColor: THEME_MAP[item.value]?.["--accent-primary-dim"] || "#222" }}
                   >
                     <div
@@ -915,14 +973,18 @@ function ThemeAndModeStep({
                   </div>
 
                   <div className="flex justify-between items-start mb-2 relative z-10">
-                    <h3 className="font-bold text-lg text-white font-rajdhani tracking-wide">{item.name}</h3>
+                    <h3 className="font-bold text-lg font-rajdhani tracking-wide" style={{ color: isSelected ? "var(--accent-text-light)" : "var(--text-primary)" }}>
+                      {item.name}
+                    </h3>
                     {isSelected && (
                       <motion.div layoutId="selectedThemeBadge" className="text-[var(--accent-primary)]">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                       </motion.div>
                     )}
                   </div>
-                  <p className="text-sm text-text-muted relative z-10">{item.description}</p>
+                  <p className="text-sm relative z-10" style={{ color: isSelected ? "var(--text-primary)" : "var(--text-secondary)" }}>
+                    {item.description}
+                  </p>
 
                   {/* Hover Glow */}
                   <div
@@ -936,11 +998,11 @@ function ThemeAndModeStep({
         </div>
       </div>
 
-      <div className="flex justify-between mt-6 pt-6 border-t border-gray-800">
+      <div className="flex justify-between mt-6 pt-6 border-t border-border-subtle">
         {onPrev ? (
           <button 
             onClick={onPrev}
-            className="px-6 py-3 rounded text-text-muted hover:text-text-primary transition-colors tracking-widest text-sm uppercase"
+            className="px-6 py-3 rounded text-text-secondary hover:text-text-primary transition-colors tracking-widest text-sm uppercase font-bold"
           >
             Go Back
           </button>

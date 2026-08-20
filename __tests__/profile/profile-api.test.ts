@@ -38,6 +38,14 @@ describe("Profile System APIs", () => {
       aura: "aura_monarch",
     },
     socialLinks: { github: "hunter_test", linkedin: "hunter-jinwoo" },
+    connectedAccounts: [
+      {
+        provider: "GITHUB",
+        providerAccountId: "12345",
+        providerEmail: "hunter_test@gh.com",
+        providerUsername: "hunter_test",
+      },
+    ],
     statEndurance: 85,
     statTenacity: 90,
     statVelocity: 75,
@@ -88,9 +96,13 @@ describe("Profile System APIs", () => {
         synthesis: 80,
         discipline: 95,
       });
+      expect(data.profile.connectedAccounts).toEqual({
+        github: "hunter_test",
+        discord: null,
+        instagram: null,
+      });
       expect(data.profile.socialLinks).toEqual({
         github: "hunter_test",
-        linkedin: "hunter-jinwoo",
       });
       expect(data.profile.completedQuestsCount).toBe(18);
       expect(data).toHaveProperty("permissions");

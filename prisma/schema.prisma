@@ -64,6 +64,7 @@ enum LedgerSource {
   LEVEL_UP
   SHOP
   SYSTEM
+  ACHIEVEMENT
 }
 
 enum CosmeticCategory {
@@ -125,6 +126,7 @@ model User {
   bio               String?
   characterConfig   Json?
   socialLinks       Json?
+  notificationPreferences Json?
 
   // Academic Cognitive Stats Matrix (Attributes 0-100+)
   statEndurance     Int       @default(10) // END: Long-duration unbroken focus blocks (>60m)
@@ -136,6 +138,12 @@ model User {
   createdAt         DateTime  @default(now())
   timezone          String    @default("UTC")
   hasCompletedOnboarding Boolean @default(false)
+
+  // Study Schedule & Penalty Engine
+  dailyGoalMinutes               Int       @default(120)
+  restDays                       Int[]     @default([0]) // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  enableHpPenalty                Boolean   @default(true)
+  lastDailyPenaltyEvaluatedDate  String    @default("")
 
   goals          Goal[]
   quests         Quest[]
@@ -161,6 +169,8 @@ model User {
   // Social
   friendshipsAsUser   Friendship[]              @relation("friendshipsAsUser")
   friendshipsAsFriend Friendship[]              @relation("friendshipsAsFriend")
+  blockedUsers        BlockedUser[]             @relation("blockedUsers")
+  blockedByUsers      BlockedUser[]             @relation("blockedByUsers")
   sentRequests        FriendRequest[]           @relation("sentRequests")
   receivedRequests    FriendRequest[]           @relation("receivedRequests")
   conversations       ConversationParticipant[]
@@ -183,6 +193,9 @@ model Goal {
   createdAt   DateTime    @default(now())
 
   quests Quest[]
+
+  @@index([userId, status])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model Quest {
@@ -207,6 +220,10 @@ model Quest {
   completedAt        DateTime?
 
   sessions StudySession[]
+
+  @@index([userId, status])
+  @@index([userId, scheduledFor])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model Subject {
@@ -219,6 +236,8 @@ model Subject {
 
   sessions StudySession[]
   invites  SessionInvite[]
+
+  @@index([userId, createdAt])
 }
 
 model StudySession {
@@ -234,6 +253,10 @@ model StudySession {
   focusRate       Int       @default(80) // Added for AI study planning
   startedAt       DateTime  @default(now())
   endedAt         DateTime?
+
+  @@index([userId, startedAt(sort: Desc)])
+  @@index([userId, questId])
+  @@index([userId, subjectId])
 }
 
 model SystemMessage {
@@ -247,6 +270,9 @@ model SystemMessage {
   read          Boolean           @default(false)
   attachmentUrl String? // Optional URL for uploaded files (images, pdfs, etc)
   createdAt     DateTime          @default(now())
+
+  @@index([userId, read, createdAt(sort: Desc)])
+  @@index([userId, sessionId])
 }
 
 model ChatSession {
@@ -258,6 +284,8 @@ model ChatSession {
   updatedAt DateTime @updatedAt
 
   messages SystemMessage[]
+
+  @@index([userId, updatedAt(sort: Desc)])
 }
 
 // ─── Social Models ───────────────────────────────────────────
@@ -271,6 +299,18 @@ model Friendship {
   createdAt DateTime @default(now())
 
   @@unique([userId, friendId])
+  @@index([friendId, userId])
+}
+
+model BlockedUser {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  blockedId Int
+  user      User     @relation("blockedUsers", fields: [userId], references: [id], onDelete: Cascade)
+  blocked   User     @relation("blockedByUsers", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, blockedId])
 }
 
 model FriendRequest {
@@ -283,11 +323,14 @@ model FriendRequest {
   createdAt  DateTime      @default(now())
 
   @@unique([senderId, receiverId])
+  @@index([receiverId, status])
+  @@index([senderId, status])
 }
 
 model Conversation {
   id        Int      @id @default(autoincrement())
   name      String?
+  avatarUrl String?
   isGroup   Boolean  @default(false)
   createdBy Int?
   createdAt DateTime @default(now())
@@ -307,6 +350,7 @@ model ConversationParticipant {
   lastReadAt     DateTime     @default(now())
 
   @@unique([userId, conversationId])
+  @@index([conversationId, userId])
 }
 
 model Message {
@@ -317,6 +361,9 @@ model Message {
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
   content        String
   createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt(sort: Asc)])
+  @@index([senderId])
 }
 
 model SessionInvite {
@@ -329,6 +376,9 @@ model SessionInvite {
   subject    Subject?     @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   status     InviteStatus @default(PENDING)
   createdAt  DateTime     @default(now())
+
+  @@index([receiverId, status])
+  @@index([senderId, status])
 }
 
 // ─── Economy Models ──────────────────────────────────────────
@@ -341,6 +391,8 @@ model InventoryItem {
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, itemKey])
 }
 
 model SylphLedger {
@@ -350,6 +402,8 @@ model SylphLedger {
   amount    Int // Positive for income, negative for expense
   source    LedgerSource
   createdAt DateTime     @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model HpLedger {
@@ -359,6 +413,8 @@ model HpLedger {
   amount    Int      // Negative for damage, positive for heal
   source    String   // e.g., "QUEST_FAILED", "ELIXIR"
   createdAt DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model UserCosmetic {
@@ -370,6 +426,7 @@ model UserCosmetic {
   createdAt DateTime         @default(now())
 
   @@unique([userId, category, itemKey])
+  @@index([userId, category])
 }
 
 model UserAchievement {
@@ -380,6 +437,7 @@ model UserAchievement {
   claimedAt     DateTime @default(now())
 
   @@unique([userId, achievementId])
+  @@index([userId, claimedAt(sort: Desc)])
 }
 
 model UserPrivacy {
@@ -406,6 +464,7 @@ model ConnectedAccount {
   provider          String // Google, GitHub, Discord, Instagram
   providerAccountId String // The unique ID given by the provider
   providerEmail     String? // The email associated with that specific provider
+  providerUsername  String? // The username/handle on the provider platform (e.g. GitHub login, Discord username)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -430,6 +489,7 @@ model AiMemory {
   updatedAt  DateTime @updatedAt
 
   @@unique([userId, key])
+  @@index([userId, confidence(sort: Desc)])
 }
 
 model AiInsight {
@@ -441,6 +501,8 @@ model AiInsight {
   metadata  String?  // JSON with supporting data
   dismissed Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([userId, dismissed, createdAt(sort: Desc)])
 }
 
 model DailyBriefingLog {
@@ -484,7 +546,7 @@ model AcousticTrack {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@index([category])
+  @@index([category, orderIndex])
 }
 
 model AuthSession {
@@ -501,7 +563,7 @@ model AuthSession {
   createdAt    DateTime  @default(now())
   expiresAt    DateTime?
 
-  @@index([userId])
+  @@index([userId, lastActiveAt(sort: Desc)])
 }
 
 

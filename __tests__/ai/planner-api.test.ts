@@ -24,7 +24,11 @@ vi.mock("../../lib/prisma", () => ({
       deleteMany: vi.fn(),
     },
     studySession: {
-      findMany: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
+    chatSession: {
+      create: vi.fn().mockResolvedValue({ id: 12, userId: 1, title: "Study Plan: maths" }),
+      findFirst: vi.fn(),
     },
     systemMessage: {
       create: vi.fn(),

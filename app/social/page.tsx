@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, Suspense } from "react";
 import { useAuth } from "../components/AuthProvider";
 import { useProfileModal } from "../components/ProfileModalContext";
 import { AddFriendModal } from "../components/AddFriendModal";
 import { CharacterRenderer } from "../components/character/CharacterRenderer";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -21,6 +21,10 @@ import {
   ArrowUpDown,
   Shield,
   MessageCircle,
+  Upload,
+  Camera,
+  Link2,
+  Trash2,
 } from "lucide-react";
 
 type Tab = "friends" | "requests" | "messages" | "groups";
@@ -36,15 +40,18 @@ interface Friend {
   totalStudySeconds: number;
   todayMinutes: number;
   todaySeconds: number;
+  completedTodaySeconds?: number;
   isOnline: boolean;
   isStudying: boolean;
   activeSessionStartedAt: string | null;
   avatarUrl: string | null;
   activeAvatar: string;
   activeFrame: string;
-  activeTitle: string;
-  activeAura: string;
-  characterConfig: any | null;
+  activeAura?: string;
+  activeTitle: string | null;
+  characterConfig?: any | null;
+  bio: string | null;
+  streakDays: number;
   lastSeenAt: string | null;
 }
 
@@ -69,6 +76,7 @@ interface FriendRequest {
 interface Conversation {
   id: number;
   name: string;
+  avatarUrl?: string | null;
   isGroup: boolean;
   hasUnread: boolean;
   participants: {
@@ -76,6 +84,11 @@ interface Conversation {
     name: string | null;
     username: string;
     hunterRank: string;
+    level?: number;
+    avatarUrl?: string | null;
+    activeAvatar?: string;
+    activeFrame?: string;
+    characterConfig?: any | null;
     isOnline: boolean;
   }[];
   lastMessage: {
@@ -96,12 +109,24 @@ function formatHHMMSS(totalSeconds: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-export default function SocialPage() {
+function SocialContent() {
   const { user, token, isLoading } = useAuth();
   const { openProfile } = useProfileModal();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [activeTab, setActiveTab] = useState<Tab>("friends");
+  const tabParam = searchParams.get("tab") as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>(
+    tabParam && ["friends", "requests", "messages", "groups"].includes(tabParam)
+      ? tabParam
+      : "friends"
+  );
+
+  useEffect(() => {
+    if (tabParam && ["friends", "requests", "messages", "groups"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
 
@@ -123,6 +148,47 @@ export default function SocialPage() {
   // Group creation states
   const [groupName, setGroupName] = useState("");
   const [selectedFriends, setSelectedFriends] = useState<number[]>([]);
+  const [groupAvatarUrl, setGroupAvatarUrl] = useState("");
+  const [groupAvatarMode, setGroupAvatarMode] = useState<"UPLOAD" | "URL">("UPLOAD");
+  const createGroupFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Client-side image compression for group avatar creation
+  const processImageFile = (file: File, callback: (dataUrl: string) => void, maxDim: number = 400) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const rawUrl = e.target?.result as string;
+      if (!rawUrl) return;
+
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/webp", 0.85);
+          callback(compressed);
+        } else {
+          callback(rawUrl);
+        }
+      };
+      img.onerror = () => callback(rawUrl);
+      img.src = rawUrl;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // ─── Data Fetching & Polling ─────────────────────────────
   useEffect(() => {
@@ -229,6 +295,7 @@ export default function SocialPage() {
         body: JSON.stringify({
           participantIds: selectedFriends,
           name: groupName.trim(),
+          avatarUrl: groupAvatarUrl.trim() || null,
           isGroup: true,
         }),
       });
@@ -236,6 +303,7 @@ export default function SocialPage() {
         const data = await res.json();
         setShowCreateGroup(false);
         setGroupName("");
+        setGroupAvatarUrl("");
         setSelectedFriends([]);
         router.push(`/social/chat/${data.id}`);
       }
@@ -300,10 +368,15 @@ export default function SocialPage() {
     return list;
   }, [friends, statusFilter, searchQuery, sortBy]);
 
-  // Current user's daily study estimate
+  // Current user's daily study time (accurate for today + live ticking if studying)
   const userTodaySeconds = useMemo(() => {
-    return (user?.totalStudyMinutes || 0) * 60;
-  }, [user]);
+    if (user?.activeSessionStartedAt) {
+      const started = new Date(user.activeSessionStartedAt).getTime();
+      const activeElapsed = Math.max(0, Math.floor((Date.now() - started) / 1000));
+      return (user.completedTodaySeconds ?? user.todayStudySeconds ?? 0) + activeElapsed;
+    }
+    return user?.todayStudySeconds ?? (user?.completedTodaySeconds ?? 0);
+  }, [user, tick]);
 
   if (isLoading) {
     return (
@@ -411,7 +484,7 @@ export default function SocialPage() {
                 </span>
                 <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400 flex items-center gap-1">
                   <Flame className="w-3.5 h-3.5 text-amber-400" />
-                  {user?.streakDays || 0}d Streak
+                  {user?.streakDays || 0} {user?.streakDays === 1 ? "Week" : "Weeks"} Streak
                 </span>
               </div>
             </div>
@@ -661,10 +734,8 @@ export default function SocialPage() {
                 let liveSeconds = friend.todaySeconds;
                 if (friend.isStudying && friend.activeSessionStartedAt) {
                   const started = new Date(friend.activeSessionStartedAt).getTime();
-                  const elapsed = Math.floor((Date.now() - started) / 1000);
-                  if (elapsed > 0) {
-                    liveSeconds = friend.todaySeconds + (elapsed % 60);
-                  }
+                  const activeElapsed = Math.max(0, Math.floor((Date.now() - started) / 1000));
+                  liveSeconds = (friend.completedTodaySeconds ?? friend.todaySeconds) + activeElapsed;
                 }
 
                 return (
@@ -940,56 +1011,81 @@ export default function SocialPage() {
             </div>
           ) : (
             <div className="space-y-2.5">
-              {dms.map((dm) => (
-                <Link
-                  href={`/social/chat/${dm.id}`}
-                  key={dm.id}
-                  className="block group"
-                >
-                  <div className="flex items-center justify-between p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light font-bold uppercase font-['Rajdhani'] text-lg">
-                        {dm.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p
-                          className={`font-bold font-['Rajdhani'] text-base ${
-                            dm.hasUnread
-                              ? "text-text-primary"
-                              : "text-text-secondary"
-                          }`}
-                        >
-                          {dm.name}
-                        </p>
-                        <p
-                          className={`text-xs max-w-md truncate ${
-                            dm.hasUnread
-                              ? "text-accent-primary font-bold"
-                              : "text-text-muted"
-                          }`}
-                        >
-                          {dm.lastMessage
-                            ? `${dm.lastMessage.senderName}: ${dm.lastMessage.content}`
-                            : "No messages yet"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      {dm.lastMessage && (
-                        <p className="text-[10px] text-text-muted font-mono mb-1">
-                          {new Date(dm.lastMessage.createdAt).toLocaleTimeString(
-                            [],
-                            { hour: "2-digit", minute: "2-digit" }
+              {dms.map((dm) => {
+                const other = dm.participants.find((p) => p.id !== user?.id) || dm.participants[0];
+                return (
+                  <Link
+                    href={`/social/chat/${dm.id}`}
+                    key={dm.id}
+                    className="block group"
+                  >
+                    <div className="flex items-center justify-between p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm">
+                      <div className="flex items-center gap-4">
+                        {/* Dynamic Participant Profile Picture */}
+                        <div className="relative w-12 h-12 rounded-xl shrink-0 overflow-hidden bg-bg-abyss border border-border-subtle flex items-center justify-center shadow-sm">
+                          <div className={`rank-badge rank-${other?.hunterRank || "E"} w-full h-full text-sm font-mono font-bold flex items-center justify-center overflow-hidden`}>
+                            {other?.avatarUrl ? (
+                              <img
+                                src={other.avatarUrl}
+                                alt={other.username}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span>{other?.hunterRank || "E"}</span>
+                            )}
+                          </div>
+                          {other?.isOnline && (
+                            <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-bg-panel" />
                           )}
-                        </p>
-                      )}
-                      {dm.hasUnread && (
-                        <span className="inline-block w-2.5 h-2.5 bg-accent-primary rounded-full animate-pulse" />
-                      )}
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p
+                              className={`font-bold font-['Rajdhani'] text-base ${
+                                dm.hasUnread
+                                  ? "text-text-primary"
+                                  : "text-text-secondary"
+                              }`}
+                            >
+                              {dm.name}
+                            </p>
+                            {other && (
+                              <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-accent-primary-dim/30 border border-accent-primary-mid/40 text-accent-text-light">
+                                Rank {other.hunterRank || "E"}
+                              </span>
+                            )}
+                          </div>
+                          <p
+                            className={`text-xs max-w-md truncate ${
+                              dm.hasUnread
+                                ? "text-accent-primary font-bold"
+                                : "text-text-muted"
+                            }`}
+                          >
+                            {dm.lastMessage
+                              ? `${dm.lastMessage.senderName}: ${dm.lastMessage.content}`
+                              : "No messages yet"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {dm.lastMessage && (
+                          <p className="text-[10px] text-text-muted font-mono mb-1">
+                            {new Date(dm.lastMessage.createdAt).toLocaleTimeString(
+                              [],
+                              { hour: "2-digit", minute: "2-digit" }
+                            )}
+                          </p>
+                        )}
+                        {dm.hasUnread && (
+                          <span className="inline-block w-2.5 h-2.5 bg-accent-primary rounded-full animate-pulse" />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
@@ -1041,8 +1137,12 @@ export default function SocialPage() {
                 >
                   <div className="flex items-center justify-between p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm">
                     <div className="flex items-center gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-bold uppercase font-['Rajdhani'] text-lg">
-                        {group.name.charAt(0)}
+                      <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-bold uppercase font-['Rajdhani'] text-lg shrink-0 shadow-sm overflow-hidden">
+                        {group.avatarUrl ? (
+                          <img src={group.avatarUrl} alt={group.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Users className="w-5 h-5 text-indigo-400" />
+                        )}
                       </div>
                       <div>
                         <p
@@ -1107,7 +1207,7 @@ export default function SocialPage() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ type: "spring", damping: 28, stiffness: 340 }}
-            className="system-card relative w-full max-w-md p-6 z-10 flex flex-col max-h-[80vh] shadow-2xl border border-border-subtle"
+            className="system-card relative w-full max-w-md p-6 z-10 flex flex-col max-h-[85vh] shadow-2xl border border-border-subtle"
           >
             <button
               type="button"
@@ -1125,13 +1225,115 @@ export default function SocialPage() {
               placeholder="Group Name"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              className="input-field mb-4 w-full text-xs font-['Rajdhani']"
+              className="input-field mb-3 w-full text-xs font-['Rajdhani']"
             />
+
+            {/* Group Image Section */}
+            <div className="mb-4 p-3 rounded-xl bg-bg-abyss/60 border border-border-subtle flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted">
+                  Group Image (Optional)
+                </span>
+                <div className="flex items-center bg-bg-panel p-0.5 rounded-lg border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setGroupAvatarMode("UPLOAD")}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold font-['Rajdhani'] uppercase transition-all flex items-center gap-1 ${
+                      groupAvatarMode === "UPLOAD"
+                        ? "bg-accent-primary text-white shadow-sm"
+                        : "text-text-muted hover:text-text-primary"
+                    }`}
+                  >
+                    <Upload className="w-2.5 h-2.5" />
+                    <span>Upload</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGroupAvatarMode("URL")}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold font-['Rajdhani'] uppercase transition-all flex items-center gap-1 ${
+                      groupAvatarMode === "URL"
+                        ? "bg-accent-primary text-white shadow-sm"
+                        : "text-text-muted hover:text-text-primary"
+                    }`}
+                  >
+                    <Link2 className="w-2.5 h-2.5" />
+                    <span>URL</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Hidden file input for create group */}
+              <input
+                ref={createGroupFileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    processImageFile(file, (compressed) => setGroupAvatarUrl(compressed), 400);
+                  }
+                  e.target.value = "";
+                }}
+              />
+
+              {groupAvatarMode === "UPLOAD" ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-bg-panel border border-white/10 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                    {groupAvatarUrl ? (
+                      <img src={groupAvatarUrl} alt="Group Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <Users className="w-5 h-5 text-text-muted" />
+                    )}
+                  </div>
+                  <div className="flex-1 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => createGroupFileInputRef.current?.click()}
+                      className="flex-1 py-1.5 px-3 rounded-lg bg-bg-panel hover:bg-bg-shadow border border-white/10 hover:border-accent-primary/60 text-xs font-['Rajdhani'] font-bold text-text-primary flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                    >
+                      <Upload className="w-3 h-3 text-accent-primary" />
+                      <span>{groupAvatarUrl ? "Replace Group Image" : "Upload Group Image"}</span>
+                    </button>
+                    {groupAvatarUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setGroupAvatarUrl("")}
+                        className="p-1.5 rounded-lg bg-bg-panel hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                        title="Clear chosen file"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="url"
+                    value={groupAvatarUrl}
+                    onChange={(e) => setGroupAvatarUrl(e.target.value)}
+                    placeholder="https://example.com/avatar.jpg"
+                    className="flex-1 rounded-lg px-3 py-1.5 bg-bg-panel border border-white/10 text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-all shadow-inner"
+                  />
+                  {groupAvatarUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setGroupAvatarUrl("")}
+                      className="p-1.5 rounded-lg bg-bg-panel hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                      title="Clear URL"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             <p className="text-xs text-text-muted mb-2 uppercase font-bold font-['Rajdhani'] tracking-wider">
               Select Friends
             </p>
-            <div className="flex-1 overflow-y-auto space-y-2 mb-4 border border-border-subtle p-2 rounded-xl max-h-60 custom-scrollbar bg-bg-abyss/40">
+            <div className="flex-1 overflow-y-auto space-y-2 mb-4 border border-border-subtle p-2 rounded-xl max-h-48 custom-scrollbar bg-bg-abyss/40">
               {friends.map((friend) => (
                 <label
                   key={friend.id}
@@ -1185,5 +1387,19 @@ export default function SocialPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SocialPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-bg-void text-text-muted">
+          <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <SocialContent />
+    </Suspense>
   );
 }

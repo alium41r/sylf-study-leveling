@@ -99,7 +99,7 @@ export async function initializeUserProfile(params: RegisterParams) {
   const tempScholarId = generateRandomScholarId();
 
   // 7. Atomic user creation
-  const newUser = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
         email: email.toLowerCase(),
@@ -148,6 +148,7 @@ export async function initializeUserProfile(params: RegisterParams) {
           provider: provider.toUpperCase(),
           providerAccountId,
           providerEmail: email,
+          providerUsername: (params as any).providerUsername || null,
         },
       });
     }
@@ -165,47 +166,65 @@ export async function initializeUserProfile(params: RegisterParams) {
     return updatedUser;
   });
 
-  // 8. Generate JWT token
   const tokenPayload: AuthTokenPayload = {
-    userId: newUser.id,
-    email: newUser.email,
-    username: newUser.username,
-    name: newUser.name,
-    scholarId: newUser.scholarId,
-    verificationStatus: newUser.verificationStatus,
-    hunterRank: newUser.hunterRank,
-    level: newUser.level,
-    hasCompletedOnboarding: newUser.hasCompletedOnboarding,
-    hasPassword: !isOAuth && !!password,
-    timezone: newUser.timezone || safeTimezone,
+    userId: result.id,
+    email: result.email,
+    username: result.username,
+    name: result.name,
+    scholarId: result.scholarId || formatScholarId(result.id),
+    verificationStatus: result.verificationStatus,
+    hunterRank: result.hunterRank,
+    level: result.level,
+    hasCompletedOnboarding: result.hasCompletedOnboarding,
+    hasPassword: !!result.password,
+    timezone: result.timezone || "UTC",
   };
 
   const token = await signToken(tokenPayload);
+  return { user: result, token };
+}
 
-  return {
-    user: {
-      id: newUser.id,
-      email: newUser.email,
-      username: newUser.username,
-      name: newUser.name,
-      scholarId: newUser.scholarId,
-      verificationStatus: newUser.verificationStatus,
-      hunterRank: newUser.hunterRank,
-      level: newUser.level,
-      currentXP: newUser.currentXP,
-      xpToNextLevel: newUser.xpToNextLevel,
-      hp: newUser.hp,
-      maxHp: newUser.maxHp,
-      streakDays: newUser.streakDays,
-      totalStudyMinutes: newUser.totalStudyMinutes,
-      hasCompletedOnboarding: newUser.hasCompletedOnboarding,
-      createdAt: newUser.createdAt,
-      avatarUrl: newUser.avatarUrl,
-      hasPassword: !isOAuth && !!password,
-      timezone: newUser.timezone || safeTimezone,
+/**
+ * Links a third-party OAuth account to an already logged-in user.
+ */
+export async function linkOAuthAccountToUser(userId: number, oauthUser: NormalizedOAuthUser) {
+  const providerUpper = oauthUser.provider.toUpperCase();
+
+  // Ensure no other user is linked to this specific provider account
+  const conflict = await prisma.connectedAccount.findFirst({
+    where: {
+      provider: providerUpper,
+      providerAccountId: oauthUser.providerAccountId,
+      userId: { not: userId },
     },
-    token,
-  };
+  });
+
+  if (conflict) {
+    throw new Error(`This ${oauthUser.provider.toUpperCase()} account is already connected to another user.`);
+  }
+
+  const linked = await prisma.connectedAccount.upsert({
+    where: {
+      userId_provider: {
+        userId,
+        provider: providerUpper,
+      },
+    },
+    create: {
+      userId,
+      provider: providerUpper,
+      providerAccountId: oauthUser.providerAccountId,
+      providerEmail: oauthUser.email || null,
+      providerUsername: oauthUser.providerUsername || oauthUser.username || null,
+    },
+    update: {
+      providerAccountId: oauthUser.providerAccountId,
+      providerEmail: oauthUser.email || null,
+      providerUsername: oauthUser.providerUsername || oauthUser.username || null,
+    },
+  });
+
+  return linked;
 }
 
 /**
@@ -229,6 +248,14 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
   });
 
   if (existingConnection?.user) {
+    // Refresh handle if available
+    if (oauthUser.providerUsername && (existingConnection as any).providerUsername !== oauthUser.providerUsername) {
+      await prisma.connectedAccount.update({
+        where: { id: existingConnection.id },
+        data: { providerUsername: oauthUser.providerUsername },
+      }).catch(() => {});
+    }
+
     const user = existingConnection.user;
     const tokenPayload: AuthTokenPayload = {
       userId: user.id,
@@ -247,68 +274,74 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
   }
 
   // 2. Check if a user with this email already exists
-  const existingUser = await prisma.user.findUnique({
-    where: { email: oauthUser.email.toLowerCase() },
-  });
-
-  if (existingUser) {
-    // Link the provider to this existing user
-    await prisma.connectedAccount.upsert({
-      where: {
-        userId_provider: {
-          userId: existingUser.id,
-          provider: providerUpper,
-        },
-      },
-      update: {
-        providerAccountId: oauthUser.providerAccountId,
-        providerEmail: oauthUser.email,
-      },
-      create: {
-        userId: existingUser.id,
-        provider: providerUpper,
-        providerAccountId: oauthUser.providerAccountId,
-        providerEmail: oauthUser.email,
-      },
+  if (oauthUser.email) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: oauthUser.email.toLowerCase() },
     });
 
-    // If OAuth is verified, upgrade user status to VERIFIED
-    let updatedUser = existingUser;
-    if (oauthUser.emailVerified && existingUser.verificationStatus !== "VERIFIED") {
-      updatedUser = await prisma.user.update({
-        where: { id: existingUser.id },
-        data: { verificationStatus: "VERIFIED" },
+    if (existingUser) {
+      // Link the provider to this existing user
+      await prisma.connectedAccount.upsert({
+        where: {
+          userId_provider: {
+            userId: existingUser.id,
+            provider: providerUpper,
+          },
+        },
+        update: {
+          providerAccountId: oauthUser.providerAccountId,
+          providerEmail: oauthUser.email,
+          providerUsername: oauthUser.providerUsername || null,
+        },
+        create: {
+          userId: existingUser.id,
+          provider: providerUpper,
+          providerAccountId: oauthUser.providerAccountId,
+          providerEmail: oauthUser.email,
+          providerUsername: oauthUser.providerUsername || null,
+        },
       });
-    }
 
-    const tokenPayload: AuthTokenPayload = {
-      userId: updatedUser.id,
-      email: updatedUser.email,
-      username: updatedUser.username,
-      name: updatedUser.name,
-      scholarId: updatedUser.scholarId || formatScholarId(updatedUser.id),
-      verificationStatus: updatedUser.verificationStatus,
-      hunterRank: updatedUser.hunterRank,
-      level: updatedUser.level,
-      hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
-      hasPassword: !!updatedUser.password,
-      timezone: updatedUser.timezone || "UTC",
-    };
-    const token = await signToken(tokenPayload);
-    return { user: updatedUser, token, isNewUser: false };
+      // If OAuth is verified, upgrade user status to VERIFIED
+      let updatedUser = existingUser;
+      if (oauthUser.emailVerified && existingUser.verificationStatus !== "VERIFIED") {
+        updatedUser = await prisma.user.update({
+          where: { id: existingUser.id },
+          data: { verificationStatus: "VERIFIED" },
+        });
+      }
+
+      const tokenPayload: AuthTokenPayload = {
+        userId: updatedUser.id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        name: updatedUser.name,
+        scholarId: updatedUser.scholarId || formatScholarId(updatedUser.id),
+        verificationStatus: updatedUser.verificationStatus,
+        hunterRank: updatedUser.hunterRank,
+        level: updatedUser.level,
+        hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
+        hasPassword: !!updatedUser.password,
+        timezone: updatedUser.timezone || "UTC",
+      };
+      const token = await signToken(tokenPayload);
+      return { user: updatedUser, token, isNewUser: false };
+    }
   }
 
   // 3. Create fresh user
+  const emailFallback = oauthUser.email || `${oauthUser.provider}_${oauthUser.providerAccountId}@sylf.app`;
   const uniqueUsername = await generateUniqueUsername(oauthUser.username);
   const result = await initializeUserProfile({
-    email: oauthUser.email,
+    email: emailFallback,
     username: uniqueUsername,
     name: oauthUser.name,
     avatarUrl: oauthUser.avatarUrl,
     isOAuth: true,
     provider: providerUpper,
     providerAccountId: oauthUser.providerAccountId,
-  });
+    providerUsername: oauthUser.providerUsername || null,
+  } as any);
 
   return { user: result.user, token: result.token, isNewUser: true };
 }

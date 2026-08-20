@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import MarkdownRenderer from "../../components/MarkdownRenderer";
 
 interface Quest {
   id: number;
@@ -293,7 +294,9 @@ export function GoalsTab() {
                             {goal.title}
                           </h3>
                           {goal.description && (
-                            <p className="text-sm text-muted mt-1">{goal.description}</p>
+                            <div className="mt-1">
+                              <MarkdownRenderer content={goal.description} compact />
+                            </div>
                           )}
                         </>
                       )}

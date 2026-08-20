@@ -105,6 +105,7 @@ export async function GET(
       conversation: {
         id: conversation.id,
         name: conversation.name,
+        avatarUrl: conversation.avatarUrl,
         isGroup: conversation.isGroup,
         createdBy: conversation.createdBy,
         createdAt: conversation.createdAt,
@@ -139,8 +140,8 @@ export async function GET(
 
 /**
  * PATCH /api/conversations/[id]
- * Update conversation (name for groups, add/remove members).
- * Body: { name?: string, addMemberIds?: number[], removeMemberIds?: number[] }
+ * Update conversation (name/avatar for groups, add/remove members).
+ * Body: { name?: string, avatarUrl?: string | null, addMemberIds?: number[], removeMemberIds?: number[] }
  */
 export async function PATCH(
   req: NextRequest,
@@ -176,11 +177,20 @@ export async function PATCH(
       return NextResponse.json({ error: "Can only modify group conversations" }, { status: 400 });
     }
 
-    // Update name
-    if (body.name) {
-      await prisma.conversation.update({
+    // Atomically update conversation fields
+    const updateData: { name?: string | null; avatarUrl?: string | null } = {};
+    if (body.name !== undefined) {
+      updateData.name = body.name ? body.name.trim() : null;
+    }
+    if (body.avatarUrl !== undefined) {
+      updateData.avatarUrl = body.avatarUrl ? (typeof body.avatarUrl === "string" ? body.avatarUrl.trim() : body.avatarUrl) : null;
+    }
+
+    let updatedConversation = conversation;
+    if (Object.keys(updateData).length > 0) {
+      updatedConversation = await prisma.conversation.update({
         where: { id: conversationId },
-        data: { name: body.name },
+        data: updateData,
       });
     }
 
@@ -205,9 +215,17 @@ export async function PATCH(
       });
     }
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
+    return NextResponse.json({
+      success: true,
+      conversation: {
+        id: updatedConversation.id,
+        name: updatedConversation.name,
+        avatarUrl: updatedConversation.avatarUrl,
+        isGroup: updatedConversation.isGroup,
+      },
+    });
+  } catch (error: any) {
     console.error("PATCH conversation error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Internal server error" }, { status: 500 });
   }
 }

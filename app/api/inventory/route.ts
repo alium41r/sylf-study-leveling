@@ -18,6 +18,12 @@ export async function GET(req: NextRequest) {
 
     const inventoryItems = await prisma.inventoryItem.findMany({
       where: { userId },
+      select: {
+        id: true,
+        itemKey: true,
+        quantity: true,
+        updatedAt: true,
+      },
     });
 
     return NextResponse.json({ inventoryItems }, { status: 200 });

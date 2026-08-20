@@ -94,11 +94,26 @@ export async function GET(req: NextRequest) {
     const now = new Date();
     const activeThreshold = new Date(Date.now() - 5 * 60 * 1000); // 5 min for active heartbeat
 
-    const friends = friendships.map((f: any) => {
+    // Fetch blocked users to exclude
+    const blockedRows = await prisma.$queryRaw<Array<{ blockedId: number; userId: number }>>`
+      SELECT "blockedId", "userId" FROM "BlockedUser"
+      WHERE "userId" = ${userId} OR "blockedId" = ${userId}
+    `.catch(() => []);
+    const blockedUserIds = new Set(
+      blockedRows.flatMap((r) => [r.blockedId, r.userId]).filter((id) => id !== userId)
+    );
+
+    const friends = friendships
+      .filter((f: any) => {
+        const otherId = f.userId === userId ? f.friendId : f.userId;
+        return !blockedUserIds.has(otherId);
+      })
+      .map((f: any) => {
       const friendData = f.userId === userId ? f.friend : f.user;
       
       // Calculate today's completed study seconds & find active session
       let todaySeconds = 0;
+      let completedTodaySeconds = 0;
       let activeSession: any = null;
 
       for (const s of friendData.sessions) {
@@ -111,7 +126,9 @@ export async function GET(req: NextRequest) {
             todaySeconds += elapsed;
           }
         } else {
-          todaySeconds += (s.durationSeconds || (s.durationMinutes * 60) || 0);
+          const sec = (s.durationSeconds || (s.durationMinutes * 60) || 0);
+          completedTodaySeconds += sec;
+          todaySeconds += sec;
         }
       }
 
@@ -130,6 +147,7 @@ export async function GET(req: NextRequest) {
         totalStudySeconds: friendData.totalStudySeconds || (friendData.totalStudyMinutes * 60),
         todayMinutes,
         todaySeconds,
+        completedTodaySeconds,
         isOnline,
         isStudying,
         activeSessionStartedAt: activeSession ? activeSession.startedAt.toISOString() : null,

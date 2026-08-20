@@ -6,6 +6,7 @@ import { awardXP, getStreakMultiplier } from "@/lib/game-engine";
 import { DIFFICULTY_CONFIG } from "@/lib/difficulty-engine";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
+import { invalidateRankingsCache } from "@/lib/cache-service";
 
 const updateQuestSchema = z.object({
   title: z.string().min(1).optional(),
@@ -125,139 +126,40 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     // ─── Handle COMPLETED ─────────────────────────────────────
     if (isNewlyCompleted) {
-      let finalXP = quest.xpReward;
-      let finalSylph = quest.sylphReward;
-      
-      // Determine if early, late, or on time
-      let isLate = false;
-      let isEarly = false;
-      if (quest.scheduledFor) {
-        if (today > quest.scheduledFor) {
-          isLate = true;
-        } else if (today < quest.scheduledFor) {
-          isEarly = true;
-        }
-      }
+      const rows = await prisma.$queryRaw<
+        [{ claim_quest_reward: { success: boolean; questId: number; status: string; xpGained?: number; sylphGained?: number; totalSylphEarned?: number; hpHealed?: number; currentHp?: number; level?: number; currentXP?: number; xpToNextLevel?: number; hunterRank?: string; levelsGained?: number; didRankUp?: boolean; penalty?: { hpLost: number; currentHp: number } } }]
+      >`
+        SELECT public.claim_quest_reward(
+          ${payload.userId as number},
+          ${parseInt(id)},
+          ${today}
+        ) AS claim_quest_reward
+      `;
 
-      // If late, redirect to FAILED logic
-      if (isLate) {
-        let penalty: number = DIFFICULTY_CONFIG[quest.difficulty as keyof typeof DIFFICULTY_CONFIG].hpPenalty;
-        if (quest.isGateKeyApplied) penalty *= 3;
-        if (quest.isKamishWardActive) penalty = 0;
-        
-        const newHp = Math.max(0, user.hp - penalty);
-        await prisma.$transaction(async (tx) => {
-          await tx.quest.update({ where: { id: parseInt(id) }, data: { status: "FAILED" } });
-          await tx.user.update({ where: { id: user.id }, data: { hp: newHp } });
-          
-          if (penalty > 0) {
-            await tx.hpLedger.create({
-              data: { userId: user.id, amount: -penalty, source: "QUEST_FAILED_LATE" },
-            });
-          }
+      const claimResult = rows[0]?.claim_quest_reward;
 
-          await tx.systemMessage.create({
-            data: {
-              userId: user.id,
-              content: `**Quest Failed (Late)**\n\n"${quest.title}" was completed past its deadline of ${quest.scheduledFor}.\n\nPenalty: -${penalty} HP`,
-              type: "WARNING",
-            },
-          });
-        });
-        
+      if (claimResult?.status === "FAILED") {
         return NextResponse.json({
           quest: { ...updatedQuest, status: "FAILED" },
-          penalty: { hpLost: penalty, currentHp: newHp },
+          penalty: claimResult.penalty,
         }, { status: 200 });
       }
 
-      // If Early, apply 20% bonus
-      if (isEarly) {
-        finalXP = Math.floor(finalXP * 1.2);
-        finalSylph = Math.floor(finalSylph * 1.2);
-      }
-
-      // Gate Key modifier
-      if (quest.isGateKeyApplied) {
-        finalXP *= 2;
-        finalSylph *= 2;
-      }
-
-      // Apply streak multiplier to Sylph
-      const multiplier = getStreakMultiplier(user.streakDays);
-      finalSylph = Math.floor(finalSylph * multiplier);
-
-      const result = awardXP(
-        user.level,
-        user.currentXP,
-        user.xpToNextLevel,
-        finalXP
-      );
-
-      // Level-up stipend
-      let levelUpSylph = 0;
-      if (result.levelsGained > 0) {
-        levelUpSylph = result.newLevel * 300;
-      }
-
-      const totalSylphEarned = finalSylph + levelUpSylph;
-
-      await prisma.$transaction(async (tx) => {
-        // Update user
-        await tx.user.update({
-          where: { id: user.id },
-          data: {
-            level: result.newLevel,
-            currentXP: result.newCurrentXP,
-            xpToNextLevel: result.newXPToNextLevel,
-            hunterRank: result.newRank,
-            sylph: user.sylph + totalSylphEarned,
-          },
-        });
-
-        // Ledger entries
-        await tx.sylphLedger.create({
-          data: { userId: user.id, amount: finalSylph, source: "QUEST" },
-        });
-
-        if (levelUpSylph > 0) {
-          await tx.sylphLedger.create({
-            data: { userId: user.id, amount: levelUpSylph, source: "LEVEL_UP" },
-          });
-        }
-
-        const earlyBonusText = isEarly ? `\n(Includes 20% Early Completion Bonus!)` : "";
-
-        // System messages
-        await tx.systemMessage.create({
-          data: {
-            userId: user.id,
-            content: `**Quest Complete**\n\n"${quest.title}"\n\nRewards Obtained:\n• +${finalXP} XP\n• +${finalSylph} Sylph${multiplier > 1 ? ` (Streak x${multiplier})` : ""}${earlyBonusText}`,
-            type: "REWARD",
-          },
-        });
-
-        if (result.levelsGained > 0) {
-          const rankUpText = result.didRankUp
-            ? `\n\nRANK UP: ${result.previousRank}-Rank → ${result.newRank}-Rank`
-            : "";
-          await tx.systemMessage.create({
-            data: {
-              userId: user.id,
-              content: `**Level Up**\n\nYou have reached Level ${result.newLevel}.${rankUpText}\n\nStipend: +${levelUpSylph} Sylph\n\nYou have grown stronger.`,
-              type: "LEVEL_UP",
-            },
-          });
-        }
-      });
+      invalidateRankingsCache();
 
       return NextResponse.json(
         {
-          quest: updatedQuest,
+          quest: { ...updatedQuest, status: "COMPLETED", completedAt: new Date() },
           rewards: {
-            xpGained: finalXP,
-            sylphGained: totalSylphEarned,
-            ...result,
+            xpGained: claimResult?.xpGained ?? quest.xpReward,
+            sylphGained: claimResult?.totalSylphEarned ?? quest.sylphReward,
+            newLevel: claimResult?.level ?? user.level,
+            newCurrentXP: claimResult?.currentXP ?? user.currentXP,
+            newXPToNextLevel: claimResult?.xpToNextLevel ?? user.xpToNextLevel,
+            newRank: claimResult?.hunterRank ?? user.hunterRank,
+            previousRank: user.hunterRank,
+            levelsGained: claimResult?.levelsGained ?? 0,
+            didRankUp: claimResult?.didRankUp ?? false,
           },
         },
         { status: 200 }

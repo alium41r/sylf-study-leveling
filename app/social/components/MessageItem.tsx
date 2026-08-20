@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Edit2, Trash2, Smile, Check, X, Clock } from "lucide-react";
+import MarkdownRenderer from "@/app/components/MarkdownRenderer";
 
 export interface MessageSender {
   id: number;
@@ -88,10 +89,7 @@ export function MessageItem({
       {/* Sender Header for Group or First Message in cluster */}
       {showHeader && !isMe && (
         <div className="flex items-center gap-2 mb-1 pl-10">
-          <span
-            onClick={() => onOpenProfile(message.sender.username)}
-            className="text-xs font-bold font-['Rajdhani'] text-text-muted hover:text-text-primary cursor-pointer transition-colors"
-          >
+          <span className="text-xs font-bold font-['Rajdhani'] text-text-muted select-none">
             {message.sender.name || message.sender.username}
           </span>
           <span className="text-[10px] font-mono text-text-secondary opacity-60">
@@ -104,21 +102,20 @@ export function MessageItem({
         {/* Avatar for Incoming Messages */}
         {!isMe && (
           <div
-            onClick={() => onOpenProfile(message.sender.username)}
-            className="w-8 h-8 rounded-xl shrink-0 overflow-hidden cursor-pointer hover:scale-105 transition-transform relative"
+            className="w-8 h-8 rounded-xl shrink-0 overflow-hidden relative flex items-center justify-center bg-bg-abyss border border-border-subtle shadow-sm select-none self-end mb-0.5"
             title={message.sender.name || message.sender.username}
           >
-            <div className={`rank-badge rank-${message.sender.hunterRank || "E"} w-full h-full text-[10px] shadow-sm flex items-center justify-center`}>
-              {message.sender.avatarUrl ? (
-                <img
-                  src={message.sender.avatarUrl}
-                  alt={message.sender.username}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span>{message.sender.hunterRank || "E"}</span>
-              )}
-            </div>
+            {message.sender.avatarUrl ? (
+              <img
+                src={message.sender.avatarUrl}
+                alt={message.sender.username}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className={`rank-badge rank-${message.sender.hunterRank || "E"} w-full h-full text-[11px] font-mono font-bold flex items-center justify-center`}>
+                {message.sender.hunterRank || "E"}
+              </div>
+            )}
           </div>
         )}
 
@@ -164,7 +161,10 @@ export function MessageItem({
                   : "bg-bg-panel/90 text-text-primary rounded-bl-none border border-white/10 shadow-sm"
               }`}
             >
-              <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
+              <MarkdownRenderer
+                content={message.content}
+                className={isMe ? "[&_*]:text-white prose-p:my-0.5" : "prose-p:my-0.5"}
+              />
 
               {/* Timestamp & Delivery State inside bubble */}
               <div

@@ -25,6 +25,7 @@ export interface ParticipantProfile {
 export interface ConversationDetail {
   id: number;
   name: string | null;
+  avatarUrl?: string | null;
   isGroup: boolean;
   createdBy?: number | null;
   createdAt?: string;
@@ -67,7 +68,7 @@ export function ChatHeader({
         {/* Left: Back Link & Identity */}
         <div className="flex items-center gap-3 min-w-0">
           <Link
-            href="/social"
+            href={conversation.isGroup ? "/social?tab=groups" : "/social?tab=messages"}
             className="p-2 rounded-xl bg-bg-abyss/80 hover:bg-white/10 text-text-muted hover:text-text-primary transition-all border border-white/5 shrink-0"
             title="Back to Social Hub"
           >
@@ -83,8 +84,16 @@ export function ChatHeader({
             {/* Avatar with Online Presence Dot */}
             <div className="relative shrink-0">
               {conversation.isGroup ? (
-                <div className="w-10 h-10 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light font-bold shadow-inner">
-                  <Users className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light font-bold shadow-inner overflow-hidden">
+                  {conversation.avatarUrl ? (
+                    <img
+                      src={conversation.avatarUrl}
+                      alt={displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Users className="w-5 h-5" />
+                  )}
                 </div>
               ) : (
                 <div className="relative">

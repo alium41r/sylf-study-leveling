@@ -12,8 +12,8 @@
 /* ─── CSS Custom Properties (Design Tokens) ─────────────────── */
 :root {
   /* Core backgrounds */
-  --bg-void: #05050f;        /* Deepest black — page background */
-  --bg-abyss: #0a0a1a;      /* Card backgrounds */
+  --bg-void: #090d16;        /* Deepest canvas — page background (uniform) */
+  --bg-abyss: #0d1117;      /* Card backgrounds */
   --bg-shadow: #0f0f2a;     /* Elevated surfaces */
   --bg-panel: #141432;       /* Panel/sidebar background */
   --bg-overlay: rgba(5, 5, 15, 0.92); /* Modal overlays */
@@ -130,19 +130,112 @@ html[data-mode="light"] body {
   --font-sans: var(--font-rajdhani), var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --shadow-card: var(--card-shadow);
+  /* Extra-small breakpoint for 360-430px viewport typography clamping */
+  --breakpoint-xs: 30rem;
+}
+
+/* ═══ Global Mobile-First Viewport Hardening (Task 3.1) ═══════ */
+@layer base {
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  /* Mobile scroll container containment */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Prevent iOS input zoom on focus */
+  @media screen and (max-width: 768px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* ─── Objective Accent Presets (Goal.color tokens) ────────────
+   Curated cyber/neon palette resolved through lib/goal-theme.ts.
+   Mirrors GoalColorTheme so inline styles and CSS vars agree.  */
+:root {
+  --goal-emerald: #10b981;
+  --goal-emerald-light: #34d399;
+  --goal-emerald-dim: rgba(16, 185, 129, 0.14);
+  --goal-emerald-mid: rgba(16, 185, 129, 0.40);
+  --goal-cyan: #06b6d4;
+  --goal-cyan-light: #22d3ee;
+  --goal-cyan-dim: rgba(6, 182, 212, 0.14);
+  --goal-cyan-mid: rgba(6, 182, 212, 0.40);
+  --goal-blue: #3b82f6;
+  --goal-blue-light: #60a5fa;
+  --goal-blue-dim: rgba(59, 130, 246, 0.14);
+  --goal-blue-mid: rgba(59, 130, 246, 0.40);
+  --goal-violet: #8b5cf6;
+  --goal-violet-light: #a78bfa;
+  --goal-violet-dim: rgba(139, 92, 246, 0.14);
+  --goal-violet-mid: rgba(139, 92, 246, 0.40);
+  --goal-rose: #f43f5e;
+  --goal-rose-light: #fb7185;
+  --goal-rose-dim: rgba(244, 63, 94, 0.14);
+  --goal-rose-mid: rgba(244, 63, 94, 0.40);
+  --goal-amber: #f59e0b;
+  --goal-amber-light: #fbbf24;
+  --goal-amber-dim: rgba(245, 158, 11, 0.14);
+  --goal-amber-mid: rgba(245, 158, 11, 0.40);
+}
+
+/* ═══ Focus Room — Light Mode Eye-Comfort Dimming ═══════════
+   True full-screen dimmer. Sits ABOVE all focus-room UI
+   (z-50) so the entire screen — background, timer digits,
+   buttons and dock — drops to ~10% luminance. `pointer-events:
+   none` keeps every control fully clickable underneath, so the
+   user can still navigate while the screen is barely readable.
+   GPU-accelerated via will-change: opacity.                   */
+.focus-dim-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(8, 13, 22, 0.84) 0%,
+    rgba(2, 5, 10, 0.94) 100%
+  );
+  /* Brightness crush + warm sepia to remove blue-light glare */
+  backdrop-filter: brightness(0.45) saturate(0.7) sepia(0.18);
+  -webkit-backdrop-filter: brightness(0.45) saturate(0.7) sepia(0.18);
+  transition: opacity 0.3s ease;
+  will-change: opacity;
 }
 
 /* ─── Base Styles ───────────────────────────────────────────── */
 html, body {
-  background-color: var(--bg-void);
-  color: var(--text-primary);
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  /* `clip` preserves the horizontal containment WITHOUT creating a scroll
+     container (overflow-x: hidden alone turns overflow-y into auto and can
+     trap page scrolling) — progressive enhancement over the fallback above. */
+  overflow-x: clip;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: 'Inter', system-ui, sans-serif;
   overscroll-behavior-y: none;
 }
 
 body {
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   transition: margin-left 0.3s ease;
 }
 
@@ -433,6 +526,15 @@ input[type="search"]::-webkit-search-results-decoration {
   50% { transform: translateY(-6px); }
 }
 
+@keyframes edge-flow {
+  from { stroke-dashoffset: 80; }
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-edge-flow {
+  animation: edge-flow 20s linear infinite;
+}
+
 /* ─── Settings Panel ─────────────────────────────────────────── */
 .settings-overlay {
   position: fixed;
@@ -616,9 +718,15 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Settings page (stub pages) */
 .settings-page-container {
   min-height: 100vh;
-  padding: 40px;
+  width: 100%;
+  padding: 24px 16px calc(32px + env(safe-area-inset-bottom));
   max-width: 900px;
   margin: 0 auto;
+}
+@media (min-width: 640px) {
+  .settings-page-container {
+    padding: 40px;
+  }
 }
 
 .settings-page-back {
@@ -810,5 +918,34 @@ input[type="search"]::-webkit-search-results-decoration {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ═══ System Hub Panel — Responsive Category Grid ══════════
+   Category cards stack on phones; tile proportions inside each
+   category stay identical at every width (2-col layout with
+   span-2 "wide" tiles = original design proportions). */
+.settings-panel-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.settings-category-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 640px) {
+  .settings-panel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .settings-category-card {
+    padding: 20px;
+  }
+}
+@media (max-width: 639.98px) {
+  .settings-category-card {
+    padding: 14px;
   }
 }

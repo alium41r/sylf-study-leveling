@@ -307,6 +307,125 @@ async function main() {
     }
   }
 
+  // 5. Seed 5-Tier RPG Item Catalog
+  console.log('⚔️ Seeding 5-Tier RPG Item Catalog...');
+  const { CATALOG_ITEMS } = require('../lib/shop-items');
+  for (const item of CATALOG_ITEMS) {
+    await prisma.item.upsert({
+      where: { sku: item.sku },
+      update: {
+        name: item.name,
+        description: item.description,
+        category: item.category,
+        slot: item.slot,
+        rarity: item.rarity,
+        rankRequirement: item.rankRequirement,
+        costSylph: item.costSylph,
+        effectPayload: item.effectPayload || {},
+        spriteLayer: item.spriteLayer || null,
+        setKey: item.setKey || null,
+      },
+      create: {
+        sku: item.sku,
+        name: item.name,
+        description: item.description,
+        category: item.category,
+        slot: item.slot,
+        rarity: item.rarity,
+        rankRequirement: item.rankRequirement,
+        costSylph: item.costSylph,
+        effectPayload: item.effectPayload || {},
+        spriteLayer: item.spriteLayer || null,
+        setKey: item.setKey || null,
+      },
+    });
+  }
+
+  // 6. Seed 8-Class Cognitive Skill Tree (24 nodes)
+  console.log('🧠 Seeding 8-Class Cognitive Skill Tree...');
+  const { SKILL_NODES } = require('../lib/skill-tree');
+  for (const node of SKILL_NODES) {
+    await prisma.skillNode.upsert({
+      where: { nodeKey: node.nodeKey },
+      update: {
+        name: node.name,
+        description: node.description,
+        branch: node.branch,
+        tier: node.tier,
+        costSp: node.costSp,
+        prerequisiteStat: node.prerequisiteStat,
+        prerequisiteValue: node.prerequisiteValue,
+        prerequisiteNodeKey: node.prerequisiteNodeKey,
+        effectPayload: node.effectPayload || {},
+      },
+      create: {
+        nodeKey: node.nodeKey,
+        name: node.name,
+        description: node.description,
+        branch: node.branch,
+        tier: node.tier,
+        costSp: node.costSp,
+        prerequisiteStat: node.prerequisiteStat,
+        prerequisiteValue: node.prerequisiteValue,
+        prerequisiteNodeKey: node.prerequisiteNodeKey,
+        effectPayload: node.effectPayload || {},
+      },
+    });
+  }
+
+  // 7. Seed Academic Concept Forge (4 Cores, 16 Topics)
+  console.log('⚛️ Seeding Academic Concept Forge...');
+  const { FORGE_CORES } = require('../lib/concept-forge');
+  for (const core of FORGE_CORES) {
+    const createdCore = await prisma.forgeCore.upsert({
+      where: { coreKey: core.coreKey },
+      update: {
+        name: core.name,
+        description: core.description,
+        discipline: core.discipline,
+        tier: core.tier,
+        rewardXp: core.rewardXp,
+        rewardSylph: core.rewardSylph,
+        rewardSp: core.rewardSp,
+        rewardBadgeKey: core.rewardBadgeKey || null,
+        rewardPedestalKey: core.rewardPedestalKey || null,
+      },
+      create: {
+        coreKey: core.coreKey,
+        name: core.name,
+        description: core.description,
+        discipline: core.discipline,
+        tier: core.tier,
+        rewardXp: core.rewardXp,
+        rewardSylph: core.rewardSylph,
+        rewardSp: core.rewardSp,
+        rewardBadgeKey: core.rewardBadgeKey || null,
+        rewardPedestalKey: core.rewardPedestalKey || null,
+      },
+    });
+
+    for (const topic of core.topics) {
+      await prisma.forgeTopic.upsert({
+        where: { topicKey: topic.topicKey },
+        update: {
+          forgeCoreId: createdCore.id,
+          name: topic.name,
+          subjectKey: topic.subjectKey,
+          targetProgress: topic.targetProgress,
+          structuralWeight: topic.structuralWeight,
+        },
+        create: {
+          forgeCoreId: createdCore.id,
+          topicKey: topic.topicKey,
+          name: topic.name,
+          subjectKey: topic.subjectKey,
+          targetProgress: topic.targetProgress,
+          structuralWeight: topic.structuralWeight,
+        },
+      });
+    }
+  }
+
   console.log('✅ Seeding complete!');
 }
 

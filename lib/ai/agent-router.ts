@@ -1,13 +1,14 @@
 // ============================================================
-// Agent Router — Intent Classification for Specialized Agents
+// Agent Router — Intent Classification & Multi-Engine Dispatch
 // ============================================================
 // Lightweight deterministic classifier that routes user messages
-// to the most appropriate specialist agent. Uses keyword patterns
-// combined with contextual heuristics — NOT an LLM call.
-//
-// Only needs CoreContext-level data for routing (no expensive
-// dynamic sections required). This keeps routing fast and free.
+// to the most appropriate specialist agent and specialized model tier
+// across DeepSeek, Google Gemini, and Groq.
 // ============================================================
+
+import { NormalizedMessage, NormalizedTool, LLMResponse } from "./providers/types";
+import { LLMFactory, LLMProviderName } from "./providers/factory";
+import { DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "./config";
 
 /**
  * Minimal context required for routing decisions.
@@ -23,10 +24,55 @@ export interface RouterContext {
 
 export type AgentType = "general" | "planner" | "calendar" | "coach" | "analyst";
 
-interface RouteResult {
+export type WorkloadType =
+  | "multimodal_vision"
+  | "planner"
+  | "syllabus"
+  | "complex_stem"
+  | "focus_chat"
+  | "general_chat"
+  | "calendar"
+  | "coach"
+  | "analyst";
+
+export interface RouteResult {
   agent: AgentType;
   confidence: number; // 0-1 how confident the router is
   reason: string;     // Human-readable explanation for debugging
+}
+
+export interface ModelRouteSpec {
+  provider: LLMProviderName;
+  model: string;
+}
+
+export interface WorkloadRouteConfig {
+  workload: WorkloadType;
+  primary: ModelRouteSpec;
+  fallback: ModelRouteSpec;
+  secondaryFallback?: ModelRouteSpec;
+  description: string;
+}
+
+export interface WorkloadRouteResult {
+  workload: WorkloadType;
+  agent: AgentType;
+  route: WorkloadRouteConfig;
+  reason: string;
+  hasMedia: boolean;
+}
+
+export interface DispatchResult {
+  response: LLMResponse;
+  providerUsed: LLMProviderName;
+  modelUsed: string;
+  fallbackOccurred: boolean;
+  attempts: Array<{
+    provider: LLMProviderName;
+    model: string;
+    error?: string;
+    success: boolean;
+  }>;
 }
 
 // ─── Pattern Definitions ─────────────────────────────────────
@@ -87,7 +133,82 @@ const ANALYST_PATTERNS = [
   /\bsubject (stats|data|performance|intelligence)\b/i,
 ];
 
-// ─── Scoring Function ────────────────────────────────────────
+export const STEM_PATTERNS = [
+  /\b(derive|derivation|proof|prove|theorem|lemma|corollary)\b/i,
+  /\b(schrodinger|lagrangian|hamiltonian|taylor series|fourier transform|eigenvalue|eigenvector|matrix proof)\b/i,
+  /\b(differential equation|calculus proof|integration by parts derivation|kinematics derivation)\b/i,
+  /\b(maxwell equations|quantum mechanics|thermodynamics derivation|rotational dynamics proof)\b/i,
+  /\b(show that|solve step by step|rigorous proof|mathematical proof|formal proof)\b/i,
+  // Deep-reasoning escalation markers → routed to reasoner models + Tier 3 verbosity
+  /\b(laplace transform|maclaurin series|proof by induction|induction proof|series convergence|power series)\b/i,
+  /\b(integrate|differentiate)\b.*\b(function|equation|expression|by parts)\b/i,
+];
+
+// ─── Workload Routing Configuration Matrix ───────────────────
+
+export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> = {
+  multimodal_vision: {
+    workload: "multimodal_vision",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.vision },
+    fallback: { provider: "gemini", model: GEMINI_MODELS.visionFallback },
+    description: "Multimodal Vision & Diagram Ingestion Engine",
+  },
+  planner: {
+    workload: "planner",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.planner },
+    fallback: { provider: "gemini", model: GEMINI_MODELS.research },
+    description: "Autonomous AI Study Planner & Curriculum Structuring",
+  },
+  syllabus: {
+    workload: "syllabus",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.compiler },
+    fallback: { provider: "gemini", model: GEMINI_MODELS.research },
+    description: "AI Syllabus Constellation 48-Node Compiler",
+  },
+  complex_stem: {
+    workload: "complex_stem",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.stem },
+    fallback: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
+    secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.stemFallback },
+    description: "Complex STEM Derivations & Algorithmic Proof Engine",
+  },
+  focus_chat: {
+    workload: "focus_chat",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.focus },
+    fallback: { provider: "gemini", model: GEMINI_MODELS.focus },
+    description: "Focus Timer In-Session Assistant",
+  },
+  general_chat: {
+    workload: "general_chat",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
+    fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
+    secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
+    description: "General System Chat & Companion Assistant",
+  },
+  calendar: {
+    workload: "calendar",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
+    fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
+    secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
+    description: "Calendar & Schedule Adjustment Specialist",
+  },
+  coach: {
+    workload: "coach",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
+    fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
+    secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
+    description: "Progress Coach & Burnout Detection Specialist",
+  },
+  analyst: {
+    workload: "analyst",
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
+    fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
+    secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
+    description: "Study Analytics & Performance Trend Specialist",
+  },
+};
+
+// ─── Scoring Functions ───────────────────────────────────────
 
 function scorePatterns(message: string, patterns: RegExp[]): number {
   let matches = 0;
@@ -97,6 +218,38 @@ function scorePatterns(message: string, patterns: RegExp[]): number {
   return matches;
 }
 
+// ─── Media Attachment Detector ───────────────────────────────
+
+export function hasMediaAttachments(
+  messagesOrParts?: NormalizedMessage[] | any
+): boolean {
+  if (!messagesOrParts) return false;
+
+  if (Array.isArray(messagesOrParts)) {
+    for (const item of messagesOrParts) {
+      if (item?.parts && Array.isArray(item.parts)) {
+        if (item.parts.some((p: any) => p && (p.inlineData || p.imageUrl || p.image_url))) {
+          return true;
+        }
+      }
+      if (item?.inlineData || item?.imageUrl || item?.image_url) {
+        return true;
+      }
+    }
+  } else if (typeof messagesOrParts === "object") {
+    if (messagesOrParts.inlineData || messagesOrParts.imageUrl || messagesOrParts.image_url) {
+      return true;
+    }
+    if (Array.isArray(messagesOrParts.parts)) {
+      return messagesOrParts.parts.some(
+        (p: any) => p && (p.inlineData || p.imageUrl || p.image_url)
+      );
+    }
+  }
+
+  return false;
+}
+
 // ─── Context-Based Boosting ──────────────────────────────────
 
 function applyContextBoosts(
@@ -104,25 +257,21 @@ function applyContextBoosts(
   message: string,
   context: RouterContext
 ): void {
-  // If user has overdue quests and mentions them, boost calendar
   if (context.today.overdueCount > 0 && /\b(overdue|late|behind|missed)\b/i.test(message)) {
     scores.calendar += 1;
     scores.coach += 0.5;
   }
 
-  // If user's HP is low, boost coach for burnout detection
   if (context.user.hp < context.user.maxHp * 0.3) {
     if (/\b(tired|overwhelmed|too much|difficult|hard|struggling)\b/i.test(message)) {
       scores.coach += 1;
     }
   }
 
-  // If user mentions a specific day name, boost calendar
   if (/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|next week)\b/i.test(message)) {
     scores.calendar += 0.5;
   }
 
-  // If message mentions a known subject name, boost analyst
   if (context.subjectNames) {
     for (const name of context.subjectNames) {
       if (message.toLowerCase().includes(name.toLowerCase())) {
@@ -132,7 +281,6 @@ function applyContextBoosts(
     }
   }
 
-  // If user has exam-related memories and mentions exam, boost planner
   if (context.memoryKeys?.some(k => k.includes("exam"))) {
     if (/\b(exam|test|midterm|final)\b/i.test(message)) {
       scores.planner += 0.5;
@@ -140,13 +288,11 @@ function applyContextBoosts(
   }
 }
 
-// ─── Main Router ─────────────────────────────────────────────
+// ─── Main Intent Classifier ──────────────────────────────────
 
 /**
  * Route a user message to the most appropriate specialist agent.
  * Returns the agent type, confidence level, and reasoning.
- *
- * This is a fast deterministic classifier — NOT an LLM call.
  */
 export function routeMessage(message: string, context: RouterContext): RouteResult {
   const scores: Record<AgentType, number> = {
@@ -157,16 +303,13 @@ export function routeMessage(message: string, context: RouterContext): RouteResu
     analyst: 0,
   };
 
-  // Score each agent
   scores.planner = scorePatterns(message, PLANNER_PATTERNS);
   scores.calendar = scorePatterns(message, CALENDAR_PATTERNS);
   scores.coach = scorePatterns(message, COACH_PATTERNS);
   scores.analyst = scorePatterns(message, ANALYST_PATTERNS);
 
-  // Apply context-based boosting
   applyContextBoosts(scores, message, context);
 
-  // Find the highest-scoring agent
   let bestAgent: AgentType = "general";
   let bestScore = 0;
 
@@ -177,11 +320,9 @@ export function routeMessage(message: string, context: RouterContext): RouteResu
     }
   }
 
-  // Calculate confidence
   const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
   const confidence = totalScore > 0 ? bestScore / totalScore : 0;
 
-  // If no pattern matched at all, or confidence is too low, default to general
   if (bestScore === 0 || confidence < 0.3) {
     return {
       agent: "general",
@@ -190,9 +331,6 @@ export function routeMessage(message: string, context: RouterContext): RouteResu
     };
   }
 
-  // If two agents are very close in score, only fall back to general when
-  // the winning score is itself low. Strong matches (>=1.5) are trusted
-  // even with close runners-up, since context boosts create fractional noise.
   const sortedScores = Object.entries(scores)
     .filter(([, s]) => s > 0)
     .sort((a, b) => b[1] - a[1]);
@@ -225,3 +363,183 @@ export function routeMessage(message: string, context: RouterContext): RouteResu
     reason: reasons[bestAgent],
   };
 }
+
+// ─── Multi-Engine Dynamic Workload Router ─────────────────────
+
+/**
+ * Classify inbound workload and select primary & fallback model route specs.
+ */
+export function classifyWorkload(
+  message: string,
+  context?: RouterContext,
+  options?: {
+    hasMedia?: boolean;
+    isFocusMode?: boolean;
+    isSyllabus?: boolean;
+    isPlanner?: boolean;
+    messages?: NormalizedMessage[];
+  }
+): WorkloadRouteResult {
+  const hasMedia =
+    options?.hasMedia === true ||
+    (options?.messages ? hasMediaAttachments(options.messages) : false);
+
+  // 1. Multimodal Vision override
+  if (hasMedia) {
+    return {
+      workload: "multimodal_vision",
+      agent: "general",
+      route: WORKLOAD_ROUTING_TABLE.multimodal_vision,
+      reason: "Image or diagram attachment detected; routed to multimodal vision pipeline.",
+      hasMedia: true,
+    };
+  }
+
+  // 2. Syllabus Compiler workload override
+  if (options?.isSyllabus) {
+    return {
+      workload: "syllabus",
+      agent: "planner",
+      route: WORKLOAD_ROUTING_TABLE.syllabus,
+      reason: "Syllabus Constellation 48-node compilation request.",
+      hasMedia: false,
+    };
+  }
+
+  // 3. Autonomous Planner workload override
+  if (options?.isPlanner) {
+    return {
+      workload: "planner",
+      agent: "planner",
+      route: WORKLOAD_ROUTING_TABLE.planner,
+      reason: "Autonomous Study Planner generation request.",
+      hasMedia: false,
+    };
+  }
+
+  // 4. Complex STEM Derivations & Proofs check
+  const isStemMatch = STEM_PATTERNS.some((p) => p.test(message));
+  if (isStemMatch) {
+    return {
+      workload: "complex_stem",
+      agent: "general",
+      route: WORKLOAD_ROUTING_TABLE.complex_stem,
+      reason: "Complex STEM derivation or mathematical proof prompt detected.",
+      hasMedia: false,
+    };
+  }
+
+  // 5. In-session Focus Assistant override
+  if (options?.isFocusMode) {
+    return {
+      workload: "focus_chat",
+      agent: "general",
+      route: WORKLOAD_ROUTING_TABLE.focus_chat,
+      reason: "In-session Focus Timer academic study assistance request.",
+      hasMedia: false,
+    };
+  }
+
+  // 6. General Agent Classification
+  const defaultCtx: RouterContext = context || {
+    user: { hp: 100, maxHp: 100 },
+    today: { overdueCount: 0 },
+  };
+  const agentRoute = routeMessage(message, defaultCtx);
+
+  let workload: WorkloadType = "general_chat";
+  if (agentRoute.agent === "planner") workload = "planner";
+  else if (agentRoute.agent === "calendar") workload = "calendar";
+  else if (agentRoute.agent === "coach") workload = "coach";
+  else if (agentRoute.agent === "analyst") workload = "analyst";
+
+  return {
+    workload,
+    agent: agentRoute.agent,
+    route: WORKLOAD_ROUTING_TABLE[workload],
+    reason: agentRoute.reason,
+    hasMedia: false,
+  };
+}
+
+/**
+ * Executes an LLM generation with automated primary -> fallback -> secondaryFallback cascades.
+ */
+export async function dispatchWithFallback(
+  workload: WorkloadType,
+  messages: NormalizedMessage[],
+  systemInstruction: string,
+  tools: NormalizedTool[] = [],
+  options?: {
+    onAttempt?: (info: { provider: LLMProviderName; model: string; attempt: number }) => void;
+    onFallback?: (from: ModelRouteSpec, to: ModelRouteSpec, err: any) => void;
+    responseFormat?: "json_object" | "text";
+    signal?: AbortSignal;
+  }
+): Promise<DispatchResult> {
+  const config = WORKLOAD_ROUTING_TABLE[workload];
+  const candidates: ModelRouteSpec[] = [
+    config.primary,
+    config.fallback,
+    ...(config.secondaryFallback ? [config.secondaryFallback] : []),
+  ];
+
+  const attempts: DispatchResult["attempts"] = [];
+
+  for (let i = 0; i < candidates.length; i++) {
+    const spec = candidates[i];
+    options?.onAttempt?.({ provider: spec.provider, model: spec.model, attempt: i + 1 });
+
+    try {
+      const adapter = LLMFactory.getAdapter(spec.provider, spec.model);
+      const response = await adapter.generateResponse(
+        messages,
+        systemInstruction,
+        tools,
+        {
+          responseFormat: options?.responseFormat,
+          signal: options?.signal,
+        }
+      );
+
+      attempts.push({
+        provider: spec.provider,
+        model: spec.model,
+        success: true,
+      });
+
+      return {
+        response,
+        providerUsed: spec.provider,
+        modelUsed: spec.model,
+        fallbackOccurred: i > 0,
+        attempts,
+      };
+    } catch (err: any) {
+      console.warn(
+        `[MultiEngineRouter] Model ${spec.provider}/${spec.model} failed on workload '${workload}':`,
+        err.message || err
+      );
+
+      attempts.push({
+        provider: spec.provider,
+        model: spec.model,
+        error: err.message || String(err),
+        success: false,
+      });
+
+      const nextSpec = candidates[i + 1];
+      if (nextSpec) {
+        options?.onFallback?.(spec, nextSpec, err);
+      }
+    }
+  }
+
+  // If all candidates in the routing table failed, throw structured error with complete audit trail
+  throw new Error(
+    `[MultiEngineRouter] All model candidates failed for workload '${workload}'. Audit: ${JSON.stringify(
+      attempts
+    )}`
+  );
+}
+

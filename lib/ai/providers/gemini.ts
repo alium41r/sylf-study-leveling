@@ -105,49 +105,78 @@ export class GeminiAdapter implements LLMAdapter {
   async generateResponse(
     messages: NormalizedMessage[],
     systemInstruction: string,
-    tools: NormalizedTool[]
+    tools: NormalizedTool[],
+    options?: import("./types").LLMGenerateOptions
   ): Promise<LLMResponse> {
-    try {
-      const contents = this.mapMessages(messages);
-      const geminiTools = tools.length > 0 ? [{ functionDeclarations: tools.map(this.mapTool) }] : undefined;
+    const contents = this.mapMessages(messages);
+    const geminiTools = tools.length > 0 ? [{ functionDeclarations: tools.map(this.mapTool) }] : undefined;
 
-      const response = await this.ai.models.generateContent({
-        model: this.model,
-        contents,
-        config: {
-          systemInstruction,
-          tools: geminiTools,
+    const candidateModels = Array.from(
+      new Set([this.model, "gemini-3.7-flash", "gemini-3.6-flash"].filter(Boolean))
+    );
+
+    let lastError: any = null;
+
+    for (const modelToTry of candidateModels) {
+      try {
+        const response = await this.ai.models.generateContent({
+          model: modelToTry,
+          contents,
+          config: {
+            systemInstruction,
+            tools: geminiTools,
+            responseMimeType:
+              options?.responseFormat === "json_object"
+                ? "application/json"
+                : undefined,
+            temperature: options?.temperature,
+            abortSignal: options?.signal,
+          }
+        });
+
+        const candidateParts = response.candidates?.[0]?.content?.parts || [];
+        const toolCalls: NormalizedToolCall[] = [];
+        if (response.functionCalls && response.functionCalls.length > 0) {
+          for (const fc of response.functionCalls) {
+            // Find matching raw part from candidateParts that has this functionCall
+            const matchingPart = candidateParts.find(p => (p as any).functionCall?.name === fc.name);
+            toolCalls.push({
+              id: crypto.randomUUID(), // deterministic correlation ID for internal use
+              name: fc.name!,
+              args: fc.args as Record<string, any>,
+              rawPart: matchingPart || { functionCall: { name: fc.name, args: fc.args } },
+            });
+          }
         }
-      });
 
-      const candidateParts = response.candidates?.[0]?.content?.parts || [];
-      const toolCalls: NormalizedToolCall[] = [];
-      if (response.functionCalls && response.functionCalls.length > 0) {
-        for (const fc of response.functionCalls) {
-          // Find matching raw part from candidateParts that has this functionCall
-          const matchingPart = candidateParts.find(p => (p as any).functionCall?.name === fc.name);
-          toolCalls.push({
-            id: crypto.randomUUID(), // deterministic correlation ID for internal use
-            name: fc.name!,
-            args: fc.args as Record<string, any>,
-            rawPart: matchingPart || { functionCall: { name: fc.name, args: fc.args } },
-          });
+        return {
+          text: response.text || undefined,
+          toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
+          rawCandidateParts: candidateParts.length > 0 ? candidateParts : undefined,
+          usage: response.usageMetadata ? {
+            promptTokens: response.usageMetadata.promptTokenCount || 0,
+            completionTokens: response.usageMetadata.candidatesTokenCount || 0,
+            totalTokens: response.usageMetadata.totalTokenCount || 0,
+          } : undefined,
+        };
+      } catch (error: any) {
+        lastError = error;
+        const isUnavailableOrRateLimited =
+          error.status === 503 ||
+          error.status === 429 ||
+          error.code === 503 ||
+          error.code === 429 ||
+          (error.message &&
+            (error.message.includes("high demand") ||
+              error.message.includes("UNAVAILABLE") ||
+              error.message.includes("RESOURCE_EXHAUSTED")));
+
+        if (!isUnavailableOrRateLimited) {
+          throw new LLMProviderError("gemini", error.message || "Failed to generate Gemini response", error);
         }
       }
-
-      return {
-        text: response.text || undefined,
-        toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
-        rawCandidateParts: candidateParts.length > 0 ? candidateParts : undefined,
-        usage: response.usageMetadata ? {
-          promptTokens: response.usageMetadata.promptTokenCount || 0,
-          completionTokens: response.usageMetadata.candidatesTokenCount || 0,
-          totalTokens: response.usageMetadata.totalTokenCount || 0,
-        } : undefined,
-      };
-
-    } catch (error: any) {
-      throw new LLMProviderError("gemini", error.message || "Failed to generate Gemini response", error);
     }
+
+    throw new LLMProviderError("gemini", lastError?.message || "Failed to generate Gemini response", lastError);
   }
 }

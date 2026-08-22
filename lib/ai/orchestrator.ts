@@ -1,9 +1,12 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
-import Groq from "groq-sdk";
-
-const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY || "dummy_gemini_key";
-const ai = new GoogleGenAI({ apiKey });
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "missing_groq_key", dangerouslyAllowBrowser: true });
+import { LLMFactory } from "./providers/factory";
+import { DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "./config";
+import { NormalizedMessage } from "./providers/types";
+import { googleSearchTool } from "./chat-tools";
+import { executeGoogleSearch } from "./chat-tool-executor";
+import { calculateQuestRewards, calculateRecommendedDifficulty } from "@/lib/difficulty-engine";
+import { extractJson } from "./json-extractor";
+import { z } from "zod";
 
 export interface StudySessionData {
   durationMinutes: number;
@@ -28,24 +31,96 @@ export interface StudyPlanResult {
 }
 
 export class AiStudyOrchestrator {
+  /**
+   * Shared Zod schema for the Master Planner's structured output.
+   * Numeric fields are coerced defensively (the model frequently emits
+   * strings) and defaulted so a missing optional field never nukes the
+   * whole engine chain. LLM-supplied xp/sylph values are DISCARDED by
+   * deterministic post-processing regardless.
+   */
+  private static buildPlanSchema(topic: string) {
+    const safeInt = (fallback: number, min: number, max: number) =>
+      z.preprocess(
+        (v) => (v === undefined || v === null || v === "" ? fallback : v),
+        z.coerce.number().int().min(min).max(max)
+      );
+
+    return z.object({
+      goalTitle: z.preprocess(
+        (v) => (typeof v === "string" && v.trim().length > 0 ? v : topic),
+        z.string().min(1).max(120)
+      ),
+      goalDescription: z.preprocess(
+        (v) => (typeof v === "string" ? v : ""),
+        z.string().max(1000)
+      ),
+      quests: z
+        .array(
+          z.object({
+            title: z.preprocess(
+              (v) => (typeof v === "string" ? v : "Study Quest"),
+              z.string().min(1).max(200)
+            ),
+            description: z.preprocess(
+              (v) => (typeof v === "string" ? v : ""),
+              z.string().max(1000)
+            ),
+            requiredMinutes: safeInt(45, 1, 600),
+            xpReward: safeInt(0, 0, 100_000),
+            sylphReward: safeInt(0, 0, 100_000),
+          })
+        )
+        .min(1)
+        .max(60),
+    });
+  }
+
+  /**
+   * Parse a planner payload through the shared resilient extractor.
+   * Returns null on ANY extraction/schema failure so the caller can
+   * cascade to the next engine without losing the error context.
+   */
+  private static parsePlanPayload(rawText: string, topic: string): StudyPlanResult | null {
+    try {
+      return extractJson<StudyPlanResult>(rawText, this.buildPlanSchema(topic));
+    } catch (err: any) {
+      console.warn("[Master Planner] Payload rejected by extractJson:", err.message);
+      return null;
+    }
+  }
+
+  /** Never cascade on client aborts — propagate immediately. */
+  private static rethrowIfAborted(err: any, signal?: AbortSignal): void {
+    if (signal?.aborted || err?.name === "AbortError" || err?.code === "ABORT_ERR") {
+      throw err;
+    }
+  }
 
   /**
    * 1. Researcher Agent
-   * Uses Gemini with Google Search grounding to find the exact official curriculum and difficulty breakdown.
+   * Primary: deepseek-v4-pro with Google Search tool calling.
+   * Fallback: gemini-3.1-pro with live Google Search grounding.
    */
   private static async runResearcherAgent(
-    topic: string, 
-    syllabus: string, 
-    onProgress?: (msg: string) => void
+    topic: string,
+    syllabus: string,
+    onProgress?: (msg: string) => void,
+    signal?: AbortSignal
   ): Promise<{ data: string; model: string }> {
     const hasSyllabus = !!syllabus && syllabus.trim().length > 0;
     const searchTarget = hasSyllabus ? `${topic} (Scope: ${syllabus})` : topic;
-    
-    onProgress?.(`[Researcher • Gemini 2.5 Flash] Initiating curriculum research and web search for "${searchTarget}"...`);
+
+    onProgress?.(
+      `[Researcher • DeepSeek & Gemini] Initiating curriculum research and web search for "${searchTarget}"...`
+    );
 
     const searchPrompt = `Search and retrieve the EXACT official curriculum / syllabus chapter breakdown for:
 Topic/Subject: "${topic}"
-${hasSyllabus ? `User Syllabus / Focus Scope: "${syllabus}"` : "User provided no specific syllabus constraints; retrieve standard official curriculum."}
+${
+  hasSyllabus
+    ? `User Syllabus / Focus Scope: "${syllabus}"`
+    : "User provided no specific syllabus constraints; retrieve standard official curriculum."
+}
 
 CRITICAL RESEARCH INSTRUCTIONS:
 1. DISAMBIGUATE CODES & EXAM BOARDS:
@@ -60,7 +135,7 @@ CRITICAL RESEARCH INSTRUCTIONS:
      4. Forces, Density and Pressure
      5. Work, Energy and Power
      6. Deforming Solids
-   - DO NOT skip chapters, do NOT combine chapters, and do NOT include topics beyond the requested range (such as Thermal Physics, Waves, Optics, Electricity, or Nuclear Physics if only the first 6 chapters are requested).
+   - DO NOT skip chapters, do NOT combine chapters, and do NOT include topics beyond the requested range.
 3. STRUCTURED OUTPUT FORMAT:
    Return a clear, numbered list for each chapter in the requested scope:
    - Chapter 1: [Exact Official Name] — Key Subtopics / Core Concepts — Difficulty Level & Content Weight %
@@ -72,35 +147,140 @@ CRITICAL RESEARCH INSTRUCTIONS:
     const systemInstruction = `You are an elite Academic Curriculum Researcher with real-time web search capabilities and deep expertise in international qualifications (Cambridge CAIE AS/A-Levels, Edexcel, AQA, AP, IB, GCSE, CBSE).
 Your job is to search the web for the exact, canonical syllabus structure, resolve any syllabus code typos or ambiguities, and return the precise numbered chapter titles, key subtopics, and difficulty weights for the requested scope.`;
 
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: searchPrompt,
-        config: {
-          systemInstruction,
-          tools: [{ googleSearch: {} }],
-        }
-      });
-      onProgress?.(`[Researcher • Gemini 2.5 Flash] Gathered exact curriculum and difficulty data.`);
-      return { data: response.text || "No research data found.", model: "Gemini 2.5 Flash" };
-    } catch (e) {
-      console.warn("[Researcher Agent] Gemini Search failed. Falling back to Groq...", e);
+    // Attempt 1: DeepSeek Primary Model (deepseek-v4-pro) with Google Search Tool Calling
+    if (process.env.DEEPSEEK_API_KEY) {
       try {
-        const groqModel = process.env.GROQ_MODEL || "qwen/qwen3.6-27b";
-        const groqRes = await groq.chat.completions.create({
-          model: groqModel,
-          messages: [
-            { role: "system", content: systemInstruction },
-            { role: "user", content: searchPrompt }
-          ],
-        });
-        onProgress?.(`[Researcher • Groq (${groqModel})] Gathered knowledge-base curriculum data.`);
-        return { data: groqRes.choices[0]?.message?.content || "No research data found.", model: `Groq (${groqModel})` };
-      } catch (groqErr) {
-        console.error("[Researcher Agent] Groq fallback also failed:", groqErr);
-        onProgress?.(`[Researcher] Web search failed. Proceeding with general knowledge.`);
-        return { data: "Could not complete web research. Proceeding with general knowledge.", model: "Gemini 2.5 Flash" };
+        const deepseek = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.planner);
+        const messages: NormalizedMessage[] = [
+          { role: "user", content: searchPrompt },
+        ];
+
+        onProgress?.(`[Researcher • DeepSeek v4 Pro] Querying DeepSeek with Google Search tool...`);
+        const initialRes = await deepseek.generateResponse(
+          messages,
+          systemInstruction,
+          [googleSearchTool],
+          { signal }
+        );
+
+        if (initialRes.toolCalls && initialRes.toolCalls.length > 0) {
+          const tc = initialRes.toolCalls[0];
+          onProgress?.(`[Researcher • DeepSeek v4 Pro] Executing live web search: "${tc.args.query || topic}"...`);
+          const searchResult = await executeGoogleSearch(tc.args);
+
+          messages.push({
+            role: "assistant",
+            toolCalls: initialRes.toolCalls,
+          });
+          messages.push({
+            role: "tool",
+            toolResults: [
+              {
+                toolCallId: tc.id,
+                name: tc.name,
+                result: searchResult,
+              },
+            ],
+          });
+
+          const secondRes = await deepseek.generateResponse(
+            messages,
+            systemInstruction,
+            [],
+            { signal }
+          );
+
+          if (secondRes.text && secondRes.text.trim().length > 50) {
+            onProgress?.(`[Researcher • DeepSeek v4 Pro] Curriculum research finalized via live grounding.`);
+            return {
+              data: secondRes.text,
+              model: `DeepSeek (${DEEPSEEK_MODELS.planner}) + Google Search`,
+            };
+          }
+        } else if (initialRes.text && initialRes.text.trim().length > 50) {
+          onProgress?.(`[Researcher • DeepSeek v4 Pro] Curriculum research synthesized.`);
+          return {
+            data: initialRes.text,
+            model: `DeepSeek (${DEEPSEEK_MODELS.planner})`,
+          };
+        }
+      } catch (deepseekErr: any) {
+        this.rethrowIfAborted(deepseekErr, signal);
+        console.warn("[Researcher Agent] DeepSeek primary failed. Falling back to Gemini research:", deepseekErr.message);
       }
+    }
+
+    // Attempt 2: Gemini Research Fallback Engine (gemini-3.1-pro / gemini-2.5-flash) with Google Search Grounding
+    const geminiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_GENAI_API_KEY ||
+      process.env.GOOGLE_API_KEY;
+
+    if (geminiKey) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: geminiKey });
+        const response = await ai.models.generateContent({
+          model: GEMINI_MODELS.research,
+          contents: searchPrompt,
+          config: {
+            systemInstruction,
+            tools: [{ googleSearch: {} }],
+            abortSignal: signal,
+          },
+        });
+
+        onProgress?.(`[Researcher • Gemini 3.1 Pro] Gathered exact curriculum and difficulty data via search grounding.`);
+        return {
+          data: response.text || "No research data found.",
+          model: `Gemini (${GEMINI_MODELS.research})`,
+        };
+      } catch (geminiErr: any) {
+        this.rethrowIfAborted(geminiErr, signal);
+        console.warn("[Researcher Agent] Gemini 3.1 Pro search failed, trying 3.7-flash:", geminiErr.message);
+        try {
+          const ai = new GoogleGenAI({ apiKey: geminiKey });
+          const response = await ai.models.generateContent({
+            model: "gemini-3.7-flash",
+            contents: searchPrompt,
+            config: {
+              systemInstruction,
+              tools: [{ googleSearch: {} }],
+              abortSignal: signal,
+            },
+          });
+          onProgress?.(`[Researcher • Gemini 3.7 Flash] Gathered curriculum research.`);
+          return {
+            data: response.text || "No research data found.",
+            model: "Gemini 3.7 Flash",
+          };
+        } catch (e) {
+          console.warn("[Researcher Agent] Gemini 3.7 Flash fallback failed, trying Groq:", e);
+        }
+      }
+    }
+
+    // Attempt 3: Groq Fallback Engine
+    try {
+      const groqAdapter = LLMFactory.getAdapter("groq", GROQ_MODELS.default);
+      const groqRes = await groqAdapter.generateResponse(
+        [{ role: "user", content: searchPrompt }],
+        systemInstruction,
+        [],
+        { signal }
+      );
+      onProgress?.(`[Researcher • Groq (${GROQ_MODELS.default})] Gathered knowledge-base curriculum data.`);
+      return {
+        data: groqRes.text || "No research data found.",
+        model: `Groq (${GROQ_MODELS.default})`,
+      };
+    } catch (groqErr: any) {
+      this.rethrowIfAborted(groqErr, signal);
+      console.error("[Researcher Agent] Groq fallback failed:", groqErr);
+      onProgress?.(`[Researcher] Web search unavailable. Proceeding with general knowledge.`);
+      return {
+        data: `Curriculum overview for ${topic}: Sequential units covering core theory, applied problem solving, and examination synthesis.`,
+        model: "Deterministic Knowledge Fallback",
+      };
     }
   }
 
@@ -108,42 +288,75 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
    * 2. Analyst Agent
    * Reviews past study sessions and determines the user's optimal study pattern.
    */
-  private static async runAnalystAgent(pastSessions: StudySessionData[], onProgress?: (msg: string) => void): Promise<{ data: string; model: string }> {
-    onProgress?.(`[Analyst • Gemini 2.5 Flash] Reviewing ${pastSessions.length} past study sessions...`);
+  private static async runAnalystAgent(
+    pastSessions: StudySessionData[],
+    onProgress?: (msg: string) => void,
+    signal?: AbortSignal
+  ): Promise<{ data: string; model: string }> {
+    onProgress?.(`[Analyst • DeepSeek & Gemini] Reviewing ${pastSessions.length} past study sessions...`);
     if (!pastSessions || pastSessions.length === 0) {
-      onProgress?.(`[Analyst • Gemini 2.5 Flash] No past history. Recommending standard 45-min Pomodoro sessions.`);
-      return { data: "User has no past study history. Assume standard 45-minute Pomodoro sessions.", model: "Gemini 2.5 Flash" };
+      onProgress?.(`[Analyst] No past history. Recommending standard 45-min Pomodoro sessions.`);
+      return {
+        data: "User has no past study history. Assume standard 45-minute Pomodoro sessions.",
+        model: "Standard Default",
+      };
     }
 
-    const prompt = `Analyze these past study sessions and give me a 2-sentence summary of the user's ideal study duration (in minutes) and their focus rate pattern. Sessions: ${JSON.stringify(pastSessions)}`;
+    const prompt = `Analyze these past study sessions and give me a 2-sentence summary of the user's ideal study duration (in minutes) and their focus rate pattern. Sessions: ${JSON.stringify(
+      pastSessions
+    )}`;
 
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
-      onProgress?.(`[Analyst • Gemini 2.5 Flash] Extracted ideal study durations and focus patterns.`);
-      return { data: response.text || "Assume standard 45-minute sessions.", model: "Gemini 2.5 Flash" };
-    } catch (e) {
-      console.warn("[Analyst Agent] Gemini failed. Falling back to Groq...", e);
+    if (process.env.DEEPSEEK_API_KEY) {
       try {
-        const groqModel = process.env.GROQ_MODEL || "qwen/qwen3.6-27b";
-        const groqRes = await groq.chat.completions.create({
-          model: groqModel,
-          messages: [{ role: "user", content: prompt }],
-        });
-        onProgress?.(`[Analyst • Groq (${groqModel})] Extracted ideal study durations and focus patterns.`);
-        return { data: groqRes.choices[0]?.message?.content || "Assume standard 45-minute sessions.", model: `Groq (${groqModel})` };
-      } catch (groqErr) {
-        console.error("[Analyst Agent] Groq fallback also failed:", groqErr);
-        return { data: "Assume standard 45-minute sessions.", model: "Gemini 2.5 Flash" };
+        const deepseek = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.chat);
+        const res = await deepseek.generateResponse(
+          [{ role: "user", content: prompt }],
+          "You are a concise study habits analyst.",
+          [],
+          { signal }
+        );
+        if (res.text) {
+          onProgress?.(`[Analyst • DeepSeek] Extracted ideal study durations and focus patterns.`);
+          return { data: res.text, model: `DeepSeek (${DEEPSEEK_MODELS.chat})` };
+        }
+      } catch (err) {
+        this.rethrowIfAborted(err, signal);
+        console.warn("[Analyst Agent] DeepSeek failed, using fallback:", err);
       }
     }
+
+    const geminiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_GENAI_API_KEY ||
+      process.env.GOOGLE_API_KEY;
+
+    if (geminiKey) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: geminiKey });
+        const response = await ai.models.generateContent({
+          model: "gemini-3.7-flash",
+          contents: prompt,
+          config: {
+            abortSignal: signal,
+          },
+        });
+        onProgress?.(`[Analyst • Gemini] Extracted ideal study durations and focus patterns.`);
+        return { data: response.text || "Assume standard 45-minute sessions.", model: "Gemini 3.7 Flash" };
+      } catch (e) {
+        console.warn("[Analyst Agent] Gemini failed:", e);
+      }
+    }
+
+    return {
+      data: "Assume standard 45-minute sessions.",
+      model: "Standard Default",
+    };
   }
 
   /**
    * 3. Master Planner Agent
    * Synthesizes all information into a concrete list of Quests (tasks) to reach the goal.
+   * Primary: deepseek-v4-pro. Fallback: gemini-3.1-pro / 3.7-flash.
    */
   private static async runMasterPlannerAgent(
     topic: string,
@@ -152,56 +365,17 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
     targetDate: string | null,
     researchData: string,
     analystData: string,
-    onProgress?: (msg: string) => void
+    onProgress?: (msg: string) => void,
+    signal?: AbortSignal
   ): Promise<StudyPlanResult> {
-    onProgress?.(`[Master Planner • Gemini 2.5 Flash] Drafting ${Math.round(totalTargetMinutes / 60)} hrs plan for "${topic}"...`);
+    onProgress?.(
+      `[Master Planner • DeepSeek v4 Pro] Drafting ${Math.round(
+        totalTargetMinutes / 60
+      )} hrs plan for "${topic}"...`
+    );
     if (targetDate) {
-      onProgress?.(`[Master Planner • Gemini 2.5 Flash] Aligning quests to meet deadline: ${targetDate}`);
+      onProgress?.(`[Master Planner] Aligning quests to meet deadline: ${targetDate}`);
     }
-
-    const schema: Schema = {
-      type: Type.OBJECT,
-      properties: {
-        goalTitle: { 
-          type: Type.STRING, 
-          description: "A motivating, catchy title for the overarching goal (e.g., 'Master AS Level Physics: First 6 Chapters')." 
-        },
-        goalDescription: { 
-          type: Type.STRING, 
-          description: "A concise summary of all chapters covered and total study hours planned." 
-        },
-        quests: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              title: { 
-                type: Type.STRING, 
-                description: "Title of the quest. MUST start with 'Ch N: ' where N is the sequential chapter number (e.g., 'Ch 1: Physical Quantities & Units', 'Ch 2: Kinematics'). If a chapter has 2 parts, use 'Ch N: Title - Part 1' / 'Ch N: Title - Part 2'." 
-              },
-              description: { 
-                type: Type.STRING, 
-                description: "Specific summary of key theory concepts, formulas to master, and practice problems to complete." 
-              },
-              requiredMinutes: { 
-                type: Type.INTEGER, 
-                description: "Duration in minutes allocated to this quest (between 30 and 180 minutes). MUST NOT exceed 240 minutes per quest." 
-              },
-              xpReward: { 
-                type: Type.INTEGER, 
-                description: "XP reward, equal to requiredMinutes (1 XP per minute)." 
-              },
-              sylphReward: { 
-                type: Type.INTEGER, 
-                description: "Currency reward between 5 and 30 based on chapter difficulty." 
-              }
-            },
-            required: ["title", "description", "requiredMinutes", "xpReward", "sylphReward"]
-          }
-        }
-      },
-      required: ["goalTitle", "goalDescription", "quests"]
-    };
 
     const targetDatePrompt = targetDate
       ? `The user has an absolute deadline on ${targetDate}. Ensure the quests are structured to cover the syllabus effectively before this date.`
@@ -214,22 +388,38 @@ MANDATORY RULES:
 1. STRICT CHAPTER-BY-CHAPTER BREAKDOWN (NO LUMPING, NO GAPS):
    - You MUST create at least one dedicated quest for EVERY SINGLE chapter listed in the Researcher Agent Findings.
    - If the researcher identified 6 chapters (e.g. Ch 1, Ch 2, Ch 3, Ch 4, Ch 5, Ch 6), you MUST generate quests covering Chapter 1, Chapter 2, Chapter 3, Chapter 4, Chapter 5, and Chapter 6 in exact sequential order.
-   - STRICTLY FORBIDDEN: NEVER combine or lump multiple chapters into a single quest (e.g. NEVER produce 'Ch 3-6: ...' or 'Chapters 4 & 5'). Each chapter MUST have its own individual quest(s).
-   - STRICTLY FORBIDDEN: NEVER repeat the same chapter number with different names (e.g. NEVER make three separate 'Ch 1' quests with different names like 'Ch 1: Kinematics', 'Ch 1: Dynamics', 'Ch 1: Work'). Chapter numbers MUST strictly match the canonical curriculum index.
+   - STRICTLY FORBIDDEN: NEVER combine or lump multiple chapters into a single quest.
+   - STRICTLY FORBIDDEN: NEVER repeat the same chapter number with different names. Chapter numbers MUST strictly match the canonical curriculum index.
    - If a single chapter is large or difficult, split it into two sub-quests under the same chapter (e.g., 'Ch 2: Kinematics - Core Equations' and 'Ch 2: Kinematics - Projectile Motion & Past Papers').
 
 2. NO HALLUCINATIONS / STRICT TOPIC FIDELITY:
    - Generate quests ONLY for the topics explicitly identified by the Researcher Agent.
-   - NEVER add extra topics or subsequent syllabus units outside the requested scope (for example, if the first 6 chapters of AS Physics were requested, DO NOT introduce Thermal Physics, Waves, Optics, Electricity, Magnetism, or Nuclear Physics).
+   - NEVER add extra topics or subsequent syllabus units outside the requested scope.
 
 3. QUEST DURATION BOUNDS & TIME SUM:
-   - No single quest should exceed 240 minutes (4 hours). Break large chapters into 2 distinct focused quests.
-   - The SUM of 'requiredMinutes' across ALL quests MUST equal exactly ${totalTargetMinutes} minutes.
+   - No single quest should exceed 240 minutes (4 hours).
+   - The SUM of 'requiredMinutes' across ALL quests MUST equal approximately ${totalTargetMinutes} minutes.
    - Distribute the minutes proportionally according to the difficulty weights from the Researcher's analysis.
 
 4. REWARDS:
-   - xpReward = requiredMinutes (1 XP per minute).
-   - sylphReward = 5 to 30 based on chapter difficulty.`;
+   - Set "xpReward" and "sylphReward" to 0 — the system computes canonical rewards deterministically from quest duration and difficulty tier.
+   - NEVER invent reward values; the backend overrides them regardless.
+
+OUTPUT FORMAT:
+Return ONLY a valid JSON object matching this exact schema:
+{
+  "goalTitle": "Motivating catchy goal title",
+  "goalDescription": "Concise summary of all chapters covered and total hours planned",
+  "quests": [
+    {
+      "title": "Ch 1: Physical Quantities & Units",
+      "description": "Specific summary of key theory concepts, formulas to master, and practice problems to complete.",
+      "requiredMinutes": 45,
+      "xpReward": 45,
+      "sylphReward": 10
+    }
+  ]
+}`;
 
     const prompt = `
 Topic: ${topic}
@@ -247,54 +437,89 @@ Based strictly on the Researcher Agent Findings above, create the final Quest br
 Remember:
 - Cover EVERY SINGLE researched chapter with its own dedicated quest (Ch 1, Ch 2, Ch 3, ...).
 - Do NOT lump multiple chapters together.
-- Do NOT introduce chapters beyond the requested scope.`;
+- Do NOT introduce chapters beyond the requested scope.
+- Return valid JSON only.`;
 
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          systemInstruction,
-          responseMimeType: "application/json",
-          responseSchema: schema,
-          temperature: 0.2,
-        }
-      });
+    const messages: NormalizedMessage[] = [{ role: "user", content: prompt }];
 
-      const resultText = response.text || "{}";
-      const cleanText = resultText.replace(/```json/gi, "").replace(/```/g, "").trim();
-      onProgress?.(`[Master Planner • Gemini 2.5 Flash] Finalizing plan...`);
-      const parsed = JSON.parse(cleanText) as StudyPlanResult;
-      parsed.modelUsed = "Gemini 2.5 Flash";
-      return parsed;
-    } catch (e: any) {
-      console.warn("[Master Planner Agent] Gemini failed. Falling back to Groq...", e);
+    // Attempt 1: DeepSeek Primary Engine (deepseek-v4-pro)
+    if (process.env.DEEPSEEK_API_KEY) {
       try {
-        const groqModel = process.env.GROQ_MODEL || "qwen/qwen3.6-27b";
-        const schemaString = JSON.stringify(schema, null, 2);
-        const groqPrompt = prompt + `\n\nCRITICAL: You MUST return ONLY a valid JSON object matching the requested schema. No markdown. Schema:\n${schemaString}`;
-
-        const groqRes = await groq.chat.completions.create({
-          model: groqModel,
-          messages: [
-            { role: "system", content: systemInstruction },
-            { role: "user", content: groqPrompt }
-          ],
-          response_format: { type: "json_object" }
+        const deepseek = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.planner);
+        const res = await deepseek.generateResponse(messages, systemInstruction, [], {
+          responseFormat: "json_object",
+          signal,
         });
 
-        const resultText = groqRes.choices[0]?.message?.content || "{}";
-        const cleanText = resultText.replace(/```json/gi, "").replace(/```/g, "").trim();
-        onProgress?.(`[Master Planner • Groq (${groqModel})] Finalizing plan...`);
-        const parsed = JSON.parse(cleanText) as StudyPlanResult;
-        parsed.modelUsed = `Groq (${groqModel})`;
-        return parsed;
-      } catch (groqErr: any) {
-        console.error("[Master Planner Agent] Groq fallback also failed:", groqErr);
-        throw new Error("Master Planner failed to generate the study plan: " + groqErr.message);
+        const parsed = this.parsePlanPayload(res.text || "", topic);
+        if (parsed && parsed.quests.length > 0) {
+          parsed.modelUsed = `DeepSeek (${DEEPSEEK_MODELS.planner})`;
+          return parsed;
+        }
+      } catch (deepseekErr: any) {
+        this.rethrowIfAborted(deepseekErr, signal);
+        console.warn("[Master Planner Agent] DeepSeek failed, attempting Gemini fallback:", deepseekErr.message);
       }
     }
+
+    // Attempt 2: Gemini Fallback Engine (gemini-3.1-pro / gemini-3.7-flash)
+    const geminiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_GENAI_API_KEY ||
+      process.env.GOOGLE_API_KEY;
+
+    if (geminiKey) {
+      try {
+        const geminiAdapter = LLMFactory.getAdapter("gemini", GEMINI_MODELS.research);
+        const res = await geminiAdapter.generateResponse(messages, systemInstruction, [], {
+          signal,
+        });
+
+        const parsed = this.parsePlanPayload(res.text || "", topic);
+        if (parsed && parsed.quests.length > 0) {
+          parsed.modelUsed = `Gemini (${GEMINI_MODELS.research})`;
+          return parsed;
+        }
+      } catch (geminiErr: any) {
+        this.rethrowIfAborted(geminiErr, signal);
+        console.warn("[Master Planner Agent] Gemini research failed, trying 3.7-flash:", geminiErr.message);
+        try {
+          const geminiFlash = LLMFactory.getAdapter("gemini", "gemini-3.7-flash");
+          const res = await geminiFlash.generateResponse(messages, systemInstruction, [], {
+            signal,
+          });
+
+          const parsed = this.parsePlanPayload(res.text || "", topic);
+          if (parsed && parsed.quests.length > 0) {
+            parsed.modelUsed = "Gemini 3.7 Flash";
+            return parsed;
+          }
+        } catch (flashErr) {
+          console.warn("[Master Planner Agent] Gemini flash failed:", flashErr);
+        }
+      }
+    }
+
+    // Attempt 3: Groq Fallback Engine
+    try {
+      const groqAdapter = LLMFactory.getAdapter("groq", GROQ_MODELS.default);
+      const groqRes = await groqAdapter.generateResponse(messages, systemInstruction, [], {
+        signal,
+      });
+
+      const parsed = this.parsePlanPayload(groqRes.text || "", topic);
+      if (parsed && parsed.quests.length > 0) {
+        parsed.modelUsed = `Groq (${GROQ_MODELS.default})`;
+        return parsed;
+      }
+      throw new Error("Groq planner output failed schema validation");
+    } catch (groqErr: any) {
+      this.rethrowIfAborted(groqErr, signal);
+      console.error("[Master Planner Agent] Groq fallback failed:", groqErr);
+      throw new Error("Master Planner failed across all engines: " + groqErr.message);
+    }
   }
+
 
   /**
    * Main Orchestrator Entrypoint
@@ -305,21 +530,24 @@ Remember:
     effortHours: number,
     targetDate: string | null,
     pastSessions: StudySessionData[],
-    onProgress?: (msg: string) => void
+    onProgress?: (msg: string) => void,
+    signal?: AbortSignal
   ): Promise<StudyPlanResult> {
 
     // Calculate exact minutes needed
     let totalDays = 7;
     if (targetDate) {
       const diff = new Date(targetDate).getTime() - Date.now();
-      totalDays = Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      if (Number.isFinite(diff)) {
+        totalDays = Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      }
     }
     const totalTargetMinutes = Math.round((effortHours / 7) * totalDays * 60);
 
     // 1 & 2: Run Researcher and Analyst in parallel for performance
     const [researchData, analystData] = await Promise.all([
-      this.runResearcherAgent(topic, syllabus, onProgress),
-      this.runAnalystAgent(pastSessions, onProgress)
+      this.runResearcherAgent(topic, syllabus, onProgress, signal),
+      this.runAnalystAgent(pastSessions, onProgress, signal)
     ]);
 
     // 3: Run Master Planner with the gathered context
@@ -330,35 +558,54 @@ Remember:
       targetDate,
       researchData.data,
       analystData.data,
-      onProgress
+      onProgress,
+      signal
     );
 
-    // 4: Mathematical Post-Processing to enforce exact target minutes & XP consistency
+    // 4: Mathematical Post-Processing to enforce exact target minutes & canonical rewards
     if (finalPlan.quests && finalPlan.quests.length > 0) {
-      let totalGeneratedMinutes = 0;
-      finalPlan.quests.forEach(q => { totalGeneratedMinutes += q.requiredMinutes; });
+      const target = Math.round(totalTargetMinutes);
+      const isFiniteTarget = Number.isFinite(target) && target > 0;
 
-      if (totalGeneratedMinutes > 0 && totalGeneratedMinutes !== totalTargetMinutes) {
-        const ratio = totalTargetMinutes / totalGeneratedMinutes;
-        let runningTotal = 0;
+      if (isFiniteTarget) {
+        // Clamp every quest into [15, 240] first, then distribute the target
+        // EXACTLY via proportional shares so the sum always equals the target.
+        const weights = finalPlan.quests.map((q) =>
+          Math.min(240, Math.max(15, Math.round(Number(q.requiredMinutes) || 15)))
+        );
+        const weightSum = weights.reduce((a, b) => a + b, 0);
+        let remaining = target;
 
         for (let i = 0; i < finalPlan.quests.length; i++) {
+          let share: number;
           if (i === finalPlan.quests.length - 1) {
-            // Last quest absorbs the rounding difference
-            const remainder = totalTargetMinutes - runningTotal;
-            finalPlan.quests[i].requiredMinutes = Math.max(15, remainder);
+            // Last quest absorbs the rounding remainder; clamp to [15, 240]
+            share = Math.min(240, Math.max(15, remaining));
           } else {
-            const adjusted = Math.max(15, Math.round(finalPlan.quests[i].requiredMinutes * ratio));
-            finalPlan.quests[i].requiredMinutes = adjusted;
-            runningTotal += adjusted;
+            share = Math.min(240, Math.max(15, Math.round((target * weights[i]) / weightSum)));
           }
+          finalPlan.quests[i].requiredMinutes = share;
+          remaining -= share;
         }
+      } else {
+        // Degenerate target (e.g. NaN from an invalid deadline) — sanitize
+        // each quest independently instead of poisoning the whole plan.
+        finalPlan.quests.forEach((q) => {
+          q.requiredMinutes = Math.min(
+            240,
+            Math.max(15, Math.round(Number(q.requiredMinutes) || 45))
+          );
+        });
       }
 
-      // Synchronize xpReward with requiredMinutes (1 XP per min)
-      finalPlan.quests.forEach(q => {
-        q.xpReward = q.requiredMinutes;
-        if (!q.sylphReward || q.sylphReward < 5) q.sylphReward = 10;
+      // Synchronize rewards via the CANONICAL unified quest reward standard.
+      // LLM-supplied xp/sylph values are discarded — they must never set the
+      // economy; difficulty tier + duration alone do.
+      finalPlan.quests.forEach((q) => {
+        const difficulty = calculateRecommendedDifficulty(q.requiredMinutes);
+        const rewards = calculateQuestRewards(q.requiredMinutes, difficulty);
+        q.xpReward = rewards.xp;
+        q.sylphReward = rewards.sylph;
       });
     }
 

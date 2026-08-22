@@ -131,4 +131,75 @@ Write the notification. Make it feel like an authoritative system prompt, but mo
       return { success: false, message: error.message };
     }
   }
+
+  /**
+   * Asynchronously creates an in-universe Hunter Protocol diagnostic briefing
+   * upon milestone events (RANK_PROMOTION, FORGE_MASTERY) without blocking session completion.
+   */
+  public static async generateHunterDiagnosticMessage(
+    userId: number,
+    event: "RANK_PROMOTION" | "FORGE_MASTERY",
+    details: any = {}
+  ): Promise<GenerateBriefingResult> {
+    try {
+      const stats = await prisma.userStats.findUnique({
+        where: { userId },
+      });
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true, name: true },
+      });
+
+      if (!user) throw new Error("User not found");
+
+      const endurance = stats?.endurance ?? 10;
+      const tenacity = stats?.tenacity ?? 10;
+      const velocity = stats?.velocity ?? 10;
+      const discipline = stats?.discipline ?? 10;
+      const synthesis = stats?.synthesis ?? 10;
+
+      let eventTitle = "[HUNTER PROTOCOL UPDATE]";
+      let eventSummary = "";
+
+      if (event === "RANK_PROMOTION") {
+        eventTitle = `[HUNTER PROMOTION: ${details.rank || stats?.rank || "RANK UP"}]`;
+        eventSummary = `The System has recognized your academic output threshold. New Hunter Classification: ${details.rank || stats?.rank}.`;
+      } else if (event === "FORGE_MASTERY") {
+        eventTitle = `[FORGE CORE MASTERED: ${details.coreName || details.coreKey || "DISCIPLINE REACTOR"}]`;
+        eventSummary = `All foundational topics under the ${details.coreName || details.coreKey} matrix have reached 100% resonance.`;
+      }
+
+      const diagnosticText = `
+${eventTitle}
+Scholar: ${user.name || user.username}
+${eventSummary}
+
+[COGNITIVE VECTOR DIAGNOSTIC]
+• Endurance: ${endurance}
+• Tenacity: ${tenacity}
+• Velocity: ${velocity}
+• Discipline: ${discipline}
+• Synthesis: ${synthesis}
+
+System Evaluation: Vector balance calibrated. Continue deliberate study loops to maintain operational resonance.
+`.trim();
+
+      await prisma.systemMessage.create({
+        data: {
+          userId,
+          content: diagnosticText,
+          type: "SYSTEM",
+          read: false,
+        },
+      });
+
+      return { success: true, message: diagnosticText };
+    } catch (error: any) {
+      console.error(`[HunterDiagnostic] Failed for user ${userId}:`, error);
+      return { success: false, message: error.message };
+    }
+  }
 }
+
+export const generateHunterDiagnosticMessage = DailyBriefingService.generateHunterDiagnosticMessage;

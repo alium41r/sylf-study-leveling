@@ -255,7 +255,7 @@ function LoginForm() {
         <p className="mt-6 text-center text-xs" style={{ color: "var(--text-muted)" }}>
           Don&apos;t have an account?{" "}
           <Link
-            href="/register"
+            href="/register?force=true"
             className="font-bold transition-colors uppercase tracking-wider hover:underline"
             style={{ color: "var(--accent-text-light)" }}
           >

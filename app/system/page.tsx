@@ -22,8 +22,9 @@ interface SystemMsg {
 
 function getMessageModelBadge(msg: SystemMsg, currentModelPref?: string): string {
   if (msg.modelUsed) {
+    if (msg.modelUsed === "DEEPSEEK") return "DeepSeek";
     if (msg.modelUsed === "GEMINI") return "Gemini 2.5 Flash";
-    if (msg.modelUsed === "GROQ") return "Groq (Qwen 3.6 27B)";
+    if (msg.modelUsed === "GROQ") return "Groq (Qwen 3.6)";
     return msg.modelUsed;
   }
   if (msg.content) {
@@ -32,11 +33,12 @@ function getMessageModelBadge(msg: SystemMsg, currentModelPref?: string): string
       return match[1].trim();
     }
   }
+  if (msg.type?.includes("DEEPSEEK")) return "DeepSeek";
   if (msg.type?.includes("GEMINI")) return "Gemini 2.5 Flash";
-  if (msg.type?.includes("GROQ")) return "Groq (Qwen 3.6 27B)";
-  if (msg.content?.includes("Study Plan Generated")) return "Gemini 2.5 Flash";
-  if (currentModelPref === "groq") return "Groq (Qwen 3.6 27B)";
-  return "Gemini 2.5 Flash";
+  if (msg.type?.includes("GROQ")) return "Groq (Qwen 3.6)";
+  if (currentModelPref === "deepseek") return "DeepSeek";
+  if (currentModelPref === "groq") return "Groq (Qwen 3.6)";
+  return "The System AI";
 }
 
 interface ChatSession {
@@ -74,11 +76,40 @@ export default function SystemPage() {
   const [chatQuota, setChatQuota] = useState<{ used: number; limit: number; remaining: number; resetsAt: string } | null>(null);
   const [plannerQuota, setPlannerQuota] = useState<{ used: number; limit: number; remaining: number; resetsAt: string } | null>(null);
   
-  // Model Preference
-  const [modelPref, setModelPref] = useState<"auto" | "gemini" | "groq">("auto");
+  // Developer Debug Mode (hidden by default; toggle by triple-clicking "THE SYSTEM" or ?dev=true)
+  const [isDevMode, setIsDevMode] = useState(false);
+  const [devClicks, setDevClicks] = useState(0);
+
+  // Model Preference (Auto multi-engine routing by default)
+  const [modelPref, setModelPref] = useState<"auto" | "deepseek" | "gemini" | "groq">("auto");
 
   // Planner Modal
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("dev") === "true" || localStorage.getItem("sylf_dev_ai") === "true") {
+        setIsDevMode(true);
+      }
+    }
+  }, []);
+
+  const handleTitleClick = () => {
+    setDevClicks((prev) => {
+      const next = prev + 1;
+      if (next >= 3) {
+        setIsDevMode((curr) => {
+          const newVal = !curr;
+          localStorage.setItem("sylf_dev_ai", newVal ? "true" : "false");
+          console.log(`[Sylf Dev Mode] Developer AI Diagnostics ${newVal ? "ENABLED" : "DISABLED"}`);
+          return newVal;
+        });
+        return 0;
+      }
+      return next;
+    });
+  };
 
   // Fetch AI usage quotas from server
   const fetchQuotas = async () => {
@@ -293,6 +324,12 @@ export default function SystemPage() {
           }
         }
 
+        console.log(
+          `%c[Sylf AI Diagnostics]%c Engine: ${data.modelDisplayName || data.modelUsed} | Provider: ${data.modelUsed} | Session ID: ${data.sessionId}`,
+          "background: #1e1b4b; color: #818cf8; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px solid #4338ca;",
+          "color: #38bdf8; font-weight: bold; margin-left: 8px;"
+        );
+
         setMessages((prev) => {
           const withoutOptimistic = prev.filter(
             (m) => m.id !== optimisticUserMsg.id
@@ -371,8 +408,6 @@ export default function SystemPage() {
     await sendMessage(currentInput, currentFile);
   };
 
-
-
   return (
     <div className="flex w-full h-[100vh] overflow-hidden">
       {/* ── Main Chat Area ── */}
@@ -381,25 +416,35 @@ export default function SystemPage() {
           
             <div className="flex justify-between items-end mb-4 shrink-0">
               <div>
-                <div className="flex items-center gap-4 mb-1">
+                <div className="flex items-center gap-3 mb-1">
                   <p
-                    className="text-xs tracking-widest text-accent-text-light font-bold"
+                    onClick={handleTitleClick}
+                    className="text-xs tracking-widest text-accent-text-light font-bold cursor-pointer select-none hover:text-accent-primary transition-colors"
                     style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                    title="The System AI"
                   >
                     THE SYSTEM
                   </p>
                   
-                  {/* Model Selector Dropdown */}
-                  <select
-                    value={modelPref}
-                    onChange={(e) => setModelPref(e.target.value as any)}
-                    className="bg-bg-panel text-xs text-text-primary border border-white/10 rounded px-2 py-1 outline-none focus:border-accent-light"
-                    style={{ fontFamily: "'Rajdhani', sans-serif" }}
-                  >
-                    <option value="auto">Auto (Gemini → Groq)</option>
-                    <option value="gemini">Gemini</option>
-                    <option value="groq">Groq (Qwen 3.6)</option>
-                  </select>
+                  {/* Developer AI Mode Inspector & Selector (Only visible in Dev Mode) */}
+                  {isDevMode && (
+                    <div className="flex items-center gap-2 animate-fadeIn">
+                      <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                        DEV AI
+                      </span>
+                      <select
+                        value={modelPref}
+                        onChange={(e) => setModelPref(e.target.value as any)}
+                        className="bg-bg-panel text-xs text-text-primary border border-indigo-500/40 rounded px-2 py-0.5 outline-none focus:border-accent-light"
+                        style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                      >
+                        <option value="auto">Auto (DeepSeek → Groq → Gemini)</option>
+                        <option value="deepseek">Force DeepSeek</option>
+                        <option value="gemini">Force Gemini</option>
+                        <option value="groq">Force Groq (Qwen 3.6)</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
                 
                 <h1
@@ -454,12 +499,12 @@ export default function SystemPage() {
                             <span className={`text-[10px] font-bold uppercase tracking-wider opacity-90 ${isUser ? 'text-accent-text-light' : 'text-accent-primary'}`}>
                               {isUser ? "You" : "The System"}
                             </span>
-                            {!isUser && (() => {
+                            {!isUser && isDevMode && (() => {
                               const modelBadge = getMessageModelBadge(msg, modelPref);
                               if (!modelBadge) return null;
                               return (
-                                <span className="text-[9px] font-mono font-medium px-2 py-0.5 rounded-full bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid/40 shadow-xs">
-                                  {modelBadge}
+                                <span className="text-[9px] font-mono font-medium px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-xs">
+                                  DEV: {modelBadge}
                                 </span>
                               );
                             })()}

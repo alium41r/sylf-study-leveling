@@ -19,6 +19,8 @@ import {
   ChevronDown,
   Trash2,
   X,
+  Sparkles,
+  Lock,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -59,6 +61,8 @@ export default function AiAssistantTool() {
   const [sessions, setSessions] = useState<ChatSessionItem[]>([]);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [unlockedSkills, setUnlockedSkills] = useState<string[]>([]);
+  const [isLocked, setIsLocked] = useState<boolean>(false); // Daily 10-prompt quota exhausted
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -93,17 +97,30 @@ export default function AiAssistantTool() {
     if (!activeToken) return;
 
     try {
-      const res = await fetch("/api/chats", {
-        headers: { Authorization: `Bearer ${activeToken}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const [chatsRes, skillsRes] = await Promise.all([
+        fetch("/api/chats", {
+          headers: { Authorization: `Bearer ${activeToken}` },
+        }),
+        fetch("/api/skills", {
+          headers: { Authorization: `Bearer ${activeToken}` },
+        }).catch(() => null),
+      ]);
+
+      if (chatsRes.ok) {
+        const data = await chatsRes.json();
         if (Array.isArray(data?.sessions)) {
           setSessions(data.sessions);
         }
       }
+
+      if (skillsRes && skillsRes.ok) {
+        const skillData = await skillsRes.json();
+        if (Array.isArray(skillData?.unlockedSkills)) {
+          setUnlockedSkills(skillData.unlockedSkills.map((s: any) => s.nodeKey));
+        }
+      }
     } catch (err) {
-      console.error("Failed to fetch chat sessions:", err);
+      console.error("Failed to fetch chat sessions or skills:", err);
     }
   }, [getActiveToken]);
 
@@ -247,7 +264,7 @@ export default function AiAssistantTool() {
 
   const handleSend = async (customPrompt?: string) => {
     const textToSend = customPrompt || input.trim();
-    if (!textToSend || isLoading || isStreaming) return;
+    if (!textToSend || isLoading || isStreaming || isLocked) return;
 
     const userMsgId = Math.random().toString(36).substring(2, 9);
     const userMsg: ChatMessage = {
@@ -276,6 +293,12 @@ export default function AiAssistantTool() {
       abortControllerRef.current = new AbortController();
       const activeToken = getActiveToken();
 
+      const hasAdvancedSynthesis = unlockedSkills.includes("researcher-literature-synthesis");
+
+      const dynamicInstruction = hasAdvancedSynthesis
+        ? "You are an expert in-session academic tutor with Comprehensive Literature Synthesis enabled. Provide rigorous, exhaustive step-by-step mathematical derivations using KaTeX ($inline$ and $$display$$ math), provide historical academic provenance, and synthesize multi-variable proofs with maximal precision."
+        : "You are an expert in-session academic study tutor and STEM coach. Provide concise, ultra-clear explanations, break down formulas step-by-step using KaTeX ($inline$ and $$display$$ math), and give high-yield conceptual clarity. Keep tone encouraging and scholarly.";
+
       const res = await fetch("/api/system-messages/chat", {
         method: "POST",
         headers: {
@@ -289,8 +312,7 @@ export default function AiAssistantTool() {
             mode: "academic_assistant",
             subject: subjectName || "General Focus",
             quest: questTitle || "Focus Session",
-            instruction:
-              "You are an expert in-session academic study tutor and STEM coach. Provide concise, ultra-clear explanations, break down formulas step-by-step using LaTeX ($inline$ and $$display$$ math), and give high-yield conceptual clarity. Keep tone encouraging and scholarly.",
+            instruction: dynamicInstruction,
           },
         }),
         signal: abortControllerRef.current.signal,
@@ -298,11 +320,14 @@ export default function AiAssistantTool() {
 
       if (res.status === 429) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(
-          errData?.error === "quota_exceeded"
-            ? "Daily AI message limit reached. Your quota resets at midnight!"
-            : "Rate limit exceeded. Please wait a moment."
-        );
+        const lockedMessage =
+          errData?.error === "DAILY_QUOTA_EXHAUSTED" || errData?.error === "quota_exceeded"
+            ? (errData?.message || "Daily AI limit reached. Your quota resets at midnight!")
+            : "Rate limit exceeded. Please wait a moment.";
+        if (errData?.error === "DAILY_QUOTA_EXHAUSTED" || errData?.error === "quota_exceeded") {
+          setIsLocked(true);
+        }
+        throw new Error(lockedMessage);
       }
 
       if (!res.ok) {
@@ -310,6 +335,7 @@ export default function AiAssistantTool() {
       }
 
       const data = await res.json();
+      setIsLocked(false); // A successful generation means quota was available again
       if (data?.sessionId) {
         setSessionId(data.sessionId);
         if (data.session) {
@@ -420,6 +446,16 @@ export default function AiAssistantTool() {
 
         {/* Right Side: + New Chat, History Drawer Toggle & Reset */}
         <div className="flex items-center gap-1.5 shrink-0">
+          {isLocked && (
+            <span
+              className="px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider"
+              title="Daily AI prompt limit reached — resets at midnight"
+            >
+              <Lock className="w-3 h-3" />
+              Daily Limit
+            </span>
+          )}
+
           <button
             onClick={handleNewChat}
             className="px-2 py-1 rounded-lg bg-accent-primary/10 hover:bg-accent-primary/20 text-accent-primary border border-accent-primary/30 transition-all flex items-center gap-1 text-[10px] font-medium"
@@ -628,6 +664,36 @@ export default function AiAssistantTool() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Analyst Dynamic Perks Chips */}
+      {unlockedSkills.includes("analyst-logic-breakdown") && (
+        <div className="px-3 pt-2 pb-1.5 bg-bg-abyss/95 flex items-center gap-1.5 overflow-x-auto border-t border-border-subtle scrollbar-none">
+          <span className="text-[10px] font-bold font-['Rajdhani'] text-cyan-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-cyan-400" />
+            Analyst:
+          </span>
+          <button
+            onClick={() =>
+              handleSend(
+                "Please decompose this problem/theorem into formal step-by-step logic and verify every premise."
+              )
+            }
+            className="px-2 py-0.5 rounded-lg bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-900/60 text-[10px] whitespace-nowrap transition-colors"
+          >
+            📐 Decompose Logic
+          </button>
+          <button
+            onClick={() =>
+              handleSend(
+                "Verify the mathematical proof rigorously and check for edge conditions or boundary violations."
+              )
+            }
+            className="px-2 py-0.5 rounded-lg bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-900/60 text-[10px] whitespace-nowrap transition-colors"
+          >
+            🔍 Verify Proof
+          </button>
+        </div>
+      )}
+
       {/* Input Bar (Auto-expanding, with Enter to Send / Shift+Enter for Newline) */}
       <div className="p-3 border-t border-border-subtle bg-bg-abyss flex items-end gap-2">
         <textarea
@@ -635,14 +701,19 @@ export default function AiAssistantTool() {
           value={input}
           onChange={handleInputChange}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
+            if (e.key === "Enter" && !e.shiftKey && !isLocked) {
               e.preventDefault();
               handleSend();
             }
           }}
-          placeholder={`Ask AI in ${activeSessionTitle}... (Enter to send)`}
+          disabled={isLocked}
+          placeholder={
+            isLocked
+              ? "Daily AI limit reached — resets at midnight."
+              : `Ask AI in ${activeSessionTitle}... (Enter to send)`
+          }
           rows={1}
-          className="flex-1 bg-bg-panel/90 border border-border-subtle rounded-xl px-3.5 py-2.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary resize-none max-h-28 min-h-[42px] leading-relaxed transition-all"
+          className="flex-1 bg-bg-panel/90 border border-border-subtle rounded-xl px-3.5 py-2.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary resize-none max-h-28 min-h-[42px] leading-relaxed transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           style={{ height: "42px" }}
         />
 
@@ -657,11 +728,11 @@ export default function AiAssistantTool() {
         ) : (
           <button
             onClick={() => handleSend()}
-            disabled={!input.trim()}
+            disabled={!input.trim() || isLocked}
             className="w-10 h-10 rounded-xl bg-accent-primary hover:bg-accent-primary-light text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-accent-primary/30 flex items-center justify-center shrink-0"
-            title="Send Message (Enter)"
+            title={isLocked ? "Daily AI limit reached" : "Send Message (Enter)"}
           >
-            <Send className="w-4 h-4" />
+            {isLocked ? <Lock className="w-4 h-4" /> : <Send className="w-4 h-4" />}
           </button>
         )}
       </div>

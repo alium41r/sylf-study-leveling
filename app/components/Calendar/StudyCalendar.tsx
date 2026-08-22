@@ -4,7 +4,13 @@ import { useAuth } from "../AuthProvider";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import StudyScheduleModal from "../../calendar/components/StudyScheduleModal";
 import DayInspectionPanel from "../../calendar/components/DayInspectionPanel";
-import { MonthCalendarData, DayStudySummary } from "@/lib/study-schedule-service";
+import {
+  MonthCalendarData,
+  DayStudySummary,
+  GoalMilestone,
+  FloatingRestDayStatus,
+} from "@/lib/study-schedule-service";
+import { resolveGoalColor } from "@/lib/goal-theme";
 
 /* ─── Helpers ──────────────────────────────────────────────── */
 
@@ -46,12 +52,16 @@ function getIntensityBorder(minutes: number): string {
 function DayCell({
   day,
   dayData,
+  milestones,
+  isFloatingRest,
   isToday,
   isCurrentMonth,
   onClick,
 }: {
   day: number;
   dayData: DayStudySummary | null;
+  milestones: GoalMilestone[];
+  isFloatingRest: boolean;
   isToday: boolean;
   isCurrentMonth: boolean;
   onClick: () => void;
@@ -61,33 +71,49 @@ function DayCell({
   const questsCompleted = dayData?.questsCompleted || 0;
   const isRest = dayData?.isRestDay;
 
+  // Goal-linked quest chips (max 2 + overflow count)
+  const dayQuests = dayData?.quests || [];
+  const linkedQuests = dayQuests.slice(0, 2);
+  const overflowQuests = dayQuests.length - linkedQuests.length;
+
+  // Milestone accent (first milestone wins for the daydot/border tint)
+  const milestoneTheme = milestones.length > 0 ? resolveGoalColor(milestones[0].color) : null;
+  const floatingTheme = resolveGoalColor("AMBER");
+
   return (
     <button
       onClick={onClick}
       style={{
-        aspectRatio: "1",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         gap: "2px",
         borderRadius: "6px",
-        background: isToday
+        overflow: "hidden",
+        touchAction: "manipulation",
+        background: isFloatingRest
+          ? "rgba(245, 158, 11, 0.05)"
+          : isToday
           ? "var(--accent-primary-dim)"
           : isRest && minutes === 0
           ? "rgba(34, 197, 94, 0.04)"
           : getIntensityColor(minutes),
-        border: isToday
+        border: isFloatingRest
+          ? "1px dashed rgba(245, 158, 11, 0.45)"
+          : isToday
           ? "1px solid var(--accent-primary-mid)"
           : isRest
           ? "1px dashed rgba(34, 197, 94, 0.35)"
+          : milestoneTheme
+          ? `1px solid ${milestoneTheme.mid}`
           : `1px solid ${getIntensityBorder(minutes)}`,
         cursor: "pointer",
         transition: "all 0.2s ease",
         position: "relative",
         opacity: isCurrentMonth ? 1 : 0.3,
       }}
-      className="hover:scale-[1.02] hover:shadow-lg hover:z-10"
+      className="hover:scale-[1.02] hover:shadow-lg hover:z-10 min-h-[64px] sm:min-h-[112px]"
     >
       <span
         style={{
@@ -96,7 +122,7 @@ function DayCell({
           fontSize: "0.85rem",
           color: isToday
             ? "var(--accent-text-light)"
-            : minutes > 0 || questsCount > 0
+            : minutes > 0 || questsCount > 0 || isFloatingRest
             ? "var(--text-primary)"
             : "var(--text-muted)",
         }}
@@ -130,25 +156,158 @@ function DayCell({
         </span>
       )}
 
+      {/* Objective milestone banner (deadline renders in goal color) */}
+      {milestones.length > 0 && milestoneTheme && (
+        <div
+          title={milestones.map((m) => `Deadline: ${m.title}`).join("\n")}
+          style={{
+            maxWidth: "92%",
+            padding: "1px 6px",
+            borderRadius: "4px",
+            background: milestoneTheme.dim,
+            border: `1px solid ${milestoneTheme.mid}`,
+            fontFamily: "'Rajdhani', sans-serif",
+            fontSize: "0.5rem",
+            fontWeight: 700,
+            lineHeight: "1.15",
+            color: milestoneTheme.light,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          ◎ {milestones.map((m) => m.title).join(" · ")}
+        </div>
+      )}
+
+      {/* Floating Rest badge (ad-hoc rest day) */}
+      {isFloatingRest && (
+        <div
+          title="Floating Rest Day — exempt from study targets and HP penalties"
+          style={{
+            maxWidth: "92%",
+            padding: "1px 6px",
+            borderRadius: "4px",
+            background: floatingTheme.dim,
+            border: `1px solid ${floatingTheme.mid}`,
+            fontFamily: "'Rajdhani', sans-serif",
+            fontSize: "0.5rem",
+            fontWeight: 700,
+            lineHeight: "1.15",
+            color: floatingTheme.light,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          ◌ Floating Rest
+        </div>
+      )}
+
+      {/* Goal-colored quest chips — desktop: full chips, mobile: micro pip dots */}
+      <div className="hidden md:flex flex-col items-center gap-[2px] w-full">
+        {linkedQuests.map((q) => {
+          const theme = q.goal ? resolveGoalColor(q.goal.color) : null;
+          return (
+            <div
+              key={q.id}
+              title={`${q.title}${q.goal ? ` — ${q.goal.title}` : ""}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "3px",
+                maxWidth: "92%",
+              }}
+            >
+              <span
+                style={{
+                  width: "5px",
+                  height: "5px",
+                  borderRadius: "1px",
+                  flexShrink: 0,
+                  background: theme ? theme.base : "var(--accent-primary-mid)",
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "'Rajdhani', sans-serif",
+                  fontSize: "0.5rem",
+                  fontWeight: 600,
+                  color: "var(--text-secondary)",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {q.title}
+              </span>
+            </div>
+          );
+        })}
+        {overflowQuests > 0 && (
+          <span
+            style={{
+              fontFamily: "'Rajdhani', sans-serif",
+              fontSize: "0.5rem",
+              fontWeight: 700,
+              color: "var(--text-muted)",
+            }}
+          >
+            +{overflowQuests} more
+          </span>
+        )}
+      </div>
+
+      {/* Mobile: compact colored indicator pip cluster */}
+      {dayQuests.length > 0 && (
+        <div
+          className="flex md:hidden gap-1 mt-0.5 justify-center flex-wrap px-1"
+          title={dayQuests.map((q) => q.title).join(" • ")}
+        >
+          {dayQuests.slice(0, 4).map((q) => {
+            const theme = q.goal ? resolveGoalColor(q.goal.color) : null;
+            return (
+              <span
+                key={q.id}
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: theme ? theme.base : "var(--accent-primary-mid)" }}
+              />
+            );
+          })}
+          {dayQuests.length > 4 && (
+            <span className="w-1.5 h-1.5 rounded-full bg-text-muted" />
+          )}
+        </div>
+      )}
+
       {/* Streak / status indicator dot */}
-      {(minutes > 0 || questsCount > 0 || isRest) && (
+      {(minutes > 0 || questsCount > 0 || isRest || milestones.length > 0 || isFloatingRest) && (
         <div
           style={{
             position: "absolute",
             top: "3px",
             right: "3px",
-            width: "4px",
-            height: "4px",
+            width: "5px",
+            height: "5px",
             borderRadius: "50%",
-            background:
-              minutes >= 60
-                ? "var(--accent-gold)"
-                : questsCount > 0
-                ? "var(--accent-green)"
-                : isRest
-                ? "var(--accent-green)"
-                : "var(--accent-primary)",
-            boxShadow: minutes >= 60 ? "0 0 4px var(--accent-gold)" : "none",
+            background: isFloatingRest
+              ? floatingTheme.base
+              : milestoneTheme
+              ? milestoneTheme.base
+              : minutes >= 60
+              ? "var(--accent-gold)"
+              : questsCount > 0
+              ? "var(--accent-green)"
+              : isRest
+              ? "var(--accent-green)"
+              : "var(--accent-primary)",
+            boxShadow: isFloatingRest
+              ? `0 0 5px ${floatingTheme.mid}`
+              : milestoneTheme
+              ? `0 0 5px ${milestoneTheme.mid}`
+              : minutes >= 60
+              ? "0 0 4px var(--accent-gold)"
+              : "none",
           }}
         />
       )}
@@ -166,6 +325,10 @@ export default function StudyCalendar() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<DayStudySummary | null>(null);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+
+  // Floating rest day toggle state (per selected day)
+  const [floatingRestStatus, setFloatingRestStatus] = useState<FloatingRestDayStatus | null>(null);
+  const [isTogglingFloatingRest, setIsTogglingFloatingRest] = useState(false);
 
   // User local today string (YYYY-MM-DD)
   const todayStr = useMemo(() => {
@@ -228,6 +391,59 @@ export default function StudyCalendar() {
     }
   };
 
+  // Live floating-rest-day status for the currently selected day
+  const loadFloatingRestStatus = useCallback(
+    async (dateKey: string) => {
+      if (!token) return;
+      try {
+        const res = await fetch(
+          `/api/user/study-schedule/floating-rest-day?dateKey=${dateKey}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.ok) {
+          const status = await res.json();
+          setFloatingRestStatus(status);
+        }
+      } catch (err) {
+        console.error("Failed to load floating rest day status:", err);
+      }
+    },
+    [token]
+  );
+
+  useEffect(() => {
+    if (selectedDay) {
+      loadFloatingRestStatus(selectedDay.date);
+    } else {
+      setFloatingRestStatus(null);
+    }
+  }, [selectedDay?.date, loadFloatingRestStatus]);
+
+  /** Toggle the selected day as a floating (ad-hoc) rest day. */
+  const handleToggleFloatingRest = async () => {
+    if (!token || !selectedDay) return;
+    setIsTogglingFloatingRest(true);
+    try {
+      const res = await fetch("/api/user/study-schedule/floating-rest-day", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ dateKey: selectedDay.date }),
+      });
+      if (res.ok) {
+        // Cascade may have shifted quests — refresh the whole month grid.
+        await fetchMonthData();
+        await loadFloatingRestStatus(selectedDay.date);
+      } else {
+        const err = await res.json().catch(() => null);
+        alert(err?.message || "Could not update rest day designation.");
+      }
+    } catch (err) {
+      console.error("Failed to toggle floating rest day:", err);
+    } finally {
+      setIsTogglingFloatingRest(false);
+    }
+  };
+
   const goToToday = () => {
     setMonth(now.getMonth());
     setYear(now.getFullYear());
@@ -250,6 +466,22 @@ export default function StudyCalendar() {
       }
     }
     return map;
+  }, [calendarData]);
+
+  // Map objective milestones (deadlines) by local date
+  const milestonesByDate = useMemo(() => {
+    const map: Record<string, GoalMilestone[]> = {};
+    if (calendarData?.milestones) {
+      for (const m of calendarData.milestones) {
+        (map[m.date] = map[m.date] || []).push(m);
+      }
+    }
+    return map;
+  }, [calendarData]);
+
+  // Floating rest day set for the displayed month
+  const floatingRestSet = useMemo(() => {
+    return new Set(calendarData?.floatingRestDays || []);
   }, [calendarData]);
 
   // Previous month filler days
@@ -541,6 +773,8 @@ export default function StudyCalendar() {
                 key={i}
                 day={cell.dayNumber}
                 dayData={cell.dateStr ? dayDataMap[cell.dateStr] || null : null}
+                milestones={cell.dateStr ? milestonesByDate[cell.dateStr] || [] : []}
+                isFloatingRest={cell.dateStr ? floatingRestSet.has(cell.dateStr) : false}
                 isToday={cell.dateStr === todayStr}
                 isCurrentMonth={cell.isCurrentMonth}
                 onClick={() => {
@@ -572,10 +806,22 @@ export default function StudyCalendar() {
 
       {/* ─── Selected Day Detail Panel ────────────────── */}
       {selectedDay && (
-        <DayInspectionPanel
-          dayData={selectedDay}
-          onClose={() => setSelectedDay(null)}
-        />
+        <>
+          {/* Mobile bottom-sheet backdrop (tap outside to close) */}
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+            aria-hidden="true"
+            onClick={() => setSelectedDay(null)}
+          />
+          <DayInspectionPanel
+            dayData={selectedDay}
+            milestones={selectedDay.date ? milestonesByDate[selectedDay.date] || [] : []}
+            floatingRestStatus={floatingRestStatus}
+            onToggleFloatingRest={handleToggleFloatingRest}
+            isTogglingFloatingRest={isTogglingFloatingRest}
+            onClose={() => setSelectedDay(null)}
+          />
+        </>
       )}
 
       {/* ─── Intensity Legend ─────────────────────────── */}

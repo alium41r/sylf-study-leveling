@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import {
+  GOAL_COLOR_TOKENS,
+  isGoalColorToken,
+  targetDateToUtc,
+  targetDateToWeeks,
+} from "@/lib/goal-theme";
 
 const updateGoalSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").optional(),
@@ -9,6 +15,8 @@ const updateGoalSchema = z.object({
   targetWeeks: z.number().int().min(1).max(52).optional(),
   effortLevel: z.enum(["RELAXED", "NORMAL", "INTENSE", "EXTREME"]).optional(),
   status: z.enum(["ACTIVE", "COMPLETED", "FAILED"]).optional(),
+  targetDate: z.string().nullable().optional(),
+  color: z.enum(GOAL_COLOR_TOKENS).optional(),
 });
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -86,9 +94,35 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Goal not found" }, { status: 404 });
     }
 
+    const dataToUpdate: Record<string, unknown> = { ...validation.data };
+    delete dataToUpdate.targetDate;
+
+    // Exact deadline editing: store representational UTC midnight of the
+    // chosen date and keep the legacy week count in sync.
+    if (validation.data.targetDate !== undefined) {
+      if (validation.data.targetDate === null) {
+        dataToUpdate.targetDate = null;
+      } else {
+        try {
+          const parsed = targetDateToUtc(validation.data.targetDate);
+          dataToUpdate.targetDate = parsed;
+          dataToUpdate.targetWeeks = validation.data.targetWeeks ?? targetDateToWeeks(parsed);
+        } catch (e) {
+          return NextResponse.json(
+            { error: "Invalid targetDate. Expected YYYY-MM-DD." },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    if (dataToUpdate.color !== undefined && !isGoalColorToken(dataToUpdate.color)) {
+      return NextResponse.json({ error: "Invalid color token." }, { status: 400 });
+    }
+
     const updated = await prisma.goal.update({
       where: { id: parseInt(id) },
-      data: validation.data,
+      data: dataToUpdate,
     });
 
     return NextResponse.json(updated, { status: 200 });

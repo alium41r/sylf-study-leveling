@@ -2,12 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import {
+  GOAL_COLOR_TOKENS,
+  isGoalColorToken,
+  targetDateToUtc,
+  targetDateToWeeks,
+} from "@/lib/goal-theme";
 
 const createGoalSchema = z.object({
   title: z.string().min(1, "Goal title is required"),
   description: z.string().optional(),
-  targetWeeks: z.number().int().min(1).max(52),
+  targetWeeks: z.number().int().min(1).max(52).optional(),
   effortLevel: z.enum(["RELAXED", "NORMAL", "INTENSE", "EXTREME"]).default("NORMAL"),
+  targetDate: z.string().optional(),
+  color: z.enum(GOAL_COLOR_TOKENS).optional(),
 });
 
 /**
@@ -75,15 +83,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { title, description, targetWeeks, effortLevel } = validation.data;
+    const { title, description, targetWeeks, effortLevel, targetDate, color } = validation.data;
+
+    let effectiveTargetWeeks = targetWeeks;
+    let effectiveTargetDate: Date | null = null;
+
+    // Exact deadline support: store the representational UTC midnight of the
+    // chosen YYYY-MM-DD and derive the legacy week count from it.
+    if (targetDate) {
+      try {
+        effectiveTargetDate = targetDateToUtc(targetDate);
+        effectiveTargetWeeks = targetDateToWeeks(effectiveTargetDate);
+      } catch (e) {
+        return NextResponse.json(
+          { error: "Invalid targetDate. Expected YYYY-MM-DD." },
+          { status: 400 }
+        );
+      }
+    }
 
     const goal = await prisma.goal.create({
       data: {
         userId: payload.userId as number,
         title,
         description: description || null,
-        targetWeeks,
+        targetWeeks: effectiveTargetWeeks ?? 4,
         effortLevel,
+        targetDate: effectiveTargetDate,
+        color: isGoalColorToken(color) ? color : "EMERALD",
       },
     });
 
@@ -91,7 +118,7 @@ export async function POST(req: NextRequest) {
     await prisma.systemMessage.create({
       data: {
         userId: payload.userId as number,
-        content: `**New Goal Detected**\n\nObjective: "${title}"\nTimeline: ${targetWeeks} weeks\nEffort Level: ${effortLevel}\n\nThe System has registered your objective. Talk to The System in the chat to generate and schedule quests for this goal!`,
+        content: `**New Goal Detected**\n\nObjective: "${title}"\nTimeline: ${effectiveTargetWeeks ?? 4} weeks${effectiveTargetDate ? `\nDeadline: ${effectiveTargetDate.toISOString().slice(0, 10)}` : ""}\nEffort Level: ${effortLevel}\n\nThe System has registered your objective. Talk to The System in the chat to generate and schedule quests for this goal!`,
         type: "SYSTEM",
       },
     });

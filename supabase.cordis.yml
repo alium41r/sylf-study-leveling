@@ -1,0 +1,15 @@
+- insert:
+    - id: mcp-supabase
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: supabase
+        transport: stdio
+        command: npx
+        args:
+          - '-y'
+          - '@supabase/mcp-server-supabase'
+          - '--project-ref'
+          - 'gjkwkdqdoekzllmnsejo'
+          - '--read-only'
+        env:
+          SUPABASE_ACCESS_TOKEN: !!js process.env.SUPABASE_ACCESS_TOKEN

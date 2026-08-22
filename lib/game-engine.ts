@@ -7,54 +7,183 @@
 // ============================================================
 
 /**
- * Solo Leveling Hunter Ranks, ordered from weakest to strongest.
- * Level thresholds determine when a hunter ranks up.
+ * Canonical 8-Tier Hunter Rank Ladder — SINGLE SOURCE OF TRUTH.
+ *
+ * Entering level (inclusive) for each tier:
+ *   RANK E (1+) → RANK D (10+) → RANK C (25+) → RANK B (50+)
+ *   → RANK A (75+) → RANK S (100+) → NATIONAL (125+) → MONARCH (150+)
+ *
+ * Two string encodings derive from this one ladder:
+ *  - `display` tokens are stored in `User.hunterRank` and rendered by the UI
+ *    (`rank-E` … `rank-S` CSS classes, `{rank}-Rank` labels).
+ *  - `db` tokens are stored in `UserStats.rank` and used by the SQL RPCs.
  */
-export const RANKS = ["E", "D", "C", "B", "A", "S"] as const;
-export type HunterRank = (typeof RANKS)[number];
+export const RANK_LADDER = [
+  { display: "MONARCH",  db: "MONARCH",  level: 150 },
+  { display: "NATIONAL", db: "NATIONAL", level: 125 },
+  { display: "S",        db: "RANK S",   level: 100 },
+  { display: "A",        db: "RANK A",   level: 75 },
+  { display: "B",        db: "RANK B",   level: 50 },
+  { display: "C",        db: "RANK C",   level: 25 },
+  { display: "D",        db: "RANK D",   level: 10 },
+  { display: "E",        db: "RANK E",   level: 1 },
+] as const;
 
-/** Maps effort level strings to daily study minutes and XP multipliers. */
+/** Display token stored in `User.hunterRank` (UI-facing). */
+export type HunterRank = (typeof RANK_LADDER)[number]["display"];
+
+/** Database token stored in `UserStats.rank` (RPC-facing). */
+export type RankTier = (typeof RANK_LADDER)[number]["db"];
+
+/**
+ * 8-Tier Master Rank Thresholds mapping ranks to their level boundaries.
+ * Backwards-compatible map derived from RANK_LADDER (kept as a plain object
+ * because tests and call sites index it by key).
+ */
+export const RANK_THRESHOLDS = {
+  MONARCH: 150,
+  NATIONAL: 125,
+  "RANK S": 100,
+  "RANK A": 75,
+  "RANK B": 50,
+  "RANK C": 25,
+  "RANK D": 10,
+  "RANK E": 1,
+} as const;
+
+/**
+ * Maps effort level strings to daily study minutes and XP multipliers.
+ *
+ * Base effort levels calibrated to high-intensity study markets:
+ *   RELAXED -> 1 hour/day (Casual)
+ *   NORMAL  -> 2 hours/day (Standard)
+ *   INTENSE -> 4 hours/day (Focused)
+ *   EXTREME -> 6+ hours/day (Hardcore)
+ */
 export const EFFORT_CONFIG = {
-  RELAXED:  { dailyMinutes: 30,  xpMultiplier: 0.8, label: "Relaxed"  },
-  NORMAL:   { dailyMinutes: 60,  xpMultiplier: 1.0, label: "Normal"   },
-  INTENSE:  { dailyMinutes: 90,  xpMultiplier: 1.3, label: "Intense"  },
-  EXTREME:  { dailyMinutes: 120, xpMultiplier: 1.6, label: "Extreme"  },
+  RELAXED:  { dailyMinutes: 60,  xpMultiplier: 0.8, label: "Casual"   },
+  NORMAL:   { dailyMinutes: 120, xpMultiplier: 1.0, label: "Standard" },
+  INTENSE:  { dailyMinutes: 240, xpMultiplier: 1.3, label: "Focused"  },
+  EXTREME:  { dailyMinutes: 360, xpMultiplier: 1.6, label: "Hardcore" },
 } as const;
 
 export type EffortLevel = keyof typeof EFFORT_CONFIG;
 
-// ─── XP Calculation ──────────────────────────────────────────
+// ─── Deterministic Progression Math ──────────────────────────
 
 /**
- * Calculate XP required to reach the NEXT level from a given level.
- * Uses a gentle exponential curve so early levels feel fast
- * and higher levels require more grind.
- *
- * Level 1 → 100 XP, Level 5 → 280 XP, Level 10 → 650 XP, etc.
+ * XP required to reach a specific level governed by XP_req(L) = floor(100 * L^1.5).
+ * Level 1 base entry threshold is 100 XP (with base starting at 0).
  */
-export function xpForNextLevel(level: number): number {
-  return Math.floor(200 * Math.pow(level, 1.2));
+export function calculateRequiredXp(level: number): number {
+  if (level <= 1) return 100;
+  return Math.floor(100 * Math.pow(level, 1.5));
 }
 
-// ─── Rank Calculation ────────────────────────────────────────
+/**
+ * Calculate user level deterministically from total lifetime XP.
+ * Uses inverse power L = floor((XP / 100)^(2/3)) with discrete boundary guards
+ * to ensure 100% mathematical parity with PostgreSQL stored procedures.
+ */
+export function calculateLevelFromXp(xp: number): number {
+  if (xp < 282) return 1;
+  let level = Math.max(1, Math.floor(Math.pow(xp / 100, 2 / 3)));
+  while (calculateRequiredXp(level + 1) <= xp) {
+    level++;
+  }
+  while (level > 1 && calculateRequiredXp(level) > xp) {
+    level--;
+  }
+  return level;
+}
 
 /**
- * Determine the Hunter Rank for a given level.
- *
- * E: Level 1–5
- * D: Level 6–12
- * C: Level 13–20
- * B: Level 21–30
- * A: Level 31–45
- * S: Level 46+
+ * Determine the DB rank tier (`UserStats.rank` encoding) for a given level
+ * according to the canonical 8-tier progression matrix.
+ */
+export function getRankFromLevel(level: number): RankTier {
+  const safeLevel = Math.max(0, Math.floor(level));
+  for (const rung of RANK_LADDER) {
+    if (safeLevel >= rung.level) return rung.db;
+  }
+  return "RANK E";
+}
+
+/**
+ * Determine the display Hunter Rank (`User.hunterRank` encoding) for a given
+ * level according to the canonical 8-tier progression matrix.
+ * This is the single rank ladder used everywhere — the legacy 6/13/21/31/46
+ * thresholds are retired.
  */
 export function rankForLevel(level: number): HunterRank {
-  if (level >= 46) return "S";
-  if (level >= 31) return "A";
-  if (level >= 21) return "B";
-  if (level >= 13) return "C";
-  if (level >= 6)  return "D";
+  const safeLevel = Math.max(0, Math.floor(level));
+  for (const rung of RANK_LADDER) {
+    if (safeLevel >= rung.level) return rung.display;
+  }
   return "E";
+}
+
+export interface LevelProgress {
+  currentLevelBaseXp: number;
+  nextLevelTargetXp: number;
+  xpIntoCurrentLevel: number;
+  xpForCurrentBracket: number;
+  progressPercentage: number;
+}
+
+/**
+ * Derives UI level progress metrics for a given total XP and level bracket.
+ */
+export function getLevelProgress(totalXp: number, currentLevel: number): LevelProgress {
+  const safeLevel = Math.max(1, currentLevel);
+  const currentLevelBaseXp = safeLevel === 1 ? 0 : calculateRequiredXp(safeLevel);
+  const nextLevelTargetXp = calculateRequiredXp(safeLevel + 1);
+  const xpForCurrentBracket = Math.max(1, nextLevelTargetXp - currentLevelBaseXp);
+  const xpIntoCurrentLevel = Math.max(0, totalXp - currentLevelBaseXp);
+  const progressPercentage = Math.min(
+    100,
+    Math.max(0, Math.floor((xpIntoCurrentLevel / xpForCurrentBracket) * 100))
+  );
+
+  return {
+    currentLevelBaseXp,
+    nextLevelTargetXp,
+    xpIntoCurrentLevel,
+    xpForCurrentBracket,
+    progressPercentage,
+  };
+}
+
+// ─── Cognitive Behavioral Vectors ────────────────────────────
+
+export const COGNITIVE_STAT_MIN = 10;
+export const COGNITIVE_STAT_MAX = 100;
+
+/**
+ * Clamps cognitive behavioral vector values within the valid [10, 100] attribute bounds.
+ */
+export function clampCognitiveStat(value: number): number {
+  return Math.min(COGNITIVE_STAT_MAX, Math.max(COGNITIVE_STAT_MIN, Math.round(value)));
+}
+
+// ─── XP Calculation (Canonical Curve) ────────────────────────
+
+/**
+ * XP required to advance from the CURRENT level to the NEXT level
+ * (the within-level bucket size shown in the UI as `xpToNextLevel`).
+ *
+ * Derived strictly from the canonical cumulative curve
+ * XP_req(L) = floor(100 * L^1.5):
+ *
+ *   xpForNextLevel(L) = XP_req(L + 1) − (L ≤ 1 ? 0 : XP_req(L))
+ *
+ * Level 1 → 282 XP, Level 5 → 351 XP, Level 10 → 604 XP, etc.
+ * This replaces the retired legacy curve 200 * L^1.2.
+ */
+export function xpForNextLevel(level: number): number {
+  const safeLevel = Math.max(1, Math.floor(level));
+  const base = safeLevel <= 1 ? 0 : calculateRequiredXp(safeLevel);
+  return calculateRequiredXp(safeLevel + 1) - base;
 }
 
 // ─── XP Award & Level Up ────────────────────────────────────
@@ -70,25 +199,32 @@ export interface LevelUpResult {
 }
 
 /**
- * Award XP to a user and calculate level-ups.
+ * Award XP to a user and calculate level-ups using the canonical curve.
  * Handles overflow (e.g., gaining enough XP for multiple level-ups at once).
+ *
+ * NOTE: `currentXP` is the XP within the current level. The legacy
+ * `xpToNextLevel` parameter is retained for API compatibility but is NO
+ * LONGER TRUSTED — the threshold is always recomputed from the canonical
+ * curve so that stale legacy-curve values stored on older rows cannot leak
+ * divergent math back into the progression system.
  *
  * @param currentLevel    The user's current level
  * @param currentXP       The user's current XP within this level
- * @param xpToNextLevel   The XP threshold for the current level
+ * @param _xpToNextLevel  DEPRECATED — ignored; canonical value recomputed
  * @param xpGained        How much XP to award
  * @returns               Updated stats after processing all level-ups
  */
 export function awardXP(
   currentLevel: number,
   currentXP: number,
-  xpToNextLevel: number,
+  _xpToNextLevel: number,
   xpGained: number
 ): LevelUpResult {
+  const safeGained = Math.max(0, Math.floor(xpGained || 0));
   const previousRank = rankForLevel(currentLevel);
-  let level = currentLevel;
-  let xp = currentXP + xpGained;
-  let threshold = xpToNextLevel;
+  let level = Math.max(1, Math.floor(currentLevel || 1));
+  let xp = Math.max(0, currentXP || 0) + safeGained;
+  let threshold = xpForNextLevel(level);
 
   // Process all level-ups (handles multi-level-up from large XP awards)
   while (xp >= threshold) {
@@ -105,7 +241,7 @@ export function awardXP(
     newXPToNextLevel: threshold,
     newRank,
     previousRank,
-    levelsGained: level - currentLevel,
+    levelsGained: level - Math.max(1, Math.floor(currentLevel || 1)),
     didRankUp: newRank !== previousRank,
   };
 }
@@ -178,12 +314,13 @@ export function getWeeklyBounds(refDate: Date = new Date(), timezone: string = "
 
 /**
  * Calculate level-scaled XP and Sylph payout for completing the 3-hour weekly quest.
- * EXP is calibrated to ~100% of current level capacity (200 XP at Level 1),
+ * EXP is calibrated to ~100% of the canonical within-level capacity
+ * (282 XP at Level 1 under floor(100 * L^1.5)),
  * while Sylph is a tight, balanced currency reward (65 Sylph at Level 1).
  */
 export function calculateWeeklyQuestReward(level: number): { xpReward: number; sylphReward: number } {
   const nextLevelCapacity = xpForNextLevel(level);
-  // Milestone XP payout for 3-hour weekly focus (200 XP at Level 1)
+  // Milestone XP payout for 3-hour weekly focus (282 XP at Level 1, canonical curve)
   const xpReward = Math.max(200, Math.round(nextLevelCapacity * 1.0));
   // Balanced currency reward (50 Sylph base + 15 per level)
   const sylphReward = Math.round(50 + level * 15);
@@ -317,18 +454,20 @@ export function previewEffortAdjustment(
   const originalDailyMinutes = Math.ceil(totalMinutes / (originalWeeks * 7));
   const newDailyMinutes = Math.ceil(totalMinutes / (newWeeks * 7));
 
-  // Auto-suggest effort level based on daily minutes
+  // Auto-suggest effort level based on daily minutes.
+  // Thresholds sit halfway between neighboring base levels:
+  //   <= 1.5h -> RELAXED · <= 3h -> NORMAL · <= 5h -> INTENSE · else EXTREME
   let suggestedEffortLevel: EffortLevel;
-  if (newDailyMinutes <= 40)       suggestedEffortLevel = "RELAXED";
-  else if (newDailyMinutes <= 75)  suggestedEffortLevel = "NORMAL";
-  else if (newDailyMinutes <= 105) suggestedEffortLevel = "INTENSE";
-  else                             suggestedEffortLevel = "EXTREME";
+  if (newDailyMinutes <= 90)        suggestedEffortLevel = "RELAXED";
+  else if (newDailyMinutes <= 180)  suggestedEffortLevel = "NORMAL";
+  else if (newDailyMinutes <= 300)  suggestedEffortLevel = "INTENSE";
+  else                              suggestedEffortLevel = "EXTREME";
 
   // Generate warning for high-intensity plans
   let intensityWarning: string | null = null;
-  if (newDailyMinutes > 120) {
+  if (newDailyMinutes > 420) {
     intensityWarning = `Warning: This pace requires ${newDailyMinutes} minutes/day. This exceeds the recommended maximum and may lead to burnout.`;
-  } else if (newDailyMinutes > 90) {
+  } else if (newDailyMinutes > 300) {
     intensityWarning = `Caution: This pace requires ${newDailyMinutes} minutes/day. Maintain rest days to avoid fatigue.`;
   }
 
@@ -353,4 +492,129 @@ export function getLongSessionMultiplier(sessionMinutes: number): number {
   if (sessionMinutes >= 60) return 1.2;
   if (sessionMinutes >= 30) return 1.1;
   return 1.0;
+}
+
+// ─── Cognitive Skill Tree Session Rewards ───────────────────
+
+import { getActiveSkillModifiers, ActiveSkillModifiers } from "./skill-tree";
+
+export interface SessionRewardContext {
+  durationMinutes: number;
+  streakWeeks?: number;
+  isHumanities?: boolean;
+  isMathOrQuantitative?: boolean;
+  isStemHighDifficulty?: boolean;
+  isTimedProblemSetUnderQuota?: boolean;
+  isOnSchedule?: boolean;
+  isSameSubjectChain?: boolean;
+  isReviewQuest?: boolean;
+  isCrossDiscipline?: boolean;
+  unlockedSkills?: string[];
+  activeModifiers?: ActiveSkillModifiers;
+}
+
+export interface SessionRewardBreakdown {
+  baseXp: number;
+  totalXp: number;
+  baseSylph: number;
+  totalSylph: number;
+  xpMultiplier: number;
+  sylphMultiplier: number;
+  appliedPerks: string[];
+}
+
+/**
+ * Pure calculation function that determines session rewards and applies active skill perks.
+ * Zero database IOPS.
+ */
+export function calculateSessionRewards(ctx: SessionRewardContext): SessionRewardBreakdown {
+  const duration = Math.max(1, ctx.durationMinutes);
+  const baseXp = duration * 10;
+  const baseSylph = calculateTimerSylph(duration);
+
+  const mods = ctx.activeModifiers || getActiveSkillModifiers(ctx.unlockedSkills || []);
+  const appliedPerks: string[] = [];
+
+  // 1. Duration Multiplier
+  let xpMult = getLongSessionMultiplier(duration);
+
+  // 2. Scholar perks
+  if (duration > 45 && mods.xpMultiplier45m > 0) {
+    xpMult += mods.xpMultiplier45m;
+    appliedPerks.push("scholar-deep-work (+10% XP)");
+  }
+  if (ctx.isReviewQuest && mods.reviewXpBonus > 0) {
+    xpMult += mods.reviewXpBonus;
+    appliedPerks.push("scholar-revision-loop (+15% XP)");
+  }
+  if (ctx.isHumanities && mods.humanitiesXpMultiplier > 0) {
+    xpMult += mods.humanitiesXpMultiplier;
+    appliedPerks.push("scholar-monarch-retention (+20% XP)");
+  }
+
+  // 3. Analyst perks
+  if (ctx.isTimedProblemSetUnderQuota && mods.timedProblemSetXpMultiplier > 0) {
+    xpMult += mods.timedProblemSetXpMultiplier;
+    appliedPerks.push("analyst-monarch-derivation (+25% XP)");
+  }
+
+  // 4. Scientist perks
+  if (ctx.isStemHighDifficulty && mods.stemHighDifficultyXpBonus > 0) {
+    xpMult += mods.stemHighDifficultyXpBonus;
+    appliedPerks.push("scientist-rigorous-proof (+20% XP)");
+  }
+
+  // 5. Researcher perks
+  if (duration >= 60 && mods.durationOver60mXpMultiplier > 0) {
+    xpMult += mods.durationOver60mXpMultiplier;
+    appliedPerks.push("researcher-deep-dive (+20% continuous XP)");
+  }
+
+  // 6. Creative perks
+  if (ctx.isCrossDiscipline && mods.crossDisciplineXpBonus > 0) {
+    xpMult += mods.crossDisciplineXpBonus;
+    appliedPerks.push("creative-unorthodox-flow (+10% XP)");
+  }
+
+  // 7. Sylph Multipliers
+  let sylphMult = getStreakMultiplier(ctx.streakWeeks || 0);
+
+  if (ctx.isMathOrQuantitative && mods.mathSylphBonus > 0) {
+    sylphMult += mods.mathSylphBonus;
+    appliedPerks.push("analyst-pattern-scan (+10% Sylph)");
+  }
+  if (ctx.isOnSchedule && mods.onScheduleSylphBonus > 0) {
+    sylphMult += mods.onScheduleSylphBonus;
+    appliedPerks.push("engineer-fast-start (+5% Sylph)");
+  }
+  if (ctx.isSameSubjectChain && mods.sameSubjectChainSylphBonus > 0) {
+    sylphMult += mods.sameSubjectChainSylphBonus;
+    appliedPerks.push("engineer-batch-processor (+15% Sylph)");
+  }
+  if (mods.plannedAgendaSylphBonus > 0) {
+    sylphMult += mods.plannedAgendaSylphBonus;
+    appliedPerks.push("strategist-milestone-forecast (+20% Sylph)");
+  }
+
+  let totalXp = Math.round(baseXp * xpMult);
+  let totalSylph = Math.round(baseSylph * sylphMult);
+
+  if (ctx.isStemHighDifficulty && mods.highDiffBonusXp > 0) {
+    totalXp += mods.highDiffBonusXp;
+    appliedPerks.push("scientist-monarch-discovery (+10 XP)");
+  }
+  if (ctx.isStemHighDifficulty && mods.highDiffBonusSylph > 0) {
+    totalSylph += mods.highDiffBonusSylph;
+    appliedPerks.push("scientist-monarch-discovery (+2 Sylph)");
+  }
+
+  return {
+    baseXp,
+    totalXp,
+    baseSylph,
+    totalSylph,
+    xpMultiplier: Number(xpMult.toFixed(2)),
+    sylphMultiplier: Number(sylphMult.toFixed(2)),
+    appliedPerks,
+  };
 }

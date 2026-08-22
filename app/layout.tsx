@@ -22,12 +22,16 @@ export default function RootLayout({
       className="h-full"
       suppressHydrationWarning
     >
-      <body className="min-h-full flex" suppressHydrationWarning>
+      <body className="min-h-full w-full" suppressHydrationWarning>
         <ThemeProvider>
           <AuthProvider>
             <GlobalSystemWrapper>
-              <SidebarWrapper />
-              <main className="flex-grow min-h-screen">{children}</main>
+              <div className="min-h-screen w-full bg-background text-foreground flex flex-col md:flex-row overflow-x-clip">
+                <SidebarWrapper />
+                <main className="flex-1 w-full min-w-0 flex flex-col">
+                  {children}
+                </main>
+              </div>
             </GlobalSystemWrapper>
           </AuthProvider>
         </ThemeProvider>

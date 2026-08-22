@@ -1,20 +1,24 @@
 /**
- * AI Usage Limiter — Database-backed Quota Engine
- * 
- * Provides server-side enforcement of daily usage quotas for AI features.
- * Uses Prisma queries against SystemMessage records to count usage per day,
- * ensuring quota state persists across serverless cold starts and page reloads.
- * 
- * Usage markers are stored as SYSTEM-type messages with a distinctive content
- * prefix to avoid requiring schema migrations for new enum values.
+ * AI Usage Limiter — Database-backed Atomic Quota Engine
+ *
+ * Daily usage quotas per user + feature ("chat" | "planner" | "compile")
+ * are stored in the dedicated `UserQuota` table keyed by
+ * (userId, feature, dateKey) where dateKey is the user's LOCAL date.
+ *
+ * Consumption is enforced ATOMICALLY in Postgres via a guarded upsert
+ * (`INSERT ... ON CONFLICT DO UPDATE ... WHERE used < limit`), which
+ * closes the parallel-request bypass that a check-then-record sequence
+ * is vulnerable to. Quota is only charged AFTER a successful generation
+ * — callers invoke `checkQuota` up-front (non-charging) and
+ * `consumeQuota` only once the generation completed successfully.
  */
 
 import { prisma } from "@/lib/prisma";
-import { AI_QUOTAS } from "./config";
+import { AI_QUOTAS, type QuotaFeature } from "./config";
 import { TimezoneService } from "../timezone-service";
 import { getUserTimezone } from "../timezone-server";
 
-export type QuotaFeature = "chat" | "planner";
+export type { QuotaFeature } from "./config";
 
 export interface QuotaCheckResult {
   allowed: boolean;
@@ -24,69 +28,76 @@ export interface QuotaCheckResult {
   resetsAt: string; // ISO string of the next reset time
 }
 
-// Content prefixes used to identify AI usage records
-const USAGE_PREFIX_MAP: Record<QuotaFeature, string> = {
-  chat: "[QUOTA:AI_CHAT]",
-  planner: "[QUOTA:AI_PLANNER]",
-};
-
-/**
- * Get the start and end of the current day in the user's timezone,
- * returned as UTC Date objects for Prisma queries.
- */
-async function getDayBoundsUTC(userId: number): Promise<{ dayStart: Date; dayEnd: Date; resetsAt: string }> {
-  const tz = await getUserTimezone(userId);
-  const dayStart = TimezoneService.getStartOfDayUTC(tz);
-  const dayEnd = TimezoneService.getEndOfDayUTC(tz);
-  const resetsAt = TimezoneService.getNextMidnightUTC(tz).toISOString();
-  
-  return { dayStart, dayEnd, resetsAt };
+export interface QuotaConsumeResult extends QuotaCheckResult {
+  /** True when this call actually incremented the usage counter. */
+  charged: boolean;
 }
 
-/**
- * Check if the user has remaining quota for a given feature.
- * Queries the database for usage records created today.
- */
-export async function checkQuota(userId: number, feature: QuotaFeature): Promise<QuotaCheckResult> {
-  const config = AI_QUOTAS[feature];
-  const { dayStart, dayEnd, resetsAt } = await getDayBoundsUTC(userId);
-  
-  const used = await prisma.systemMessage.count({
-    where: {
-      userId,
-      type: "SYSTEM",
-      content: { startsWith: USAGE_PREFIX_MAP[feature] },
-      createdAt: {
-        gte: dayStart,
-        lte: dayEnd,
-      },
-    },
-  });
-  
-  const remaining = Math.max(0, config.limit - used);
-  
+async function getQuotaContext(userId: number): Promise<{ dateKey: string; resetsAt: string }> {
+  const tz = await getUserTimezone(userId);
+  const dateKey = TimezoneService.getUserLocalDate(tz);
+  const resetsAt = TimezoneService.getNextMidnightUTC(tz).toISOString();
+  return { dateKey, resetsAt };
+}
+
+function toResult(used: number, limit: number, resetsAt: string): QuotaCheckResult {
   return {
-    allowed: remaining > 0,
+    allowed: used < limit,
     used,
-    limit: config.limit,
-    remaining,
+    limit,
+    remaining: Math.max(0, limit - used),
     resetsAt,
   };
 }
 
 /**
- * Record that the user consumed one unit of quota for a given feature.
- * Creates a lightweight SystemMessage record as a durable usage marker.
+ * Non-charging read of the user's current usage for a feature.
  */
-export async function recordUsage(userId: number, feature: QuotaFeature): Promise<void> {
-  await prisma.systemMessage.create({
-    data: {
-      userId,
-      type: "SYSTEM",
-      content: `${USAGE_PREFIX_MAP[feature]} usage recorded`,
-      read: true, // Mark as read so it doesn't pollute unread counts
-    },
+export async function checkQuota(userId: number, feature: QuotaFeature): Promise<QuotaCheckResult> {
+  const config = AI_QUOTAS[feature];
+  const { dateKey, resetsAt } = await getQuotaContext(userId);
+
+  const row = await prisma.userQuota.findUnique({
+    where: { userId_feature_dateKey: { userId, feature, dateKey } },
+    select: { used: true },
   });
+
+  return toResult(row?.used ?? 0, config.limit, resetsAt);
+}
+
+/**
+ * Atomically consume one unit of quota for a feature.
+ *
+ * The guarded upsert increments `used` only while it is still below the
+ * limit; concurrent requests serialize on the unique row and cannot
+ * collectively exceed the daily cap. Call this ONLY after a generation
+ * succeeded — never on model errors, timeouts, or client aborts.
+ */
+export async function consumeQuota(userId: number, feature: QuotaFeature): Promise<QuotaConsumeResult> {
+  const config = AI_QUOTAS[feature];
+  const { dateKey, resetsAt } = await getQuotaContext(userId);
+
+  const rows = await prisma.$queryRawUnsafe<Array<{ used: number }>>(
+    `INSERT INTO "UserQuota" ("userId", "feature", "dateKey", "used", "createdAt", "updatedAt")
+     VALUES ($1::int, $2::text, $3::text, 1, NOW(), NOW())
+     ON CONFLICT ("userId", "feature", "dateKey")
+     DO UPDATE SET "used" = "UserQuota"."used" + 1, "updatedAt" = NOW()
+     WHERE "UserQuota"."used" < $4::int
+     RETURNING "used"`,
+    userId,
+    feature,
+    dateKey,
+    config.limit
+  );
+
+  // No returned row ⇒ the guarded update was skipped (limit reached).
+  if (!rows || rows.length === 0) {
+    const current = await checkQuota(userId, feature);
+    return { ...current, allowed: false, remaining: 0, charged: false };
+  }
+
+  const used = rows[0].used;
+  return { ...toResult(used, config.limit, resetsAt), charged: true };
 }
 
 /**
@@ -94,10 +105,11 @@ export async function recordUsage(userId: number, feature: QuotaFeature): Promis
  * Used by the /api/ai-usage endpoint.
  */
 export async function getUsageReport(userId: number): Promise<Record<QuotaFeature, QuotaCheckResult>> {
-  const [chat, planner] = await Promise.all([
+  const [chat, planner, compile] = await Promise.all([
     checkQuota(userId, "chat"),
     checkQuota(userId, "planner"),
+    checkQuota(userId, "compile"),
   ]);
-  
-  return { chat, planner };
+
+  return { chat, planner, compile };
 }

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 enum EffortLevel {
@@ -67,6 +67,32 @@ enum LedgerSource {
   ACHIEVEMENT
 }
 
+enum ItemCategory {
+  CONSUMABLE
+  EQUIPMENT
+  WEAPON
+  SET_BUNDLE
+}
+
+enum ItemSlot {
+  HELMET
+  CHESTPLATE
+  PANTS
+  BOOTS
+  WEAPON
+  RELIC
+  NONE
+}
+
+enum ItemRarity {
+  COMMON
+  RARE
+  EPIC
+  LEGENDARY
+  MYTHIC
+}
+
+
 enum CosmeticCategory {
   THEME
   BACKGROUND
@@ -94,77 +120,82 @@ enum VerificationStatus {
 }
 
 model User {
-  id                Int                @id @default(autoincrement())
-  email             String             @unique
-  username          String             @unique
-  password          String?
-  name              String?
-  scholarId         String?            @unique
-  verificationStatus VerificationStatus @default(UNVERIFIED)
-  avatarUrl         String?
-  hunterRank        String             @default("E")
-  level             Int       @default(1)
-  currentXP         Int       @default(0)
-  xpToNextLevel     Int       @default(200)
-  hp                Int       @default(100)
-  maxHp             Int       @default(100)
-  streakDays        Int       @default(0)
-  totalStudyMinutes Int       @default(0)
-  totalStudySeconds Int       @default(0)
-  lastActiveDate    String    @default("")
-  lastSeenAt        DateTime?
-  sylph             Int       @default(0)
-  activeTheme       String    @default("default")
-  activeBackground  String    @default("none")
-  activeAvatar      String    @default("class_scholar")
-  tokenVersion      Int       @default(1)
-  activeFrame       String    @default("none")
-  activeTitle       String    @default("Novice")
-  activeNameColor   String    @default("default")
-  activeAura        String    @default("none")
-  bannerUrl         String?
-  bio               String?
-  characterConfig   Json?
-  socialLinks       Json?
+  id                      Int                @id @default(autoincrement())
+  email                   String             @unique
+  username                String             @unique
+  password                String?
+  name                    String?
+  scholarId               String?            @unique
+  verificationStatus      VerificationStatus @default(UNVERIFIED)
+  avatarUrl               String?
+  hunterRank              String             @default("E")
+  level                   Int                @default(1)
+  currentXP               Int                @default(0)
+  xpToNextLevel           Int                @default(282)
+  hp                      Int                @default(100)
+  maxHp                   Int                @default(100)
+  streakDays              Int                @default(0)
+  totalStudyMinutes       Int                @default(0)
+  totalStudySeconds       Int                @default(0)
+  lastActiveDate          String             @default("")
+  lastSeenAt              DateTime?
+  sylph                   Int                @default(0)
+  activeTheme             String             @default("default")
+  activeBackground        String             @default("none")
+  activeAvatar            String             @default("class_scholar")
+  tokenVersion            Int                @default(1)
+  activeFrame             String             @default("none")
+  activeTitle             String             @default("Novice")
+  activeNameColor         String             @default("default")
+  activeAura              String             @default("none")
+  bannerUrl               String?
+  bio                     String?
+  characterConfig         Json?
+  socialLinks             Json?
   notificationPreferences Json?
 
   // Academic Cognitive Stats Matrix (Attributes 0-100+)
-  statEndurance     Int       @default(10) // END: Long-duration unbroken focus blocks (>60m)
-  statTenacity      Int       @default(10) // TEN: Weekly streak stability & consistency
-  statVelocity      Int       @default(10) // VEL: Daily quest & milestone completion throughput
-  statSynthesis     Int       @default(10) // SYN: Problem sets & STEM deep work focus
-  statDiscipline    Int       @default(10) // DIS: Punctuality, early start, low pause frequency
+  statEndurance  Int @default(10) // END: Long-duration unbroken focus blocks (>60m)
+  statTenacity   Int @default(10) // TEN: Weekly streak stability & consistency
+  statVelocity   Int @default(10) // VEL: Daily quest & milestone completion throughput
+  statSynthesis  Int @default(10) // SYN: Problem sets & STEM deep work focus
+  statDiscipline Int @default(10) // DIS: Punctuality, early start, low pause frequency
 
-  createdAt         DateTime  @default(now())
-  timezone          String    @default("UTC")
-  hasCompletedOnboarding Boolean @default(false)
+  createdAt              DateTime @default(now())
+  timezone               String   @default("UTC")
+  hasCompletedOnboarding Boolean  @default(false)
 
   // Study Schedule & Penalty Engine
-  dailyGoalMinutes               Int       @default(120)
-  restDays                       Int[]     @default([0]) // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  enableHpPenalty                Boolean   @default(true)
-  lastDailyPenaltyEvaluatedDate  String    @default("")
+  dailyGoalMinutes              Int     @default(120)
+  restDays                      Int[]   @default([0]) // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  enableHpPenalty               Boolean @default(true)
+  lastDailyPenaltyEvaluatedDate String  @default("")
 
-  goals          Goal[]
-  quests         Quest[]
-  sessions       StudySession[]
-  systemMessages SystemMessage[]
-  subjects       Subject[]
-  inventoryItems InventoryItem[]
-  sylphLedger    SylphLedger[]
-  hpLedger       HpLedger[]
-  chatSessions   ChatSession[]
-  cosmetics      UserCosmetic[]
-  achievements   UserAchievement[]
-  privacy        UserPrivacy?
-  connectedAccounts ConnectedAccount[]
+  goals              Goal[]
+  quests             Quest[]
+  sessions           StudySession[]
+  systemMessages     SystemMessage[]
+  subjects           Subject[]
+  inventoryItems     InventoryItem[]
+  inventory          UserInventory[]
+  sylphLedger        SylphLedger[]
+  hpLedger           HpLedger[]
+  xpLedger           XpLedger[]
+  userSkillNodes     UserSkillNode[]
+  chatSessions       ChatSession[]
+  cosmetics          UserCosmetic[]
+  achievements       UserAchievement[]
+  privacy            UserPrivacy?
+  connectedAccounts  ConnectedAccount[]
   verificationTokens VerificationToken[]
-  authSessions   AuthSession[]
+  authSessions       AuthSession[]
+  floatingRestDays   FloatingRestDay[]
 
   // AI
   aiMemories     AiMemory[]
   aiInsights     AiInsight[]
   dailyBriefings DailyBriefingLog[]
+  quotaUsage     UserQuota[]
 
   // Social
   friendshipsAsUser   Friendship[]              @relation("friendshipsAsUser")
@@ -178,7 +209,31 @@ model User {
   sentInvites         SessionInvite[]           @relation("sentInvites")
   receivedInvites     SessionInvite[]           @relation("receivedInvites")
 
+  // Progression & Cognitive Stats Engine
+  stats UserStats?
+
   @@index([currentXP, hunterRank])
+}
+
+model UserStats {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level       Int      @default(1)
+  xp          Int      @default(0)
+  rank        String   @default("RANK E")
+  currency    Int      @default(0)
+  skillPoints Int      @default(0)
+  endurance   Int      @default(10) // END: Focus Stamina
+  tenacity    Int      @default(10) // TEN: Streak Resilience
+  velocity    Int      @default(10) // VEL: Pacing Speed
+  discipline  Int      @default(10) // DIS: Daily Consistency
+  synthesis   Int      @default(10) // SYN: Complex Output
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([level, xp])
 }
 
 model Goal {
@@ -190,54 +245,101 @@ model Goal {
   targetWeeks Int
   effortLevel EffortLevel @default(NORMAL)
   status      GoalStatus  @default(ACTIVE)
+  // Exact deadline (UTC). Representational midnight of the user-chosen date.
+  targetDate  DateTime?
+  // Objective accent preset token: EMERALD | CYAN | BLUE | VIOLET | ROSE | AMBER
+  color       String      @default("EMERALD")
   createdAt   DateTime    @default(now())
 
   quests Quest[]
 
   @@index([userId, status])
   @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, targetDate])
 }
+
+// ==========================================
+// SUBJECT & CONSTELLATION PROGRESSION
+// ==========================================
+
+model Subject {
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  name         String        // e.g., "A-Level Mathematics"
+  code         String        @default("GENERAL") // e.g., "9709"
+  examBoard    String        @default("CAIE")    // e.g., "CAIE", "Edexcel", "AQA", "AP", "IB"
+  level        String        @default("A-Level") // e.g., "A-Level", "AS-Level", "AP", "University"
+  color        String        @default("#8B5CF6")
+  lastCompiledAt DateTime?   // Set when the AI 48-node syllabus compilation commits (30-day recompile cooldown)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodes        SubjectNode[]
+  quests       Quest[]
+  sessions     StudySession[]
+  invites      SessionInvite[]
+
+  @@unique([userId, code])
+}
+
+model SubjectNode {
+  id           Int       @id @default(autoincrement())
+  subjectId    Int
+  nodeId       String    // Matches skeleton: "N1_1", "N2_1", ..., "N10_1"
+  tier         Int       // 1 to 10
+  title        String    // AI-generated syllabus topic name
+  description  String    // Learning objectives / syllabus subtopics
+  difficulty   Int       // 1 to 5
+  spAward      Int       // T1-T3: 1, T4-T5: 2, T6-T7: 3, T8-T9: 4, T10: 0
+  progress     Float     @default(0.0) // 0.0 to 100.0%
+  isMastered   Boolean   @default(false)
+  masteredAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  subject      Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  quests       Quest[]
+
+  @@unique([subjectId, nodeId])
+}
+
+// ==========================================
+// QUEST ENGINE EXTENSION
+// ==========================================
 
 model Quest {
   id                 Int             @id @default(autoincrement())
   userId             Int
-  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   goalId             Int?
-  goal               Goal?           @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  subjectId          Int?
+  subjectNodeId      Int?
   title              String
   description        String?
-  status             QuestStatus     @default(PENDING)
-  difficulty         QuestDifficulty @default(NORMAL)
-  requiredMinutes    Int
+  targetMinutes      Int             @default(45)
+  requiredMinutes    Int             @default(45)
   elapsedSeconds     Int             @default(0)
-  xpReward           Int
-  sylphReward        Int             @default(0)
+  scopeWeight        Float           @default(0.25) // Evaluated by AI: 0.05 to 1.00
+  status             String          @default("ACTIVE") // "ACTIVE", "COMPLETED", "FAILED"
+  difficulty         QuestDifficulty @default(NORMAL)
+  scheduledFor       String          @default("") // YYYY-MM-DD
   isKamishWardActive Boolean         @default(false)
   isGateKeyApplied   Boolean         @default(false)
-  scheduledFor       String // YYYY-MM-DD
   createdByAi        Boolean         @default(false)
+  xpReward           Int             @default(150)
+  sylphReward        Int             @default(25)
   createdAt          DateTime        @default(now())
   completedAt        DateTime?
 
-  sessions StudySession[]
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal               Goal?           @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  subject            Subject?        @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subjectNode        SubjectNode?    @relation(fields: [subjectNodeId], references: [id], onDelete: SetNull)
+  sessions           StudySession[]
 
   @@index([userId, status])
-  @@index([userId, scheduledFor])
-  @@index([userId, createdAt(sort: Desc)])
-}
-
-model Subject {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  color     String?  @default("#7c3aed")
-  createdAt DateTime @default(now())
-
-  sessions StudySession[]
-  invites  SessionInvite[]
-
-  @@index([userId, createdAt])
+  @@index([subjectNodeId])
+  @@index([goalId])
 }
 
 model StudySession {
@@ -251,6 +353,7 @@ model StudySession {
   durationMinutes Int
   durationSeconds Int       @default(0)
   focusRate       Int       @default(80) // Added for AI study planning
+  rewardsClaimed  Boolean   @default(false) // Quest rewards claimed via claim_session_reward_atomic
   startedAt       DateTime  @default(now())
   endedAt         DateTime?
 
@@ -383,6 +486,45 @@ model SessionInvite {
 
 // ─── Economy Models ──────────────────────────────────────────
 
+model Item {
+  id              Int          @id @default(autoincrement())
+  sku             String       @unique
+  name            String
+  description     String
+  category        ItemCategory
+  slot            ItemSlot     @default(NONE)
+  rarity          ItemRarity   @default(COMMON)
+  rankRequirement String       @default("RANK E")
+  costSylph       Int          @default(0)
+  effectPayload   Json         @default("{}")
+  spriteLayer     String?
+  setKey          String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  inventories UserInventory[]
+
+  @@index([category, rankRequirement])
+  @@index([rarity])
+  @@index([setKey])
+}
+
+model UserInventory {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId     Int
+  item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  quantity   Int      @default(1)
+  isEquipped Boolean  @default(false)
+  acquiredAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, itemId])
+  @@index([userId, isEquipped])
+}
+
+
 model InventoryItem {
   id        Int      @id @default(autoincrement())
   userId    Int
@@ -396,12 +538,16 @@ model InventoryItem {
 }
 
 model SylphLedger {
-  id        Int          @id @default(autoincrement())
-  userId    Int
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount    Int // Positive for income, negative for expense
-  source    LedgerSource
-  createdAt DateTime     @default(now())
+  id           Int          @id @default(autoincrement())
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Int          @default(0) // Positive for income, negative for expense
+  delta        Int          @default(0)
+  balanceAfter Int          @default(0)
+  reason       String       @default("")
+  source       LedgerSource @default(SYSTEM)
+  metadata     Json         @default("{}")
+  createdAt    DateTime     @default(now())
 
   @@index([userId, createdAt(sort: Desc)])
 }
@@ -410,11 +556,50 @@ model HpLedger {
   id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount    Int      // Negative for damage, positive for heal
-  source    String   // e.g., "QUEST_FAILED", "ELIXIR"
+  amount    Int // Negative for damage, positive for heal
+  source    String // e.g., "QUEST_FAILED", "ELIXIR"
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt(sort: Desc)])
+}
+
+model XpLedger {
+  id           Int          @id @default(autoincrement())
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Int          @default(0) // Positive for income, negative for expense
+  balanceAfter Int          @default(0) // Lifetime total XP after this entry
+  reason       String       @default("")
+  source       LedgerSource @default(SYSTEM)
+  metadata     Json         @default("{}")
+  createdAt    DateTime     @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model UserSkillNode {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodeKey    String // Fully-qualified key, e.g. "SCHOLAR_N2_1"
+  unlockedAt DateTime @default(now())
+
+  @@unique([userId, nodeKey])
+  @@index([userId])
+}
+
+model UserQuota {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feature   String // "chat" | "planner" | "compile"
+  dateKey   String // YYYY-MM-DD in the user's timezone
+  used      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([userId, feature, dateKey])
+  @@index([userId])
 }
 
 model UserCosmetic {
@@ -441,25 +626,25 @@ model UserAchievement {
 }
 
 model UserPrivacy {
-  id                  Int          @id @default(autoincrement())
-  userId              Int          @unique
-  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  profileVisibility   PrivacyLevel @default(PUBLIC)
-  showOnlineStatus    PrivacyLevel @default(PUBLIC)
-  showCurrentSession  PrivacyLevel @default(PUBLIC)
-  showStudyHours      PrivacyLevel @default(PUBLIC)
-  showRank            PrivacyLevel @default(PUBLIC)
-  showAchievements    PrivacyLevel @default(PUBLIC)
+  profileVisibility  PrivacyLevel @default(PUBLIC)
+  showOnlineStatus   PrivacyLevel @default(PUBLIC)
+  showCurrentSession PrivacyLevel @default(PUBLIC)
+  showStudyHours     PrivacyLevel @default(PUBLIC)
+  showRank           PrivacyLevel @default(PUBLIC)
+  showAchievements   PrivacyLevel @default(PUBLIC)
 
   allowFriendRequests PrivacyLevel @default(PUBLIC)
   allowDirectMessages PrivacyLevel @default(FRIENDS)
 }
 
 model ConnectedAccount {
-  id                Int      @id @default(autoincrement())
-  userId            Int
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   provider          String // Google, GitHub, Discord, Instagram
   providerAccountId String // The unique ID given by the provider
@@ -481,8 +666,8 @@ model AiMemory {
   id         Int      @id @default(autoincrement())
   userId     Int
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  key        String   // e.g., "exam_dates", "preferred_study_time", "career_goal"
-  value      String   // JSON string for flexible storage
+  key        String // e.g., "exam_dates", "preferred_study_time", "career_goal"
+  value      String // JSON string for flexible storage
   confidence Float    @default(1.0) // How confident the AI is (0-1)
   source     String   @default("inferred") // "user_stated", "inferred", "observed"
   createdAt  DateTime @default(now())
@@ -496,9 +681,9 @@ model AiInsight {
   id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category  String   // "coaching", "trend", "recommendation", "warning"
-  content   String   // The insight text
-  metadata  String?  // JSON with supporting data
+  category  String // "coaching", "trend", "recommendation", "warning"
+  content   String // The insight text
+  metadata  String? // JSON with supporting data
   dismissed Boolean  @default(false)
   createdAt DateTime @default(now())
 
@@ -509,7 +694,7 @@ model DailyBriefingLog {
   id        Int            @id @default(autoincrement())
   userId    Int
   user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  dateKey   String         // "YYYY-MM-DD" in user's local time
+  dateKey   String // "YYYY-MM-DD" in user's local time
   status    BriefingStatus @default(PENDING)
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
@@ -534,9 +719,9 @@ model VerificationToken {
 model AcousticTrack {
   id            Int      @id @default(autoincrement())
   title         String
-  category      String   // "BINAURAL", "NOISE", "AMBIENT", "LOFI"
-  frequency     String?  // e.g. "40Hz Gamma", "10Hz Alpha", "Broadband"
-  audioUrl      String   // URL or synthetic generator id (e.g. "synth:gamma-40", "synth:brown-noise")
+  category      String // "BINAURAL", "NOISE", "AMBIENT", "LOFI"
+  frequency     String? // e.g. "40Hz Gamma", "10Hz Alpha", "Broadband"
+  audioUrl      String // URL or synthetic generator id (e.g. "synth:gamma-40", "synth:brown-noise")
   duration      Int      @default(0) // in seconds (0 = infinite ambient loop)
   defaultVolume Float    @default(0.75)
   description   String?
@@ -566,4 +751,24 @@ model AuthSession {
   @@index([userId, lastActiveAt(sort: Desc)])
 }
 
+// ==========================================
+// FLOATING REST DAYS (Ad-hoc / Irregular Rest)
+// ==========================================
+// Users may designate ONE ad-hoc rest day per ISO week for unplanned
+// events, sickness, or family commitments. Floating rest days:
+//  - hard-block quest allocation (manual UI, API, and AI paths)
+//  - trigger the automatic quest-shifting cascade on designation
+//  - fully exempt the day from HP penalties / daily target evaluation
 
+model FloatingRestDay {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  dateKey   String // "YYYY-MM-DD"
+  weekKey   String // "YYYY-Www" ISO week key for O(1) weekly quota checks
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dateKey])
+  @@index([userId, weekKey])
+}

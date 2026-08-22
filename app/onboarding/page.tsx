@@ -7,10 +7,27 @@ import { useAuth } from "../components/AuthProvider";
 import { COSMETICS_CATALOG, CosmeticItem } from "@/lib/cosmetics-catalog";
 import { THEME_MAP, BG_MAP } from "../components/GlobalSystemWrapper";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
-import { Moon, Sun, Sparkles, Check } from "lucide-react";
+import { Moon, Sun, Sparkles, Check, BookOpen, Plus, X } from "lucide-react";
 
 // --- Extensible Onboarding Types ---
-type OnboardingStep = "BOOT" | "IDENTITY" | "CLASS" | "BACKGROUND" | "THEME" | "INITIALIZING";
+type OnboardingStep = "BOOT" | "IDENTITY" | "SUBJECTS" | "BACKGROUND" | "THEME" | "INITIALIZING";
+
+export interface ConfiguredSubject {
+  id: string;
+  name: string;
+  code: string;
+  examBoard: string;
+  level: string;
+  color: string;
+}
+
+const PRESET_SUBJECTS: Omit<ConfiguredSubject, "id">[] = [
+  { name: "Mathematics", code: "9709", examBoard: "CAIE", level: "A-Level", color: "#8B5CF6" },
+  { name: "Physics", code: "9702", examBoard: "CAIE", level: "A-Level", color: "#06B6D4" },
+  { name: "Computer Science", code: "9618", examBoard: "CAIE", level: "A-Level", color: "#EC4899" },
+  { name: "Chemistry", code: "9701", examBoard: "CAIE", level: "A-Level", color: "#10B981" },
+  { name: "Further Mathematics", code: "9231", examBoard: "CAIE", level: "A-Level", color: "#F59E0B" },
+];
 
 export default function OnboardingFlow() {
   const router = useRouter();
@@ -29,8 +46,12 @@ export default function OnboardingFlow() {
   const [usernameMsg, setUsernameMsg] = useState("");
   const usernameDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Academic Curriculum & Subject Intake
+  const [configuredSubjects, setConfiguredSubjects] = useState<ConfiguredSubject[]>([
+    { id: "preset-9709", name: "Mathematics", code: "9709", examBoard: "CAIE", level: "A-Level", color: "#8B5CF6" },
+  ]);
+
   // Cosmetic & Mode Selections
-  const [selectedClass, setSelectedClass] = useState<string | null>("class_scholar");
   const [selectedBackground, setSelectedBackground] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   const [selectedMode, setSelectedMode] = useState<"dark" | "light">("dark");
@@ -130,10 +151,10 @@ export default function OnboardingFlow() {
   // Determine if user registered via Google (no credentials password set)
   const isGoogleSignup = user ? user.hasPassword === false : false;
 
-  // Step progression: Manual signups skip IDENTITY step and go straight to cosmetic selection
+  // Step progression: Manual signups skip IDENTITY step
   const steps: OnboardingStep[] = isGoogleSignup
-    ? ["BOOT", "IDENTITY", "CLASS", "BACKGROUND", "THEME", "INITIALIZING"]
-    : ["BOOT", "CLASS", "BACKGROUND", "THEME", "INITIALIZING"];
+    ? ["BOOT", "IDENTITY", "SUBJECTS", "BACKGROUND", "THEME", "INITIALIZING"]
+    : ["BOOT", "SUBJECTS", "BACKGROUND", "THEME", "INITIALIZING"];
 
   const stepIndex = steps.indexOf(currentStep);
 
@@ -156,7 +177,7 @@ export default function OnboardingFlow() {
         if (isGoogleSignup) {
           setCurrentStep("IDENTITY");
         } else {
-          setCurrentStep("CLASS");
+          setCurrentStep("SUBJECTS");
         }
       }, 3500); // 3.5s cinematic boot
       return () => clearTimeout(timer);
@@ -202,14 +223,21 @@ export default function OnboardingFlow() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          classId: selectedClass || "class_scholar",
-          avatarId: selectedClass || "class_scholar",
+          classId: "class_scholar",
+          avatarId: "class_scholar",
           backgroundId: selectedBackground || "void",
           themeId: selectedTheme || "cyberpunk",
           username: isGoogleSignup ? (scholarUsername || user?.username) : undefined,
           name: isGoogleSignup ? (scholarName || user?.name) : undefined,
           password: isGoogleSignup ? (scholarPassword || undefined) : undefined,
           timezone: detectedTimezone,
+          subjects: configuredSubjects.map(({ name, code, examBoard, level, color }) => ({
+            name,
+            code,
+            examBoard,
+            level,
+            color,
+          })),
         }),
       });
 
@@ -295,17 +323,16 @@ export default function OnboardingFlow() {
           />
         )}
         
-        {currentStep === "CLASS" && (
-          <SelectionStep 
-            key="class"
-            title="SELECT YOUR CLASS"
-            subtitle="Choose your specialization and core cognitive domain."
-            items={COSMETICS_CATALOG.CLASS}
-            selectedId={selectedClass}
-            onSelect={setSelectedClass}
+        {currentStep === "SUBJECTS" && (
+          <SubjectIntakeStep 
+            key="subjects"
+            title="CONFIGURE CURRICULUM"
+            subtitle="Select your academic subjects & syllabus codes to generate your Constellation Trees."
+            subjects={configuredSubjects}
+            onUpdateSubjects={setConfiguredSubjects}
             onNext={nextStep}
             onPrev={isGoogleSignup ? prevStep : undefined}
-            canProceed={!!selectedClass}
+            canProceed={configuredSubjects.length > 0}
           />
         )}
 
@@ -348,6 +375,7 @@ export default function OnboardingFlow() {
     </div>
   );
 }
+
 
 /* --- Sub Components --- */
 
@@ -636,6 +664,388 @@ function IdentityStep({
           style={{ opacity: canProceed ? 1 : 0.5, cursor: canProceed ? "pointer" : "not-allowed" }}
         >
           CONFIRM IDENTITY & PROCEED
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+interface SubjectIntakeStepProps {
+  title: string;
+  subtitle: string;
+  subjects: ConfiguredSubject[];
+  onUpdateSubjects: (subjects: ConfiguredSubject[]) => void;
+  onNext: () => void;
+  onPrev?: () => void;
+  canProceed: boolean;
+}
+
+const ACCENT_COLORS = [
+  "#8B5CF6", // Violet
+  "#06B6D4", // Cyan
+  "#EC4899", // Pink
+  "#10B981", // Emerald
+  "#F59E0B", // Amber
+  "#3B82F6", // Blue
+  "#EF4444", // Red
+  "#6366F1", // Indigo
+];
+
+function SubjectIntakeStep({
+  title,
+  subtitle,
+  subjects,
+  onUpdateSubjects,
+  onNext,
+  onPrev,
+  canProceed,
+}: SubjectIntakeStepProps) {
+  const [customName, setCustomName] = useState("");
+  const [customCode, setCustomCode] = useState("");
+  const [customExamBoard, setCustomExamBoard] = useState("CAIE");
+  const [customLevel, setCustomLevel] = useState("A-Level");
+  const [customColor, setCustomColor] = useState("#8B5CF6");
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [validationError, setValidationError] = useState("");
+
+  const handleTogglePreset = (preset: Omit<ConfiguredSubject, "id">) => {
+    const existingIndex = subjects.findIndex((s) => s.code.toUpperCase() === preset.code.toUpperCase());
+    if (existingIndex >= 0) {
+      onUpdateSubjects(subjects.filter((_, idx) => idx !== existingIndex));
+    } else {
+      onUpdateSubjects([
+        ...subjects,
+        {
+          id: `preset-${preset.code}-${Date.now()}`,
+          ...preset,
+        },
+      ]);
+    }
+  };
+
+  const handleAddCustom = (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError("");
+
+    if (!customName.trim()) {
+      setValidationError("Subject name is required.");
+      return;
+    }
+    if (!customCode.trim()) {
+      setValidationError("Syllabus code is required.");
+      return;
+    }
+
+    const cleanCode = customCode.trim().toUpperCase();
+    if (subjects.some((s) => s.code.toUpperCase() === cleanCode)) {
+      setValidationError(`Subject code "${cleanCode}" is already in your curriculum.`);
+      return;
+    }
+
+    onUpdateSubjects([
+      ...subjects,
+      {
+        id: `custom-${Date.now()}`,
+        name: customName.trim(),
+        code: cleanCode,
+        examBoard: customExamBoard.trim() || "CAIE",
+        level: customLevel.trim() || "A-Level",
+        color: customColor,
+      },
+    ]);
+
+    setCustomName("");
+    setCustomCode("");
+    setValidationError("");
+    setShowCustomForm(false);
+  };
+
+  const handleRemoveSubject = (id: string) => {
+    onUpdateSubjects(subjects.filter((s) => s.id !== id));
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="w-full max-w-6xl p-6 sm:p-8 z-10 flex flex-col h-[88vh]"
+    >
+      <div className="text-center mb-6">
+        <h2 className="text-4xl font-bold tracking-widest uppercase font-rajdhani drop-shadow-sm" style={{ color: "var(--text-primary)" }}>
+          {title}
+        </h2>
+        <p className="mt-2 text-sm uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 pb-8 flex flex-col gap-6">
+        {/* ─── AI Calibration Guidance Banner ─── */}
+        <div className="rounded-xl border border-purple-500/30 bg-purple-950/20 p-4 text-xs text-purple-200 shadow-sm backdrop-blur-sm">
+          <div className="flex items-center gap-2 font-semibold text-purple-300 tracking-wider font-rajdhani text-sm">
+            <Sparkles className="h-4 w-4 text-purple-400" />
+            <span>AI CONSTELLATION ENGINE CALIBRATION</span>
+          </div>
+          <p className="mt-1 leading-relaxed text-zinc-400">
+            Enter your official subject codes and exam boards carefully (e.g. CAIE 9709, Edexcel 9MA0, AP Calculus BC). 
+            The AI decomposes your exact syllabus to forge your 48-node academic constellation graph.
+          </p>
+        </div>
+
+        {/* Presets Section */}
+        <div className="bg-bg-abyss/90 border border-border-subtle p-5 rounded-2xl flex flex-col gap-3 shadow-card">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold font-rajdhani uppercase tracking-widest text-accent-text-light flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>QUICK-ADD STANDARD SYLLABI</span>
+            </span>
+            <span className="text-[11px] text-text-secondary font-rajdhani font-medium">
+              Click to toggle syllabus into curriculum
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {PRESET_SUBJECTS.map((preset) => {
+              const isSelected = subjects.some((s) => s.code.toUpperCase() === preset.code.toUpperCase());
+              return (
+                <button
+                  key={preset.code}
+                  type="button"
+                  onClick={() => handleTogglePreset(preset)}
+                  className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group ${
+                    isSelected
+                      ? "bg-accent-primary-dim/30 border-accent-primary shadow-[0_0_15px_rgba(124,58,237,0.25)] scale-[1.01]"
+                      : "bg-bg-panel/60 border-border-subtle hover:border-border-active hover:bg-bg-panel"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-3.5 h-10 rounded-full flex-shrink-0 shadow-sm"
+                      style={{ backgroundColor: preset.color }}
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-sm font-rajdhani" style={{ color: "var(--text-primary)" }}>
+                          {preset.name}
+                        </h4>
+                        <span
+                          className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold uppercase"
+                          style={{
+                            backgroundColor: `${preset.color}25`,
+                            color: preset.color,
+                            border: `1px solid ${preset.color}50`,
+                          }}
+                        >
+                          {preset.code}
+                        </span>
+                      </div>
+                      <p className="text-xs text-text-secondary font-rajdhani">
+                        {preset.examBoard} • {preset.level}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
+                      isSelected ? "border-accent-primary bg-accent-primary text-white" : "border-border-subtle group-hover:border-border-active"
+                    }`}
+                  >
+                    {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Configured Subjects List */}
+        <div className="bg-bg-abyss/90 border border-border-subtle p-5 rounded-2xl flex flex-col gap-4 shadow-card">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold font-rajdhani uppercase tracking-widest text-text-secondary flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-accent-primary" />
+              <span>ACTIVE CURRICULUM ({subjects.length} SUBJECT{subjects.length === 1 ? "" : "S"})</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowCustomForm(!showCustomForm)}
+              className="text-xs font-rajdhani font-bold uppercase tracking-wider text-accent-text-light hover:text-white flex items-center gap-1 transition-colors px-2.5 py-1 rounded bg-bg-panel border border-border-subtle hover:border-accent-primary"
+            >
+              <Plus className="w-3 h-3" />
+              <span>{showCustomForm ? "Cancel Custom Form" : "Add Custom Subject"}</span>
+            </button>
+          </div>
+
+          {/* Custom Subject Intake Sub-Form */}
+          {showCustomForm && (
+            <form onSubmit={handleAddCustom} className="p-4 rounded-xl border border-border-active bg-bg-void/80 flex flex-col gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[11px] font-mono uppercase text-text-secondary mb-1">Subject Name *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Linear Algebra"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg bg-bg-abyss border border-border-subtle text-text-primary text-xs focus:outline-none focus:border-accent-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono uppercase text-text-secondary mb-1">Syllabus Code *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. MATH-201"
+                    value={customCode}
+                    onChange={(e) => setCustomCode(e.target.value.toUpperCase())}
+                    className="w-full px-3 py-2 rounded-lg bg-bg-abyss border border-border-subtle text-text-primary text-xs focus:outline-none focus:border-accent-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono uppercase text-text-secondary mb-1">Exam Board</label>
+                  <select
+                    value={customExamBoard}
+                    onChange={(e) => setCustomExamBoard(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg bg-bg-abyss border border-border-subtle text-text-primary text-xs focus:outline-none focus:border-accent-primary"
+                  >
+                    <option value="CAIE">CAIE</option>
+                    <option value="Edexcel">Edexcel</option>
+                    <option value="AQA">AQA</option>
+                    <option value="AP">AP (College Board)</option>
+                    <option value="IB">IB (International)</option>
+                    <option value="University">University</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono uppercase text-text-secondary mb-1">Academic Level</label>
+                  <select
+                    value={customLevel}
+                    onChange={(e) => setCustomLevel(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg bg-bg-abyss border border-border-subtle text-text-primary text-xs focus:outline-none focus:border-accent-primary"
+                  >
+                    <option value="A-Level">A-Level</option>
+                    <option value="AS-Level">AS-Level</option>
+                    <option value="AP">AP</option>
+                    <option value="IB HL">IB Higher Level</option>
+                    <option value="IB SL">IB Standard Level</option>
+                    <option value="University">Undergraduate</option>
+                    <option value="High School">High School</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border-subtle">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono uppercase text-text-secondary">Accent Color:</span>
+                  <div className="flex items-center gap-1.5">
+                    {ACCENT_COLORS.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setCustomColor(c)}
+                        className={`w-6 h-6 rounded-full border-2 transition-transform ${
+                          customColor === c ? "scale-125 border-white shadow-md" : "border-transparent opacity-70 hover:opacity-100"
+                        }`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-accent-primary text-white hover:bg-accent-primary-light shadow-sm"
+                >
+                  + Add to Curriculum
+                </button>
+              </div>
+
+              {validationError && (
+                <p className="text-xs text-accent-red font-mono">{validationError}</p>
+              )}
+            </form>
+          )}
+
+          {/* Subjects Grid */}
+          {subjects.length === 0 ? (
+            <div className="p-8 border border-dashed border-border-subtle rounded-xl text-center flex flex-col items-center justify-center gap-2">
+              <BookOpen className="w-8 h-8 text-text-muted opacity-40" />
+              <p className="text-sm text-text-secondary font-rajdhani">No subjects selected yet.</p>
+              <p className="text-xs text-text-muted font-mono">
+                Click any quick-add preset above or add a custom syllabus to continue.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {subjects.map((sub) => (
+                <div
+                  key={sub.id}
+                  className="p-3.5 rounded-xl border border-border-subtle bg-bg-panel/80 flex items-center justify-between relative overflow-hidden group hover:border-border-active transition-all"
+                >
+                  <div
+                    className="absolute left-0 top-0 bottom-0 w-1.5"
+                    style={{ backgroundColor: sub.color }}
+                  />
+                  <div className="pl-2">
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-bold text-sm font-rajdhani truncate max-w-[160px]" style={{ color: "var(--text-primary)" }}>
+                        {sub.name}
+                      </h4>
+                      <span
+                        className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold uppercase"
+                        style={{
+                          backgroundColor: `${sub.color}20`,
+                          color: sub.color,
+                          border: `1px solid ${sub.color}40`,
+                        }}
+                      >
+                        {sub.code}
+                      </span>
+                    </div>
+                    <p className="text-xs text-text-secondary font-rajdhani mt-0.5">
+                      {sub.examBoard} • {sub.level}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSubject(sub.id)}
+                    className="w-7 h-7 rounded-lg border border-border-subtle hover:border-accent-red/50 hover:bg-accent-red/10 text-text-muted hover:text-accent-red flex items-center justify-center transition-colors"
+                    title="Remove subject"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex justify-between mt-6 pt-6 border-t border-border-subtle">
+        {onPrev ? (
+          <button
+            onClick={onPrev}
+            className="px-6 py-3 rounded text-text-secondary hover:text-text-primary transition-colors tracking-widest text-sm uppercase font-bold"
+          >
+            Go Back
+          </button>
+        ) : (
+          <div />
+        )}
+
+        <button
+          onClick={onNext}
+          disabled={!canProceed}
+          className={`px-8 py-3 rounded font-bold tracking-widest uppercase transition-all duration-300 relative overflow-hidden
+            ${
+              canProceed
+                ? "bg-[var(--accent-primary)] text-white shadow-[0_0_15px_var(--accent-primary-mid)] hover:scale-105"
+                : "bg-bg-shadow text-text-muted cursor-not-allowed"
+            }
+          `}
+        >
+          CONFIRM CURRICULUM
         </button>
       </div>
     </motion.div>

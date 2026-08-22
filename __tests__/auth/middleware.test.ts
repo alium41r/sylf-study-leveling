@@ -163,4 +163,23 @@ describe("Phase 2: Next.js Edge Middleware Route Guards", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("location")).toBeNull();
   });
+
+  it("allows user with existing cookie to access /register when force=true is supplied", async () => {
+    const token = await signToken({
+      userId: 1,
+      email: "veteran@system.dev",
+      username: "veteran",
+      hasCompletedOnboarding: true,
+    });
+
+    const req = new NextRequest("http://localhost:3000/register?force=true", {
+      headers: {
+        cookie: `hunter_token=${token}`,
+      },
+    });
+
+    const res = await middleware(req);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("location")).toBeNull();
+  });
 });

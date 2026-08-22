@@ -21,7 +21,9 @@ import {
   Share2,
   ExternalLink,
   Sparkles,
+  Crop,
 } from "lucide-react";
+import { ImageCropModal } from "./ImageCropModal";
 
 interface ConnectedAccountsMap {
   github?: string | null;
@@ -63,46 +65,61 @@ export function ProfileStudioView({
   const [pfpMode, setPfpMode] = useState<"UPLOAD" | "URL">("UPLOAD");
   const [bannerMode, setBannerMode] = useState<"UPLOAD" | "URL">("UPLOAD");
 
+  const [cropModal, setCropModal] = useState<{
+    isOpen: boolean;
+    imageSrc: string;
+    cropType: "avatar" | "banner";
+    title: string;
+  }>({
+    isOpen: false,
+    imageSrc: "",
+    cropType: "avatar",
+    title: "",
+  });
+
   const avatarFileInputRef = useRef<HTMLInputElement | null>(null);
   const bannerFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const classInfo = getClassInfo(activeCosmetics.activeAvatar || user.activeAvatar || "class_scholar");
 
-  // Client-side WebP Compression & Resizing (Max 1200px for banner, 400px for avatar)
-  const processImageFile = (file: File, callback: (dataUrl: string) => void, maxDim: number) => {
-    if (!file || !file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const rawUrl = e.target?.result as string;
-      if (!rawUrl) return;
-
-      const img = new Image();
-      img.onload = () => {
-        let { width, height } = img;
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressed = canvas.toDataURL("image/webp", 0.88);
-          callback(compressed);
-        } else {
-          callback(rawUrl);
+  const handleAvatarFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const rawData = ev.target?.result as string;
+        if (rawData) {
+          setCropModal({
+            isOpen: true,
+            imageSrc: rawData,
+            cropType: "avatar",
+            title: "Adjust Profile Picture Framing & Position",
+          });
         }
       };
-      img.src = rawUrl;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    }
+    e.target.value = "";
+  };
+
+  const handleBannerFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const rawData = ev.target?.result as string;
+        if (rawData) {
+          setCropModal({
+            isOpen: true,
+            imageSrc: rawData,
+            cropType: "banner",
+            title: "Adjust Profile Banner Framing & Position",
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = "";
   };
 
   const hasBannerChanged = bannerUrl !== (user.bannerUrl || "");
@@ -222,7 +239,9 @@ export function ProfileStudioView({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-3xl select-none">{classInfo?.fallbackIcon || "📖"}</span>
+                    <span className="text-3xl select-none font-bold font-['Rajdhani'] text-emerald-400">
+                      {(user.name || user.username || "S").charAt(0).toUpperCase()}
+                    </span>
                   )}
                 </div>
               </div>
@@ -336,18 +355,12 @@ export function ProfileStudioView({
               type="file"
               accept="image/png,image/jpeg,image/webp"
               className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  processImageFile(file, (compressedUrl) => setAvatarUrl(compressedUrl), 400);
-                }
-                e.target.value = "";
-              }}
+              onChange={handleAvatarFileSelect}
             />
 
             {/* Mode Controls */}
             {pfpMode === "UPLOAD" ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <button
                   type="button"
                   onClick={() => avatarFileInputRef.current?.click()}
@@ -358,34 +371,71 @@ export function ProfileStudioView({
                 </button>
 
                 {avatarUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setAvatarUrl("")}
-                    className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
-                    title="Remove custom PFP"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCropModal({
+                          isOpen: true,
+                          imageSrc: avatarUrl,
+                          cropType: "avatar",
+                          title: "Adjust Profile Picture Framing & Position",
+                        })
+                      }
+                      className="py-2 px-3.5 rounded-xl bg-bg-abyss hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/40 text-xs font-['Rajdhani'] font-bold text-emerald-400 flex items-center gap-1.5 transition-all shadow-sm"
+                      title="Adjust position, zoom, and framing"
+                    >
+                      <Crop className="w-3.5 h-3.5" />
+                      <span>Adjust Position</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setAvatarUrl("")}
+                      className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                      title="Remove custom PFP"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <input
                   type="url"
                   value={avatarUrl}
                   onChange={(e) => setAvatarUrl(e.target.value)}
                   placeholder="https://example.com/avatar.jpg"
-                  className="flex-1 rounded-xl px-3.5 py-2 bg-bg-abyss border border-white/10 text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-emerald-500 transition-all shadow-inner"
+                  className="flex-1 min-w-[200px] rounded-xl px-3.5 py-2 bg-bg-abyss border border-white/10 text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-emerald-500 transition-all shadow-inner"
                 />
                 {avatarUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setAvatarUrl("")}
-                    className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
-                    title="Clear URL"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCropModal({
+                          isOpen: true,
+                          imageSrc: avatarUrl,
+                          cropType: "avatar",
+                          title: "Adjust Profile Picture Framing & Position",
+                        })
+                      }
+                      className="py-2 px-3 rounded-xl bg-bg-abyss hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/40 text-xs font-['Rajdhani'] font-bold text-emerald-400 flex items-center gap-1 transition-all"
+                      title="Adjust position, zoom, and framing"
+                    >
+                      <Crop className="w-3.5 h-3.5" />
+                      <span>Adjust</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAvatarUrl("")}
+                      className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                      title="Clear URL"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
                 )}
               </div>
             )}
@@ -438,18 +488,12 @@ export function ProfileStudioView({
               type="file"
               accept="image/png,image/jpeg,image/webp"
               className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  processImageFile(file, (compressedUrl) => setBannerUrl(compressedUrl), 1200);
-                }
-                e.target.value = "";
-              }}
+              onChange={handleBannerFileSelect}
             />
 
             {/* Mode Controls */}
             {bannerMode === "UPLOAD" ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <button
                   type="button"
                   onClick={() => bannerFileInputRef.current?.click()}
@@ -460,34 +504,71 @@ export function ProfileStudioView({
                 </button>
 
                 {bannerUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setBannerUrl("")}
-                    className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
-                    title="Remove custom banner"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCropModal({
+                          isOpen: true,
+                          imageSrc: bannerUrl,
+                          cropType: "banner",
+                          title: "Adjust Profile Banner Framing & Position",
+                        })
+                      }
+                      className="py-2 px-3.5 rounded-xl bg-bg-abyss hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/40 text-xs font-['Rajdhani'] font-bold text-emerald-400 flex items-center gap-1.5 transition-all shadow-sm"
+                      title="Adjust position, show left/right side, zoom"
+                    >
+                      <Crop className="w-3.5 h-3.5" />
+                      <span>Adjust Position</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setBannerUrl("")}
+                      className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                      title="Remove custom banner"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <input
                   type="url"
                   value={bannerUrl}
                   onChange={(e) => setBannerUrl(e.target.value)}
                   placeholder="https://example.com/banner.jpg"
-                  className="flex-1 rounded-xl px-3.5 py-2 bg-bg-abyss border border-white/10 text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-emerald-500 transition-all shadow-inner"
+                  className="flex-1 min-w-[200px] rounded-xl px-3.5 py-2 bg-bg-abyss border border-white/10 text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-emerald-500 transition-all shadow-inner"
                 />
                 {bannerUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setBannerUrl("")}
-                    className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
-                    title="Clear URL"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCropModal({
+                          isOpen: true,
+                          imageSrc: bannerUrl,
+                          cropType: "banner",
+                          title: "Adjust Profile Banner Framing & Position",
+                        })
+                      }
+                      className="py-2 px-3 rounded-xl bg-bg-abyss hover:bg-emerald-500/20 border border-white/10 hover:border-emerald-500/40 text-xs font-['Rajdhani'] font-bold text-emerald-400 flex items-center gap-1 transition-all"
+                      title="Adjust position, show left/right side, zoom"
+                    >
+                      <Crop className="w-3.5 h-3.5" />
+                      <span>Adjust</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBannerUrl("")}
+                      className="p-2 rounded-xl bg-bg-abyss hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-text-muted hover:text-rose-400 transition-all"
+                      title="Clear URL"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
                 )}
               </div>
             )}
@@ -587,6 +668,23 @@ export function ProfileStudioView({
           </div>
         </div>
       </div>
+
+      {/* ─── Interactive Image Framing & Crop Modal ──────────────── */}
+      <ImageCropModal
+        isOpen={cropModal.isOpen}
+        imageSrc={cropModal.imageSrc}
+        cropType={cropModal.cropType}
+        title={cropModal.title}
+        onClose={() => setCropModal((prev) => ({ ...prev, isOpen: false }))}
+        onApply={(croppedDataUrl) => {
+          if (cropModal.cropType === "avatar") {
+            setAvatarUrl(croppedDataUrl);
+          } else {
+            setBannerUrl(croppedDataUrl);
+          }
+        }}
+      />
     </div>
   );
 }
+

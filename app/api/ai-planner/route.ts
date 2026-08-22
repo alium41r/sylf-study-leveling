@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { AiStudyOrchestrator, StudySessionData } from "@/lib/ai/orchestrator";
-import { checkQuota, recordUsage } from "@/lib/ai/usage-limiter";
+import { checkQuota, consumeQuota } from "@/lib/ai/usage-limiter";
 import { AI_LIMITS } from "@/lib/ai/config";
+import { calculateRecommendedDifficulty } from "@/lib/difficulty-engine";
 
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
@@ -86,25 +87,46 @@ export async function POST(req: NextRequest) {
           }));
 
           const onProgress = (msg: string) => {
-            sendEvent("thought", { text: msg });
+            try {
+              sendEvent("thought", { text: msg });
+            } catch {
+              // Stream already closed (client disconnected) — ignore.
+            }
           };
 
-          // Generate Plan using Multi-Agent Orchestrator (with timeout)
-          const timeoutPromise = new Promise<never>((_, reject) => {
-            setTimeout(() => reject(new Error("AI_TIMEOUT")), AI_LIMITS.plannerTimeoutMs);
-          });
+          // ── Unified abort chain: client disconnect OR hard timeout
+          //    aborts the upstream LLM requests immediately. ──
+          const abortController = new AbortController();
+          let timedOut = false;
+          const onClientAbort = () => abortController.abort();
+          if (req.signal) {
+            req.signal.addEventListener("abort", onClientAbort);
+            if (req.signal.aborted) abortController.abort();
+          }
+          const timeoutId = setTimeout(() => {
+            timedOut = true;
+            abortController.abort();
+          }, AI_LIMITS.plannerTimeoutMs);
 
-          const planResult = await Promise.race([
-            AiStudyOrchestrator.generatePlan(
+          let planResult;
+          try {
+            planResult = await AiStudyOrchestrator.generatePlan(
               topic, 
               syllabus || "", 
               effortHours, 
               targetDate || null,
               pastSessions,
-              onProgress
-            ),
-            timeoutPromise,
-          ]);
+              onProgress,
+              abortController.signal
+            );
+          } finally {
+            clearTimeout(timeoutId);
+            if (req.signal) req.signal.removeEventListener("abort", onClientAbort);
+          }
+
+          if (!planResult) {
+            throw new Error(timedOut ? "AI_TIMEOUT" : "AI_ABORTED");
+          }
 
           sendEvent("thought", { text: "[System] Plan finalized. Saving to database..." });
 
@@ -114,14 +136,27 @@ export async function POST(req: NextRequest) {
           else if (effortHours <= 5) mappedEffortLevel = "RELAXED";
 
           // Save the Goal and Quests to the Database directly to maintain control
+          let targetWeeks = 1;
+          if (targetDate) {
+            const weekDiff = (new Date(targetDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 7);
+            if (Number.isFinite(weekDiff)) {
+              targetWeeks = Math.max(1, Math.ceil(weekDiff));
+            }
+          }
+
           const goal = await prisma.goal.create({
             data: {
               userId,
               title: planResult.goalTitle,
               description: planResult.goalDescription,
-              targetWeeks: targetDate ? Math.ceil((new Date(targetDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 7)) || 1 : 1,
+              targetWeeks,
               effortLevel: mappedEffortLevel as any,
-              status: "ACTIVE"
+              status: "ACTIVE",
+              // Exact deadline (UTC representational midnight) when provided
+              targetDate:
+                targetDate && /^\d{4}-\d{2}-\d{2}$/.test(targetDate)
+                  ? new Date(`${targetDate}T00:00:00.000Z`)
+                  : null,
             }
           });
 
@@ -137,20 +172,36 @@ export async function POST(req: NextRequest) {
           let daysToDeadline = 7;
           if (targetDate) {
              const diff = new Date(targetDate).getTime() - today.getTime();
-             daysToDeadline = Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+             if (Number.isFinite(diff)) {
+               daysToDeadline = Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+             }
           }
+
+          // Floating (ad-hoc) rest days are hard-blocked here too: no quest may
+          // be generated on a date the user exempted from study.
+          let floatingRestSet = new Set<string>();
+          try {
+            const floatingStart = TimezoneService.getUserLocalDate(tz);
+            const floatingEnd = TimezoneService.getUserLocalDateOffset(tz, daysToDeadline + 14);
+            const floating = await prisma.floatingRestDay.findMany({
+              where: { userId, dateKey: { gte: floatingStart, lte: floatingEnd } },
+              select: { dateKey: true },
+            });
+            floatingRestSet = new Set(floating.map((f) => f.dateKey));
+          } catch {} // best-effort: schedule lookup must never abort generation
 
           const questsToCreate = planResult.quests.map((q, index) => {
             // Distribute quests across the timeline evenly
-            let offsetDays = Math.floor((index / planResult.quests.length) * daysToDeadline);
+            let offsetDays = Math.floor((index / Math.max(1, planResult.quests.length)) * daysToDeadline);
             let scheduledFor = TimezoneService.getUserLocalDateOffset(tz, offsetDays);
             
-            // Skip rest days by rolling forward to the nearest active study day
+            // Skip fixed AND floating rest days by rolling forward to the nearest
+            // active study day.
             let attempts = 0;
-            while (attempts < 7) {
+            while (attempts < 30) {
               const parts = scheduledFor.split("-").map((n) => parseInt(n, 10));
               const dayOfWeek = new Date(parts[0], parts[1] - 1, parts[2]).getDay();
-              if (restDays.includes(dayOfWeek)) {
+              if (restDays.includes(dayOfWeek) || floatingRestSet.has(scheduledFor)) {
                 offsetDays += 1;
                 scheduledFor = TimezoneService.getUserLocalDateOffset(tz, offsetDays);
                 attempts += 1;
@@ -158,7 +209,11 @@ export async function POST(req: NextRequest) {
                 break;
               }
             }
-            
+
+            // Canonical difficulty tier derived deterministically from duration;
+            // rewards were already canonicalized by the orchestrator.
+            const difficulty = calculateRecommendedDifficulty(q.requiredMinutes);
+
             return {
               userId,
               goalId: goal.id,
@@ -167,6 +222,7 @@ export async function POST(req: NextRequest) {
               requiredMinutes: q.requiredMinutes,
               xpReward: q.xpReward,
               sylphReward: q.sylphReward,
+              difficulty,
               scheduledFor,
               status: "PENDING" as any,
               createdByAi: true
@@ -199,7 +255,7 @@ export async function POST(req: NextRequest) {
             .join("\n");
           const moreQuestsNote = questsToCreate.length > 5 ? `\n*...and ${questsToCreate.length - 5} more quests scheduled across your calendar.*` : "";
 
-          const plannerModelName = planResult.modelUsed || "Gemini 2.5 Flash";
+          const plannerModelName = planResult.modelUsed || "Gemini 3.7 Flash";
           const assistantContent = `<!-- model: ${plannerModelName} -->\n### 🎓 Study Plan Generated: **${planResult.goalTitle}**\n\nI have researched your curriculum and generated a personalized study schedule.\n\n- **Goal**: ${planResult.goalTitle}\n- **Workload**: ${questsToCreate.length} quests totaling ~${Math.round(actualTotalMinutes / 60)} hours\n- **Effort Level**: ${mappedEffortLevel} (${effortHours} hrs/week)\n\n#### 📋 Scheduled Quests Preview:\n${questsPreview}${moreQuestsNote}\n\n✨ *Your quests are now active on your dashboard & calendar. You can ask me to modify, reschedule, split, or add new quests anytime!*`;
 
           await prisma.systemMessage.create({
@@ -215,8 +271,12 @@ export async function POST(req: NextRequest) {
           // Final response with targetSessionId and modelUsed
           sendEvent("result", { goal, sessionId: targetSessionId, modelUsed: plannerModelName });
 
-          // Record quota usage after successful generation
-          await recordUsage(userId, "planner");
+          // Quota charged atomically ONLY after the plan was successfully
+          // generated AND persisted (never on errors, timeouts, or aborts).
+          const consumed = await consumeQuota(userId, "planner");
+          if (!consumed.allowed) {
+            console.warn(`[Planner] Quota race: plan succeeded but consumeQuota was not charged for user ${userId}`);
+          }
 
           controller.close();
         } catch (err: any) {
@@ -224,9 +284,15 @@ export async function POST(req: NextRequest) {
           const errorMsg =
             err.message === "AI_TIMEOUT"
               ? "The AI took longer than expected to research your topics. Please try again with a slightly more concise topic or syllabus."
-              : err.message || "Failed to generate plan.";
-          sendEvent("error", { message: errorMsg });
-          controller.close();
+              : err.message === "AI_ABORTED" || err.name === "AbortError"
+                ? "Generation was cancelled."
+                : err.message || "Failed to generate plan.";
+          try {
+            sendEvent("error", { message: errorMsg });
+          } catch {}
+          try {
+            controller.close();
+          } catch {}
         }
       },
     });

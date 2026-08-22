@@ -94,9 +94,14 @@ const NAV_ITEMS = [
 interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (val: boolean) => void;
+  /**
+   * Mobile drawer variant: renders inside the off-canvas drawer container
+   * (in-flow, full height, never collapsed) instead of the desktop fixed rail.
+   */
+  mobile?: boolean;
 }
 
-export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
+export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout, token, refreshStats } = useAuth();
   const { openSettings } = useSettings();
@@ -237,13 +242,24 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
   return (
     <aside
-      className="fixed left-0 top-0 h-full flex flex-col py-6 z-50 overflow-visible"
-      style={{
-        width: isCollapsed ? "var(--sidebar-collapsed-width)" : "var(--sidebar-width)",
-        background: "var(--bg-panel)",
-        borderRight: "1px solid var(--border-subtle)",
-        transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-      }}
+      className={`flex flex-col py-6 ${
+        mobile
+          ? "relative h-full w-full overflow-y-auto"
+          : "fixed left-0 top-0 h-full z-50 overflow-visible hidden md:flex"
+      }`}
+      style={
+        mobile
+          ? {
+              background: "var(--bg-panel)",
+              borderRight: "1px solid var(--border-subtle)",
+            }
+          : {
+              width: isCollapsed ? "var(--sidebar-collapsed-width)" : "var(--sidebar-width)",
+              background: "var(--bg-panel)",
+              borderRight: "1px solid var(--border-subtle)",
+              transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            }
+      }
     >
       {/* Top: Toggle + Profile Badge */}
       <div className="px-4">
@@ -285,7 +301,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -6 }}
                     transition={{ type: "spring", damping: 25, stiffness: 380 }}
-                    className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} w-80 max-h-96 overflow-y-auto bg-bg-abyss border border-border-subtle shadow-2xl rounded-lg p-2 custom-scrollbar z-[100]`}
+                    className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} ${mobile ? 'w-60' : 'w-80'} max-h-96 overflow-y-auto bg-bg-abyss border border-border-subtle shadow-2xl rounded-lg p-2 custom-scrollbar z-[100]`}
                   >
                     <div className="flex items-center justify-between p-2 mb-1 border-b border-border-subtle">
                       <h3 className="text-xs tracking-widest text-accent-light font-['Rajdhani']">
@@ -364,40 +380,62 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             </div>
           </div>
           
-          {/* Toggle Button */}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-text-secondary hover:text-text-primary transition-transform duration-200 hover:scale-110 active:scale-95"
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{
-                transform: isCollapsed ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-              }}
+          {/* Toggle Button (desktop rail only — mobile drawer is never collapsed) */}
+          {!mobile && (
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="text-text-secondary hover:text-text-primary transition-transform duration-200 hover:scale-110 active:scale-95"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{
+                  transform: isCollapsed ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* ─── Scholar Profile (Compact) ──────────────── */}
         <div className={`system-card transition-all duration-300 ${isCollapsed ? "p-2" : "p-4"}`}>
           {isCollapsed ? (
             <div className="flex flex-col items-center gap-2">
-              <div className={`rank-badge rank-${user.hunterRank} w-8 h-8 text-sm`}>
-                {user.hunterRank}
+              <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm" title={user.name || user.username || "Scholar"}>
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name || user.username || "Scholar"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                    {(user.name || user.username || "S").charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className={`rank-badge rank-${user.hunterRank} shrink-0`}>
-                {user.hunterRank}
+              <div className="w-10 h-10 rounded-xl overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm">
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name || user.username || "Scholar"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-sm font-bold font-['Rajdhani'] text-emerald-400">
+                    {(user.name || user.username || "S").charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-bold text-sm truncate" style={{ color: "var(--text-primary)" }}>

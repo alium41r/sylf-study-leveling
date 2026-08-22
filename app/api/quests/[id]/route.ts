@@ -7,6 +7,7 @@ import { DIFFICULTY_CONFIG } from "@/lib/difficulty-engine";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
 import { invalidateRankingsCache } from "@/lib/cache-service";
+import { StudyScheduleService } from "@/lib/study-schedule-service";
 
 const updateQuestSchema = z.object({
   title: z.string().min(1).optional(),
@@ -16,6 +17,7 @@ const updateQuestSchema = z.object({
   status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED", "FAILED"]).optional(),
   elapsedSeconds: z.number().int().min(0).optional(),
   difficulty: z.enum(["EASY", "NORMAL", "HARD", "EXPERT"]).optional(),
+  goalId: z.number().int().positive().nullable().optional(),
 });
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -82,7 +84,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const { status, title, description, requiredMinutes, scheduledFor, elapsedSeconds, difficulty } = validation.data;
+    const { status, title, description, requiredMinutes, scheduledFor, elapsedSeconds, difficulty, goalId } = validation.data;
 
     // Verify quest ownership
     const quest = await prisma.quest.findFirst({
@@ -90,6 +92,41 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     });
     if (!quest) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });
+    }
+
+    // Goal relink: verify the target goal belongs to the user before applying.
+    if (goalId !== undefined && goalId !== null) {
+      const goal = await prisma.goal.findFirst({
+        where: { id: goalId, userId: payload.userId as number },
+        select: { id: true },
+      });
+      if (!goal) {
+        return NextResponse.json({ error: "Goal not found or unauthorized" }, { status: 404 });
+      }
+    }
+
+    // ─── STRICT REST-DAY ALLOCATION GUARDRAIL ─────────────────
+    // Rescheduling a quest onto a fixed or floating rest day is prohibited.
+    if (scheduledFor !== undefined) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(scheduledFor)) {
+        return NextResponse.json(
+          { error: "Invalid scheduledFor. Expected YYYY-MM-DD." },
+          { status: 400 }
+        );
+      }
+      const isRestDay = await StudyScheduleService.isUserRestDay(
+        payload.userId as number,
+        scheduledFor
+      );
+      if (isRestDay) {
+        return NextResponse.json(
+          {
+            error: "REST_DAY_ALLOCATION_PROHIBITED",
+            message: "Quests cannot be scheduled on designated rest days.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Get current user stats
@@ -107,6 +144,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (scheduledFor !== undefined) dataToUpdate.scheduledFor = scheduledFor;
     if (elapsedSeconds !== undefined) dataToUpdate.elapsedSeconds = elapsedSeconds;
     if (difficulty !== undefined) dataToUpdate.difficulty = difficulty;
+    if (goalId !== undefined) dataToUpdate.goalId = goalId;
     if (status !== undefined) {
       dataToUpdate.status = status;
       dataToUpdate.completedAt = status === "COMPLETED" ? new Date() : null;

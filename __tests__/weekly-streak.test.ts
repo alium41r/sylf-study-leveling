@@ -52,13 +52,14 @@ describe("Level-Scaled Weekly Quest Rewards", () => {
 
       // EXP must always exceed Sylph
       expect(rewards.xpReward).toBeGreaterThan(rewards.sylphReward);
-      // Base EXP reward at level 1 is 200 XP
+      // Base EXP reward at level 1 is >= 200 XP (282 XP under the canonical curve)
       expect(rewards.xpReward).toBeGreaterThanOrEqual(200);
       // Sylph reward is tightly balanced (starts around 65 at Lv 1, scales smoothly)
       expect(rewards.sylphReward).toBeGreaterThanOrEqual(50);
       expect(rewards.sylphReward).toBeLessThan(1000);
     }
-    expect(calculateWeeklyQuestReward(1).xpReward).toBe(200);
+    // Canonical within-level bucket at Lv 1: XP_req(2) = floor(100*2^1.5) = 282
+    expect(calculateWeeklyQuestReward(1).xpReward).toBe(282);
   });
 
   it("scales rewards progressively higher for higher level hunters", () => {

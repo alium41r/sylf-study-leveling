@@ -23,6 +23,7 @@ interface Friend {
   id: number;
   name: string | null;
   username: string;
+  avatarUrl?: string | null;
   hunterRank: string;
   level: number;
   todayMinutes: number;
@@ -141,7 +142,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
       {/* ─── Header ──────────────────────────────────── */}
       <div className="mb-8">
         <p
@@ -157,7 +158,7 @@ export default function DashboardPage() {
         </h1>
 
         {/* ─── Character Build & Stacked Progress Bars Row ─── */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-6">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-6 w-full">
           {/* Character Avatar Build */}
           <div 
             onClick={() => router.push("/locker?tab=identity")}
@@ -190,7 +191,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Stacked EXP and HP Progress Bars (Beside to the right) */}
-          <div className="flex-1 flex flex-col justify-center gap-3 max-w-xl">
+          <div className="flex-1 min-w-0 flex flex-col justify-center gap-3 max-w-xl w-full">
             {/* EXP Bar */}
             <div>
               <div className="flex justify-between text-xs text-text-muted mb-1.5 font-['Rajdhani'] font-bold tracking-wider">
@@ -225,21 +226,21 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ─── Stats Grid (3 columns, no Gold) ──────────── */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="system-card p-4 text-center">
+      {/* ─── Stats Grid (side-by-side on mobile, 3 columns on desktop) ─── */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-8 w-full">
+        <div className="system-card p-2 px-3 sm:p-4 text-center min-w-0">
           <p className="stat-label">Level</p>
           <p className="stat-value text-text-primary">
             {user.level || 1}
           </p>
         </div>
-        <div className="system-card p-4 text-center">
+        <div className="system-card p-2 px-3 sm:p-4 text-center min-w-0">
           <p className="stat-label">Study Hours</p>
           <p className="stat-value text-text-primary">
             {Math.floor((Number(user.totalStudyMinutes) || 0) / 60)}
           </p>
         </div>
-        <div className="system-card p-4 text-center">
+        <div className="system-card p-2 px-3 sm:p-4 text-center min-w-0">
           <p className="stat-label">Today&apos;s Quests</p>
           <p className="stat-value text-text-primary">
             {completedToday}/{totalToday}
@@ -372,7 +373,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start w-full min-w-0">
         {/* ─── Today's Quests ──────────────────────────── */}
         <div className="system-card p-6">
           <h2
@@ -503,8 +504,14 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className={`rank-badge rank-${friend.hunterRank} w-8 h-8 text-xs`}>
-                        {friend.hunterRank}
+                      <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center">
+                        {friend.avatarUrl ? (
+                          <img src={friend.avatarUrl} alt={friend.username} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                            {(friend.name || friend.username || "S").charAt(0).toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-bg-panel" />
                     </div>
@@ -533,8 +540,14 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className={`rank-badge rank-${friend.hunterRank} w-8 h-8 text-xs`}>
-                        {friend.hunterRank}
+                      <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center">
+                        {friend.avatarUrl ? (
+                          <img src={friend.avatarUrl} alt={friend.username} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                            {(friend.name || friend.username || "S").charAt(0).toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-gray-600 border-2 border-bg-panel" />
                     </div>

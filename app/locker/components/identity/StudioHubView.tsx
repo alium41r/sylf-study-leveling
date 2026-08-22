@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
 import {
   CharacterConfig,
-  SKIN_TONES,
-  HAIR_STYLES,
-  HAIR_COLORS,
+  FULL_BODY_FORMS,
+  PEDESTAL_OPTIONS,
   OUTFIT_STYLES,
   AURA_PRESETS,
+  RELIC_OPTIONS,
 } from "@/lib/character-traits";
 import { getClassInfo } from "@/lib/cosmetics-catalog";
 import {
@@ -63,10 +63,15 @@ export function StudioHubView({
   saving,
 }: StudioHubViewProps) {
   const classInfo = getClassInfo(activeCosmetics.activeAvatar || user.activeAvatar || "class_scholar");
-  const outfitLabel = OUTFIT_STYLES.find((o) => o.value === characterConfig.outfit)?.label || "Scholar";
-  const skinLabel = SKIN_TONES.find((s) => s.value === characterConfig.skin)?.label.split(" ")[0] || "Fair";
-  const hairLabel = HAIR_COLORS.find((h) => h.value === characterConfig.hairColor)?.label.split(" ")[0] || "Black";
-  const auraLabel = AURA_PRESETS.find((a) => a.id === characterConfig.aura)?.label.split(" ")[0] || "None";
+  const formLabel =
+    FULL_BODY_FORMS.find((f) => f.value === characterConfig.outfit)?.label.split(" ")[0] ||
+    OUTFIT_STYLES.find((o) => o.value === characterConfig.outfit)?.label.split(" ")[0] ||
+    "Hunter";
+  const pedestalLabel =
+    PEDESTAL_OPTIONS.find((p) => p.value === (characterConfig.pedestal || characterConfig.pedestalKey))?.label.split(" ")[0] ||
+    "Cyber";
+  const auraLabel = AURA_PRESETS.find((a) => a.id === (characterConfig.aura || "none"))?.label.split(" ")[0] || "None";
+  const relicLabel = RELIC_OPTIONS.find((r) => r.value === (characterConfig.relic || "none"))?.label.split(" ")[0] || "None";
 
   const connectedSocialsCount = connectedAccounts
     ? [connectedAccounts.github, connectedAccounts.discord, connectedAccounts.instagram].filter(Boolean).length
@@ -171,27 +176,27 @@ export function StudioHubView({
               {/* Traits Breakdown Chips */}
               <div className="w-full grid grid-cols-4 gap-2 pt-3 border-t border-border-subtle/60 text-center text-xs font-['Rajdhani']">
                 <div className="p-1.5 rounded-lg bg-bg-panel/70 border border-border-subtle">
-                  <span className="text-[9px] text-text-muted block uppercase">Outfit</span>
+                  <span className="text-[9px] text-text-muted block uppercase">Form</span>
                   <span className="font-bold text-text-primary capitalize truncate block text-[11px]">
-                    {outfitLabel}
+                    {formLabel}
                   </span>
                 </div>
                 <div className="p-1.5 rounded-lg bg-bg-panel/70 border border-border-subtle">
-                  <span className="text-[9px] text-text-muted block uppercase">Skin</span>
+                  <span className="text-[9px] text-text-muted block uppercase">Pedestal</span>
                   <span className="font-bold text-text-primary capitalize truncate block text-[11px]">
-                    {skinLabel}
-                  </span>
-                </div>
-                <div className="p-1.5 rounded-lg bg-bg-panel/70 border border-border-subtle">
-                  <span className="text-[9px] text-text-muted block uppercase">Hair</span>
-                  <span className="font-bold text-text-primary capitalize truncate block text-[11px]">
-                    {hairLabel}
+                    {pedestalLabel}
                   </span>
                 </div>
                 <div className="p-1.5 rounded-lg bg-bg-panel/70 border border-border-subtle">
                   <span className="text-[9px] text-text-muted block uppercase">Aura</span>
                   <span className="font-bold text-accent-text-light capitalize truncate block text-[11px]">
                     {auraLabel}
+                  </span>
+                </div>
+                <div className="p-1.5 rounded-lg bg-bg-panel/70 border border-border-subtle">
+                  <span className="text-[9px] text-text-muted block uppercase">Relic</span>
+                  <span className="font-bold text-text-primary capitalize truncate block text-[11px]">
+                    {relicLabel}
                   </span>
                 </div>
               </div>
@@ -263,7 +268,9 @@ export function StudioHubView({
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-2xl select-none">{classInfo?.fallbackIcon || "📖"}</span>
+                      <span className="text-2xl select-none font-bold font-['Rajdhani'] text-emerald-400">
+                        {(user.name || user.username || "S").charAt(0).toUpperCase()}
+                      </span>
                     )}
                   </div>
                   <span className="text-[11px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2.5 py-1 rounded-lg bg-bg-panel border border-border-subtle text-accent-text-light">

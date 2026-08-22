@@ -1,4 +1,76 @@
-export interface ShopItem {
+export type ItemCategory =
+  | "HUNTER_FORM"
+  | "PEDESTAL"
+  | "AURA"
+  | "RELIC"
+  | "WEAPON"
+  | "CONSUMABLE"
+  | "EQUIPMENT"
+  | "SET_BUNDLE";
+
+export type ItemSlot = "HELMET" | "CHESTPLATE" | "PANTS" | "BOOTS" | "WEAPON" | "RELIC" | "NONE";
+export type ItemRarity = "COMMON" | "RARE" | "EPIC" | "LEGENDARY" | "MYTHIC";
+
+export interface CatalogItemDefinition {
+  id?: number;
+  sku: string;
+  name: string;
+  description: string;
+  category: ItemCategory;
+  slot: ItemSlot;
+  rarity: ItemRarity;
+  rankRequirement: string;
+  costSylph: number;
+  effectPayload?: Record<string, any>;
+  spriteLayer?: string;
+  setKey?: string;
+}
+
+export type CatalogItem = CatalogItemDefinition;
+
+export const RANK_WEIGHTS: Record<string, number> = {
+  MONARCH: 8,
+  NATIONAL: 7,
+  "RANK S": 6,
+  "RANK A": 5,
+  "RANK B": 4,
+  "RANK C": 3,
+  "RANK D": 2,
+  "RANK E": 1,
+  // Shorthand aliases
+  S: 6,
+  A: 5,
+  B: 4,
+  C: 3,
+  D: 2,
+  E: 1,
+};
+
+/**
+ * Validates whether a user's current rank tier satisfies an item's rank requirement.
+ */
+export function isRankSufficient(userRank: string, requiredRank: string): boolean {
+  const userWeight = RANK_WEIGHTS[userRank] ?? 1;
+  const reqWeight = RANK_WEIGHTS[requiredRank] ?? 1;
+  return userWeight >= reqWeight;
+}
+
+/**
+ * Calculates a discounted set bundle price given individual piece prices and discount rate (default 15%).
+ */
+export function calculateSetBundlePrice(piecePrices: number[], discountPercentage: number = 15): number {
+  const total = piecePrices.reduce((sum, p) => sum + p, 0);
+  return Math.floor(total * (1 - discountPercentage / 100));
+}
+
+// ─── Production Dynamic Store Catalog (Empty Baseline) ────────
+// Database-driven armory: Items are populated dynamically as new PixelLab MCP assets are forged.
+export const CATALOG_ITEMS: CatalogItemDefinition[] = [];
+
+// ─── Legacy & Test Reference Catalog Items ────────────────────
+export { CATALOG_ITEMS as ARCHIVED_CATALOG_ITEMS } from "@/archive/legacy_catalog/shop-items.legacy";
+
+export interface LegacyShopItem {
   id: string;
   itemKey: string;
   name: string;
@@ -7,85 +79,11 @@ export interface ShopItem {
   icon: string;
 }
 
-export const SHOP_ITEMS: ShopItem[] = [
-  {
-    id: "shop_reroll",
-    itemKey: "EXTRA_REROLL",
-    name: "Extra Quest Reroll",
-    description: "Allows you to reroll one of your scheduled quests.",
-    price: 150,
-    icon: "🎲",
-  },
-  {
-    id: "shop_change_quests",
-    itemKey: "CHANGE_TODAY_QUESTS",
-    name: "Change Today's Quests",
-    description: "Completely changes all of your active scheduled quests.",
-    price: 500,
-    icon: "🔄",
-  },
-  {
-    id: "shop_xp_boost",
-    itemKey: "XP_BOOST_24H",
-    name: "XP Multiplier Boost",
-    description: "Grants a 1.5x EXP multiplier for the next 24 hours.",
-    price: 800,
-    icon: "⚡",
-  },
-  {
-    id: "shop_elixir_insight",
-    itemKey: "ELIXIR_OF_INSIGHT",
-    name: "Elixir of Insight",
-    description: "Grants 1.5x EXP multiplier for the next 24 hours.",
-    price: 800,
-    icon: "🧪",
-  },
-  {
-    id: "shop_freeze_streak",
-    itemKey: "STREAK_FREEZE",
-    name: "Weekly Streak Freeze",
-    description: "Protects your weekly streak if you fail to reach the 3-hour study milestone before the Sunday reset.",
-    price: 1000,
-    icon: "❄️",
-  },
-  {
-    id: "shop_gate_key_red",
-    itemKey: "GATE_KEY_RED",
-    name: "Gate Key (Red)",
-    description: "Instantly doubles the Sylph and EXP payout of a selected quest. Risk: Failure results in 3x HP damage.",
-    price: 1200,
-    icon: "🗝️",
-  },
-  {
-    id: "shop_calendar_custom",
-    itemKey: "CALENDAR_CUSTOM",
-    name: "Calendar Customization",
-    description: "Unlock advanced customization for your system calendar.",
-    price: 1500,
-    icon: "📅",
-  },
-  {
-    id: "shop_nickname_change",
-    itemKey: "NICKNAME_CHANGE",
-    name: "Nickname Change",
-    description: "Allows you to change your system username once.",
-    price: 2000,
-    icon: "🏷️",
-  },
-  {
-    id: "shop_kamish_ward",
-    itemKey: "KAMISH_WARD",
-    name: "Kamish's Ward",
-    description: "Equip before a Hardcore quest. Completely negates the HP penalty if you fail.",
-    price: 2500,
-    icon: "🛡️",
-  },
-  {
-    id: "shop_shadow_extraction",
-    itemKey: "SHADOW_EXTRACTION",
-    name: "Shadow Extraction",
-    description: "Resurrect a failed quest and restore the HP lost from it.",
-    price: 3000,
-    icon: "👥",
-  },
-];
+export const SHOP_ITEMS: LegacyShopItem[] = CATALOG_ITEMS.map((item) => ({
+  id: item.sku,
+  itemKey: item.sku,
+  name: item.name,
+  description: item.description,
+  price: item.costSylph,
+  icon: item.category === "CONSUMABLE" ? "🧪" : item.category === "WEAPON" ? "⚔️" : item.category === "SET_BUNDLE" ? "📦" : "🛡️",
+}));

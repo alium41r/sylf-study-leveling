@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { GeminiAdapter } from "../../lib/ai/providers/gemini";
 import { GroqAdapter } from "../../lib/ai/providers/groq";
+import { DeepSeekAdapter } from "../../lib/ai/providers/deepseek";
 import { NormalizedMessage, NormalizedTool } from "../../lib/ai/providers/types";
 
 // Mock the Groq SDK completely to avoid the `dangerouslyAllowBrowser` error in Vitest
@@ -34,12 +35,13 @@ describe("LLM Provider Contract Tests", () => {
   const adapters = [
     { name: "Gemini", instance: new GeminiAdapter("dummy-key", "gemini-3.7-flash") },
     { name: "Groq", instance: new GroqAdapter("dummy-key", "qwen/qwen3.6-27b") },
+    { name: "DeepSeek", instance: new DeepSeekAdapter("dummy-key", "deepseek-v4-flash") },
   ];
 
   for (const { name, instance } of adapters) {
     describe(`${name} Adapter`, () => {
       beforeEach(() => {
-        // Mock the underlying SDKs
+        // Mock the underlying SDKs / fetch
         if (name === "Gemini") {
           (instance as any).ai = {
             models: {
@@ -50,7 +52,7 @@ describe("LLM Provider Contract Tests", () => {
               }),
             },
           };
-        } else {
+        } else if (name === "Groq") {
           (instance as any).groq = {
             chat: {
               completions: {
@@ -74,6 +76,27 @@ describe("LLM Provider Contract Tests", () => {
               },
             },
           };
+        } else if (name === "DeepSeek") {
+          global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({
+              choices: [
+                {
+                  message: {
+                    content: "Here is the weather.",
+                    tool_calls: [
+                      {
+                        id: "call_ds_123",
+                        type: "function",
+                        function: { name: "getWeather", arguments: JSON.stringify({ location: "London" }) },
+                      },
+                    ],
+                  },
+                },
+              ],
+              usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+            }),
+          } as any);
         }
       });
 

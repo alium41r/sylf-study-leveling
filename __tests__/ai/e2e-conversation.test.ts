@@ -16,7 +16,9 @@ vi.mock("../../lib/prisma", () => ({
     systemMessage: { create: vi.fn(), findMany: vi.fn(), count: vi.fn() },
     hpLedger: { findMany: vi.fn() },
     subject: { findMany: vi.fn() },
-    userAchievement: { findMany: vi.fn() }
+    userAchievement: { findMany: vi.fn() },
+    userQuota: { findUnique: vi.fn() },
+    $queryRawUnsafe: vi.fn()
   }
 }));
 
@@ -83,6 +85,8 @@ describe("Phase 4D: E2E Conversational Intelligence", () => {
     } as any)) as any);
     vi.mocked(prisma.systemMessage.findMany).mockResolvedValue([]);
     vi.mocked(prisma.systemMessage.count).mockResolvedValue(0); // quota check returns 0 usage
+    vi.mocked(prisma.userQuota.findUnique).mockResolvedValue(null); // 0 quota used today
+    vi.mocked(prisma.$queryRawUnsafe).mockResolvedValue([{ used: 1 }] as any); // atomic consumeQuota
     
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: userId, hp: 100, maxHp: 100, level: 5, currentXP: 100, xpToNextLevel: 500, sylph: 1000, hunterRank: "E", streakDays: 5

@@ -448,8 +448,8 @@ export function PublicProfileModal() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-4xl select-none">
-                          {classInfo?.fallbackIcon || "📖"}
+                        <span className="text-4xl select-none font-bold font-['Rajdhani'] text-emerald-400">
+                          {(dossier?.name || dossier?.username || "S").charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>

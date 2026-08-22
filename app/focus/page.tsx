@@ -7,6 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FocusToolsProvider } from "./components/FocusToolsContext";
 import FocusToolsDock from "./components/FocusToolsDock";
 import FocusToolWindow from "./components/FocusToolWindow";
+import { useFocusEyeComfort } from "./hooks/useFocusEyeComfort";
+import { SESSION_ENDED_EVENT, SESSION_SUMMARY_KEY } from "../components/SessionEndToast";
+import { CheckCircle2 } from "lucide-react";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -31,6 +34,9 @@ function FocusContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { token, refreshStats } = useAuth();
+
+  // Eye-Comfort Dimming (Light Mode only) — zero-IOPS client state
+  const { isDimActive, isLightMode, toggleDim } = useFocusEyeComfort();
 
   const subjectId = searchParams.get("subjectId");
   const subjectName = searchParams.get("subjectName") || "Focus Session";
@@ -58,6 +64,8 @@ function FocusContent() {
   const [phaseLabel, setPhaseLabel] = useState("FOCUS");
   const [questData, setQuestData] = useState<any>(null);
   const [showQuestPopup, setShowQuestPopup] = useState(false);
+  // Flowtime mode: stretch-break nudge banner
+  const [flowNudge, setFlowNudge] = useState(false);
   
   const questPopupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -124,7 +132,7 @@ function FocusContent() {
 
   // ─── Throttled Flush Helper ────────────────────────
   const flushSessionProgress = useCallback(
-    async (isFinal: boolean = false): Promise<boolean> => {
+    async (isFinal: boolean = false, completeQuest: boolean = false): Promise<boolean> => {
       const currSeconds = elapsedSecondsRef.current;
       const currentSessionId = sessionIdRef.current;
       const currentToken = tokenRef.current;
@@ -150,6 +158,10 @@ function FocusContent() {
             durationMinutes,
             durationSeconds,
             questId: questId ? parseInt(questId) : undefined,
+            completeQuest: completeQuest || undefined,
+            // Only the final flush triggers the single canonical reward award;
+            // the RPC performs exact delta accounting on every flush.
+            final: isFinal || undefined,
           }),
           keepalive: true,
         });
@@ -231,6 +243,26 @@ function FocusContent() {
         setPhaseLabel("FOCUS");
         break;
       }
+      case "5217": {
+        // Data-backed 52/17 rhythm: long work block, real recovery break.
+        const workMin = get("workDuration", 52);
+        const cycles = get("cycles", 3);
+        setRemainingSeconds(workMin * 60);
+        setTotalSessions(cycles);
+        setPhase("focus");
+        setPhaseLabel("52/17 FOCUS");
+        break;
+      }
+      case "animedoro": {
+        // Long focus block rewarded with a guilt-free fun break.
+        const focusMin = get("focusDuration", 45);
+        const cycles = get("cycles", 3);
+        setRemainingSeconds(focusMin * 60);
+        setTotalSessions(cycles);
+        setPhase("focus");
+        setPhaseLabel("ANIMEDORO FOCUS");
+        break;
+      }
       case "deepwork": {
         const sessionMin = get("sessionLength", 90);
         setRemainingSeconds(sessionMin * 60);
@@ -248,6 +280,14 @@ function FocusContent() {
         setPhaseLabel("SPRINT 1/" + sprints);
         break;
       }
+      case "flowtime": {
+        // Flexible: open-ended stopwatch; breaks are taken on demand.
+        setRemainingSeconds(null);
+        setPhase("focus");
+        setPhaseLabel("FLOW");
+        setTotalSessions(1);
+        break;
+      }
       case "freeflow":
       default: {
         // Stopwatch mode
@@ -258,8 +298,11 @@ function FocusContent() {
       }
     }
 
-    // Trigger Fullscreen for Deep Work
-    if (activeMode.id === "deepwork") {
+    // Trigger Fullscreen for Deep Work (respects the autoFullscreen setting)
+    if (
+      activeMode.id === "deepwork" &&
+      getSetting(activeMode, "autoFullscreen", true) !== false
+    ) {
       try {
         if (!document.fullscreenElement) {
           document.documentElement.requestFullscreen().catch(() => {});
@@ -305,7 +348,17 @@ function FocusContent() {
     const get = (key: string, fallback: number) =>
       Number(getSetting(activeMode, key, fallback));
 
-    playChime();
+    // End-of-session chime is a per-mode setting (silent modes stay silent).
+    const chimeEnabled = getSetting(activeMode, "endChime", true) !== false;
+    if (chimeEnabled) playChime();
+
+    // Auto-start boundaries: when disabled, the timer pauses at the
+    // transition so the next block only begins when the user resumes.
+    const pauseIf = (autoSetting: string) => {
+      if (getSetting(activeMode, autoSetting, true) === false) {
+        setIsPaused(true);
+      }
+    };
 
     if (activeMode.id === "pomodoro") {
       if (phase === "focus") {
@@ -323,6 +376,7 @@ function FocusContent() {
           setPhase("short-break");
           setPhaseLabel("SHORT BREAK");
         }
+        pauseIf("autoStartBreaks");
       } else {
         // After a break → next focus session
         const nextSession = phase === "long-break" ? 1 : currentSession + 1;
@@ -331,6 +385,41 @@ function FocusContent() {
         setRemainingSeconds(focusMin * 60);
         setPhase("focus");
         setPhaseLabel(`FOCUS ${nextSession}/${totalSessions}`);
+        pauseIf("autoStartFocus");
+      }
+    } else if (activeMode.id === "5217") {
+      // 52/17 rhythm: work block ↔ real recovery break, cycling.
+      if (phase === "focus") {
+        const breakMin = get("breakDuration", 17);
+        setRemainingSeconds(breakMin * 60);
+        setPhase("short-break");
+        setPhaseLabel("RECOVERY BREAK");
+        pauseIf("autoStartBreaks");
+      } else {
+        const nextCycle = currentSession + 1;
+        setCurrentSession(nextCycle);
+        const workMin = get("workDuration", 52);
+        setRemainingSeconds(workMin * 60);
+        setPhase("focus");
+        setPhaseLabel(`52/17 FOCUS ${nextCycle}/${totalSessions}`);
+        pauseIf("autoStartFocus");
+      }
+    } else if (activeMode.id === "animedoro") {
+      // Animedoro: focus block → guilt-free reward break, cycling.
+      if (phase === "focus") {
+        const rewardMin = get("rewardBreak", 20);
+        setRemainingSeconds(rewardMin * 60);
+        setPhase("long-break");
+        setPhaseLabel("REWARD BREAK");
+        pauseIf("autoStartBreaks");
+      } else {
+        const nextCycle = currentSession + 1;
+        setCurrentSession(nextCycle);
+        const focusMin = get("focusDuration", 45);
+        setRemainingSeconds(focusMin * 60);
+        setPhase("focus");
+        setPhaseLabel(`ANIMEDORO FOCUS ${nextCycle}/${totalSessions}`);
+        pauseIf("autoStartFocus");
       }
     } else if (activeMode.id === "sprint") {
       if (phase === "focus") {
@@ -344,6 +433,7 @@ function FocusContent() {
           setRemainingSeconds(restMin * 60);
           setPhase("rest");
           setPhaseLabel("REST");
+          pauseIf("autoStartRests");
         }
       } else {
         // After rest → next sprint
@@ -353,6 +443,7 @@ function FocusContent() {
         setRemainingSeconds(sprintMin * 60);
         setPhase("focus");
         setPhaseLabel(`SPRINT ${nextSprint}/${totalSessions}`);
+        pauseIf("autoStartSprints");
       }
     } else if (activeMode.id === "deepwork") {
       // Deep work done → break
@@ -366,6 +457,12 @@ function FocusContent() {
         setPhaseLabel("SESSION COMPLETE");
         setRemainingSeconds(null);
       }
+    } else if (activeMode.id === "flowtime") {
+      // Flowtime: the break countdown finished → back to open-ended flow.
+      setRemainingSeconds(null);
+      setPhase("focus");
+      setPhaseLabel("FLOW");
+      setFlowNudge(false);
     }
   }, [activeMode, phase, currentSession, totalSessions, playChime, questData]);
 
@@ -541,12 +638,14 @@ function FocusContent() {
     setIsEnding(true);
 
     try {
-      const success = await flushSessionProgress(true);
+      // isFinal = true, completeQuest = false (logs time, keeps quest active)
+      const success = await flushSessionProgress(true, false);
       if (success) {
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
         }
         await refreshStats();
+        announceSessionEnd();
         router.push("/timer");
       } else {
         setIsEnding(false);
@@ -557,16 +656,102 @@ function FocusContent() {
     }
   };
 
+  const handleCompleteQuest = async () => {
+    if (!tokenRef.current || !sessionIdRef.current || isEnding) return;
+    setIsEnding(true);
+
+    try {
+      // isFinal = true, completeQuest = true (completes quest, credits XP and node progress)
+      const success = await flushSessionProgress(true, true);
+      if (success) {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+        await refreshStats();
+        announceSessionEnd();
+        router.push("/timer");
+      } else {
+        setIsEnding(false);
+      }
+    } catch (err) {
+      console.error("Failed to complete quest:", err);
+      setIsEnding(false);
+    }
+  };
+
+  /**
+   * Broadcast the just-finished session so the global toast can surface the
+   * exact duration on the next page, and persist it for reload resilience.
+   */
+  const announceSessionEnd = () => {
+    const summary = {
+      durationSeconds: elapsedSecondsRef.current,
+      subjectName: subjectName || null,
+      questTitle: questData?.title || null,
+    };
+    try {
+      localStorage.setItem(SESSION_SUMMARY_KEY, JSON.stringify(summary));
+    } catch {}
+    // Small delay so the redirect lands first — toast appears "after" the
+    // focus room, on the destination page.
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent(SESSION_ENDED_EVENT, { detail: summary }));
+    }, 300);
+  };
+
+  // ─── Flowtime: on-demand, focus-scaled breaks ────────
+  const handleTakeFlowBreak = () => {
+    if (activeMode?.id !== "flowtime") return;
+    const focusMinutes = Math.max(1, Math.round(elapsedSecondsRef.current / 60));
+    const autoScale = getSetting(activeMode, "autoScaleBreak", true) !== false;
+    const defaultBreak = Number(getSetting(activeMode, "defaultBreak", 10));
+    const maxBreak = Number(getSetting(activeMode, "maxBreak", 20));
+    // Flowtime doctrine: ~10% of the focus block, clamped to 5–max minutes.
+    const scaled = Math.max(5, Math.round(focusMinutes * 0.1));
+    const breakMin = Math.max(1, Math.min(maxBreak, autoScale ? scaled : defaultBreak));
+    setRemainingSeconds(breakMin * 60);
+    setPhase("long-break");
+    setPhaseLabel("FLOW BREAK");
+    setFlowNudge(false);
+  };
+
+  const handleSkipFlowBreak = () => {
+    setRemainingSeconds(null);
+    setPhase("focus");
+    setPhaseLabel("FLOW");
+    setFlowNudge(false);
+  };
+
+  // Flowtime stretch nudge — fires at the configured reminder interval.
+  useEffect(() => {
+    if (!activeMode || activeMode.id !== "flowtime" || phase !== "focus") return;
+    const intervalMin = Number(getSetting(activeMode, "reminderInterval", 45));
+    if (intervalMin <= 0) return;
+    if (elapsedSeconds > 0 && elapsedSeconds % (intervalMin * 60) === 0) {
+      setFlowNudge(true);
+      const timer = setTimeout(() => setFlowNudge(false), 12000);
+      return () => clearTimeout(timer);
+    }
+  }, [elapsedSeconds, activeMode, phase]);
+
   // Determine display time — countdown for timed modes, elapsed for stopwatch
   const displayTime = remainingSeconds !== null ? remainingSeconds : elapsedSeconds;
   const isCountdown = remainingSeconds !== null;
   const isBreak = phase === "short-break" || phase === "long-break" || phase === "rest";
 
-  // Phase color
+  // Phase color (sprint intensity shifts the focus accent)
+  const sprintIntensity =
+    activeMode?.id === "sprint" ? String(getSetting(activeMode, "intensity", "High")) : null;
   const phaseColor = isBreak
     ? "var(--accent-green)"
     : phase === "done"
     ? "var(--accent-gold)"
+    : activeMode?.id === "sprint" && phase === "focus"
+    ? sprintIntensity === "Extreme"
+      ? "#ef4444"
+      : sprintIntensity === "Medium"
+      ? "#fbbf24"
+      : "#fb923c"
     : "var(--accent-primary)";
 
   // Mode display name
@@ -582,6 +767,13 @@ function FocusContent() {
           : "radial-gradient(ellipse at center, var(--accent-primary-dim) 0%, var(--bg-void) 75%)",
       }}
     >
+      {/* Eye-Comfort Dim Layer (Light Mode only) — a full-viewport,
+          non-interactive dimmer above ALL focus UI: the whole screen
+          (background, timer digits, controls, dock) drops to low
+          luminance while every control stays clickable underneath. */}
+      {isDimActive && (
+        <div aria-hidden="true" className="focus-dim-overlay" data-testid="focus-dim-overlay" />
+      )}
       {/* ─── Top Header Section ─────────────────── */}
       <div className="w-full flex flex-col items-center text-center gap-1.5 shrink-0 z-10 max-w-2xl px-4">
         {/* Mode / Phase Badge */}
@@ -619,7 +811,7 @@ function FocusContent() {
       <div className="flex-1 flex flex-col items-center justify-center my-auto py-4 z-10 w-full max-w-4xl text-center">
         {/* Dynamic Responsive Digital Timer */}
         <div
-          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold font-mono tracking-tight leading-none my-2 select-none"
+          className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold font-mono tracking-tight leading-none my-2 select-none"
           style={{
             color: phaseColor,
             textShadow: `0 0 35px var(--accent-primary-dim)`,
@@ -636,6 +828,16 @@ function FocusContent() {
           >
             Total elapsed: {formatTime(elapsedSeconds)}
           </p>
+        )}
+
+        {/* Flowtime stretch-break nudge */}
+        {flowNudge && (
+          <button
+            onClick={handleTakeFlowBreak}
+            className="mt-4 px-5 py-2.5 rounded-full border border-amber-400/50 bg-amber-400/10 text-amber-300 text-xs sm:text-sm font-['Rajdhani'] font-bold uppercase tracking-wider hover:bg-amber-400/20 transition-all animate-pulse"
+          >
+            ☕ You&apos;ve focused {formatTime(elapsedSeconds)} — stretch break?
+          </button>
         )}
 
         {/* Daily Cumulative Totals */}
@@ -660,8 +862,8 @@ function FocusContent() {
           </div>
         </div>
 
-        {/* Pomodoro Session Dots */}
-        {activeMode && (activeMode.id === "pomodoro" || activeMode.id === "sprint") && (
+        {/* Pomodoro / 52·17 / Animedoro / Sprint session dots */}
+        {activeMode && (activeMode.id === "pomodoro" || activeMode.id === "sprint" || activeMode.id === "5217" || activeMode.id === "animedoro") && (
           <div className="flex gap-2 mt-6">
             {Array.from({ length: totalSessions }).map((_, i) => (
               <div
@@ -687,7 +889,7 @@ function FocusContent() {
       </div>
 
       {/* ─── Bottom Action Controls ──────────────── */}
-      <div className="w-full flex justify-center items-center gap-4 shrink-0 pb-2 z-10">
+      <div className="w-full flex flex-wrap justify-center items-center gap-3 sm:gap-4 shrink-0 z-10 px-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         {/* Pause/Resume (for countdown modes) */}
         {isCountdown && phase !== "done" && (
           <button
@@ -722,6 +924,35 @@ function FocusContent() {
           </button>
         )}
 
+        {/* Flowtime: on-demand break controls */}
+        {activeMode?.id === "flowtime" && phase === "focus" && remainingSeconds === null && (
+          <button
+            onClick={handleTakeFlowBreak}
+            className="flex items-center gap-3 px-6 py-3 rounded-full bg-amber-500/10 hover:bg-amber-500/20 hover:scale-105 active:scale-95 transition-all duration-200 border border-amber-500/40 hover:border-amber-400/60 shadow-lg text-amber-300"
+          >
+            <span className="text-lg leading-none">☕</span>
+            <span
+              className="text-sm uppercase tracking-wider font-bold"
+              style={{ fontFamily: "'Rajdhani', sans-serif" }}
+            >
+              Take a Break
+            </span>
+          </button>
+        )}
+        {activeMode?.id === "flowtime" && isBreak && (
+          <button
+            onClick={handleSkipFlowBreak}
+            className="flex items-center gap-3 px-6 py-3 rounded-full bg-bg-panel hover:bg-bg-shadow hover:scale-105 active:scale-95 transition-all duration-200 border border-border-subtle hover:border-accent-primary-mid shadow-lg text-text-primary"
+          >
+            <span
+              className="text-sm uppercase tracking-wider font-bold"
+              style={{ fontFamily: "'Rajdhani', sans-serif" }}
+            >
+              Skip Break → Focus
+            </span>
+          </button>
+        )}
+
         {/* End Session */}
         <button
           onClick={handleEndSession}
@@ -746,6 +977,24 @@ function FocusContent() {
             </>
           )}
         </button>
+
+        {/* Complete Quest (only shown when bound to an active quest) */}
+        {questData && (
+          <button
+            onClick={handleCompleteQuest}
+            disabled={isEnding}
+            className="flex items-center gap-3 px-8 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 hover:scale-105 active:scale-95 transition-all duration-200 border border-emerald-400/50 shadow-[0_0_20px_rgba(16,185,129,0.35)] text-white"
+            title="Complete quest and claim XP rewards"
+          >
+            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-200" />
+            <span
+              className="text-base sm:text-lg uppercase tracking-wider font-bold"
+              style={{ fontFamily: "'Rajdhani', sans-serif" }}
+            >
+              Complete Quest
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Paused Overlay */}
@@ -811,23 +1060,9 @@ function FocusContent() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={async () => {
-                    try {
-                      await flushSessionProgress(false);
-                      await fetch(`/api/quests/${questData.id}`, {
-                        method: "PATCH",
-                        headers: {
-                          Authorization: `Bearer ${tokenRef.current}`,
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ status: "COMPLETED" }),
-                      });
-                    } catch (e) {
-                       console.error(e);
-                    }
                     setShowQuestPopup(false);
                     if (questPopupTimeoutRef.current) clearTimeout(questPopupTimeoutRef.current);
-                    setPhaseLabel("QUEST OVERTIME");
-                    setRemainingSeconds(null);
+                    await handleCompleteQuest();
                   }}
                   className="w-full py-3.5 rounded-xl bg-green-500/15 hover:bg-green-500/25 text-green-600 dark:text-green-400 font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border border-green-500/30 shadow-lg"
                 >
@@ -853,7 +1088,7 @@ function FocusContent() {
 
         {/* ─── Floating Focus Tools Dock & Expandable Window ─── */}
         <FocusToolWindow />
-        <FocusToolsDock />
+        <FocusToolsDock dimControl={{ isDimActive, isLightMode, onToggleDim: toggleDim }} />
       </div>
     </FocusToolsProvider>
   );

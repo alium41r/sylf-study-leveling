@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { TimezoneService } from "@/lib/timezone-service";
+import { SKELETON_NODES } from "@/lib/skill-tree-skeleton";
+import { revalidateTag } from "next/cache";
 
 async function getUserId(req: NextRequest): Promise<number | null> {
   const authHeader = req.headers.get("Authorization");
@@ -32,13 +34,20 @@ export async function GET(req: NextRequest) {
     const timezone = user?.timezone || "UTC";
     const todayStart = TimezoneService.getStartOfDayUTC(timezone);
 
-    // We want to fetch subjects and calculate today's duration for each
+    // Fetch subjects with strict projections and today's session duration
     const subjects = await prisma.subject.findMany({
       where: { userId },
       select: {
         id: true,
         name: true,
+        code: true,
+        examBoard: true,
+        level: true,
         color: true,
+        createdAt: true,
+        _count: {
+          select: { nodes: true },
+        },
         sessions: {
           where: {
             startedAt: {
@@ -64,7 +73,12 @@ export async function GET(req: NextRequest) {
       return {
         id: sub.id,
         name: sub.name,
+        code: sub.code,
+        examBoard: sub.examBoard,
+        level: sub.level,
         color: sub.color,
+        createdAt: sub.createdAt,
+        nodesCount: sub._count?.nodes || 0,
         todaySeconds,
       };
     });
@@ -87,22 +101,81 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    if (!body.name) {
+    if (!body.name || !body.code) {
       return NextResponse.json(
-        { error: "Subject name is required" },
+        { error: "Subject name and code are required" },
         { status: 400 }
       );
     }
 
-    const subject = await prisma.subject.create({
-      data: {
-        userId,
-        name: body.name,
-        color: body.color || "#7c3aed",
-      },
+    const cleanCode = String(body.code).trim().toUpperCase();
+    const cleanName = String(body.name).trim();
+    const cleanExamBoard = String(body.examBoard || "CAIE").trim().toUpperCase();
+    const cleanLevel = String(body.level || "A-Level").trim();
+    const cleanColor = String(body.color || "#8B5CF6").trim();
+
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { id: userId },
+        select: { username: true },
+      });
+
+      const subject = await tx.subject.upsert({
+        where: {
+          userId_code: { userId, code: cleanCode },
+        },
+        create: {
+          userId,
+          name: cleanName,
+          code: cleanCode,
+          examBoard: cleanExamBoard,
+          level: cleanLevel,
+          color: cleanColor,
+        },
+        update: {
+          name: cleanName,
+          examBoard: cleanExamBoard,
+          level: cleanLevel,
+          color: cleanColor,
+        },
+      });
+
+      // Synchronously provision all 48 constellation skeleton nodes
+      const nodePayloads = SKELETON_NODES.map((node) => ({
+        subjectId: subject.id,
+        nodeId: node.id,
+        tier: node.tier,
+        title: `${cleanName} - ${node.label}`,
+        description: node.description,
+        difficulty: Math.min(5, Math.max(1, Math.ceil(node.tier / 2))),
+        spAward: node.tier <= 3 ? 1 : node.tier <= 5 ? 2 : node.tier <= 7 ? 3 : node.tier <= 9 ? 4 : 0,
+        progress: 0.0,
+        isMastered: false,
+      }));
+
+      await tx.subjectNode.createMany({
+        data: nodePayloads,
+        skipDuplicates: true,
+      });
+
+      return { subject, username: user?.username };
     });
 
-    return NextResponse.json({ ...subject, todaySeconds: 0 }, { status: 201 });
+    if (result.username) {
+      try {
+        revalidateTag(`user-${result.username.toLowerCase()}`, "max");
+        revalidateTag(`profile-stats-${result.username.toLowerCase()}`, "max");
+      } catch {}
+    }
+
+    return NextResponse.json(
+      {
+        ...result.subject,
+        nodesCount: SKELETON_NODES.length,
+        todaySeconds: 0,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("POST subject error:", error);
     return NextResponse.json(

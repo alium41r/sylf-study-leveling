@@ -1,27 +1,53 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
+import { useAuth } from "./AuthProvider";
 
 const PUBLIC_PATHS = ["/", "/login", "/register", "/focus", "/onboarding"];
 
 /**
  * Conditionally renders the Sidebar only on authenticated (non-public) pages.
- * Also applies left margin to the main content area when sidebar is visible.
+ *
+ * Viewport separation:
+ *  - Desktop (md+): static/collapsible sidebar rail in flex flow (+ spacer).
+ *  - Mobile (< 768px): the inline rail + spacer are hidden; navigation lives
+ *    in an absolute off-canvas drawer (`fixed inset-y-0 left-0 z-50 w-72`)
+ *    toggled by a sticky mobile header with a hamburger trigger, plus a
+ *    backdrop layer that closes the drawer on tap.
  */
 export default function SidebarWrapper() {
   const pathname = usePathname();
   const isPublicPage = PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/settings");
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close the mobile drawer after in-drawer navigation.
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll while the drawer is open.
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [isMobileMenuOpen]);
 
   if (isPublicPage) return null;
 
   return (
     <>
+      {/* ─── Desktop Sidebar (flex flow, md and above) ─────── */}
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-      {/* Spacer div to push main content to the right of the fixed sidebar */}
+
+      {/* Spacer div to push main content right of the fixed sidebar (desktop only) */}
       <div
+        className="hidden md:block"
         style={{
           width: isCollapsed
             ? "var(--sidebar-collapsed-width)"
@@ -33,6 +59,105 @@ export default function SidebarWrapper() {
           flexShrink: 0,
         }}
       />
+
+      {/* ─── Mobile Sticky Top Navigation Bar ───────────────── */}
+      <MobileTopBar onOpenMenu={() => setIsMobileMenuOpen(true)} />
+
+      {/* ─── Mobile Off-Canvas Drawer ──────────────────────── */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out md:hidden shadow-2xl ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+      >
+        <Sidebar isCollapsed={false} setIsCollapsed={() => {}} mobile />
+      </div>
+
+      {/* ─── Mobile Backdrop (closes drawer on tap) ─────────── */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
+          aria-hidden="true"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
     </>
+  );
+}
+
+/**
+ * Mobile-only sticky header: hamburger drawer trigger, rank badge, and
+ * quick HP / Sylph status. Rendered only below the md breakpoint.
+ */
+function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
+  const { user } = useAuth();
+
+  const hp = Number(user?.hp ?? 0);
+  const maxHp = Number(user?.maxHp ?? 100);
+  const sylph = Number(user?.sylph ?? 0);
+  const streak = Number(user?.streakDays ?? 0);
+
+  return (
+    <header className="h-14 w-full flex items-center justify-between gap-2 px-3 md:hidden border-b border-border-subtle bg-background/80 backdrop-blur-md sticky top-0 z-30 shrink-0">
+      {/* Left: hamburger + rank badge */}
+      <div className="flex items-center gap-3 min-w-0">
+        <button
+          type="button"
+          onClick={onOpenMenu}
+          aria-label="Open navigation menu"
+          className="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg border border-border-subtle bg-bg-panel/70 text-text-primary hover:border-border-active transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <div className="min-w-0">
+          <p className="text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary truncate">
+            {user?.name || user?.username || "The System"}
+          </p>
+          <p className="text-[10px] font-mono text-text-muted truncate">
+            {user?.hunterRank || "E"}-Rank • Lv. {user?.level || 1}
+          </p>
+        </div>
+      </div>
+
+      {/* Right: quick status (streak / HP / Sylph) */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        <span
+          className="flex items-center gap-1 px-2 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-500 text-[10px] font-['Rajdhani'] font-bold"
+          title={`Weekly Streak: ${streak} week${streak === 1 ? "" : "s"}`}
+        >
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
+          <span>{streak}</span>
+        </span>
+
+        <span
+          className="flex items-center gap-1 px-2 py-1 rounded-full border border-red-500/30 bg-red-500/10 text-red-400 text-[10px] font-['Rajdhani'] font-bold"
+          title={`HP: ${hp}/${maxHp}`}
+        >
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13.35 20.13c-.76.69-1.93.69-2.69-.01l-3.7-3.22C3.86 14.09 2 12.06 2 9.6 2 6.24 4.7 3.5 8.02 3.5c1.65 0 3.13.7 4.16 1.8.5-.49 1.63-.78 2.34-.45 0 0 .95.23 1.7 1.05.27.29.5.62.66.98.32.7.47 1.48.47 2.32 0 1.06-.31 2.06-.85 2.93-.6.96-1.49 1.9-2.63 2.9l-3.52 3.1z" opacity="0.9" />
+          </svg>
+          <span>
+            {hp}/{maxHp}
+          </span>
+        </span>
+
+        <span
+          className="flex items-center gap-1 px-2 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-[10px] font-['Rajdhani'] font-bold"
+          title={`Sylph: ${sylph}`}
+        >
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z" />
+          </svg>
+          <span>{sylph}</span>
+        </span>
+      </div>
+    </header>
   );
 }

@@ -1,10 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { DayStudySummary } from "@/lib/study-schedule-service";
+import { DayStudySummary, GoalMilestone, FloatingRestDayStatus } from "@/lib/study-schedule-service";
+import { resolveGoalColor, formatGoalDeadline } from "@/lib/goal-theme";
 
 interface DayInspectionPanelProps {
   dayData: DayStudySummary | null;
+  milestones?: GoalMilestone[];
+  floatingRestStatus?: FloatingRestDayStatus | null;
+  onToggleFloatingRest?: () => void;
+  isTogglingFloatingRest?: boolean;
   onClose: () => void;
 }
 
@@ -20,6 +25,10 @@ function formatDuration(totalSeconds: number, totalMinutes: number): string {
 
 export default function DayInspectionPanel({
   dayData,
+  milestones = [],
+  floatingRestStatus = null,
+  onToggleFloatingRest,
+  isTogglingFloatingRest = false,
   onClose,
 }: DayInspectionPanelProps) {
   if (!dayData) return null;
@@ -42,12 +51,14 @@ export default function DayInspectionPanel({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+      initial={{ opacity: 0, y: 24, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 12, scale: 0.98 }}
+      exit={{ opacity: 0, y: 24, scale: 0.98 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="system-card p-6 sm:p-8 mt-6 relative overflow-hidden border border-border-subtle shadow-xl"
+      className="system-card p-4 sm:p-6 md:p-8 mt-6 relative overflow-y-auto border border-border-subtle shadow-xl z-50 fixed inset-x-0 bottom-0 max-h-[80vh] rounded-t-2xl pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:inset-x-auto md:bottom-auto md:max-h-none md:rounded-none md:overflow-hidden md:pb-8"
     >
+      {/* Mobile grab handle */}
+      <div className="md:hidden mx-auto mb-3 h-1 w-10 rounded-full bg-border-subtle shrink-0" />
       {/* Top Accent Line */}
       <div
         className="absolute top-0 left-0 right-0 h-1"
@@ -75,6 +86,15 @@ export default function DayInspectionPanel({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
                 Rest Day (Protected)
+              </span>
+            )}
+
+            {floatingRestStatus?.isFloatingRest && !dayData.isRestDay && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider bg-[var(--goal-amber-dim)] text-[var(--goal-amber-light)] border border-[var(--goal-amber-mid)]">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-2.21 0-4-.95-4-2s1.79-2 4-2 4 .95 4 2-1.79 2-4 2zm0 0v6m0 0a4 4 0 11-8 0 4 4 0 018 0zm8-6a4 4 0 11-8 0 4 4 0 018 0z" opacity="0.9" />
+                </svg>
+                Floating Rest (Protected)
               </span>
             )}
 
@@ -113,6 +133,64 @@ export default function DayInspectionPanel({
           </svg>
         </button>
       </div>
+
+      {/* Objective Milestone Banner (deadline landing on this day) */}
+      {milestones.length > 0 && (
+        <div className="mt-6 space-y-2.5">
+          {milestones.map((m) => {
+            const theme = resolveGoalColor(m.color);
+            return (
+              <div
+                key={m.id}
+                className="p-4 rounded-xl border flex items-center justify-between gap-3"
+                style={{
+                  background: theme.dim,
+                  borderColor: theme.mid,
+                }}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-white"
+                    style={{ background: theme.base }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zm12-2a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9a3 3 0 116 0" opacity="0.5" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold font-['Rajdhani'] truncate" style={{ color: theme.light }}>
+                      Milestone — {m.title}
+                    </p>
+                    <p className="text-xs text-text-muted font-['Rajdhani']">
+                      Objective deadline lands today · {formatGoalDeadline(m.targetDate)}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className="text-[0.65rem] font-mono font-bold px-2.5 py-1 rounded-full border shrink-0"
+                  style={{
+                    color: theme.light,
+                    background: "rgba(0,0,0,0.25)",
+                    borderColor: theme.mid,
+                  }}
+                >
+                  {theme.name.toUpperCase()}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Floating Rest Day Control (ad-hoc rest designation) */}
+      {floatingRestStatus && (
+        <FloatingRestDayControl
+          status={floatingRestStatus}
+          onToggle={onToggleFloatingRest}
+          isToggling={isTogglingFloatingRest}
+        />
+      )}
 
       {/* Metric Strip (4 Key Stats) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
@@ -276,7 +354,11 @@ export default function DayInspectionPanel({
               </div>
             ) : (
               <p className="text-xs text-text-muted italic">
-                No quests were scheduled on this calendar date.
+                {floatingRestStatus?.isFloatingRest
+                  ? "This is a floating rest day — scheduled quests were automatically shifted to the next active study day."
+                  : milestones.length > 0
+                  ? "No quests were scheduled on this calendar date — but an objective deadline lands today."
+                  : "No quests were scheduled on this calendar date."}
               </p>
             )}
           </div>
@@ -284,6 +366,7 @@ export default function DayInspectionPanel({
           <div className="space-y-2.5">
             {dayData.quests.map((q) => {
               const isDone = q.status === "COMPLETED";
+              const goalTheme = q.goal ? resolveGoalColor(q.goal.color) : null;
               return (
                 <div
                   key={q.id}
@@ -292,14 +375,20 @@ export default function DayInspectionPanel({
                       ? "bg-accent-green-dim/20 border-accent-green/30"
                       : "bg-bg-abyss border-border-subtle"
                   }`}
+                  style={{
+                    ...(goalTheme ? { borderLeft: `4px solid ${goalTheme.base}` } : {}),
+                  }}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center ${
                         isDone
                           ? "bg-accent-green text-white"
+                          : goalTheme
+                          ? "text-white"
                           : "bg-bg-shadow text-text-muted"
                       }`}
+                      style={!isDone && goalTheme ? { background: goalTheme.base } : undefined}
                     >
                       {isDone ? (
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -323,13 +412,32 @@ export default function DayInspectionPanel({
                         {q.title}
                       </p>
                       <p className="text-xs text-text-muted">
+                        {q.goal && (
+                          <span
+                            className="inline-flex items-center gap-1.5 mr-2 px-2 py-0.5 rounded-full text-[0.6rem] font-['Rajdhani'] font-bold uppercase tracking-wider border"
+                            style={{
+                              color: goalTheme?.light,
+                              background: goalTheme?.dim,
+                              borderColor: goalTheme?.mid,
+                            }}
+                          >
+                            <span
+                              className="w-1.5 h-1.5 rounded-full inline-block"
+                              style={{ background: goalTheme?.base }}
+                            />
+                            {q.goal.title}
+                          </span>
+                        )}
                         Target: {q.requiredMinutes}m • Difficulty: {q.difficulty}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-xs font-mono font-bold text-accent-gold">
+                    <span
+                      className="text-xs font-mono font-bold"
+                      style={{ color: goalTheme ? goalTheme.light : "var(--accent-gold)" }}
+                    >
                       +{q.xpReward} XP
                     </span>
                     <span
@@ -338,8 +446,15 @@ export default function DayInspectionPanel({
                           ? "bg-accent-green text-white"
                           : q.status === "IN_PROGRESS"
                           ? "bg-accent-primary text-white"
+                          : goalTheme
+                          ? ""
                           : "bg-bg-shadow text-text-muted border border-border-subtle"
                       }`}
+                      style={
+                        !isDone && q.status !== "IN_PROGRESS" && goalTheme
+                          ? { background: goalTheme.dim, color: goalTheme.light, border: `1px solid ${goalTheme.mid}` }
+                          : undefined
+                      }
                     >
                       {q.status.replace("_", " ")}
                     </span>
@@ -352,7 +467,7 @@ export default function DayInspectionPanel({
       </div>
 
       {/* Global Empty State (If zero activity and not a rest day) */}
-      {!hasActivity && !dayData.isRestDay && (
+      {!hasActivity && !dayData.isRestDay && !floatingRestStatus?.isFloatingRest && (
         <div className="mt-4 p-4 rounded-xl bg-bg-abyss/40 border border-border-subtle/50 text-center">
           <p className="text-xs text-text-muted">
             No study sessions or quests were recorded on this date.
@@ -360,5 +475,106 @@ export default function DayInspectionPanel({
         </div>
       )}
     </motion.div>
+  );
+}
+
+/**
+ * Floating Rest Day designation control.
+ *
+ *  - Active floating rest day  -> "Cancel Rest Day" (toggle off)
+ *  - Addable                   -> "Designate Floating Rest Day"
+ *  - Fixed rest day            -> disabled (already in weekly schedule)
+ *  - Weekly quota exhausted    -> disabled with "1/1 floating rest days
+ *                                 used this week" tooltip
+ */
+function FloatingRestDayControl({
+  status,
+  onToggle,
+  isToggling,
+}: {
+  status: FloatingRestDayStatus;
+  onToggle?: () => void;
+  isToggling: boolean;
+}) {
+  const amber = resolveGoalColor("AMBER");
+  const quotaLabel = `${status.weekUsage}/${status.weekQuota} floating rest days used this week`;
+  const isQuotaExhausted = status.weekUsage >= status.weekQuota;
+  const isActive = status.isFloatingRest;
+
+  let buttonLabel = "Designate Floating Rest Day";
+  let disabled = false;
+  let tooltip: string | null = null;
+  let tone: "add" | "cancel" | "disabled" = "add";
+
+  if (isActive) {
+    buttonLabel = "Cancel Rest Day";
+    tone = "cancel";
+  } else if (status.isFixedRest) {
+    buttonLabel = "Fixed Rest Day (weekly schedule)";
+    disabled = true;
+    tone = "disabled";
+    tooltip = "This date is already a fixed weekly rest day.";
+  } else if (isQuotaExhausted) {
+    buttonLabel = "Weekly Rest Day Limit Reached";
+    disabled = true;
+    tone = "disabled";
+    tooltip = quotaLabel;
+  }
+
+  return (
+    <div
+      className="mt-6 p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      style={{
+        background: isActive ? amber.dim : "rgba(5, 5, 15, 0.35)",
+        borderColor: isActive ? amber.mid : "var(--border-subtle)",
+      }}
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <div
+          className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center"
+          style={{ background: amber.dim, border: `1px solid ${amber.mid}` }}
+        >
+          <svg className="w-4 h-4" style={{ color: amber.light }} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4-.95-4-2s1.79-2 4-2 4 .95 4 2-1.79 2-4 2zm0 0v6m0 0a4 4 0 11-8 0 4 4 0 018 0zm8-6a4 4 0 11-8 0 4 4 0 018 0z" opacity="0.9" />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold font-['Rajdhani'] truncate" style={{ color: amber.light }}>
+            {isActive ? "Floating Rest Day Active" : "Ad-hoc Rest Day Designation"}
+          </p>
+          <p className="text-xs text-text-muted">
+            {isActive
+              ? `Rescued by the auto-cascade: quests shifted off ${status.dateKey}.`
+              : isQuotaExhausted && !status.isFixedRest
+              ? quotaLabel
+              : "Unplanned events, family dinners, or sickness — exempt from HP penalties and daily targets."}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        disabled={disabled || isToggling}
+        title={tooltip || undefined}
+        onClick={onToggle}
+        className={`px-4 py-2 rounded-lg text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shrink-0 ${
+          isToggling ? "opacity-60 cursor-wait" : ""
+        }`}
+        style={
+          tone === "cancel"
+            ? { background: amber.base, color: "#fff", border: `1px solid ${amber.light}` }
+            : tone === "add"
+            ? { background: amber.dim, color: amber.light, border: `1px dashed ${amber.mid}` }
+            : {
+                background: "var(--bg-shadow)",
+                color: "var(--text-muted)",
+                border: "1px solid var(--border-subtle)",
+                cursor: "not-allowed",
+              }
+        }
+      >
+        {isToggling ? "Updating..." : buttonLabel}
+      </button>
+    </div>
   );
 }

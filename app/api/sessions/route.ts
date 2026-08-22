@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
-import { calculateStreak, calculateWeeklyStreak, getWeeklyBounds, calculateWeeklyQuestReward, awardXP, calculateTimerSylph, getStreakMultiplier, getLongSessionMultiplier } from "@/lib/game-engine";
+import {
+  calculateWeeklyStreak,
+  getWeeklyBounds,
+  calculateWeeklyQuestReward,
+} from "@/lib/game-engine";
 import { invalidateRankingsCache } from "@/lib/cache-service";
+import { revalidateTag } from "next/cache";
+import { clampSessionSeconds } from "@/lib/session-math";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
@@ -15,13 +21,95 @@ const endSessionSchema = z.object({
   durationMinutes: z.number().int().min(0),
   durationSeconds: z.number().int().min(0).optional(),
   questId: z.number().int().optional(),
+  completeQuest: z.boolean().optional(),
+  final: z.boolean().optional(),
 });
+
+interface SessionRewardClaimInput {
+  userId: number;
+  sessionId: number;
+  xp: number;
+  sylph: number;
+  nodeId: number | null;
+  progressDelta: number;
+}
+
+interface SessionRewardClaimResult {
+  success: boolean;
+  xpGained: number;
+  sylphGained: number;
+  level: number;
+  currentXP: number;
+  xpToNextLevel: number;
+  hunterRank: string;
+  levelsGained: number;
+  didRankUp: boolean;
+  nodeProgress: number | null;
+  masteryGranted: boolean;
+}
+
+const EMPTY_SESSION_CLAIM: SessionRewardClaimResult = {
+  success: false,
+  xpGained: 0,
+  sylphGained: 0,
+  level: 1,
+  currentXP: 0,
+  xpToNextLevel: 282,
+  hunterRank: "E",
+  levelsGained: 0,
+  didRankUp: false,
+  nodeProgress: null,
+  masteryGranted: false,
+};
+
+/**
+ * Delegates XP/Sylph/node-progress mutations to the atomic,
+ * row-locked SECURITY DEFINER RPC claim_session_reward_atomic.
+ * ALREADY_CLAIMED (S0001) is absorbed into a no-op result so
+ * client retries never double-award and never hard-fail.
+ */
+async function claimSessionRewardAtomic(input: SessionRewardClaimInput): Promise<SessionRewardClaimResult> {
+  try {
+    const rows = await prisma.$queryRawUnsafe<
+      Array<{
+        claim_session_reward_atomic: {
+          success: boolean;
+          xpGained: number;
+          sylphGained: number;
+          level: number;
+          currentXP: number;
+          xpToNextLevel: number;
+          hunterRank: string;
+          levelsGained: number;
+          didRankUp: boolean;
+          nodeProgress: number | null;
+          masteryGranted: boolean;
+        };
+      }>
+    >(
+      `SELECT public.claim_session_reward_atomic($1::text, $2::text, $3::int, $4::int, $5::text, $6::numeric) AS claim_session_reward_atomic`,
+      String(input.userId),
+      String(input.sessionId),
+      input.xp,
+      input.sylph,
+      input.nodeId === null ? null : String(input.nodeId),
+      String(input.progressDelta)
+    );
+    const result = rows[0]?.claim_session_reward_atomic;
+    if (!result) throw new Error("claim_session_reward_atomic returned no result");
+    return result;
+  } catch (err: any) {
+    if (err?.code === "S0001" || /ALREADY_CLAIMED/.test(err?.message || "")) {
+      return { ...EMPTY_SESSION_CLAIM, success: true };
+    }
+    throw err;
+  }
+}
 
 /**
  * POST /api/sessions
  * Start a new study session. Optionally link it to a quest.
- */
-export async function POST(req: NextRequest) {
+ */export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -88,8 +176,8 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const { id, durationMinutes, durationSeconds, questId } = validation.data;
-    const actualSeconds = durationSeconds ?? (durationMinutes * 60);
+    const { id, durationMinutes, durationSeconds, questId, completeQuest, final } = validation.data;
+    const claimedSeconds = durationSeconds ?? durationMinutes * 60;
 
     // Verify session ownership
     const existing = await prisma.studySession.findFirst({
@@ -99,20 +187,155 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    // Execute atomic PostgreSQL complete_study_session RPC
+    // ─── SERVER-SIDE TIMESTAMP CLAMPING ───────────────────────
+    // The claimed duration can never exceed wall-clock elapsed time
+    // since session start (+ a small grace window). This defeats both
+    // unit-mismatch inflation (seconds passed as minutes) and spoofing.
+    const startedAtMs = new Date(existing.startedAt).getTime();
+    const actualSeconds = Number.isFinite(startedAtMs)
+      ? clampSessionSeconds(claimedSeconds, startedAtMs)
+      : Math.max(0, Math.floor(claimedSeconds || 0));
+    const actualMinutes = Math.floor(actualSeconds / 60);
+
+    // Execute atomic PostgreSQL complete_study_session RPC.
+    // The RPC performs exact delta accounting against the previously
+    // credited duration and awards canonical rewards only on final.
     const rows = await prisma.$queryRaw<
-      [{ complete_study_session: { sessionId: number; userId: number; durationMinutes: number; durationSeconds: number; xpGained: number; sylphGained: number; totalSylphEarned: number; level: number; currentXP: number; xpToNextLevel: number; hunterRank: string; levelsGained: number; didRankUp: boolean } }]
+      [{ complete_study_session: { sessionId: number; userId: number; durationMinutes: number; durationSeconds: number; deltaSeconds: number; awarded: boolean; xpGained: number; sylphGained: number; totalSylphEarned: number; level: number; currentXP: number; xpToNextLevel: number; hunterRank: string; levelsGained: number; didRankUp: boolean } }]
     >`
       SELECT public.complete_study_session(
         ${payload.userId as number},
         ${id},
-        ${durationMinutes},
+        ${actualMinutes},
         ${actualSeconds},
         ${questId ?? null},
         null,
-        80
+        80,
+        ${final === true}
       ) AS complete_study_session
     `;
+
+    const rpcResult = rows[0]?.complete_study_session;
+    const sessionDeltaSeconds = rpcResult?.deltaSeconds ?? 0;
+
+    // Reconcile Quest & Subject Node Progress.
+    // NOTE: the RPC has already added THIS flush's delta to
+    // Quest.elapsedSeconds — re-read the fresh value so completion
+    // checks and node-progress ratios never double-count.
+    if (questId) {
+      const quest = await prisma.quest.findFirst({
+        where: { id: Number(questId), userId: payload.userId as number },
+        include: {
+          subjectNode: {
+            select: {
+              id: true,
+              progress: true,
+              isMastered: true,
+              masteredAt: true,
+              spAward: true,
+              nodeId: true,
+              title: true,
+            },
+          },
+        },
+      });
+
+      if (quest && quest.status === "ACTIVE") {
+        const targetDuration = (quest.targetMinutes || quest.requiredMinutes || 45) * 60;
+        const totalQuestElapsed = quest.elapsedSeconds || 0;
+        const shouldComplete = completeQuest === true || totalQuestElapsed >= targetDuration;
+
+        if (shouldComplete) {
+          // 1. Atomic quest-reward claim via SECURITY DEFINER RPC:
+          //    XP + Sylph + node progress + level/rank recompute + ledgers
+          //    all happen inside one row-locked Postgres transaction.
+          const deltaProgress = Math.min(
+            100.0,
+            Math.max(5.0, Math.floor(quest.scopeWeight * 100))
+          );
+
+          const claimResult = await claimSessionRewardAtomic({
+            userId: payload.userId as number,
+            sessionId: id,
+            xp: quest.xpReward,
+            sylph: quest.sylphReward,
+            nodeId: quest.subjectNodeId ?? null,
+            progressDelta: deltaProgress,
+          });
+
+          // 2. Mark Quest as Completed (status only — elapsedSeconds was
+          //    already credited exactly by the RPC's delta accounting).
+          await prisma.quest.update({
+            where: { id: quest.id },
+            data: {
+              status: "COMPLETED",
+              completedAt: new Date(),
+            },
+          });
+
+          // 3. Reward & mastery announcements
+          await prisma.systemMessage.create({
+            data: {
+              userId: payload.userId as number,
+              type: "REWARD",
+              content: `**🏆 QUEST COMPLETED: ${quest.title}**\n\nTarget Duration: ${quest.targetMinutes || quest.requiredMinutes || 45} mins.\n\nRewards Claimed: **+${quest.xpReward} XP** • **+${quest.sylphReward} Sylph**.`,
+            },
+          });
+
+          if (claimResult.masteryGranted && quest.subjectNode) {
+            await prisma.systemMessage.create({
+              data: {
+                userId: payload.userId as number,
+                type: "REWARD",
+                content: `**🎯 SYLLABUS NODE MASTERED: ${quest.subjectNode.title}**\n\nYou achieved 100% mastery on node **${quest.subjectNode.nodeId}**!\n\nReward Minted: **+${quest.subjectNode.spAward} Subject SP**.`,
+              },
+            });
+          }
+
+          const username = (
+            await prisma.user.findUnique({
+              where: { id: payload.userId as number },
+              select: { username: true },
+            })
+          )?.username;
+          if (username) {
+            try {
+              revalidateTag(`user-${username.toLowerCase()}`, "max");
+              revalidateTag(`profile-stats-${username.toLowerCase()}`, "max");
+            } catch {}
+          }
+        } else {
+          // Quest is NOT completed yet. elapsedSeconds was already credited
+          // exactly by the RPC (delta accounting) — advance the syllabus node
+          // proportionally to THIS flush's delta only.
+          if (quest.subjectNodeId && quest.subjectNode) {
+            const node = quest.subjectNode;
+            const completionRatio = Math.min(1.0, sessionDeltaSeconds / targetDuration);
+            const rawDelta = Math.floor(quest.scopeWeight * 100 * completionRatio);
+            const deltaProgress = sessionDeltaSeconds >= 30 ? Math.min(100.0, Math.max(1.0, rawDelta)) : 0;
+
+            const claimResult = await claimSessionRewardAtomic({
+              userId: payload.userId as number,
+              sessionId: id,
+              xp: 0,
+              sylph: 0,
+              nodeId: node.id,
+              progressDelta: deltaProgress,
+            });
+
+            if (claimResult.masteryGranted) {
+              await prisma.systemMessage.create({
+                data: {
+                  userId: payload.userId as number,
+                  type: "REWARD",
+                  content: `**🎯 SYLLABUS NODE MASTERED: ${node.title}**\n\nYou achieved 100% mastery on node **${node.nodeId}**!\n\nReward Minted: **+${node.spAward} Subject SP**.`,
+                },
+              });
+            }
+          }
+        }
+      }
+    }
 
     // Handle weekly milestone check
     const user = await prisma.user.findUnique({

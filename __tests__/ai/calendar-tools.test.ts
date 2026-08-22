@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { executeChatTool } from "../../lib/ai/chat-tool-executor";
 import { prisma } from "../../lib/prisma";
 import { calculateDailyCapacity } from "../../lib/ai/planning-engine";
+import { StudyScheduleService } from "../../lib/study-schedule-service";
 
 vi.mock("../../lib/prisma", () => ({
   prisma: {
@@ -115,6 +116,31 @@ describe("Phase 3A: Calendar Tools", () => {
         where: { id: 100 },
         data: { scheduledFor: "2026-08-05" }
       });
+    });
+
+    it("blocks moving a quest onto a floating rest day with a repath hint", async () => {
+      vi.spyOn(StudyScheduleService, "isUserRestDay").mockResolvedValueOnce(true);
+      vi.mocked(prisma.quest.findUnique).mockResolvedValue(mockQuest as any);
+
+      const res = await executeChatTool("moveQuest", { questId: 100, targetDate: "2026-08-05" }, userId);
+
+      expect(res.error).toContain("REST_DAY_BLOCKED");
+      expect(res.error).toContain("active study day");
+      expect(prisma.quest.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("createQuestTool", () => {
+    it("blocks AI quest creation on a designated rest day", async () => {
+      vi.spyOn(StudyScheduleService, "isUserRestDay").mockResolvedValueOnce(true);
+
+      const res = await executeChatTool(
+        "createQuest",
+        { title: "Physics Set B", requiredMinutes: 60, scheduledFor: "2026-08-25" },
+        userId
+      );
+
+      expect(res.error).toContain("REST_DAY_BLOCKED");
     });
   });
 

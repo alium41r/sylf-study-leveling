@@ -1,3 +1,4 @@
+/** @vitest-environment jsdom */
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
@@ -59,9 +60,23 @@ function TestConsumer() {
   );
 }
 
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => { store[key] = value.toString(); },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { store = {}; },
+  };
+})();
+if (typeof window !== "undefined") {
+  Object.defineProperty(window, "localStorage", { value: localStorageMock, writable: true });
+}
+Object.defineProperty(global, "localStorage", { value: localStorageMock, writable: true });
+
 describe("Focus Tools Dock & Expandable Window System", () => {
   beforeEach(() => {
-    localStorage.clear();
+    localStorageMock.clear();
     vi.clearAllMocks();
 
     global.fetch = vi.fn().mockImplementation(async (url: any) => {

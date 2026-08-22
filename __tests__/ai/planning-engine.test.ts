@@ -24,7 +24,10 @@ vi.mock("../../lib/prisma", () => ({
     },
     goal: {
       findFirst: vi.fn(),
-    }
+    },
+    floatingRestDay: {
+      findMany: vi.fn(),
+    },
   }
 }));
 
@@ -86,8 +89,8 @@ describe("Planning Engine", () => {
 
     it("detects overloaded when scheduled minutes > 90% capacity", async () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue({ hp: 100, streakDays: 5 } as any);
-      // NORMAL effort = 60/day. 7 days = 420. 90% = 378.
-      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 400 } } as any);
+      // NORMAL effort = 120/day. 7 days = 840. 90% = 756.
+      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 760 } } as any);
       const { getSituationalFlags } = await import("../../lib/ai/planning-engine");
       const flags = await getSituationalFlags(1);
       expect(flags.isOverloaded).toBe(true);
@@ -131,8 +134,8 @@ describe("Planning Engine", () => {
 
     it("boundary: exactly 90% capacity is not overloaded", async () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue({ hp: 100, streakDays: 5 } as any);
-      // NORMAL effort = 60/day. 7 days = 420. 90% = 378.
-      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 378 } } as any);
+      // NORMAL effort = 120/day. 7 days = 840. 90% = 756.
+      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 756 } } as any);
       const { getSituationalFlags } = await import("../../lib/ai/planning-engine");
       const flags = await getSituationalFlags(1);
       expect(flags.isOverloaded).toBe(false);
@@ -140,7 +143,7 @@ describe("Planning Engine", () => {
 
     it("boundary: just above 90% capacity is overloaded", async () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue({ hp: 100, streakDays: 5 } as any);
-      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 379 } } as any);
+      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 757 } } as any);
       const { getSituationalFlags } = await import("../../lib/ai/planning-engine");
       const flags = await getSituationalFlags(1);
       expect(flags.isOverloaded).toBe(true);
@@ -177,7 +180,7 @@ describe("Planning Engine", () => {
 
     it("boundary: simultaneous burnout and overload", async () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue({ hp: 20, streakDays: 5 } as any); // Burnout
-      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 400 } } as any); // Overload
+      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 760 } } as any); // Overload
       const { getSituationalFlags } = await import("../../lib/ai/planning-engine");
       const flags = await getSituationalFlags(1);
       expect(flags.isBurnoutRisk).toBe(true);
@@ -198,7 +201,7 @@ describe("Planning Engine", () => {
       vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 0 } } as any);
       
       const matrix = await calculateDailyCapacity(1, "NORMAL", "2026-08-01", "2026-08-03");
-      const budget = EFFORT_CONFIG["NORMAL"].dailyMinutes; // 60
+      const budget = EFFORT_CONFIG["NORMAL"].dailyMinutes; // 120
       
       expect(matrix).toEqual({
         "2026-08-01": budget,
@@ -217,12 +220,12 @@ describe("Planning Engine", () => {
       vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 0 } } as any);
       
       const matrix = await calculateDailyCapacity(1, "INTENSE", "2026-08-01", "2026-08-03");
-      const budget = EFFORT_CONFIG["INTENSE"].dailyMinutes; // 90
+      const budget = EFFORT_CONFIG["INTENSE"].dailyMinutes; // 240
       
       expect(matrix).toEqual({
-        "2026-08-01": 50, // 90 - 40
-        "2026-08-02": 30, // 90 - 60
-        "2026-08-03": 90, // empty
+        "2026-08-01": 200, // 240 - 40
+        "2026-08-02": 180, // 240 - 60
+        "2026-08-03": 240, // empty
       });
     });
 
@@ -236,7 +239,7 @@ describe("Planning Engine", () => {
       
       const matrix = await calculateDailyCapacity(1, "RELAXED", "2026-08-01", "2026-08-01");
       
-      expect(matrix["2026-08-01"]).toBe(0); // 30 - 120 -> 0
+      expect(matrix["2026-08-01"]).toBe(0); // 60 - 120 -> 0
     });
 
     it("does not silently stack burnout and overload reductions (prioritizes burnout 50%)", async () => {
@@ -248,10 +251,31 @@ describe("Planning Engine", () => {
       vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 400 } } as any); 
       
       const matrix = await calculateDailyCapacity(1, "NORMAL", "2026-08-01", "2026-08-01");
-      const budget = EFFORT_CONFIG["NORMAL"].dailyMinutes; // 60
+      const budget = EFFORT_CONFIG["NORMAL"].dailyMinutes; // 120
       
-      // Should be Math.floor(60 * 0.5) = 30. Not (60 * 0.5 * 0.75) = 22.
-      expect(matrix["2026-08-01"]).toBe(30); 
+      // Should be Math.floor(120 * 0.5) = 60. Not (120 * 0.5 * 0.75) = 45.
+      expect(matrix["2026-08-01"]).toBe(60); 
+    });
+
+    it("hard-blocks floating rest days in the capacity matrix", async () => {
+      vi.mocked(prisma.quest.findMany).mockResolvedValueOnce([]);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        hp: 100,
+        streakDays: 5,
+        restDays: [],
+      } as any);
+      vi.mocked(prisma.goal.findFirst).mockResolvedValue({ effortLevel: "NORMAL" } as any);
+      vi.mocked(prisma.quest.aggregate).mockResolvedValue({ _sum: { requiredMinutes: 0 } } as any);
+      // 2026-08-02 is designated a floating rest day
+      vi.mocked(prisma.floatingRestDay.findMany).mockResolvedValueOnce([
+        { dateKey: "2026-08-02" },
+      ] as any);
+
+      const matrix = await calculateDailyCapacity(1, "NORMAL", "2026-08-01", "2026-08-03");
+
+      expect(matrix["2026-08-02"]).toBe(-999999); // no capacity on floating rest days
+      expect(matrix["2026-08-01"]).toBe(120);
+      expect(matrix["2026-08-03"]).toBe(120);
     });
   });
 

@@ -35,12 +35,17 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["sys_ranks", "eco_sylph", "sys_stats"],
     content: [
-      { type: "p", text: "The System quantifies your academic and focus growth through Experience Points (XP). XP is earned by completing study sessions on the Focus Timer, finishing daily and weekly Quests, and unlocking Achievements." },
-      { type: "p", text: "As your XP fills the required threshold for your current level, you automatically Level Up. Each level up increases your maximum capacity, unlocks new cosmetic rewards, and awards a direct Sylph currency bonus." },
-      { type: "h3", text: "XP Calculation & Curve" },
-      { type: "p", text: "The required XP to advance from one level to the next follows a gentle exponential progression: XP = floor(200 × Level^1.2). Early levels feel swift and motivating, while higher tiers demand sustained academic consistency." },
-      { type: "h3", text: "XP Boost Multipliers" },
-      { type: "p", text: "You can temporarily amplify your XP acquisition rate by activating consumable boosts from the System Shop, such as the 24-hour XP Boost (1.5× multiplier)." }
+      { type: "p", text: "The System measures your growth through Experience Points (XP). You earn XP naturally by studying — finishing focus sessions on the Timer, completing Quests, and unlocking Achievements." },
+      { type: "p", text: "As your XP bar fills, you automatically Level Up. Each level-up raises your standing, unlocks new cosmetic rewards and shop items, and hands you a Sylph currency bonus as a gift." },
+      { type: "h3", text: "How it Feels" },
+      { type: "p", text: "Early levels come quickly so you feel the momentum of your new habit. Higher levels demand real consistency — the bar simply takes longer to fill the further you climb. There are no tricks: only study time and completed quests move it." },
+      { type: "h3", text: "Ways to Earn XP" },
+      { type: "list", items: [
+        "Focus sessions: the longer you focus, the more XP you earn.",
+        "Quests: every completed quest pays out its listed XP bounty.",
+        "Achievements: milestone rewards from the Achievements codex.",
+        "The weekly 3-hour milestone pays a large level-scaled XP reward."
+      ]}
     ]
   },
   {
@@ -50,34 +55,41 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["sys_leveling", "sys_classes"],
     content: [
-      { type: "p", text: "While Levels measure cumulative time and effort, your Hunter Rank represents your overall academic standing and tier within the System. Every user awakens as an E-Rank Hunter and ascends through higher tiers as their level increases." },
-      { type: "h3", text: "Rank Tiers & Thresholds" },
+      { type: "p", text: "While your Level measures raw progress, your Hunter Rank is your title — the badge everyone sees next to your name. Every scholar awakens as an E-Rank Hunter and climbs the ladder as their level rises." },
+      { type: "h3", text: "The Rank Ladder" },
       { type: "list", items: [
-        "E-Rank: Level 1 – 5 (The Awakening tier; fundamental access to timers and quests).",
-        "D-Rank: Level 6 – 12 (Established habit formation and routine focus).",
-        "C-Rank: Level 13 – 20 (Seasoned scholar tier with expanded capabilities).",
-        "B-Rank: Level 21 – 30 (Advanced focus discipline and high-tier status).",
-        "A-Rank: Level 31 – 45 (Elite academic status granting access to prestigious titles and cosmetics).",
-        "S-Rank: Level 46+ (The pinnacle of the System, reflecting master-level focus mastery)."
-      ]}
+        "E-Rank — Level 1+ (The Awakening. Everyone starts here.)",
+        "D-Rank — Level 10+ (Habit is forming; the grind becomes routine.)",
+        "C-Rank — Level 25+ (A seasoned scholar with real standing.)",
+        "B-Rank — Level 50+ (Advanced discipline. High-tier status.)",
+        "A-Rank — Level 75+ (Elite. Prestigious titles and cosmetics unlock.)",
+        "S-Rank — Level 100+ (Master-level focus mastery.)",
+        "National Hunter — Level 125+ (Among the best in the country.)",
+        "Monarch — Level 150+ (The apex. The shadow monarch of scholars.)"
+      ]},
+      { type: "p", text: "Ranks aren't just for show — stronger shop gear, titles, and frames open up as you rise. Your rank badge appears on your profile, the leaderboards, and your friends' screens." }
     ]
   },
   {
     id: "sys_classes",
     categoryId: "The System",
-    title: "Scholar Classes & Archetypes",
+    title: "Scholar Archetypes",
     requirement: { type: "NONE" },
-    related: ["sys_ranks", "inv_character", "sys_stats"],
+    related: ["sys_ranks", "sys_skilltree", "sys_stats"],
     content: [
-      { type: "p", text: "During onboarding or via character customization, you can align with a Scholar Class that reflects your primary study discipline and personality." },
-      { type: "h3", text: "Available Classes" },
+      { type: "p", text: "Every scholar has a study personality. The System models eight Archetypes — eight different ways of approaching learning — each with its own branch of the Skill Tree and its own bonuses." },
+      { type: "h3", text: "The Eight Archetypes" },
       { type: "list", items: [
-        "Scholar: Balanced intellectual with an affinity for deep reading and conceptual mastery.",
-        "Alchemist: Experimental mindset focused on synthesis, research, and technical sciences.",
-        "Shadow Scholar: Stealth focus master specializing in solitary, uninterrupted deep work.",
-        "Monarch: High-stamina focus leader driven by ambitious milestones and large workloads."
+        "Scholar — The reader. Bonuses to revision, review loops, and deep reading.",
+        "Analyst — The problem-solver. Earns extra Sylph on math and quantitative work.",
+        "Engineer — The organizer. Bonus rewards for staying on schedule and batch tasks.",
+        "Scientist — The rigor chaser. Extra XP for high-difficulty STEM work.",
+        "Researcher — The deep-diver. Bonuses for long, unbroken focus sessions.",
+        "Psychologist — The balanced one. Resists burnout and protects your mind.",
+        "Strategist — The planner. Bonus rewards for forecasting milestones.",
+        "Creative — The wildcard. Bonuses for cross-discipline and unusual study."
       ]},
-      { type: "p", text: "Your active class influences your default avatar sprite, profile badges, and initial stat allocations." }
+      { type: "p", text: "You don't lock yourself in forever — the Skill Tree lets you invest points into any archetype you like, mixing perks to match your study style." }
     ]
   },
   {
@@ -87,14 +99,15 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["sys_leveling", "focus_timer"],
     content: [
-      { type: "p", text: "The System models your cognitive development across five core attributes visible on your Scholar Profile:" },
+      { type: "p", text: "The System tracks your growth across five core attributes, shown on your Scholar Profile:" },
       { type: "list", items: [
-        "Endurance: Reflects your ability to sustain long focus sessions without fatigue.",
-        "Tenacity: Measures consistency in maintaining streaks and overcoming difficult tasks.",
-        "Velocity: Tracks focus efficiency and task completion speed.",
-        "Synthesis: Gauges conceptual retention and diverse subject mastery.",
-        "Discipline: Demonstrates regular adherence to daily study targets and scheduled quests."
-      ]}
+        "Endurance: Your ability to sustain long focus sessions without fatigue.",
+        "Tenacity: How consistently you hold streaks and push through hard tasks.",
+        "Velocity: How quickly you power through tasks and clear quests.",
+        "Synthesis: How well you retain concepts across subjects.",
+        "Discipline: How reliably you hit your daily targets and schedules."
+      ]},
+      { type: "p", text: "These attributes grow with real behaviour — long sessions build Endurance, consistent weeks build Tenacity. Think of them as your report card of habits, written by the System." }
     ]
   },
 
@@ -106,11 +119,16 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["focus_subjects", "focus_streak", "eco_sylph"],
     content: [
-      { type: "p", text: "The Focus Timer is the core engine for logging focused study time. It features a distraction-free full-screen mode, real-time stopwatch and countdown modes, ambient audio alerts, and live pause/resume handling." },
-      { type: "h3", text: "Live Session Tracking" },
-      { type: "p", text: "When you start a focus session, the System records an active session timestamp. Friends and study partners can view your live study status in real time on the Social Hub." },
-      { type: "h3", text: "Cumulative Daily Focus" },
-      { type: "p", text: "The Study Timer page displays a unified Daily Focus clock that aggregates time spent across all active Quests and academic Subjects today." }
+      { type: "p", text: "The Focus Timer is where the work happens. Start a session from any subject or quest and it runs distraction-free — a big, clean timer with nothing else pulling your attention." },
+      { type: "h3", text: "Modes" },
+      { type: "list", items: [
+        "Free Flow: a simple stopwatch — study for as long as you want.",
+        "Pomodoro: classic focus/break cycles with session dots.",
+        "Deep Work: one long, protected block in fullscreen.",
+        "Sprint: short bursts with quick rests between them."
+      ]},
+      { type: "h3", text: "While You Study" },
+      { type: "p", text: "You can pull up the Tools dock for a calculator, scratchpad, formula sheet, ambient audio, or the in-session tutor — without ever leaving the timer. In Light Mode, a one-tap Eye-Comfort dimmer softens the screen for night studying." }
     ]
   },
   {
@@ -120,25 +138,34 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["focus_timer", "qst_overview"],
     content: [
-      { type: "p", text: "Organize your study goals by creating dedicated Subjects (e.g., Mathematics, Computer Science, Organic Chemistry, Literature). Each subject tracks its own cumulative study hours and daily progress." },
-      { type: "p", text: "Starting a focus session directly from a subject card links the logged time to that discipline, allowing you to monitor where your effort is invested over time." }
+      { type: "p", text: "Organize your study by creating Subjects — Mathematics, Physics, Chemistry, Literature, whatever you're tackling. Each subject tracks its own total hours and daily progress." },
+      { type: "p", text: "The System can also compile a full 48-topic syllabus for a subject (mapped to your Skill Tree). Once it exists, every quest you finish on a topic pushes that topic toward mastery." }
     ]
   },
   {
     id: "focus_streak",
     categoryId: "Focus & Study",
-    title: "Daily & Weekly Streaks",
+    title: "Streaks & Weekly Milestones",
     requirement: { type: "NONE" },
-    related: ["focus_timer", "qst_weekly", "inv_items"],
+    related: ["focus_timer", "qst_weekly", "inv_shop"],
     content: [
-      { type: "p", text: "Consistency is rewarded through two parallel streak systems:" },
-      { type: "list", items: [
-        "Daily Streak: Increments each day you log at least one focus session. Missing a day resets the counter to 0.",
-        "Weekly Streak: Increments each week you complete your 3-hour Weekly Focus target (Monday to Sunday)."
-      ]},
-      { type: "h3", text: "Streak Multipliers" },
-      { type: "p", text: "Consecutive weekly streaks provide exponential Sylph bonuses: 1 week = 1.05×, 2 weeks = 1.15×, 4 weeks = 1.3×, and 8+ weeks = 1.5× Sylph multiplier on all earnings." },
-      { type: "p", text: "Equipping a 'Streak Freeze' from your inventory protects your streak from resetting if life interruptions prevent studying." }
+      { type: "p", text: "Consistency is the whole game. The System rewards it with a Weekly Streak: log 3 hours of focus between Monday and Sunday and your streak grows by one week." },
+      { type: "h3", text: "Streak Rewards" },
+      { type: "p", text: "Longer streaks mean richer payouts — every week your streak grows, your Sylph earnings are multiplied a little more, all the way up to a hefty 1.5× bonus." },
+      { type: "p", text: "Life happens. If a brutal week breaks your rhythm, a Streak Freeze item from the shop absorbs the hit and keeps your streak alive." }
+    ]
+  },
+  {
+    id: "focus_rest",
+    categoryId: "Focus & Study",
+    title: "Rest Days & Recovery",
+    requirement: { type: "NONE" },
+    related: ["focus_timer", "focus_streak", "qst_ai_planner"],
+    content: [
+      { type: "p", text: "Rest is part of the build. You can mark days of the week as permanent Rest Days in your calendar, and the System will never schedule quests on them or penalize you for taking them off." },
+      { type: "h3", text: "Floating Rest Days" },
+      { type: "p", text: "For unplanned days — a family dinner, a sickness, an emergency — you get one Floating Rest Day per week. Tap any date on the calendar and designate it. Any quests on that day automatically slide to the next available day, and the day is fully protected: no HP loss, no broken streak." },
+      { type: "p", text: "Rest days are walls the System refuses to cross — no quest, manual or automatic, will ever land on one." }
     ]
   },
 
@@ -146,17 +173,18 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
   {
     id: "qst_overview",
     categoryId: "Quests & AI",
-    title: "System Quests & Bounties",
+    title: "Quests & Bounties",
     requirement: { type: "NONE" },
     related: ["qst_weekly", "qst_ai_planner", "eco_sylph"],
     content: [
-      { type: "p", text: "Quests are actionable study objectives designed to break down large workloads into achievable goals. Completing a quest grants XP, Sylph, and progress toward quest-based achievements." },
+      { type: "p", text: "Quests are your study tasks, broken into bite-sized missions. Each one has a target time, a difficulty rating, and an XP + Sylph bounty. Finish it, claim the rewards, watch the bars move." },
       { type: "h3", text: "Quest Types" },
       { type: "list", items: [
-        "Daily Quests: Recurring micro-tasks generated based on your effort level (Relaxed, Normal, Intense, Extreme).",
-        "Scheduled Quests: Tasks assigned to specific calendar dates with target focus durations.",
-        "Custom Quests: User-created objectives tailored to specific exams, assignments, or reading chapters."
-      ]}
+        "Scheduled Quests: planned tasks on specific dates with target durations.",
+        "AI-Planned Quests: study plans generated from your syllabus and deadlines.",
+        "Custom Quests: your own tasks — create one anytime from the Quest Log."
+      ]},
+      { type: "p", text: "Quests can be linked to a Goal (and inherit its color), to a subject topic for skill-tree progress, or stand alone. Difficulty (Easy → Expert) decides the bounty." }
     ]
   },
   {
@@ -166,24 +194,26 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["focus_streak", "qst_overview"],
     content: [
-      { type: "p", text: "Every Monday at 00:00 UTC, the System activates your Weekly Focus Quest: log at least 3 hours (180 minutes) of focus study before Sunday midnight." },
-      { type: "p", text: "Meeting the milestone awards substantial level-scaled XP and Sylph currency, while advancing your Weekly Streak multiplier." }
+      { type: "p", text: "Every week the System issues one big mission: 3 hours of focused study between Monday and Sunday midnight." },
+      { type: "p", text: "Hit it and the payout is serious — a level-scaled XP bomb plus a Sylph bonus — and your Weekly Streak ticks up one, supercharging future earnings." }
     ]
   },
   {
     id: "qst_ai_planner",
     categoryId: "Quests & AI",
-    title: "AI Study Intelligence & Agents",
+    title: "The System's Study Assistant",
     requirement: { type: "NONE" },
-    related: ["qst_overview", "focus_subjects"],
+    related: ["qst_overview", "focus_subjects", "focus_rest"],
     content: [
-      { type: "p", text: "The System incorporates specialized AI agents powered by Gemini and Groq to assist your academic journey:" },
+      { type: "p", text: "A quiet AI assistant works behind the scenes of The System. You don't need to know how it works — just what it does for you:" },
+      { type: "h3", text: "What It Does" },
       { type: "list", items: [
-        "Planner Agent: Automatically breaks complex subjects into structured daily study quests with realistic time budgets.",
-        "Coach Agent: Analyzes study trends, highlights areas of improvement, and provides strategic motivation.",
-        "Analyst Agent: Evaluates your focus velocity, subject balance, and stamina curves over time.",
-        "Daily Briefing: Generates a concise daily overview of your scheduled tasks, current streak, and recommended priorities each morning."
-      ]}
+        "Plans your syllabus: give it an exam date and it splits the work into sensible daily quests.",
+        "Respects your life: it never schedules on your rest days and shrinks the workload if you're burning out.",
+        "Writes your morning briefing: each day starts with a short message summarizing yesterday and telling you what matters today.",
+        "Tutors you mid-session: stuck on a problem in the Focus Room? The assistant explains it step by step, with clean math formatting."
+      ]},
+      { type: "p", text: "You can also just talk to it from the chat — ask about your stats, move quests, set goals, or ask study advice. It can only do what the game allows; it can never cheat your XP or wipe your data without asking you first." }
     ]
   },
 
@@ -195,34 +225,57 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["inv_shop", "sys_leveling", "ach_system"],
     content: [
-      { type: "p", text: "Sylph is the universal energy currency of the System, representing crystallized academic effort." },
+      { type: "p", text: "Sylph is the currency of The System — crystallized effort. You earn it from almost everything you do, and you spend it in the Shop on items, cosmetics, and protection." },
       { type: "h3", text: "Earning Sylph" },
       { type: "list", items: [
-        "Focus Timer: Earn Sylph proportional to your logged study minutes.",
-        "Quests: Claim bounties upon successfully completing daily and weekly quests.",
-        "Level Ups: Receive a bonus of (Level × 300) Sylph each time you ascend.",
-        "Achievements: Claim milestone awards from the Achievements codex."
+        "Focus Timer: every studied minute pays Sylph.",
+        "Quests: each completed bounty includes a Sylph payout.",
+        "Level Ups: every level grants a bonus gift of Sylph.",
+        "Achievements: milestone rewards from the codex."
       ]},
-      { type: "p", text: "All Sylph earnings and expenditures are tracked in your personal Sylph Ledger with complete transaction history." }
+      { type: "p", text: "Every single Sylph you earn or spend is written into your personal ledger — a full transaction history you can always check." }
     ]
   },
   {
     id: "inv_shop",
     categoryId: "Economy & Shop",
-    title: "The System Shop & Inventory",
+    title: "The Shop & Consumables",
     requirement: { type: "NONE" },
-    related: ["eco_sylph", "inv_items"],
+    related: ["eco_sylph", "inv_equipment"],
     content: [
-      { type: "p", text: "The System Shop allows scholars to spend earned Sylph on consumable items and gameplay aids. Purchased items are added to your Inventory and can be activated at any time." },
-      { type: "h3", text: "Catalog of Functional Items" },
+      { type: "p", text: "The System Shop sells functional items with real in-game effects. Buy them with Sylph and activate them when you need them." },
+      { type: "h3", text: "Popular Items" },
       { type: "list", items: [
-        "Weekly Streak Freeze: Shields your weekly streak if you are unable to fulfill the 3-hour requirement.",
-        "XP Multiplier Boost (24h): Multiplies all XP gains by 1.5× for 24 hours.",
-        "Sylph Multiplier Boost (24h): Multiplies all Sylph yield by 1.5× for 24 hours.",
-        "Kamish's Ward: Emergency protection negating penalty damage.",
-        "Elixir of Insight: Instantly restores focus vitality.",
-        "Gate Key: High-risk dungeon item doubling rewards."
-      ]}
+        "Streak Freeze: protects your weekly streak if a week goes sideways.",
+        "XP Boost (24h): multiplies all XP earned for a full day.",
+        "Sylph Boost (24h): multiplies Sylph earnings for a full day.",
+        "HP Potions: restore lost Health after missed goals.",
+        "Kamish's Ward: a shield that absorbs quest-failure damage.",
+        "Gate Key: doubles a quest's risk — and its reward.",
+        "Elixir of Insight: instantly refreshes your focus state."
+      ]},
+      { type: "p", text: "Some items trigger automatically (like the Streak Freeze); others you activate from your inventory before a session." }
+    ]
+  },
+  {
+    id: "inv_equipment",
+    categoryId: "Economy & Shop",
+    title: "Armour & Equipment",
+    requirement: { type: "NONE" },
+    related: ["inv_character", "sys_ranks", "eco_sylph"],
+    content: [
+      { type: "p", text: "Beyond consumables, the Shop sells real equipment your character wears into battle — visually and mechanically." },
+      { type: "h3", text: "Equipment Slots" },
+      { type: "list", items: [
+        "Helmet: headgear from scholar caps to hunter visors.",
+        "Chestplate: the main armour piece that defines your silhouette.",
+        "Pants: lower-body gear completing the set.",
+        "Boots: footwear, from sneakers to shadow boots.",
+        "Weapon: your tool of focus — grimoires, staves, blades.",
+        "Relic: a powerful accessory slot for rare artifacts."
+      ]},
+      { type: "h3", text: "Rarity & Requirements" },
+      { type: "p", text: "Gear comes in rarities — Common, Rare, Epic, Legendary, and Mythic — and stronger gear demands a higher Hunter Rank. Everything you equip appears live on your character in the Locker, on your profile, and in your friends' social cards." }
     ]
   },
 
@@ -234,31 +287,51 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["inv_character", "sys_ranks"],
     content: [
-      { type: "p", text: "Personalize your System interface with unlockable aesthetic cosmetics earned through leveling and milestone progression:" },
+      { type: "p", text: "Make the System yours. Cosmetic unlocks personalize your whole experience without affecting gameplay balance:" },
       { type: "list", items: [
-        "Interface Themes: Cyber Shadow, Monochromatic Slate, Bioluminescent Monarch, and High-Contrast Light Mode.",
-        "Awakened Auras: Ambient animated particle glows encircling your scholar card (e.g., Azure Flame, Shadow Monarch, Cyber Visor).",
-        "Avatar Frames: High-tech bordered frames for your profile picture.",
-        "Titles: Prestigious titles (e.g., Novice, Shadow Monarch, Grandmaster Scholar) displayed next to your username.",
-        "Glowing Name Colors: Custom chromatic hues for your scholar ID."
+        "Interface Themes: recolor the entire app (Cyberpunk, Emerald, Sakura, Crimson, and more).",
+        "Awakened Auras: animated glows that surround your scholar card.",
+        "Avatar Frames: decorative borders for your profile picture.",
+        "Titles: badges of honour shown next to your name (Novice → Shadow Monarch).",
+        "Name Colors: customize the hue of your scholar ID."
       ]}
     ]
   },
   {
     id: "inv_character",
     categoryId: "Customization",
-    title: "Avatar & Sprite Customizer",
+    title: "The Character Studio",
     requirement: { type: "NONE" },
-    related: ["inv_cosmetics", "sys_classes"],
+    related: ["inv_equipment", "inv_cosmetics", "sys_classes"],
     content: [
-      { type: "p", text: "Craft your unique scholar avatar using the built-in 2D pixel/vector sprite customizer:" },
+      { type: "p", text: "The Character Studio is where your scholar avatar comes to life. Build your look piece by piece on a live stage, and it follows you everywhere — profile, social cards, leaderboards, friends' screens." },
+      { type: "h3", text: "What You Can Customize" },
       { type: "list", items: [
-        "Skin Tones: Fair, Pale, Olive, Caramel, Espresso, and Astral.",
-        "Hair Styles & Colors: Crop, Undercut, Spiky, Flowing, and Wavy in Midnight Black, Platinum, Purple, and Crimson.",
-        "Attire: Scholar Robes, Techwear Armor, Stealth Uniform, and Formal Academic Wear.",
-        "Eyewear & Accessories: Cyber Visors, Reading Spectacles, Headbands, and Ear pieces."
+        "Appearance: skin tones, hair styles and colors, eyewear and accessories.",
+        "Attire & Armour: robes, techwear, stealth gear — plus every equipment slot you own.",
+        "Auras: animated energy glows in different colors and shapes.",
+        "Pedestals: the platform your character stands on.",
+        "Everything updates live as you equip — including your Shop armour."
+      ]}
+    ]
+  },
+  {
+    id: "sys_skilltree",
+    categoryId: "Customization",
+    title: "The Skill Tree",
+    requirement: { type: "NONE" },
+    related: ["sys_classes", "focus_subjects", "sys_stats"],
+    content: [
+      { type: "p", text: "The Skill Tree is your permanent power-up map. It's a constellation of 24 skills across the eight archetypes, drawn as a glowing node graph." },
+      { type: "h3", text: "How Unlocking Works" },
+      { type: "list", items: [
+        "Master syllabus topics: finish a subject's compiled topics to earn Subject Points (SP).",
+        "SP unlocks Skill Nodes — one at a time, in any branch you choose.",
+        "Every unlocked node grants a real bonus: extra XP, extra Sylph, damage shields, and more.",
+        "Three tiers per archetype — deeper nodes mean stronger perks."
       ]},
-      { type: "p", text: "Your custom character is rendered dynamically on your Scholar Profile, Social cards, and top navigation bar." }
+      { type: "h3", text: "The Apex Keystone" },
+      { type: "p", text: "At the top of the constellation sits a final, unique node — the Apex Keystone. Forge it after mastering enough of your syllabus (115 SP), and the System crowns the achievement with a massive XP and Sylph reward." }
     ]
   },
 
@@ -270,25 +343,24 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["soc_presence", "soc_privacy"],
     content: [
-      { type: "p", text: "Connect with other scholars across the network to stay accountable, compare weekly study times, and exchange direct messages." },
-      { type: "h3", text: "Social Management" },
+      { type: "p", text: "Study is better together. Add friends by username or Scholar ID, see their levels and study time, and keep each other accountable." },
+      { type: "h3", text: "What Friends See" },
       { type: "list", items: [
-        "Friend Requests: Search scholars by username or unique Scholar ID (e.g., SCH-000101) and send requests.",
-        "Public Scholar Dossiers: Inspect a user's Level, Hunter Rank, Today's Focus, Total Hours, and Active Character.",
-        "Friend Controls: Remove friends or block scholars directly from their profile menu."
+        "Live study status: a glowing card with a ticking timer while they focus.",
+        "Today's study time, total hours, streak, and rank.",
+        "Their fully customized character — armour, aura, and all."
       ]}
     ]
   },
   {
     id: "soc_presence",
     categoryId: "Social & Network",
-    title: "Live Study Presence & Rooms",
+    title: "Live Study Presence",
     requirement: { type: "NONE" },
     related: ["soc_friends", "focus_timer"],
     content: [
-      { type: "p", text: "The Social Hub features real-time presence indicators that show when your friends are currently studying." },
-      { type: "p", text: "Live cards display an active cyan glow, a pulsing study badge, and a real-time study timer ticking upward as your friends focus." },
-      { type: "p", text: "Scholars can also gather in virtual Study Rooms for synchronized focus sessions with shared ambient sounds and chat." }
+      { type: "p", text: "When you're in a focus session, the network knows. Your card lights up cyan with a pulsing study badge and a live timer, so friends can join the grind." },
+      { type: "p", text: "You can also invite friends into shared Study Rooms for synchronized focus sessions with shared ambient audio." }
     ]
   },
   {
@@ -298,12 +370,12 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["soc_friends"],
     content: [
-      { type: "p", text: "The System provides granular privacy settings accessible under Settings → Privacy:" },
+      { type: "p", text: "You control your exposure. Under Settings → Privacy you can tune:" },
       { type: "list", items: [
-        "Profile Visibility: Public, Friends Only, or Private.",
-        "Study Hours & Stats: Control whether your total study time and cognitive attributes are visible to others.",
-        "Online & Study Presence: Toggle whether your live studying status is broadcasted.",
-        "Direct Messages & Requests: Restrict incoming messages and friend invitations."
+        "Profile visibility: Public, Friends Only, or Private.",
+        "Stats visibility: hide your study hours and attributes if you prefer.",
+        "Presence: turn off your live studying status.",
+        "Messages & Requests: restrict who can message or invite you."
       ]}
     ]
   },
@@ -316,16 +388,16 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     requirement: { type: "NONE" },
     related: ["sys_leveling", "eco_sylph"],
     content: [
-      { type: "p", text: "The Achievements codex features 24 structured milestones across six categories: Study, Streaks, Rank, Social, Quests, and Exploration." },
-      { type: "h3", text: "Rarity Tiers & Rewards" },
+      { type: "p", text: "The Achievements codex is your trophy shelf — 24 milestones across six categories: Study, Streaks, Rank, Social, Quests, and Exploration." },
+      { type: "h3", text: "Rarity Tiers" },
       { type: "list", items: [
-        "Common (Green): Fundamental milestones rewarding +50 to +200 Sylph/XP.",
-        "Rare (Blue): Intermediate milestones rewarding +300 to +800 Sylph.",
-        "Epic (Purple): Advanced challenges rewarding +1,000 to +2,500 Sylph and rare items.",
-        "Legendary (Orange): Elite achievements granting items like Gate Keys and Elixirs.",
-        "Mythic (Gold): Master-level milestones awarding ultimate artifacts like Shadow Extractions."
+        "Common (Green): early wins — small Sylph/XP gifts.",
+        "Rare (Blue): intermediate milestones with meaningful payouts.",
+        "Epic (Purple): serious challenges with rare rewards.",
+        "Legendary (Orange): elite feats that grant special items.",
+        "Mythic (Gold): master-level achievements awarding ultimate artifacts."
       ]},
-      { type: "p", text: "Claiming achievements instantly credits your balance, awards XP, or deposits items directly into your inventory." }
+      { type: "p", text: "Claim them from the codex whenever you qualify — the reward lands instantly in your balance or inventory." }
     ]
   }
 ];

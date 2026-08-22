@@ -110,6 +110,21 @@ export async function calculateDailyCapacity(
   });
   const restDays = user?.restDays || [];
 
+  // Floating (ad-hoc) rest days are hard-blocked exactly like fixed ones —
+  // every ingestion vector that plans through the capacity matrix must
+  // never allocate quests onto these dates.
+  let floatingRestDays: string[] = [];
+  try {
+    const floating = await prisma.floatingRestDay.findMany({
+      where: { userId, dateKey: { gte: startDateStr, lte: endDateStr } },
+      select: { dateKey: true },
+    });
+    floatingRestDays = floating.map((r) => r.dateKey);
+  } catch {
+    floatingRestDays = [];
+  }
+  const floatingRestSet = new Set(floatingRestDays);
+
   // Find all quests the user has scheduled between startDate and endDate
   const existingQuests = await prisma.quest.findMany({
     where: {
@@ -133,9 +148,10 @@ export async function calculateDailyCapacity(
     const dayOfWeek = new Date(parts[0], parts[1] - 1, parts[2]).getDay();
     const isRest = restDays.includes(dayOfWeek);
 
-    // Rest days have a massive negative budget to prevent the fallback logic 
-    // from overflowing quests onto them when normal days are full.
-    matrix[dateStr] = isRest ? -999999 : dailyBudget;
+    // Rest days (fixed OR floating) have a massive negative budget to prevent
+    // the fallback logic from overflowing quests onto them when normal days
+    // are full.
+    matrix[dateStr] = isRest || floatingRestSet.has(dateStr) ? -999999 : dailyBudget;
     curr.setDate(curr.getDate() + 1);
   }
 

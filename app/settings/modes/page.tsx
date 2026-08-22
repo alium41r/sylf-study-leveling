@@ -9,6 +9,7 @@ interface StudyMode {
   id: string;
   name: string;
   description: string;
+  bestFor: string;
   icon: React.ReactNode;
   color: string;
   settings: ModeSetting[];
@@ -189,8 +190,8 @@ function ModeCard({
           {mode.icon}
         </div>
 
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
             <h3
               style={{
                 fontFamily: "'Rajdhani', sans-serif",
@@ -224,6 +225,9 @@ function ModeCard({
           <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.75rem", color: "var(--text-muted)" }}>
             {mode.description}
           </p>
+          <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.68rem", color: mode.color, fontWeight: 600 }}>
+            {mode.bestFor}
+          </p>
         </div>
 
         <svg
@@ -235,6 +239,7 @@ function ModeCard({
             color: "var(--text-muted)",
             transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.3s ease",
+            flexShrink: 0,
           }}
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -244,7 +249,7 @@ function ModeCard({
       {/* Expanded Settings */}
       <div
         style={{
-          maxHeight: isExpanded ? "600px" : "0px",
+          maxHeight: isExpanded ? "700px" : "0px",
           overflow: "hidden",
           transition: "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
@@ -359,7 +364,8 @@ const DEFAULT_MODES: StudyMode[] = [
   {
     id: "pomodoro",
     name: "Pomodoro",
-    description: "Classic time-boxed sessions with regular breaks for sustained focus",
+    description: "Classic time-boxing: focus blocks with short breaks, plus a long break every few rounds.",
+    bestFor: "Beating procrastination and getting started",
     color: "#ef4444",
     isActive: true,
     icon: (
@@ -371,15 +377,59 @@ const DEFAULT_MODES: StudyMode[] = [
       { key: "focusDuration", label: "Focus Duration", type: "range", value: 25, min: 5, max: 90, unit: " min" },
       { key: "shortBreak", label: "Short Break", type: "range", value: 5, min: 1, max: 15, unit: " min" },
       { key: "longBreak", label: "Long Break", type: "range", value: 15, min: 5, max: 30, unit: " min" },
-      { key: "sessionsBeforeLong", label: "Sessions Before Long Break", type: "range", value: 4, min: 2, max: 8, unit: "" },
-      { key: "autoStartBreak", label: "Auto-start Breaks", type: "toggle", value: true },
+      { key: "sessionsBeforeLong", label: "Rounds Before Long Break", type: "range", value: 4, min: 2, max: 8, unit: "" },
+      { key: "autoStartBreaks", label: "Auto-start Breaks", type: "toggle", value: true },
       { key: "autoStartFocus", label: "Auto-start Focus", type: "toggle", value: false },
+      { key: "endChime", label: "Session End Chime", type: "toggle", value: true },
+    ],
+  },
+  {
+    id: "5217",
+    name: "52/17 Rhythm",
+    description: "The data-backed rhythm: 52 minutes of deep work, then a real 17-minute recovery break.",
+    bestFor: "Long study days and heavy material",
+    color: "#3b82f6",
+    icon: (
+      <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 4h3m-1.5-3v3M18 4h-3m1.5-3v3" opacity="0.6" />
+      </svg>
+    ),
+    settings: [
+      { key: "workDuration", label: "Work Block", type: "range", value: 52, min: 40, max: 70, unit: " min" },
+      { key: "breakDuration", label: "Recovery Break", type: "range", value: 17, min: 10, max: 25, unit: " min" },
+      { key: "cycles", label: "Cycles", type: "range", value: 3, min: 2, max: 6, unit: "" },
+      { key: "autoStartBreaks", label: "Auto-start Breaks", type: "toggle", value: true },
+      { key: "autoStartFocus", label: "Auto-start Focus", type: "toggle", value: false },
+      { key: "endChime", label: "Session End Chime", type: "toggle", value: true },
+    ],
+  },
+  {
+    id: "animedoro",
+    name: "Animedoro",
+    description: "Long focus blocks rewarded with a guilt-free fun break — watch an episode, scroll, or nap.",
+    bestFor: "Reward-driven studying and long sessions",
+    color: "#ec4899",
+    icon: (
+      <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    settings: [
+      { key: "focusDuration", label: "Focus Block", type: "range", value: 45, min: 30, max: 60, unit: " min" },
+      { key: "rewardBreak", label: "Reward Break", type: "range", value: 20, min: 10, max: 30, unit: " min" },
+      { key: "cycles", label: "Cycles", type: "range", value: 3, min: 2, max: 6, unit: "" },
+      { key: "autoStartBreaks", label: "Auto-start Breaks", type: "toggle", value: true },
+      { key: "autoStartFocus", label: "Auto-start Focus", type: "toggle", value: false },
+      { key: "endChime", label: "Session End Chime", type: "toggle", value: true },
     ],
   },
   {
     id: "deepwork",
     name: "Deep Work",
-    description: "Extended uninterrupted sessions for maximum concentration and flow state",
+    description: "One long, protected marathon block — optionally fullscreen — followed by a proper recovery break.",
+    bestFor: "Exams, essays, and hard problem sets",
     color: "var(--accent-primary)",
     icon: (
       <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,31 +439,15 @@ const DEFAULT_MODES: StudyMode[] = [
     settings: [
       { key: "sessionLength", label: "Session Length", type: "range", value: 90, min: 30, max: 180, unit: " min" },
       { key: "breakLength", label: "Break Length", type: "range", value: 20, min: 5, max: 30, unit: " min" },
-      { key: "blockNotifications", label: "Block Notifications", type: "toggle", value: true },
-      { key: "ambientSound", label: "Ambient Sound", type: "select", value: "None", options: ["None", "Rain", "Fireplace", "White Noise", "Forest"] },
-    ],
-  },
-  {
-    id: "freeflow",
-    name: "Free Flow",
-    description: "Open-ended stopwatch with no time limits — study at your own pace",
-    color: "#06b6d4",
-    icon: (
-      <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    settings: [
-      { key: "showElapsed", label: "Show Elapsed Time", type: "toggle", value: true },
-      { key: "reminderInterval", label: "Break Reminder", type: "range", value: 45, min: 0, max: 120, unit: " min" },
-      { key: "trackSessions", label: "Auto-track Sessions", type: "toggle", value: true },
+      { key: "autoFullscreen", label: "Auto Fullscreen", type: "toggle", value: true },
+      { key: "endChime", label: "Session End Chime", type: "toggle", value: true },
     ],
   },
   {
     id: "sprint",
     name: "Sprint Mode",
-    description: "Intense short bursts for high-energy tasks and quick review sessions",
+    description: "Short, intense bursts with micro-rests — cycle after cycle until the set is complete.",
+    bestFor: "Drills, flashcards, and quick reviews",
     color: "#f59e0b",
     icon: (
       <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -424,7 +458,30 @@ const DEFAULT_MODES: StudyMode[] = [
       { key: "sprintDuration", label: "Sprint Duration", type: "range", value: 10, min: 5, max: 25, unit: " min" },
       { key: "restDuration", label: "Rest Duration", type: "range", value: 2, min: 1, max: 5, unit: " min" },
       { key: "totalSprints", label: "Total Sprints", type: "range", value: 6, min: 3, max: 12, unit: "" },
-      { key: "intensity", label: "Intensity", type: "select", value: "High", options: ["Medium", "High", "Extreme"] },
+      { key: "intensity", label: "Intensity (Timer Accent)", type: "select", value: "High", options: ["Medium", "High", "Extreme"] },
+      { key: "autoStartRests", label: "Auto-start Rests", type: "toggle", value: true },
+      { key: "autoStartSprints", label: "Auto-start Sprints", type: "toggle", value: false },
+      { key: "endChime", label: "Session End Chime", type: "toggle", value: true },
+    ],
+  },
+  {
+    id: "flowtime",
+    name: "Flowtime",
+    description: "No fixed blocks. Focus until you naturally slow down, then take a break sized to how long you lasted.",
+    bestFor: "Reading, writing, and creative flow",
+    color: "#06b6d4",
+    icon: (
+      <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12c1.5-4 4.5-6 9-6s7.5 2 9 6c-1.5 4-4.5 6-9 6s-7.5-2-9-6z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12c1-2.5 3-3.75 5-3.75s4 1.25 5 3.75c-1 2.5-3 3.75-5 3.75S8 14.5 7 12z" opacity="0.6" />
+      </svg>
+    ),
+    settings: [
+      { key: "reminderInterval", label: "Stretch Reminder", type: "range", value: 45, min: 15, max: 90, unit: " min" },
+      { key: "autoScaleBreak", label: "Scale Break to Focus", type: "toggle", value: true },
+      { key: "defaultBreak", label: "Default Break", type: "range", value: 10, min: 5, max: 20, unit: " min" },
+      { key: "maxBreak", label: "Maximum Break", type: "range", value: 20, min: 10, max: 30, unit: " min" },
+      { key: "endChime", label: "Session End Chime", type: "toggle", value: true },
     ],
   },
 ];
@@ -500,12 +557,26 @@ export default function ModesSettingsPage() {
           fontFamily: "'Rajdhani', sans-serif",
           fontSize: "0.85rem",
           color: "var(--text-secondary)",
+          marginBottom: "8px",
+          lineHeight: 1.6,
+        }}
+      >
+        Six genuinely different study techniques, each with its own rhythm and its own rules.
+        The active mode controls how your Focus Timer behaves — every setting below is live,
+        nothing is decorative.
+      </p>
+      <p
+        style={{
+          fontFamily: "'Rajdhani', sans-serif",
+          fontSize: "0.75rem",
+          color: "var(--text-muted)",
           marginBottom: "24px",
           lineHeight: 1.6,
         }}
       >
-        Choose and customize your preferred study technique. The active mode determines how
-        your focus timer behaves.
+        Pomodoro for getting started · 52/17 for long days · Animedoro when you need a fun
+        reward waiting · Deep Work for marathons · Sprint for drills · Flowtime for creative
+        sessions. Switch modes anytime — the change applies to your next session.
       </p>
 
       {modes.map((mode, i) => (

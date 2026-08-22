@@ -4,6 +4,15 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
+import {
+  GOAL_COLOR_TOKENS,
+  GOAL_COLOR_PALETTE,
+  resolveGoalColor,
+  formatGoalDeadline,
+  formatTargetDateLabel,
+  targetDateToWeeks,
+  type GoalColorToken,
+} from "@/lib/goal-theme";
 
 interface Quest {
   id: number;
@@ -18,8 +27,10 @@ interface Goal {
   title: string;
   description: string;
   targetWeeks: number;
+  targetDate: string | null;
   effortLevel: string;
   status: string;
+  color: string;
   quests: Quest[];
 }
 
@@ -28,7 +39,7 @@ interface GoalsTabProps {
 }
 
 export function GoalsTab() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedGoalIds, setSelectedGoalIds] = useState<number[]>([]);
@@ -38,18 +49,41 @@ export function GoalsTab() {
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null);
   const [editGoalTitle, setEditGoalTitle] = useState("");
   const [editGoalDescription, setEditGoalDescription] = useState("");
+  const [editGoalColor, setEditGoalColor] = useState<GoalColorToken>("EMERALD");
 
   // New goal form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [targetWeeks, setTargetWeeks] = useState(4);
   const [effortLevel, setEffortLevel] = useState("NORMAL");
+  const [goalColor, setGoalColor] = useState<GoalColorToken>("EMERALD");
   
   // Edit deadline state
   const [editingDeadlineId, setEditingDeadlineId] = useState<number | null>(null);
   const [newDeadline, setNewDeadline] = useState("");
 
   const [isNewGoalPanelOpen, setIsNewGoalPanelOpen] = useState(false);
+
+  // User-local "today" for date inputs
+  const todayStr = (() => {
+    try {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: user?.timezone || "UTC",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+    } catch {
+      return new Date().toISOString().split("T")[0];
+    }
+  })();
+
+  /** Target date derived from the timeline slider (today + N weeks). */
+  const sliderTargetDate = (() => {
+    const d = new Date(todayStr + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() + targetWeeks * 7);
+    return d.toISOString().split("T")[0];
+  })();
 
   const fetchGoals = () => {
     if (!token) return;
@@ -77,13 +111,21 @@ export function GoalsTab() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, description, targetWeeks, effortLevel }),
+        body: JSON.stringify({
+          title,
+          description,
+          targetWeeks,
+          effortLevel,
+          color: goalColor,
+          targetDate: sliderTargetDate,
+        }),
       });
       if (res.ok) {
         setTitle("");
         setDescription("");
         setTargetWeeks(4);
         setEffortLevel("NORMAL");
+        setGoalColor("EMERALD");
         setIsNewGoalPanelOpen(false);
         fetchGoals();
       }
@@ -161,9 +203,30 @@ export function GoalsTab() {
       await fetch(`/api/goals/${id}`, { 
         method: "PATCH", 
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ title: editGoalTitle, description: editGoalDescription })
+        body: JSON.stringify({ title: editGoalTitle, description: editGoalDescription, color: editGoalColor })
       });
       setEditingGoalId(null);
+      fetchGoals();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  /**
+   * Exact-deadline save: stores the UTC representational midnight of the
+   * picked YYYY-MM-DD and keeps the legacy week count in sync.
+   */
+  const handleSaveDeadline = async (goal: Goal) => {
+    if (!newDeadline) return;
+    try {
+      const parsed = new Date(`${newDeadline}T00:00:00Z`);
+      const weeks = targetDateToWeeks(parsed);
+      await fetch(`/api/goals/${goal.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ targetDate: newDeadline, targetWeeks: weeks }),
+      });
+      setEditingDeadlineId(null);
       fetchGoals();
     } catch (err) {
       console.error(err);
@@ -179,9 +242,8 @@ export function GoalsTab() {
   }
 
   return (
-    <div>
-      {/* Action Header */}
-      <div className="mb-6 flex justify-between items-center">
+    <div className="w-full">      {/* Action Header */}
+      <div className="mb-6 flex flex-wrap justify-between items-center gap-2">
         <div>
           <p className="text-xs tracking-widest mb-1 text-accent-text-light font-['Rajdhani'] font-bold">
             SCHOLAR OBJECTIVES
@@ -246,13 +308,17 @@ export function GoalsTab() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                 transition={{ type: "spring", damping: 25, stiffness: 350 }}
-                className={`system-card p-6 ${isSelectMode ? 'cursor-pointer' : ''} transition-colors ${
+                className={`system-card p-6 w-full ${isSelectMode ? 'cursor-pointer' : ''} transition-colors ${
                   isSelectMode && selectedGoalIds.includes(goal.id)
                     ? "bg-red-900/20 border-red-500/50"
                     : ""
                 }`}
                 style={{
-                  borderLeft: `4px solid ${goal.status === "ACTIVE" ? "var(--accent-primary)" : "var(--border-subtle)"}`,
+                  borderLeft: `4px solid ${
+                    goal.status === "ACTIVE"
+                      ? resolveGoalColor(goal.color).base
+                      : "var(--border-subtle)"
+                  }`,
                 }}
                 onClick={() => {
                   if (isSelectMode) {
@@ -262,8 +328,8 @@ export function GoalsTab() {
                   }
                 }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1 mr-4 flex gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 w-full">
+                  <div className="flex-1 min-w-0 mr-0 sm:mr-4 flex gap-3 sm:gap-4">
                     {isSelectMode && (
                       <div className={`mt-1.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedGoalIds.includes(goal.id) ? 'bg-red-500 border-red-500' : 'border-border-subtle'}`}>
                         {selectedGoalIds.includes(goal.id) && (
@@ -287,6 +353,7 @@ export function GoalsTab() {
                             onChange={e => setEditGoalDescription(e.target.value)} 
                             className="input-field text-sm py-1 px-2 min-h-16"
                           />
+                          <GoalColorPicker value={editGoalColor} onChange={setEditGoalColor} />
                         </div>
                       ) : (
                         <>
@@ -302,11 +369,11 @@ export function GoalsTab() {
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
                     <span className={`quest-status ${goal.status === "ACTIVE" ? "quest-progress" : ""}`}>
                       {goal.status}
                     </span>
-                    <div className="flex gap-2 mt-1">
+                    <div className="flex gap-2 mt-0">
                       {editingGoalId === goal.id ? (
                         <>
                           <button onClick={() => handleSaveGoal(goal.id)} className="text-xs text-green-400 hover:text-green-300">Save</button>
@@ -315,7 +382,7 @@ export function GoalsTab() {
                       ) : (
                         <>
                           <button 
-                            onClick={() => { setEditingGoalId(goal.id); setEditGoalTitle(goal.title); setEditGoalDescription(goal.description || ""); }}
+                            onClick={() => { setEditingGoalId(goal.id); setEditGoalTitle(goal.title); setEditGoalDescription(goal.description || ""); setEditGoalColor((goal.color as GoalColorToken) || "EMERALD"); }}
                             className="text-xs text-accent-primary hover:text-accent-primary-light"
                           >Edit</button>
                           <button onClick={() => handleDeleteGoal(goal.id)} className="text-xs text-red-400 hover:text-red-300">Abandon</button>
@@ -328,7 +395,26 @@ export function GoalsTab() {
                 <div className="flex flex-wrap gap-2 text-xs mb-5">
                   <div className="px-3 py-1.5 rounded bg-white/5 border border-white/10 flex items-center gap-2">
                     <span className="text-muted tracking-wider">Timeline:</span> 
-                    <span className="font-medium text-accent-light">{goal.targetWeeks} weeks</span>
+                    {goal.targetDate ? (
+                      <span className="flex flex-col leading-tight">
+                        <span
+                          className="font-medium"
+                          style={{ color: resolveGoalColor(goal.color).light }}
+                        >
+                          {formatGoalDeadline(goal.targetDate)}
+                        </span>
+                        <span className="text-[0.65rem] text-text-secondary font-['Rajdhani']">
+                          {formatTargetDateLabel(goal.targetDate)}
+                        </span>
+                      </span>
+                    ) : (
+                      <span
+                        className="font-medium"
+                        style={{ color: resolveGoalColor(goal.color).light }}
+                      >
+                        {goal.targetWeeks} weeks
+                      </span>
+                    )}
                   </div>
                   <div className="px-3 py-1.5 rounded bg-white/5 border border-white/10 flex items-center gap-2">
                     <span className="text-muted tracking-wider">Intensity:</span> 
@@ -349,7 +435,7 @@ export function GoalsTab() {
                     <div className="flex items-center gap-2">
                       <input 
                         type="date"
-                        min={new Date().toISOString().split("T")[0]}
+                        min={todayStr}
                         className="input-field py-1 px-2 text-xs"
                         style={{ colorScheme: "dark" }}
                         value={newDeadline}
@@ -357,14 +443,7 @@ export function GoalsTab() {
                       />
                       <button 
                         className="text-xs text-green-400 hover:text-green-300 font-bold"
-                        onClick={() => {
-                          if (newDeadline) {
-                            const diffTime = Math.abs(new Date(newDeadline).getTime() - new Date().getTime());
-                            const diffWeeks = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)));
-                            handleAdjustEffort(goal.id, diffWeeks);
-                          }
-                          setEditingDeadlineId(null);
-                        }}
+                        onClick={() => handleSaveDeadline(goal)}
                       >
                         Save
                       </button>
@@ -381,9 +460,15 @@ export function GoalsTab() {
                       style={{ textTransform: 'none' }}
                       onClick={() => {
                         setEditingDeadlineId(goal.id);
-                        const d = new Date();
-                        d.setDate(d.getDate() + goal.targetWeeks * 7);
-                        setNewDeadline(d.toISOString().split("T")[0]);
+                        // Prefill with the stored exact date (UTC representational day),
+                        // falling back to targetWeeks * 7 from today for legacy goals.
+                        if (goal.targetDate) {
+                          setNewDeadline(goal.targetDate.slice(0, 10));
+                        } else {
+                          const d = new Date(todayStr + "T00:00:00Z");
+                          d.setUTCDate(d.getUTCDate() + goal.targetWeeks * 7);
+                          setNewDeadline(d.toISOString().split("T")[0]);
+                        }
                       }}
                     >
                       Edit deadline
@@ -396,10 +481,10 @@ export function GoalsTab() {
         )}
       </div>
 
-      {/* Slide-over Panel for New Objective */}
+      {/* New Objective Modal: mobile bottom sheet → centered modal on sm+ */}
       <AnimatePresence>
         {isNewGoalPanelOpen && (
-          <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -410,13 +495,13 @@ export function GoalsTab() {
               onClick={() => setIsNewGoalPanelOpen(false)}
             />
 
-            {/* Slide Drawer */}
+            {/* Sheet / Dialog */}
             <motion.div 
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              initial={{ y: "100%", opacity: 1 }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 350 }}
-              className="relative z-10 w-full max-w-md h-full bg-bg-panel border-l border-border-subtle p-8 overflow-y-auto shadow-2xl flex flex-col gap-6"
+              className="relative z-10 w-full max-w-lg sm:max-w-2xl mx-auto sm:my-8 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-bg-panel border border-border-subtle p-4 sm:p-6 shadow-2xl flex flex-col gap-5"
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold tracking-wide" style={{ fontFamily: "'Rajdhani', sans-serif", color: "var(--accent-primary-light)" }}>
@@ -470,6 +555,17 @@ export function GoalsTab() {
                     <span>1 Week</span>
                     <span>1 Year</span>
                   </div>
+                  <div className="mt-3 pt-2 border-t border-border-subtle/60 text-xs font-['Rajdhani'] text-text-secondary">
+                    Target:{" "}
+                    <span className="font-bold text-[var(--accent-text-light)]">
+                      {formatTargetDateLabel(sliderTargetDate)}
+                    </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="stat-label block mb-2 text-sm">Objective Accent</label>
+                  <GoalColorPicker value={goalColor} onChange={setGoalColor} />
                 </div>
                 
                 <div>
@@ -479,10 +575,10 @@ export function GoalsTab() {
                     value={effortLevel}
                     onChange={(e) => setEffortLevel(e.target.value)}
                   >
-                    <option value="RELAXED">Casual (30 mins/day)</option>
-                    <option value="NORMAL">Standard (1 hour/day)</option>
-                    <option value="INTENSE">Focused (2 hours/day)</option>
-                    <option value="EXTREME">Hardcore (4 hours/day)</option>
+                    <option value="RELAXED">Casual (1 hour/day)</option>
+                    <option value="NORMAL">Standard (2 hours/day)</option>
+                    <option value="INTENSE">Focused (4 hours/day)</option>
+                    <option value="EXTREME">Hardcore (6+ hours/day)</option>
                   </select>
                 </div>
                 
@@ -496,6 +592,50 @@ export function GoalsTab() {
           </div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/**
+ * Curated 6-token cyber/neon swatch picker for objective accent theming.
+ * Fully controlled via value/onChange.
+ */
+function GoalColorPicker({
+  value,
+  onChange,
+}: {
+  value: GoalColorToken;
+  onChange: (token: GoalColorToken) => void;
+}) {
+  return (
+    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 items-center">
+      {GOAL_COLOR_TOKENS.map((token) => {
+        const theme = GOAL_COLOR_PALETTE[token];
+        const isSelected = value === token;
+        return (
+          <button
+            key={token}
+            type="button"
+            title={theme.name}
+            aria-label={`Set ${theme.name} accent`}
+            onClick={() => onChange(token)}
+            className="relative w-9 h-9 rounded-full transition-all flex items-center justify-center"
+            style={{
+              background: theme.swatch,
+              boxShadow: isSelected
+                ? `0 0 0 2px var(--bg-panel), 0 0 0 4px ${theme.base}, 0 0 12px ${theme.mid}`
+                : `0 0 0 1px ${theme.mid}`,
+              transform: isSelected ? "scale(1.08)" : "scale(1)",
+            }}
+          >
+            {isSelected && (
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

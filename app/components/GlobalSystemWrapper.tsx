@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useHeartbeat } from "../hooks/useHeartbeat";
 import { SessionInviteToast } from "./SessionInviteToast";
+import SessionEndToast from "./SessionEndToast";
 import SettingsPanel from "./SettingsPanel";
 import { SettingsProvider } from "./SettingsContext";
 import { AcousticsProvider } from "./AcousticsContext";
@@ -78,12 +79,12 @@ const THEME_MAP: Record<string, Record<string, string>> = {
 
 const BG_MAP: Record<string, { value: string; size?: string; lightValue: string }> = {
   void: { 
-    value: "linear-gradient(to bottom, #05050f, #050508)",
+    value: "linear-gradient(to bottom, #090d16, #0d1117)",
     lightValue: "linear-gradient(to bottom, #f8fafc, #f1f5f9)"
   },
   "cyber-grid": {
     value:
-      "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(to bottom, #0a0a0f, #0a0a0f)",
+      "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(to bottom, #0d1117, #0d1117)",
     size: "30px 30px, 30px 30px, auto",
     lightValue: 
       "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.1) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.1) 100%), linear-gradient(to bottom, #f8fafc, #f8fafc)"
@@ -104,7 +105,7 @@ const BG_MAP: Record<string, { value: string; size?: string; lightValue: string 
     value:
       "linear-gradient(to top, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.05), transparent), linear-gradient(to bottom, #0f0a0a, #050505)",
     lightValue: 
-      "linear-gradient(to top, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.05), transparent), linear-gradient(to bottom, #fffbeb, #fef3c7)"
+      "linear-gradient(to top, rgba(239, 68, 68, 0.08), rgba(245, 158, 11, 0.05), transparent), linear-gradient(to bottom, #f8fafc, #f1f5f9)"
   },
   "matrix-rain": {
     value:
@@ -168,6 +169,7 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
           <PublicProfileModal />
           <AcousticsDynamicIsland />
           <SessionInviteToast />
+          <SessionEndToast />
           <TopRightBar />
           <SettingsPanel />
         </ProfileModalProvider>

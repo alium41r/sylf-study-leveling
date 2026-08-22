@@ -39,18 +39,19 @@ export default function FocusToolWindow() {
   const Icon = currentConfig?.icon || Sparkles;
   const isMinimized = windowMode === "minimized";
 
-  // Align window with dock anchor side
+  // Desktop dock-anchored positioning (md+). On mobile the window is a
+  // full-width bottom sheet, so every anchor class is prefixed with md:.
   const isLeftAnchored =
     dockAnchor === "bottom-left" || dockAnchor === "left" || dockAnchor === "top-left";
   const isTopAnchored = dockAnchor === "top-left" || dockAnchor === "top-right";
 
     const positionClasses = isLeftAnchored
     ? isTopAnchored
-      ? "top-16 left-4 sm:left-8 md:left-10"
-      : "bottom-20 left-4 sm:left-8 md:left-10"
+      ? "md:top-16 md:left-4 lg:left-8"
+      : "md:bottom-20 md:left-4 lg:left-8"
     : isTopAnchored
-    ? "top-16 right-4 sm:right-8 md:right-10"
-    : "bottom-20 right-4 sm:right-8 md:right-10";
+    ? "md:top-16 md:right-4 lg:right-8"
+    : "md:bottom-20 md:right-4 lg:right-8";
 
   return (
     <AnimatePresence>
@@ -60,13 +61,13 @@ export default function FocusToolWindow() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.94, y: 16 }}
         transition={{ type: "spring", damping: 26, stiffness: 350 }}
-        className={`fixed z-40 w-[95vw] sm:w-[420px] md:w-[460px] flex flex-col rounded-2xl border border-border-subtle bg-bg-abyss/95 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.65)] overflow-hidden ${positionClasses}`}
+        className={`fixed z-40 inset-x-0 bottom-0 md:inset-x-auto md:bottom-auto w-full max-w-full md:w-[460px] flex flex-col rounded-t-2xl md:rounded-2xl border border-border-subtle bg-bg-abyss/95 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.65)] overflow-hidden ${positionClasses}`}
         style={{
           height: isMinimized
             ? "48px"
             : activeTool === "calculator"
             ? "auto"
-            : "min(600px, calc(100vh - 100px))",
+            : "min(600px, 82vh)",
           maxHeight: "calc(100vh - 100px)",
           borderColor: "var(--border-active)",
         }}

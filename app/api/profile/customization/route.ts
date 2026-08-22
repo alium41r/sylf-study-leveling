@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,7 @@ const CustomizationSchema = z.object({
     .nullable(),
 });
 
-export async function PATCH(req: NextRequest) {
+async function handleCustomizationUpdate(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -93,12 +94,31 @@ export async function PATCH(req: NextRequest) {
       },
     });
 
+    try {
+      if (updatedUser.username) {
+        revalidateTag(`user-${updatedUser.username.toLowerCase()}`, "max");
+        revalidateTag(`profile-stats-${updatedUser.username.toLowerCase()}`, "max");
+      }
+    } catch {
+      // Graceful fallback when not running in Static Generation Context
+    }
+
     return NextResponse.json({
+      success: true,
       message: "Profile identity updated successfully.",
+      characterConfig: updatedUser.characterConfig,
       user: updatedUser,
     });
   } catch (error: any) {
-    console.error("Customization PATCH Error:", error);
+    console.error("Customization Route Error:", error);
     return NextResponse.json({ error: "Failed to update profile customization." }, { status: 500 });
   }
+}
+
+export async function PATCH(req: NextRequest) {
+  return handleCustomizationUpdate(req);
+}
+
+export async function POST(req: NextRequest) {
+  return handleCustomizationUpdate(req);
 }

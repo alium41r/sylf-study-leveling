@@ -14,6 +14,8 @@ import {
   ChevronDown,
   Wrench,
   GripVertical,
+  SunMedium,
+  SunDim,
 } from "lucide-react";
 
 interface DockItem {
@@ -23,6 +25,13 @@ interface DockItem {
   icon: React.ComponentType<{ className?: string }>;
   color: string;
   activeBorder: string;
+}
+
+/** Eye-Comfort dim control passed in by the Focus page (Light Mode only). */
+export interface DimControlProps {
+  isDimActive: boolean;
+  isLightMode: boolean;
+  onToggleDim: () => void;
 }
 
 const DOCK_ITEMS: DockItem[] = [
@@ -68,7 +77,11 @@ const DOCK_ITEMS: DockItem[] = [
   },
 ];
 
-export default function FocusToolsDock() {
+export default function FocusToolsDock({
+  dimControl,
+}: {
+  dimControl?: DimControlProps;
+}) {
   const {
     activeTool,
     toggleTool,
@@ -245,6 +258,17 @@ export default function FocusToolsDock() {
     toggleTool(toolId);
   };
 
+  const handleDimClick = (e: React.MouseEvent) => {
+    if (hasMovedRef.current || isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    dimControl?.onToggleDim();
+  };
+
   return (
     <div
       ref={dockRef}
@@ -264,6 +288,10 @@ export default function FocusToolsDock() {
             }
           : {
               touchAction: "none",
+              // Keep bottom-anchored dock clear of iOS/Android home indicators
+              ...(dockAnchor.startsWith("bottom")
+                ? { bottom: "calc(1.5rem + env(safe-area-inset-bottom))" }
+                : {}),
             }
       }
       className={`fixed z-40 flex items-center select-none ${
@@ -314,6 +342,41 @@ export default function FocusToolsDock() {
           </span>
           {isDockExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
         </button>
+
+          {/* Eye-Comfort Dim Toggle (Light Mode only) */}
+          {dimControl && (
+            <button
+              onClick={handleDimClick}
+              onPointerDown={(e) => e.stopPropagation()}
+              disabled={!dimControl.isLightMode}
+              title={
+                dimControl.isLightMode
+                  ? "Dim Screen — Eye Comfort (Shift+D / ⌘D)"
+                  : "Only active in Light Mode"
+              }
+              aria-label={dimControl.isDimActive ? "Dim screen on" : "Dim screen off"}
+              aria-pressed={dimControl.isDimActive}
+              className={`flex items-center gap-1.5 px-2.5 py-2 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto border ${
+                dimControl.isDimActive
+                  ? "bg-cyan-400/10 text-cyan-300 border-cyan-400/60 shadow-[0_0_12px_rgba(6,182,212,0.35)]"
+                  : dimControl.isLightMode
+                  ? "bg-bg-panel/70 text-text-secondary hover:text-text-primary hover:bg-bg-panel border-border-subtle"
+                  : "bg-bg-panel/40 text-text-muted/50 border-border-subtle cursor-not-allowed opacity-50"
+              }`}
+            >
+              {dimControl.isDimActive ? (
+                <SunDim className="w-4 h-4" />
+              ) : (
+                <SunMedium className="w-4 h-4" />
+              )}
+              <span
+                className="text-[0.65rem] font-bold tracking-widest uppercase"
+                style={{ fontFamily: "'Rajdhani', sans-serif" }}
+              >
+                {dimControl.isDimActive ? "DIM: ON" : "DIM: OFF"}
+              </span>
+            </button>
+          )}
 
         {/* Expanded Quick-Launch Tool Icons */}
         <AnimatePresence>

@@ -229,7 +229,7 @@ export function ChatDetailsDrawer({
                   <div className="p-5 rounded-2xl bg-bg-abyss/80 border border-white/10 flex flex-col items-center text-center gap-3 relative overflow-hidden shadow-inner">
                     <div className="relative">
                       <div
-                        className={`rank-badge rank-${otherParticipant.hunterRank || "E"} w-20 h-20 text-lg rounded-2xl overflow-hidden shadow-xl flex items-center justify-center`}
+                        className="w-20 h-20 text-2xl rounded-2xl overflow-hidden shadow-xl flex items-center justify-center bg-bg-panel border border-border-subtle shrink-0"
                       >
                         {otherParticipant.avatarUrl ? (
                           <img
@@ -238,7 +238,9 @@ export function ChatDetailsDrawer({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="font-bold">{otherParticipant.hunterRank || "E"}</span>
+                          <span className="font-bold font-['Rajdhani'] text-emerald-400">
+                            {(otherParticipant.name || otherParticipant.username || "S").charAt(0).toUpperCase()}
+                          </span>
                         )}
                       </div>
                       <span
@@ -605,11 +607,13 @@ export function ChatDetailsDrawer({
                               className="flex items-center gap-3 cursor-pointer min-w-0"
                             >
                               <div className="relative shrink-0">
-                                <div className={`rank-badge rank-${p.hunterRank || "E"} w-8 h-8 text-[10px] rounded-lg`}>
+                                <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-panel flex items-center justify-center">
                                   {p.avatarUrl ? (
                                     <img src={p.avatarUrl} alt={p.username} className="w-full h-full object-cover" />
                                   ) : (
-                                    <span>{p.hunterRank || "E"}</span>
+                                    <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                                      {(p.name || p.username || "S").charAt(0).toUpperCase()}
+                                    </span>
                                   )}
                                 </div>
                                 <span

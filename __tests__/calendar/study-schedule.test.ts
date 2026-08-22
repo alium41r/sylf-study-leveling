@@ -220,6 +220,48 @@ describe("Study Schedule & Calendar Engine", () => {
       expect(ledgerSpy).not.toHaveBeenCalled();
     });
 
+    it("exempts floating (ad-hoc) rest days from HP penalties", async () => {
+      const todayStr = TimezoneService.getUserLocalDate("UTC");
+      const todayObj = new Date(`${todayStr}T12:00:00Z`);
+      const yesterdayObj = new Date(todayObj.getTime() - 24 * 60 * 60 * 1000);
+      const yesterdayStr = yesterdayObj.toISOString().split("T")[0];
+      const dayBeforeObj = new Date(yesterdayObj.getTime() - 24 * 60 * 60 * 1000);
+      const dayBeforeStr = dayBeforeObj.toISOString().split("T")[0];
+
+      // Yesterday is NOT a fixed rest day, but IS designated floating-rest.
+      const yesterdayDayOfWeek = yesterdayObj.getDay();
+      const nonMatchingRestDay = (yesterdayDayOfWeek + 1) % 7;
+
+      vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
+        id: 1,
+        hp: 100,
+        maxHp: 100,
+        timezone: "UTC",
+        dailyGoalMinutes: 120,
+        restDays: [nonMatchingRestDay],
+        enableHpPenalty: true,
+        lastDailyPenaltyEvaluatedDate: dayBeforeStr, // Evaluate exactly yesterday
+        createdAt: new Date("2026-08-01"),
+      } as any);
+
+      // No study sessions logged — but the day is exempt anyway.
+      vi.spyOn(prisma.studySession, "findMany").mockResolvedValue([]);
+      // Yesterday is a floating rest day record.
+      vi.spyOn(prisma.floatingRestDay, "findMany").mockResolvedValueOnce([
+        { dateKey: yesterdayStr },
+      ] as any);
+
+      const updateSpy = vi.spyOn(prisma.user, "update").mockResolvedValue({} as any);
+
+      const res = await HpPenaltyService.reconcileDailyHpPenalty(1);
+
+      // 0 HP deducted, evaluation pointer advanced, day recorded as exempt.
+      expect(res.penaltiesApplied).toBe(0);
+      expect(res.totalHpDeducted).toBe(0);
+      expect(res.restExemptDays).toContain(yesterdayStr);
+      expect(updateSpy).toHaveBeenCalled();
+    });
+
     it("deducts HP on missed non-rest days", async () => {
       const todayStr = TimezoneService.getUserLocalDate("UTC");
       const todayObj = new Date(`${todayStr}T12:00:00Z`);
@@ -303,9 +345,9 @@ describe("Study Schedule & Calendar Engine", () => {
       // 2026-08-15 (Sat), 2026-08-16 (Sun = rest), 2026-08-17 (Mon)
       const matrix = await calculateDailyCapacity(1, "NORMAL", "2026-08-15", "2026-08-17");
 
-      expect(matrix["2026-08-15"]).toBe(60); // Saturday: normal capacity
+      expect(matrix["2026-08-15"]).toBe(120); // Saturday: normal capacity (2h/day)
       expect(matrix["2026-08-16"]).toBe(-999999);  // Sunday: negative capacity on designated rest day
-      expect(matrix["2026-08-17"]).toBe(60); // Monday: normal capacity
+      expect(matrix["2026-08-17"]).toBe(120); // Monday: normal capacity
     });
   });
 });

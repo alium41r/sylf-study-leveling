@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../components/AuthProvider";
 import OAuthButtons from "../components/OAuthButtons";
@@ -35,7 +35,17 @@ function RegisterForm() {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
+
+  // Clear previous session if forced
+  useEffect(() => {
+    const isForce = searchParams.get("force") === "true";
+    if (isForce && typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_data");
+    }
+  }, [searchParams]);
 
   // Debounced check username availability
   useEffect(() => {
@@ -363,7 +373,7 @@ function RegisterForm() {
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>
             Already have an active link?{" "}
             <Link
-              href="/login"
+              href="/login?force=true"
               className="font-bold hover:underline"
               style={{ color: "var(--accent-text-light)" }}
             >

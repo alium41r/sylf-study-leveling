@@ -61,8 +61,12 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         durationMinutes: true,
+        durationSeconds: true,
+        focusRate: true,
         startedAt: true,
+        endedAt: true,
         subject: { select: { id: true, name: true, color: true } },
+        quest: { select: { id: true, title: true } },
       },
       orderBy: { startedAt: "asc" },
     });
@@ -102,6 +106,22 @@ export async function GET(req: NextRequest) {
       }
     }
     const subjectBreakdown = Object.values(subjectMap).sort((a, b) => b.minutes - a.minutes);
+
+    // Individual session log (most recent first) — one entry per completed
+    // focus block so users can review "30 min in the morning, 50 min at night".
+    const sessionLog = sessions
+      .map((s) => ({
+        id: s.id,
+        startedAt: s.startedAt,
+        endedAt: s.endedAt,
+        durationMinutes: s.durationMinutes,
+        durationSeconds: s.durationSeconds > 0 ? s.durationSeconds : s.durationMinutes * 60,
+        focusRate: s.focusRate,
+        subjectName: s.subject?.name ?? null,
+        subjectColor: s.subject?.color ?? null,
+        questTitle: s.quest?.title ?? null,
+      }))
+      .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
 
     // Quest stats
     const allQuests = await prisma.quest.findMany({
@@ -149,6 +169,7 @@ export async function GET(req: NextRequest) {
       user,
       dailyStudy,
       subjectBreakdown,
+      sessionLog,
       questStats,
       goalStats,
       summary: {

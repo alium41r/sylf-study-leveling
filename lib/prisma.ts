@@ -18,7 +18,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Increment this version whenever schema fields are modified
-const SCHEMA_BUILD_VERSION = 5;
+const SCHEMA_BUILD_VERSION = 10;
 
 export function getPrismaClient(): PrismaClient {
   if (globalForPrisma.prisma && globalForPrisma.prismaVersion === SCHEMA_BUILD_VERSION) {

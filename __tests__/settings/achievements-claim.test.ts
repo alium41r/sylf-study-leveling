@@ -138,14 +138,24 @@ describe("Achievements System - Progress & Reward Claiming", () => {
         hunterRank: "E",
         sylph: 200,
       } as any);
+      vi.spyOn(prisma.systemMessage, "create").mockResolvedValue({} as any);
 
-      const mockTx = {
-        userAchievement: { create: vi.fn().mockResolvedValue({}) },
-        user: { update: vi.fn().mockResolvedValue({}) },
-        sylphLedger: { create: vi.fn().mockResolvedValue({}) },
-        systemMessage: { create: vi.fn().mockResolvedValue({}) },
-      };
-      vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(mockTx));
+      vi.spyOn(prisma, "$queryRawUnsafe").mockResolvedValue([
+        {
+          claim_achievement_reward_atomic: {
+            success: true,
+            achievementId: "study_1_hour",
+            xpGained: 0,
+            sylphGained: 50,
+            level: 1,
+            currentXP: 0,
+            xpToNextLevel: 282,
+            hunterRank: "E",
+            levelsGained: 0,
+            didRankUp: false,
+          },
+        },
+      ] as any);
 
       const req = new NextRequest("http://localhost:3000/api/achievements", {
         method: "POST",
@@ -161,14 +171,15 @@ describe("Achievements System - Progress & Reward Claiming", () => {
       const data = await res.json();
       expect(data.success).toBe(true);
 
-      expect(mockTx.userAchievement.create).toHaveBeenCalledWith({
-        data: { userId, achievementId: "study_1_hour" },
-      });
-      expect(mockTx.user.update).toHaveBeenCalledWith({
-        where: { id: userId },
-        data: { sylph: { increment: 50 } },
-      });
-      expect(mockTx.sylphLedger.create).toHaveBeenCalled();
+      // Delegated to the atomic SECURITY DEFINER RPC (no read-modify-write loop)
+      expect(prisma.$queryRawUnsafe).toHaveBeenCalledWith(
+        expect.stringContaining("claim_achievement_reward_atomic"),
+        "101",
+        "study_1_hour",
+        0,
+        50,
+        expect.any(String)
+      );
     });
 
     it("successfully claims XP reward and performs level-up calculation", async () => {
@@ -177,20 +188,30 @@ describe("Achievements System - Progress & Reward Claiming", () => {
       vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
         id: userId,
         level: 1,
-        currentXP: 180,
-        xpToNextLevel: 200,
+        currentXP: 250,
+        xpToNextLevel: 200, // stale legacy value — the RPC must ignore it
         hunterRank: "E",
         totalStudyMinutes: 30,
         streakDays: 1,
       } as any);
+      vi.spyOn(prisma.systemMessage, "create").mockResolvedValue({} as any);
 
-      const mockTx = {
-        userAchievement: { create: vi.fn().mockResolvedValue({}) },
-        user: { update: vi.fn().mockResolvedValue({}) },
-        sylphLedger: { create: vi.fn().mockResolvedValue({}) },
-        systemMessage: { create: vi.fn().mockResolvedValue({}) },
-      };
-      vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(mockTx));
+      vi.spyOn(prisma, "$queryRawUnsafe").mockResolvedValue([
+        {
+          claim_achievement_reward_atomic: {
+            success: true,
+            achievementId: "study_first_session",
+            xpGained: 50,
+            sylphGained: 600,
+            level: 2,
+            currentXP: 18,
+            xpToNextLevel: 237,
+            hunterRank: "E",
+            levelsGained: 1,
+            didRankUp: false,
+          },
+        },
+      ] as any);
 
       const req = new NextRequest("http://localhost:3000/api/achievements", {
         method: "POST",
@@ -206,18 +227,44 @@ describe("Achievements System - Progress & Reward Claiming", () => {
       const data = await res.json();
       expect(data.success).toBe(true);
 
-      expect(mockTx.userAchievement.create).toHaveBeenCalledWith({
-        data: { userId, achievementId: "study_first_session" },
-      });
-      // User had 180 XP, + 50 XP = 230 XP (level 1 requires 200 XP -> level up to 2!)
-      expect(mockTx.user.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: userId },
-          data: expect.objectContaining({
-            level: 2,
-          }),
-        })
+      // The XP leg of the reward is fully delegated to the atomic RPC
+      // (User had 250 XP within level 1, +50 XP = 300 ≥ canonical 282 bucket).
+      expect(prisma.$queryRawUnsafe).toHaveBeenCalledWith(
+        expect.stringContaining("claim_achievement_reward_atomic"),
+        "101",
+        "study_first_session",
+        50,
+        0,
+        expect.any(String)
       );
+    });
+
+    it("maps ALREADY_CLAIMED RPC errors to a 400 response (idempotency)", async () => {
+      vi.spyOn(prisma.userAchievement, "findUnique").mockResolvedValue(null);
+      vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
+        id: userId,
+        totalStudyMinutes: 65,
+        streakDays: 1,
+        hunterRank: "E",
+      } as any);
+
+      const rpcError: any = new Error("ALREADY_CLAIMED: Achievement study_1_hour already claimed");
+      rpcError.code = "S0001";
+      vi.spyOn(prisma, "$queryRawUnsafe").mockRejectedValue(rpcError);
+
+      const req = new NextRequest("http://localhost:3000/api/achievements", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${validToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ achievementId: "study_1_hour" }),
+      });
+
+      const res = await claimAchievement(req);
+      expect(res.status).toBe(400);
+      const data = await res.json();
+      expect(data.error).toContain("Already claimed");
     });
 
     it("successfully claims ITEM reward and updates inventory", async () => {

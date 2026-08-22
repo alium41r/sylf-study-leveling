@@ -395,7 +395,7 @@ function SocialContent() {
   const groups = conversations.filter((c) => c.isGroup);
 
   return (
-    <div className="p-4 sm:p-8 max-w-7xl mx-auto min-h-screen flex flex-col gap-6">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen min-w-0 flex flex-col gap-6">
       {/* ─── Top Header & Title ──────────────────────────────── */}
       <div className="flex items-center justify-between gap-4">
         <h1
@@ -445,7 +445,9 @@ function SocialContent() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-3xl">📖</span>
+                  <span className="text-3xl font-bold font-['Rajdhani'] text-emerald-400 select-none">
+                    {(user?.name || user?.username || "S").charAt(0).toUpperCase()}
+                  </span>
                 )}
               </div>
               <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-bg-panel shadow-sm" />
@@ -473,7 +475,7 @@ function SocialContent() {
           </div>
 
           {/* Center: Live Today Focus Time */}
-          <div className="flex items-center justify-center bg-bg-abyss/80 border border-border-subtle px-8 py-3.5 rounded-xl">
+          <div className="flex items-center justify-center bg-bg-abyss/80 border border-border-subtle px-8 py-3.5 rounded-xl w-full md:w-auto shrink-0">
             <div className="text-center">
               <span className="text-[10px] uppercase font-bold font-['Rajdhani'] tracking-widest text-text-muted block">
                 Today&apos;s Study Time
@@ -491,7 +493,7 @@ function SocialContent() {
           </div>
 
           {/* Right: Roster Statistics & Quick Timer Launch */}
-          <div className="flex items-center justify-between md:justify-end gap-5">
+          <div className="flex items-center justify-between md:justify-end gap-5 w-full md:w-auto shrink-0">
             <div className="text-left md:text-right">
               <span className="text-[10px] uppercase font-bold font-['Rajdhani'] tracking-wider text-text-muted block">
                 Friends Status
@@ -924,7 +926,9 @@ function SocialContent() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="text-xl">📖</span>
+                          <span className="text-xl font-bold font-['Rajdhani'] text-emerald-400 select-none">
+                            {(req.sender.name || req.sender.username || "S").charAt(0).toUpperCase()}
+                          </span>
                         )}
                       </div>
                     </div>

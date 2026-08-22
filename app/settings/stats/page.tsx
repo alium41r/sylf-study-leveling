@@ -42,6 +42,18 @@ interface Summary {
   completionRate: number;
 }
 
+interface SessionLogEntry {
+  id: number;
+  startedAt: string;
+  endedAt: string | null;
+  durationMinutes: number;
+  durationSeconds: number;
+  focusRate: number;
+  subjectName: string | null;
+  subjectColor: string | null;
+  questTitle: string | null;
+}
+
 interface DetailedStats {
   user: {
     username: string;
@@ -58,9 +70,41 @@ interface DetailedStats {
   };
   dailyStudy: DailyStudy[];
   subjectBreakdown: SubjectBreakdown[];
+  sessionLog: SessionLogEntry[];
   questStats: QuestStats;
   goalStats: GoalStats;
   summary: Summary;
+}
+
+/** "30m", "50m 12s", "1h 20m", "3s" — human duration for a single session. */
+function formatSessionDuration(totalSeconds: number): string {
+  const sec = Math.max(0, Math.floor(totalSeconds));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m${s > 0 ? ` ${s}s` : ""}`;
+  return `${s}s`;
+}
+
+/** "Today · 09:15" or "Aug 26 · 21:40" for a session timestamp. */
+function formatSessionTime(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (d.toDateString() === now.toDateString()) return `Today · ${time}`;
+  const date = d.toLocaleDateString([], { month: "short", day: "numeric" });
+  return `${date} · ${time}`;
+}
+
+/** "Morning", "Afternoon", "Evening" or "Night" from the local hour. */
+function periodOfDay(iso: string): string {
+  const h = new Date(iso).getHours();
+  if (h < 5) return "Night";
+  if (h < 12) return "Morning";
+  if (h < 17) return "Afternoon";
+  if (h < 21) return "Evening";
+  return "Night";
 }
 
 /* ─── Mini Bar Chart Component ──────────────────────────────── */
@@ -400,7 +444,7 @@ export default function StatsSettingsPage() {
     );
   }
 
-  const { user, dailyStudy, subjectBreakdown, questStats, goalStats, summary } = data;
+  const { user, dailyStudy, subjectBreakdown, sessionLog, questStats, goalStats, summary } = data;
   const totalHours = Math.floor(user.totalStudyMinutes / 60);
   const maxSubjectMinutes = subjectBreakdown.length > 0 ? subjectBreakdown[0].minutes : 0;
 
@@ -632,6 +676,128 @@ export default function StatsSettingsPage() {
             ))
           )}
         </div>
+      </div>
+
+      {/* ─── Individual Session Log ──────────────────────── */}
+      <div className="system-card" style={{ padding: "24px", marginBottom: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+          <h3
+            style={{
+              fontFamily: "'Rajdhani', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.85rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "var(--accent-cyan)",
+            }}
+          >
+            Individual Session Log
+          </h3>
+          <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.7rem", color: "var(--text-muted)" }}>
+            {sessionLog.length} session{sessionLog.length === 1 ? "" : "s"} recorded
+          </span>
+        </div>
+        <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "16px" }}>
+          Every focus block is logged separately — morning, night, or in between.
+        </p>
+
+        {sessionLog.length === 0 ? (
+          <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", textAlign: "center", padding: "24px 0" }}>
+            No study sessions recorded yet. Start a focus session and end it to log your first entry.
+          </p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {sessionLog.slice(0, 25).map((s) => {
+              const accent = s.subjectColor || "var(--accent-primary)";
+              return (
+                <div
+                  key={s.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    padding: "10px 14px",
+                    borderRadius: "10px",
+                    background: "var(--bg-abyss)",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  {/* Duration badge */}
+                  <span
+                    style={{
+                      fontFamily: "'Rajdhani', sans-serif",
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      minWidth: "72px",
+                      textAlign: "center",
+                      padding: "4px 8px",
+                      borderRadius: "8px",
+                      color: accent,
+                      background: "rgba(255,255,255,0.04)",
+                      border: `1px solid ${accent}44`,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {formatSessionDuration(s.durationSeconds)}
+                  </span>
+
+                  {/* Period chip */}
+                  <span
+                    style={{
+                      fontSize: "0.6rem",
+                      fontFamily: "'Rajdhani', sans-serif",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      color: "var(--text-secondary)",
+                      padding: "2px 8px",
+                      borderRadius: "999px",
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid var(--border-subtle)",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {periodOfDay(s.startedAt)}
+                  </span>
+
+                  {/* Subject / Quest */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontFamily: "'Rajdhani', sans-serif",
+                        fontWeight: 600,
+                        fontSize: "0.85rem",
+                        color: "var(--text-primary)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {s.subjectName || "General Focus"}
+                      {s.questTitle ? ` · ${s.questTitle}` : ""}
+                    </p>
+                    <p style={{ fontSize: "0.68rem", color: "var(--text-muted)", fontFamily: "'Rajdhani', sans-serif" }}>
+                      {formatSessionTime(s.startedAt)}
+                      {s.focusRate ? ` • ${s.focusRate}% focus` : ""}
+                    </p>
+                  </div>
+
+                  {/* Subject color dot */}
+                  <span
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "50%",
+                      background: accent,
+                      boxShadow: `0 0 8px ${accent}66`,
+                      flexShrink: 0,
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* ─── Goals Overview ──────────────────────────────── */}

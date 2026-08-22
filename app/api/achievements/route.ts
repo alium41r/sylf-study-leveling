@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ACHIEVEMENTS_CATALOG } from "@/lib/achievements-catalog";
 import { verifyToken } from "@/lib/auth";
-import { awardXP } from "@/lib/game-engine";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 
 export const dynamic = "force-dynamic";
@@ -177,74 +176,86 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Requirements not met" }, { status: 400 });
     }
 
-    // Process Reward in a Transaction
-    await prisma.$transaction(async (tx: any) => {
-      // 1. Mark as claimed
-      await tx.userAchievement.create({
-        data: { userId, achievementId }
-      });
+    // Process Reward
+    if (ach.reward.type === "XP" || ach.reward.type === "SYLPH") {
+      // Atomic redemption via SECURITY DEFINER RPC: claim record +
+      // XP/Sylph credit + canonical level/rank recompute + ledgers
+      // inside one row-locked Postgres transaction.
+      const rows = await prisma.$queryRawUnsafe<
+        Array<{
+          claim_achievement_reward_atomic: {
+            success: boolean;
+            achievementId: string;
+            xpGained: number;
+            sylphGained: number;
+            level: number;
+            currentXP: number;
+            xpToNextLevel: number;
+            hunterRank: string;
+            levelsGained: number;
+            didRankUp: boolean;
+          };
+        }>
+      >(
+        `SELECT public.claim_achievement_reward_atomic($1::text, $2::text, $3::int, $4::int, $5::text) AS claim_achievement_reward_atomic`,
+        String(userId),
+        achievementId,
+        ach.reward.type === "XP" ? ach.reward.amount : 0,
+        ach.reward.type === "SYLPH" ? ach.reward.amount : 0,
+        ach.title
+      );
 
-      // 2. Grant Reward
-      if (ach.reward.type === "SYLPH") {
-        await tx.user.update({
-          where: { id: userId },
-          data: { sylph: { increment: ach.reward.amount } }
-        });
-        try {
-          await tx.sylphLedger.create({
-            data: { userId, amount: ach.reward.amount, source: "ACHIEVEMENT" as any }
-          });
-        } catch {
-          await tx.sylphLedger.create({
-            data: { userId, amount: ach.reward.amount, source: "SYSTEM" as any }
-          });
-        }
-      } else if (ach.reward.type === "XP") {
-        const xpResult = awardXP(user.level, user.currentXP, user.xpToNextLevel, ach.reward.amount);
-        const levelUpSylph = xpResult.levelsGained > 0 ? xpResult.newLevel * 300 : 0;
-        await tx.user.update({
-          where: { id: userId },
+      const rpcResult = rows[0]?.claim_achievement_reward_atomic;
+      if (!rpcResult || !rpcResult.success) {
+        throw new Error("claim_achievement_reward_atomic returned no result");
+      }
+
+      // System Notification
+      await prisma.systemMessage
+        .create({
           data: {
-            level: xpResult.newLevel,
-            currentXP: xpResult.newCurrentXP,
-            xpToNextLevel: xpResult.newXPToNextLevel,
-            hunterRank: xpResult.newRank,
-            sylph: { increment: levelUpSylph }
-          }
+            userId,
+            type: "REWARD",
+            content: `[ACHIEVEMENT] Unlocked: **${ach.title}**! Claimed +${ach.reward.amount} ${ach.reward.type}.`,
+          },
+        })
+        .catch(() => null);
+    } else if (ach.reward.type === "ITEM" && ach.reward.itemKey) {
+      // Item rewards stay in Prisma-land (inventory is not part of the
+      // progression ledgers); the claim record + inventory update are
+      // transactional.
+      await prisma.$transaction(async (tx: any) => {
+        await tx.userAchievement.create({
+          data: { userId, achievementId },
         });
-        if (levelUpSylph > 0) {
-          await tx.sylphLedger.create({
-            data: { userId, amount: levelUpSylph, source: "LEVEL_UP" }
-          });
-        }
-      } else if (ach.reward.type === "ITEM" && ach.reward.itemKey) {
-        // Add to inventory
+
         const existingItem = await tx.inventoryItem.findFirst({
-          where: { userId, itemKey: ach.reward.itemKey }
+          where: { userId, itemKey: ach.reward.itemKey },
         });
         if (existingItem) {
           await tx.inventoryItem.update({
             where: { id: existingItem.id },
-            data: { quantity: { increment: ach.reward.amount } }
+            data: { quantity: { increment: ach.reward.amount } },
           });
         } else {
           await tx.inventoryItem.create({
-            data: { userId, itemKey: ach.reward.itemKey, quantity: ach.reward.amount }
+            data: { userId, itemKey: ach.reward.itemKey, quantity: ach.reward.amount },
           });
         }
-      }
 
-      // 3. Create System Notification
-      if (tx?.systemMessage?.create) {
-        await tx.systemMessage.create({
-          data: {
-            userId,
-            type: "REWARD",
-            content: `[ACHIEVEMENT] Unlocked: **${ach.title}**! Claimed +${ach.reward.amount} ${ach.reward.type}${ach.reward.itemKey ? ` (${ach.reward.itemKey.replace(/_/g, " ")})` : ""}.`,
-          },
-        }).catch(() => null);
-      }
-    });
+        if (tx?.systemMessage?.create) {
+          await tx.systemMessage
+            .create({
+              data: {
+                userId,
+                type: "REWARD",
+                content: `[ACHIEVEMENT] Unlocked: **${ach.title}**! Claimed +${ach.reward.amount} ${ach.reward.type}${ach.reward.itemKey ? ` (${ach.reward.itemKey.replace(/_/g, " ")})` : ""}.`,
+              },
+            })
+            .catch(() => null);
+        }
+      });
+    }
 
     invalidateRankingsCache();
     const updatedUser = await prisma.user.findUnique({ where: { id: userId } });
@@ -252,6 +263,15 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error("Achievement Claim Error:", error);
+    // Map atomic-RPC idempotency errors (including the unique-constraint
+    // race backstop) to a precise client response.
+    if (
+      error?.code === "S0001" ||
+      error?.code === "23505" ||
+      /ALREADY_CLAIMED/.test(error?.message || "")
+    ) {
+      return NextResponse.json({ error: "Already claimed" }, { status: 400 });
+    }
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "name": "Sylf Reference Sprite Archive Manifest",
+  "version": "1.0.0",
+  "archivedAt": "2026-08-22T04:10:00.000Z",
+  "purpose": "Quarantine of legacy third-party sprites for coordinate and alignment reference during PixelLab custom asset generation pipeline",
+  "canvasSpecs": {
+    "width": 90,
+    "height": 90,
+    "aspectRatio": "1:1",
+    "colorFormat": "8-bit RGBA PNG with alpha transparency",
+    "groundAnchorY": 72,
+    "horizontalCenterX": 56.5,
+    "renderOffsetCorrection": "-11.67% (-10.5px)",
+    "layerOrder": [
+      { "layer": "aura", "zIndex": 0, "type": "SVG / CSS glow" },
+      { "layer": "pedestal", "zIndex": 1, "type": "SVG platform" },
+      { "layer": "hairBase", "zIndex": 2, "slot": "hair_back" },
+      { "layer": "body", "zIndex": 3, "slot": "body_skin" },
+      { "layer": "pants", "zIndex": 3.5, "slot": "pants_gear" },
+      { "layer": "boots", "zIndex": 3.6, "slot": "boots_gear" },
+      { "layer": "outfit", "zIndex": 4, "slot": "chestplate_robes" },
+      { "layer": "eyewear", "zIndex": 5, "slot": "face_optics" },
+      { "layer": "hairBangs", "zIndex": 6, "slot": "hair_front" },
+      { "layer": "accessory", "zIndex": 7, "slot": "headgear_helmet" },
+      { "layer": "weapon", "zIndex": 8, "slot": "hand_weapon" },
+      { "layer": "relic", "zIndex": 9, "slot": "offhand_shield" }
+    ]
+  },
+  "anatomyCoordinates": {
+    "head": {
+      "xRange": [39, 74],
+      "yRange": [24, 42],
+      "center": [56.5, 33.0],
+      "description": "Head and face anchor for hairstyles, circlets, and cowls"
+    },
+    "torso": {
+      "xRange": [39, 74],
+      "yRange": [45, 68],
+      "center": [56.5, 56.5],
+      "description": "Chest and torso anchor for armor, tunics, robes, and vests"
+    },
+    "legsAndFeet": {
+      "xRange": [39, 74],
+      "yRange": [63, 76],
+      "center": [56.5, 69.5],
+      "description": "Pants and boots baseline touching the pedestal ground anchor"
+    },
+    "weaponSlot": {
+      "xRange": [10, 40],
+      "yRange": [35, 75],
+      "center": [25.0, 55.0],
+      "description": "Primary weapon hand anchor (swords, daggers, scythes, staves)"
+    },
+    "relicSlot": {
+      "xRange": [55, 85],
+      "yRange": [35, 75],
+      "center": [70.0, 55.0],
+      "description": "Secondary offhand anchor (shields, magical relics, cores)"
+    }
+  },
+  "quarantinedDirectories": {
+    "body": "archive/reference_sprites/body/",
+    "hair": "archive/reference_sprites/hair/",
+    "face": "archive/reference_sprites/face/",
+    "outfits": "archive/reference_sprites/outfits/",
+    "equipment": "archive/reference_sprites/equipment/",
+    "accessories": "archive/reference_sprites/accessories/"
+  }
+}

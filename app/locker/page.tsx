@@ -6,9 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IdentityTab } from "./components/IdentityTab";
 import { ItemsTab } from "./components/ItemsTab";
 import { AcousticsTab } from "./components/AcousticsTab";
-import { SkillTreeTab } from "./components/SkillTreeTab";
 
-type LockerTab = "identity" | "items" | "acoustics" | "skill-tree";
+type LockerTab = "identity" | "items" | "acoustics";
 
 const TABS: { id: LockerTab; label: string; icon: React.ReactNode }[] = [
   {
@@ -38,15 +37,6 @@ const TABS: { id: LockerTab; label: string; icon: React.ReactNode }[] = [
       </svg>
     ),
   },
-  {
-    id: "skill-tree",
-    label: "SKILL TREE",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
-  },
 ];
 
 function LockerContent() {
@@ -54,7 +44,7 @@ function LockerContent() {
   const router = useRouter();
 
   const tabParam = searchParams.get("tab") as LockerTab;
-  const activeTab: LockerTab = (tabParam && ["identity", "items", "acoustics", "skill-tree"].includes(tabParam))
+  const activeTab: LockerTab = (tabParam && ["identity", "items", "acoustics"].includes(tabParam))
     ? tabParam
     : "identity";
 
@@ -64,10 +54,10 @@ function LockerContent() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto min-h-screen">
+    <div className="px-4 py-6 sm:p-8 max-w-6xl mx-auto min-h-screen">
       {/* ─── Top Switcher Bar ──────────────────────────── */}
-      <div className="flex justify-center mb-8">
-        <div className="bg-bg-panel/80 backdrop-blur-md border border-border-subtle p-1.5 rounded-2xl flex items-center gap-1 shadow-xl overflow-x-auto max-w-full scrollbar-none">
+      <div className="w-full flex mb-8">
+        <div className="bg-bg-panel/80 backdrop-blur-md border border-border-subtle p-1.5 rounded-2xl flex items-center justify-center gap-1 shadow-xl max-w-full mx-auto flex-wrap">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
 
@@ -111,7 +101,6 @@ function LockerContent() {
           {activeTab === "identity" && <IdentityTab />}
           {activeTab === "items" && <ItemsTab />}
           {activeTab === "acoustics" && <AcousticsTab />}
-          {activeTab === "skill-tree" && <SkillTreeTab />}
         </motion.div>
       </AnimatePresence>
     </div>

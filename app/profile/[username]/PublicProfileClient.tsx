@@ -66,6 +66,32 @@ export interface ProfileData {
   completedQuestsCount?: number;
   achievementsCount?: number;
   recentAchievements?: { achievementId: string; claimedAt: string }[];
+  levelProgress?: number;
+  inventory?: Array<{
+    id: number;
+    itemId: number;
+    isEquipped: boolean;
+    item: {
+      sku: string;
+      name: string;
+      slot: string;
+      rarity: string;
+      spriteLayer: string;
+      setKey?: string | null;
+    };
+  }>;
+  forgeMasteries?: Array<{
+    forgeCoreId: number;
+    prestigeTier: number;
+    completedAt: string;
+    forgeCore: {
+      coreKey: string;
+      name: string;
+      discipline: string;
+      rewardPedestalKey?: string | null;
+      rewardBadgeKey?: string | null;
+    };
+  }>;
   lastActiveDate?: string;
   createdAt?: string;
 }
@@ -377,7 +403,9 @@ export function PublicProfileClient({
                 {profile.avatarUrl ? (
                   <img src={profile.avatarUrl} alt={profile.username} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-4xl select-none">{classInfo?.fallbackIcon || "📖"}</span>
+                  <span className="text-4xl select-none font-bold font-['Rajdhani'] text-emerald-400">
+                    {(profile.name || profile.username || "S").charAt(0).toUpperCase()}
+                  </span>
                 )}
               </div>
 

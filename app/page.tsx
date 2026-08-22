@@ -123,7 +123,7 @@ export default function Home() {
                 LOGIN
               </button>
             </Link>
-            <Link href="/register" className="w-full sm:w-auto">
+            <Link href="/register?force=true" className="w-full sm:w-auto">
               <button className="btn-secondary w-full sm:w-auto text-base sm:text-lg px-8 py-3.5 tracking-wider">
                 CREATE ACCOUNT
               </button>

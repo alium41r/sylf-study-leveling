@@ -5,6 +5,8 @@ import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
 import { hash } from "bcryptjs";
+import { revalidateTag } from "next/cache";
+import { SKELETON_NODES } from "@/lib/skill-tree-skeleton";
 
 export async function POST(req: NextRequest) {
   try {
@@ -81,7 +83,7 @@ export async function POST(req: NextRequest) {
 
     // Parse the payload
     const body = await req.json();
-    const { themeId, backgroundId, avatarId, classId, username, name, password, timezone } = body;
+    const { themeId, backgroundId, avatarId, classId, username, name, password, timezone, subjects } = body;
 
     const safeThemeId = themeId || "cyberpunk";
     const safeBackgroundId = backgroundId || "void";
@@ -157,12 +159,69 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      // Provision subjects and 48-node constellation skeletons if provided
+      if (Array.isArray(subjects) && subjects.length > 0) {
+        for (const sub of subjects) {
+          if (!sub.name || !sub.code) continue;
+          const cleanCode = String(sub.code).trim().toUpperCase();
+          const cleanName = String(sub.name).trim();
+          const cleanExamBoard = String(sub.examBoard || "CAIE").trim().toUpperCase();
+          const cleanLevel = String(sub.level || "A-Level").trim();
+          const cleanColor = String(sub.color || "#8B5CF6").trim();
+
+          const createdSubject = await tx.subject.upsert({
+            where: {
+              userId_code: { userId, code: cleanCode },
+            },
+            create: {
+              userId,
+              name: cleanName,
+              code: cleanCode,
+              examBoard: cleanExamBoard,
+              level: cleanLevel,
+              color: cleanColor,
+            },
+            update: {
+              name: cleanName,
+              examBoard: cleanExamBoard,
+              level: cleanLevel,
+              color: cleanColor,
+            },
+          });
+
+          // Batch insert 48 constellation skeleton nodes for this subject
+          const nodePayloads = SKELETON_NODES.map((node) => ({
+            subjectId: createdSubject.id,
+            nodeId: node.id,
+            tier: node.tier,
+            title: `${cleanName} - ${node.label}`,
+            description: node.description,
+            difficulty: Math.min(5, Math.max(1, Math.ceil(node.tier / 2))),
+            spAward: node.tier <= 3 ? 1 : node.tier <= 5 ? 2 : node.tier <= 7 ? 3 : node.tier <= 9 ? 4 : 0,
+            progress: 0.0,
+            isMastered: false,
+          }));
+
+          await tx.subjectNode.createMany({
+            data: nodePayloads,
+            skipDuplicates: true,
+          });
+        }
+      }
+
       // Update user record
       return tx.user.update({
         where: { id: userId },
         data: userUpdates,
       });
     });
+
+    if (updatedUser.username) {
+      try {
+        revalidateTag(`user-${updatedUser.username.toLowerCase()}`, "max");
+        revalidateTag(`profile-stats-${updatedUser.username.toLowerCase()}`, "max");
+      } catch {}
+    }
 
     const updatedScholarId = updatedUser.scholarId || formatScholarId(updatedUser.id);
 

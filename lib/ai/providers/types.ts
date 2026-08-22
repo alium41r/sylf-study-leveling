@@ -65,10 +65,20 @@ export class LLMProviderError extends Error {
   }
 }
 
+export interface LLMGenerateOptions {
+  responseFormat?: "json_object" | "text";
+  temperature?: number;
+  maxTokens?: number;
+  /** Aborts the upstream HTTP request immediately when signalled. */
+  signal?: AbortSignal;
+}
+
 export interface LLMAdapter {
   generateResponse(
     messages: NormalizedMessage[],
     systemInstruction: string,
-    tools: NormalizedTool[]
+    tools: NormalizedTool[],
+    options?: LLMGenerateOptions
   ): Promise<LLMResponse>;
 }
+

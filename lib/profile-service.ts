@@ -3,6 +3,8 @@ import { getRelationship, isVisible } from "@/lib/privacy";
 import { Relationship } from "@/lib/privacy-types";
 import { isUserBlocked } from "@/lib/block-service";
 import { TimezoneService } from "@/lib/timezone-service";
+import { unstable_cache } from "next/cache";
+import { getLevelProgress } from "@/lib/game-engine";
 
 export interface ProfileDossierResult {
   profile: any | null;
@@ -24,16 +26,9 @@ export interface ProfileDossierResult {
   status: number;
 }
 
-/**
- * Server-side profile dossier data loader with strict column projections
- * and ISO string date serialization across Server/Client boundary.
- */
-export async function getProfileDossier(
-  username: string,
-  viewerId: number | null
-): Promise<ProfileDossierResult> {
-  const targetUser = await prisma.user.findUnique({
-    where: { username: username.toLowerCase() },
+async function fetchTargetUserData(normalized: string) {
+  return prisma.user.findUnique({
+    where: { username: normalized },
     select: {
       id: true,
       username: true,
@@ -66,6 +61,38 @@ export async function getProfileDossier(
       statSynthesis: true,
       statDiscipline: true,
       createdAt: true,
+      stats: {
+        select: {
+          level: true,
+          xp: true,
+          rank: true,
+          currency: true,
+          skillPoints: true,
+          endurance: true,
+          tenacity: true,
+          velocity: true,
+          discipline: true,
+          synthesis: true,
+        },
+      },
+      inventory: {
+        where: { isEquipped: true },
+        select: {
+          id: true,
+          itemId: true,
+          isEquipped: true,
+          item: {
+            select: {
+              sku: true,
+              name: true,
+              slot: true,
+              rarity: true,
+              spriteLayer: true,
+              setKey: true,
+            },
+          },
+        },
+      },
       privacy: {
         select: {
           profileVisibility: true,
@@ -94,6 +121,38 @@ export async function getProfileDossier(
       },
     },
   });
+}
+
+/**
+ * Cached loader for target user profile base data
+ */
+export async function getCachedUserData(username: string) {
+  const normalized = username.toLowerCase();
+  try {
+    const cachedFn = unstable_cache(
+      async () => fetchTargetUserData(normalized),
+      [`user-${normalized}`, `profile-stats-${normalized}`],
+      {
+        revalidate: 3600,
+        tags: [`user-${normalized}`, `profile-stats-${normalized}`],
+      }
+    );
+    return await cachedFn();
+  } catch {
+    // Graceful fallback for non-static / test environments where incrementalCache is not initialized
+    return await fetchTargetUserData(normalized);
+  }
+}
+
+/**
+ * Server-side profile dossier data loader with strict column projections
+ * and ISO string date serialization across Server/Client boundary.
+ */
+export async function getProfileDossier(
+  username: string,
+  viewerId: number | null
+): Promise<ProfileDossierResult> {
+  const targetUser = await getCachedUserData(username);
 
   if (!targetUser) {
     return {
@@ -204,103 +263,128 @@ export async function getProfileDossier(
   if (discordAcc?.providerUsername) connectedSocials.discord = discordAcc.providerUsername;
   if (igAcc?.providerUsername) connectedSocials.instagram = igAcc.providerUsername;
 
-  const rawProfileData = {
-    id: targetUser.id,
-    name: targetUser.name,
-    username: targetUser.username,
-    scholarId: (targetUser as any).scholarId,
-    verificationStatus: (targetUser as any).verificationStatus,
-    avatarUrl: targetUser.avatarUrl,
-    bannerUrl: targetUser.bannerUrl,
-    bio: targetUser.bio,
-    hunterRank: targetUser.hunterRank,
-    level: targetUser.level,
-    currentXP: targetUser.currentXP,
-    xpToNextLevel: targetUser.xpToNextLevel,
-    hp: targetUser.hp,
-    maxHp: targetUser.maxHp,
-    streakDays: targetUser.streakDays,
-    totalStudyMinutes: targetUser.totalStudyMinutes,
-    totalStudySeconds: targetUser.totalStudySeconds || (targetUser.totalStudyMinutes * 60),
-    todayStudyMinutes,
-    todayStudySeconds,
-    completedTodaySeconds,
-    isStudying,
-    activeSessionStartedAt,
-    activeAvatar: targetUser.activeAvatar,
-    activeFrame: targetUser.activeFrame,
-    activeTitle: targetUser.activeTitle,
-    activeAura: targetUser.activeAura,
-    activeNameColor: targetUser.activeNameColor,
-    characterConfig: targetUser.characterConfig || null,
-    socialLinks: connectedSocials,
-    connectedAccounts: {
-      github: ghAcc?.providerUsername || null,
-      discord: discordAcc?.providerUsername || null,
-      instagram: igAcc?.providerUsername || null,
-    },
-    stats: {
+    const userStats = targetUser.stats || {
+      level: targetUser.level || 1,
+      xp: targetUser.currentXP || 0,
+      rank: targetUser.hunterRank || "RANK E",
+      currency: 0,
+      skillPoints: 0,
       endurance: targetUser.statEndurance ?? 10,
       tenacity: targetUser.statTenacity ?? 10,
       velocity: targetUser.statVelocity ?? 10,
-      synthesis: targetUser.statSynthesis ?? 10,
       discipline: targetUser.statDiscipline ?? 10,
-    },
-    completedQuestsCount,
-    achievementsCount: targetUser.achievements?.length || 0,
-    recentAchievements: (targetUser.achievements || []).map((a: any) => ({
-      achievementId: a.achievementId,
-      claimedAt: a.claimedAt ? (typeof a.claimedAt === "string" ? a.claimedAt : new Date(a.claimedAt).toISOString()) : new Date().toISOString(),
-    })),
-    lastActiveDate: targetUser.lastActiveDate,
-    createdAt: targetUser.createdAt ? (typeof targetUser.createdAt === "string" ? targetUser.createdAt : new Date(targetUser.createdAt).toISOString()) : new Date().toISOString(),
-  };
+      synthesis: targetUser.statSynthesis ?? 10,
+    };
+    const levelProgress = getLevelProgress(userStats.xp, userStats.level).progressPercentage;
 
-  const isRestrictedByBlock = isBlockedByViewer || isBlockedByTarget;
-  const isProfilePublic = isVisible(privacy.profileVisibility, baseRelationship);
-
-  let finalProfile: any = null;
-  if (isRestrictedByBlock || (!isSelf && !isProfilePublic)) {
-    finalProfile = {
+    const rawProfileData = {
       id: targetUser.id,
-      username: targetUser.username,
       name: targetUser.name,
+      username: targetUser.username,
+      scholarId: (targetUser as any).scholarId,
+      verificationStatus: (targetUser as any).verificationStatus,
       avatarUrl: targetUser.avatarUrl,
+      bannerUrl: targetUser.bannerUrl,
+      bio: targetUser.bio,
+      hunterRank: userStats.rank || targetUser.hunterRank,
+      level: userStats.level || targetUser.level,
+      currentXP: userStats.xp || targetUser.currentXP,
+      xpToNextLevel: targetUser.xpToNextLevel,
+      levelProgress,
+      hp: targetUser.hp,
+      maxHp: targetUser.maxHp,
+      streakDays: targetUser.streakDays,
+      totalStudyMinutes: targetUser.totalStudyMinutes,
+      totalStudySeconds: targetUser.totalStudySeconds || (targetUser.totalStudyMinutes * 60),
+      todayStudyMinutes,
+      todayStudySeconds,
+      completedTodaySeconds,
+      isStudying,
+      activeSessionStartedAt,
       activeAvatar: targetUser.activeAvatar,
       activeFrame: targetUser.activeFrame,
       activeTitle: targetUser.activeTitle,
-      characterConfig: undefined,
-      isRestricted: true,
-      bio: undefined,
-      stats: undefined,
-      socialLinks: undefined,
-      connectedAccounts: undefined,
-      recentAchievements: [],
+      activeAura: targetUser.activeAura,
+      activeNameColor: targetUser.activeNameColor,
+      characterConfig: targetUser.characterConfig || null,
+      socialLinks: connectedSocials,
+      connectedAccounts: {
+        github: ghAcc?.providerUsername || null,
+        discord: discordAcc?.providerUsername || null,
+        instagram: igAcc?.providerUsername || null,
+      },
+      stats: {
+        endurance: userStats.endurance ?? targetUser.statEndurance ?? 10,
+        tenacity: userStats.tenacity ?? targetUser.statTenacity ?? 10,
+        velocity: userStats.velocity ?? targetUser.statVelocity ?? 10,
+        discipline: userStats.discipline ?? targetUser.statDiscipline ?? 10,
+        synthesis: userStats.synthesis ?? targetUser.statSynthesis ?? 10,
+      },
+      userStats,
+      inventory: (targetUser.inventory || []).map((inv: any) => ({
+        id: inv.id,
+        itemId: inv.itemId,
+        isEquipped: inv.isEquipped,
+        item: inv.item,
+      })),
+      completedQuestsCount,
+      achievementsCount: targetUser.achievements?.length || 0,
+      recentAchievements: (targetUser.achievements || []).map((a: any) => ({
+        achievementId: a.achievementId,
+        claimedAt: a.claimedAt ? (typeof a.claimedAt === "string" ? a.claimedAt : new Date(a.claimedAt).toISOString()) : new Date().toISOString(),
+      })),
+      lastActiveDate: targetUser.lastActiveDate,
+      createdAt: targetUser.createdAt ? (typeof targetUser.createdAt === "string" ? targetUser.createdAt : new Date(targetUser.createdAt).toISOString()) : new Date().toISOString(),
     };
-  } else {
-    const showStudy = isSelf || isVisible(privacy.showStudyHours, baseRelationship);
-    const showRank = isSelf || isVisible(privacy.showRank, baseRelationship);
-    const showAchievements = isSelf || isVisible(privacy.showAchievements, baseRelationship);
-    const showOnline = isSelf || isVisible(privacy.showOnlineStatus, baseRelationship);
 
-    finalProfile = {
-      ...rawProfileData,
-      hunterRank: showRank ? rawProfileData.hunterRank : undefined,
-      level: showRank ? rawProfileData.level : undefined,
-      currentXP: showRank ? rawProfileData.currentXP : undefined,
-      xpToNextLevel: showRank ? rawProfileData.xpToNextLevel : undefined,
-      totalStudyMinutes: showStudy ? rawProfileData.totalStudyMinutes : undefined,
-      totalStudySeconds: showStudy ? rawProfileData.totalStudySeconds : undefined,
-      todayStudyMinutes: showStudy ? rawProfileData.todayStudyMinutes : undefined,
-      todayStudySeconds: showStudy ? rawProfileData.todayStudySeconds : undefined,
-      completedTodaySeconds: showStudy ? rawProfileData.completedTodaySeconds : undefined,
-      streakDays: showStudy ? rawProfileData.streakDays : undefined,
-      stats: showStudy ? rawProfileData.stats : undefined,
-      recentAchievements: showAchievements ? rawProfileData.recentAchievements : undefined,
-      achievementsCount: showAchievements ? rawProfileData.achievementsCount : undefined,
-      lastActiveDate: showOnline ? rawProfileData.lastActiveDate : undefined,
-    };
-  }
+    const isRestrictedByBlock = isBlockedByViewer || isBlockedByTarget;
+    const isProfilePublic = isVisible(privacy.profileVisibility, baseRelationship);
+
+    let finalProfile: any = null;
+    if (isRestrictedByBlock || (!isSelf && !isProfilePublic)) {
+      finalProfile = {
+        id: targetUser.id,
+        username: targetUser.username,
+        name: targetUser.name,
+        avatarUrl: targetUser.avatarUrl,
+        activeAvatar: targetUser.activeAvatar,
+        activeFrame: targetUser.activeFrame,
+        activeTitle: targetUser.activeTitle,
+        characterConfig: undefined,
+        isRestricted: true,
+        bio: undefined,
+        stats: undefined,
+        inventory: undefined,
+        socialLinks: undefined,
+        connectedAccounts: undefined,
+        recentAchievements: [],
+      };
+    } else {
+      const showStudy = isSelf || isVisible(privacy.showStudyHours, baseRelationship);
+      const showRank = isSelf || isVisible(privacy.showRank, baseRelationship);
+      const showAchievements = isSelf || isVisible(privacy.showAchievements, baseRelationship);
+      const showOnline = isSelf || isVisible(privacy.showOnlineStatus, baseRelationship);
+
+      finalProfile = {
+        ...rawProfileData,
+        hunterRank: showRank ? rawProfileData.hunterRank : undefined,
+        level: showRank ? rawProfileData.level : undefined,
+        currentXP: showRank ? rawProfileData.currentXP : undefined,
+        xpToNextLevel: showRank ? rawProfileData.xpToNextLevel : undefined,
+        levelProgress: showRank ? rawProfileData.levelProgress : undefined,
+        totalStudyMinutes: showStudy ? rawProfileData.totalStudyMinutes : undefined,
+        totalStudySeconds: showStudy ? rawProfileData.totalStudySeconds : undefined,
+        todayStudyMinutes: showStudy ? rawProfileData.todayStudyMinutes : undefined,
+        todayStudySeconds: showStudy ? rawProfileData.todayStudySeconds : undefined,
+        completedTodaySeconds: showStudy ? rawProfileData.completedTodaySeconds : undefined,
+        streakDays: showStudy ? rawProfileData.streakDays : undefined,
+        stats: showStudy ? rawProfileData.stats : undefined,
+        inventory: rawProfileData.inventory,
+        recentAchievements: showAchievements ? rawProfileData.recentAchievements : undefined,
+        achievementsCount: showAchievements ? rawProfileData.achievementsCount : undefined,
+        lastActiveDate: showOnline ? rawProfileData.lastActiveDate : undefined,
+      };
+    }
 
   const permissions = {
     canSendFriendRequest: !isSelf && !isRestrictedByBlock && isVisible(privacy.allowFriendRequests, baseRelationship) && relationshipStatus === Relationship.PUBLIC,

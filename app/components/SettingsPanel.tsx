@@ -221,8 +221,9 @@ export default function SettingsPanel() {
             style={{
               maxWidth: "860px",
               margin: "0 auto",
-              padding: "80px 24px 60px",
+              padding: "64px 16px calc(60px + env(safe-area-inset-bottom))",
             }}
+            className="w-full"
           >
             {/* Panel title */}
             <div style={{ textAlign: "center", marginBottom: "40px" }}>
@@ -252,14 +253,8 @@ export default function SettingsPanel() {
               </h2>
             </div>
 
-            {/* 2x2 Category Grid */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "20px",
-              }}
-            >
+            {/* Responsive Category Grid (1-col mobile, 2-col sm+) */}
+            <div className="settings-panel-grid">
               {SETTINGS_CATEGORIES.map((category, catIdx) => (
                 <motion.div
                   key={category.label}
@@ -269,13 +264,7 @@ export default function SettingsPanel() {
                   className="settings-category-card"
                 >
                   <p className="settings-category-label">{category.label}</p>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "10px",
-                    }}
-                  >
+                  <div className="settings-category-tiles">
                     {category.tiles.map((tile) => (
                       <button
                         key={tile.key}

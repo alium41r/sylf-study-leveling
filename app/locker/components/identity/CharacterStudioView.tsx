@@ -6,43 +6,50 @@ import { CharacterRenderer } from "@/app/components/character/CharacterRenderer"
 import {
   CharacterConfig,
   generateRandomCharacterConfig,
-  SKIN_TONES,
-  HAIR_STYLES,
-  HAIR_COLORS,
-  OUTFIT_STYLES,
-  EYEWEAR_STYLES,
-  ACCESSORY_STYLES,
+  FULL_BODY_FORMS,
+  PEDESTAL_OPTIONS,
   AURA_PRESETS,
+  TraitOption,
 } from "@/lib/character-traits";
-import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
+import { isRankSufficient } from "@/lib/shop-items";
 import {
   User,
-  Scissors,
-  Shirt,
-  Glasses,
-  Crown,
   Sparkles,
-  Award,
+  Shield,
   Dices,
   RotateCcw,
   Save,
   ArrowLeft,
   Eye,
-  X,
+  Lock,
   Palette,
+  Check,
+  Zap,
 } from "lucide-react";
 
-type TraitCategory = "SKIN" | "HAIR" | "ATTIRE" | "EYEWEAR" | "ACCESSORIES" | "AURAS" | "CLASS";
+type StudioCategory = "FORMS" | "PEDESTALS" | "AURAS";
 
-const TRAIT_TABS: { key: TraitCategory; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: "SKIN", label: "Skin & Base", icon: User },
-  { key: "HAIR", label: "Hair & Cut", icon: Scissors },
-  { key: "ATTIRE", label: "Outfits & Robes", icon: Shirt },
-  { key: "EYEWEAR", label: "Eyewear & Optics", icon: Glasses },
-  { key: "ACCESSORIES", label: "Headgear", icon: Crown },
-  { key: "AURAS", label: "Auras & Pedestals", icon: Sparkles },
-  { key: "CLASS", label: "Class & Titles", icon: Award },
+const STUDIO_TABS: { key: StudioCategory; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { key: "FORMS", label: "Hunter Forms", icon: User },
+  { key: "PEDESTALS", label: "Pedestal Cores", icon: Shield },
+  { key: "AURAS", label: "Energy Auras", icon: Sparkles },
 ];
+
+const RARITY_BORDER_STYLES: Record<string, string> = {
+  COMMON: "border-zinc-700/70 hover:border-zinc-500",
+  RARE: "border-blue-500/40 hover:border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.12)]",
+  EPIC: "border-purple-500/40 hover:border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)]",
+  LEGENDARY: "border-amber-500/40 hover:border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.18)]",
+  MYTHIC: "border-rose-500/50 hover:border-rose-400 shadow-[0_0_25px_rgba(244,63,94,0.22)]",
+};
+
+const RARITY_BADGE_STYLES: Record<string, string> = {
+  COMMON: "border-zinc-700 bg-zinc-800/80 text-zinc-300",
+  RARE: "border-blue-500/50 bg-blue-500/15 text-blue-400",
+  EPIC: "border-purple-500/50 bg-purple-500/15 text-purple-400",
+  LEGENDARY: "border-amber-500/50 bg-amber-500/15 text-amber-400",
+  MYTHIC: "border-rose-500/60 bg-rose-500/15 text-rose-400",
+};
 
 interface CharacterStudioViewProps {
   user: any;
@@ -63,15 +70,22 @@ export function CharacterStudioView({
   characterConfig,
   setCharacterConfig,
   savedConfig,
-  activeCosmetics,
-  setActiveCosmetics,
   stats,
   onBackToHub,
   onPreviewProfile,
   onSaveCharacter,
   saving,
 }: CharacterStudioViewProps) {
-  const [activeTab, setActiveTab] = useState<TraitCategory>("SKIN");
+  const [activeTab, setActiveTab] = useState<StudioCategory>("FORMS");
+
+  const userRank = user?.hunterRank || "RANK E";
+  const userLevel = user?.level || 1;
+
+  const isItemUnlocked = (requiredRank?: string, requiredLevel?: number) => {
+    const rankOk = requiredRank ? isRankSufficient(userRank, requiredRank) : true;
+    const levelOk = requiredLevel ? userLevel >= requiredLevel : true;
+    return rankOk && levelOk;
+  };
 
   const updateTrait = <K extends keyof CharacterConfig>(key: K, value: CharacterConfig[K]) => {
     setCharacterConfig((prev) => ({
@@ -94,10 +108,10 @@ export function CharacterStudioView({
   const requiredXP = stats?.nextUnlock?.requiredXP || 1000;
   const xpPercent = Math.min(100, Math.round((currentXP / requiredXP) * 100));
 
-  const outfitLabel = OUTFIT_STYLES.find((o) => o.value === characterConfig.outfit)?.label || "Scholar";
-  const skinLabel = SKIN_TONES.find((s) => s.value === characterConfig.skin)?.label.split(" ")[0] || "Fair";
-  const hairColorLabel = HAIR_COLORS.find((h) => h.value === characterConfig.hairColor)?.label.split(" ")[0] || "Black";
-  const auraLabel = AURA_PRESETS.find((a) => a.id === characterConfig.aura)?.label.split(" ")[0] || "None";
+  // Resolved active labels for preview summary pills
+  const activeForm = FULL_BODY_FORMS.find((f) => f.value === characterConfig.outfit) || FULL_BODY_FORMS[0];
+  const activePedestal = PEDESTAL_OPTIONS.find((p) => p.value === (characterConfig.pedestal || characterConfig.pedestalKey)) || PEDESTAL_OPTIONS[0];
+  const activeAura = AURA_PRESETS.find((a) => a.id === (characterConfig.aura || "none")) || AURA_PRESETS[0];
 
   return (
     <div className="system-card rounded-2xl bg-bg-panel/70 border border-white/10 shadow-2xl backdrop-blur-xl p-5 sm:p-7 relative overflow-hidden flex flex-col gap-6">
@@ -123,7 +137,7 @@ export function CharacterStudioView({
               <span>Character Studio</span>
             </h2>
             <p className="text-xs text-text-muted font-['Rajdhani']">
-              Customize your full-body sprite appearance, equipped gear, and radiant particle auras.
+              Visual Customization Studio: Select your unlocked Hunter model, pedestal platform, and energy aura.
             </p>
           </div>
         </div>
@@ -165,7 +179,7 @@ export function CharacterStudioView({
             type="button"
             onClick={onSaveCharacter}
             disabled={saving}
-            className="btn-primary px-5 py-2 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-md"
+            className="btn-primary px-5 py-2 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-md active:scale-95"
             style={{
               background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
               color: "var(--text-primary)",
@@ -173,7 +187,7 @@ export function CharacterStudioView({
             }}
           >
             <Save className="w-3.5 h-3.5" />
-            <span>{saving ? "Saving..." : "Save Character"}</span>
+            <span>{saving ? "Equipping..." : "Equip Configuration"}</span>
           </button>
         </div>
       </div>
@@ -191,26 +205,28 @@ export function CharacterStudioView({
               <Sparkles className="w-3.5 h-3.5 text-accent-text-light" />
               <span>Live Sprite Stage</span>
             </span>
-            <span className="text-[11px] font-bold font-mono px-2 py-0.5 rounded-full bg-bg-panel border border-white/10 text-accent-text-light">
-              Level {user.level || 1}
+            <span className="text-[11px] font-bold font-mono px-2.5 py-0.5 rounded-full bg-bg-panel border border-white/10 text-accent-text-light">
+              Lv. {userLevel} • {userRank}
             </span>
           </div>
 
           {/* Character Stage Center */}
-          <div className="relative z-10 py-4 flex flex-col items-center justify-center">
-            <div className="scale-100 sm:scale-105 transform transition-transform">
-              <CharacterRenderer
-                config={characterConfig}
-                seed={characterConfig.seed || user.username}
-                size={210}
-                showPedestal={true}
-                showAura={true}
-              />
+          <div className="relative z-10 py-4 sm:py-6 flex flex-col items-center justify-center">
+            <div className="w-full max-w-[320px] sm:max-w-md mx-auto aspect-square flex items-center justify-center">
+              <div className="scale-95 sm:scale-110 md:scale-125 transform transition-transform">
+                <CharacterRenderer
+                  config={characterConfig}
+                  seed={characterConfig.seed || user.username}
+                  size={260}
+                  showPedestal={true}
+                  showAura={true}
+                />
+              </div>
             </div>
 
-            <div className="text-center mt-2">
+            <div className="text-center mt-3">
               <span className="text-[10px] font-bold font-['Rajdhani'] uppercase tracking-widest px-3 py-1 rounded-full bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid inline-block mb-1 shadow-sm">
-                {outfitLabel}
+                {activeForm.label}
               </span>
               <h3 className="text-xl font-bold font-['Rajdhani'] text-text-primary">
                 {user.name || user.username}
@@ -219,26 +235,26 @@ export function CharacterStudioView({
             </div>
           </div>
 
-          {/* Stage Footer: Traits Chips & Integrated XP Bar */}
+          {/* Stage Footer: Visual Traits Chips & Integrated XP Bar */}
           <div className="relative z-10 flex flex-col gap-3 pt-4 border-t border-white/10">
-            {/* Traits Summary Pills */}
+            {/* Traits Summary Pills (3 Cosmetic Categories) */}
             <div className="grid grid-cols-3 gap-2 text-center text-xs font-['Rajdhani']">
               <div className="p-2 rounded-xl bg-bg-panel/70 border border-white/10">
-                <span className="text-[9px] text-text-muted block uppercase tracking-wider">Skin</span>
-                <span className="font-bold text-text-primary capitalize truncate block text-[11px]">
-                  {skinLabel}
+                <span className="text-[9px] text-text-muted block uppercase tracking-wider">Form</span>
+                <span className="font-bold text-text-primary truncate block text-[10px]">
+                  {activeForm.label.split(" ")[0]}
                 </span>
               </div>
               <div className="p-2 rounded-xl bg-bg-panel/70 border border-white/10">
-                <span className="text-[9px] text-text-muted block uppercase tracking-wider">Hair</span>
-                <span className="font-bold text-text-primary capitalize truncate block text-[11px]">
-                  {hairColorLabel}
+                <span className="text-[9px] text-text-muted block uppercase tracking-wider">Pedestal</span>
+                <span className="font-bold text-text-primary truncate block text-[10px]">
+                  {activePedestal.label.split(" ")[0]}
                 </span>
               </div>
               <div className="p-2 rounded-xl bg-bg-panel/70 border border-white/10">
                 <span className="text-[9px] text-text-muted block uppercase tracking-wider">Aura</span>
-                <span className="font-bold text-accent-text-light capitalize truncate block text-[11px]">
-                  {auraLabel}
+                <span className="font-bold text-accent-text-light truncate block text-[10px]">
+                  {activeAura.label.split(" ")[0]}
                 </span>
               </div>
             </div>
@@ -246,7 +262,7 @@ export function CharacterStudioView({
             {/* Integrated XP Progress */}
             <div className="p-3 rounded-xl bg-bg-panel/50 border border-white/5 flex flex-col gap-1.5">
               <div className="flex justify-between text-[11px] font-['Rajdhani'] font-bold">
-                <span className="text-text-secondary">Level Progress</span>
+                <span className="text-text-secondary">Evolution Progress</span>
                 <span className="text-accent-text-light font-mono">
                   {currentXP} / {requiredXP} XP ({xpPercent}%)
                 </span>
@@ -261,11 +277,11 @@ export function CharacterStudioView({
           </div>
         </div>
 
-        {/* ─── Right Column: Framed Customization Panel (7 Cols) ──── */}
+        {/* ─── Right Column: 3-Category Cosmetic Visual Workbench (7 Cols) ─ */}
         <div className="lg:col-span-7 rounded-2xl bg-bg-abyss/60 border border-white/10 p-5 sm:p-6 flex flex-col gap-5 shadow-inner min-h-[460px]">
           {/* Deck Tab Bar */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none border-b border-white/10">
-            {TRAIT_TABS.map((tab) => {
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-white/10">
+            {STUDIO_TABS.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.key;
               return (
@@ -273,277 +289,188 @@ export function CharacterStudioView({
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shrink-0 flex items-center gap-1.5 border ${
+                  className={`px-4 py-2.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shrink-0 flex items-center gap-2 border ${
                     isActive
-                      ? "bg-accent-primary text-white border-accent-primary shadow-[0_0_12px_rgba(124,58,237,0.35)]"
+                      ? "bg-accent-primary text-white border-accent-primary shadow-[0_0_14px_rgba(124,58,237,0.35)]"
                       : "bg-bg-panel/80 text-text-secondary hover:text-text-primary border-white/10 hover:border-white/20"
                   }`}
                 >
-                  <TabIcon className="w-3.5 h-3.5" />
+                  <TabIcon className="w-4 h-4" />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* ─── TAB 1: SKIN & BASE ────────────────────────────── */}
-          {activeTab === "SKIN" && (
+          {/* ─── CATEGORY 1: CHARACTER FORMS ───────────────────── */}
+          {activeTab === "FORMS" && (
             <motion.div
-              key="skin"
+              key="forms"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col gap-4"
             >
               <div>
                 <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
-                  Skin Complexion
+                  Full-Body Hunter Forms
                 </h4>
                 <p className="text-xs text-text-muted font-['Rajdhani']">
-                  Select your character's foundational skin tone.
+                  Unlock higher visual evolution forms through hunter rank promotions and level milestones.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {SKIN_TONES.map((tone) => (
-                  <button
-                    key={tone.id}
-                    type="button"
-                    onClick={() => updateTrait("skin", tone.value)}
-                    className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all ${
-                      characterConfig.skin === tone.value
-                        ? "bg-accent-primary-dim/40 border-accent-primary shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                        : "bg-bg-panel/60 border-white/10 hover:border-white/25 hover:bg-bg-panel/90"
-                    }`}
-                  >
-                    <span
-                      className="w-6 h-6 rounded-full border-2 border-black/30 shadow-inner shrink-0"
-                      style={{ backgroundColor: tone.previewColor }}
-                    />
-                    <span className="text-xs font-bold font-['Rajdhani'] text-text-primary truncate">
-                      {tone.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {FULL_BODY_FORMS.map((form) => {
+                  const unlocked = isItemUnlocked(form.requiredRank, form.requiredLevel);
+                  const isSelected = characterConfig.outfit === form.value;
+                  const borderStyle = RARITY_BORDER_STYLES[form.rarity || "COMMON"];
+                  const badgeStyle = RARITY_BADGE_STYLES[form.rarity || "COMMON"];
 
-          {/* ─── TAB 2: HAIR & CUT ────────────────────────────── */}
-          {activeTab === "HAIR" && (
-            <motion.div
-              key="hair"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-5"
-            >
-              {/* Hair Style */}
-              <div className="flex flex-col gap-3">
-                <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light">
-                  Hairstyle & Cut
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {HAIR_STYLES.map((style) => (
+                  return (
                     <button
-                      key={style.id}
+                      key={form.id}
                       type="button"
-                      onClick={() => updateTrait("hairStyle", style.value)}
-                      className={`p-3 rounded-xl border text-xs font-['Rajdhani'] font-bold transition-all text-left truncate ${
-                        characterConfig.hairStyle === style.value
-                          ? "bg-accent-primary-dim/40 border-accent-primary text-accent-text-light shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                          : "bg-bg-panel/60 border-white/10 text-text-secondary hover:text-text-primary hover:border-white/25 hover:bg-bg-panel/90"
-                      }`}
+                      disabled={!unlocked}
+                      onClick={() => updateTrait("outfit", form.value)}
+                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group ${borderStyle} ${
+                        isSelected
+                          ? "ring-2 ring-accent-primary bg-accent-primary/10 shadow-lg"
+                          : "bg-bg-panel/75 hover:bg-bg-panel"
+                      } ${!unlocked ? "opacity-65 cursor-not-allowed grayscale-[35%]" : "cursor-pointer"}`}
                     >
-                      {style.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider border ${badgeStyle}`}>
+                          Tier {form.tier} • {form.rarity}
+                        </span>
 
-              {/* Hair Color */}
-              <div className="flex flex-col gap-3 pt-3 border-t border-white/10">
-                <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light">
-                  Hair Color Swatches
-                </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {HAIR_COLORS.map((hc) => (
-                    <button
-                      key={hc.id}
-                      type="button"
-                      onClick={() => updateTrait("hairColor", hc.value)}
-                      className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all ${
-                        characterConfig.hairColor === hc.value
-                          ? "bg-accent-primary-dim/40 border-accent-primary shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                          : "bg-bg-panel/60 border-white/10 hover:border-white/25 hover:bg-bg-panel/90"
-                      }`}
-                    >
-                      <span
-                        className="w-5 h-5 rounded-full border-2 border-black/30 shrink-0 shadow-inner"
-                        style={{ backgroundColor: hc.previewColor }}
-                      />
-                      <span className="text-xs font-bold font-['Rajdhani'] text-text-primary truncate">
-                        {hc.label}
-                      </span>
+                        {isSelected && (
+                          <span className="px-2 py-0.5 rounded-md bg-accent-primary text-white text-[10px] font-bold font-['Rajdhani'] uppercase flex items-center gap-1">
+                            <Check className="w-3 h-3" />
+                            <span>Equipped</span>
+                          </span>
+                        )}
+
+                        {!unlocked && (
+                          <span className="px-2 py-0.5 rounded-md bg-bg-abyss text-text-muted border border-border-subtle text-[10px] font-bold font-['Rajdhani'] uppercase flex items-center gap-1">
+                            <Lock className="w-3 h-3" />
+                            <span>{form.requiredRank} (Lv. {form.requiredLevel})</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div>
+                        <h5 className="text-sm font-bold font-['Rajdhani'] text-text-primary group-hover:text-accent-text-light transition-colors">
+                          {form.label}
+                        </h5>
+                        <p className="text-xs text-text-secondary leading-relaxed mt-1">
+                          {form.description}
+                        </p>
+                      </div>
                     </button>
-                  ))}
+                  );
+                })}
+
+                {/* Dynamic Armory Acquisition Slot */}
+                <div className="p-4 rounded-xl border border-dashed border-white/10 bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
+                  <Sparkles className="w-5 h-5 text-accent-text-light opacity-50" />
+                  <span className="text-xs font-bold font-['Rajdhani'] text-text-secondary">
+                    Armory Form Ingestion
+                  </span>
+                  <p className="text-[11px] text-text-muted font-['Rajdhani'] max-w-xs">
+                    New custom pixel Hunter models can be forged via PixelLab MCP and acquired in the System Store.
+                  </p>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* ─── TAB 3: OUTFITS & ROBES ───────────────────────── */}
-          {activeTab === "ATTIRE" && (
+          {/* ─── CATEGORY 2: HOLOGRAPHIC PEDESTALS ───────────────── */}
+          {activeTab === "PEDESTALS" && (
             <motion.div
-              key="attire"
+              key="pedestals"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col gap-4"
             >
               <div>
                 <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
-                  Academic & Hunter Attire
+                  Base Platform Pedestals
                 </h4>
                 <p className="text-xs text-text-muted font-['Rajdhani']">
-                  Select your equipped robes, armor, tunics, or techwear suits.
+                  Holographic projection platforms displaying under your hunter avatar.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[340px] overflow-y-auto pr-1">
-                {OUTFIT_STYLES.map((outfit) => (
-                  <button
-                    key={outfit.id}
-                    type="button"
-                    onClick={() => updateTrait("outfit", outfit.value)}
-                    className={`p-3.5 rounded-xl border text-left flex items-center gap-3 transition-all ${
-                      characterConfig.outfit === outfit.value
-                        ? "bg-accent-primary-dim/40 border-accent-primary shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                        : "bg-bg-panel/60 border-white/10 hover:border-white/25 hover:bg-bg-panel/90"
-                    }`}
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-bg-abyss border border-white/10 flex items-center justify-center p-1 shrink-0 shadow-inner">
-                      {outfit.imagePath && (
-                        <img
-                          src={outfit.imagePath}
-                          alt={outfit.label}
-                          className="w-full h-full object-contain"
-                          style={{ imageRendering: "pixelated" }}
-                        />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-xs font-bold font-['Rajdhani'] text-text-primary block truncate">
-                        {outfit.label}
-                      </span>
-                      <span className="text-[10px] text-text-muted uppercase font-['Rajdhani'] font-bold">
-                        {outfit.category}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                {PEDESTAL_OPTIONS.map((ped) => {
+                  const unlocked = isItemUnlocked(ped.requiredRank, ped.requiredLevel);
+                  const isSelected =
+                    (characterConfig.pedestal || characterConfig.pedestalKey) === ped.value;
+                  const borderStyle = RARITY_BORDER_STYLES[ped.rarity || "COMMON"];
+                  const badgeStyle = RARITY_BADGE_STYLES[ped.rarity || "COMMON"];
+
+                  return (
+                    <button
+                      key={ped.id}
+                      type="button"
+                      disabled={!unlocked}
+                      onClick={() => {
+                        updateTrait("pedestal", ped.value);
+                        updateTrait("pedestalKey", ped.value);
+                      }}
+                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group ${borderStyle} ${
+                        isSelected
+                          ? "ring-2 ring-accent-primary bg-accent-primary/10 shadow-lg"
+                          : "bg-bg-panel/75 hover:bg-bg-panel"
+                      } ${!unlocked ? "opacity-65 cursor-not-allowed grayscale-[35%]" : "cursor-pointer"}`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider border ${badgeStyle}`}>
+                          {ped.rarity}
+                        </span>
+
+                        {isSelected && (
+                          <span className="px-2 py-0.5 rounded-md bg-accent-primary text-white text-[10px] font-bold font-['Rajdhani'] uppercase flex items-center gap-1">
+                            <Check className="w-3 h-3" />
+                            <span>Active</span>
+                          </span>
+                        )}
+
+                        {!unlocked && (
+                          <span className="px-2 py-0.5 rounded-md bg-bg-abyss text-text-muted border border-border-subtle text-[10px] font-bold font-['Rajdhani'] uppercase flex items-center gap-1">
+                            <Lock className="w-3 h-3" />
+                            <span>{ped.requiredRank}</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div>
+                        <h5 className="text-sm font-bold font-['Rajdhani'] text-text-primary group-hover:text-accent-text-light transition-colors">
+                          {ped.label}
+                        </h5>
+                        <p className="text-xs text-text-secondary leading-relaxed mt-1">
+                          {ped.description}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                {/* Dynamic Armory Pedestal Acquisition Slot */}
+                <div className="p-4 rounded-xl border border-dashed border-white/10 bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
+                  <Shield className="w-5 h-5 text-accent-text-light opacity-50" />
+                  <span className="text-xs font-bold font-['Rajdhani'] text-text-secondary">
+                    Platform Telemetry
+                  </span>
+                  <p className="text-[11px] text-text-muted font-['Rajdhani'] max-w-xs">
+                    Higher-tier holographic platform cores unlock in the System Armory.
+                  </p>
+                </div>
               </div>
             </motion.div>
           )}
 
-          {/* ─── TAB 4: EYEWEAR & OPTICS ──────────────────────── */}
-          {activeTab === "EYEWEAR" && (
-            <motion.div
-              key="eyewear"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4"
-            >
-              <div>
-                <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
-                  Glasses & Tactical Visors
-                </h4>
-                <p className="text-xs text-text-muted font-['Rajdhani']">
-                  Equip scholar wireframes or cybernetic optics.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {EYEWEAR_STYLES.map((gw) => (
-                  <button
-                    key={gw.id}
-                    type="button"
-                    onClick={() => updateTrait("eyewear", gw.value)}
-                    className={`p-3.5 rounded-xl border text-left flex items-center gap-3 transition-all ${
-                      characterConfig.eyewear === gw.value
-                        ? "bg-accent-primary-dim/40 border-accent-primary shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                        : "bg-bg-panel/60 border-white/10 hover:border-white/25 hover:bg-bg-panel/90"
-                    }`}
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-bg-abyss border border-white/10 flex items-center justify-center p-1 shrink-0 shadow-inner">
-                      {gw.imagePath ? (
-                        <img
-                          src={gw.imagePath}
-                          alt={gw.label}
-                          className="w-full h-full object-contain"
-                          style={{ imageRendering: "pixelated" }}
-                        />
-                      ) : (
-                        <X className="w-4 h-4 text-text-muted" />
-                      )}
-                    </div>
-                    <span className="text-xs font-bold font-['Rajdhani'] text-text-primary truncate">
-                      {gw.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ─── TAB 5: HEADGEAR & ACCESSORIES ────────────────── */}
-          {activeTab === "ACCESSORIES" && (
-            <motion.div
-              key="accessories"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4"
-            >
-              <div>
-                <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
-                  Headgear, Berets & Circlets
-                </h4>
-                <p className="text-xs text-text-muted font-['Rajdhani']">
-                  Scholar berets, shadow cowls, and focus headbands.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {ACCESSORY_STYLES.map((acc) => (
-                  <button
-                    key={acc.id}
-                    type="button"
-                    onClick={() => updateTrait("accessory", acc.value)}
-                    className={`p-3.5 rounded-xl border text-left flex items-center gap-3 transition-all ${
-                      (characterConfig.accessory || "none") === acc.value
-                        ? "bg-accent-primary-dim/40 border-accent-primary shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                        : "bg-bg-panel/60 border-white/10 hover:border-white/25 hover:bg-bg-panel/90"
-                    }`}
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-bg-abyss border border-white/10 flex items-center justify-center p-1 shrink-0 shadow-inner">
-                      {acc.imagePath ? (
-                        <img
-                          src={acc.imagePath}
-                          alt={acc.label}
-                          className="w-full h-full object-contain"
-                          style={{ imageRendering: "pixelated" }}
-                        />
-                      ) : (
-                        <X className="w-4 h-4 text-text-muted" />
-                      )}
-                    </div>
-                    <span className="text-xs font-bold font-['Rajdhani'] text-text-primary truncate">
-                      {acc.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ─── TAB 6: AURAS & PEDESTALS ─────────────────────── */}
+          {/* ─── CATEGORY 3: ENERGY AURAS ────────────────────────── */}
           {activeTab === "AURAS" && (
             <motion.div
               key="auras"
@@ -553,118 +480,79 @@ export function CharacterStudioView({
             >
               <div>
                 <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
-                  Holographic Aura Particle Emitters
+                  Radiant Particle Auras
                 </h4>
                 <p className="text-xs text-text-muted font-['Rajdhani']">
-                  Emit a radiant ambient energy aura around your character stage.
+                  Holographic ambient energy surges expressing your hunter's inner mana potency.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {AURA_PRESETS.map((aura) => (
-                  <button
-                    key={aura.id}
-                    type="button"
-                    onClick={() => {
-                      updateTrait("aura", aura.id);
-                      setActiveCosmetics((prev: any) => ({ ...prev, activeAura: aura.id }));
-                    }}
-                    className={`p-4 rounded-xl border flex items-center justify-between transition-all ${
-                      characterConfig.aura === aura.id
-                        ? "bg-accent-primary-dim/40 border-accent-primary shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                        : "bg-bg-panel/60 border-white/10 hover:border-white/25 hover:bg-bg-panel/90"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-6 h-6 rounded-full border-2 border-black/30 shrink-0 shadow-inner"
-                        style={{
-                          backgroundColor: aura.color !== "transparent" ? aura.color : "#334155",
-                        }}
-                      />
-                      <span className="text-sm font-bold font-['Rajdhani'] text-text-primary">
-                        {aura.label}
-                      </span>
-                    </div>
-                    {characterConfig.aura === aura.id && (
-                      <span className="text-xs text-accent-text-light font-bold font-['Rajdhani']">Equipped</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                {AURA_PRESETS.map((aura) => {
+                  const unlocked = isItemUnlocked(aura.requiredRank, aura.requiredLevel);
+                  const isSelected = (characterConfig.aura || "none") === aura.id;
+                  const borderStyle = RARITY_BORDER_STYLES[aura.rarity];
+                  const badgeStyle = RARITY_BADGE_STYLES[aura.rarity];
 
-          {/* ─── TAB 7: CLASS & TITLES ────────────────────────── */}
-          {activeTab === "CLASS" && (
-            <motion.div
-              key="class"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4"
-            >
-              {/* Class Selection */}
-              <div className="flex flex-col gap-3">
-                <div>
-                  <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
-                    Academic Class Archetype
-                  </h4>
-                  <p className="text-xs text-text-muted font-['Rajdhani']">
-                    Classes govern your intellectual skill trees, quest multipliers, and study archetypes.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {(COSMETICS_CATALOG.CLASS || []).map((item) => (
+                  return (
                     <button
-                      key={item.id}
+                      key={aura.id}
                       type="button"
-                      onClick={() => setActiveCosmetics((prev: any) => ({ ...prev, activeAvatar: item.id }))}
-                      className={`p-3.5 rounded-xl border text-left flex flex-col justify-between transition-all ${
-                        activeCosmetics.activeAvatar === item.id
-                          ? "bg-accent-primary-dim/40 border-accent-primary shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                          : "bg-bg-panel/60 border-white/10 hover:border-white/25 hover:bg-bg-panel/90"
-                      }`}
+                      disabled={!unlocked}
+                      onClick={() => updateTrait("aura", aura.id)}
+                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group ${borderStyle} ${
+                        isSelected
+                          ? "ring-2 ring-accent-primary bg-accent-primary/10 shadow-lg"
+                          : "bg-bg-panel/75 hover:bg-bg-panel"
+                      } ${!unlocked ? "opacity-65 cursor-not-allowed grayscale-[35%]" : "cursor-pointer"}`}
                     >
-                      <div className="flex items-center gap-2.5 mb-1.5">
-                        <Award className="w-4 h-4 text-accent-primary" />
-                        <div>
-                          <span className="text-xs font-bold font-['Rajdhani'] text-text-primary block">
-                            {item.name}
-                          </span>
-                          <span className="text-[9px] text-text-muted font-['Rajdhani'] uppercase">
-                            {item.rarity}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0"
+                            style={{ backgroundColor: aura.color }}
+                          />
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider border ${badgeStyle}`}>
+                            {aura.rarity}
                           </span>
                         </div>
-                      </div>
-                      <p className="text-[11px] text-text-muted font-['Rajdhani'] line-clamp-2">
-                        {item.description}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </div>
 
-              {/* Scholar Titles */}
-              <div className="flex flex-col gap-3 pt-3 border-t border-white/10">
-                <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light">
-                  Equipped Scholar Title
-                </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {(COSMETICS_CATALOG.TITLE || []).map((title) => (
-                    <button
-                      key={title.id}
-                      type="button"
-                      onClick={() => setActiveCosmetics((prev: any) => ({ ...prev, activeTitle: title.id }))}
-                      className={`p-2.5 rounded-xl border text-xs font-['Rajdhani'] font-bold transition-all text-left truncate ${
-                        activeCosmetics.activeTitle === title.id
-                          ? "bg-accent-primary-dim/40 border-accent-primary text-accent-text-light shadow-[0_0_10px_rgba(124,58,237,0.25)]"
-                          : "bg-bg-panel/60 border-white/10 text-text-secondary hover:text-text-primary hover:border-white/25"
-                      }`}
-                    >
-                      {title.value}
+                        {isSelected && (
+                          <span className="px-2 py-0.5 rounded-md bg-accent-primary text-white text-[10px] font-bold font-['Rajdhani'] uppercase flex items-center gap-1">
+                            <Check className="w-3 h-3" />
+                            <span>Active</span>
+                          </span>
+                        )}
+
+                        {!unlocked && (
+                          <span className="px-2 py-0.5 rounded-md bg-bg-abyss text-text-muted border border-border-subtle text-[10px] font-bold font-['Rajdhani'] uppercase flex items-center gap-1">
+                            <Lock className="w-3 h-3" />
+                            <span>{aura.requiredRank}</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div>
+                        <h5 className="text-sm font-bold font-['Rajdhani'] text-text-primary group-hover:text-accent-text-light transition-colors">
+                          {aura.label}
+                        </h5>
+                        <span className="text-[10px] font-mono text-text-muted uppercase">
+                          Req: {aura.requiredRank} (Lv. {aura.requiredLevel})
+                        </span>
+                      </div>
                     </button>
-                  ))}
+                  );
+                })}
+
+                {/* Dynamic Armory Aura Acquisition Slot */}
+                <div className="p-4 rounded-xl border border-dashed border-white/10 bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
+                  <Zap className="w-5 h-5 text-accent-text-light opacity-50" />
+                  <span className="text-xs font-bold font-['Rajdhani'] text-text-secondary">
+                    Resonance Auras
+                  </span>
+                  <p className="text-[11px] text-text-muted font-['Rajdhani'] max-w-xs">
+                    Rank-based energy aura surges unlock in the System Store.
+                  </p>
                 </div>
               </div>
             </motion.div>

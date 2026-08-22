@@ -7,8 +7,8 @@ import { getToolsForAgent, AgentType, ALLOWED_HANDOFFS } from "@/lib/ai/chat-too
 import { executeChatTool } from "@/lib/ai/chat-tool-executor";
 import { LLMFactory } from "@/lib/ai/providers/factory";
 import { NormalizedMessage } from "@/lib/ai/providers/types";
-import { checkQuota, recordUsage } from "@/lib/ai/usage-limiter";
-import { AI_LIMITS } from "@/lib/ai/config";
+import { checkQuota, consumeQuota } from "@/lib/ai/usage-limiter";
+import { AI_LIMITS, DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "@/lib/ai/config";
 
 const MAX_TOOL_ITERATIONS = AI_LIMITS.maxToolIterations;
 
@@ -26,11 +26,17 @@ export async function POST(req: NextRequest) {
 
     const userId = payload.userId as number;
 
-    // ── Quota enforcement ─────────────────────────────────
+    // ── Quota enforcement (shared 10-prompt daily pool for General Chat + Focus Drawer) ──
     const quota = await checkQuota(userId, "chat");
     if (!quota.allowed) {
       return NextResponse.json(
-        { error: "quota_exceeded", remaining: 0, limit: quota.limit, resetsAt: quota.resetsAt },
+        {
+          error: "DAILY_QUOTA_EXHAUSTED",
+          limit: quota.limit,
+          used: quota.used,
+          message: `Daily AI limit reached (${quota.used}/${quota.limit} prompts). Resets at midnight UTC.`,
+          resetsAt: quota.resetsAt,
+        },
         { status: 429 }
       );
     }
@@ -72,6 +78,18 @@ export async function POST(req: NextRequest) {
     let newSession = null;
     if (sessionIdStr) {
       sessionId = parseInt(sessionIdStr);
+      if (isNaN(sessionId)) {
+        return NextResponse.json({ error: "Invalid session id" }, { status: 400 });
+      }
+
+      // ── IDOR guard: the session MUST belong to the authenticated user ──
+      const sessionRecord = await prisma.chatSession.findUnique({
+        where: { id: sessionId },
+        select: { userId: true },
+      });
+      if (!sessionRecord || sessionRecord.userId !== userId) {
+        return NextResponse.json({ error: "Unauthorized session access" }, { status: 403 });
+      }
     } else {
       isNewSession = true;
       const title = messageText 
@@ -112,43 +130,59 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const recentMessages = await prisma.systemMessage.findMany({
-      where: { sessionId },
-      orderBy: { createdAt: "asc" },
+    // ── Context window: the 20 MOST RECENT messages (desc + reverse),
+    //    scoped to this user AND session. The previously saved user message
+    //    is excluded because it is appended again as currentUserMsg below.
+    const rawHistory = await prisma.systemMessage.findMany({
+      where: { sessionId, userId },
+      orderBy: { createdAt: "desc" },
       take: 20,
+      select: { id: true, type: true, content: true, createdAt: true },
     });
+    const conversationHistory = rawHistory.reverse();
 
     // ── Build normalized history for adapter ──────────────
-    const normalizedHistory: NormalizedMessage[] = recentMessages
+    const normalizedHistory: NormalizedMessage[] = conversationHistory
       .filter((m) => m.id !== userMessage.id) 
       .map((m) => ({
         role: m.type === "USER" ? "user" : "assistant",
         content: m.content,
       }));
 
-    // ── Build tiered AI context and route to specialist agent ──
+    // ── Build tiered AI context and route to specialist agent & workload ──
     const { buildCoreContext, buildRelevantContext, formatCoreContext, formatRelevantContext } = await import("@/lib/ai/context-engine");
     const core = await buildCoreContext(userId);
     const coreString = formatCoreContext(core);
 
-    const { routeMessage } = await import("@/lib/ai/agent-router");
+    const { classifyWorkload } = await import("@/lib/ai/agent-router");
     const routerCtx = {
       user: { hp: core.user.hp, maxHp: core.user.maxHp },
       today: { overdueCount: core.today.overdueCount },
     };
-    const routeResult = routeMessage(messageText || "", routerCtx);
 
-    const relevant = await buildRelevantContext(userId, routeResult.agent, [], messageText);
+    const hasMedia = !!(base64Data && mimeType);
+    const workloadResult = classifyWorkload(messageText || "", routerCtx, {
+      hasMedia,
+      isFocusMode: !!contextOverride,
+    });
+
+    const currentAgent = workloadResult.agent;
+    const relevant = await buildRelevantContext(userId, currentAgent, [], messageText);
     const relevantString = formatRelevantContext(relevant);
 
-    const { buildSystemInstruction } = await import("@/lib/ai/prompts");
+    const { buildSystemInstruction, buildVerbosityDirective } = await import("@/lib/ai/prompts");
+    // Router → verbosity escalation: reasoner-routed queries get Tier 3,
+    // focus sessions get flow-protecting Tier 1 guidance.
+    const verbosityDirective = buildVerbosityDirective(workloadResult.workload);
     const systemInstruction = buildSystemInstruction(
-      routeResult.agent,
+      currentAgent,
       coreString,
       core.localTimeContext.localDate,
       relevantString
+    ) + `\n\n${verbosityDirective}`;
+    console.log(
+      `[Agent Router] → Workload: ${workloadResult.workload} | Agent: ${workloadResult.agent} | Primary: ${workloadResult.route.primary.provider}/${workloadResult.route.primary.model}`
     );
-    console.log(`[Agent Router] → ${routeResult.agent} (conf: ${routeResult.confidence.toFixed(2)}) | Sections: core${Object.keys(relevant).length > 0 ? " + " + Object.keys(relevant).join(", ") : ""}`);
 
     // ── Build the user's current message ──────────────
     const currentUserMsg: NormalizedMessage = {
@@ -158,23 +192,28 @@ export async function POST(req: NextRequest) {
     };
     normalizedHistory.push(currentUserMsg);
 
-    // ── Function-calling loop via LLMFactory with Auto Fallback ──────────────
+    // ── Function-calling loop via LLMFactory with Multi-Engine Fallback ──────────────
     let aiResponseText = "";
-    let actualModelUsed = "GEMINI";
+    let actualModelUsed = "DEEPSEEK";
+    let actualModelDisplayName = "DeepSeek v4 Flash";
 
-    const executeAgentLoop = async (provider: "gemini" | "groq"): Promise<string> => {
-      const adapter = LLMFactory.getAdapter(provider);
-      let currentAgent = routeResult.agent as AgentType;
-      let tools = getToolsForAgent(currentAgent);
-      let systemInstruction = buildSystemInstruction(
-        currentAgent,
+    const executeAgentLoop = async (
+      provider: "deepseek" | "gemini" | "groq",
+      modelOverride?: string,
+      signal?: AbortSignal
+    ): Promise<string> => {
+      const adapter = LLMFactory.getAdapter(provider, modelOverride);
+      let activeAgent = currentAgent as AgentType;
+      let tools = getToolsForAgent(activeAgent);
+      let activeSystemInstruction = buildSystemInstruction(
+        activeAgent,
         coreString,
         core.localTimeContext.localDate,
         relevantString
-      );
+      ) + `\n\n${verbosityDirective}`;
 
       if (contextOverride?.instruction) {
-        systemInstruction += `\n\n### IN-SESSION ACADEMIC STUDY TUTOR DIRECTIVE\n${contextOverride.instruction}\nActive Subject: ${contextOverride.subject || "General Focus"}\nActive Quest: ${contextOverride.quest || "Focus Session"}\nAlways format mathematical expressions with KaTeX LaTeX ($inline$ and $$display$$). Provide direct, clear, scholarly, and encouraging step-by-step guidance.`;
+        activeSystemInstruction += `\n\n### IN-SESSION ACADEMIC STUDY TUTOR DIRECTIVE\n${contextOverride.instruction}\nActive Subject: ${contextOverride.subject || "General Focus"}\nActive Quest: ${contextOverride.quest || "Focus Session"}\nAlways format mathematical expressions with KaTeX LaTeX ($inline$ and $$display$$). Provide direct, clear, scholarly, and encouraging step-by-step guidance.`;
       }
 
       // Deep copy history for this execution attempt so retries start with fresh history
@@ -182,7 +221,7 @@ export async function POST(req: NextRequest) {
 
       let iterations = 0;
       let handoffs = 0;
-      let response = await adapter.generateResponse(runHistory, systemInstruction, tools);
+      let response = await adapter.generateResponse(runHistory, activeSystemInstruction, tools, { signal });
 
       while (response.toolCalls && response.toolCalls.length > 0 && iterations < MAX_TOOL_ITERATIONS) {
         iterations++;
@@ -206,7 +245,7 @@ export async function POST(req: NextRequest) {
 
           if (tc.name === "handoff") {
             const targetAgent = tc.args.target_agent as AgentType;
-            const allowedTargets = ALLOWED_HANDOFFS[currentAgent] || [];
+            const allowedTargets = ALLOWED_HANDOFFS[activeAgent] || [];
 
             if (!allowedTargets.includes(targetAgent)) {
               result = { error: `Unauthorized handoff. You cannot handoff to ${targetAgent}.` };
@@ -214,7 +253,7 @@ export async function POST(req: NextRequest) {
               result = { error: "Handoff failed. Maximum number of handoffs reached for this request." };
             } else {
               handoffs++;
-              currentAgent = targetAgent;
+              activeAgent = targetAgent;
               didHandoff = true;
               result = { success: true, message: `Handoff successful. You are now the ${targetAgent} agent.` };
             }
@@ -232,13 +271,13 @@ export async function POST(req: NextRequest) {
         runHistory.push(toolResultsMsg);
 
         if (didHandoff) {
-          const newRelevant = await buildRelevantContext(userId, currentAgent, [], messageText);
+          const newRelevant = await buildRelevantContext(userId, activeAgent, [], messageText);
           const newRelevantString = formatRelevantContext(newRelevant);
-          systemInstruction = buildSystemInstruction(currentAgent, coreString, core.localTimeContext.localDate, newRelevantString);
-          tools = getToolsForAgent(currentAgent);
+          activeSystemInstruction = buildSystemInstruction(activeAgent, coreString, core.localTimeContext.localDate, newRelevantString) + `\n\n${verbosityDirective}`;
+          tools = getToolsForAgent(activeAgent);
         }
 
-        response = await adapter.generateResponse(runHistory, systemInstruction, tools);
+        response = await adapter.generateResponse(runHistory, activeSystemInstruction, tools, { signal });
       }
 
       return (
@@ -251,33 +290,68 @@ export async function POST(req: NextRequest) {
       );
     };
 
-    const withTimeout = <T>(promise: Promise<T>): Promise<T> => {
-      return Promise.race([
-        promise,
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("AI_TIMEOUT")), AI_LIMITS.chatTimeoutMs)
-        ),
-      ]);
-    };
+    // ── Unified abort chain: client disconnect OR hard timeout aborts the
+    //    upstream LLM request immediately (no orphaned generations). ──
+    const abortController = new AbortController();
+    const onClientAbort = () => abortController.abort();
+    if (req.signal) {
+      req.signal.addEventListener("abort", onClientAbort);
+      if (req.signal.aborted) abortController.abort();
+    }
+    const timeoutId = setTimeout(() => abortController.abort(), AI_LIMITS.chatTimeoutMs);
+    let generationSucceeded = false;
+
+    const primarySpec = workloadResult.route.primary;
+    const fallbackSpec = workloadResult.route.fallback;
+    const secondarySpec = workloadResult.route.secondaryFallback;
 
     try {
       if (modelPreference === "groq") {
         actualModelUsed = "GROQ";
-        aiResponseText = await withTimeout(executeAgentLoop("groq"));
+        actualModelDisplayName = "Groq (Llama 3.3 70B)";
+        aiResponseText = await executeAgentLoop("groq", GROQ_MODELS.default, abortController.signal);
       } else if (modelPreference === "gemini") {
         actualModelUsed = "GEMINI";
-        aiResponseText = await withTimeout(executeAgentLoop("gemini"));
+        actualModelDisplayName = "Gemini 3.7 Flash";
+        aiResponseText = await executeAgentLoop("gemini", GEMINI_MODELS.default, abortController.signal);
+      } else if (modelPreference === "deepseek") {
+        actualModelUsed = "DEEPSEEK";
+        actualModelDisplayName = `DeepSeek (${primarySpec.model})`;
+        aiResponseText = await executeAgentLoop("deepseek", primarySpec.model, abortController.signal);
       } else {
-        // "auto" mode: Default to Gemini, gracefully fall back to Groq if Gemini fails
-        actualModelUsed = "GEMINI";
+        // Multi-Engine Auto Mode with Cascade Fallbacks
+        actualModelUsed = primarySpec.provider.toUpperCase();
+        actualModelDisplayName = `${primarySpec.provider.toUpperCase()} (${primarySpec.model})`;
+
         try {
-          aiResponseText = await withTimeout(executeAgentLoop("gemini"));
-        } catch (geminiError: any) {
-          console.warn("[Chat Route] Gemini failed in auto mode. Falling back to Groq...", geminiError);
-          actualModelUsed = "GROQ";
-          aiResponseText = await withTimeout(executeAgentLoop("groq"));
+          aiResponseText = await executeAgentLoop(primarySpec.provider, primarySpec.model, abortController.signal);
+        } catch (primaryErr: any) {
+          console.warn(
+            `[Chat Route] Primary model ${primarySpec.provider}/${primarySpec.model} failed. Trying fallback ${fallbackSpec.provider}/${fallbackSpec.model}:`,
+            primaryErr.message
+          );
+          actualModelUsed = fallbackSpec.provider.toUpperCase();
+          actualModelDisplayName = `${fallbackSpec.provider.toUpperCase()} (${fallbackSpec.model})`;
+
+          try {
+            aiResponseText = await executeAgentLoop(fallbackSpec.provider, fallbackSpec.model, abortController.signal);
+          } catch (fallbackErr: any) {
+            if (secondarySpec) {
+              console.warn(
+                `[Chat Route] Fallback model ${fallbackSpec.provider}/${fallbackSpec.model} failed. Trying secondary fallback ${secondarySpec.provider}/${secondarySpec.model}:`,
+                fallbackErr.message
+              );
+              actualModelUsed = secondarySpec.provider.toUpperCase();
+              actualModelDisplayName = `${secondarySpec.provider.toUpperCase()} (${secondarySpec.model})`;
+              aiResponseText = await executeAgentLoop(secondarySpec.provider, secondarySpec.model, abortController.signal);
+            } else {
+              throw fallbackErr;
+            }
+          }
         }
       }
+
+      generationSucceeded = true;
     } catch (apiError: any) {
       console.error("API Error:", apiError);
       let friendlyError = "The AI service is temporarily unavailable. Please try again later.";
@@ -287,16 +361,16 @@ export async function POST(req: NextRequest) {
         if (pErr.originalError?.status === 429 || pErr.originalError?.status === 503 || pErr.code === "rate_limit_exceeded") {
           friendlyError = "The AI is currently overloaded with requests. Please wait a moment and try again.";
         }
-      } else if (apiError.message === "AI_TIMEOUT") {
-        friendlyError = "The AI took too long to respond. Please try a simpler question or try again later.";
+      } else if (apiError.name === "AbortError" || abortController.signal.aborted) {
+        friendlyError = req.signal?.aborted
+          ? "The request was cancelled."
+          : "The AI took too long to respond. Please try a simpler question or try again later.";
       }
       aiResponseText = friendlyError;
+    } finally {
+      clearTimeout(timeoutId);
+      if (req.signal) req.signal.removeEventListener("abort", onClientAbort);
     }
-
-    // ── Determine exact model display name ─────────────────
-    const groqModelName = process.env.GROQ_MODEL ? `Groq (${process.env.GROQ_MODEL})` : "Groq (Qwen 3.6 27B)";
-    const geminiModelName = "Gemini 2.5 Flash";
-    const actualModelDisplayName = actualModelUsed === "GROQ" ? groqModelName : geminiModelName;
 
     // ── Save AI response to DB ──────────────────────────────
     const aiMessage = await prisma.systemMessage.create({
@@ -309,8 +383,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // ── Record quota usage ───────────────────────────────────
-    await recordUsage(userId, "chat");
+    // ── Quota consumption: charged ONLY on successful generation.
+    //    Model errors, timeouts and client aborts never consume quota;
+    //    the atomic guarded upsert prevents parallel-request bypass. ──
+    if (generationSucceeded) {
+      const consumed = await consumeQuota(userId, "chat");
+      if (!consumed.allowed) {
+        console.warn(`[Chat Route] Quota race: generation succeeded but consumeQuota was not charged for user ${userId}`);
+      }
+    }
 
     return NextResponse.json({ 
       userMessage, 

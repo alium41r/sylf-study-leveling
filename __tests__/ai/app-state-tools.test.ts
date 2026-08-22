@@ -181,9 +181,12 @@ describe("Phase 3D: App-State Tools", () => {
     it("returns shop inventory", async () => {
       const res = await executeChatTool("getShopInventory", {}, userId);
       expect(res.items).toBeDefined();
+      expect(Array.isArray(res.items)).toBe(true);
       expect(res.items.length).toBe(SHOP_ITEMS.length);
-      expect(res.items[0]).toHaveProperty("name");
-      expect(res.items[0]).toHaveProperty("cost");
+      if (res.items.length > 0) {
+        expect(res.items[0]).toHaveProperty("name");
+        expect(res.items[0]).toHaveProperty("cost");
+      }
     });
   });
 });

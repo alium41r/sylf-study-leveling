@@ -98,7 +98,7 @@ export function ChatHeader({
               ) : (
                 <div className="relative">
                   <div
-                    className={`rank-badge rank-${otherParticipant?.hunterRank || "E"} w-10 h-10 text-xs rounded-xl overflow-hidden shadow-md flex items-center justify-center`}
+                    className="w-10 h-10 rounded-xl overflow-hidden shadow-md flex items-center justify-center bg-bg-abyss border border-border-subtle shrink-0"
                   >
                     {otherParticipant?.avatarUrl ? (
                       <img
@@ -107,7 +107,9 @@ export function ChatHeader({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="font-bold">{otherParticipant?.hunterRank || "E"}</span>
+                      <span className="text-sm font-bold font-['Rajdhani'] text-emerald-400">
+                        {(otherParticipant?.name || otherParticipant?.username || "S").charAt(0).toUpperCase()}
+                      </span>
                     )}
                   </div>
                   {/* Presence indicator */}

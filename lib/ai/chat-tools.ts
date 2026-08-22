@@ -34,6 +34,14 @@ export const createGoalTool: NormalizedTool = {
         type: "string",
         description: "Effort level: RELAXED, NORMAL, INTENSE, or EXTREME. Defaults to NORMAL.",
       },
+      color: {
+        type: "string",
+        description: "Optional accent preset: EMERALD, CYAN, BLUE, VIOLET, ROSE, or AMBER. Defaults to EMERALD.",
+      },
+      targetDate: {
+        type: "string",
+        description: "Optional exact deadline date in YYYY-MM-DD format.",
+      },
     },
     required: ["title"],
   },
@@ -214,18 +222,18 @@ export const updateQuestTool = {
 
 /**
  * Tool: deleteQuest
- * Delete a quest.
+ * Delete a quest (bulk deletions require user confirmation).
  */
 export const deleteQuestTool = {
   name: "deleteQuest",
-  description: "Delete one, multiple, or ALL quests. Use questId or searchTitle for single quests. Use searchTitles array to delete multiple quests by name. Set deleteAll to true to wipe ALL of the user's quests. DO NOT ask for IDs if the user says 'delete all quests', just set deleteAll to true.",
+  description: "Delete one or more quests. Use questId or searchTitle for single quests. Use searchTitles array to delete multiple quests by name. Bulk deletions require the user's explicit confirmation: if the tool returns a REQUIRES_CONFIRMATION response, show the message to the user and ask them to confirm — do NOT retry the deletion until they say yes, then include the confirmationToken from the confirmation response.",
   parameters: {
     type: "object",
     properties: {
       questId: { type: "number", description: "ID of a specific quest to delete" },
       searchTitle: { type: "string", description: "Title of a specific quest to delete" },
       searchTitles: { type: "array", items: { type: "string" }, description: "List of quest titles to delete multiple quests at once" },
-      deleteAll: { type: "boolean", description: "Set to true to delete ALL quests for the user" },
+      confirmationToken: { type: "string", description: "Signed confirmation token returned by a REQUIRES_CONFIRMATION response. Only include this when the user has explicitly confirmed the deletion." },
     },
     required: [],
   },
@@ -237,7 +245,7 @@ export const deleteQuestTool = {
  */
 export const updateGoalTool = {
   name: "updateGoal",
-  description: "Update an existing goal's title, description, or effort level. You must provide EITHER goalId OR searchTitle to identify the goal.",
+  description: "Update an existing goal's title, description, effort level, accent color, or deadline. You must provide EITHER goalId OR searchTitle to identify the goal.",
   parameters: {
     type: "object",
     properties: {
@@ -247,6 +255,8 @@ export const updateGoalTool = {
       description: { type: "string" },
       effortLevel: { type: "string" },
       targetWeeks: { type: "number" },
+      color: { type: "string", description: "Accent preset: EMERALD, CYAN, BLUE, VIOLET, ROSE, or AMBER." },
+      targetDate: { type: "string", description: "Exact deadline date in YYYY-MM-DD format." },
     },
     required: [],
   },
@@ -254,18 +264,18 @@ export const updateGoalTool = {
 
 /**
  * Tool: deleteGoal
- * Delete a goal.
+ * Delete a goal (bulk deletions require user confirmation).
  */
 export const deleteGoalTool = {
   name: "deleteGoal",
-  description: "Delete a goal and all its associated quests. Use goalId or searchTitle for single goals. Use searchTitles array to delete multiple goals by name. Set deleteAll to true to wipe ALL of the user's goals.",
+  description: "Delete a goal and all its associated quests. Use goalId or searchTitle for single goals. Use searchTitles array to delete multiple goals by name. Bulk deletions require the user's explicit confirmation: if the tool returns a REQUIRES_CONFIRMATION response, show the message to the user and ask them to confirm — do NOT retry the deletion until they say yes, then include the confirmationToken from the confirmation response.",
   parameters: {
     type: "object",
     properties: {
       goalId: { type: "number", description: "ID of the goal to delete" },
       searchTitle: { type: "string", description: "Title of a specific goal to delete" },
       searchTitles: { type: "array", items: { type: "string" }, description: "List of goal titles to delete multiple goals at once" },
-      deleteAll: { type: "boolean", description: "Set to true to delete ALL goals for the user" },
+      confirmationToken: { type: "string", description: "Signed confirmation token returned by a REQUIRES_CONFIRMATION response. Only include this when the user has explicitly confirmed the deletion." },
     },
     required: [],
   },
@@ -273,25 +283,28 @@ export const deleteGoalTool = {
 
 /**
  * Tool: deleteAllTasks
- * Delete all quests and goals.
+ * Delete all quests and goals (ALWAYS requires user confirmation).
  */
 export const deleteAllTasksTool = {
   name: "deleteAllTasks",
-  description: "Delete ALL quests and goals for the user. Call this ONLY when the user explicitly asks to delete 'everything', 'all quests', or 'all goals'.",
+  description: "Delete ALL quests and goals for the user. This ALWAYS requires explicit user confirmation: if the tool returns a REQUIRES_CONFIRMATION response, show the message to the user and ask them to confirm — do NOT retry the deletion until they say yes, then include the confirmationToken from the confirmation response.",
   parameters: {
     type: "object",
-    properties: {},
+    properties: {
+      confirmationToken: { type: "string", description: "Signed confirmation token returned by the REQUIRES_CONFIRMATION response. Only include this when the user has explicitly confirmed the full wipe." },
+    },
+    required: [],
   },
 };
 
 /**
  * Tool: completeQuest
- * Mark a quest as completed.
+ * Mark a quest as completed through the authoritative reward RPC.
  */
 export const completeQuestTool = {
   name: "completeQuest",
   description:
-    "Mark a specific quest as completed. Call this when the user says they finished a task or quest. You need the quest ID.",
+    "Mark a specific quest as completed. The system atomically awards the quest's XP and Sylph rewards, updates the streak/level, and writes audit ledgers — never claim rewards manually or mention amounts not returned by this tool. Call this only when the user says they finished a task or quest. You need the quest ID.",
   parameters: {
     type: "object",
     properties: {
@@ -568,8 +581,32 @@ function getHandoffTool(agent: AgentType): NormalizedTool | null {
   };
 }
 
+/**
+ * Tool: googleSearch
+ * Search the live web for academic curricula, syllabus breakdowns, qualification specs, and exam board outlines.
+ */
+export const googleSearchTool: NormalizedTool = {
+  name: "googleSearch",
+  description:
+    "Search the live web for official academic curricula, syllabus codes (e.g. Cambridge CAIE 9702/9709, Edexcel, AQA, AP, IB, GCSE), chapter breakdowns, and exam specifications. Always cite specific findings.",
+  parameters: {
+    type: "object",
+    properties: {
+      query: {
+        type: "string",
+        description: "The search query (e.g. 'Cambridge AS Level Physics 9702 syllabus chapter list')",
+      },
+      qualification: {
+        type: "string",
+        description: "Optional exam board or qualification context (e.g. 'CAIE', 'Edexcel', 'AP', 'IB')",
+      },
+    },
+    required: ["query"],
+  },
+};
+
 const GENERAL_TOOLS = [getUserStatsTool, getGoalsTool, getQuestsTool, getStudySessionsTool, getWeeklySummaryTool, completeQuestTool, getAppStateTool, getShopInventoryTool];
-const PLANNER_TOOLS = [createGoalTool, createQuestTool, createMultipleQuestsTool, updateQuestTool, deleteQuestTool, updateGoalTool, deleteGoalTool, deleteAllTasksTool];
+const PLANNER_TOOLS = [createGoalTool, createQuestTool, createMultipleQuestsTool, updateQuestTool, deleteQuestTool, updateGoalTool, deleteGoalTool, deleteAllTasksTool, googleSearchTool];
 const CALENDAR_TOOLS = [moveQuestTool, swapQuestsTool, clearDayTool];
 const ANALYTICS_TOOLS = [getSubjectAnalyticsTool, getPerformanceTrendsTool, getDailyPatternTool, generateInsightTool];
 const MEMORY_TOOLS = [saveMemoryTool, getMemoryTool, forgetMemoryTool];
@@ -603,3 +640,4 @@ export function getToolsForAgent(agent: AgentType): NormalizedTool[] {
 
   return tools;
 }
+

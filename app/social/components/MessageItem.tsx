@@ -112,9 +112,9 @@ export function MessageItem({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className={`rank-badge rank-${message.sender.hunterRank || "E"} w-full h-full text-[11px] font-mono font-bold flex items-center justify-center`}>
-                {message.sender.hunterRank || "E"}
-              </div>
+              <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                {(message.sender.name || message.sender.username || "S").charAt(0).toUpperCase()}
+              </span>
             )}
           </div>
         )}

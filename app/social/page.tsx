@@ -113,6 +113,45 @@ function formatHHMMSS(totalSeconds: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
+/**
+ * Self-ticking timer for a friend card. Only THIS component re-renders every
+ * second while the friend is studying — the rest of the page stays still.
+ * The anchor (completedTodaySeconds + activeSessionStartedAt) comes from the
+ * last /api/friends response; elapsed time is computed locally so the clock
+ * runs smoothly between server refreshes.
+ */
+function FriendStudyTimer({ friend }: { friend: Friend }) {
+  const isStudying = friend.isStudying;
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!isStudying) return;
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [isStudying]);
+
+  let liveSeconds = friend.todaySeconds;
+  if (isStudying && friend.activeSessionStartedAt) {
+    const started = new Date(friend.activeSessionStartedAt).getTime();
+    const activeElapsed = Math.max(0, Math.floor((now - started) / 1000));
+    liveSeconds = (friend.completedTodaySeconds ?? friend.todaySeconds) + activeElapsed;
+  }
+
+  return (
+    <span
+      className={`text-2xl font-mono font-bold tracking-tight block mt-0.5 ${
+        isStudying
+          ? "text-cyan-300 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]"
+          : liveSeconds > 0
+          ? "text-text-primary"
+          : "text-text-muted"
+      }`}
+    >
+      {formatHHMMSS(liveSeconds)}
+    </span>
+  );
+}
+
 function SocialContent() {
   const { user, token, isLoading } = useAuth();
   const { openProfile } = useProfileModal();
@@ -238,6 +277,11 @@ function SocialContent() {
     { event: "DELETE", table: "Conversation" },
     { event: "INSERT", table: "ConversationParticipant" },
     { event: "DELETE", table: "ConversationParticipant" },
+    // Study sessions drive the "Studying" badges + timer snapshots — refresh
+    // the roster the instant one starts/ends instead of waiting for a poll.
+    { event: "INSERT", table: "StudySession" },
+    { event: "UPDATE", table: "StudySession" },
+    { event: "DELETE", table: "StudySession" },
   ], (payload) => {
     switch (payload.table) {
       case "Message":
@@ -251,6 +295,9 @@ function SocialContent() {
         break;
       case "FriendRequest":
         loadersRef.current.loadRequests();
+        break;
+      case "StudySession":
+        loadersRef.current.loadFriends();
         break;
     }
   });
@@ -844,14 +891,6 @@ function SocialContent() {
 
               {/* ─── Friends Cards ─── */}
               {filteredFriends.map((friend) => {
-                // Calculate live dynamic seconds if studying
-                let liveSeconds = friend.todaySeconds;
-                if (friend.isStudying && friend.activeSessionStartedAt) {
-                  const started = new Date(friend.activeSessionStartedAt).getTime();
-                  const activeElapsed = Math.max(0, Math.floor((Date.now() - started) / 1000));
-                  liveSeconds = (friend.completedTodaySeconds ?? friend.todaySeconds) + activeElapsed;
-                }
-
                 return (
                   <motion.div
                     key={friend.id}
@@ -937,17 +976,7 @@ function SocialContent() {
                         <span className="text-[10px] uppercase font-bold font-['Rajdhani'] tracking-widest text-text-muted block">
                           Today&apos;s Study Time
                         </span>
-                        <span
-                          className={`text-2xl font-mono font-bold tracking-tight block mt-0.5 ${
-                            friend.isStudying
-                              ? "text-cyan-300 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]"
-                              : liveSeconds > 0
-                              ? "text-text-primary"
-                              : "text-text-muted"
-                          }`}
-                        >
-                          {formatHHMMSS(liveSeconds)}
-                        </span>
+                        <FriendStudyTimer friend={friend} />
                       </div>
 
                       {/* Card Action Buttons */}

@@ -19,6 +19,7 @@ alter publication supabase_realtime add table "Friendship";
 alter publication supabase_realtime add table "FriendRequest";
 alter publication supabase_realtime add table "ChatSession";
 alter publication supabase_realtime add table "SystemMessage";
+alter publication supabase_realtime add table "StudySession";
 
 -- ============================================================================
 -- 2. Row Level Security for Realtime subscribers
@@ -106,6 +107,23 @@ drop policy if exists "system_message_select_owner" on "SystemMessage";
 create policy "system_message_select_owner" on "SystemMessage"
   for select to authenticated
   using ("SystemMessage"."userId" = (auth.jwt() ->> 'sub')::bigint);
+
+-- Study sessions: visible to the owner and their friends (drives the social
+-- page's live "Studying" badges/timers)
+alter table "StudySession" enable row level security;
+drop policy if exists "study_session_select_owner_or_friend" on "StudySession";
+create policy "study_session_select_owner_or_friend" on "StudySession"
+  for select to authenticated
+  using (
+    "StudySession"."userId" = (auth.jwt() ->> 'sub')::bigint
+    or exists (
+      select 1 from "Friendship" f
+      where (f."userId" = (auth.jwt() ->> 'sub')::bigint
+             and f."friendId" = "StudySession"."userId")
+         or (f."friendId" = (auth.jwt() ->> 'sub')::bigint
+             and f."userId" = "StudySession"."userId")
+    )
+  );
 
 -- ============================================================================
 -- Presence does NOT need any table or RLS setup — it lives entirely in

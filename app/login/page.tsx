@@ -189,7 +189,7 @@ function LoginForm() {
             <label className="stat-label block mb-1">Email or Username</label>
             <input
               type="text"
-              placeholder="scholar@example.com or hunter_name"
+              placeholder="Email or username"
               required
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
@@ -206,7 +206,7 @@ function LoginForm() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Your password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
         examBoard: true,
         level: true,
         color: true,
+        syllabusNote: true,
         createdAt: true,
         lastCompiledAt: true,
         _count: {
@@ -78,6 +79,7 @@ export async function GET(req: NextRequest) {
         examBoard: sub.examBoard,
         level: sub.level,
         color: sub.color,
+        syllabusNote: sub.syllabusNote,
         createdAt: sub.createdAt,
         lastCompiledAt: sub.lastCompiledAt,
         nodesCount: sub._count?.nodes || 0,
@@ -115,6 +117,7 @@ export async function POST(req: NextRequest) {
     const cleanExamBoard = String(body.examBoard || "CAIE").trim().toUpperCase();
     const cleanLevel = String(body.level || "A-Level").trim();
     const cleanColor = String(body.color || "#8B5CF6").trim();
+    const cleanSyllabusNote = body.syllabusNote ? String(body.syllabusNote).trim().slice(0, 2000) : null;
 
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
@@ -133,12 +136,14 @@ export async function POST(req: NextRequest) {
           examBoard: cleanExamBoard,
           level: cleanLevel,
           color: cleanColor,
+          syllabusNote: cleanSyllabusNote,
         },
         update: {
           name: cleanName,
           examBoard: cleanExamBoard,
           level: cleanLevel,
           color: cleanColor,
+          syllabusNote: cleanSyllabusNote,
         },
       });
 

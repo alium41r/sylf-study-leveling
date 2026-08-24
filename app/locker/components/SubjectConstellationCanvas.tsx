@@ -55,8 +55,9 @@ interface ViewportTransform {
 const WORLD_W = 1000;
 const WORLD_H = 1200;
 
-const MIN_ZOOM = 0.55;
-const MAX_ZOOM = 2.4;
+// Responsive zoom bounds (allows full constellation fitting even on narrow mobile devices)
+const MIN_ZOOM = 0.20;
+const MAX_ZOOM = 2.5;
 
 function clampPan(
   pan: { x: number; y: number },
@@ -67,14 +68,33 @@ function clampPan(
   const scaledW = WORLD_W * zoom;
   const scaledH = WORLD_H * zoom;
 
-  const marginX = Math.min(200, cw * 0.35);
-  const marginY = Math.min(200, ch * 0.35);
+  let minPanX: number;
+  let maxPanX: number;
+  if (scaledW <= cw) {
+    // When scaled width fits inside viewport, center with slight floating slack
+    const centerPanX = (cw - scaledW) / 2;
+    const slack = Math.max(30, (cw - scaledW) * 0.35);
+    minPanX = centerPanX - slack;
+    maxPanX = centerPanX + slack;
+  } else {
+    const marginX = Math.min(160, cw * 0.25);
+    minPanX = cw - scaledW - marginX;
+    maxPanX = marginX;
+  }
 
-  const minPanX = marginX - scaledW;
-  const maxPanX = cw - marginX;
-
-  const minPanY = marginY - scaledH;
-  const maxPanY = ch - marginY;
+  let minPanY: number;
+  let maxPanY: number;
+  if (scaledH <= ch) {
+    // When scaled height fits inside viewport, center with slight floating slack
+    const centerPanY = (ch - scaledH) / 2;
+    const slack = Math.max(30, (ch - scaledH) * 0.35);
+    minPanY = centerPanY - slack;
+    maxPanY = centerPanY + slack;
+  } else {
+    const marginY = Math.min(160, ch * 0.25);
+    minPanY = ch - scaledH - marginY;
+    maxPanY = marginY;
+  }
 
   return {
     x: Math.min(maxPanX, Math.max(minPanX, pan.x)),
@@ -172,9 +192,12 @@ export function SubjectConstellationCanvas({
     const { clientWidth: cw, clientHeight: ch } = containerRef.current;
     if (cw === 0 || ch === 0) return;
 
-    const scaleW = cw / WORLD_W;
-    const scaleH = ch / WORLD_H;
-    const fitScale = Math.min(scaleW, scaleH) * 0.94;
+    const padX = cw < 640 ? 16 : 36;
+    const padY = ch < 640 ? 16 : 36;
+
+    const scaleW = (cw - padX) / WORLD_W;
+    const scaleH = (ch - padY) / WORLD_H;
+    const fitScale = Math.min(scaleW, scaleH);
     const zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, fitScale));
 
     const panX = (cw - WORLD_W * zoom) / 2;
@@ -207,7 +230,7 @@ export function SubjectConstellationCanvas({
     }
 
     const targetSkeleton = skeletonMap.get(targetNodeId) || SKELETON_NODES[0];
-    const focusZoom = 1.18;
+    const focusZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, cw < 640 ? 1.05 : 1.25));
 
     const targetPanX = cw / 2 - targetSkeleton.x * focusZoom;
     const targetPanY = ch / 2 - targetSkeleton.y * focusZoom;
@@ -222,7 +245,7 @@ export function SubjectConstellationCanvas({
       if (targetSkeleton) {
         const { clientWidth: cw, clientHeight: ch } = containerRef.current;
         if (cw > 0 && ch > 0) {
-          const focusZoom = 1.22;
+          const focusZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, cw < 640 ? 1.05 : 1.25));
           const targetPanX = cw / 2 - targetSkeleton.x * focusZoom;
           const targetPanY = ch / 2 - targetSkeleton.y * focusZoom;
           const clamped = clampPan({ x: targetPanX, y: targetPanY }, focusZoom, cw, ch);
@@ -436,7 +459,7 @@ export function SubjectConstellationCanvas({
             linear-gradient(to bottom, #090a12, #0d0e1a, #0a0808)
           `,
       }}
-      className={`relative w-full h-[460px] sm:h-[600px] lg:h-[820px] rounded-3xl border ${
+      className={`relative w-full h-[520px] sm:h-[640px] lg:h-[820px] rounded-3xl border ${
         isLightMode ? "border-purple-200/50 shadow-2xl" : "border-white/10 shadow-2xl"
       } overflow-hidden select-none cursor-grab touch-none ${
         isPanning ? "cursor-grabbing" : ""
@@ -462,6 +485,11 @@ export function SubjectConstellationCanvas({
         >
           <ZoomIn className="w-4 h-4" />
         </button>
+
+        <span className="text-[11px] font-mono font-bold px-1.5 min-w-[42px] text-center select-none text-slate-700 dark:text-zinc-300">
+          {Math.round(transform.zoom * 100)}%
+        </span>
+
         <button
           type="button"
           onClick={() => handleZoom(-0.15)}
@@ -474,6 +502,7 @@ export function SubjectConstellationCanvas({
         >
           <ZoomOut className="w-4 h-4" />
         </button>
+
         <div
           className={`w-[1px] h-4 mx-0.5 ${
             isLightMode ? "bg-slate-200" : "bg-white/10"
@@ -499,7 +528,7 @@ export function SubjectConstellationCanvas({
               ? "text-slate-600 hover:text-purple-600 hover:bg-purple-50"
               : "text-zinc-400 hover:text-purple-300 hover:bg-white/10"
           }`}
-          title="Reset Constellation View"
+          title="Fit Full Constellation"
         >
           <Maximize2 className="w-4 h-4" />
         </button>
@@ -636,7 +665,6 @@ export function SubjectConstellationCanvas({
              ═══════════════════════════════════════════════════════════════ */}
           <g className="celestial-backdrop">
             {/* Left Flank — Wavy Whirlwind Mana Streams */}
-            {/* Stream A: Primary Dotted Wavy Guide */}
             <path
               d={leftManaStreamA}
               fill="none"
@@ -645,7 +673,6 @@ export function SubjectConstellationCanvas({
               strokeDasharray="4 7"
               opacity={isLightMode ? 0.42 : 0.48}
             />
-            {/* Stream A: Ascending Ethereal Whirlwind Mana Pulse */}
             <path
               d={leftManaStreamA}
               fill="none"
@@ -657,7 +684,6 @@ export function SubjectConstellationCanvas({
               opacity={isLightMode ? 0.72 : 0.88}
               className="mana-flow-primary"
             />
-            {/* Stream B: Intertwining Counter-Spiral Ribbon */}
             <path
               d={leftManaStreamB}
               fill="none"
@@ -670,7 +696,6 @@ export function SubjectConstellationCanvas({
             />
 
             {/* Right Flank — Wavy Whirlwind Mana Streams */}
-            {/* Stream A: Primary Dotted Wavy Guide */}
             <path
               d={rightManaStreamA}
               fill="none"
@@ -679,7 +704,6 @@ export function SubjectConstellationCanvas({
               strokeDasharray="4 7"
               opacity={isLightMode ? 0.42 : 0.48}
             />
-            {/* Stream A: Ascending Ethereal Whirlwind Mana Pulse */}
             <path
               d={rightManaStreamA}
               fill="none"
@@ -691,7 +715,6 @@ export function SubjectConstellationCanvas({
               opacity={isLightMode ? 0.72 : 0.88}
               className="mana-flow-primary"
             />
-            {/* Stream B: Intertwining Counter-Spiral Ribbon */}
             <path
               d={rightManaStreamB}
               fill="none"

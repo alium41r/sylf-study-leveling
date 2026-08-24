@@ -477,26 +477,34 @@ export async function POST(req: NextRequest) {
     const fallbackSpec = workloadResult.route.fallback;
     const secondarySpec = workloadResult.route.secondaryFallback;
 
+    // Vision prompts must always run on a vision-capable model — even when
+    // the user has an explicit provider preference, the per-provider VISION
+    // tier is used instead of that provider's default text model.
+    const isVisionWorkload = workloadResult.workload === "multimodal_vision";
+
     try {
       if (modelPreference === "groq") {
+        const groqModel = isVisionWorkload ? GROQ_MODELS.vision : GROQ_MODELS.default;
         actualModelUsed = "GROQ";
-        actualModelDisplayName = "Groq (Llama 3.3 70B)";
-        actualModelId = GROQ_MODELS.default;
-        const loopResult = await executeAgentLoop("groq", GROQ_MODELS.default, abortController.signal);
+        actualModelDisplayName = `Groq (${groqModel})`;
+        actualModelId = groqModel;
+        const loopResult = await executeAgentLoop("groq", groqModel, abortController.signal);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
       } else if (modelPreference === "gemini") {
+        const geminiModel = isVisionWorkload ? GEMINI_MODELS.vision : GEMINI_MODELS.default;
         actualModelUsed = "GEMINI";
-        actualModelDisplayName = "Gemini 3.7 Flash";
-        actualModelId = GEMINI_MODELS.default;
-        const loopResult = await executeAgentLoop("gemini", GEMINI_MODELS.default, abortController.signal);
+        actualModelDisplayName = `Gemini (${geminiModel})`;
+        actualModelId = geminiModel;
+        const loopResult = await executeAgentLoop("gemini", geminiModel, abortController.signal);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
       } else if (modelPreference === "deepseek") {
+        const deepseekModel = isVisionWorkload ? DEEPSEEK_MODELS.vision : primarySpec.model;
         actualModelUsed = "DEEPSEEK";
-        actualModelDisplayName = `DeepSeek (${primarySpec.model})`;
-        actualModelId = primarySpec.model;
-        const loopResult = await executeAgentLoop("deepseek", primarySpec.model, abortController.signal);
+        actualModelDisplayName = `DeepSeek (${deepseekModel})`;
+        actualModelId = deepseekModel;
+        const loopResult = await executeAgentLoop("deepseek", deepseekModel, abortController.signal);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
       } else {

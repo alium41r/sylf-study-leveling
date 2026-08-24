@@ -8,6 +8,7 @@ import { FocusToolsProvider } from "./components/FocusToolsContext";
 import FocusToolsDock from "./components/FocusToolsDock";
 import FocusToolWindow from "./components/FocusToolWindow";
 import { useFocusEyeComfort } from "./hooks/useFocusEyeComfort";
+import { useScreenWakeLock } from "./hooks/useScreenWakeLock";
 import { SESSION_ENDED_EVENT, SESSION_SUMMARY_KEY } from "../components/SessionEndToast";
 import { CheckCircle2 } from "lucide-react";
 
@@ -38,6 +39,9 @@ function FocusContent() {
   // Eye-Comfort Dimming (Light Mode only) — zero-IOPS client state
   const { isDimActive, isLightMode, toggleDim } = useFocusEyeComfort();
 
+  // Keep the screen awake during the study session (Web Screen Wake Lock)
+  const keepAwake = useScreenWakeLock();
+
   const subjectId = searchParams.get("subjectId");
   const subjectName = searchParams.get("subjectName") || "Focus Session";
   const questId = searchParams.get("questId");
@@ -50,6 +54,7 @@ function FocusContent() {
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null); // null = stopwatch mode
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [isEnding, setIsEnding] = useState(false);
+  const [endError, setEndError] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
 
   // Daily totals
@@ -78,6 +83,11 @@ function FocusContent() {
   const tokenRef = useRef<string | null>(token || null);
   const lastSyncedSecondsRef = useRef<number>(0);
   const isSyncingRef = useRef<boolean>(false);
+  // Holds the in-flight flush promise so overlapping calls serialize.
+  const flushInFlightRef = useRef<Promise<boolean> | null>(null);
+  // Set inside the timer updater (no side effects allowed there) and consumed
+  // by a dedicated effect so the 3-minute auto-save fires exactly once.
+  const autoFlushDueRef = useRef<boolean>(false);
 
   // Keep refs in sync with React state
   useEffect(() => {
@@ -133,6 +143,17 @@ function FocusContent() {
   // ─── Throttled Flush Helper ────────────────────────
   const flushSessionProgress = useCallback(
     async (isFinal: boolean = false, completeQuest: boolean = false): Promise<boolean> => {
+      // Serialize flushes: if one is in flight, the next waits for it instead
+      // of racing. Races could deliver an older durationSeconds after the
+      // final flush, and overlapping retries looked like a dead button.
+      if (flushInFlightRef.current) {
+        try {
+          await flushInFlightRef.current;
+        } catch {
+          // swallow — the new flush below will do the authoritative write
+        }
+      }
+
       const currSeconds = elapsedSecondsRef.current;
       const currentSessionId = sessionIdRef.current;
       const currentToken = tokenRef.current;
@@ -146,53 +167,61 @@ function FocusContent() {
       const durationMinutes = Math.floor(currSeconds / 60);
       const durationSeconds = currSeconds;
 
-      try {
-        const res = await fetch("/api/sessions", {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${currentToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: currentSessionId,
-            durationMinutes,
-            durationSeconds,
-            questId: questId ? parseInt(questId) : undefined,
-            completeQuest: completeQuest || undefined,
-            // Only the final flush triggers the single canonical reward award;
-            // the RPC performs exact delta accounting on every flush.
-            final: isFinal || undefined,
-          }),
-          keepalive: true,
-        });
+      const run = (async () => {
+        try {
+          const res = await fetch("/api/sessions", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${currentToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: currentSessionId,
+              durationMinutes,
+              durationSeconds,
+              questId: questId ? parseInt(questId) : undefined,
+              completeQuest: completeQuest || undefined,
+              // Only the final flush triggers the single canonical reward award;
+              // the RPC performs exact delta accounting on every flush.
+              final: isFinal || undefined,
+            }),
+            keepalive: true,
+          });
 
-        if (res.ok) {
-          lastSyncedSecondsRef.current = currSeconds;
-          if (isFinal) {
-            // Local Storage Cleanup ONLY after 200 OK
-            localStorage.removeItem(cacheKey);
-            sessionStorage.removeItem(timerKey);
-            sessionStorage.removeItem("runningTimerSeconds");
-          } else {
-            localStorage.setItem(
-              cacheKey,
-              JSON.stringify({
-                sessionId: currentSessionId,
-                elapsedSeconds: currSeconds,
-                lastSyncedSeconds: currSeconds,
-                timestamp: Date.now(),
-              })
-            );
+          if (res.ok) {
+            lastSyncedSecondsRef.current = currSeconds;
+            if (isFinal) {
+              // Local Storage Cleanup ONLY after 200 OK
+              localStorage.removeItem(cacheKey);
+              sessionStorage.removeItem(timerKey);
+              sessionStorage.removeItem("runningTimerSeconds");
+            } else {
+              localStorage.setItem(
+                cacheKey,
+                JSON.stringify({
+                  sessionId: currentSessionId,
+                  elapsedSeconds: currSeconds,
+                  lastSyncedSeconds: currSeconds,
+                  timestamp: Date.now(),
+                })
+              );
+            }
+            return true;
           }
-          return true;
+          return false;
+        } catch (err) {
+          console.error("Failed to flush session progress:", err);
+          return false;
+        } finally {
+          isSyncingRef.current = false;
         }
-        return false;
-      } catch (err) {
-        console.error("Failed to flush session progress:", err);
-        return false;
-      } finally {
-        isSyncingRef.current = false;
-      }
+      })();
+
+      flushInFlightRef.current = run;
+      run.finally(() => {
+        if (flushInFlightRef.current === run) flushInFlightRef.current = null;
+      });
+      return run;
     },
     [cacheKey, timerKey, questId]
   );
@@ -466,6 +495,39 @@ function FocusContent() {
     }
   }, [activeMode, phase, currentSession, totalSessions, playChime, questData]);
 
+  // ─── Session helpers ───────────────────────────────
+  // End/Complete used to silently no-op when the session had failed to start
+  // (sessionIdRef null) — the buttons looked dead. ensureSession() retries the
+  // start so a user can always recover, and returns the live session id.
+  const ensureSession = useCallback(async (): Promise<number | null> => {
+    if (sessionIdRef.current) return sessionIdRef.current;
+    if (!tokenRef.current) return null;
+    try {
+      const res = await fetch("/api/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subjectId: subjectId ? parseInt(subjectId) : undefined,
+          questId: questId ? parseInt(questId) : undefined,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.id) {
+          setSessionId(data.id);
+          sessionIdRef.current = data.id;
+          return data.id;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to (re)start session:", err);
+    }
+    return null;
+  }, [subjectId, questId]);
+
   // ─── Start API session on mount ────────────────────
   useEffect(() => {
     if (!token || sessionStartedRef.current) return;
@@ -564,9 +626,10 @@ function FocusContent() {
               );
             } catch {}
 
-            // Throttled Auto-Save Checkpoint: Flush every 3 minutes (180s) of active focus
+            // Throttled Auto-Save Checkpoint: Flush every 3 minutes (180s) of
+            // active focus. No side effects inside the updater — just flag it.
             if (newSeconds - lastSyncedSecondsRef.current >= 180) {
-              flushSessionProgress(false);
+              autoFlushDueRef.current = true;
             }
 
             return newSeconds;
@@ -591,6 +654,13 @@ function FocusContent() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isPaused, phase, remainingSeconds, transitionPhase, cacheKey, timerKey, flushSessionProgress]);
+
+  // ─── Auto-save checkpoint (consumes the flag set by the timer loop) ──
+  useEffect(() => {
+    if (!autoFlushDueRef.current) return;
+    autoFlushDueRef.current = false;
+    flushSessionProgress(false);
+  }, [elapsedSeconds, flushSessionProgress]);
 
   // ─── Page Lifecycle & Unload Sync ─────────────────
   useEffect(() => {
@@ -634,48 +704,68 @@ function FocusContent() {
   };
 
   const handleEndSession = async () => {
-    if (!tokenRef.current || !sessionIdRef.current || isEnding) return;
+    if (!tokenRef.current || isEnding) return;
     setIsEnding(true);
+    setEndError(null);
 
     try {
+      // If the session never started (flaky start request), retry it first —
+      // previously the button silently no-op'd and looked broken.
+      const sid = sessionIdRef.current || (await ensureSession());
+      if (!sid) {
+        setIsEnding(false);
+        setEndError("Couldn't start the session — check your connection and try again.");
+        return;
+      }
       // isFinal = true, completeQuest = false (logs time, keeps quest active)
       const success = await flushSessionProgress(true, false);
       if (success) {
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
         }
-        await refreshStats();
+        void refreshStats();
         announceSessionEnd();
         router.push("/timer");
       } else {
         setIsEnding(false);
+        setEndError("Couldn't finish the session — check your connection and try again. Your in-session progress is safe.");
       }
     } catch (err) {
       console.error("Failed to end session:", err);
       setIsEnding(false);
+      setEndError("Couldn't finish the session — check your connection and try again. Your in-session progress is safe.");
     }
   };
 
   const handleCompleteQuest = async () => {
-    if (!tokenRef.current || !sessionIdRef.current || isEnding) return;
+    if (!tokenRef.current || isEnding) return;
     setIsEnding(true);
+    setEndError(null);
 
     try {
+      const sid = sessionIdRef.current || (await ensureSession());
+      if (!sid) {
+        setIsEnding(false);
+        setEndError("Couldn't start the session — check your connection and try again.");
+        return;
+      }
       // isFinal = true, completeQuest = true (completes quest, credits XP and node progress)
       const success = await flushSessionProgress(true, true);
       if (success) {
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
         }
-        await refreshStats();
+        void refreshStats();
         announceSessionEnd();
         router.push("/timer");
       } else {
         setIsEnding(false);
+        setEndError("Couldn't complete the quest — check your connection and try again. Your in-session progress is safe.");
       }
     } catch (err) {
       console.error("Failed to complete quest:", err);
       setIsEnding(false);
+      setEndError("Couldn't complete the quest — check your connection and try again. Your in-session progress is safe.");
     }
   };
 
@@ -760,8 +850,14 @@ function FocusContent() {
   return (
     <FocusToolsProvider subjectName={subjectName} questTitle={questData?.title}>
       <div
-        className="min-h-screen flex flex-col justify-between items-center py-6 sm:py-8 px-4 select-none relative overflow-y-auto bg-bg-void text-text-primary transition-colors duration-500"
+        className="h-screen flex flex-col justify-between items-center py-6 sm:py-8 px-4 select-none relative overflow-hidden bg-bg-void text-text-primary transition-colors duration-500"
       style={{
+        // Height-lock the focus page to the visible viewport: `min-h-screen`
+        // let the page grow past the viewport on mobile, so the document (and
+        // the fixed tool windows with it) scrolled. `100dvh` tracks the
+        // mobile URL-bar-aware height; `h-screen` above is the old-browser
+        // fallback since an unsupported inline value is simply ignored.
+        height: "100dvh",
         background: phase.includes("break") || phase === "rest"
           ? "radial-gradient(ellipse at center, rgba(34, 197, 94, 0.08) 0%, var(--bg-void) 75%)"
           : "radial-gradient(ellipse at center, var(--accent-primary-dim) 0%, var(--bg-void) 75%)",
@@ -808,7 +904,7 @@ function FocusContent() {
       </div>
 
       {/* ─── Center Core: Digital Timer & Sub-stats ─ */}
-      <div className="flex-1 flex flex-col items-center justify-center my-auto py-4 z-10 w-full max-w-4xl text-center">
+      <div className="flex-1 min-h-0 flex flex-col items-center justify-center my-auto py-4 z-10 w-full max-w-4xl text-center">
         {/* Dynamic Responsive Digital Timer */}
         <div
           className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold font-mono tracking-tight leading-none my-2 select-none"
@@ -997,6 +1093,22 @@ function FocusContent() {
         )}
       </div>
 
+      {/* End / Complete failure feedback — never fail silently */}
+      <AnimatePresence>
+        {endError && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="fixed bottom-36 left-1/2 -translate-x-1/2 z-30 max-w-md w-[calc(100%-2rem)] px-4 py-3 rounded-xl border border-amber-500/40 bg-amber-500/10 backdrop-blur-xl text-center"
+          >
+            <p className="text-xs font-['Rajdhani'] font-semibold text-amber-300 leading-relaxed">
+              {endError}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Paused Overlay */}
       <AnimatePresence>
         {isPaused && (
@@ -1088,7 +1200,15 @@ function FocusContent() {
 
         {/* ─── Floating Focus Tools Dock & Expandable Window ─── */}
         <FocusToolWindow />
-        <FocusToolsDock dimControl={{ isDimActive, isLightMode, onToggleDim: toggleDim }} />
+        <FocusToolsDock
+          dimControl={{ isDimActive, isLightMode, onToggleDim: toggleDim }}
+          keepAwakeControl={{
+            isActive: keepAwake.isActive,
+            isSupported: keepAwake.isSupported,
+            error: keepAwake.error,
+            onToggle: keepAwake.toggle,
+          }}
+        />
       </div>
     </FocusToolsProvider>
   );

@@ -178,8 +178,11 @@ const QUEST_LOOKUP_QUESTION =
 export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> = {
   multimodal_vision: {
     workload: "multimodal_vision",
-    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.vision },
-    fallback: { provider: "gemini", model: GEMINI_MODELS.visionFallback },
+    // Gemini 3.7 Flash is the dedicated primary vision model; DeepSeek's
+    // vision-exp tier is the fallback when Gemini fails (unavailable,
+    // rate-limited, network error — the chat route cascades automatically).
+    primary: { provider: "gemini", model: GEMINI_MODELS.vision },
+    fallback: { provider: "deepseek", model: DEEPSEEK_MODELS.vision },
     description: "Multimodal Vision & Diagram Ingestion Engine",
     outputTokenCap: 1024,
   },

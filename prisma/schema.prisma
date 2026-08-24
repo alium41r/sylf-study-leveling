@@ -271,6 +271,7 @@ model Subject {
   examBoard    String        @default("CAIE")    // e.g., "CAIE", "Edexcel", "AQA", "AP", "IB"
   level        String        @default("A-Level") // e.g., "A-Level", "AS-Level", "AP", "University"
   color        String        @default("#8B5CF6")
+  syllabusNote String?       // Free-text book / syllabus details (used by the AI syllabus dissection)
   lastCompiledAt DateTime?   // Set when the AI 48-node syllabus compilation commits (30-day recompile cooldown)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @default(now()) @updatedAt

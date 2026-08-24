@@ -179,10 +179,38 @@ export async function PATCH(req: NextRequest) {
     const { id, durationMinutes, durationSeconds, questId, completeQuest, final } = validation.data;
     const claimedSeconds = durationSeconds ?? durationMinutes * 60;
 
-    // Verify session ownership
-    const existing = await prisma.studySession.findFirst({
-      where: { id, userId: payload.userId as number },
-    });
+    // ─── PARALLEL READ PHASE ────────────────────────────────────
+    // Session ownership, quest (+ node) and user profile are independent —
+    // fetching them in parallel instead of sequentially removes several
+    // round-trips (~2-3s → sub-second), which is what made "End Session"
+    // feel unresponsive and pushed the request toward function timeouts.
+    const [existing, quest, userRow] = await Promise.all([
+      prisma.studySession.findFirst({
+        where: { id, userId: payload.userId as number },
+      }),
+      questId
+        ? prisma.quest.findFirst({
+            where: { id: Number(questId), userId: payload.userId as number },
+            include: {
+              subjectNode: {
+                select: {
+                  id: true,
+                  progress: true,
+                  isMastered: true,
+                  masteredAt: true,
+                  spAward: true,
+                  nodeId: true,
+                  title: true,
+                },
+              },
+            },
+          })
+        : Promise.resolve(null),
+      prisma.user.findUnique({
+        where: { id: payload.userId as number },
+        select: { id: true, username: true, timezone: true, lastActiveDate: true, streakDays: true, level: true },
+      }) as Promise<{ id: number; username: string | null; timezone: string | null; lastActiveDate: string | null; streakDays: number; level: number } | null>,
+    ]);
     if (!existing) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
@@ -217,48 +245,56 @@ export async function PATCH(req: NextRequest) {
 
     const rpcResult = rows[0]?.complete_study_session;
     const sessionDeltaSeconds = rpcResult?.deltaSeconds ?? 0;
+    let questCompletedNow = false;
 
     // Reconcile Quest & Subject Node Progress.
     // NOTE: the RPC has already added THIS flush's delta to
     // Quest.elapsedSeconds — re-read the fresh value so completion
     // checks and node-progress ratios never double-count.
-    if (questId) {
-      const quest = await prisma.quest.findFirst({
-        where: { id: Number(questId), userId: payload.userId as number },
-        include: {
-          subjectNode: {
-            select: {
-              id: true,
-              progress: true,
-              isMastered: true,
-              masteredAt: true,
-              spAward: true,
-              nodeId: true,
-              title: true,
-            },
-          },
-        },
-      });
-
-      if (quest && quest.status === "ACTIVE") {
+    if (questId && quest) {
+      // Quests are open (completable / progressable) in any of these states.
+      // Quests started from the Timer page are moved to IN_PROGRESS by
+      // PATCH /api/quests/:id, and restricting to "ACTIVE" meant those quests
+      // could NEVER be completed — they stayed "In Progress" forever.
+      const isOpenQuest =
+        quest.status === "ACTIVE" ||
+        quest.status === "IN_PROGRESS" ||
+        quest.status === "PENDING";
+      if (isOpenQuest) {
         const targetDuration = (quest.targetMinutes || quest.requiredMinutes || 45) * 60;
-        const totalQuestElapsed = quest.elapsedSeconds || 0;
+        // The RPC added THIS flush's delta to Quest.elapsedSeconds; the quest
+        // row above was read before the RPC, so fold the delta in to get the
+        // FRESH total for completion checks and reward scaling.
+        const totalQuestElapsed = (quest.elapsedSeconds || 0) + Math.max(0, sessionDeltaSeconds);
         const shouldComplete = completeQuest === true || totalQuestElapsed >= targetDuration;
 
         if (shouldComplete) {
-          // 1. Atomic quest-reward claim via SECURITY DEFINER RPC:
-          //    XP + Sylph + node progress + level/rank recompute + ledgers
-          //    all happen inside one row-locked Postgres transaction.
-          const deltaProgress = Math.min(
-            100.0,
-            Math.max(5.0, Math.floor(quest.scopeWeight * 100))
-          );
+          // Reward policy:
+          //  • Full duration reached (or exceeded) → FULL quest reward.
+          //  • Explicit "Complete Quest" press with less time → the quest is
+          //    still marked COMPLETED, but rewards scale with the fraction of
+          //    time actually studied — the full XP/Sylph is NOT granted
+          //    unless the quest's total duration was genuinely completed.
+          const completionRatio = Math.min(1.0, targetDuration > 0 ? totalQuestElapsed / targetDuration : 1);
+          const fullDurationReached = totalQuestElapsed >= targetDuration;
+          const xpAward = fullDurationReached
+            ? quest.xpReward
+            : Math.floor(quest.xpReward * completionRatio);
+          const sylphAward = fullDurationReached
+            ? quest.sylphReward
+            : Math.floor(quest.sylphReward * completionRatio);
+
+          // Node progress mirrors the reward: full scope weight at full
+          // completion, scaled by studied time otherwise.
+          const deltaProgress = fullDurationReached
+            ? Math.min(100.0, Math.max(5.0, Math.floor(quest.scopeWeight * 100)))
+            : Math.min(100.0, Math.max(0, Math.floor(quest.scopeWeight * 100 * completionRatio)));
 
           const claimResult = await claimSessionRewardAtomic({
             userId: payload.userId as number,
             sessionId: id,
-            xp: quest.xpReward,
-            sylph: quest.sylphReward,
+            xp: xpAward,
+            sylph: sylphAward,
             nodeId: quest.subjectNodeId ?? null,
             progressDelta: deltaProgress,
           });
@@ -272,13 +308,16 @@ export async function PATCH(req: NextRequest) {
               completedAt: new Date(),
             },
           });
+          questCompletedNow = true;
 
           // 3. Reward & mastery announcements
           await prisma.systemMessage.create({
             data: {
               userId: payload.userId as number,
               type: "REWARD",
-              content: `**🏆 QUEST COMPLETED: ${quest.title}**\n\nTarget Duration: ${quest.targetMinutes || quest.requiredMinutes || 45} mins.\n\nRewards Claimed: **+${quest.xpReward} XP** • **+${quest.sylphReward} Sylph**.`,
+              content: fullDurationReached
+                ? `**🏆 QUEST COMPLETED: ${quest.title}**\n\nTarget Duration: ${quest.targetMinutes || quest.requiredMinutes || 45} mins.\n\nRewards Claimed: **+${quest.xpReward} XP** • **+${quest.sylphReward} Sylph**.`
+                : `**🏆 QUEST COMPLETED EARLY: ${quest.title}**\n\nStudied ${Math.floor(completionRatio * 100)}% of the target — rewards scaled to time studied.\n\nRewards Claimed: **+${xpAward} XP** • **+${sylphAward} Sylph** (full reward unlocks at ${quest.targetMinutes || quest.requiredMinutes || 45} mins).`,
             },
           });
 
@@ -290,19 +329,6 @@ export async function PATCH(req: NextRequest) {
                 content: `**🎯 SYLLABUS NODE MASTERED: ${quest.subjectNode.title}**\n\nYou achieved 100% mastery on node **${quest.subjectNode.nodeId}**!\n\nReward Minted: **+${quest.subjectNode.spAward} Subject SP**.`,
               },
             });
-          }
-
-          const username = (
-            await prisma.user.findUnique({
-              where: { id: payload.userId as number },
-              select: { username: true },
-            })
-          )?.username;
-          if (username) {
-            try {
-              revalidateTag(`user-${username.toLowerCase()}`, "max");
-              revalidateTag(`profile-stats-${username.toLowerCase()}`, "max");
-            } catch {}
           }
         } else {
           // Quest is NOT completed yet. elapsedSeconds was already credited
@@ -337,79 +363,94 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    // Handle weekly milestone check
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId as number },
-      select: { id: true, timezone: true, lastActiveDate: true, streakDays: true, level: true },
-    });
-
-    if (user) {
-      const bounds = getWeeklyBounds(new Date(), user.timezone || "UTC");
-      const weekSessions = await prisma.studySession.aggregate({
-        _sum: { durationMinutes: true },
-        where: {
-          userId: user.id,
-          startedAt: {
-            gte: bounds.weekStart,
-            lte: bounds.weekEnd,
+    // Handle weekly milestone check. The weekly aggregation is skipped as
+    // soon as this week's streak was already recorded (the common case) —
+    // it was one of the slowest queries on every flush.
+    let weeklyAwarded = false;
+    if (userRow) {
+      const bounds = getWeeklyBounds(new Date(), userRow.timezone || "UTC");
+      if (userRow.lastActiveDate === bounds.weekKey) {
+        weeklyAwarded = true; // already recorded this week
+      } else {
+        const weekSessions = await prisma.studySession.aggregate({
+          _sum: { durationMinutes: true },
+          where: {
+            userId: userRow.id,
+            startedAt: {
+              gte: bounds.weekStart,
+              lte: bounds.weekEnd,
+            },
           },
-        },
-      });
-
-      const weekMinutes = weekSessions._sum.durationMinutes || 0;
-      if (weekMinutes >= 180 && user.lastActiveDate !== bounds.weekKey) {
-        const freezeItem = await prisma.inventoryItem.findFirst({
-          where: { userId: user.id, itemKey: "STREAK_FREEZE", quantity: { gt: 0 } },
         });
 
-        const streakResult = calculateWeeklyStreak(
-          user.lastActiveDate,
-          bounds.weekKey,
-          user.streakDays,
-          !!freezeItem
-        );
-
-        if (streakResult.freezeUsed && freezeItem) {
-          await prisma.inventoryItem.update({
-            where: { id: freezeItem.id },
-            data: { quantity: { decrement: 1 } },
+        const weekMinutes = weekSessions._sum.durationMinutes || 0;
+        if (weekMinutes >= 180) {
+          const freezeItem = await prisma.inventoryItem.findFirst({
+            where: { userId: userRow.id, itemKey: "STREAK_FREEZE", quantity: { gt: 0 } },
           });
+
+          const streakResult = calculateWeeklyStreak(
+            userRow.lastActiveDate,
+            bounds.weekKey,
+            userRow.streakDays,
+            !!freezeItem
+          );
+
+          if (streakResult.freezeUsed && freezeItem) {
+            await prisma.inventoryItem.update({
+              where: { id: freezeItem.id },
+              data: { quantity: { decrement: 1 } },
+            });
+            await prisma.systemMessage.create({
+              data: {
+                userId: userRow.id,
+                content: `**Weekly Streak Freeze Consumed**\n\nYour Streak Freeze protected your weekly streak after a missed cycle. Streak continues at **${streakResult.newStreak} weeks**!`,
+                type: "STREAK",
+              },
+            });
+          }
+
+          const weeklyReward = calculateWeeklyQuestReward(userRow.level);
+          await prisma.user.update({
+            where: { id: userRow.id },
+            data: {
+              streakDays: streakResult.newStreak,
+              lastActiveDate: bounds.weekKey,
+              sylph: { increment: weeklyReward.sylphReward },
+            },
+          });
+
           await prisma.systemMessage.create({
             data: {
-              userId: user.id,
-              content: `**Weekly Streak Freeze Consumed**\n\nYour Streak Freeze protected your weekly streak after a missed cycle. Streak continues at **${streakResult.newStreak} weeks**!`,
+              userId: userRow.id,
+              content: `**Weekly Mission Complete: 3 Hours of Focus!**\n\nYou completed the weekly 3-hour study target. Weekly streak is now **${streakResult.newStreak} week${streakResult.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
               type: "STREAK",
             },
           });
+          weeklyAwarded = true;
         }
-
-        const weeklyReward = calculateWeeklyQuestReward(user.level);
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            streakDays: streakResult.newStreak,
-            lastActiveDate: bounds.weekKey,
-            sylph: { increment: weeklyReward.sylphReward },
-          },
-        });
-
-        await prisma.systemMessage.create({
-          data: {
-            userId: user.id,
-            content: `**Weekly Mission Complete: 3 Hours of Focus!**\n\nYou completed the weekly 3-hour study target. Weekly streak is now **${streakResult.newStreak} week${streakResult.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
-            type: "STREAK",
-          },
-        });
       }
     }
 
     invalidateRankingsCache();
 
-    const session = await prisma.studySession.findUnique({
-      where: { id },
-    });
+    const username = userRow?.username;
+    if (username) {
+      try {
+        revalidateTag(`user-${username.toLowerCase()}`, "max");
+        revalidateTag(`profile-stats-${username.toLowerCase()}`, "max");
+      } catch {}
+    }
 
-    return NextResponse.json(session, { status: 200 });
+    // Respond immediately with the RPC result — no trailing re-read.
+    return NextResponse.json(
+      {
+        ...(rpcResult || {}),
+        questCompletedNow,
+        weeklyAwarded,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("PATCH /api/sessions error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

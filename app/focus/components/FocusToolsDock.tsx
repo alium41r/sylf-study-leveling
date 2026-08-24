@@ -16,6 +16,7 @@ import {
   GripVertical,
   SunMedium,
   SunDim,
+  Power,
 } from "lucide-react";
 
 interface DockItem {
@@ -32,6 +33,14 @@ export interface DimControlProps {
   isDimActive: boolean;
   isLightMode: boolean;
   onToggleDim: () => void;
+}
+
+/** Keep-screen-awake control (Web Screen Wake Lock) passed in by the Focus page. */
+export interface KeepAwakeControlProps {
+  isActive: boolean;
+  isSupported: boolean;
+  error?: string | null;
+  onToggle: () => void | Promise<void>;
 }
 
 const DOCK_ITEMS: DockItem[] = [
@@ -79,8 +88,10 @@ const DOCK_ITEMS: DockItem[] = [
 
 export default function FocusToolsDock({
   dimControl,
+  keepAwakeControl,
 }: {
   dimControl?: DimControlProps;
+  keepAwakeControl?: KeepAwakeControlProps;
 }) {
   const {
     activeTool,
@@ -105,6 +116,12 @@ export default function FocusToolsDock({
   const dockRef = useRef<HTMLDivElement>(null);
   const pointerStartRef = useRef<{ x: number; y: number; originX: number; originY: number } | null>(null);
   const hasMovedRef = useRef<boolean>(false);
+  // Latest clamped drag position, mirrored for the pointer-up handler.
+  // Reading the drag state from a ref avoids calling setDockPosition inside
+  // the setDragOffset updater — updaters run during React's render phase,
+  // and setting another component's state from there triggers the
+  // "Cannot update a component while rendering a different component" error.
+  const dragOffsetRef = useRef<{ x: number; y: number } | null>(null);
 
   // Track mobile viewport dynamically
   useEffect(() => {
@@ -177,7 +194,9 @@ export default function FocusToolsDock({
         const clampedX = Math.max(10, Math.min(window.innerWidth - currentWidth - 10, newX));
         const clampedY = Math.max(10, Math.min(window.innerHeight - currentHeight - 10, newY));
 
-        setDragOffset({ x: clampedX, y: clampedY });
+        const nextPos = { x: clampedX, y: clampedY };
+        dragOffsetRef.current = nextPos;
+        setDragOffset(nextPos);
       }
     };
 
@@ -186,14 +205,11 @@ export default function FocusToolsDock({
       window.removeEventListener("pointerup", handleWindowPointerUp);
       window.removeEventListener("pointercancel", handleWindowPointerUp);
 
-      if (hasMovedRef.current) {
-        setDragOffset((latest) => {
-          if (latest) {
-            setDockPosition({ x: latest.x, y: latest.y });
-          }
-          return null;
-        });
+      if (hasMovedRef.current && dragOffsetRef.current) {
+        setDockPosition({ x: dragOffsetRef.current.x, y: dragOffsetRef.current.y });
       }
+      dragOffsetRef.current = null;
+      setDragOffset(null);
 
       pointerStartRef.current = null;
       setTimeout(() => {
@@ -247,6 +263,64 @@ export default function FocusToolsDock({
     e.stopPropagation();
     dimControl?.onToggleDim();
   };
+
+  const handleWakeClick = (e: React.MouseEvent) => {
+    if (hasMovedRef.current || isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    keepAwakeControl?.onToggle();
+  };
+
+  // ─── Keep the dock fully on-screen ────────────────────────────
+  // Clamp against the element's ACTUAL rect (not stored-position math) and
+  // only after the expand/collapse layout animation has settled. A clamp
+  // during the animation that re-sets the position restarts framer's layout
+  // animation, which keeps the width changing and re-clamping in a loop —
+  // the "Maximum update depth exceeded" error.
+  const clampDock = useCallback(() => {
+    const el = dockRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const margin = 10;
+    const iw = window.innerWidth;
+    const ih = window.innerHeight;
+    let nx = r.left;
+    let ny = r.top;
+    if (r.right > iw - margin) nx = iw - r.width - margin;
+    else if (r.left < margin) nx = margin;
+    if (r.bottom > ih - margin) ny = ih - r.height - margin;
+    else if (r.top < margin) ny = margin;
+    // Rounding via Math.round lets the numeric compare settle (fractional
+    // geometry + integer saved positions would otherwise mismatch forever).
+    if (Math.abs(nx - r.left) > 0.5 || Math.abs(ny - r.top) > 0.5) {
+      setDockPosition({ x: Math.round(nx), y: Math.round(ny) });
+    }
+  }, [setDockPosition]);
+
+  // Clamp whenever a freeform position is (re)applied — covers a saved
+  // position restored after a viewport change. Rect-based and self-settling:
+  // once the element is in bounds, the next run finds no mismatch.
+  useEffect(() => {
+    if (!dockPosition || isMobile) return;
+    clampDock();
+  }, [dockPosition, isMobile, clampDock]);
+
+  // One-shot clamp after the expand/collapse layout animation settles, and on
+  // viewport resize/rotation.
+  useEffect(() => {
+    if (!dockPosition || isMobile) return;
+    const settleTimer = setTimeout(clampDock, 700);
+    const onResizeClamp = () => clampDock();
+    window.addEventListener("resize", onResizeClamp);
+    return () => {
+      clearTimeout(settleTimer);
+      window.removeEventListener("resize", onResizeClamp);
+    };
+  }, [dockPosition, isMobile, clampDock]);
 
   // ─── Overlap Prevention on Mobile ──────────────────────────
   // If a tool window is active on mobile, hide the floating dock so it never
@@ -318,6 +392,11 @@ export default function FocusToolsDock({
               {isAudioPlaying && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               )}
+              {/* Keep-screen-awake active indicator — visible in the compact
+                  pill on mobile too, so the state is never hidden. */}
+              {keepAwakeControl?.isActive && (
+                <span className="absolute -top-1 -left-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              )}
             </div>
             <span
               className="text-xs font-bold tracking-widest uppercase"
@@ -363,6 +442,39 @@ export default function FocusToolsDock({
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 {dimControl.isDimActive ? "DIM: ON" : "DIM: OFF"}
+              </span>
+            </button>
+          )}
+
+          {/* Keep-Screen-Awake Toggle (Desktop pill only — on mobile it lives
+              in the tools sheet to keep the pill compact) */}
+          {!isMobile && keepAwakeControl && (
+            <button
+              onClick={handleWakeClick}
+              onPointerDown={(e) => e.stopPropagation()}
+              disabled={!keepAwakeControl.isSupported}
+              title={
+                keepAwakeControl.error ||
+                (keepAwakeControl.isSupported
+                  ? "Keep the screen awake while studying"
+                  : "Keep screen awake is not supported on this device")
+              }
+              aria-label={keepAwakeControl.isActive ? "Keep screen on" : "Keep screen off"}
+              aria-pressed={keepAwakeControl.isActive}
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto border shrink-0 ${
+                keepAwakeControl.isActive
+                  ? "bg-emerald-400/10 text-emerald-300 border-emerald-400/60 shadow-[0_0_12px_rgba(16,185,129,0.35)]"
+                  : keepAwakeControl.isSupported
+                  ? "bg-bg-panel/70 text-text-secondary hover:text-text-primary hover:bg-bg-panel border-border-subtle"
+                  : "bg-bg-panel/40 text-text-muted/50 border-border-subtle cursor-not-allowed opacity-50"
+              }`}
+            >
+              <Power className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span
+                className="text-[0.65rem] font-bold tracking-widest uppercase"
+                style={{ fontFamily: "'Rajdhani', sans-serif" }}
+              >
+                {keepAwakeControl.isActive ? "KEEP: ON" : "KEEP: OFF"}
               </span>
             </button>
           )}
@@ -546,6 +658,47 @@ export default function FocusToolsDock({
                     {dimControl.isDimActive ? "ACTIVE" : "TURN ON"}
                   </button>
                 </div>
+              )}
+
+              {/* Keep Screen Awake Option in Mobile Drawer */}
+              {keepAwakeControl && (
+                <div className="pt-2 border-t border-border-subtle flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Power className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-text-secondary font-['Rajdhani'] uppercase tracking-wider">
+                      Keep Screen Awake
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => keepAwakeControl.onToggle()}
+                    disabled={!keepAwakeControl.isSupported}
+                    title={
+                      keepAwakeControl.error ||
+                      (keepAwakeControl.isSupported
+                        ? "Prevent the screen from sleeping during your session"
+                        : "Keep screen awake is not supported on this device")
+                    }
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold font-['Rajdhani'] uppercase tracking-wider border transition-all ${
+                      keepAwakeControl.isActive
+                        ? "bg-emerald-400/20 text-emerald-300 border-emerald-400/50"
+                        : keepAwakeControl.isSupported
+                        ? "bg-bg-abyss text-text-muted border-border-subtle"
+                        : "bg-bg-abyss text-text-muted/40 border-border-subtle cursor-not-allowed opacity-60"
+                    }`}
+                  >
+                    {keepAwakeControl.isActive
+                      ? "ACTIVE"
+                      : keepAwakeControl.isSupported
+                      ? "TURN ON"
+                      : "N/A"}
+                  </button>
+                </div>
+              )}
+              {keepAwakeControl?.error && (
+                <p className="pt-1 text-[10px] text-amber-300/90 font-mono leading-relaxed">
+                  {keepAwakeControl.error}
+                </p>
               )}
             </motion.div>
           </div>

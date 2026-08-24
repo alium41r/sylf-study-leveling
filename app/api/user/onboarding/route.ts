@@ -168,6 +168,7 @@ export async function POST(req: NextRequest) {
           const cleanExamBoard = String(sub.examBoard || "CAIE").trim().toUpperCase();
           const cleanLevel = String(sub.level || "A-Level").trim();
           const cleanColor = String(sub.color || "#8B5CF6").trim();
+          const cleanSyllabusNote = sub.syllabusNote ? String(sub.syllabusNote).trim().slice(0, 2000) : null;
 
           const createdSubject = await tx.subject.upsert({
             where: {
@@ -180,12 +181,14 @@ export async function POST(req: NextRequest) {
               examBoard: cleanExamBoard,
               level: cleanLevel,
               color: cleanColor,
+              syllabusNote: cleanSyllabusNote,
             },
             update: {
               name: cleanName,
               examBoard: cleanExamBoard,
               level: cleanLevel,
               color: cleanColor,
+              syllabusNote: cleanSyllabusNote,
             },
           });
 

@@ -54,7 +54,8 @@ export const DEEPSEEK_MODELS = {
 
 export const GEMINI_MODELS = {
   research: "gemini-3.1-pro",
-  visionFallback: "gemini-3.7-flash",
+  vision: "gemini-3.7-flash", // Dedicated vision model for image/diagram prompts
+  visionFallback: "gemini-3.6-flash", // In-adapter cascade only
   stemFallback: "gemini-3.7-flash",
   focus: "gemini-3.7-flash",
   flash: "gemini-2.5-flash",

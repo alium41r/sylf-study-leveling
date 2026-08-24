@@ -245,7 +245,7 @@ function RegisterForm() {
             <label className="stat-label block mb-1">Display Name</label>
             <input
               type="text"
-              placeholder="Sung Jin-Woo"
+              placeholder="Your full name"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -260,7 +260,7 @@ function RegisterForm() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="shadow_monarch"
+                placeholder="your_username"
                 required
                 minLength={3}
                 maxLength={20}
@@ -306,7 +306,7 @@ function RegisterForm() {
             <label className="stat-label block mb-1">Email Address</label>
             <input
               type="email"
-              placeholder="scholar@system.dev"
+              placeholder="you@example.com"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
@@ -320,7 +320,7 @@ function RegisterForm() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Minimum 6 characters"
+                placeholder="At least 6 characters"
                 required
                 minLength={6}
                 value={password}

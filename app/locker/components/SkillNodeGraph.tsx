@@ -53,9 +53,10 @@ interface ViewportTransform {
 const WORLD_W = 1000;
 const WORLD_H = 1200;
 
-const MIN_ZOOM = 0.65;
+// Responsive zoom bounds (allows full constellation fitting even on narrow mobile devices)
+const MIN_ZOOM = 0.20;
 const MAX_ZOOM = 2.6;
-const DEFAULT_FOCUS_ZOOM = 1.35;
+const DEFAULT_FOCUS_ZOOM = 1.25;
 
 function clampPan(
   pan: { x: number; y: number },
@@ -66,14 +67,31 @@ function clampPan(
   const scaledW = WORLD_W * zoom;
   const scaledH = WORLD_H * zoom;
 
-  const padX = Math.min(100, cw * 0.18);
-  const padY = Math.min(100, ch * 0.18);
+  let minPanX: number;
+  let maxPanX: number;
+  if (scaledW <= cw) {
+    const centerPanX = (cw - scaledW) / 2;
+    const slack = Math.max(30, (cw - scaledW) * 0.35);
+    minPanX = centerPanX - slack;
+    maxPanX = centerPanX + slack;
+  } else {
+    const marginX = Math.min(160, cw * 0.25);
+    minPanX = cw - scaledW - marginX;
+    maxPanX = marginX;
+  }
 
-  const maxPanX = cw - padX;
-  const minPanX = padX - scaledW;
-
-  const maxPanY = ch - padY;
-  const minPanY = padY - scaledH;
+  let minPanY: number;
+  let maxPanY: number;
+  if (scaledH <= ch) {
+    const centerPanY = (ch - scaledH) / 2;
+    const slack = Math.max(30, (ch - scaledH) * 0.35);
+    minPanY = centerPanY - slack;
+    maxPanY = centerPanY + slack;
+  } else {
+    const marginY = Math.min(160, ch * 0.25);
+    minPanY = ch - scaledH - marginY;
+    maxPanY = marginY;
+  }
 
   return {
     x: Math.min(maxPanX, Math.max(minPanX, pan.x)),
@@ -236,15 +254,19 @@ export function SkillNodeGraph({
     const cw = rect.width || 600;
     const ch = rect.height || 600;
 
-    const scaleX = (cw - 40) / WORLD_W;
-    const scaleY = (ch - 40) / WORLD_H;
-    const fitScale = Math.min(scaleX, scaleY, 1.0);
+    const padX = cw < 640 ? 16 : 36;
+    const padY = ch < 640 ? 16 : 36;
 
-    const rawPanX = (cw - WORLD_W * fitScale) / 2;
-    const rawPanY = (ch - WORLD_H * fitScale) / 2;
+    const scaleX = (cw - padX) / WORLD_W;
+    const scaleY = (ch - padY) / WORLD_H;
+    const fitScale = Math.min(scaleX, scaleY);
+    const zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, fitScale));
 
-    const clamped = clampPan({ x: rawPanX, y: rawPanY }, fitScale, cw, ch);
-    const next = { zoom: fitScale, panX: clamped.x, panY: clamped.y };
+    const rawPanX = (cw - WORLD_W * zoom) / 2;
+    const rawPanY = (ch - WORLD_H * zoom) / 2;
+
+    const clamped = clampPan({ x: rawPanX, y: rawPanY }, zoom, cw, ch);
+    const next = { zoom, panX: clamped.x, panY: clamped.y };
     viewportRef.current = next;
     setViewport(next);
   }, []);
@@ -454,7 +476,7 @@ export function SkillNodeGraph({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className={`relative w-full h-[580px] sm:h-[640px] rounded-3xl overflow-hidden select-none border ${
+      className={`relative w-full h-[540px] sm:h-[640px] rounded-3xl overflow-hidden select-none border ${
         isLightMode ? "border-purple-200/50 shadow-2xl" : "border-white/10 shadow-2xl"
       } ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
       style={{

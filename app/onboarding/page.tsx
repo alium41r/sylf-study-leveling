@@ -10,7 +10,7 @@ import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { Moon, Sun, Sparkles, Check, BookOpen, Plus, X } from "lucide-react";
 
 // --- Extensible Onboarding Types ---
-type OnboardingStep = "BOOT" | "IDENTITY" | "SUBJECTS" | "BACKGROUND" | "THEME" | "INITIALIZING";
+type OnboardingStep = "BOOT" | "IDENTITY" | "SUBJECTS" | "THEME" | "INITIALIZING";
 
 export interface ConfiguredSubject {
   id: string;
@@ -19,14 +19,52 @@ export interface ConfiguredSubject {
   examBoard: string;
   level: string;
   color: string;
+  /** Free-text book / syllabus details used by the AI syllabus dissection. */
+  syllabusNote?: string;
 }
 
-const PRESET_SUBJECTS: Omit<ConfiguredSubject, "id">[] = [
-  { name: "Mathematics", code: "9709", examBoard: "CAIE", level: "A-Level", color: "#8B5CF6" },
-  { name: "Physics", code: "9702", examBoard: "CAIE", level: "A-Level", color: "#06B6D4" },
-  { name: "Computer Science", code: "9618", examBoard: "CAIE", level: "A-Level", color: "#EC4899" },
-  { name: "Chemistry", code: "9701", examBoard: "CAIE", level: "A-Level", color: "#10B981" },
-  { name: "Further Mathematics", code: "9231", examBoard: "CAIE", level: "A-Level", color: "#F59E0B" },
+// Exam boards across international, Pakistani and Indian systems.
+const EXAM_BOARDS: { value: string; label: string }[] = [
+  { value: "CAIE", label: "CAIE — Cambridge International" },
+  { value: "Edexcel", label: "Edexcel (Pearson)" },
+  { value: "Oxford AQA International", label: "Oxford AQA International" },
+  { value: "AQA", label: "AQA (UK)" },
+  { value: "OCR", label: "OCR (UK)" },
+  { value: "WJEC/Eduqas", label: "WJEC / Eduqas (Wales)" },
+  { value: "CCEA", label: "CCEA (Northern Ireland)" },
+  { value: "AP", label: "AP (College Board)" },
+  { value: "IB", label: "IB (International Baccalaureate)" },
+  { value: "FBISE", label: "FBISE — Federal Board (Pakistan)" },
+  { value: "BISE Punjab", label: "BISE Punjab (Lahore)" },
+  { value: "BISE Sindh", label: "BISE Sindh (Karachi)" },
+  { value: "BISE KPK", label: "BISE KPK (Peshawar)" },
+  { value: "BISE Balochistan", label: "BISE Balochistan (Quetta)" },
+  { value: "AKU-EB", label: "AKU-EB (Aga Khan University)" },
+  { value: "CBSE", label: "CBSE (India)" },
+  { value: "CISCE", label: "CISCE — ICSE / ISC (India)" },
+  { value: "NIOS", label: "NIOS (India — Open Schooling)" },
+  { value: "State Board", label: "State Board (India)" },
+  { value: "University", label: "University" },
+  { value: "Other", label: "Other" },
+];
+
+// Academic levels spanning international, Pakistani (Matric/Intermediate)
+// and Indian (Middle/Secondary/Senior Secondary) systems.
+const ACADEMIC_LEVELS: { value: string; label: string }[] = [
+  { value: "A-Level", label: "A-Level" },
+  { value: "AS-Level", label: "AS-Level" },
+  { value: "IGCSE", label: "IGCSE" },
+  { value: "GCSE", label: "GCSE" },
+  { value: "O-Level", label: "O-Level" },
+  { value: "AP", label: "AP (Advanced Placement)" },
+  { value: "IB HL", label: "IB Higher Level (HL)" },
+  { value: "IB SL", label: "IB Standard Level (SL)" },
+  { value: "Middle School", label: "Middle School (Class 6-8)" },
+  { value: "Matric / SSC", label: "Matriculation / SSC (Class 9-10)" },
+  { value: "Intermediate / HSSC", label: "Intermediate / HSSC (Class 11-12)" },
+  { value: "High School", label: "High School" },
+  { value: "University", label: "Undergraduate" },
+  { value: "Other", label: "Other" },
 ];
 
 export default function OnboardingFlow() {
@@ -146,8 +184,8 @@ export default function OnboardingFlow() {
 
   // Step progression: Manual signups skip IDENTITY step
   const steps: OnboardingStep[] = isGoogleSignup
-    ? ["BOOT", "IDENTITY", "SUBJECTS", "BACKGROUND", "THEME", "INITIALIZING"]
-    : ["BOOT", "SUBJECTS", "BACKGROUND", "THEME", "INITIALIZING"];
+    ? ["BOOT", "IDENTITY", "SUBJECTS", "THEME", "INITIALIZING"]
+    : ["BOOT", "SUBJECTS", "THEME", "INITIALIZING"];
 
   const stepIndex = steps.indexOf(currentStep);
 
@@ -223,12 +261,13 @@ export default function OnboardingFlow() {
           name: isGoogleSignup ? (scholarName || user?.name) : undefined,
           password: isGoogleSignup ? (scholarPassword || undefined) : undefined,
           timezone: detectedTimezone,
-          subjects: configuredSubjects.map(({ name, code, examBoard, level, color }) => ({
+          subjects: configuredSubjects.map(({ name, code, examBoard, level, color, syllabusNote }) => ({
             name,
             code,
             examBoard,
             level,
             color,
+            syllabusNote: syllabusNote || undefined,
           })),
         }),
       });
@@ -328,34 +367,22 @@ export default function OnboardingFlow() {
           />
         )}
 
-        {currentStep === "BACKGROUND" && (
-          <SelectionStep 
-            key="background"
-            title="SELECT DOMAIN"
-            subtitle="Choose the environment for your awakening."
-            items={COSMETICS_CATALOG.BACKGROUND}
-            selectedId={selectedBackground}
-            selectedMode={selectedMode}
-            onSelect={setSelectedBackground}
-            onNext={nextStep}
-            onPrev={prevStep}
-            canProceed={!!selectedBackground}
-          />
-        )}
-
         {currentStep === "THEME" && (
           <ThemeAndModeStep 
             key="theme"
             title="CALIBRATE RESONANCE"
-            subtitle="Choose your core system aura and interface appearance."
-            items={COSMETICS_CATALOG.THEME}
+            subtitle="Choose your interface mode, domain environment and core system aura."
+            themeItems={COSMETICS_CATALOG.THEME}
+            backgroundItems={COSMETICS_CATALOG.BACKGROUND}
             selectedThemeId={selectedTheme}
+            selectedBackgroundId={selectedBackground}
             selectedMode={selectedMode}
             onSelectTheme={setSelectedTheme}
+            onSelectBackground={setSelectedBackground}
             onSelectMode={handleModeChange}
             onNext={nextStep}
             onPrev={prevStep}
-            canProceed={!!selectedTheme}
+            canProceed={!!selectedTheme && !!selectedBackground}
             nextLabel="COMPLETE SETUP"
           />
         )}
@@ -697,23 +724,9 @@ function SubjectIntakeStep({
   const [customExamBoard, setCustomExamBoard] = useState("CAIE");
   const [customLevel, setCustomLevel] = useState("A-Level");
   const [customColor, setCustomColor] = useState("#8B5CF6");
+  const [customSyllabusNote, setCustomSyllabusNote] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [validationError, setValidationError] = useState("");
-
-  const handleTogglePreset = (preset: Omit<ConfiguredSubject, "id">) => {
-    const existingIndex = subjects.findIndex((s) => s.code.toUpperCase() === preset.code.toUpperCase());
-    if (existingIndex >= 0) {
-      onUpdateSubjects(subjects.filter((_, idx) => idx !== existingIndex));
-    } else {
-      onUpdateSubjects([
-        ...subjects,
-        {
-          id: `preset-${preset.code}-${Date.now()}`,
-          ...preset,
-        },
-      ]);
-    }
-  };
 
   const handleAddCustom = (e: React.FormEvent) => {
     e.preventDefault();
@@ -743,11 +756,13 @@ function SubjectIntakeStep({
         examBoard: customExamBoard.trim() || "CAIE",
         level: customLevel.trim() || "A-Level",
         color: customColor,
+        syllabusNote: customSyllabusNote.trim() || undefined,
       },
     ]);
 
     setCustomName("");
     setCustomCode("");
+    setCustomSyllabusNote("");
     setValidationError("");
     setShowCustomForm(false);
   };
@@ -781,74 +796,11 @@ function SubjectIntakeStep({
             <span>AI CONSTELLATION ENGINE CALIBRATION</span>
           </div>
           <p className="mt-1 leading-relaxed text-zinc-400">
-            Enter your official subject codes and exam boards carefully (e.g. CAIE 9709, Edexcel 9MA0, AP Calculus BC). 
-            The AI decomposes your exact syllabus to forge your 48-node academic constellation graph.
+            Add each subject yourself — name, official syllabus code, exam board and academic
+            level (e.g. CAIE 9709, Edexcel 9MA0, FBISE Mathematics). Include your book or syllabus
+            details so the AI can dissect your exact syllabus and forge your 48-node academic
+            constellation graph.
           </p>
-        </div>
-
-        {/* Presets Section */}
-        <div className="bg-bg-abyss/90 border border-border-subtle p-5 rounded-2xl flex flex-col gap-3 shadow-card">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold font-rajdhani uppercase tracking-widest text-accent-text-light flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>QUICK-ADD STANDARD SYLLABI</span>
-            </span>
-            <span className="text-[11px] text-text-secondary font-rajdhani font-medium">
-              Click to toggle syllabus into curriculum
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {PRESET_SUBJECTS.map((preset) => {
-              const isSelected = subjects.some((s) => s.code.toUpperCase() === preset.code.toUpperCase());
-              return (
-                <button
-                  key={preset.code}
-                  type="button"
-                  onClick={() => handleTogglePreset(preset)}
-                  className={`p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group ${
-                    isSelected
-                      ? "bg-accent-primary-dim/30 border-accent-primary shadow-[0_0_15px_rgba(124,58,237,0.25)] scale-[1.01]"
-                      : "bg-bg-panel/60 border-border-subtle hover:border-border-active hover:bg-bg-panel"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-3.5 h-10 rounded-full flex-shrink-0 shadow-sm"
-                      style={{ backgroundColor: preset.color }}
-                    />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-sm font-rajdhani" style={{ color: "var(--text-primary)" }}>
-                          {preset.name}
-                        </h4>
-                        <span
-                          className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold uppercase"
-                          style={{
-                            backgroundColor: `${preset.color}25`,
-                            color: preset.color,
-                            border: `1px solid ${preset.color}50`,
-                          }}
-                        >
-                          {preset.code}
-                        </span>
-                      </div>
-                      <p className="text-xs text-text-secondary font-rajdhani">
-                        {preset.examBoard} • {preset.level}
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
-                      isSelected ? "border-accent-primary bg-accent-primary text-white" : "border-border-subtle group-hover:border-border-active"
-                    }`}
-                  >
-                    {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* Configured Subjects List */}
@@ -899,13 +851,9 @@ function SubjectIntakeStep({
                     onChange={(e) => setCustomExamBoard(e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-bg-abyss border border-border-subtle text-text-primary text-xs focus:outline-none focus:border-accent-primary"
                   >
-                    <option value="CAIE">CAIE</option>
-                    <option value="Edexcel">Edexcel</option>
-                    <option value="AQA">AQA</option>
-                    <option value="AP">AP (College Board)</option>
-                    <option value="IB">IB (International)</option>
-                    <option value="University">University</option>
-                    <option value="Other">Other</option>
+                    {EXAM_BOARDS.map((b) => (
+                      <option key={b.value} value={b.value}>{b.label}</option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -915,15 +863,29 @@ function SubjectIntakeStep({
                     onChange={(e) => setCustomLevel(e.target.value)}
                     className="w-full px-3 py-2 rounded-lg bg-bg-abyss border border-border-subtle text-text-primary text-xs focus:outline-none focus:border-accent-primary"
                   >
-                    <option value="A-Level">A-Level</option>
-                    <option value="AS-Level">AS-Level</option>
-                    <option value="AP">AP</option>
-                    <option value="IB HL">IB Higher Level</option>
-                    <option value="IB SL">IB Standard Level</option>
-                    <option value="University">Undergraduate</option>
-                    <option value="High School">High School</option>
+                    {ACADEMIC_LEVELS.map((l) => (
+                      <option key={l.value} value={l.value}>{l.label}</option>
+                    ))}
                   </select>
                 </div>
+              </div>
+
+              {/* Book / syllabus details — feeds the AI syllabus dissection */}
+              <div>
+                <label className="block text-[11px] font-mono uppercase text-text-secondary mb-1">
+                  Book / Syllabus Details <span className="normal-case text-text-muted">(optional)</span>
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. 'Cambridge International AS & A Level Mathematics (9709) — Pure Mathematics 1 & 2, Hodder Education'"
+                  value={customSyllabusNote}
+                  onChange={(e) => setCustomSyllabusNote(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-bg-abyss border border-border-subtle text-text-primary text-xs focus:outline-none focus:border-accent-primary resize-y min-h-[52px]"
+                />
+                <p className="mt-1 text-[10px] text-text-muted font-mono leading-relaxed">
+                  Include the textbook / exam-spec name and syllabus code if possible — the AI uses
+                  these details to dissect your exact syllabus into skill nodes.
+                </p>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border-subtle">
@@ -964,7 +926,7 @@ function SubjectIntakeStep({
               <BookOpen className="w-8 h-8 text-text-muted opacity-40" />
               <p className="text-sm text-text-secondary font-rajdhani">No subjects selected yet.</p>
               <p className="text-xs text-text-muted font-mono">
-                Click any quick-add preset above or add a custom syllabus to continue.
+                Add each subject with its code, exam board and syllabus details below.
               </p>
             </div>
           ) : (
@@ -997,6 +959,14 @@ function SubjectIntakeStep({
                     <p className="text-xs text-text-secondary font-rajdhani mt-0.5">
                       {sub.examBoard} • {sub.level}
                     </p>
+                    {sub.syllabusNote && (
+                      <p
+                        className="text-[10px] text-text-muted font-mono mt-1 truncate max-w-[200px]"
+                        title={sub.syllabusNote}
+                      >
+                        {sub.syllabusNote}
+                      </p>
+                    )}
                   </div>
 
                   <button
@@ -1044,190 +1014,16 @@ function SubjectIntakeStep({
   );
 }
 
-interface SelectionStepProps {
-  title: string;
-  subtitle: string;
-  items: CosmeticItem[];
-  selectedId: string | null;
-  selectedMode?: "dark" | "light";
-  onSelect: (id: string) => void;
-  onNext: () => void;
-  onPrev?: () => void;
-  canProceed: boolean;
-  nextLabel?: string;
-}
-
-const BG_PREVIEWS: Record<string, { darkBg: string; lightBg: string; size?: string }> = {
-  void: {
-    darkBg: "linear-gradient(135deg, #090918 0%, #04040a 100%)",
-    lightBg: "linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)",
-  },
-  "cyber-grid": {
-    darkBg: "linear-gradient(transparent 90%, rgba(6, 182, 212, 0.4) 100%), linear-gradient(90deg, transparent 90%, rgba(6, 182, 212, 0.4) 100%), linear-gradient(135deg, #04141c 0%, #020a0e 100%)",
-    lightBg: "linear-gradient(transparent 90%, rgba(6, 182, 212, 0.35) 100%), linear-gradient(90deg, transparent 90%, rgba(6, 182, 212, 0.35) 100%), linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%)",
-    size: "18px 18px, 18px 18px, auto",
-  },
-  "sakura-fall": {
-    darkBg: "linear-gradient(135deg, #2b0b20 0%, #150510 50%, #0c0409 100%)",
-    lightBg: "linear-gradient(135deg, #fff0f5 0%, #fce7f3 50%, #fbcfe8 100%)",
-  },
-  "abyssal-glow": {
-    darkBg: "linear-gradient(135deg, #1b0d3a 0%, #0d0620 50%, #060310 100%)",
-    lightBg: "linear-gradient(135deg, #f5f0ff 0%, #ede9fe 50%, #ddd6fe 100%)",
-  },
-  "neon-sunrise": {
-    darkBg: "linear-gradient(to top, rgba(239, 68, 68, 0.4) 0%, rgba(245, 158, 11, 0.25) 50%, #100404 100%)",
-    lightBg: "linear-gradient(to top, rgba(239, 68, 68, 0.25) 0%, rgba(245, 158, 11, 0.2) 50%, #fffdf5 100%)",
-  },
-  "matrix-rain": {
-    darkBg: "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.35) 0px, transparent 1px, transparent 12px), linear-gradient(135deg, #041a10 0%, #010c07 100%)",
-    lightBg: "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.3) 0px, transparent 1px, transparent 12px), linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%)",
-  },
-  "aurora-borealis": {
-    darkBg: "linear-gradient(135deg, #09203f 0%, #0d1b2a 50%, #1b0c2a 100%)",
-    lightBg: "linear-gradient(135deg, #e0f2fe 0%, #e0e7ff 50%, #fae8ff 100%)",
-  },
-  "deep-ocean": {
-    darkBg: "linear-gradient(135deg, #071e42 0%, #04122b 50%, #020718 100%)",
-    lightBg: "linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #bfdbfe 100%)",
-  },
-};
-
-function SelectionStep({ 
-  title, subtitle, items, selectedId, selectedMode, onSelect, onNext, onPrev, canProceed, nextLabel = "CONFIRM" 
-}: SelectionStepProps) {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full max-w-6xl p-6 sm:p-8 z-10 flex flex-col h-[88vh]"
-    >
-      <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold tracking-widest uppercase font-rajdhani drop-shadow-sm" style={{ color: "var(--text-primary)" }}>
-          {title}
-        </h2>
-        <p className="mt-2 text-sm uppercase tracking-wider font-semibold" style={{ color: "var(--text-secondary)" }}>{subtitle}</p>
-      </div>
-
-      <div className="flex-grow overflow-y-auto custom-scrollbar pr-2 pb-8">
-        <div className={`grid gap-6 p-2 ${items[0]?.category === "CLASS" || items[0]?.category === "AVATAR" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3"}`}>
-          {items.map((item: CosmeticItem, idx: number) => {
-            const isSelected = selectedId === item.id;
-            return (
-              <motion.button
-                key={item.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                onClick={() => onSelect(item.id)}
-                className={`relative p-6 text-left border rounded-xl overflow-hidden transition-all duration-300 group
-                  ${isSelected 
-                    ? "border-[var(--accent-primary)] bg-[var(--accent-primary-dim)] shadow-[0_0_20px_var(--accent-primary-mid)] scale-[1.03] z-10" 
-                    : "border-border-subtle bg-bg-abyss hover:border-border-active hover:bg-bg-panel z-0 hover:z-10 hover:scale-[1.01]"}
-                `}
-              >
-                {/* Visual Preview logic based on category */}
-                {(item.category === "CLASS" || item.category === "AVATAR") && (
-                  <div className="w-full h-44 sm:h-48 mb-4 rounded-lg overflow-hidden relative border border-border-subtle bg-black/60 shadow-inner group-hover:border-[var(--accent-primary-light)] transition-colors duration-300">
-                    <img 
-                      src={item.value} 
-                      alt={item.name} 
-                      className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = "none";
-                        const fallback = (e.target as HTMLElement).nextElementSibling;
-                        if (fallback) (fallback as HTMLElement).style.display = "flex";
-                      }}
-                    />
-                    {/* Dark gradient overlay for manhwa card atmosphere */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-abyss)] via-black/20 to-transparent pointer-events-none opacity-80" />
-                    
-                    <div className="absolute inset-0 hidden items-center justify-center text-5xl">
-                      {item.fallbackIcon || "👤"}
-                    </div>
-                  </div>
-                )}
-                {item.category === "BACKGROUND" && (() => {
-                  const preview = BG_PREVIEWS[item.value] || {
-                    darkBg: "#0a0a14",
-                    lightBg: "#f8fafc",
-                  };
-                  const bgGradient = selectedMode === "light" ? preview.lightBg : preview.darkBg;
-                  return (
-                    <div
-                      className="w-full h-24 mb-4 rounded-xl border border-border-subtle relative overflow-hidden shadow-inner flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300"
-                      style={{
-                        background: bgGradient,
-                        backgroundSize: preview.size || "cover",
-                      }}
-                    >
-                      {/* Category chip */}
-                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-bg-abyss/80 text-text-secondary border border-border-subtle backdrop-blur-sm">
-                        {item.bgCategory || "domain"}
-                      </span>
-                    </div>
-                  );
-                })()}
-
-                <div className="flex justify-between items-start mb-2 relative z-10">
-                  <h3 className="font-bold text-lg font-rajdhani tracking-wide" style={{ color: isSelected ? "var(--accent-text-light)" : "var(--text-primary)" }}>
-                    {item.name}
-                  </h3>
-                  {isSelected && (
-                    <motion.div layoutId="selectedBadge" className="text-[var(--accent-primary)]">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </motion.div>
-                  )}
-                </div>
-                <p className="text-sm relative z-10" style={{ color: isSelected ? "var(--text-primary)" : "var(--text-secondary)" }}>
-                  {item.description}
-                </p>
-                
-                {/* Hover Glow */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500" 
-                     style={{ background: "radial-gradient(circle at center, var(--accent-primary-dim) 0%, transparent 70%)" }}>
-                </div>
-              </motion.button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="flex justify-between mt-6 pt-6 border-t border-border-subtle">
-        {onPrev ? (
-          <button 
-            onClick={onPrev}
-            className="px-6 py-3 rounded text-text-secondary hover:text-text-primary transition-colors tracking-widest text-sm uppercase font-bold"
-          >
-            Go Back
-          </button>
-        ) : <div></div>}
-
-        <button 
-          onClick={onNext}
-          disabled={!canProceed}
-          className={`px-8 py-3 rounded font-bold tracking-widest uppercase transition-all duration-300 relative overflow-hidden
-            ${canProceed 
-              ? "bg-[var(--accent-primary)] text-white shadow-[0_0_15px_var(--accent-primary-mid)] hover:scale-105" 
-              : "bg-bg-shadow text-text-muted cursor-not-allowed"}
-          `}
-        >
-          {nextLabel}
-        </button>
-      </div>
-    </motion.div>
-  );
-}
-
 interface ThemeAndModeStepProps {
   title: string;
   subtitle: string;
-  items: CosmeticItem[];
+  themeItems: CosmeticItem[];
+  backgroundItems: CosmeticItem[];
   selectedThemeId: string | null;
+  selectedBackgroundId: string | null;
   selectedMode: "dark" | "light";
   onSelectTheme: (id: string) => void;
+  onSelectBackground: (id: string) => void;
   onSelectMode: (mode: "dark" | "light") => void;
   onNext: () => void;
   onPrev?: () => void;
@@ -1238,10 +1034,13 @@ interface ThemeAndModeStepProps {
 function ThemeAndModeStep({
   title,
   subtitle,
-  items,
+  themeItems,
+  backgroundItems,
   selectedThemeId,
+  selectedBackgroundId,
   selectedMode,
   onSelectTheme,
+  onSelectBackground,
   onSelectMode,
   onNext,
   onPrev,
@@ -1338,6 +1137,69 @@ function ThemeAndModeStep({
           </div>
         </div>
 
+        {/* ─── Domain / Background Selection (live preview) ─── */}
+        <div className="bg-bg-abyss/90 border border-border-subtle p-5 rounded-2xl flex flex-col gap-3 shadow-card">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>ENVIRONMENT DOMAIN</span>
+            </span>
+            <span className="text-[11px] text-text-secondary font-['Rajdhani'] font-medium">
+              Preview updates live as you choose
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {backgroundItems.map((item) => {
+              const isSelected = selectedBackgroundId === item.id;
+              // Preview EXACTLY what the app renders: the same BG_MAP
+              // gradients used by the System Hub backgrounds page (and the
+              // live wallpaper layer) — not hand-rolled approximations.
+              const bgData = BG_MAP[item.value] || BG_MAP["void"];
+              const bgGradient = selectedMode === "light" ? bgData.lightValue : bgData.value;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onSelectBackground(item.id)}
+                  className={`relative p-4 text-left border rounded-xl overflow-hidden transition-all duration-300 group
+                    ${
+                      isSelected
+                        ? "border-[var(--accent-primary)] bg-[var(--accent-primary-dim)] shadow-[0_0_20px_var(--accent-primary-mid)] scale-[1.02] z-10"
+                        : "border-border-subtle bg-bg-panel/60 hover:border-border-active hover:bg-bg-panel z-0 hover:z-10 hover:scale-[1.01]"
+                    }
+                  `}
+                >
+                  <div
+                    className="w-full h-20 mb-3 rounded-lg border border-border-subtle relative overflow-hidden shadow-inner group-hover:scale-[1.02] transition-transform duration-300"
+                    style={{
+                      // backgroundImage (longhand) + backgroundSize — the
+                      // shorthand `background` resets size and triggers
+                      // React's shorthand-vs-longhand re-render warning.
+                      backgroundImage: bgGradient,
+                      backgroundSize: bgData.size || "cover",
+                    }}
+                  >
+                    <span className="absolute bottom-1.5 right-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider bg-bg-abyss/80 text-text-secondary border border-border-subtle backdrop-blur-sm">
+                      {item.bgCategory || "domain"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-start relative z-10">
+                    <h4 className="font-bold text-sm font-rajdhani tracking-wide" style={{ color: isSelected ? "var(--accent-text-light)" : "var(--text-primary)" }}>
+                      {item.name}
+                    </h4>
+                    {isSelected && (
+                      <span className="text-[var(--accent-primary)]">
+                        <Check className="w-4 h-4 stroke-[3]" />
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* ─── Themes Grid ─── */}
         <div>
           <div className="mb-3">
@@ -1347,7 +1209,7 @@ function ThemeAndModeStep({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {items.map((item: CosmeticItem, idx: number) => {
+            {themeItems.map((item: CosmeticItem, idx: number) => {
               const isSelected = selectedThemeId === item.id;
               return (
                 <motion.button

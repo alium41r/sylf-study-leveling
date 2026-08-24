@@ -219,13 +219,28 @@ html[data-mode="light"] body {
 }
 
 /* ─── Base Styles ───────────────────────────────────────────── */
-html, body {
+/* Note: the flat background-color lives on <body> ONLY. If <html> also gets
+   a background, the body's background stops being promoted to the canvas and
+   instead paints as a normal element background — which by CSS painting order
+   covers negative z-index children. That would bury the #app-bg-layer
+   wallpaper layer behind a flat color, so wallpapers would never be visible. */
+html {
   min-height: 100%;
   width: 100%;
   overflow-x: hidden;
   /* `clip` preserves the horizontal containment WITHOUT creating a scroll
      container (overflow-x: hidden alone turns overflow-y into auto and can
      trap page scrolling) — progressive enhancement over the fallback above. */
+  overflow-x: clip;
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, sans-serif;
+  overscroll-behavior-y: none;
+}
+
+body {
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
   overflow-x: clip;
   background-color: var(--background);
   color: var(--foreground);

@@ -182,19 +182,38 @@ export function applyGlobalBackground(bgId?: string | null, mode?: string | null
   const bgData = BG_MAP[currentBg] || BG_MAP["void"];
   if (!bgData) return;
 
-  // Paint onto the dedicated viewport-fixed layer (#app-bg-layer) instead of
-  // <body>. `background-attachment: fixed` is unreliable on mobile browsers:
-  // iOS Safari ignores it and Android Chrome paints the background for the
-  // initially-visible region only, so the wallpaper visibly "cuts off" once
-  // the page scrolls. A real position:fixed layer renders identically on
-  // every browser, and pointer-events:none keeps it from ever intercepting
-  // taps (including the floating AI trigger).
+  // Paint the wallpaper on a dedicated viewport-fixed layer (#app-bg-layer)
+  // on desktop, but on mobile browsers (<768px) paint it scroll-attached on
+  // <body> instead. `position: fixed` layers are rasterized lazily while
+  // scrolling on Android Chrome / iOS Safari, so the wallpaper visibly
+  // "cuts off" during a scroll and only catches up after the gesture ends.
+  // A scroll-attached body background spans the whole document and moves
+  // with the content, so it is always fully painted. (Plain
+  // `background-attachment: fixed` is even worse on mobile — ignored on
+  // iOS, mis-painted on Android — so it is never used.)
   const layer = document.getElementById("app-bg-layer") as HTMLElement | null;
+  const value = currentMode === "light" ? bgData.lightValue : bgData.value;
+  const size = bgData.size || "cover";
+  const isMobile = window.matchMedia("(max-width: 767px)").matches;
+
+  if (isMobile) {
+    const bodyStyle = document.body.style;
+    bodyStyle.background = value;
+    bodyStyle.backgroundSize = size;
+    bodyStyle.backgroundAttachment = "scroll";
+    // Hide the fixed layer so no stale paint lingers behind the body.
+    if (layer) layer.style.background = "none";
+    return;
+  }
+
   const target = layer?.style ?? document.body.style;
-  target.background = currentMode === "light" ? bgData.lightValue : bgData.value;
-  target.backgroundSize = bgData.size || "cover";
+  target.background = value;
+  target.backgroundSize = size;
+  // If we previously painted the body for mobile, clear it — it would cover
+  // the fixed layer (body backgrounds paint above negative z-index children).
+  if (layer) document.body.style.background = "";
   // Note: no `background-attachment` here — the layer element is itself
-  // position: fixed, so the background is viewport-anchored everywhere.
+  // position: fixed, so the background is viewport-anchored on desktop.
 }
 
 export function applyGlobalTheme(themeId?: string | null) {
@@ -243,16 +262,27 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
       applyGlobalTheme(latestTheme);
     };
 
+    // Re-apply on viewport resize: mobile uses a scroll-attached body
+    // wallpaper while desktop uses the fixed layer, so crossing the md
+    // breakpoint (rotate, resize, split-screen) must re-paint.
+    const handleResize = () => {
+      const latestBg = localStorage.getItem("app_background") || "void";
+      const latestMode = localStorage.getItem("app_mode") || "dark";
+      applyGlobalBackground(latestBg, latestMode);
+    };
+
     window.addEventListener("background-updated", handleBgUpdate);
     window.addEventListener("theme-updated", handleThemeUpdate);
     window.addEventListener("storage", handleBgUpdate);
     window.addEventListener("storage", handleThemeUpdate);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("background-updated", handleBgUpdate);
       window.removeEventListener("theme-updated", handleThemeUpdate);
       window.removeEventListener("storage", handleBgUpdate);
       window.removeEventListener("storage", handleThemeUpdate);
+      window.removeEventListener("resize", handleResize);
     };
   }, [user?.activeBackground, user?.activeTheme]);
 

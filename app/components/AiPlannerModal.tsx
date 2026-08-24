@@ -65,7 +65,7 @@ export function AiPlannerModal({
                           : "bg-bg-abyss border-border-subtle text-text-muted"
                       }`}
                     >
-                      {quota.used} / {quota.limit} Free Daily Plan
+                      {quota.used} / {quota.limit} Free Weekly Plan
                     </span>
                   )}
                 </h2>

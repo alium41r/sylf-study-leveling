@@ -95,11 +95,15 @@ export async function GET(
       return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
     }
 
-    // Mark as read
-    await prisma.conversationParticipant.update({
-      where: { userId_conversationId: { userId, conversationId } },
-      data: { lastReadAt: new Date() },
-    });
+    // Mark as read — only for user-initiated loads. Background refreshes
+    // (the 30s presence poll) pass ?refresh=1 and skip this write entirely,
+    // which removes a pointless DB write per poll per viewer.
+    if (req.nextUrl.searchParams.get("refresh") !== "1") {
+      await prisma.conversationParticipant.update({
+        where: { userId_conversationId: { userId, conversationId } },
+        data: { lastReadAt: new Date() },
+      });
+    }
 
     return NextResponse.json({
       conversation: {

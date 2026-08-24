@@ -6,6 +6,7 @@ import { Lock, Paperclip, Sparkles, X } from "lucide-react";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import { QuotaInfo } from "../../components/AiPlannerPanel";
 import { SystemChatSession } from "./SessionSidebar";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 interface SystemMsg {
   id: number;
@@ -83,12 +84,15 @@ export default function ConversationPanel({
 
     if (sessionId) {
       setIsLoadingMessages(true);
-      fetch(`/api/system-messages?limit=100&sessionId=${sessionId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(async (r) => (r.ok ? r.json().catch(() => ({})) : {}))
+      // Stale-while-revalidate per session: switching between chats paints
+      // the cached thread instantly and refreshes in the background.
+      fetchCachedJSON<{ messages?: SystemMsg[] }>(
+        `/api/system-messages?limit=100&sessionId=${sessionId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        { ttlMs: 3_000, staleMs: 120_000, storageKey: `sys-msgs:${sessionId}` }
+      )
         .then((data) => {
-          const sorted = (data.messages || []).sort(
+          const sorted = (data?.messages || []).sort(
             (a: SystemMsg, b: SystemMsg) =>
               new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           );
@@ -498,13 +502,13 @@ export default function ConversationPanel({
                 ? "Daily chat quota reached (0 messages remaining)..."
                 : "Ask anything..."
             }
-            className="flex-1 bg-bg-void border border-border-subtle rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent-primary transition-colors shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 min-w-0 bg-bg-void border border-border-subtle rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent-primary transition-colors shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSending || quotaExhausted}
           />
           <button
             type="submit"
             disabled={isSending || (!inputText.trim() && !selectedFile) || quotaExhausted}
-            className="btn-primary rounded-xl px-6 font-bold disabled:opacity-50 disabled:cursor-not-allowed tracking-wider shrink-0 flex items-center justify-center gap-1.5"
+            className="btn-primary rounded-xl px-4 sm:px-6 font-bold disabled:opacity-50 disabled:cursor-not-allowed tracking-wider shrink-0 whitespace-nowrap flex items-center justify-center gap-1.5"
             style={{ fontFamily: "'Rajdhani', sans-serif" }}
           >
             {isSending ? (

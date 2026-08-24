@@ -26,6 +26,7 @@ import {
   NotificationPreferences,
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from "@/lib/notification-preferences";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 interface ToggleItemProps {
   id: keyof NotificationPreferences;
@@ -118,16 +119,15 @@ export default function NotificationsSettingsPage() {
         headers["Authorization"] = `Bearer ${activeToken}`;
       }
 
-      const res = await fetch("/api/notifications/preferences", {
-        headers,
-        credentials: "include",
-      });
+      // Stale-while-revalidate: reopening alerts paints instantly.
+      const data = await fetchCachedJSON<{ preferences?: NotificationPreferences }>(
+        "/api/notifications/preferences",
+        { headers, credentials: "include" },
+        { ttlMs: 20_000, staleMs: 120_000 }
+      );
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.preferences) {
-          setPreferences(data.preferences);
-        }
+      if (data?.preferences) {
+        setPreferences(data.preferences);
       }
     } catch (e) {
       console.error("Failed to load notification preferences:", e);

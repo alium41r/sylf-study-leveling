@@ -3,6 +3,7 @@
 import BackToSettings from "../../components/BackToSettings";
 import { useAuth } from "../../components/AuthProvider";
 import { useEffect, useState } from "react";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -243,10 +244,13 @@ export default function RankingsSettingsPage() {
     if (!token) return;
     setIsLoading(true);
 
-    fetch(`/api/user/rankings?sortBy=${sortBy}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(async (r) => (r.ok ? r.json().catch(() => null) : null))
+    // Stale-while-revalidate: reopening rankings paints instantly from the
+    // previous leaderboard and refreshes in the background.
+    fetchCachedJSON<RankingsData>(
+      `/api/user/rankings?sortBy=${sortBy}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 30_000, staleMs: 120_000, storageKey: `rankings:${sortBy}` }
+    )
       .then((d) => { if (d) setData(d); })
       .catch(console.error)
       .finally(() => setIsLoading(false));

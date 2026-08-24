@@ -5,6 +5,7 @@ import BackToSettings from "../../components/BackToSettings";
 import { THEME_MAP, applyGlobalBackground } from "../../components/GlobalSystemWrapper";
 import { useAuth } from "../../components/AuthProvider";
 import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -168,13 +169,12 @@ export default function ThemesSettingsPage() {
 
     if (!token) return;
     
-    fetch("/api/cosmetics", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(async (res) => {
-        if (!res.ok) return null;
-        return res.json().catch(() => null);
-      })
+    // Stale-while-revalidate: reopening themes paints instantly.
+    fetchCachedJSON<{ cosmetics?: any[]; active?: { activeTheme?: string | null } }>(
+      "/api/cosmetics",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 30_000, staleMs: 120_000, storageKey: "cosmetics:owned" }
+    )
       .then((data) => {
         if (!data) return;
         setCosmetics(data.cosmetics || []);

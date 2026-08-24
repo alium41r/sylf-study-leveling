@@ -5,6 +5,7 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
 import { CharacterConfig } from "@/lib/character-traits";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 import {
   CATALOG_ITEMS,
   CatalogItemDefinition,
@@ -146,12 +147,18 @@ export default function ShopPage() {
   const fetchShopData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/shop", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      // Stale-while-revalidate: the catalog is static and the inventory
+      // changes only on purchase, so repeat visits paint instantly.
+      const data = await fetchCachedJSON<{
+        catalog: any[];
+        inventory: any[];
+      }>(
+        "/api/shop",
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {},
+        { ttlMs: 30_000, staleMs: 300_000, storageKey: `shop:data:${user?.id ?? 0}` }
+      );
 
-      if (res.ok) {
-        const data = await res.json();
+      if (data) {
         if (Array.isArray(data.catalog)) {
           setCatalog(data.catalog);
         }
@@ -179,7 +186,7 @@ export default function ShopPage() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, user?.id]);
 
   useEffect(() => {
     fetchShopData();

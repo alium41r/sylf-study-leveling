@@ -196,38 +196,76 @@ export class TimezoneService {
   }
 
   /**
-   * Returns a Date object representing the precise UTC instant of midnight (00:00:00.000)
-   * in the user's local timezone for the local day of `now`.
+   * Returns the UTC instant of 00:00 local time for an explicit local date
+   * string (YYYY-MM-DD) in the given timezone.
    */
-  static getStartOfDayUTC(timezone: string, now: Date = new Date()): Date {
+  static getStartOfLocalDateUTC(timezone: string, localDateStr: string): Date {
     const safeTz = this.validateTimezone(timezone) ? timezone : "UTC";
-    const localDateStr = this.getUserLocalDate(safeTz, now);
     const [year, month, day] = localDateStr.split('-').map(Number);
-    
+
     const guess = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
-    
+
     const formatter = new Intl.DateTimeFormat('en-CA', {
       timeZone: safeTz,
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit', second: '2-digit',
       hour12: false
     });
-    
+
     const parts = formatter.formatToParts(guess);
     const getPart = (type: string) => parseInt(parts.find(p => p.type === type)?.value || "0", 10);
-    
-    const localHour = getPart('hour');
-    const normalizedHour = localHour === 24 ? 0 : localHour;
-    
+
     const localTimeAsUtc = new Date(Date.UTC(
       getPart('year'), getPart('month') - 1, getPart('day'),
-      normalizedHour, getPart('minute'), getPart('second')
+      getPart('hour') === 24 ? 0 : getPart('hour'), getPart('minute'), getPart('second')
     ));
-    
+
     const targetLocalAsUtc = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
     const diffMs = localTimeAsUtc.getTime() - targetLocalAsUtc.getTime();
-    
+
     return new Date(guess.getTime() - diffMs);
+  }
+
+  /**
+   * Returns a Date object representing the precise UTC instant of midnight (00:00:00.000)
+   * in the user's local timezone for the local day of `now`.
+   */
+  static getStartOfDayUTC(timezone: string, now: Date = new Date()): Date {
+    const safeTz = this.validateTimezone(timezone) ? timezone : "UTC";
+    return this.getStartOfLocalDateUTC(safeTz, this.getUserLocalDate(safeTz, now));
+  }
+
+  /**
+   * Returns the user's local Monday-based week key (YYYY-MM-DD of Monday) and
+   * the UTC instant the week resets (next Monday at local midnight).
+   */
+  static getUserLocalWeekKey(timezone: string, now: Date = new Date()): { weekKey: string; resetsAt: Date } {
+    const safeTz = this.validateTimezone(timezone) ? timezone : "UTC";
+    try {
+      const dowStr = new Intl.DateTimeFormat("en-US", { timeZone: safeTz, weekday: "short" }).format(now);
+      const dayIndex = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(dowStr);
+      const idx = dayIndex >= 0 ? dayIndex : 1; // default to Monday
+      const daysSinceMonday = idx === 0 ? 6 : idx - 1;
+      const mondayStr = this.getUserLocalDateOffset(safeTz, -daysSinceMonday, now);
+      const nextMondayStr = this.getUserLocalDateOffset(safeTz, 7 - daysSinceMonday, now);
+      return {
+        weekKey: mondayStr,
+        resetsAt: this.getStartOfLocalDateUTC(safeTz, nextMondayStr),
+      };
+    } catch {
+      const fallback = new Date(now);
+      const day = fallback.getDay(); // 0 = Sunday
+      const sinceMonday = day === 0 ? 6 : day - 1;
+      const monday = new Date(fallback);
+      monday.setDate(monday.getDate() - sinceMonday);
+      monday.setHours(0, 0, 0, 0);
+      const next = new Date(monday);
+      next.setDate(next.getDate() + 7);
+      return {
+        weekKey: monday.toISOString().split("T")[0],
+        resetsAt: next,
+      };
+    }
   }
 
   /**

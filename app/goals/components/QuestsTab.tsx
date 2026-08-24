@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { resolveGoalColor } from "@/lib/goal-theme";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 interface Quest {
   id: number;
@@ -59,15 +60,14 @@ export function QuestsTab() {
 
   const fetchQuests = () => {
     if (!token) return;
+    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch("/api/quests?all=true", { headers: { Authorization: `Bearer ${token}` } })
-        .then(async (r) => (r.ok ? r.json().catch(() => []) : []))
+      // Stale-while-revalidate: repeat visits to /goals paint instantly.
+      fetchCachedJSON<any[]>("/api/quests?all=true", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
         .catch(() => []),
-      fetch("/api/quests/weekly", { headers: { Authorization: `Bearer ${token}` } })
-        .then(async (r) => (r.ok ? r.json().catch(() => null) : null))
+      fetchCachedJSON<any>("/api/quests/weekly", { headers }, { ttlMs: 30_000, staleMs: 300_000 })
         .catch(() => null),
-      fetch("/api/goals", { headers: { Authorization: `Bearer ${token}` } })
-        .then(async (r) => (r.ok ? r.json().catch(() => []) : []))
+      fetchCachedJSON<any[]>("/api/goals", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
         .catch(() => []),
     ])
       .then(([questsData, weeklyData, goalsData]) => {

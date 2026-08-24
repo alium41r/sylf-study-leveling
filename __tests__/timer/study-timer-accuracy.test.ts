@@ -138,19 +138,26 @@ describe("Study Timer Accuracy & Synchronization Tests", () => {
             lastSeenAt: new Date(),
             avatarUrl: null,
             activeAvatar: "class_scholar",
-            sessions: [
-              {
-                durationMinutes: 30,
-                durationSeconds: 1800,
-                startedAt: pastStarted,
-                endedAt: pastEnded,
-              },
-            ],
           },
         },
       ] as any);
 
-      vi.spyOn(prisma, "$queryRaw").mockResolvedValue([]);
+      // The route computes today's study aggregates via grouped raw SQL
+      // queries instead of loading every session row per friend.
+      vi.spyOn(prisma, "$queryRaw").mockImplementation((async (...args: any[]) => {
+        const template = args[0] as any;
+        const sql = Array.isArray(template)
+          ? template.join("?")
+          : typeof template === "string"
+            ? template
+            : template?.strings?.join("?") ?? "";
+        if (sql.includes("BlockedUser")) return [];
+        if (sql.includes('SUM("durationSeconds")')) {
+          return [{ userId: friendId, seconds: 1800 }];
+        }
+        if (sql.includes('MAX("startedAt")')) return [];
+        return [];
+      }) as any);
 
       const req = new NextRequest("http://localhost:3000/api/friends", {
         headers: { Authorization: `Bearer ${validToken}` },

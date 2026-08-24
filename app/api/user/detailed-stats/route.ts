@@ -53,23 +53,34 @@ export async function GET(req: NextRequest) {
     const thirtyFiveDaysAgo = new Date();
     thirtyFiveDaysAgo.setDate(thirtyFiveDaysAgo.getDate() - 35);
 
-    const sessions = await prisma.studySession.findMany({
-      where: {
-        userId,
-        startedAt: { gte: thirtyFiveDaysAgo },
-      },
-      select: {
-        id: true,
-        durationMinutes: true,
-        durationSeconds: true,
-        focusRate: true,
-        startedAt: true,
-        endedAt: true,
-        subject: { select: { id: true, name: true, color: true } },
-        quest: { select: { id: true, title: true } },
-      },
-      orderBy: { startedAt: "asc" },
-    });
+    // ── Independent reads in parallel: sessions + quest stats + goal stats ──
+    const [sessions, allQuests, goals] = await Promise.all([
+      prisma.studySession.findMany({
+        where: {
+          userId,
+          startedAt: { gte: thirtyFiveDaysAgo },
+        },
+        select: {
+          id: true,
+          durationMinutes: true,
+          durationSeconds: true,
+          focusRate: true,
+          startedAt: true,
+          endedAt: true,
+          subject: { select: { id: true, name: true, color: true } },
+          quest: { select: { id: true, title: true } },
+        },
+        orderBy: { startedAt: "asc" },
+      }),
+      prisma.quest.findMany({
+        where: { userId },
+        select: { status: true, xpReward: true, requiredMinutes: true },
+      }),
+      prisma.goal.findMany({
+        where: { userId },
+        select: { status: true },
+      }),
+    ]);
 
     // Aggregate daily study minutes for the last 30 local calendar days
     const last30Days = TimezoneService.getDateRangeInUserTimezone(timezone, -29, 0);
@@ -124,11 +135,6 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
 
     // Quest stats
-    const allQuests = await prisma.quest.findMany({
-      where: { userId },
-      select: { status: true, xpReward: true, requiredMinutes: true },
-    });
-
     const questStats = {
       total: allQuests.length,
       completed: allQuests.filter((q) => q.status === "COMPLETED").length,
@@ -141,11 +147,6 @@ export async function GET(req: NextRequest) {
     };
 
     // Goals stats
-    const goals = await prisma.goal.findMany({
-      where: { userId },
-      select: { status: true },
-    });
-
     const goalStats = {
       total: goals.length,
       active: goals.filter((g) => g.status === "ACTIVE").length,
@@ -183,6 +184,8 @@ export async function GET(req: NextRequest) {
             ? Math.round((questStats.completed / questStats.total) * 100)
             : 0,
       },
+    }, {
+      headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=30" },
     });
   } catch (error) {
     console.error("GET detailed-stats error:", error);

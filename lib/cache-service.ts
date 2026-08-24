@@ -1,5 +1,6 @@
 import { unstable_cache, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { cachedWithRedis, invalidateRedisKeys } from "@/lib/redis";
 
 export interface CachedLeaderboardEntry {
   id: number;
@@ -20,21 +21,25 @@ export interface CachedLeaderboardEntry {
  */
 export const getCachedGlobalRankings = unstable_cache(
   async (): Promise<CachedLeaderboardEntry[]> => {
-    const allUsers = await prisma.user.findMany({
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        hunterRank: true,
-        level: true,
-        currentXP: true,
-        totalStudyMinutes: true,
-        streakDays: true,
-        quests: {
-          where: { status: "COMPLETED" },
-          select: { id: true },
+    // Redis (or in-process fallback) absorbs the leaderboard reads across
+    // serverless instances; the DB only recomputes every 120s per key.
+    const allUsers = await cachedWithRedis("rankings:global", 120, async () => {
+      return prisma.user.findMany({
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          hunterRank: true,
+          level: true,
+          currentXP: true,
+          totalStudyMinutes: true,
+          streakDays: true,
+          quests: {
+            where: { status: "COMPLETED" },
+            select: { id: true },
+          },
         },
-      },
+      });
     });
 
     return allUsers.map((u) => ({
@@ -112,4 +117,9 @@ export function invalidateRankingsCache() {
   } catch (err) {
     console.error("Failed to revalidate rankings cache tag:", err);
   }
+  // Best-effort Redis invalidation so other serverless instances pick up
+  // the fresh leaderboard immediately.
+  invalidateRedisKeys("rankings:global").catch((err) =>
+    console.warn("Failed to invalidate rankings Redis key:", err)
+  );
 }

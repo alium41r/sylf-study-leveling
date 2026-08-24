@@ -18,7 +18,48 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Performance layers (optional, graceful fallback)
+
+### 1. Supabase Realtime — presence & push updates
+
+Replaces heartbeat/polling with live websocket updates:
+
+- **Presence** — online/offline dots for friends come from a Realtime presence
+  channel (instant) instead of the 60s `lastSeenAt` heartbeat window.
+- **postgres_changes** — new chat messages, friendship changes and
+  conversation updates are pushed to the browser instead of 1s–15s REST polls.
+
+Setup:
+
+1. Add to `.env` (Supabase Dashboard → Settings → API):
+   ```
+   NEXT_PUBLIC_SUPABASE_URL="https://YOUR-PROJECT-REF.supabase.co"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
+   SUPABASE_JWT_SECRET="..."   # the "JWT secret" on the same page
+   ```
+2. Run `scripts/supabase-realtime-setup.sql` in the Supabase SQL editor
+   (adds the tables to the `supabase_realtime` publication + RLS policies).
+3. Make sure Realtime is enabled: Dashboard → Database → Replication.
+
+The app mints a Supabase-format JWT per user via `GET /api/realtime/token`
+(sub = the app's integer user id), so Realtime authorizes as `authenticated`
+even though the app uses its own auth system.
+
+**Without these env vars nothing changes** — the app keeps using REST polling
+and DB heartbeats automatically.
+
+### 2. Upstash Redis — hot-read cache
+
+Absorbs repeated hot reads across serverless instances (global rankings,
+profile dossiers, shop catalog) with short TTLs:
+
+```
+UPSTASH_REDIS_REST_URL="https://your-region.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="..."
+```
+
+Without these, `lib/redis.ts` falls back to a small in-process LRU cache, so
+local development needs zero setup.
 
 ## Learn More
 

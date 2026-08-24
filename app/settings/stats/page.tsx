@@ -3,6 +3,7 @@
 import BackToSettings from "../../components/BackToSettings";
 import { useAuth } from "../../components/AuthProvider";
 import { useEffect, useState } from "react";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -395,14 +396,17 @@ export default function StatsSettingsPage() {
   useEffect(() => {
     if (!token) return;
 
-    fetch("/api/user/detailed-stats", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => {
-        if (!r.ok) throw new Error("Failed to load stats");
-        return r.json();
+    // Stale-while-revalidate: revisiting the stats page paints the previous
+    // snapshot instantly, then refreshes in the background.
+    fetchCachedJSON<DetailedStats>(
+      "/api/user/detailed-stats",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 30_000, staleMs: 300_000 }
+    )
+      .then((d) => {
+        if (d) setData(d);
+        else setError("Failed to load stats");
       })
-      .then((d) => setData(d))
       .catch((e) => setError(e.message))
       .finally(() => setIsLoading(false));
   }, [token]);

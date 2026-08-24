@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import BackToSettings from "../../components/BackToSettings";
 import { useAuth } from "@/app/components/AuthProvider";
 import { ACHIEVEMENTS_CATALOG, RARITY_COLORS, AchievementDef } from "@/lib/achievements-catalog";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 type EnrichedAchievement = AchievementDef & {
   currentProgress: number;
@@ -19,10 +20,12 @@ export default function AchievementsPage() {
 
   const fetchAchievements = () => {
     if (!token) return;
-    fetch("/api/achievements", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
+    // Stale-while-revalidate: reopen the achievements page instantly.
+    fetchCachedJSON<{ achievements?: EnrichedAchievement[] }>(
+      "/api/achievements",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 30_000, staleMs: 120_000, storageKey: `achievements:${user?.id ?? 0}` }
+    )
       .then(data => {
         if (data?.achievements) {
           setAchievements(data.achievements);

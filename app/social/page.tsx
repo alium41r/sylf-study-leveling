@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from "react";
 import { useAuth } from "../components/AuthProvider";
 import { useProfileModal } from "../components/ProfileModalContext";
+import { useRealtimePresence } from "../hooks/useRealtimePresence";
+import { usePostgresChanges } from "../hooks/usePostgresChanges";
 import { AddFriendModal } from "../components/AddFriendModal";
 import { CharacterRenderer } from "../components/character/CharacterRenderer";
 import { getDefaultCharacterConfig } from "@/lib/character-traits";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -191,51 +194,133 @@ function SocialContent() {
     reader.readAsDataURL(file);
   };
 
+  // ─── Data Loaders (stale-while-revalidate + storage-backed) ──
+  // Repeat visits paint instantly; background refresh keeps data current.
+  const loadFriends = useCallback(async () => {
+    const data = await fetchCachedJSON<Friend[]>("/api/friends",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:friends:${user?.id ?? 0}` });
+    if (data) setFriends(Array.isArray(data) ? data : []);
+  }, [token, user?.id]);
+
+  const loadRequests = useCallback(async () => {
+    const data = await fetchCachedJSON<FriendRequest[]>("/api/friends/requests",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 20_000, staleMs: 120_000, storageKey: `social:requests:${user?.id ?? 0}` });
+    if (data) setRequests(Array.isArray(data) ? data : []);
+  }, [token, user?.id]);
+
+  const loadConversations = useCallback(async () => {
+    const data = await fetchCachedJSON<Conversation[]>("/api/conversations",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:convos:${user?.id ?? 0}` });
+    if (data) setConversations(Array.isArray(data) ? data : []);
+  }, [token, user?.id]);
+
+  // ─── Supabase Realtime: presence + postgres_changes push ────
+  // Presence replaces the lastSeenAt window for online dots (instant on/off);
+  // postgres_changes replaces the fast polling for roster/thread updates.
+  // Both no-op (and polling continues) when Realtime isn't configured.
+  const presence = useRealtimePresence();
+
+  const loadersRef = useRef({ loadFriends, loadRequests, loadConversations });
+  loadersRef.current = { loadFriends, loadRequests, loadConversations };
+
+  const { connected: pushConnected } = usePostgresChanges([
+    { event: "INSERT", table: "Friendship" },
+    { event: "DELETE", table: "Friendship" },
+    { event: "INSERT", table: "FriendRequest" },
+    { event: "UPDATE", table: "FriendRequest" },
+    { event: "DELETE", table: "FriendRequest" },
+    { event: "INSERT", table: "Message" },
+    { event: "INSERT", table: "Conversation" },
+    { event: "UPDATE", table: "Conversation" },
+    { event: "DELETE", table: "Conversation" },
+    { event: "INSERT", table: "ConversationParticipant" },
+    { event: "DELETE", table: "ConversationParticipant" },
+  ], (payload) => {
+    switch (payload.table) {
+      case "Message":
+      case "Conversation":
+      case "ConversationParticipant":
+        loadersRef.current.loadConversations();
+        break;
+      case "Friendship":
+        loadersRef.current.loadFriends();
+        loadersRef.current.loadConversations();
+        break;
+      case "FriendRequest":
+        loadersRef.current.loadRequests();
+        break;
+    }
+  });
+
   // ─── Data Fetching & Polling ─────────────────────────────
+  // With Realtime push connected the intervals become slow safety nets;
+  // without it they carry the live updates as before.
   useEffect(() => {
     if (!token) return;
 
-    const fetchData = async () => {
+    let cancelled = false;
+    const initial = async () => {
       try {
-        const [friendsRes, requestsRes, convosRes] = await Promise.all([
-          fetch("/api/friends", { headers: { Authorization: `Bearer ${token}` } }),
-          fetch("/api/friends/requests", { headers: { Authorization: `Bearer ${token}` } }),
-          fetch("/api/conversations", { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-
-        if (friendsRes.ok) {
-          const data = await friendsRes.json();
-          setFriends(Array.isArray(data) ? data : []);
-        }
-        if (requestsRes.ok) {
-          const data = await requestsRes.json();
-          setRequests(Array.isArray(data) ? data : []);
-        }
-        if (convosRes.ok) {
-          const data = await convosRes.json();
-          setConversations(Array.isArray(data) ? data : []);
-        }
+        await Promise.all([loadFriends(), loadRequests(), loadConversations()]);
       } catch (err) {
         console.error("Failed to fetch social data", err);
       } finally {
-        setIsLoadingData(false);
+        if (!cancelled) setIsLoadingData(false);
       }
     };
+    initial();
 
-    fetchData();
+    const realtimeActive = pushConnected || presence.connected;
+    const rosterMs = realtimeActive ? 60_000 : 15_000;
+    const requestsMs = realtimeActive ? 120_000 : 30_000;
 
-    // Polling every 12 seconds
-    const interval = setInterval(fetchData, 12000);
-    return () => clearInterval(interval);
-  }, [token]);
+    const friendsInterval = setInterval(loadFriends, rosterMs);
+    const requestsInterval = setInterval(loadRequests, requestsMs);
+    const convosInterval = setInterval(loadConversations, rosterMs);
+    return () => {
+      cancelled = true;
+      clearInterval(friendsInterval);
+      clearInterval(requestsInterval);
+      clearInterval(convosInterval);
+    };
+  }, [token, user?.id, pushConnected, presence.connected, loadFriends, loadRequests, loadConversations]);
+
+  // ─── Presence overlay for online dots ─────────────────────
+  // When the presence channel is live, a friend is online if EITHER the
+  // server says so (lastSeenAt) OR they are currently on the channel.
+  const friendsLive = useMemo(() => {
+    if (!presence.enabled) return friends;
+    return friends.map((f) => ({
+      ...f,
+      isOnline: f.isOnline || presence.onlineUserIds.has(f.id),
+    }));
+  }, [friends, presence.enabled, presence.onlineUserIds]);
+
+  const conversationsLive = useMemo(() => {
+    if (!presence.enabled) return conversations;
+    return conversations.map((c) => ({
+      ...c,
+      participants: c.participants.map((p) => ({
+        ...p,
+        isOnline: p.isOnline || presence.onlineUserIds.has(p.id),
+      })),
+    }));
+  }, [conversations, presence.enabled, presence.onlineUserIds]);
 
   // ─── Live Second Clock Ticker ─────────────────────────────
+  // Only ticks while the current user has an active study session —
+  // previously this re-rendered the entire page every second for everyone.
+  const isUserStudying = Boolean(user?.activeSessionStartedAt);
   useEffect(() => {
+    if (!isUserStudying) return;
     const timer = setInterval(() => {
       setTick((t) => (t + 1) % 1000000);
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isUserStudying]);
 
   // ─── Action Handlers ─────────────────────────────────────
   const handleRequestAction = async (requestId: number, action: "ACCEPT" | "REJECT") => {
@@ -315,16 +400,16 @@ function SocialContent() {
 
   // ─── Filtered & Sorted Friends Roster ────────────────────
   const studyingFriendsCount = useMemo(
-    () => friends.filter((f) => f.isStudying).length,
-    [friends]
+    () => friendsLive.filter((f) => f.isStudying).length,
+    [friendsLive]
   );
   const onlineFriendsCount = useMemo(
-    () => friends.filter((f) => f.isOnline).length,
-    [friends]
+    () => friendsLive.filter((f) => f.isOnline).length,
+    [friendsLive]
   );
 
   const filteredFriends = useMemo(() => {
-    let list = [...friends];
+    let list = [...friendsLive];
 
     // Status filter
     if (statusFilter === "STUDYING") {
@@ -367,7 +452,7 @@ function SocialContent() {
     });
 
     return list;
-  }, [friends, statusFilter, searchQuery, sortBy]);
+  }, [friendsLive, statusFilter, searchQuery, sortBy]);
 
   // Current user's daily study time (accurate for today + live ticking if studying)
   const userTodaySeconds = useMemo(() => {
@@ -378,8 +463,6 @@ function SocialContent() {
     }
     return user?.todayStudySeconds ?? (user?.completedTodaySeconds ?? 0);
   }, [user, tick]);
-
-  const isUserStudying = Boolean(user?.activeSessionStartedAt);
 
   const shouldShowUserCard = useMemo(() => {
     if (!user) return false;
@@ -406,8 +489,8 @@ function SocialContent() {
     );
   }
 
-  const dms = conversations.filter((c) => !c.isGroup);
-  const groups = conversations.filter((c) => c.isGroup);
+  const dms = conversationsLive.filter((c) => !c.isGroup);
+  const groups = conversationsLive.filter((c) => c.isGroup);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen min-w-0 flex flex-col gap-6">
@@ -545,7 +628,7 @@ function SocialContent() {
                       : "text-text-muted hover:text-text-primary"
                   }`}
                 >
-                  All ({friends.length})
+                  All ({friendsLive.length})
                 </button>
                 <button
                   type="button"
@@ -598,7 +681,7 @@ function SocialContent() {
           </div>
 
           {/* Friends Spacious YPT Card Grid (2-3 Columns) */}
-          {isLoadingData && friends.length === 0 ? (
+          {isLoadingData && friendsLive.length === 0 ? (
             <div className="py-24 text-center text-text-muted font-['Rajdhani'] font-bold animate-pulse">
               Loading Friends...
             </div>
@@ -1051,6 +1134,7 @@ function SocialContent() {
                     href={`/social/chat/${dm.id}`}
                     key={dm.id}
                     className="block group"
+                    onMouseEnter={() => router.prefetch(`/social/chat/${dm.id}`)}
                   >
                     <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm gap-3">
                       <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
@@ -1167,6 +1251,7 @@ function SocialContent() {
                   href={`/social/chat/${group.id}`}
                   key={group.id}
                   className="block group"
+                  onMouseEnter={() => router.prefetch(`/social/chat/${group.id}`)}
                 >
                   <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm gap-3">
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
@@ -1369,7 +1454,7 @@ function SocialContent() {
               Select Friends
             </p>
             <div className="flex-1 overflow-y-auto space-y-2 mb-4 border border-border-subtle p-2 rounded-xl max-h-48 custom-scrollbar bg-bg-abyss/40">
-              {friends.map((friend) => (
+              {friendsLive.map((friend) => (
                 <label
                   key={friend.id}
                   className="flex items-center gap-3 p-2 hover:bg-white/[0.04] rounded-lg cursor-pointer transition-colors"
@@ -1397,7 +1482,7 @@ function SocialContent() {
                   </div>
                 </label>
               ))}
-              {friends.length === 0 && (
+              {friendsLive.length === 0 && (
                 <p className="text-xs text-text-muted text-center py-6 font-['Rajdhani']">
                   No friends added yet.
                 </p>

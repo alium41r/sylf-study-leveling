@@ -1,14 +1,18 @@
 "use client";
 
 import { useAuth } from "../components/AuthProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import MarkdownRenderer from "../components/MarkdownRenderer";
 import { motion, AnimatePresence } from "framer-motion";
 import { CharacterRenderer } from "../components/character/CharacterRenderer";
 import { getDefaultCharacterConfig } from "@/lib/character-traits";
 import { calculateWeeklyQuestReward } from "@/lib/game-engine";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
+
+// react-markdown + katex + remark plugins are heavy — lazy-load them so
+// they don't block the dashboard's first paint / route transition.
+const MarkdownRenderer = lazy(() => import("../components/MarkdownRenderer"));
 
 interface Quest {
   id: number;
@@ -64,11 +68,11 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!token) return;
 
-    const safeJson = (r: Response) => (r.ok ? r.json().catch(() => null) : null);
+    const headers = { Authorization: `Bearer ${token}` };
 
     // 1. Fetch weekly focus quest independently (fast delta)
-    fetch("/api/quests/weekly", { headers: { Authorization: `Bearer ${token}` } })
-      .then(safeJson)
+    fetch("/api/quests/weekly", { headers })
+      .then((r) => (r.ok ? r.json().catch(() => null) : null))
       .then((weeklyData) => {
         if (weeklyData && !weeklyData.error) {
           setWeeklyQuest(weeklyData);
@@ -79,35 +83,33 @@ export default function DashboardPage() {
       })
       .catch(console.error);
 
-    // 2. Fetch today's assigned quests
-    fetch("/api/quests", { headers: { Authorization: `Bearer ${token}` } })
-      .then(safeJson)
+    // 2-5. Cached stale-while-revalidate loads: repeat visits paint the
+    // last-known data instantly and refresh in the background.
+    fetchCachedJSON<any[]>("/api/quests", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
       .then((questsData) => {
-        setQuests(Array.isArray(questsData) ? questsData : []);
+        if (questsData) setQuests(Array.isArray(questsData) ? questsData : []);
       })
       .catch(console.error);
 
-    // 3. Fetch friends list & statuses
-    fetch("/api/friends", { headers: { Authorization: `Bearer ${token}` } })
-      .then(safeJson)
+    fetchCachedJSON<any[]>("/api/friends", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
       .then((friendsData) => {
-        setFriends(Array.isArray(friendsData) ? friendsData : []);
+        if (friendsData) setFriends(Array.isArray(friendsData) ? friendsData : []);
       })
       .catch(console.error);
 
-    // 4. Fetch daily briefing
-    fetch("/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true", { headers: { Authorization: `Bearer ${token}` } })
-      .then(safeJson)
+    fetchCachedJSON<any>(
+      "/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true",
+      { headers },
+      { ttlMs: 20_000, staleMs: 120_000 }
+    )
       .then((briefingsData) => {
-        setBriefings(briefingsData?.messages || []);
+        if (briefingsData) setBriefings(briefingsData.messages || []);
       })
       .catch(console.error);
 
-    // 5. Fetch system insights
-    fetch("/api/insights", { headers: { Authorization: `Bearer ${token}` } })
-      .then(safeJson)
+    fetchCachedJSON<any[]>("/api/insights", { headers }, { ttlMs: 30_000, staleMs: 300_000 })
       .then((insightsData) => {
-        setInsights(Array.isArray(insightsData) ? insightsData : []);
+        if (insightsData) setInsights(Array.isArray(insightsData) ? insightsData : []);
       })
       .catch(console.error);
   }, [token]);
@@ -330,11 +332,13 @@ export default function DashboardPage() {
               </button>
             </div>
             <div>
-              <MarkdownRenderer
-                content={(briefings[0]?.content || "")
-                  .replace(/^\[SYSTEM NOTIFICATION\]\s*/i, "")
-                  .replace(/^\[SYSTEM\]\s*/i, "")}
-              />
+              <Suspense fallback={<div className="h-24 animate-pulse rounded-lg bg-bg-panel/40" />}>
+                <MarkdownRenderer
+                  content={(briefings[0]?.content || "")
+                    .replace(/^\[SYSTEM NOTIFICATION\]\s*/i, "")
+                    .replace(/^\[SYSTEM\]\s*/i, "")}
+                />
+              </Suspense>
             </div>
           </motion.div>
         )}
@@ -362,7 +366,9 @@ export default function DashboardPage() {
                     {insight.category}
                   </span>
                   <div className="mb-3">
-                    <MarkdownRenderer content={insight.content} compact />
+                    <Suspense fallback={<div className="h-16 animate-pulse rounded bg-bg-panel/40" />}>
+                      <MarkdownRenderer content={insight.content} compact />
+                    </Suspense>
                   </div>
                 </div>
                 <span className="text-[10px] text-text-muted font-medium">

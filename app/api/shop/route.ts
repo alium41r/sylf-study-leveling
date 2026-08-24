@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 import { CATALOG_ITEMS } from "@/lib/shop-items";
+import { cachedWithRedis } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -16,29 +17,33 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Strict projection: filter out quarantined legacy equipment and set bundles
-    const dbItems = await prisma.item.findMany({
-      where: {
-        category: {
-          notIn: ["EQUIPMENT", "SET_BUNDLE"],
+    // Strict projection: filter out quarantined legacy equipment and set
+    // bundles. The item catalog rarely changes, so it's a perfect Redis hot
+    // read — 5 minute TTL keeps it warm across serverless instances.
+    const dbItems = await cachedWithRedis("shop:db-items", 300, () =>
+      prisma.item.findMany({
+        where: {
+          category: {
+            notIn: ["EQUIPMENT", "SET_BUNDLE"],
+          },
         },
-      },
-      select: {
-        id: true,
-        sku: true,
-        name: true,
-        description: true,
-        category: true,
-        slot: true,
-        rarity: true,
-        rankRequirement: true,
-        costSylph: true,
-        effectPayload: true,
-        spriteLayer: true,
-        setKey: true,
-      },
-      orderBy: { id: "asc" },
-    });
+        select: {
+          id: true,
+          sku: true,
+          name: true,
+          description: true,
+          category: true,
+          slot: true,
+          rarity: true,
+          rankRequirement: true,
+          costSylph: true,
+          effectPayload: true,
+          spriteLayer: true,
+          setKey: true,
+        },
+        orderBy: { id: "asc" },
+      })
+    );
 
     let userInventory: Array<{ itemId: number; quantity: number; isEquipped: boolean }> = [];
     let stats = null;

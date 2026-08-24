@@ -17,6 +17,7 @@ import { PagePresence, resolvePresence } from "./page-presence";
 import { QuotaInfo, AiPlannerModal } from "../AiPlannerModal";
 import SystemFab from "./SystemFab";
 import SystemOverlay from "./SystemOverlay";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 // ============================================================
 // System AI Provider — the client-side intelligence layer.
@@ -70,11 +71,14 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
     const t = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
     if (!t) return;
     try {
-      const res = await fetch("/api/ai-usage", {
-        headers: { Authorization: `Bearer ${t}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      // Stale-while-revalidate: quota info mounts on every page; reuse a
+      // fresh-enough snapshot instead of re-querying on each full load.
+      const data = await fetchCachedJSON<{ chat?: QuotaInfo | null; planner?: QuotaInfo | null }>(
+        "/api/ai-usage",
+        { headers: { Authorization: `Bearer ${t}` } },
+        { ttlMs: 30_000, staleMs: 120_000 }
+      );
+      if (data) {
         setChatQuota(data.chat || null);
         setPlannerQuota(data.planner || null);
       }

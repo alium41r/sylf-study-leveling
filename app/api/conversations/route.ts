@@ -109,7 +109,9 @@ export async function GET(req: NextRequest) {
       return new Date(bTime).getTime() - new Date(aTime).getTime();
     });
 
-    return NextResponse.json(conversations);
+    return NextResponse.json(conversations, {
+      headers: { "Cache-Control": "private, max-age=5, stale-while-revalidate=10" },
+    });
   } catch (error) {
     console.error("GET conversations error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -5,6 +5,7 @@ import { isUserBlocked } from "@/lib/block-service";
 import { TimezoneService } from "@/lib/timezone-service";
 import { unstable_cache } from "next/cache";
 import { getLevelProgress } from "@/lib/game-engine";
+import { cachedWithRedis } from "@/lib/redis";
 
 export interface ProfileDossierResult {
   profile: any | null;
@@ -27,8 +28,12 @@ export interface ProfileDossierResult {
 }
 
 async function fetchTargetUserData(normalized: string) {
-  return prisma.user.findUnique({
-    where: { username: normalized },
+  // Redis (or in-process fallback) absorbs repeated profile reads across
+  // serverless instances — a 60s TTL keeps dossiers fresh without hammering
+  // Postgres on every profile view.
+  return cachedWithRedis(`user-data:${normalized}`, 60, () =>
+    prisma.user.findUnique({
+      where: { username: normalized },
     select: {
       id: true,
       username: true,
@@ -120,7 +125,8 @@ async function fetchTargetUserData(normalized: string) {
         },
       },
     },
-  });
+  })
+  );
 }
 
 /**
@@ -164,38 +170,42 @@ export async function getProfileDossier(
     };
   }
 
-  const baseRelationship = await getRelationship(viewerId, targetUser.id);
   const isSelf = viewerId === targetUser.id;
 
-  const isBlockedByViewer = viewerId && !isSelf ? await isUserBlocked(viewerId, targetUser.id) : false;
-  const isBlockedByTarget = viewerId && !isSelf ? await isUserBlocked(targetUser.id, viewerId) : false;
+  // ── Relationship + block state resolved in ONE parallel hop ──
+  const [baseRelationship, isBlockedByViewer, isBlockedByTarget] = await Promise.all([
+    getRelationship(viewerId, targetUser.id),
+    viewerId && !isSelf ? isUserBlocked(viewerId, targetUser.id) : Promise.resolve(false),
+    viewerId && !isSelf ? isUserBlocked(targetUser.id, viewerId) : Promise.resolve(false),
+  ]);
 
   let relationshipStatus: string = baseRelationship;
   if (isBlockedByViewer) {
     relationshipStatus = "BLOCKED";
   } else if (!isSelf && baseRelationship === Relationship.PUBLIC && viewerId) {
-    const pendingSent = await prisma.friendRequest.findUnique({
-      where: {
-        senderId_receiverId: {
-          senderId: viewerId,
-          receiverId: targetUser.id,
+    // Pending request checks only matter for PUBLIC relationships — one parallel hop.
+    const [pendingSent, pendingReceived] = await Promise.all([
+      prisma.friendRequest.findUnique({
+        where: {
+          senderId_receiverId: {
+            senderId: viewerId,
+            receiverId: targetUser.id,
+          },
         },
-      },
-    }).catch(() => null);
-    if (pendingSent && pendingSent.status === "PENDING") {
-      relationshipStatus = "PENDING_SENT";
-    } else {
-      const pendingReceived = await prisma.friendRequest.findUnique({
+      }).catch(() => null),
+      prisma.friendRequest.findUnique({
         where: {
           senderId_receiverId: {
             senderId: targetUser.id,
             receiverId: viewerId,
           },
         },
-      }).catch(() => null);
-      if (pendingReceived && pendingReceived.status === "PENDING") {
-        relationshipStatus = "PENDING_RECEIVED";
-      }
+      }).catch(() => null),
+    ]);
+    if (pendingSent && pendingSent.status === "PENDING") {
+      relationshipStatus = "PENDING_SENT";
+    } else if (pendingReceived && pendingReceived.status === "PENDING") {
+      relationshipStatus = "PENDING_RECEIVED";
     }
   }
 
@@ -210,27 +220,29 @@ export async function getProfileDossier(
     allowDirectMessages: "FRIENDS",
   };
 
-  const completedQuestsCount = await prisma.quest.count({
-    where: { userId: targetUser.id, status: "COMPLETED" },
-  }).catch(() => 0);
-
+  // ── Aggregate stats in one parallel hop ──
   const targetTimezone = targetUser.timezone || "UTC";
   const todayStart = TimezoneService.getStartOfDayUTC(targetTimezone);
 
-  const todaySessions = prisma.studySession?.findMany
-    ? await prisma.studySession.findMany({
-        where: {
-          userId: targetUser.id,
-          startedAt: { gte: todayStart },
-        },
-        select: {
-          durationMinutes: true,
-          durationSeconds: true,
-          startedAt: true,
-          endedAt: true,
-        },
-      }).catch(() => [])
-    : [];
+  const [completedQuestsCount, todaySessions] = await Promise.all([
+    prisma.quest.count({
+      where: { userId: targetUser.id, status: "COMPLETED" },
+    }).catch(() => 0),
+    prisma.studySession?.findMany
+      ? prisma.studySession.findMany({
+          where: {
+            userId: targetUser.id,
+            startedAt: { gte: todayStart },
+          },
+          select: {
+            durationMinutes: true,
+            durationSeconds: true,
+            startedAt: true,
+            endedAt: true,
+          },
+        }).catch(() => [])
+      : Promise.resolve([]),
+  ]);
 
   let completedTodaySeconds = 0;
   let todayStudySeconds = 0;

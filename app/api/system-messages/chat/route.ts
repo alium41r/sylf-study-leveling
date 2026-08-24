@@ -450,6 +450,28 @@ export async function POST(req: NextRequest) {
         addUsage(response.usage);
       }
 
+      // Tool-loop exhausted or the model stopped without text (e.g. it kept
+      // calling tools until the iteration cap): force ONE final text-only
+      // generation with tools disabled so the user always gets a real reply
+      // instead of "Failed to complete task."
+      if (!response.text && iterations > 0) {
+        try {
+          const forced = await adapter.generateResponse(
+            runHistory,
+            activeSystemInstruction,
+            [],
+            { ...genOptions, signal }
+          );
+          addUsage(forced.usage);
+          response = forced;
+        } catch (forcedErr: any) {
+          console.warn(
+            `[${provider.toUpperCase()}] Forced final response failed:`,
+            forcedErr?.message
+          );
+        }
+      }
+
       return {
         text:
           response.text ||
@@ -462,17 +484,6 @@ export async function POST(req: NextRequest) {
       };
     };
 
-    // ── Unified abort chain: client disconnect OR hard timeout aborts the
-    //    upstream LLM request immediately (no orphaned generations). ──
-    const abortController = new AbortController();
-    const onClientAbort = () => abortController.abort();
-    if (req.signal) {
-      req.signal.addEventListener("abort", onClientAbort);
-      if (req.signal.aborted) abortController.abort();
-    }
-    const timeoutId = setTimeout(() => abortController.abort(), AI_LIMITS.chatTimeoutMs);
-    let generationSucceeded = false;
-
     const primarySpec = workloadResult.route.primary;
     const fallbackSpec = workloadResult.route.fallback;
     const secondarySpec = workloadResult.route.secondaryFallback;
@@ -482,13 +493,53 @@ export async function POST(req: NextRequest) {
     // tier is used instead of that provider's default text model.
     const isVisionWorkload = workloadResult.workload === "multimodal_vision";
 
+    // ── Per-attempt abort chain: client disconnect aborts the in-flight
+    //    upstream request immediately, and EACH cascade attempt (primary →
+    //    fallback → secondary) gets its OWN fresh controller + timeout budget.
+    //    Reusing one controller meant a timed-out primary aborted the fallback
+    //    instantly, so the cascade could never actually run. ──
+    let generationSucceeded = false;
+    // Mutable ref object so TS doesn't narrow the nullable fields to `never`
+    // across the closure boundaries below.
+    const attemptRef: {
+      controller: AbortController | null;
+      timeout: ReturnType<typeof setTimeout> | null;
+    } = { controller: null, timeout: null };
+    const onClientAbort = () => attemptRef.controller?.abort();
+
+    const executeAttempt = async (
+      provider: "deepseek" | "gemini" | "groq",
+      model: string
+    ) => {
+      attemptRef.controller = new AbortController();
+      // Vision attempts get a tighter per-attempt budget so the DeepSeek
+      // fallback engages quickly when Gemini stalls instead of waiting the
+      // full 90s chat budget.
+      const attemptBudget = isVisionWorkload ? 45_000 : AI_LIMITS.chatTimeoutMs;
+      attemptRef.timeout = setTimeout(
+        () => attemptRef.controller?.abort(),
+        attemptBudget
+      );
+      try {
+        return await executeAgentLoop(provider, model, attemptRef.controller.signal);
+      } finally {
+        if (attemptRef.timeout) clearTimeout(attemptRef.timeout);
+        attemptRef.timeout = null;
+      }
+    };
+
+    if (req.signal) {
+      req.signal.addEventListener("abort", onClientAbort);
+      if (req.signal.aborted) attemptRef.controller?.abort();
+    }
+
     try {
       if (modelPreference === "groq") {
         const groqModel = isVisionWorkload ? GROQ_MODELS.vision : GROQ_MODELS.default;
         actualModelUsed = "GROQ";
         actualModelDisplayName = `Groq (${groqModel})`;
         actualModelId = groqModel;
-        const loopResult = await executeAgentLoop("groq", groqModel, abortController.signal);
+        const loopResult = await executeAttempt("groq", groqModel);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
       } else if (modelPreference === "gemini") {
@@ -496,7 +547,7 @@ export async function POST(req: NextRequest) {
         actualModelUsed = "GEMINI";
         actualModelDisplayName = `Gemini (${geminiModel})`;
         actualModelId = geminiModel;
-        const loopResult = await executeAgentLoop("gemini", geminiModel, abortController.signal);
+        const loopResult = await executeAttempt("gemini", geminiModel);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
       } else if (modelPreference === "deepseek") {
@@ -504,7 +555,7 @@ export async function POST(req: NextRequest) {
         actualModelUsed = "DEEPSEEK";
         actualModelDisplayName = `DeepSeek (${deepseekModel})`;
         actualModelId = deepseekModel;
-        const loopResult = await executeAgentLoop("deepseek", deepseekModel, abortController.signal);
+        const loopResult = await executeAttempt("deepseek", deepseekModel);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
       } else {
@@ -514,7 +565,7 @@ export async function POST(req: NextRequest) {
         actualModelId = primarySpec.model;
 
         try {
-          const loopResult = await executeAgentLoop(primarySpec.provider, primarySpec.model, abortController.signal);
+          const loopResult = await executeAttempt(primarySpec.provider, primarySpec.model);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
         } catch (primaryErr: any) {
@@ -527,7 +578,7 @@ export async function POST(req: NextRequest) {
           actualModelId = fallbackSpec.model;
 
           try {
-            const loopResult = await executeAgentLoop(fallbackSpec.provider, fallbackSpec.model, abortController.signal);
+            const loopResult = await executeAttempt(fallbackSpec.provider, fallbackSpec.model);
             aiResponseText = loopResult.text;
             totalUsage = loopResult.usage;
           } catch (fallbackErr: any) {
@@ -539,7 +590,7 @@ export async function POST(req: NextRequest) {
               actualModelUsed = secondarySpec.provider.toUpperCase();
               actualModelDisplayName = `${secondarySpec.provider.toUpperCase()} (${secondarySpec.model})`;
               actualModelId = secondarySpec.model;
-              const loopResult = await executeAgentLoop(secondarySpec.provider, secondarySpec.model, abortController.signal);
+              const loopResult = await executeAttempt(secondarySpec.provider, secondarySpec.model);
               aiResponseText = loopResult.text;
               totalUsage = loopResult.usage;
             } else {
@@ -559,14 +610,14 @@ export async function POST(req: NextRequest) {
         if (pErr.originalError?.status === 429 || pErr.originalError?.status === 503 || pErr.code === "rate_limit_exceeded") {
           friendlyError = "The AI is currently overloaded with requests. Please wait a moment and try again.";
         }
-      } else if (apiError.name === "AbortError" || abortController.signal.aborted) {
+      } else if (apiError.name === "AbortError" || attemptRef.controller?.signal.aborted) {
         friendlyError = req.signal?.aborted
           ? "The request was cancelled."
           : "The AI took too long to respond. Please try a simpler question or try again later.";
       }
       aiResponseText = friendlyError;
     } finally {
-      clearTimeout(timeoutId);
+      if (attemptRef.timeout) clearTimeout(attemptRef.timeout);
       if (req.signal) req.signal.removeEventListener("abort", onClientAbort);
     }
 

@@ -46,12 +46,12 @@ export default function PlannerTab({
                       : "bg-bg-abyss border-border-subtle text-text-muted"
                   }`}
                 >
-                  {plannerQuota ? `${plannerQuota.used} / ${plannerQuota.limit} Free Daily Plan` : "Daily Plan"}
+                  {plannerQuota ? `${plannerQuota.used} / ${plannerQuota.limit} Free Weekly Plan` : "Weekly Plan"}
                 </span>
               </h2>
               <p className="text-xs text-text-muted font-['Rajdhani'] leading-relaxed mt-1">
                 Give The System a subject and it will research an adaptive syllabus, then schedule it
-                as quests on your calendar — one comprehensive plan per day on the free tier.
+                as quests on your calendar — one comprehensive plan per week on the free tier.
               </p>
 
               <div className="flex flex-wrap gap-2 mt-4">

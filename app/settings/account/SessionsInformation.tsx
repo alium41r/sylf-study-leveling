@@ -6,6 +6,7 @@ import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
 import { useAuth } from "../../components/AuthProvider";
 import { useRouter } from "next/navigation";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 interface SessionItem {
   id: string;
@@ -41,16 +42,16 @@ export default function SessionsInformation() {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch("/api/user/sessions", {
-        headers,
-        credentials: "include",
-      });
-      if (res.ok) {
-        const data = await res.json();
+      // Stale-while-revalidate: reopening account paints instantly.
+      const data = await fetchCachedJSON<{ sessions?: SessionItem[]; error?: string }>(
+        "/api/user/sessions",
+        { headers, credentials: "include" },
+        { ttlMs: 20_000, staleMs: 120_000 }
+      );
+      if (data && !data.error) {
         setSessions(data.sessions || []);
       } else {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to load sessions");
+        setError(data?.error || "Failed to load sessions");
       }
     } catch (err) {
       console.error("Error fetching sessions:", err);

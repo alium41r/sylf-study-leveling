@@ -2,7 +2,6 @@ import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { LLMFactory } from "./providers/factory";
 import { DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "./config";
 import { NormalizedMessage } from "./providers/types";
-import { googleSearchTool } from "./chat-tools";
 import { executeGoogleSearch } from "./chat-tool-executor";
 import { calculateQuestRewards, calculateRecommendedDifficulty } from "@/lib/difficulty-engine";
 import { extractJson } from "./json-extractor";
@@ -126,8 +125,11 @@ export class AiStudyOrchestrator {
 
   /**
    * 1. Researcher Agent
-   * Primary: deepseek-v4-pro with Google Search tool calling.
-   * Fallback: gemini-3.1-pro with live Google Search grounding.
+   * Deterministic grounded research: live Google Search (Gemini grounding)
+   * runs FIRST and ALWAYS. The LLM (DeepSeek primary) only SYNTHESIZES the
+   * real search findings into the numbered chapter breakdown — it is never
+   * trusted to research from memory, because DeepSeek's optional tool calling
+   * routinely skipped the search and hallucinated wrong chapter lists.
    */
   private static async runResearcherAgent(
     topic: string,
@@ -139,108 +141,86 @@ export class AiStudyOrchestrator {
     const searchTarget = hasSyllabus ? `${topic} (Scope: ${syllabus})` : topic;
 
     onProgress?.(
-      `[Researcher • DeepSeek & Gemini] Initiating curriculum research and web search for "${searchTarget}"...`
+      `[Researcher] Running grounded Google Search for "${searchTarget}"...`
     );
 
-    const searchPrompt = `Search and retrieve the EXACT official curriculum / syllabus chapter breakdown for:
-Topic/Subject: "${topic}"
-${
-  hasSyllabus
-    ? `User Syllabus / Focus Scope: "${syllabus}"`
-    : "User provided no specific syllabus constraints; retrieve standard official curriculum."
-}
+    // ── 1. DETERMINISTIC GROUNDED SEARCH ─────────────────────────
+    // Fetched directly via Gemini's Google Search grounding BEFORE any
+    // generative model is asked for curriculum facts.
+    let groundedFindings = "";
+    let searchSource = "grounded search";
+    try {
+      const searchResult = await executeGoogleSearch({
+        query: topic,
+        qualification: syllabus || undefined,
+      });
+      if (searchResult?.summary) {
+        groundedFindings = String(searchResult.summary);
+        searchSource = searchResult.source || "grounded search";
+      }
+    } catch (searchErr: any) {
+      console.warn("[Researcher Agent] Grounded search failed, continuing with model synthesis:", searchErr?.message);
+    }
 
-CRITICAL RESEARCH INSTRUCTIONS:
+    if (!groundedFindings.trim()) {
+      groundedFindings =
+        `Live search unavailable. Use ONLY well-established, official curriculum knowledge for "${searchTarget}" and clearly mark any uncertainty.`;
+    }
+
+    onProgress?.(
+      `[Researcher] Live findings received (${searchSource}). Synthesizing official chapter breakdown...`
+    );
+
+    const synthesisSystemInstruction = `You are an elite Academic Curriculum Researcher with deep expertise in international qualifications (Cambridge CAIE AS/A-Levels, Edexcel, AQA, AP, IB, GCSE, CBSE, FBISE, BISE, AKU-EB).
+Your job is to convert the provided LIVE SEARCH FINDINGS into the precise numbered chapter titles, key subtopics, and difficulty weights for the requested scope. STRICT FIDELITY: use only chapter names and facts that appear in the search findings — never invent or reorder chapters.`;
+
+    const synthesisPrompt = `LIVE GROUNDED SEARCH FINDINGS (${searchSource}) for:
+Topic/Subject: "${topic}"
+${hasSyllabus ? `User Syllabus / Focus Scope: "${syllabus}"` : "No specific syllabus constraints provided."}
+
+${groundedFindings}
+
+TASK — produce the exact curriculum breakdown:
 1. DISAMBIGUATE CODES & EXAM BOARDS:
-   - Identify the qualification and exam board from the topic/syllabus (e.g., Cambridge CAIE AS & A Level Physics 9702, Cambridge Math 9709, Edexcel, AQA, AP, IB, GCSE, CBSE).
-   - Resolve any code ambiguities (e.g., Physics 9709 -> Cambridge AS Physics 9702).
+   - Identify the qualification and exam board from the topic/syllabus and the findings (e.g., Cambridge CAIE 9702, 9709, Edexcel, AQA, AP, IB, CBSE, FBISE).
 2. PRECISE SCOPE EXTRACTION:
-   - If the user specifies a subset of chapters (e.g., "first 6 chapters", "chapters 1 to 5", "Mechanics units only"), look up the official syllabus specification or standard textbook Table of Contents and extract ONLY those exact sequential chapters.
-   - For example, for Cambridge AS Level Physics (9702) first 6 chapters:
-     1. Physical Quantities and Units
-     2. Kinematics
-     3. Dynamics
-     4. Forces, Density and Pressure
-     5. Work, Energy and Power
-     6. Deforming Solids
-   - DO NOT skip chapters, do NOT combine chapters, and do NOT include topics beyond the requested range.
+   - If the user specifies a subset (e.g., "first 6 chapters", "chapters 1 to 5"), extract ONLY those exact sequential chapters from the findings.
+   - DO NOT skip, combine, or add chapters beyond the requested range.
 3. STRUCTURED OUTPUT FORMAT:
    Return a clear, numbered list for each chapter in the requested scope:
    - Chapter 1: [Exact Official Name] — Key Subtopics / Core Concepts — Difficulty Level & Content Weight %
-   - Chapter 2: [Exact Official Name] — Key Subtopics / Core Concepts — Difficulty Level & Content Weight %
-   ...
-   - Chapter N: [Exact Official Name] — Key Subtopics / Core Concepts — Difficulty Level & Content Weight %
-4. Include student difficulty analysis (which subtopics are conceptually challenging vs routine practice).`;
+   - Chapter 2: ...
+   - Chapter N: ...
+4. Include a short student difficulty analysis (which subtopics are conceptually challenging vs routine practice).
+5. If the live findings do NOT contain the requested curriculum, say so explicitly and provide the closest well-established structure with a clear disclaimer instead of fabricating.`;
 
-    const systemInstruction = `You are an elite Academic Curriculum Researcher with real-time web search capabilities and deep expertise in international qualifications (Cambridge CAIE AS/A-Levels, Edexcel, AQA, AP, IB, GCSE, CBSE).
-Your job is to search the web for the exact, canonical syllabus structure, resolve any syllabus code typos or ambiguities, and return the precise numbered chapter titles, key subtopics, and difficulty weights for the requested scope.`;
-
-    // Attempt 1: DeepSeek Primary Model (deepseek-v4-pro) with Google Search Tool Calling
+    // ── 2. DeepSeek SYNTHESIS (no tools — formatting + fidelity pass) ──
     if (process.env.DEEPSEEK_API_KEY) {
       try {
         const deepseek = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.planner);
         const messages: NormalizedMessage[] = [
-          { role: "user", content: searchPrompt },
+          { role: "user", content: synthesisPrompt },
         ];
 
-        onProgress?.(`[Researcher • DeepSeek v4 Pro] Querying DeepSeek with Google Search tool...`);
-        const initialRes = await deepseek.generateResponse(
-          messages,
-          systemInstruction,
-          [googleSearchTool],
-          { signal }
-        );
+        onProgress?.(`[Researcher • DeepSeek v4 Pro] Synthesizing grounded findings into the official chapter list...`);
+        const res = await deepseek.generateResponse(messages, synthesisSystemInstruction, [], { signal });
 
-        if (initialRes.toolCalls && initialRes.toolCalls.length > 0) {
-          const tc = initialRes.toolCalls[0];
-          onProgress?.(`[Researcher • DeepSeek v4 Pro] Executing live web search: "${tc.args.query || topic}"...`);
-          const searchResult = await executeGoogleSearch(tc.args);
-
-          messages.push({
-            role: "assistant",
-            toolCalls: initialRes.toolCalls,
-          });
-          messages.push({
-            role: "tool",
-            toolResults: [
-              {
-                toolCallId: tc.id,
-                name: tc.name,
-                result: searchResult,
-              },
-            ],
-          });
-
-          const secondRes = await deepseek.generateResponse(
-            messages,
-            systemInstruction,
-            [],
-            { signal }
-          );
-
-          if (secondRes.text && secondRes.text.trim().length > 50) {
-            onProgress?.(`[Researcher • DeepSeek v4 Pro] Curriculum research finalized via live grounding.`);
-            return {
-              data: secondRes.text,
-              model: `DeepSeek (${DEEPSEEK_MODELS.planner}) + Google Search`,
-              usage: this.sumUsage(initialRes.usage, secondRes.usage),
-            };
-          }
-        } else if (initialRes.text && initialRes.text.trim().length > 50) {
-          onProgress?.(`[Researcher • DeepSeek v4 Pro] Curriculum research synthesized.`);
+        if (res.text && res.text.trim().length > 50) {
+          onProgress?.(`[Researcher • DeepSeek v4 Pro] Curriculum research finalized from live search findings.`);
           return {
-            data: initialRes.text,
-            model: `DeepSeek (${DEEPSEEK_MODELS.planner})`,
-            usage: this.sumUsage(initialRes.usage),
+            data: res.text,
+            model: `DeepSeek (${DEEPSEEK_MODELS.planner}) + ${searchSource}`,
+            usage: this.sumUsage(res.usage),
           };
         }
       } catch (deepseekErr: any) {
         this.rethrowIfAborted(deepseekErr, signal);
-        console.warn("[Researcher Agent] DeepSeek primary failed. Falling back to Gemini research:", deepseekErr.message);
+        console.warn("[Researcher Agent] DeepSeek synthesis failed. Falling back to Gemini research:", deepseekErr.message);
       }
     }
 
-    // Attempt 2: Gemini Research Fallback Engine (gemini-3.1-pro / gemini-2.5-flash) with Google Search Grounding
+    // ── 3. Gemini fallback — synthesize the SAME grounded findings (with its
+    //       own live googleSearch grounding as an additional safety net). ──
     const geminiKey =
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_GENAI_API_KEY ||
@@ -251,15 +231,15 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
         const ai = new GoogleGenAI({ apiKey: geminiKey });
         const response = await ai.models.generateContent({
           model: GEMINI_MODELS.research,
-          contents: searchPrompt,
+          contents: synthesisPrompt,
           config: {
-            systemInstruction,
+            systemInstruction: synthesisSystemInstruction,
             tools: [{ googleSearch: {} }],
             abortSignal: signal,
           },
         });
 
-        onProgress?.(`[Researcher • Gemini 3.1 Pro] Gathered exact curriculum and difficulty data via search grounding.`);
+        onProgress?.(`[Researcher • Gemini 3.1 Pro] Gathered exact curriculum data via grounded findings + live search.`);
         return {
           data: response.text || "No research data found.",
           model: `Gemini (${GEMINI_MODELS.research})`,
@@ -272,9 +252,9 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
           const ai = new GoogleGenAI({ apiKey: geminiKey });
           const response = await ai.models.generateContent({
             model: "gemini-3.7-flash",
-            contents: searchPrompt,
+            contents: synthesisPrompt,
             config: {
-              systemInstruction,
+              systemInstruction: synthesisSystemInstruction,
               tools: [{ googleSearch: {} }],
               abortSignal: signal,
             },
@@ -291,16 +271,16 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
       }
     }
 
-    // Attempt 3: Groq Fallback Engine
+    // ── 4. Groq fallback (synthesizes the grounded findings) ──
     try {
       const groqAdapter = LLMFactory.getAdapter("groq", GROQ_MODELS.default);
       const groqRes = await groqAdapter.generateResponse(
-        [{ role: "user", content: searchPrompt }],
-        systemInstruction,
+        [{ role: "user", content: synthesisPrompt }],
+        synthesisSystemInstruction,
         [],
         { signal }
       );
-      onProgress?.(`[Researcher • Groq (${GROQ_MODELS.default})] Gathered knowledge-base curriculum data.`);
+      onProgress?.(`[Researcher • Groq (${GROQ_MODELS.default})] Synthesized curriculum data from grounded findings.`);
       return {
         data: groqRes.text || "No research data found.",
         model: `Groq (${GROQ_MODELS.default})`,
@@ -309,10 +289,10 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
     } catch (groqErr: any) {
       this.rethrowIfAborted(groqErr, signal);
       console.error("[Researcher Agent] Groq fallback failed:", groqErr);
-      onProgress?.(`[Researcher] Web search unavailable. Proceeding with general knowledge.`);
+      onProgress?.(`[Researcher] All engines unavailable. Proceeding with the grounded findings directly.`);
       return {
-        data: `Curriculum overview for ${topic}: Sequential units covering core theory, applied problem solving, and examination synthesis.`,
-        model: "Deterministic Knowledge Fallback",
+        data: groundedFindings,
+        model: "Grounded Search Findings",
       };
     }
   }

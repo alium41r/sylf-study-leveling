@@ -5,6 +5,7 @@ import BackToSettings from "../../components/BackToSettings";
 import { BG_MAP, applyGlobalBackground } from "../../components/GlobalSystemWrapper";
 import { useAuth } from "@/app/components/AuthProvider";
 import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -91,13 +92,12 @@ export default function BackgroundsSettingsPage() {
 
     if (!token) return;
     
-    fetch("/api/cosmetics", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(async (res) => {
-        if (!res.ok) return null;
-        return res.json().catch(() => null);
-      })
+    // Stale-while-revalidate: reopening backgrounds paints instantly.
+    fetchCachedJSON<{ cosmetics?: any[]; active?: { activeBackground?: string | null } }>(
+      "/api/cosmetics",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 30_000, staleMs: 120_000, storageKey: "cosmetics:owned" }
+    )
       .then((data) => {
         if (!data) return;
         setCosmetics(data.cosmetics || []);

@@ -38,7 +38,17 @@ export function getPrismaClient(): PrismaClient {
     connectionString,
     max: process.env.NODE_ENV === "production" ? 20 : 10,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000,
+    connectionTimeoutMillis: 5000,
+    // Fail slow queries fast instead of hanging serverless invocations on
+    // the pooler (Supabase transaction pooler / pgbouncer connection
+    // bottleneck from the 25k scaling video).
+    options: "-c statement_timeout=30000",
+  });
+
+  // An unhandled 'error' event on an idle pooled client would otherwise
+  // crash the Node process (classic pg + serverless issue). Log instead.
+  pool.on("error", (err) => {
+    console.error("[pg pool] idle client error:", err.message);
   });
 
   if (process.env.NODE_ENV !== "production") {

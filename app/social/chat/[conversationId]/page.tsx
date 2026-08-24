@@ -10,6 +10,8 @@ import { ChatInputBar } from "../../components/ChatInputBar";
 import { ChatDetailsDrawer } from "../../components/ChatDetailsDrawer";
 import { ChatEmptyState } from "../../components/ChatEmptyState";
 import { AlertCircle, X } from "lucide-react";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { usePostgresChanges } from "@/app/hooks/usePostgresChanges";
 
 export default function ModernChatPage({
   params,
@@ -65,6 +67,47 @@ export default function ModernChatPage({
     });
   };
 
+  // ─── Realtime push: new messages arrive via postgres_changes ──
+  // Instead of the 1s incremental poll. Falls back to polling when
+  // Realtime isn't configured or the subscription drops.
+  const conversationRef = useRef<ConversationDetail | null>(null);
+  conversationRef.current = conversation;
+
+  const mergeRef = useRef(mergeServerMessages);
+  mergeRef.current = mergeServerMessages;
+
+  const { connected: pushConnected } = usePostgresChanges(
+    [{ event: "INSERT", table: "Message", filter: `conversationId=eq.${conversationId}` }],
+    (payload) => {
+      const row = payload.new as any;
+      if (!row || typeof row.id !== "number") return;
+      const senderProfile = conversationRef.current?.participants?.find(
+        (p) => p.id === row.senderId
+      );
+      const msg: ChatMessage = {
+        id: row.id,
+        content: row.content,
+        createdAt: row.createdAt,
+        senderId: row.senderId,
+        sender: senderProfile
+          ? {
+              id: senderProfile.id,
+              name: senderProfile.name,
+              username: senderProfile.username,
+              hunterRank: senderProfile.hunterRank,
+              level: senderProfile.level,
+              avatarUrl: senderProfile.avatarUrl,
+              activeAvatar: senderProfile.activeAvatar,
+            }
+          : { id: row.senderId, name: null, username: "Unknown", hunterRank: "E" },
+        isOptimistic: false,
+      };
+      // mergeServerMessages dedupes by id, so a message that also arrives
+      // via the send-response or a poll is only rendered once.
+      mergeRef.current([msg]);
+    }
+  );
+
   // Prevent outer body rubber-banding / double scrolling on mobile devices while in chat
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -75,14 +118,21 @@ export default function ModernChatPage({
   }, []);
 
   // Full load: conversation detail + recent messages
-  const fetchChat = async (silent = false) => {
+  // (stale-while-revalidate cache → returning to a chat paints instantly)
+  const fetchChat = async (silent = false, refresh = false) => {
     if (!token) return;
     try {
-      const res = await fetch(`/api/conversations/${conversationId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const url = `/api/conversations/${conversationId}${refresh ? "?refresh=1" : ""}`;
+      const data = await fetchCachedJSON<{
+        conversation: ConversationDetail;
+        messages: ChatMessage[];
+        hasMore?: boolean;
+      }>(
+        url,
+        { headers: { Authorization: `Bearer ${token}` } },
+        { ttlMs: 3000, staleMs: 45000 }
+      );
+      if (data && data.conversation) {
         setConversation(data.conversation);
         // Ingest server messages (track max server id for polling)
         setMessages((prev) => {
@@ -121,17 +171,18 @@ export default function ModernChatPage({
 
   useEffect(() => {
     if (token) {
-      // Initial full load, instant 1s incremental poll for new messages,
-      // and a slower full refresh to keep presence (online dots) fresh.
+      // Initial full load, incremental poll for new messages, and a slower
+      // full refresh for presence dots. With Realtime push connected the
+      // polls become slow safety nets instead of the live path.
       fetchChat();
-      const lightInterval = setInterval(() => fetchNewMessages(), 1000);
-      const refreshInterval = setInterval(() => fetchChat(true), 30000);
+      const lightInterval = setInterval(() => fetchNewMessages(), pushConnected ? 15000 : 1000);
+      const refreshInterval = setInterval(() => fetchChat(true, true), pushConnected ? 60000 : 30000);
       return () => {
         clearInterval(lightInterval);
         clearInterval(refreshInterval);
       };
     }
-  }, [token, conversationId]);
+  }, [token, conversationId, pushConnected]);
 
   // Track if user is near bottom of scroll window (within 100px)
   const handleScroll = () => {
@@ -196,7 +247,11 @@ export default function ModernChatPage({
 
       const realMsg = await res.json();
       if (realMsg.id > lastServerIdRef.current) lastServerIdRef.current = realMsg.id;
-      setMessages((prev) => prev.map((m) => (m.id === tempId ? realMsg : m)));
+      // Replace the optimistic bubble with the real message. Merge instead of
+      // a direct swap so a Realtime push of the same row (arriving in either
+      // order) can never render the message twice.
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      mergeServerMessages([realMsg]);
     } catch (err: any) {
       console.error("Send message error:", err);
       // Rollback optimistic message

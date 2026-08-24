@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 interface ProviderConfig {
   id: string;
@@ -78,18 +79,20 @@ export default function ConnectedAccounts() {
   const fetchConnections = useCallback(async () => {
     try {
       const storedToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-      const res = await fetch("/api/user/connections", {
-        credentials: "include",
-        headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
-      });
-      if (res.ok) {
-        const data = await res.json();
+      // Stale-while-revalidate: reopening account paints instantly.
+      const data = await fetchCachedJSON<{ connections?: ConnectedAccountInfo[] }>(
+        "/api/user/connections",
+        {
+          credentials: "include",
+          headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
+        },
+        { ttlMs: 30_000, staleMs: 120_000 }
+      );
+      if (data?.connections) {
         const map: Record<string, ConnectedAccountInfo> = {};
-        if (data.connections) {
-          data.connections.forEach((c: ConnectedAccountInfo) => {
-            map[c.provider.toLowerCase()] = c;
-          });
-        }
+        data.connections.forEach((c: ConnectedAccountInfo) => {
+          map[c.provider.toLowerCase()] = c;
+        });
         setConnections(map);
       }
     } catch (err) {

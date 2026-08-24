@@ -76,7 +76,9 @@ export async function POST(
       );
     }
 
-    // 3. Daily rate limit for syllabus compilations (5/day per user).
+    // 3. Daily rate limit for syllabus compilations (1/day per user). Combined
+    //    with the one-compile-per-subject rule above, a user can compile at
+    //    most ONE subject per day, and never the same subject twice.
     const quota = await checkQuota(userId, "compile");
     if (!quota.allowed) {
       return NextResponse.json(

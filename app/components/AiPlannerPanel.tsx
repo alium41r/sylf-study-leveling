@@ -155,7 +155,7 @@ export default function AiPlannerPanel({
 
   const handleGenerate = async () => {
     if (isQuotaExhausted) {
-      setError("Daily generation limit reached. Free tier accounts receive 1 AI Study Plan per day.");
+      setError("Weekly generation limit reached. Free tier accounts receive 1 AI Study Plan per week.");
       return;
     }
 
@@ -330,12 +330,12 @@ export default function AiPlannerPanel({
 
         <div className="space-y-2 max-w-md">
           <h3 className="text-xl font-bold font-['Rajdhani'] text-text-primary tracking-wide">
-            Daily Planner Quota Reached
+            Weekly Planner Quota Reached
           </h3>
           <p className="text-xs text-text-secondary font-['Rajdhani'] leading-relaxed">
             You have already used your{" "}
             <span className="text-amber-400 font-bold">1 free AI Study Plan</span> for today. Free
-            tier accounts receive 1 comprehensive multi-week syllabus generation per day.
+            tier accounts receive 1 comprehensive multi-week syllabus generation per week.
           </p>
         </div>
 

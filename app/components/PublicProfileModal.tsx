@@ -8,6 +8,7 @@ import { useProfileModal } from "./ProfileModalContext";
 import { getClassInfo, COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 import { CharacterRenderer } from "./character/CharacterRenderer";
 import { ConfirmationModal } from "./ConfirmationModal";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 import {
   Edit3,
   MessageSquare,
@@ -159,19 +160,27 @@ export function PublicProfileModal() {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const res = await fetch(`/api/profile/${username}`, { headers });
-        if (!res.ok) {
-          if (res.status === 404) {
-            setError("Scholar not found in the system registry.");
-          } else {
-            setError("Failed to load scholar dossier.");
-          }
+        // Stale-while-revalidate: re-opening a recently viewed profile paints
+        // the cached dossier instantly and refreshes in the background.
+        const data = await fetchCachedJSON<{
+          profile: any;
+          isSelf?: boolean;
+          relationship: string;
+          permissions: any;
+          privacySettings?: any;
+        }>(
+          `/api/profile/${username}`,
+          { headers },
+          { ttlMs: 15_000, staleMs: 300_000, storageKey: `profile:${username.toLowerCase()}:${currentUser?.id ?? "guest"}` }
+        );
+
+        if (!data || !data.profile) {
+          setError("Scholar not found in the system registry.");
           return;
         }
 
-        const data = await res.json();
         setDossier(data.profile);
-        setIsSelf(data.isSelf);
+        setIsSelf(Boolean(data.isSelf));
         setRelationship(data.relationship);
         setPermissions(data.permissions);
       } catch (err) {
@@ -182,7 +191,7 @@ export function PublicProfileModal() {
     };
 
     fetchProfile();
-  }, [isOpen, username, token]);
+  }, [isOpen, username, token, currentUser?.id]);
 
   // ─── Keyboard Shortcut to Close (ESC) ──────────────────────
   useEffect(() => {

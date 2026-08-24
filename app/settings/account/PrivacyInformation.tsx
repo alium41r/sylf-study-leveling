@@ -5,6 +5,7 @@ import { useAuth } from "../../components/AuthProvider";
 import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
 import { PrivacyLevel } from "@/lib/privacy-types";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 export default function PrivacyInformation() {
   const { token, isLoading } = useAuth();
@@ -29,11 +30,13 @@ export default function PrivacyInformation() {
     async function fetchPrivacy() {
       if (!token) return;
       try {
-        const res = await fetch("/api/user/privacy", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
+        // Stale-while-revalidate: reopening account paints instantly.
+        const data = await fetchCachedJSON<{ id?: number; userId?: number; [key: string]: any }>(
+          "/api/user/privacy",
+          { headers: { Authorization: `Bearer ${token}` } },
+          { ttlMs: 30_000, staleMs: 120_000 }
+        );
+        if (data) {
           // Strip out id and userId
           const { id, userId, ...settings } = data;
           setPrivacyState(settings);

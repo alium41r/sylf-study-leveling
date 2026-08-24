@@ -7,6 +7,7 @@ import SessionSidebar, { SystemChatSession } from "./components/SessionSidebar";
 import ConversationPanel from "./components/ConversationPanel";
 import PlannerTab from "./components/PlannerTab";
 import { QuotaInfo } from "../components/AiPlannerPanel";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 type WorkspaceTab = "conversation" | "planner";
 
@@ -28,7 +29,12 @@ export default function SystemPage() {
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
 
   const [tab, setTab] = useState<WorkspaceTab>("conversation");
+  // Desktop defaults the history rail open; on mobile it must start CLOSED so
+  // the overlay drawer doesn't cover the workspace on load.
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  useEffect(() => {
+    if (window.innerWidth < 768) setIsSidebarOpen(false);
+  }, []);
 
   // Daily quota tracking (server-backed)
   const [chatQuota, setChatQuota] = useState<QuotaInfo | null>(null);
@@ -106,13 +112,15 @@ export default function SystemPage() {
   const fetchQuotas = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch("/api/ai-usage", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setChatQuota(data.chat);
-        setPlannerQuota(data.planner);
+      // Stale-while-revalidate: reopening the workspace paints instantly.
+      const data = await fetchCachedJSON<{ chat?: QuotaInfo; planner?: QuotaInfo }>(
+        "/api/ai-usage",
+        { headers: { Authorization: `Bearer ${token}` } },
+        { ttlMs: 30_000, staleMs: 120_000 }
+      );
+      if (data) {
+        if (data.chat) setChatQuota(data.chat);
+        if (data.planner) setPlannerQuota(data.planner);
       }
     } catch (e) {
       console.error("Failed to fetch quotas:", e);
@@ -127,17 +135,21 @@ export default function SystemPage() {
   const fetchSessions = useCallback(async () => {
     if (!token) return;
     try {
-      const res = await fetch(`/api/chats?_t=${Date.now()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSessions(data.sessions || []);
+      // Stale-while-revalidate: reopening the workspace shows the last
+      // session list instantly and refreshes in the background.
+      const data = await fetchCachedJSON<{ sessions?: SystemChatSession[] }>(
+        "/api/chats",
+        { headers: { Authorization: `Bearer ${token}` } },
+        { ttlMs: 10_000, staleMs: 120_000, storageKey: `chats:${token.slice(-12)}` }
+      );
+      if (data) {
+        const sessions = data.sessions || [];
+        setSessions(sessions);
         setActiveSessionId((prev) => {
           // Never override an explicit user choice (deep link / new chat).
           if (!autoSelectRef.current) return prev;
-          if (prev !== null && data.sessions?.some((s: SystemChatSession) => s.id === prev)) return prev;
-          return data.sessions?.length > 0 ? data.sessions[0].id : prev;
+          if (prev !== null && sessions.some((s: SystemChatSession) => s.id === prev)) return prev;
+          return sessions.length > 0 ? sessions[0].id : prev;
         });
       }
     } catch (e) {
@@ -262,6 +274,20 @@ export default function SystemPage() {
                 System Workspace
               </h1>
             </div>
+
+            {/* ── Mobile-only History trigger — the session rail is hidden
+                   below md; this opens it as an overlay drawer. ── */}
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-lg bg-bg-panel border border-border-subtle text-accent-text-light hover:border-accent-primary-mid transition-colors"
+              title="Chat history"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+              <span>History</span>
+            </button>
           </div>
 
           {/* ── Workspace Tabs ── */}
@@ -285,7 +311,7 @@ export default function SystemPage() {
                         ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
                         : "bg-bg-abyss border-border-subtle text-text-muted"
                     }`}
-                    title="Free daily plan"
+                    title="Free weekly plan"
                   >
                     {plannerQuota.remaining === 0 ? (
                       <>

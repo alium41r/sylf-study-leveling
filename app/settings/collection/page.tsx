@@ -5,6 +5,7 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { SHOP_ITEMS } from "@/lib/shop-items";
 import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 import BackToSettings from "@/app/components/BackToSettings";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 export default function SettingsInventoryPage() {
   const { user, token } = useAuth();
@@ -17,36 +18,38 @@ export default function SettingsInventoryPage() {
   useEffect(() => {
     if (!token) return;
 
-    // Fetch Stats
-    fetch("/api/currency/stats", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
-      .then(data => setStats(data))
+    const headers = { Authorization: `Bearer ${token}` };
+    const cacheKey = `collection:${user?.id ?? 0}`;
+
+    // All three reads are cached (stale-while-revalidate) so reopening the
+    // collection paints instantly and refreshes in the background.
+    fetchCachedJSON<{ totalEarned: number; totalSpent: number; totalHpLost: number }>(
+      "/api/currency/stats",
+      { headers },
+      { ttlMs: 20_000, staleMs: 120_000, storageKey: `${cacheKey}:stats` }
+    )
+      .then(data => { if (data) setStats(data); })
       .catch(console.error);
 
-    // Fetch Inventory Items
-    fetch("/api/inventory", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
-      .then(data => setInventoryItems(data.inventoryItems || []))
+    fetchCachedJSON<{ inventoryItems?: { itemKey: string; quantity: number }[] }>(
+      "/api/inventory",
+      { headers },
+      { ttlMs: 30_000, staleMs: 120_000, storageKey: `${cacheKey}:items` }
+    )
+      .then(data => { if (data) setInventoryItems(data.inventoryItems || []); })
       .catch(console.error);
-      
-    // Fetch Cosmetics
-    fetch("/api/cosmetics", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(async (res) => {
-        if (!res.ok) return null;
-        return res.json().catch(() => null);
-      })
+
+    fetchCachedJSON<{ cosmetics?: any[] }>(
+      "/api/cosmetics",
+      { headers },
+      { ttlMs: 30_000, staleMs: 120_000, storageKey: `${cacheKey}:cosmetics` }
+    )
       .then((data) => {
         if (data?.cosmetics) setCosmetics(data.cosmetics);
       })
       .catch(console.error);
 
-  }, [token]);
+  }, [token, user?.id]);
 
   if (!user) return <div className="text-text-muted">Loading collection...</div>;
 

@@ -12,14 +12,16 @@ export const AI_QUOTAS = {
     window: "day" as const,
   },
   planner: {
-    /** Maximum AI planner generations per user per day */
+    /** Maximum AI planner generations per user per WEEK */
     limit: 1,
-    /** Window type for the quota */
-    window: "day" as const,
+    /** Window type for the quota (Monday-based local week) */
+    window: "week" as const,
   },
   compile: {
-    /** Maximum syllabus compilations / recompiles per user per day */
-    limit: 5,
+    /** Maximum syllabus compilations per user per DAY — combined with the
+     *  one-compile-per-subject-forever rule, a user with N subjects can
+     *  compile at most one subject each day (each subject only ever once). */
+    limit: 1,
     /** Window type for the quota */
     window: "day" as const,
   },

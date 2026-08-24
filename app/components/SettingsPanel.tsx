@@ -165,11 +165,25 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
 
 /* ─── Component ────────────────────────────────────────────── */
 
+// All navigable tile routes (excludes the logout action tile).
+const PREFETCHABLE_TILE_KEYS = SETTINGS_CATEGORIES.flatMap((c) =>
+  c.tiles.map((t) => t.key).filter((key) => key !== "logout")
+);
+
 export default function SettingsPanel() {
   const { isOpen, openSettings, closeSettings, originRoute } = useSettings();
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuth();
+
+  // Warm the router cache for every settings page the moment the hub opens,
+  // so tapping a tile navigates instantly instead of waiting on the RSC fetch.
+  useEffect(() => {
+    if (!isOpen) return;
+    for (const key of PREFETCHABLE_TILE_KEYS) {
+      router.prefetch(`/settings/${key}`);
+    }
+  }, [isOpen, router]);
 
   // Lock page scroll while the panel is open so only the panel scrolls —
   // the page behind (and its scroller) must not move. Uses a ref-counted
@@ -281,6 +295,16 @@ export default function SettingsPanel() {
                         key={tile.key}
                         className={`settings-tile ${tile.danger ? "settings-tile-danger" : ""} ${tile.colSpan === 2 ? "settings-tile-wide" : ""}`}
                         onClick={() => handleTileClick(tile)}
+                        onMouseEnter={
+                          tile.action !== "logout"
+                            ? () => router.prefetch(`/settings/${tile.key}`)
+                            : undefined
+                        }
+                        onTouchStart={
+                          tile.action !== "logout"
+                            ? () => router.prefetch(`/settings/${tile.key}`)
+                            : undefined
+                        }
                         style={{
                           gridColumn: tile.colSpan ? `span ${tile.colSpan}` : undefined,
                         }}

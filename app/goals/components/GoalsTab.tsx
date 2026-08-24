@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
 import {
   GOAL_COLOR_TOKENS,
   GOAL_COLOR_PALETTE,
@@ -87,10 +88,12 @@ export function GoalsTab() {
 
   const fetchGoals = () => {
     if (!token) return;
-    fetch("/api/goals", { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (r) => (r.ok ? r.json().catch(() => []) : []))
+    // Stale-while-revalidate: repeat visits to /goals paint instantly.
+    fetchCachedJSON<any[]>("/api/goals",
+      { headers: { Authorization: `Bearer ${token}` } },
+      { ttlMs: 15_000, staleMs: 120_000 })
       .then((data) => {
-        setGoals(Array.isArray(data) ? data : []);
+        if (data) setGoals(Array.isArray(data) ? data : []);
         setIsLoading(false);
       })
       .catch(console.error);

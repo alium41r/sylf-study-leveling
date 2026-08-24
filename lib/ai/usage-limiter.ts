@@ -33,8 +33,21 @@ export interface QuotaConsumeResult extends QuotaCheckResult {
   charged: boolean;
 }
 
-async function getQuotaContext(userId: number): Promise<{ dateKey: string; resetsAt: string }> {
+async function getQuotaContext(
+  userId: number,
+  feature: QuotaFeature
+): Promise<{ dateKey: string; resetsAt: string }> {
+  const config = AI_QUOTAS[feature];
   const tz = await getUserTimezone(userId);
+
+  // Weekly quotas (AI planner) bucket by the user's local Monday-based week
+  // instead of the local calendar day. The key is stored in the same
+  // `dateKey` column — it is opaque to the DB.
+  if (config.window === "week") {
+    const { weekKey, resetsAt } = TimezoneService.getUserLocalWeekKey(tz);
+    return { dateKey: weekKey, resetsAt: resetsAt.toISOString() };
+  }
+
   const dateKey = TimezoneService.getUserLocalDate(tz);
   const resetsAt = TimezoneService.getNextMidnightUTC(tz).toISOString();
   return { dateKey, resetsAt };
@@ -55,7 +68,7 @@ function toResult(used: number, limit: number, resetsAt: string): QuotaCheckResu
  */
 export async function checkQuota(userId: number, feature: QuotaFeature): Promise<QuotaCheckResult> {
   const config = AI_QUOTAS[feature];
-  const { dateKey, resetsAt } = await getQuotaContext(userId);
+  const { dateKey, resetsAt } = await getQuotaContext(userId, feature);
 
   const row = await prisma.userQuota.findUnique({
     where: { userId_feature_dateKey: { userId, feature, dateKey } },
@@ -75,7 +88,7 @@ export async function checkQuota(userId: number, feature: QuotaFeature): Promise
  */
 export async function consumeQuota(userId: number, feature: QuotaFeature): Promise<QuotaConsumeResult> {
   const config = AI_QUOTAS[feature];
-  const { dateKey, resetsAt } = await getQuotaContext(userId);
+  const { dateKey, resetsAt } = await getQuotaContext(userId, feature);
 
   const rows = await prisma.$queryRawUnsafe<Array<{ used: number }>>(
     `INSERT INTO "UserQuota" ("userId", "feature", "dateKey", "used", "createdAt", "updatedAt")

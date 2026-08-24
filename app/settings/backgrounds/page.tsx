@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import BackToSettings from "../../components/BackToSettings";
-import { BG_MAP } from "../../components/GlobalSystemWrapper";
+import { BG_MAP, applyGlobalBackground } from "../../components/GlobalSystemWrapper";
 import { useAuth } from "@/app/components/AuthProvider";
 import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 
@@ -142,12 +142,9 @@ export default function BackgroundsSettingsPage() {
           mutateUser(data.user);
         }
 
-        // Apply globally
-        const bgData = BG_MAP[bg.id];
-        if (bgData) {
-          document.body.style.background = mode === "light" ? bgData.lightValue : bgData.value;
-          document.body.style.backgroundSize = bgData.size || "cover";
-          document.body.style.backgroundAttachment = "fixed";
+        // Apply globally (painted on the viewport-fixed background layer)
+        if (BG_MAP[bg.id]) {
+          applyGlobalBackground(bg.id, mode);
         }
         window.dispatchEvent(new Event("background-updated"));
 

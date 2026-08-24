@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import BackToSettings from "../../components/BackToSettings";
-import { THEME_MAP, BG_MAP } from "../../components/GlobalSystemWrapper";
+import { THEME_MAP, applyGlobalBackground } from "../../components/GlobalSystemWrapper";
 import { useAuth } from "../../components/AuthProvider";
 import { COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 
@@ -171,16 +171,8 @@ export default function ThemesSettingsPage() {
     localStorage.setItem("app_mode", newMode);
     document.documentElement.setAttribute("data-mode", newMode);
 
-    const savedBg = localStorage.getItem("app_background");
-    if (savedBg && BG_MAP[savedBg]) {
-      document.body.style.background = newMode === "light" ? BG_MAP[savedBg].lightValue : BG_MAP[savedBg].value;
-      document.body.style.backgroundSize = BG_MAP[savedBg].size || "cover";
-      document.body.style.backgroundAttachment = "fixed";
-    } else {
-      document.body.style.background = newMode === "light" ? BG_MAP["void"].lightValue : BG_MAP["void"].value;
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundAttachment = "fixed";
-    }
+    // Apply globally (painted on the viewport-fixed background layer)
+    applyGlobalBackground(localStorage.getItem("app_background"), newMode);
     window.dispatchEvent(new Event("background-updated"));
   };
 

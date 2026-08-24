@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
+import { lockPageScroll } from "../../lib/scroll-lock";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ─── Settings Data ────────────────────────────────────────────── */
@@ -169,6 +171,15 @@ export default function SettingsPanel() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
+  // Lock page scroll while the panel is open so only the panel scrolls —
+  // the page behind (and its scroller) must not move. Uses a ref-counted
+  // lock so overlapping overlays (e.g. the mobile drawer) can't unlock the
+  // page prematurely; the panel itself is the only scroll container.
+  useEffect(() => {
+    if (!isOpen) return;
+    return lockPageScroll();
+  }, [isOpen]);
+
   // Don't render on public pages or when user is not logged in
   const PUBLIC_PATHS = ["/", "/login", "/register", "/focus"];
   if (!user || PUBLIC_PATHS.includes(pathname)) return null;
@@ -199,7 +210,7 @@ export default function SettingsPanel() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="fixed inset-0 z-60 bg-bg-overlay backdrop-blur-xl overflow-y-auto"
+          className="fixed inset-0 z-60 bg-bg-overlay backdrop-blur-xl overflow-y-auto overscroll-contain"
         >
           {/* Close button */}
           <button

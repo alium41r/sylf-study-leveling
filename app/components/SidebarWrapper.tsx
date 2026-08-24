@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { PanelLeft } from "lucide-react";
 import Sidebar from "./Sidebar";
 import { useAuth } from "./AuthProvider";
+import { useSettings } from "./SettingsContext";
+import { lockPageScroll } from "../../lib/scroll-lock";
 
 const PUBLIC_PATHS = ["/", "/login", "/register", "/focus", "/onboarding"];
 
@@ -30,14 +32,20 @@ export default function SidebarWrapper() {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Lock body scroll while the drawer is open.
+  // Close the mobile drawer when the settings panel opens on top of it
+  // (opening settings does not navigate, so the pathname effect misses it).
+  const { isOpen: isSettingsOpen } = useSettings();
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = "";
-      };
-    }
+    if (isSettingsOpen) setIsMobileMenuOpen(false);
+  }, [isSettingsOpen]);
+
+  // Lock page scroll while the drawer is open so only the drawer scrolls.
+  // Both <html> and <body> must be locked — with body-only overflow:hidden
+  // the document scroller stays live and the page behind the drawer can
+  // still be scrolled. Ref-counted so it never fights the settings panel.
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    return lockPageScroll();
   }, [isMobileMenuOpen]);
 
   if (isPublicPage) return null;

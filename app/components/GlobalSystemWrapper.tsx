@@ -137,11 +137,21 @@ export function applyGlobalBackground(bgId?: string | null, mode?: string | null
   const currentMode = mode || document.documentElement.getAttribute("data-mode") || localStorage.getItem("app_mode") || "dark";
   const currentBg = bgId || localStorage.getItem("app_background") || "void";
   const bgData = BG_MAP[currentBg] || BG_MAP["void"];
-  if (bgData) {
-    document.body.style.background = currentMode === "light" ? bgData.lightValue : bgData.value;
-    document.body.style.backgroundSize = bgData.size || "cover";
-    document.body.style.backgroundAttachment = "fixed";
-  }
+  if (!bgData) return;
+
+  // Paint onto the dedicated viewport-fixed layer (#app-bg-layer) instead of
+  // <body>. `background-attachment: fixed` is unreliable on mobile browsers:
+  // iOS Safari ignores it and Android Chrome paints the background for the
+  // initially-visible region only, so the wallpaper visibly "cuts off" once
+  // the page scrolls. A real position:fixed layer renders identically on
+  // every browser, and pointer-events:none keeps it from ever intercepting
+  // taps (including the floating AI trigger).
+  const layer = document.getElementById("app-bg-layer") as HTMLElement | null;
+  const target = layer?.style ?? document.body.style;
+  target.background = currentMode === "light" ? bgData.lightValue : bgData.value;
+  target.backgroundSize = bgData.size || "cover";
+  // Note: no `background-attachment` here — the layer element is itself
+  // position: fixed, so the background is viewport-anchored everywhere.
 }
 
 export function applyGlobalTheme(themeId?: string | null) {
@@ -204,21 +214,35 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
   }, [user?.activeBackground, user?.activeTheme]);
 
   return (
-    <AcousticsProvider>
-      <SettingsProvider>
-        <ProfileModalProvider>
-          <SystemAIProvider>
-            {children}
-          </SystemAIProvider>
-          <PublicProfileModal />
-          <AcousticsDynamicIsland />
-          <SessionInviteToast />
-          <SessionEndToast />
-          <TopRightBar />
-          <SettingsPanel />
-        </ProfileModalProvider>
-      </SettingsProvider>
-    </AcousticsProvider>
+    <>
+      {/* Global background wallpaper — a viewport-fixed layer that never
+          intercepts pointer events (see applyGlobalBackground above). */}
+      <div
+        id="app-bg-layer"
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: -10,
+          pointerEvents: "none",
+        }}
+      />
+      <AcousticsProvider>
+        <SettingsProvider>
+          <ProfileModalProvider>
+            <SystemAIProvider>
+              {children}
+            </SystemAIProvider>
+            <PublicProfileModal />
+            <AcousticsDynamicIsland />
+            <SessionInviteToast />
+            <SessionEndToast />
+            <TopRightBar />
+            <SettingsPanel />
+          </ProfileModalProvider>
+        </SettingsProvider>
+      </AcousticsProvider>
+    </>
   );
 }
 

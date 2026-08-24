@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../components/AuthProvider";
 import { COSMETICS_CATALOG, CosmeticItem } from "@/lib/cosmetics-catalog";
-import { THEME_MAP, BG_MAP } from "../components/GlobalSystemWrapper";
+import { THEME_MAP, BG_MAP, applyGlobalBackground } from "../components/GlobalSystemWrapper";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { Moon, Sun, Sparkles, Check, BookOpen, Plus, X } from "lucide-react";
 
@@ -137,15 +137,8 @@ export default function OnboardingFlow() {
     localStorage.setItem("app_mode", newMode);
     document.documentElement.setAttribute("data-mode", newMode);
 
-    if (selectedBackground && BG_MAP[selectedBackground]) {
-      document.body.style.background = newMode === "light" ? BG_MAP[selectedBackground].lightValue : BG_MAP[selectedBackground].value;
-      document.body.style.backgroundSize = BG_MAP[selectedBackground].size || "cover";
-      document.body.style.backgroundAttachment = "fixed";
-    } else {
-      document.body.style.background = newMode === "light" ? BG_MAP["void"].lightValue : BG_MAP["void"].value;
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundAttachment = "fixed";
-    }
+    // Paint on the viewport-fixed background layer (mobile-safe)
+    applyGlobalBackground(selectedBackground, newMode);
   };
 
   // Determine if user registered via Google (no credentials password set)
@@ -194,9 +187,8 @@ export default function OnboardingFlow() {
     }
     
     if (selectedBackground && BG_MAP[selectedBackground]) {
-      document.body.style.background = selectedMode === "light" ? BG_MAP[selectedBackground].lightValue : BG_MAP[selectedBackground].value;
-      document.body.style.backgroundSize = BG_MAP[selectedBackground].size || "cover";
-      document.body.style.backgroundAttachment = "fixed";
+      // Paint on the viewport-fixed background layer (mobile-safe)
+      applyGlobalBackground(selectedBackground, selectedMode);
     }
   }, [selectedTheme, selectedBackground, selectedMode]);
 

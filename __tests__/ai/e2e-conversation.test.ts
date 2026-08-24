@@ -147,7 +147,8 @@ describe("Phase 4D: E2E Conversational Intelligence", () => {
     expect(toolResponseMsg.toolResults[0].name).toBe("getAppState");
     // Check that we got the final natural language response
     const json = await res.json();
-    expect(json.aiMessage.content).toBe("Your HP is full and you are doing great!");
+    // Content is prefixed with a hidden `<!-- model: X -->` marker.
+    expect(json.aiMessage.content).toContain("Your HP is full and you are doing great!");
   });
 
   it("2 & 3. Explicit vs Conversational Routing & Tool Isolation", async () => {
@@ -205,7 +206,7 @@ describe("Phase 4D: E2E Conversational Intelligence", () => {
     // No DB mutation should have occurred
     expect(prisma.aiInsight.create).not.toHaveBeenCalled();
     // Final text should correctly reflect the backend's rejection
-    expect(json.aiMessage.content).toBe("I couldn't save the insight because you recently saved one.");
+    expect(json.aiMessage.content).toContain("I couldn't save the insight because you recently saved one.");
   });
 
   it("6. Prompt boundary explicitly prevents invented trends and mutations", async () => {
@@ -398,7 +399,7 @@ describe("Phase 4D: E2E Conversational Intelligence", () => {
     const res = await POST(req);
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.aiMessage.content).toBe("Hello from Groq fallback!");
+    expect(data.aiMessage.content).toContain("Hello from Groq fallback!");
     expect(data.modelUsed).toBe("GROQ");
   });
 });

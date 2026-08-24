@@ -147,6 +147,30 @@ describe("Background AI Syllabus Compiler Service & Node Ingestion (Phase 4)", (
       expect(data.error).toBe("Subject not found");
     });
 
+    it("blocks recompiling a subject that has already been compiled (one-time per subject)", async () => {
+      const token = await signToken({ userId: 101, username: "scholar_test" });
+      (prisma.subject.findFirst as any).mockResolvedValue({
+        id: 42,
+        userId: 101,
+        name: "Mathematics",
+        code: "9709",
+        examBoard: "CAIE",
+        level: "A-Level",
+        lastCompiledAt: new Date("2026-08-01T00:00:00.000Z"),
+        user: { username: "scholar_test" },
+      });
+
+      const req = new NextRequest("http://localhost:3000/api/subjects/42/compile", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const res = await POST(req, { params: Promise.resolve({ id: "42" }) });
+      expect(res.status).toBe(409);
+      const data = await res.json();
+      expect(data.error).toBe("SUBJECT_ALREADY_COMPILED");
+    });
+
     it("transactionally updates all 48 nodes while preserving progress and isMastered state", async () => {
       const token = await signToken({ userId: 101, username: "scholar_test" });
       const updateManyMock = (prisma as any)._updateManyMock;

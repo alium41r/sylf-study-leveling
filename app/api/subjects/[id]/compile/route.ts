@@ -62,23 +62,18 @@ export async function POST(
       return NextResponse.json({ error: "Subject not found" }, { status: 404 });
     }
 
-    // 2. 30-day recompilation cooldown (prevents unlimited recompiles
-    //    burning deepseek-v4-pro tokens).
-    const COMPILE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+    // 2. ONE-COMPILE-PER-SUBJECT (forever): once a subject's syllabus has
+    //    been compiled, it can never be compiled again. This protects
+    //    DeepSeek tokens — the compile is a single, one-time AI generation.
     if (subject.lastCompiledAt) {
-      const lastCompiled = new Date(subject.lastCompiledAt).getTime();
-      const nextAvailableAt = new Date(lastCompiled + COMPILE_COOLDOWN_MS);
-      if (Date.now() < nextAvailableAt.getTime()) {
-        return NextResponse.json(
-          {
-            error: "COMPILE_COOLDOWN_ACTIVE",
-            message: `This subject's syllabus was compiled recently and can be recompiled on ${nextAvailableAt.toISOString()}.`,
-            lastCompiledAt: subject.lastCompiledAt,
-            nextAvailableAt: nextAvailableAt.toISOString(),
-          },
-          { status: 429 }
-        );
-      }
+      return NextResponse.json(
+        {
+          error: "SUBJECT_ALREADY_COMPILED",
+          message: "This subject's syllabus has already been compiled and cannot be compiled again.",
+          lastCompiledAt: subject.lastCompiledAt,
+        },
+        { status: 409 }
+      );
     }
 
     // 3. Daily rate limit for syllabus compilations (5/day per user).

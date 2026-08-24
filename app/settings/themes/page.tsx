@@ -181,6 +181,7 @@ export default function ThemesSettingsPage() {
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundAttachment = "fixed";
     }
+    window.dispatchEvent(new Event("background-updated"));
   };
 
   const handleApplyTheme = async (theme: ThemeOption) => {
@@ -212,6 +213,7 @@ export default function ThemesSettingsPage() {
             document.documentElement.style.setProperty(prop, val);
           }
         }
+        window.dispatchEvent(new Event("theme-updated"));
 
         setShowApplied(true);
         setTimeout(() => setShowApplied(false), 2000);

@@ -116,20 +116,27 @@ describe("Notification Preferences & Alert Configuration System", () => {
       expect(isNotificationAllowed("FRIEND_REQUEST", "Hunter Jin-Woo sent you a friend request", off)).toBe(false);
     });
 
-    it("9. Private Direct Messages", () => {
+    it("9. Private Direct Messages — chat messages NEVER notify (hard block)", () => {
       const on = { ...basePrefs, directMessages: true };
       const off = { ...basePrefs, directMessages: false };
-      expect(isNotificationAllowed("DIRECT_MESSAGE", "New direct message from Elena", on)).toBe(true);
+      // Text-message echoes are permanently excluded from the inbox,
+      // regardless of the (legacy) toggle state.
+      expect(isNotificationAllowed("DIRECT_MESSAGE", "New direct message from Elena", on)).toBe(false);
       expect(isNotificationAllowed("DIRECT_MESSAGE", "New direct message from Elena", off)).toBe(false);
+      expect(isNotificationAllowed("INFO", "[DIRECT_MESSAGE] testing (@testing): Hello", on)).toBe(false);
+      expect(isNotificationAllowed("INFO", "[DIRECT_MESSAGE] testing (@testing): Hello", off)).toBe(false);
     });
 
-    it("10. Group Chat Activity & Mentions", () => {
+    it("10. Group Chat Activity & Mentions — chat echoes never notify (hard block)", () => {
       const on = { ...basePrefs, groupActivity: true };
       const off = { ...basePrefs, groupActivity: false };
-      expect(isNotificationAllowed("GROUP_CHAT", "New activity in STEM Study Guild", on)).toBe(true);
-      expect(isNotificationAllowed("MENTION", "Elena mentioned you in Group Chat", on)).toBe(true);
+      expect(isNotificationAllowed("GROUP_CHAT", "New activity in STEM Study Guild", on)).toBe(false);
+      expect(isNotificationAllowed("MENTION", "Elena mentioned you in Group Chat", on)).toBe(false);
       expect(isNotificationAllowed("GROUP_CHAT", "New activity in STEM Study Guild", off)).toBe(false);
       expect(isNotificationAllowed("MENTION", "Elena mentioned you in Group Chat", off)).toBe(false);
+      // Important group events (added to a group) still honor the toggle
+      expect(isNotificationAllowed("INFO", "[GROUP_ADDED] you were added to the group", on)).toBe(true);
+      expect(isNotificationAllowed("INFO", "[GROUP_ADDED] you were added to the group", off)).toBe(false);
     });
   });
 
@@ -304,13 +311,13 @@ describe("Notification Preferences & Alert Configuration System", () => {
       expect(types).toContain("QUEST");
     });
 
-    it("filters out friend requests and direct messages when their social toggles are disabled", async () => {
+    it("filters out friend requests and chat messages (chat is hard-blocked even when enabled)", async () => {
       vi.spyOn(prisma, "$queryRaw").mockResolvedValueOnce([
         {
           notificationPreferences: {
             masterEnabled: true,
             incomingFriendRequests: false,
-            directMessages: false,
+            directMessages: true, // even ON — chat echoes never show
             groupActivity: true,
           },
         },
@@ -320,6 +327,7 @@ describe("Notification Preferences & Alert Configuration System", () => {
         { id: 10, type: "INFO", content: "[FRIEND_REQUEST] @alice sent you a friend request.", read: false, createdAt: new Date() },
         { id: 11, type: "INFO", content: "[DIRECT_MESSAGE] @bob: Hey, let's study!", read: false, createdAt: new Date() },
         { id: 12, type: "INFO", content: "[GROUP_CHAT] @guild: Study session starting now!", read: false, createdAt: new Date() },
+        { id: 13, type: "INFO", content: "[GROUP_ADDED] @alice added you to the group \"Guild\".", read: false, createdAt: new Date() },
       ];
 
       vi.spyOn(prisma.systemMessage, "findMany").mockResolvedValueOnce(socialNotifications as any);
@@ -332,8 +340,12 @@ describe("Notification Preferences & Alert Configuration System", () => {
       expect(res.status).toBe(200);
       const data = await res.json();
 
+      // Friend request filtered by toggle; BOTH chat echoes hard-blocked;
+      // the important group-added event survives (groupActivity = true).
       expect(data).toHaveLength(1);
-      expect(data[0].content).toContain("[GROUP_CHAT]");
+      expect(data[0].content).toContain("[GROUP_ADDED]");
+      expect(data[0].content).not.toContain("[DIRECT_MESSAGE]");
+      expect(data[0].content).not.toContain("[GROUP_CHAT]");
     });
   });
 });

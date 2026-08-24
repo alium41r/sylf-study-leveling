@@ -202,6 +202,28 @@ export async function PATCH(
           create: { userId: memberId, conversationId },
           update: {},
         });
+
+        // ─── Important-event notification: "added to a group" ───
+        // Only when the acting user is someone else (not adding yourself),
+        // and scoped to event notifications (sessionId NULL).
+        if (memberId !== userId) {
+          try {
+            const adder = await prisma.user.findUnique({
+              where: { id: userId },
+              select: { name: true, username: true },
+            });
+            const adderLabel = adder?.name
+              ? `${adder.name} (@${adder.username})`
+              : `@${adder?.username || "Someone"}`;
+            await prisma.systemMessage.create({
+              data: {
+                userId: memberId,
+                type: "INFO",
+                content: `[GROUP_ADDED] **${adderLabel}** added you to the group **"${conversation.name || "Study Group"}"**.`,
+              },
+            });
+          } catch {}
+        }
       }
     }
 

@@ -8,6 +8,7 @@ import MarkdownRenderer from "../components/MarkdownRenderer";
 import { motion, AnimatePresence } from "framer-motion";
 import { CharacterRenderer } from "../components/character/CharacterRenderer";
 import { getDefaultCharacterConfig } from "@/lib/character-traits";
+import { calculateWeeklyQuestReward } from "@/lib/game-engine";
 
 interface Quest {
   id: number;
@@ -34,7 +35,15 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user, token, isLoading } = useAuth();
   const [quests, setQuests] = useState<Quest[]>([]);
-  const [weeklyQuest, setWeeklyQuest] = useState<any>(null);
+  const [weeklyQuest, setWeeklyQuest] = useState<any>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("sylf_cached_weekly_quest");
+        if (cached) return JSON.parse(cached);
+      } catch {}
+    }
+    return null;
+  });
   const [friends, setFriends] = useState<Friend[]>([]);
   const [briefings, setBriefings] = useState<any[]>([]);
   const [insights, setInsights] = useState<any[]>([]);
@@ -57,18 +66,47 @@ export default function DashboardPage() {
 
     const safeJson = (r: Response) => (r.ok ? r.json().catch(() => null) : null);
 
-    Promise.all([
-      fetch("/api/quests", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
-      fetch("/api/quests/weekly", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
-      fetch("/api/friends", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
-      fetch("/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson),
-      fetch("/api/insights", { headers: { Authorization: `Bearer ${token}` } }).then(safeJson)
-    ])
-      .then(([questsData, weeklyData, friendsData, briefingsData, insightsData]) => {
+    // 1. Fetch weekly focus quest independently (fast delta)
+    fetch("/api/quests/weekly", { headers: { Authorization: `Bearer ${token}` } })
+      .then(safeJson)
+      .then((weeklyData) => {
+        if (weeklyData && !weeklyData.error) {
+          setWeeklyQuest(weeklyData);
+          try {
+            localStorage.setItem("sylf_cached_weekly_quest", JSON.stringify(weeklyData));
+          } catch {}
+        }
+      })
+      .catch(console.error);
+
+    // 2. Fetch today's assigned quests
+    fetch("/api/quests", { headers: { Authorization: `Bearer ${token}` } })
+      .then(safeJson)
+      .then((questsData) => {
         setQuests(Array.isArray(questsData) ? questsData : []);
-        setWeeklyQuest(weeklyData && !weeklyData.error ? weeklyData : null);
+      })
+      .catch(console.error);
+
+    // 3. Fetch friends list & statuses
+    fetch("/api/friends", { headers: { Authorization: `Bearer ${token}` } })
+      .then(safeJson)
+      .then((friendsData) => {
         setFriends(Array.isArray(friendsData) ? friendsData : []);
+      })
+      .catch(console.error);
+
+    // 4. Fetch daily briefing
+    fetch("/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true", { headers: { Authorization: `Bearer ${token}` } })
+      .then(safeJson)
+      .then((briefingsData) => {
         setBriefings(briefingsData?.messages || []);
+      })
+      .catch(console.error);
+
+    // 5. Fetch system insights
+    fetch("/api/insights", { headers: { Authorization: `Bearer ${token}` } })
+      .then(safeJson)
+      .then((insightsData) => {
         setInsights(Array.isArray(insightsData) ? insightsData : []);
       })
       .catch(console.error);
@@ -140,6 +178,21 @@ export default function DashboardPage() {
       characterCfg = null;
     }
   }
+
+  const fallbackRewards = calculateWeeklyQuestReward(user.level || 1);
+  const activeWeeklyQuest = weeklyQuest || {
+    progressMinutes: 0,
+    progressSeconds: 0,
+    percentComplete: 0,
+    isCompleted: false,
+    daysRemaining: (() => {
+      const now = new Date();
+      const day = now.getDay();
+      return day === 0 ? 1 : 7 - day + 1;
+    })(),
+    xpReward: fallbackRewards.xpReward,
+    sylphReward: fallbackRewards.sylphReward,
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
@@ -321,249 +374,248 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ─── Recurring Weekly Quest (3-Hour Target) ───── */}
-      {weeklyQuest && (
-        <div className="system-card p-6 mb-8 border border-accent-primary/30 bg-bg-panel/70 relative overflow-hidden group">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid tracking-wider uppercase font-['Rajdhani']">
-                  Streak Quest
-                </span>
-                <span className="text-xs text-text-muted font-['Rajdhani'] font-medium">
-                  Resets in {weeklyQuest.daysRemaining}d (Sunday 23:59)
-                </span>
-              </div>
-              <h2 className="text-xl font-bold text-text-primary font-['Rajdhani']">
-                Cumulative Focus
-              </h2>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <span className="text-xs text-text-muted font-['Rajdhani'] block uppercase tracking-wider">Level-Scaled Payout</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-accent-text-light font-['Rajdhani']">+{weeklyQuest.xpReward} XP</span>
-                  <span className="text-sm font-bold text-accent-text-light/80 font-['Rajdhani']">+{weeklyQuest.sylphReward} Sylph</span>
-                </div>
-              </div>
-              <span className={`px-3 py-1 text-xs font-bold rounded-full font-['Rajdhani'] uppercase tracking-wider ${
-                weeklyQuest.isCompleted 
-                  ? "bg-green-500/20 text-green-400 border border-green-500/40" 
-                  : "bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid"
-              }`}>
-                {weeklyQuest.isCompleted ? "Milestone Achieved" : "In Progress"}
-              </span>
-            </div>
-          </div>
-
-          {/* Progress Bar & Stats */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs font-['Rajdhani'] font-bold text-text-secondary">
-              <span>{Math.floor(weeklyQuest.progressMinutes / 60)}h {weeklyQuest.progressMinutes % 60}m / 3h 00m</span>
-              <span>{weeklyQuest.percentComplete}%</span>
-            </div>
-            <div className="h-2.5 bg-bg-void/80 rounded-full overflow-hidden border border-border-subtle relative">
-              <div
-                className="h-full bg-gradient-to-r from-accent-primary to-accent-primary-light transition-all duration-1000 ease-out rounded-full"
-                style={{ width: `${weeklyQuest.percentComplete}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start w-full min-w-0">
-        {/* ─── Today's Quests ──────────────────────────── */}
-        <div className="system-card p-6">
-          <h2
-            className="text-xl font-bold mb-5 text-accent-text-light font-['Rajdhani']"
-          >
-            Today's Quests
-          </h2>
-          {quests.length === 0 ? (
-            <div className="text-center py-10 border border-dashed border-border-subtle rounded-lg">
-              <p className="text-sm text-text-secondary">
-                No quests assigned. Create a Goal to receive quests from The System.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {quests.map((quest) => (
-                <div
-                  key={quest.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg bg-bg-panel border border-border-subtle hover:border-border-active shadow-[var(--card-shadow)] transition-colors gap-4 relative hover:z-50"
-                  style={{
-                    borderLeft: `3px solid ${
-                      quest.status === "COMPLETED"
-                        ? "var(--accent-green)"
-                        : quest.status === "FAILED"
-                        ? "var(--accent-red)"
-                        : "var(--accent-purple)"
-                    }`,
-                  }}
-                >
-                  <div className="min-w-0 pr-2 flex-1">
-                    <div className="flex items-center gap-3 mb-1.5 min-w-0">
-                      <div className="relative group/title cursor-default min-w-0">
-                        <p className="text-base font-medium truncate transition-colors">{quest.title}</p>
-                        {/* Glassmorphism Tooltip */}
-                        <div className="absolute left-0 top-full mt-2 hidden group-hover/title:block z-[100] bg-bg-abyss/95 backdrop-blur-xl text-text-primary text-sm p-3 rounded-lg shadow-2xl border border-border-subtle whitespace-normal min-w-[200px] w-max max-w-[300px]">
-                          {quest.title}
-                        </div>
-                      </div>
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-wider shrink-0 ${
-                        quest.difficulty === "EASY" ? "bg-green-500/20 text-green-400" :
-                        quest.difficulty === "HARD" ? "bg-orange-500/20 text-orange-400" :
-                        quest.difficulty === "EXPERT" ? "bg-red-500/20 text-red-400" :
-                        "bg-blue-500/20 text-blue-400"
-                      }`}>
-                        {quest.difficulty ? quest.difficulty.charAt(0) + quest.difficulty.slice(1).toLowerCase() : "Normal"}
-                      </span>
-                    </div>
-                    <p className="text-sm text-text-muted truncate">
-                      Target: {quest.requiredMinutes} min • +{quest.xpReward} XP
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4 shrink-0">
-                    <span
-                      className={`quest-status quest-${
+        {/* ─── Left Column: Today's Quests + Streak Quest ──────────────────────────── */}
+        <div className="flex flex-col gap-6 w-full min-w-0">
+          {/* Today's Quests Card */}
+          <div className="system-card p-6">
+            <h2
+              className="text-xl font-bold mb-5 text-accent-text-light font-['Rajdhani']"
+            >
+              Today&apos;s Quests
+            </h2>
+            {quests.length === 0 ? (
+              <div className="text-center py-10 border border-dashed border-border-subtle rounded-lg">
+                <p className="text-sm text-text-secondary">
+                  No quests assigned. Create a Goal to receive quests from The System.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {quests.map((quest) => (
+                  <div
+                    key={quest.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg bg-bg-panel border border-border-subtle hover:border-border-active shadow-[var(--card-shadow)] transition-colors gap-4 relative hover:z-50"
+                    style={{
+                      borderLeft: `3px solid ${
                         quest.status === "COMPLETED"
-                          ? "completed"
+                          ? "var(--accent-green)"
                           : quest.status === "FAILED"
-                          ? "failed"
-                          : quest.status === "IN_PROGRESS"
-                          ? "progress"
-                          : "pending"
-                      }`}
-                    >
-                      {quest.status === "IN_PROGRESS" ? "In Progress" : quest.status.charAt(0) + quest.status.slice(1).toLowerCase()}
-                    </span>
-                    {quest.status === "PENDING" && (
-                      <button
-                        onClick={() => router.push(`/focus?questId=${quest.id}&subjectName=${encodeURIComponent(quest.title)}`)}
-                        className="px-4 py-2 text-sm font-bold rounded bg-accent-dim text-accent-light hover:bg-accent-mid hover:text-white transition-colors"
-                        style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                          ? "var(--accent-red)"
+                          : "var(--accent-purple)"
+                      }`,
+                    }}
+                  >
+                    <div className="min-w-0 pr-2 flex-1">
+                      <div className="flex items-center gap-3 mb-1.5 min-w-0">
+                        <div className="relative group/title cursor-default min-w-0">
+                          <p className="text-base font-medium truncate transition-colors">{quest.title}</p>
+                          {/* Glassmorphism Tooltip */}
+                          <div className="absolute left-0 top-full mt-2 hidden group-hover/title:block z-[100] bg-bg-abyss/95 backdrop-blur-xl text-text-primary text-sm p-3 rounded-lg shadow-2xl border border-border-subtle whitespace-normal min-w-[200px] w-max max-w-[300px]">
+                            {quest.title}
+                          </div>
+                        </div>
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold tracking-wider shrink-0 ${
+                          quest.difficulty === "EASY" ? "bg-green-500/20 text-green-400" :
+                          quest.difficulty === "HARD" ? "bg-orange-500/20 text-orange-400" :
+                          quest.difficulty === "EXPERT" ? "bg-red-500/20 text-red-400" :
+                          "bg-blue-500/20 text-blue-400"
+                        }`}>
+                          {quest.difficulty ? quest.difficulty.charAt(0) + quest.difficulty.slice(1).toLowerCase() : "Normal"}
+                        </span>
+                      </div>
+                      <p className="text-sm text-text-muted truncate">
+                        Target: {quest.requiredMinutes} min • +{quest.xpReward} XP
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <span
+                        className={`quest-status quest-${
+                          quest.status === "COMPLETED"
+                            ? "completed"
+                            : quest.status === "FAILED"
+                            ? "failed"
+                            : quest.status === "IN_PROGRESS"
+                            ? "progress"
+                            : "pending"
+                        }`}
                       >
-                        Start
-                      </button>
-                    )}
+                        {quest.status === "IN_PROGRESS" ? "In Progress" : quest.status.charAt(0) + quest.status.slice(1).toLowerCase()}
+                      </span>
+                      {quest.status === "PENDING" && (
+                        <button
+                          onClick={() => router.push(`/focus?questId=${quest.id}&subjectName=${encodeURIComponent(quest.title)}`)}
+                          className="px-4 py-2 text-sm font-bold rounded bg-accent-dim text-accent-light hover:bg-accent-mid hover:text-white transition-colors"
+                          style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                        >
+                          Start
+                        </button>
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ─── Compact Streak Quest Card (Separate & Small) ───── */}
+          {activeWeeklyQuest && (
+            <div className="system-card p-3.5 sm:p-4 border border-accent-primary/30 bg-bg-panel/70 relative overflow-hidden group">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid tracking-wider uppercase font-['Rajdhani'] shrink-0">
+                    Streak Quest
+                  </span>
+                  <span className="text-sm font-bold text-text-primary font-['Rajdhani'] truncate">
+                    Cumulative Focus
+                  </span>
                 </div>
-              ))}
+                
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-xs font-bold text-accent-text-light font-['Rajdhani']">
+                    +{activeWeeklyQuest.xpReward} XP • +{activeWeeklyQuest.sylphReward} Sylph
+                  </span>
+                  <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full font-['Rajdhani'] uppercase tracking-wider ${
+                    activeWeeklyQuest.isCompleted 
+                      ? "bg-green-500/20 text-green-400 border border-green-500/40" 
+                      : "bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid"
+                  }`}>
+                    {activeWeeklyQuest.isCompleted ? "Completed" : "In Progress"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress Bar & Compact Stats */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] font-['Rajdhani'] font-medium text-text-muted">
+                  <span>
+                    {Math.floor((activeWeeklyQuest.progressMinutes || 0) / 60)}h {(activeWeeklyQuest.progressMinutes || 0) % 60}m / 3h 00m
+                    <span className="text-text-muted/60 ml-2 hidden sm:inline">• Resets in {activeWeeklyQuest.daysRemaining || 1}d</span>
+                  </span>
+                  <span className="font-bold text-text-secondary">{activeWeeklyQuest.percentComplete || 0}%</span>
+                </div>
+                <div className="h-1.5 bg-bg-void/80 rounded-full overflow-hidden border border-border-subtle relative">
+                  <div
+                    className="h-full bg-gradient-to-r from-accent-primary to-accent-primary-light transition-all duration-1000 ease-out rounded-full"
+                    style={{ width: `${activeWeeklyQuest.percentComplete || 0}%` }}
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* ─── Friends Widget ──────────────────────────── */}
-        <div className="system-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2
-              className="text-xl font-bold text-accent-text-light font-['Rajdhani']"
-            >
-              Friends
-            </h2>
-            <Link
-              href="/social"
-              className="text-xs tracking-wider uppercase hover:text-text-primary transition-colors text-accent-text-light font-['Rajdhani']"
-            >
-              View All →
-            </Link>
-          </div>
-
-          {friends.length === 0 ? (
-            <div className="text-center py-8 border border-dashed border-border-subtle rounded-lg">
-              <p className="text-sm text-text-secondary mb-4">
-                Add friends to study together
-              </p>
+        {/* ─── Right Column: Friends Widget ──────────────────────────── */}
+        <div className="flex flex-col gap-6 w-full min-w-0">
+          <div className="system-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2
+                className="text-xl font-bold text-accent-text-light font-['Rajdhani']"
+              >
+                Friends
+              </h2>
               <Link
                 href="/social"
-                className="text-sm px-5 py-2 rounded transition-all inline-block font-bold tracking-wide hover:-translate-y-0.5"
-                style={{
-                  background: "var(--accent-primary-dim)",
-                  border: "1px solid var(--accent-primary-mid)",
-                  color: "var(--accent-text-light)",
-                  boxShadow: "var(--card-shadow)"
-                }}
+                className="text-xs tracking-wider uppercase hover:text-text-primary transition-colors text-accent-text-light font-['Rajdhani']"
               >
-                Find Friends
+                View All →
               </Link>
             </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {/* Online friends */}
-              {onlineFriends.length > 0 && (
-                <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "var(--accent-green)", fontFamily: "'Rajdhani', sans-serif" }}>
-                  ONLINE — {onlineFriends.length}
-                </p>
-              )}
-              {onlineFriends.slice(0, 3).map((friend) => (
-                <div
-                  key={friend.id}
-                  className="flex items-center justify-between p-2 rounded bg-bg-panel"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center">
-                        {friend.avatarUrl ? (
-                          <img src={friend.avatarUrl} alt={friend.username} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
-                            {(friend.name || friend.username || "S").charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-bg-panel" />
-                    </div>
-                    <div>
-                      <Link href={`/profile/${friend.username}`} className="text-sm font-medium hover:underline hover:text-text-primary transition-colors block">
-                        {friend.name || friend.username}
-                      </Link>
-                      <p className="text-xs text-text-muted">
-                        Lv. {friend.level} • {friend.todayMinutes}m today
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
 
-              {/* Offline friends */}
-              {offlineFriends.length > 0 && (
-                <p className="text-xs tracking-widest uppercase mt-2 mb-1" style={{ color: "var(--text-muted)", fontFamily: "'Rajdhani', sans-serif" }}>
-                  OFFLINE — {offlineFriends.length}
+            {friends.length === 0 ? (
+              <div className="text-center py-8 border border-dashed border-border-subtle rounded-lg">
+                <p className="text-sm text-text-secondary mb-4">
+                  Add friends to study together
                 </p>
-              )}
-              {offlineFriends.slice(0, 2).map((friend) => (
-                <div
-                  key={friend.id}
-                  className="flex items-center justify-between p-2 rounded opacity-60 bg-bg-panel"
+                <Link
+                  href="/social"
+                  className="text-sm px-5 py-2 rounded transition-all inline-block font-bold tracking-wide hover:-translate-y-0.5"
+                  style={{
+                    background: "var(--accent-primary-dim)",
+                    border: "1px solid var(--accent-primary-mid)",
+                    color: "var(--accent-text-light)",
+                    boxShadow: "var(--card-shadow)"
+                  }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center">
-                        {friend.avatarUrl ? (
-                          <img src={friend.avatarUrl} alt={friend.username} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
-                            {(friend.name || friend.username || "S").charAt(0).toUpperCase()}
-                          </span>
-                        )}
+                  Find Friends
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {/* Online friends */}
+                {onlineFriends.length > 0 && (
+                  <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "var(--accent-green)", fontFamily: "'Rajdhani', sans-serif" }}>
+                    ONLINE — {onlineFriends.length}
+                  </p>
+                )}
+                {onlineFriends.slice(0, 3).map((friend) => (
+                  <div
+                    key={friend.id}
+                    className="flex items-center justify-between p-2 rounded bg-bg-panel"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center">
+                          {friend.avatarUrl ? (
+                            <img src={friend.avatarUrl} alt={friend.username} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                              {(friend.name || friend.username || "S").charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-bg-panel" />
                       </div>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-gray-600 border-2 border-bg-panel" />
-                    </div>
-                    <div>
-                      <Link href={`/profile/${friend.username}`} className="text-sm font-medium hover:underline hover:text-text-primary transition-colors block">
-                        {friend.name || friend.username}
-                      </Link>
-                      <p className="text-xs text-text-muted">
-                        Lv. {friend.level}
-                      </p>
+                      <div>
+                        <Link href={`/profile/${friend.username}`} className="text-sm font-medium hover:underline hover:text-text-primary transition-colors block">
+                          {friend.name || friend.username}
+                        </Link>
+                        <p className="text-xs text-text-muted">
+                          Lv. {friend.level} • {friend.todayMinutes}m today
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+
+                {/* Offline friends */}
+                {offlineFriends.length > 0 && (
+                  <p className="text-xs tracking-widest uppercase mt-2 mb-1" style={{ color: "var(--text-muted)", fontFamily: "'Rajdhani', sans-serif" }}>
+                    OFFLINE — {offlineFriends.length}
+                  </p>
+                )}
+                {offlineFriends.slice(0, 2).map((friend) => (
+                  <div
+                    key={friend.id}
+                    className="flex items-center justify-between p-2 rounded opacity-60 bg-bg-panel"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center">
+                          {friend.avatarUrl ? (
+                            <img src={friend.avatarUrl} alt={friend.username} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                              {(friend.name || friend.username || "S").charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-gray-600 border-2 border-bg-panel" />
+                      </div>
+                      <div>
+                        <Link href={`/profile/${friend.username}`} className="text-sm font-medium hover:underline hover:text-text-primary transition-colors block">
+                          {friend.name || friend.username}
+                        </Link>
+                        <p className="text-xs text-text-muted">
+                          Lv. {friend.level}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

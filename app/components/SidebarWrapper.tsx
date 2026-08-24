@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { PanelLeft } from "lucide-react";
 import Sidebar from "./Sidebar";
 import { useAuth } from "./AuthProvider";
 
@@ -20,6 +21,7 @@ const PUBLIC_PATHS = ["/", "/login", "/register", "/focus", "/onboarding"];
 export default function SidebarWrapper() {
   const pathname = usePathname();
   const isPublicPage = PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/settings");
+  const isChatPage = pathname.startsWith("/social/chat");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -60,28 +62,34 @@ export default function SidebarWrapper() {
         }}
       />
 
-      {/* ─── Mobile Sticky Top Navigation Bar ───────────────── */}
-      <MobileTopBar onOpenMenu={() => setIsMobileMenuOpen(true)} />
+      {/* ─── Mobile Sticky Top Navigation Bar (Hidden on chat page) ───────────────── */}
+      {!isChatPage && (
+        <MobileTopBar onOpenMenu={() => setIsMobileMenuOpen(true)} />
+      )}
 
       {/* ─── Mobile Off-Canvas Drawer ──────────────────────── */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out md:hidden shadow-2xl ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Navigation menu"
-      >
-        <Sidebar isCollapsed={false} setIsCollapsed={() => {}} mobile />
-      </div>
+      {!isChatPage && (
+        <>
+          <div
+            className={`fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out md:hidden shadow-2xl ${
+              isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+          >
+            <Sidebar isCollapsed={false} setIsCollapsed={() => {}} mobile />
+          </div>
 
-      {/* ─── Mobile Backdrop (closes drawer on tap) ─────────── */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
-          aria-hidden="true"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
+          {/* ─── Mobile Backdrop (closes drawer on tap) ─────────── */}
+          {isMobileMenuOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
+              aria-hidden="true"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          )}
+        </>
       )}
     </>
   );
@@ -107,11 +115,10 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
           type="button"
           onClick={onOpenMenu}
           aria-label="Open navigation menu"
-          className="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg border border-border-subtle bg-bg-panel/70 text-text-primary hover:border-border-active transition-colors"
+          title="Open sidebar"
+          className="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg border border-border-subtle bg-bg-panel/70 text-text-primary hover:border-border-active hover:text-accent-primary-light transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          <PanelLeft className="w-5 h-5 text-text-secondary" />
         </button>
 
         <div className="min-w-0">

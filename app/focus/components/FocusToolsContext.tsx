@@ -48,12 +48,16 @@ export function FocusToolsProvider({
   const [dockAnchor, setDockAnchor] = useState<DockAnchor>("bottom-right");
   const [dockPosition, setDockPosition] = useState<DockPosition | null>(null);
 
-  // Restore dock anchor preference from localStorage on mount
+  // Restore dock anchor & position preferences from localStorage on mount
   useEffect(() => {
     try {
       const savedAnchor = localStorage.getItem("focus_dock_anchor") as DockAnchor;
       if (savedAnchor) {
         setDockAnchor(savedAnchor);
+      }
+      const savedPos = localStorage.getItem("focus_dock_pos");
+      if (savedPos) {
+        setDockPosition(JSON.parse(savedPos));
       }
     } catch {}
   }, []);
@@ -62,6 +66,17 @@ export function FocusToolsProvider({
     setDockAnchor(anchor);
     try {
       localStorage.setItem("focus_dock_anchor", anchor);
+    } catch {}
+  }, []);
+
+  const handleSetDockPosition = useCallback((pos: DockPosition | null) => {
+    setDockPosition(pos);
+    try {
+      if (pos) {
+        localStorage.setItem("focus_dock_pos", JSON.stringify(pos));
+      } else {
+        localStorage.removeItem("focus_dock_pos");
+      }
     } catch {}
   }, []);
 
@@ -173,7 +188,7 @@ export function FocusToolsProvider({
         setIsDockExpanded,
         setWindowMode,
         setDockAnchor: handleSetDockAnchor,
-        setDockPosition,
+        setDockPosition: handleSetDockPosition,
       }}
     >
       {children}

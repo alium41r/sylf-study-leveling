@@ -534,7 +534,7 @@ export default function StudyCalendar() {
   const [showMonthStats, setShowMonthStats] = useState(false);
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+    <div style={{ maxWidth: "min(980px, 100%)", margin: "0 auto" }}>
       {/* ─── Top Control Bar: Month Navigation & Goals Trigger ────── */}
       <div
         style={{

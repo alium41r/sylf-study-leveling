@@ -98,7 +98,7 @@ export function MessageItem({
         </div>
       )}
 
-      <div className={`flex items-end gap-2.5 max-w-[85%] sm:max-w-[75%] ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+      <div className={`flex items-end gap-2.5 max-w-[92%] sm:max-w-[75%] min-w-0 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
         {/* Avatar for Incoming Messages */}
         {!isMe && (
           <div
@@ -120,10 +120,10 @@ export function MessageItem({
         )}
 
         {/* Message Bubble with Hover Action Toolbar */}
-        <div className="relative group/bubble">
+        <div className="relative group/bubble min-w-0 max-w-full">
           {isEditing ? (
             /* Inline Edit Input */
-            <div className="p-3 rounded-2xl bg-bg-panel border border-accent-primary shadow-xl flex flex-col gap-2 min-w-[240px]">
+            <div className="p-3 rounded-2xl bg-bg-panel border border-accent-primary shadow-xl flex flex-col gap-2 min-w-[220px] max-w-full">
               <textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
@@ -153,17 +153,18 @@ export function MessageItem({
               </div>
             </div>
           ) : (
-            /* Standard Message Bubble */
+            /* Standard Message Bubble — wraps anywhere so long unbroken
+               text/URLs never overflow the bubble on narrow screens */
             <div
-              className={`px-4 py-2.5 rounded-2xl break-words text-sm relative transition-all ${
+              className={`px-3.5 py-2 rounded-[18px] min-w-0 max-w-full [overflow-wrap:anywhere] break-words text-sm relative transition-all ${
                 isMe
-                  ? "bg-accent-primary text-white rounded-br-none shadow-[0_2px_12px_rgba(124,58,237,0.3)]"
-                  : "bg-bg-panel/90 text-text-primary rounded-bl-none border border-white/10 shadow-sm"
+                  ? "bg-accent-primary text-white rounded-br-md shadow-[0_2px_12px_rgba(124,58,237,0.3)]"
+                  : "bg-bg-panel/90 text-text-primary rounded-bl-md border border-white/10 shadow-sm"
               }`}
             >
               <MarkdownRenderer
                 content={message.content}
-                className={isMe ? "[&_*]:text-white prose-p:my-0.5" : "prose-p:my-0.5"}
+                className={`[&_*]:[overflow-wrap:anywhere] ${isMe ? "[&_*]:text-white prose-p:my-0.5" : "prose-p:my-0.5"}`}
               />
 
               {/* Timestamp & Delivery State inside bubble */}

@@ -869,7 +869,7 @@ export default function ShopPage() {
         </div>
 
         {/* ═══ Right Column: Sticky Wardrobe Preview Dock (4 cols) ═══ */}
-        <div className="lg:col-span-4 xl:col-span-3 sticky top-6 flex flex-col gap-3">
+        <div className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-6 flex flex-col gap-3">
           <div className="system-card rounded-2xl bg-bg-panel/90 border border-border-subtle p-5 shadow-2xl backdrop-blur-xl flex flex-col items-center text-center relative overflow-hidden">
             {/* Header */}
             <div className="w-full flex items-center justify-between border-b border-border-subtle pb-3 mb-4">

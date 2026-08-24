@@ -489,7 +489,7 @@ export function ItemsTab() {
       {/* ═════════════════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* ─── LEFT COLUMN: CHARACTER CARD STAGE (4 Cols) ────────── */}
-        <div className="lg:col-span-4 xl:col-span-4 rounded-2xl bg-bg-panel/90 border border-white/10 p-6 flex flex-col items-center text-center relative overflow-hidden shadow-2xl backdrop-blur-xl gap-5 sticky top-6">
+        <div className="lg:col-span-4 xl:col-span-4 rounded-2xl bg-bg-panel/90 border border-white/10 p-6 flex flex-col items-center text-center relative overflow-hidden shadow-2xl backdrop-blur-xl gap-5 lg:sticky lg:top-6">
           {/* Ambient Glow Background Accent */}
           <div className="absolute -top-16 -left-16 w-48 h-48 bg-accent-primary/15 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />

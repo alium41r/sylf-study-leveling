@@ -102,8 +102,8 @@ describe("Social System - Friend Requests & Direct Message Notifications", () =>
     });
   });
 
-  describe("POST /api/conversations/[id]/messages - Direct Message Notifications", () => {
-    it("creates direct message notification for recipient", async () => {
+  describe("POST /api/conversations/[id]/messages - Chat Messages Do NOT Notify", () => {
+    it("does NOT create a direct-message notification for the recipient", async () => {
       const conversationId = 10;
       vi.spyOn(prisma.conversationParticipant, "findUnique").mockResolvedValue({
         userId: senderId,
@@ -124,13 +124,6 @@ describe("Social System - Friend Requests & Direct Message Notifications", () =>
         },
       ] as any);
 
-      vi.spyOn(prisma.conversationParticipant, "findMany").mockResolvedValue([
-        {
-          userId: receiverId,
-          conversation: { id: conversationId, isGroup: false },
-        },
-      ] as any);
-
       const systemMessageSpy = vi.spyOn(prisma.systemMessage, "create").mockResolvedValue({} as any);
 
       const req = new NextRequest("http://localhost:3000/api/conversations/10/messages", {
@@ -145,15 +138,9 @@ describe("Social System - Friend Requests & Direct Message Notifications", () =>
       const res = await sendMessage(req, { params: Promise.resolve({ id: "10" }) });
       expect(res.status).toBe(201);
 
-      expect(systemMessageSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            userId: receiverId,
-            type: "INFO",
-            content: expect.stringContaining("[DIRECT_MESSAGE]"),
-          }),
-        })
-      );
+      // Inbox is reserved for important events — chat messages never
+      // create notification entries.
+      expect(systemMessageSpy).not.toHaveBeenCalled();
     });
   });
 });

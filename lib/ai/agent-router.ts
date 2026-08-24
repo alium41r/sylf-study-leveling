@@ -9,6 +9,7 @@
 import { NormalizedMessage, NormalizedTool, LLMResponse } from "./providers/types";
 import { LLMFactory, LLMProviderName } from "./providers/factory";
 import { DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "./config";
+import { normalizeMessage, isDateSpecificQuery } from "./message-intent";
 
 /**
  * Minimal context required for routing decisions.
@@ -33,7 +34,8 @@ export type WorkloadType =
   | "general_chat"
   | "calendar"
   | "coach"
-  | "analyst";
+  | "analyst"
+  | "simple";
 
 export interface RouteResult {
   agent: AgentType;
@@ -52,6 +54,14 @@ export interface WorkloadRouteConfig {
   fallback: ModelRouteSpec;
   secondaryFallback?: ModelRouteSpec;
   description: string;
+  /** Hard cap on generated output tokens for this workload. */
+  outputTokenCap: number;
+  /**
+   * DeepSeek thinking mode for this workload. "disabled" skips generating
+   * (and billing) reasoning tokens — used for simple/fast tiers. Undefined
+   * keeps the model default (thinking on for reasoner-style tasks).
+   */
+  thinking?: "enabled" | "disabled";
 }
 
 export interface WorkloadRouteResult {
@@ -144,6 +154,25 @@ export const STEM_PATTERNS = [
   /\b(integrate|differentiate)\b.*\b(function|equation|expression|by parts)\b/i,
 ];
 
+/**
+ * Short imperative verbs that mark the lightweight "simple" tier.
+ * These are quick CRUD / lookup-style requests that don't need reasoning
+ * tokens or heavyweight context. Note: messages matching PLANNER_PATTERNS
+ * or STEM_PATTERNS are explicitly excluded by the classifier.
+ */
+const SIMPLE_ACTION_VERB =
+  /^(create|add|delete|remove|complete|finish|mark|move|reschedule|swap|clear|start|set|show|list|check)\b/i;
+
+/**
+ * Question-form quest lookups ("what quests do i have right now") belong to
+ * the cheap tier too. The normalizer canonicalizes them to "my quests …"
+ * statements, so the pattern matches both the raw and canonical forms.
+ * Date-specific phrasings ("next Tuesday") are excluded by the classifier —
+ * those need the full Calendar context.
+ */
+const QUEST_LOOKUP_QUESTION =
+  /^(my |the )?(quests?|tasks?|schedule)( (do i have|are due|are pending|right now|today|for today))?$|^(whats? (are )?(my |the )?quests?|what quests? do i have|which quests?|any quests?|quests? (do i have|are due|are pending)|are (my )?quests? (due|pending)|show (me )?(my )?quests?|how many quests?)/i;
+
 // ─── Workload Routing Configuration Matrix ───────────────────
 
 export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> = {
@@ -152,18 +181,26 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     primary: { provider: "deepseek", model: DEEPSEEK_MODELS.vision },
     fallback: { provider: "gemini", model: GEMINI_MODELS.visionFallback },
     description: "Multimodal Vision & Diagram Ingestion Engine",
+    outputTokenCap: 1024,
   },
   planner: {
     workload: "planner",
-    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.planner },
-    fallback: { provider: "gemini", model: GEMINI_MODELS.research },
-    description: "Autonomous AI Study Planner & Curriculum Structuring",
+    // In-chat planning = goal/quest CRUD via tools. Runs on the cheap flash
+    // tier; deepseek-v4-pro is reserved for the dedicated /api/ai-planner
+    // orchestration (research + structured plan synthesis).
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
+    fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
+    secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
+    description: "In-Chat Goal & Quest Structuring (CRUD via tools)",
+    outputTokenCap: 1024,
+    thinking: "disabled",
   },
   syllabus: {
     workload: "syllabus",
     primary: { provider: "deepseek", model: DEEPSEEK_MODELS.compiler },
     fallback: { provider: "gemini", model: GEMINI_MODELS.research },
     description: "AI Syllabus Constellation 48-Node Compiler",
+    outputTokenCap: 8192,
   },
   complex_stem: {
     workload: "complex_stem",
@@ -171,12 +208,15 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.stemFallback },
     description: "Complex STEM Derivations & Algorithmic Proof Engine",
+    outputTokenCap: 4096,
   },
   focus_chat: {
     workload: "focus_chat",
     primary: { provider: "deepseek", model: DEEPSEEK_MODELS.focus },
     fallback: { provider: "gemini", model: GEMINI_MODELS.focus },
     description: "Focus Timer In-Session Assistant",
+    outputTokenCap: 512,
+    thinking: "disabled",
   },
   general_chat: {
     workload: "general_chat",
@@ -184,6 +224,8 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "General System Chat & Companion Assistant",
+    outputTokenCap: 768,
+    thinking: "disabled",
   },
   calendar: {
     workload: "calendar",
@@ -191,6 +233,8 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "Calendar & Schedule Adjustment Specialist",
+    outputTokenCap: 640,
+    thinking: "disabled",
   },
   coach: {
     workload: "coach",
@@ -198,6 +242,7 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "Progress Coach & Burnout Detection Specialist",
+    outputTokenCap: 768,
   },
   analyst: {
     workload: "analyst",
@@ -205,6 +250,19 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "Study Analytics & Performance Trend Specialist",
+    outputTokenCap: 1024,
+  },
+  simple: {
+    workload: "simple",
+    // Lightweight tier: short imperative CRUD/factual requests. Same cheap
+    // model as general chat, but with core-only context, no reasoning
+    // tokens (thinking disabled) and a tiny output budget.
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
+    fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
+    secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
+    description: "Simple Action & Quick Fact Tier (no reasoning tokens)",
+    outputTokenCap: 384,
+    thinking: "disabled",
   },
 };
 
@@ -440,7 +498,36 @@ export function classifyWorkload(
     };
   }
 
-  // 6. General Agent Classification
+  // 6. Simple Action Tier — short imperative CRUD / quest-lookup requests
+  //    get the lightweight route: cheap model, no reasoning tokens, and the
+  //    caller skips heavyweight context for this workload. Lead-ins are
+  //    normalized away so "can you tell me what quests do i have" still lands
+  //    here, while date-specific queries stay on the full Calendar tier.
+  const trimmed = normalizeMessage(message);
+  const isQuestLookup = QUEST_LOOKUP_QUESTION.test(trimmed) && !isDateSpecificQuery(trimmed);
+  if (
+    trimmed.length <= 80 &&
+    (SIMPLE_ACTION_VERB.test(trimmed) || isQuestLookup) &&
+    !PLANNER_PATTERNS.some((p) => p.test(trimmed)) &&
+    !STEM_PATTERNS.some((p) => p.test(trimmed))
+  ) {
+    const simpleCtx: RouterContext = context || {
+      user: { hp: 100, maxHp: 100 },
+      today: { overdueCount: 0 },
+    };
+    const simpleAgent = routeMessage(trimmed, simpleCtx);
+    if (simpleAgent.agent === "calendar" || simpleAgent.agent === "general") {
+      return {
+        workload: "simple",
+        agent: simpleAgent.agent,
+        route: WORKLOAD_ROUTING_TABLE.simple,
+        reason: "Short imperative action — simple tier (no reasoning tokens).",
+        hasMedia: false,
+      };
+    }
+  }
+
+  // 7. General Agent Classification
   const defaultCtx: RouterContext = context || {
     user: { hp: 100, maxHp: 100 },
     today: { overdueCount: 0 },
@@ -499,6 +586,8 @@ export async function dispatchWithFallback(
         {
           responseFormat: options?.responseFormat,
           signal: options?.signal,
+          maxTokens: config.outputTokenCap,
+          thinking: config.thinking,
         }
       );
 

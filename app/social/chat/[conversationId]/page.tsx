@@ -37,6 +37,7 @@ export default function ModernChatPage({
   const isNearBottomRef = useRef(true);
   const hasInitialScrolledRef = useRef(false);
   const justSentMessageRef = useRef(false);
+  const lastServerIdRef = useRef(0);
 
   // Auto-dismiss error toast
   useEffect(() => {
@@ -46,7 +47,34 @@ export default function ModernChatPage({
     }
   }, [errorToast]);
 
-  // Fetch chat data
+  /** Merge server messages in, preserving pending optimistic bubbles. */
+  const mergeServerMessages = (incoming: ChatMessage[]) => {
+    if (!incoming || incoming.length === 0) return;
+    setMessages((prev) => {
+      const pendingOptimistic = prev.filter((m) => m.isOptimistic);
+      const byId = new Map<number, ChatMessage>();
+      for (const m of prev) {
+        if (!m.isOptimistic) byId.set(m.id, m);
+      }
+      for (const m of incoming) {
+        byId.set(m.id, m);
+        if (m.id > lastServerIdRef.current) lastServerIdRef.current = m.id;
+      }
+      const sorted = Array.from(byId.values()).sort((a, b) => a.id - b.id);
+      return [...sorted, ...pendingOptimistic];
+    });
+  };
+
+  // Prevent outer body rubber-banding / double scrolling on mobile devices while in chat
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
+  // Full load: conversation detail + recent messages
   const fetchChat = async (silent = false) => {
     if (!token) return;
     try {
@@ -56,10 +84,13 @@ export default function ModernChatPage({
       if (res.ok) {
         const data = await res.json();
         setConversation(data.conversation);
+        // Ingest server messages (track max server id for polling)
         setMessages((prev) => {
-          // Keep any pending optimistic messages that haven't resolved yet
           const pendingOptimistic = prev.filter((m) => m.isOptimistic);
           const serverMsgs: ChatMessage[] = data.messages || [];
+          for (const m of serverMsgs) {
+            if (m.id > lastServerIdRef.current) lastServerIdRef.current = m.id;
+          }
           return [...serverMsgs, ...pendingOptimistic];
         });
       } else if (!silent) {
@@ -70,11 +101,35 @@ export default function ModernChatPage({
     }
   };
 
+  // Lightweight incremental poll — only fetches messages newer than we have.
+  // No-ops until the initial full load has established the baseline id.
+  const fetchNewMessages = async () => {
+    if (!token || lastServerIdRef.current === 0) return;
+    try {
+      const res = await fetch(
+        `/api/conversations/${conversationId}/messages?after=${lastServerIdRef.current}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        mergeServerMessages(data.messages || []);
+      }
+    } catch (err) {
+      console.error("Failed to poll messages", err);
+    }
+  };
+
   useEffect(() => {
     if (token) {
+      // Initial full load, instant 1s incremental poll for new messages,
+      // and a slower full refresh to keep presence (online dots) fresh.
       fetchChat();
-      const interval = setInterval(() => fetchChat(true), 3000);
-      return () => clearInterval(interval);
+      const lightInterval = setInterval(() => fetchNewMessages(), 1000);
+      const refreshInterval = setInterval(() => fetchChat(true), 30000);
+      return () => {
+        clearInterval(lightInterval);
+        clearInterval(refreshInterval);
+      };
     }
   }, [token, conversationId]);
 
@@ -140,6 +195,7 @@ export default function ModernChatPage({
       }
 
       const realMsg = await res.json();
+      if (realMsg.id > lastServerIdRef.current) lastServerIdRef.current = realMsg.id;
       setMessages((prev) => prev.map((m) => (m.id === tempId ? realMsg : m)));
     } catch (err: any) {
       console.error("Send message error:", err);
@@ -327,7 +383,7 @@ export default function ModernChatPage({
 
   if (isLoading || !user || !conversation) {
     return (
-      <div className="flex items-center justify-center min-h-[70vh]">
+      <div className="fixed inset-0 z-20 md:relative md:inset-auto md:z-auto flex items-center justify-center h-full min-h-[70vh] bg-background md:bg-transparent">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
           <p className="text-xs font-['Rajdhani'] uppercase tracking-widest text-text-muted">
@@ -347,7 +403,7 @@ export default function ModernChatPage({
     : otherParticipant?.name || otherParticipant?.username || "Scholar";
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)] max-w-5xl mx-auto p-2 sm:p-6 gap-3 relative">
+    <div className="fixed inset-0 z-20 md:relative md:inset-auto md:z-auto flex flex-col w-full h-[100dvh] md:h-[calc(100dvh-2rem)] max-w-7xl mx-auto p-2 sm:px-6 sm:py-4 gap-2 sm:gap-3 overflow-hidden bg-background md:bg-transparent">
       {/* Floating Error Toast */}
       {errorToast && (
         <div className="fixed top-4 right-4 z-50 p-3.5 rounded-xl bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs font-['Rajdhani'] flex items-center gap-2 shadow-2xl backdrop-blur-md animate-fade-in-down">
@@ -378,12 +434,13 @@ export default function ModernChatPage({
       />
 
       {/* ─── Main Chat Viewport ────────────────────────────────── */}
-      <div className="system-card flex-1 flex flex-col min-h-0 rounded-2xl bg-bg-panel/70 border border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden relative">
+      <div className="system-card flex-1 flex flex-col min-h-0 rounded-xl sm:rounded-2xl bg-bg-panel/70 border border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden relative">
         {/* Message Stream Container */}
         <div
           ref={messagesContainerRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-5 space-y-3"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar p-3 sm:p-5 space-y-3"
+          style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}
         >
           {filteredMessages.length === 0 ? (
             searchQuery ? (

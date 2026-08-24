@@ -1,17 +1,25 @@
 "use client";
 
 import React, { useMemo, useState, useRef, useEffect, useCallback } from "react";
-import type { SkeletonNode, NodeShape } from "@/lib/skill-tree-skeleton";
+import type { SkeletonNode } from "@/lib/skill-tree-skeleton";
 import { SKELETON_NODES, SKELETON_EDGES, getNodeDisplayCode } from "@/lib/skill-tree-skeleton";
+import {
+  TIER_THEMES,
+  getTierTheme,
+  getScallopedMedallionPath,
+  getApexCelestialStarPath,
+  getApexStarFacetLines,
+  getSparkleStarPath,
+  getLaurelLeavesSVG,
+  getWhirlwindManaPath,
+} from "@/lib/skill-tree-theme";
 import {
   ZoomIn,
   ZoomOut,
   Maximize2,
   Crosshair,
-  Lock,
-  Check,
-  Sparkles,
   Flame,
+  Check,
 } from "lucide-react";
 
 export interface LiveSubjectNode {
@@ -50,11 +58,6 @@ const WORLD_H = 1200;
 const MIN_ZOOM = 0.55;
 const MAX_ZOOM = 2.4;
 
-/**
- * Invisible Boundary Clamping:
- * Prevents the user from panning or zooming infinitely into the void.
- * Ensures that at least 35% of the viewport always overlaps the constellation world.
- */
 function clampPan(
   pan: { x: number; y: number },
   zoom: number,
@@ -79,79 +82,26 @@ function clampPan(
   };
 }
 
-function getNodeRadius(shape: NodeShape): number {
-  switch (shape) {
-    case "apex_star":
-      return 32;
-    case "octagon":
-      return 24;
-    case "diamond":
-      return 22;
-    case "hexagon":
-      return 20;
-    case "circle":
-      return 22;
-    default:
-      return 20;
-  }
-}
-
-function getShapePath(shape: NodeShape, r: number): string {
-  switch (shape) {
-    case "circle":
-      return `M ${r} 0 A ${r} ${r} 0 1 1 ${-r} 0 A ${r} ${r} 0 1 1 ${r} 0 Z`;
-
-    case "hexagon": {
-      const pts: [number, number][] = [];
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 3) * i - Math.PI / 2;
-        pts.push([r * Math.cos(angle), r * Math.sin(angle)]);
-      }
-      return `M ${pts.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join(" L ")} Z`;
-    }
-
-    case "diamond":
-      return `M 0 ${-r} L ${r} 0 L 0 ${r} L ${-r} 0 Z`;
-
-    case "octagon": {
-      const pts: [number, number][] = [];
-      for (let i = 0; i < 8; i++) {
-        const angle = (Math.PI / 4) * i - Math.PI / 8;
-        pts.push([r * Math.cos(angle), r * Math.sin(angle)]);
-      }
-      return `M ${pts.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join(" L ")} Z`;
-    }
-
-    case "apex_star": {
-      const points: [number, number][] = [];
-      const outerR = r;
-      const innerR = r * 0.52;
-      for (let i = 0; i < 10; i++) {
-        const rad = (i * Math.PI) / 5 - Math.PI / 2;
-        const currentR = i % 2 === 0 ? outerR : innerR;
-        points.push([currentR * Math.cos(rad), currentR * Math.sin(rad)]);
-      }
-      return `M ${points.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join(" L ")} Z`;
-    }
-
-    default:
-      return `M ${r} 0 A ${r} ${r} 0 1 1 ${-r} 0 A ${r} ${r} 0 1 1 ${r} 0 Z`;
-  }
-}
+const SPARKLE_NODE_IDS = new Set([
+  "N3_1", "N3_6",
+  "N4_1", "N4_8",
+  "N5_1", "N5_6",
+  "N6_1", "N6_8",
+  "N7_1", "N7_7",
+  "N8_1", "N8_5",
+  "N9_1", "N9_2", "N9_3",
+]);
 
 export function SubjectConstellationCanvas({
   nodes,
   mintedSP,
   selectedNodeId,
-  accentColor = "#8B5CF6",
   onSelectNode,
   searchQuery = "",
   matchingNodeIds,
   focusTargetNodeId,
 }: SubjectConstellationCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // Light/Dark Theme Observer for crisp SVG canvas rendering
   const [isLightMode, setIsLightMode] = useState(false);
 
   useEffect(() => {
@@ -170,7 +120,6 @@ export function SubjectConstellationCanvas({
     return () => observer.disconnect();
   }, []);
 
-  // Map live nodes by nodeId ("N1_1", etc.)
   const liveMap = useMemo(() => {
     const map = new Map<string, LiveSubjectNode>();
     for (const node of nodes) {
@@ -187,7 +136,23 @@ export function SubjectConstellationCanvas({
     return map;
   }, []);
 
-  // Viewport transformation state
+  // Precomputed geometry
+  const standardMedallionPath = useMemo(() => getScallopedMedallionPath(18, 12, 2.5), []);
+  const rootMedallionPath = useMemo(() => getScallopedMedallionPath(32, 16, 3.2), []);
+  const apexStarPath = useMemo(() => getApexCelestialStarPath(48, 22), []);
+  const apexFacetLines = useMemo(() => getApexStarFacetLines(48, 22), []);
+  const sparklePath = useMemo(() => getSparkleStarPath(5.5), []);
+  const largeSparklePath = useMemo(() => getSparkleStarPath(8.5), []);
+  const miniSparklePath = useMemo(() => getSparkleStarPath(3.5), []);
+  const leftLaurel = useMemo(() => getLaurelLeavesSVG("left", "#D97706"), []);
+  const rightLaurel = useMemo(() => getLaurelLeavesSVG("right", "#D97706"), []);
+
+  // Wavy Whirlwind Mana Paths
+  const leftManaStreamA = useMemo(() => getWhirlwindManaPath("left", 0, 26, 3.2), []);
+  const leftManaStreamB = useMemo(() => getWhirlwindManaPath("left", Math.PI, 18, 3.2), []);
+  const rightManaStreamA = useMemo(() => getWhirlwindManaPath("right", 0, 26, 3.2), []);
+  const rightManaStreamB = useMemo(() => getWhirlwindManaPath("right", Math.PI, 18, 3.2), []);
+
   const [transform, setTransform] = useState<ViewportTransform>({
     zoom: 0.82,
     panX: 0,
@@ -202,7 +167,6 @@ export function SubjectConstellationCanvas({
     panY: 0,
   });
 
-  // Fit view automatically on mount or container resize
   const centerConstellation = useCallback(() => {
     if (!containerRef.current) return;
     const { clientWidth: cw, clientHeight: ch } = containerRef.current;
@@ -226,13 +190,11 @@ export function SubjectConstellationCanvas({
     return () => ro.disconnect();
   }, [centerConstellation]);
 
-  // Recenter & Zoom directly on the Active / Selected Node
   const recenterOnActiveNode = useCallback(() => {
     if (!containerRef.current) return;
     const { clientWidth: cw, clientHeight: ch } = containerRef.current;
     if (cw === 0 || ch === 0) return;
 
-    // Target node prioritization: Selected node -> In-Progress Node -> First Unmastered Node -> Root N1_1
     let targetNodeId = selectedNodeId;
     if (!targetNodeId) {
       const inProgress = nodes.find((n) => n.progress > 0 && !n.isMastered);
@@ -245,7 +207,7 @@ export function SubjectConstellationCanvas({
     }
 
     const targetSkeleton = skeletonMap.get(targetNodeId) || SKELETON_NODES[0];
-    const focusZoom = 1.18; // Optimal high-clarity focus zoom level
+    const focusZoom = 1.18;
 
     const targetPanX = cw / 2 - targetSkeleton.x * focusZoom;
     const targetPanY = ch / 2 - targetSkeleton.y * focusZoom;
@@ -254,7 +216,6 @@ export function SubjectConstellationCanvas({
     setTransform({ zoom: focusZoom, panX: clamped.x, panY: clamped.y });
   }, [selectedNodeId, nodes, skeletonMap]);
 
-  // Smooth auto-centering when a search match or external target node is focused
   useEffect(() => {
     if (focusTargetNodeId && containerRef.current) {
       const targetSkeleton = skeletonMap.get(focusTargetNodeId);
@@ -271,7 +232,6 @@ export function SubjectConstellationCanvas({
     }
   }, [focusTargetNodeId, skeletonMap]);
 
-  // Centered 1D Zoom Control (No horizontal sideways drift)
   const handleZoom = useCallback((delta: number) => {
     if (!containerRef.current) return;
     const { clientWidth: cw, clientHeight: ch } = containerRef.current;
@@ -279,7 +239,6 @@ export function SubjectConstellationCanvas({
       const nextZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev.zoom + delta));
       if (nextZoom === prev.zoom) return prev;
 
-      // Pure 1D radial zoom anchored strictly to viewport center
       const centerWorldX = (cw / 2 - prev.panX) / prev.zoom;
       const centerWorldY = (ch / 2 - prev.panY) / prev.zoom;
 
@@ -291,13 +250,11 @@ export function SubjectConstellationCanvas({
     });
   }, []);
 
-  // Native Non-Passive Wheel Listener: Completely prevents outer page scroll & ensures 1D centered zoom
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleNativeWheel = (e: WheelEvent) => {
-      // 1. Unconditionally stop page scroll propagation
       e.preventDefault();
       e.stopPropagation();
 
@@ -308,7 +265,6 @@ export function SubjectConstellationCanvas({
         const nextZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev.zoom * zoomFactor));
         if (nextZoom === prev.zoom) return prev;
 
-        // Centered 1D zoom on viewport center: prevents ANY sideways horizontal shift
         const centerWorldX = (cw / 2 - prev.panX) / prev.zoom;
         const centerWorldY = (ch / 2 - prev.panY) / prev.zoom;
 
@@ -326,7 +282,6 @@ export function SubjectConstellationCanvas({
     };
   }, []);
 
-  // Pan gesture listeners (Mouse)
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return;
     setIsPanning(true);
@@ -358,7 +313,6 @@ export function SubjectConstellationCanvas({
 
   const handleMouseUp = () => setIsPanning(false);
 
-  // Touch Gesture Listeners (Single finger pan & 2-finger pinch zoom without page scroll)
   const touchStateRef = useRef<{
     mode: "pan" | "pinch" | null;
     startX: number;
@@ -456,7 +410,6 @@ export function SubjectConstellationCanvas({
     };
   }, [transform]);
 
-  // Node Click Handlers
   const handleNodeClick = (skeleton: SkeletonNode) => {
     const live = liveMap.get(skeleton.id);
     onSelectNode({ skeleton, live });
@@ -469,17 +422,42 @@ export function SubjectConstellationCanvas({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      style={{ touchAction: "none" }}
-      className={`relative w-full h-[420px] sm:h-[560px] lg:h-[750px] rounded-2xl bg-bg-abyss border border-border-subtle overflow-hidden select-none cursor-grab touch-none shadow-card ${
+      style={{
+        touchAction: "none",
+        backgroundImage: isLightMode
+          ? `
+            radial-gradient(ellipse at 50% 12%, rgba(139, 92, 246, 0.10) 0%, transparent 65%),
+            radial-gradient(ellipse at 50% 88%, rgba(245, 158, 11, 0.10) 0%, transparent 65%),
+            linear-gradient(to bottom, #faf8fd, #ffffff, #fffaf5)
+          `
+          : `
+            radial-gradient(ellipse at 50% 12%, rgba(139, 92, 246, 0.20) 0%, transparent 65%),
+            radial-gradient(ellipse at 50% 88%, rgba(245, 158, 11, 0.15) 0%, transparent 65%),
+            linear-gradient(to bottom, #090a12, #0d0e1a, #0a0808)
+          `,
+      }}
+      className={`relative w-full h-[460px] sm:h-[600px] lg:h-[820px] rounded-3xl border ${
+        isLightMode ? "border-purple-200/50 shadow-2xl" : "border-white/10 shadow-2xl"
+      } overflow-hidden select-none cursor-grab touch-none ${
         isPanning ? "cursor-grabbing" : ""
       }`}
     >
       {/* ─── HUD Floating Control Bar ─────────────────────────────── */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 p-1.5 rounded-xl bg-bg-panel/90 border border-border-subtle backdrop-blur-md shadow-card">
+      <div
+        className={`absolute top-4 right-4 z-20 flex items-center gap-1.5 p-1.5 rounded-2xl backdrop-blur-xl border shadow-xl ${
+          isLightMode
+            ? "bg-white/80 border-purple-100 shadow-purple-900/5"
+            : "bg-zinc-950/80 border-white/10 shadow-black/40"
+        }`}
+      >
         <button
           type="button"
           onClick={() => handleZoom(0.15)}
-          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-abyss transition-colors"
+          className={`p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl transition-all ${
+            isLightMode
+              ? "text-slate-600 hover:text-purple-600 hover:bg-purple-50"
+              : "text-zinc-400 hover:text-purple-300 hover:bg-white/10"
+          }`}
           title="Zoom In"
         >
           <ZoomIn className="w-4 h-4" />
@@ -487,99 +465,44 @@ export function SubjectConstellationCanvas({
         <button
           type="button"
           onClick={() => handleZoom(-0.15)}
-          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-abyss transition-colors"
+          className={`p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl transition-all ${
+            isLightMode
+              ? "text-slate-600 hover:text-purple-600 hover:bg-purple-50"
+              : "text-zinc-400 hover:text-purple-300 hover:bg-white/10"
+          }`}
           title="Zoom Out"
         >
           <ZoomOut className="w-4 h-4" />
         </button>
-        <div className="w-[1px] h-4 bg-border-subtle mx-0.5" />
+        <div
+          className={`w-[1px] h-4 mx-0.5 ${
+            isLightMode ? "bg-slate-200" : "bg-white/10"
+          }`}
+        />
         <button
           type="button"
           onClick={recenterOnActiveNode}
-          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-text-secondary hover:text-accent-primary hover:bg-bg-abyss transition-colors"
-          title="Recenter & Focus Active Node"
+          className={`p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl transition-all ${
+            isLightMode
+              ? "text-purple-600 hover:bg-purple-100/60"
+              : "text-purple-400 hover:bg-purple-950/40"
+          }`}
+          title="Recenter Active Node"
         >
           <Crosshair className="w-4 h-4" />
         </button>
         <button
           type="button"
           onClick={centerConstellation}
-          className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-abyss transition-colors"
+          className={`p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-xl transition-all ${
+            isLightMode
+              ? "text-slate-600 hover:text-purple-600 hover:bg-purple-50"
+              : "text-zinc-400 hover:text-purple-300 hover:bg-white/10"
+          }`}
           title="Reset Constellation View"
         >
           <Maximize2 className="w-4 h-4" />
         </button>
-      </div>
-
-      {/* ─── Legend HUD ────────────────────────────────────────────── */}
-      <div className="absolute bottom-4 left-4 z-20 flex flex-wrap items-center gap-3.5 px-4 py-2.5 rounded-xl bg-bg-panel/90 border border-border-subtle backdrop-blur-md text-[11px] font-rajdhani font-semibold text-text-secondary shadow-lg">
-        {/* Untouched */}
-        <div className="flex items-center gap-1.5">
-          <svg width="14" height="14" viewBox="0 0 14 14" className="shrink-0">
-            <polygon
-              points="7,1 12.5,4 12.5,10 7,13 1.5,10 1.5,4"
-              fill={isLightMode ? "#f1f5f9" : "#11131f"}
-              stroke={isLightMode ? "#94a3b8" : "#475569"}
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>Untouched</span>
-        </div>
-
-        {/* In Progress */}
-        <div className="flex items-center gap-1.5">
-          <svg width="14" height="14" viewBox="0 0 14 14" className="shrink-0">
-            <circle
-              cx="7"
-              cy="7"
-              r="5"
-              fill={isLightMode ? "#e0f2fe" : "#083344"}
-              stroke={isLightMode ? "#0284c7" : "#22d3ee"}
-              strokeWidth="1.5"
-              strokeDasharray="4 2"
-              className="animate-spin-slow"
-              style={{ animationDuration: "8s" }}
-            />
-          </svg>
-          <span>In Progress</span>
-        </div>
-
-        {/* Mastered */}
-        <div className="flex items-center gap-1.5">
-          <svg width="14" height="14" viewBox="0 0 14 14" className="shrink-0">
-            <polygon
-              points="7,1 12.5,4 12.5,10 7,13 1.5,10 1.5,4"
-              fill="url(#constellation-grad-mastered)"
-              stroke="#c084fc"
-              strokeWidth="1.2"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M 4.5 7 L 6.2 8.7 L 9.5 5.5"
-              fill="none"
-              stroke="#ffffff"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>Mastered</span>
-        </div>
-
-        {/* Apex */}
-        <div className="flex items-center gap-1.5">
-          <svg width="14" height="14" viewBox="0 0 14 14" className="shrink-0">
-            <polygon
-              points="7,0.5 8.8,4.5 13.5,4.8 9.8,8 11,12.5 7,10 3,12.5 4.2,8 0.5,4.8 5.2,4.5"
-              fill="url(#constellation-grad-apex)"
-              stroke="#f59e0b"
-              strokeWidth="1"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>Apex (115 SP)</span>
-        </div>
       </div>
 
       {/* ─── Main SVG Graph Viewport ──────────────────────────────── */}
@@ -592,54 +515,111 @@ export function SubjectConstellationCanvas({
       >
         <defs>
           {/* Glow Filters */}
-          <filter id="constellation-glow-violet" x="-40%" y="-40%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#8b5cf6" floodOpacity="0.55" />
+          <filter id="celestial-glow-gold" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#f59e0b" floodOpacity={isLightMode ? 0.45 : 0.65} />
           </filter>
-          <filter id="constellation-glow-cyan" x="-40%" y="-40%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#06b6d4" floodOpacity="0.55" />
+          <filter id="celestial-glow-violet" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="7" floodColor="#8b5cf6" floodOpacity={isLightMode ? 0.5 : 0.75} />
           </filter>
-          <filter id="constellation-glow-gold" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#f59e0b" floodOpacity="0.65" />
+          <filter id="celestial-glow-mana" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#a855f7" floodOpacity={isLightMode ? 0.65 : 0.85} />
+          </filter>
+          <filter id="celestial-glow-warm" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#f43f5e" floodOpacity={isLightMode ? 0.5 : 0.75} />
           </filter>
 
-          {/* Gradients */}
-          <linearGradient id="constellation-grad-mastered" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#7c3aed" />
-            <stop offset="100%" stopColor="#4f46e5" />
+          {/* Tier Fill Gradients */}
+          {Object.values(TIER_THEMES).map((t) => (
+            <React.Fragment key={`tgrad-${t.tier}`}>
+              <linearGradient id={`tier-fill-${t.tier}-light`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={t.fillLightStart} />
+                <stop offset="100%" stopColor={t.fillLightEnd} />
+              </linearGradient>
+              <linearGradient id={`tier-fill-${t.tier}-dark`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={t.fillDarkStart} />
+                <stop offset="100%" stopColor={t.fillDarkEnd} />
+              </linearGradient>
+            </React.Fragment>
+          ))}
+
+          {/* Universal Full-Tree Vertical Gradient */}
+          <linearGradient
+            id="global-tree-gradient-light"
+            x1="500"
+            y1="1150"
+            x2="500"
+            y2="70"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#D97706" />
+            <stop offset="10%" stopColor="#EA580C" />
+            <stop offset="20%" stopColor="#F97316" />
+            <stop offset="32%" stopColor="#E11D48" />
+            <stop offset="45%" stopColor="#BE123C" />
+            <stop offset="58%" stopColor="#C026D3" />
+            <stop offset="70%" stopColor="#9333EA" />
+            <stop offset="82%" stopColor="#6366F1" />
+            <stop offset="92%" stopColor="#4F46E5" />
+            <stop offset="100%" stopColor="#7C3AED" />
           </linearGradient>
-          <linearGradient id="constellation-grad-mastered-light" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="100%" stopColor="#6366f1" />
-          </linearGradient>
-          <linearGradient id="constellation-grad-in-progress" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#083344" />
-            <stop offset="100%" stopColor="#0e7490" />
-          </linearGradient>
-          <linearGradient id="constellation-grad-in-progress-light" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#e0f2fe" />
-            <stop offset="100%" stopColor="#bae6fd" />
-          </linearGradient>
-          <linearGradient id="constellation-grad-apex" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#fbbf24" />
-            <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#d97706" />
-          </linearGradient>
-          <linearGradient id="constellation-grad-untouched-dark" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#11131f" />
-            <stop offset="100%" stopColor="#090a10" />
-          </linearGradient>
-          <linearGradient id="constellation-grad-untouched-light" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f8fafc" />
-            <stop offset="100%" stopColor="#f1f5f9" />
+
+          <linearGradient
+            id="global-tree-gradient-dark"
+            x1="500"
+            y1="1150"
+            x2="500"
+            y2="70"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#FBBF24" />
+            <stop offset="10%" stopColor="#FB923C" />
+            <stop offset="20%" stopColor="#FDBA74" />
+            <stop offset="32%" stopColor="#FB7185" />
+            <stop offset="45%" stopColor="#F43F5E" />
+            <stop offset="58%" stopColor="#E879F9" />
+            <stop offset="70%" stopColor="#C084FC" />
+            <stop offset="82%" stopColor="#A5B4FC" />
+            <stop offset="92%" stopColor="#818CF8" />
+            <stop offset="100%" stopColor="#A78BFA" />
           </linearGradient>
 
           <style>{`
-            @keyframes constellation-edge-flow {
-              from { stroke-dashoffset: 80; }
+            @keyframes edgeFlowDash {
+              from { stroke-dashoffset: 40; }
               to { stroke-dashoffset: 0; }
             }
-            .constellation-edge-active {
-              animation: constellation-edge-flow 20s linear infinite;
+            .constellation-active-edge {
+              animation: edgeFlowDash 8s linear infinite;
+            }
+            @keyframes pulseAura {
+              0%, 100% { transform: scale(1); opacity: 0.7; }
+              50% { transform: scale(1.08); opacity: 1; }
+            }
+            .celestial-pulse {
+              animation: pulseAura 3s ease-in-out infinite;
+              transform-origin: center;
+            }
+            @keyframes celestialRotate {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+            .celestial-spin {
+              animation: celestialRotate 20s linear infinite;
+              transform-origin: center;
+            }
+            @keyframes manaWhirlwindPrimary {
+              from { stroke-dashoffset: 400; }
+              to { stroke-dashoffset: 0; }
+            }
+            @keyframes manaWhirlwindSecondary {
+              from { stroke-dashoffset: 0; }
+              to { stroke-dashoffset: -400; }
+            }
+            .mana-flow-primary {
+              animation: manaWhirlwindPrimary 11s linear infinite;
+            }
+            .mana-flow-secondary {
+              animation: manaWhirlwindSecondary 15s linear infinite;
             }
           `}</style>
         </defs>
@@ -651,7 +631,148 @@ export function SubjectConstellationCanvas({
           }}
           className="pointer-events-auto"
         >
-          {/* ─── 68 Cubic Bézier Edges ─────────────────────────────── */}
+          {/* ═══════════════════════════════════════════════════════════════
+              1. ORGANIC WAVY WHIRLWIND MANA FLOW & CELESTIAL BACKDROP
+             ═══════════════════════════════════════════════════════════════ */}
+          <g className="celestial-backdrop">
+            {/* Left Flank — Wavy Whirlwind Mana Streams */}
+            {/* Stream A: Primary Dotted Wavy Guide */}
+            <path
+              d={leftManaStreamA}
+              fill="none"
+              stroke={isLightMode ? "url(#global-tree-gradient-light)" : "url(#global-tree-gradient-dark)"}
+              strokeWidth="1.8"
+              strokeDasharray="4 7"
+              opacity={isLightMode ? 0.42 : 0.48}
+            />
+            {/* Stream A: Ascending Ethereal Whirlwind Mana Pulse */}
+            <path
+              d={leftManaStreamA}
+              fill="none"
+              stroke={isLightMode ? "url(#global-tree-gradient-light)" : "url(#global-tree-gradient-dark)"}
+              strokeWidth="2.4"
+              strokeDasharray="16 54"
+              strokeLinecap="round"
+              filter="url(#celestial-glow-mana)"
+              opacity={isLightMode ? 0.72 : 0.88}
+              className="mana-flow-primary"
+            />
+            {/* Stream B: Intertwining Counter-Spiral Ribbon */}
+            <path
+              d={leftManaStreamB}
+              fill="none"
+              stroke={isLightMode ? "rgba(244, 63, 94, 0.35)" : "rgba(244, 63, 94, 0.45)"}
+              strokeWidth="1.4"
+              strokeDasharray="3 9"
+              filter="url(#celestial-glow-warm)"
+              opacity={isLightMode ? 0.5 : 0.65}
+              className="mana-flow-secondary"
+            />
+
+            {/* Right Flank — Wavy Whirlwind Mana Streams */}
+            {/* Stream A: Primary Dotted Wavy Guide */}
+            <path
+              d={rightManaStreamA}
+              fill="none"
+              stroke={isLightMode ? "url(#global-tree-gradient-light)" : "url(#global-tree-gradient-dark)"}
+              strokeWidth="1.8"
+              strokeDasharray="4 7"
+              opacity={isLightMode ? 0.42 : 0.48}
+            />
+            {/* Stream A: Ascending Ethereal Whirlwind Mana Pulse */}
+            <path
+              d={rightManaStreamA}
+              fill="none"
+              stroke={isLightMode ? "url(#global-tree-gradient-light)" : "url(#global-tree-gradient-dark)"}
+              strokeWidth="2.4"
+              strokeDasharray="16 54"
+              strokeLinecap="round"
+              filter="url(#celestial-glow-mana)"
+              opacity={isLightMode ? 0.72 : 0.88}
+              className="mana-flow-primary"
+            />
+            {/* Stream B: Intertwining Counter-Spiral Ribbon */}
+            <path
+              d={rightManaStreamB}
+              fill="none"
+              stroke={isLightMode ? "rgba(244, 63, 94, 0.35)" : "rgba(244, 63, 94, 0.45)"}
+              strokeWidth="1.4"
+              strokeDasharray="3 9"
+              filter="url(#celestial-glow-warm)"
+              opacity={isLightMode ? 0.5 : 0.65}
+              className="mana-flow-secondary"
+            />
+
+            {/* Apex Concentric Celestial Orbit Halos (Aligned to 500, 100) */}
+            <circle
+              cx="500"
+              cy="100"
+              r="80"
+              fill="none"
+              stroke={isLightMode ? "rgba(139, 92, 246, 0.28)" : "rgba(168, 85, 247, 0.32)"}
+              strokeWidth="1"
+              strokeDasharray="3 5"
+            />
+            <circle
+              cx="500"
+              cy="100"
+              r="130"
+              fill="none"
+              stroke={isLightMode ? "rgba(139, 92, 246, 0.18)" : "rgba(168, 85, 247, 0.22)"}
+              strokeWidth="0.8"
+            />
+            <circle
+              cx="500"
+              cy="100"
+              r="185"
+              fill="none"
+              stroke={isLightMode ? "rgba(139, 92, 246, 0.12)" : "rgba(168, 85, 247, 0.16)"}
+              strokeWidth="0.6"
+              strokeDasharray="6 8"
+            />
+
+            {/* Apex Top Spire Needle (Aligned to 500, 100) */}
+            <line
+              x1="500"
+              y1="52"
+              x2="500"
+              y2="24"
+              stroke={isLightMode ? "#8b5cf6" : "#c084fc"}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d={largeSparklePath}
+              transform="translate(500, 24)"
+              fill={isLightMode ? "#8b5cf6" : "#c084fc"}
+            />
+            <path
+              d={miniSparklePath}
+              transform="translate(500, 38)"
+              fill={isLightMode ? "#8b5cf6" : "#c084fc"}
+            />
+
+            {/* Cardinal Sparkles at Apex */}
+            <line x1="360" y1="100" x2="340" y2="100" stroke={isLightMode ? "#8b5cf6" : "#a855f7"} strokeWidth="1" />
+            <line x1="640" y1="100" x2="660" y2="100" stroke={isLightMode ? "#8b5cf6" : "#a855f7"} strokeWidth="1" />
+            <path d={sparklePath} transform="translate(340, 100)" fill={isLightMode ? "#8b5cf6" : "#c084fc"} />
+            <path d={sparklePath} transform="translate(660, 100)" fill={isLightMode ? "#8b5cf6" : "#c084fc"} />
+
+            {/* Root #01 Halo Background (Aligned to 500, 1100) */}
+            <circle
+              cx="500"
+              cy="1100"
+              r="62"
+              fill="none"
+              stroke={isLightMode ? "rgba(245, 158, 11, 0.28)" : "rgba(251, 191, 36, 0.32)"}
+              strokeWidth="1"
+              strokeDasharray="2 4"
+            />
+          </g>
+
+          {/* ═══════════════════════════════════════════════════════════════
+              2. 68 S-CURVED GRADIENT CONNECTING EDGES
+             ═══════════════════════════════════════════════════════════════ */}
           <g className="edges-layer">
             {SKELETON_EDGES.map(([srcId, tgtId], idx) => {
               const srcNode = skeletonMap.get(srcId);
@@ -663,37 +784,26 @@ export function SubjectConstellationCanvas({
 
               const isSrcMastered = liveSrc?.isMastered || (liveSrc?.progress ?? 0) >= 100;
               const isTgtMastered = liveTgt?.isMastered || (liveTgt?.progress ?? 0) >= 100;
-
               const isSrcActive = (liveSrc?.progress ?? 0) > 0;
               const isTgtActive = (liveTgt?.progress ?? 0) > 0;
 
               const isEdgeMastered = isSrcMastered && isTgtMastered;
-              // Active conduit: Mastered -> Available / In-Progress or active progression path
-              const isEdgeActiveConduit =
+              const isEdgeActive =
                 (isSrcMastered && (isTgtActive || (liveTgt?.progress ?? 0) === 0)) ||
                 (isTgtMastered && isSrcActive) ||
                 (isSrcActive && isTgtActive);
 
-              const midY = (srcNode.y + tgtNode.y) / 2;
-              const d = `M ${srcNode.x} ${srcNode.y} C ${srcNode.x} ${midY}, ${tgtNode.x} ${midY}, ${tgtNode.x} ${tgtNode.y}`;
-
-              let stroke = isLightMode ? "#cbd5e1" : "#27272a";
-              let strokeWidth = 1.5;
-              let strokeDasharray: string | undefined = undefined;
-              let filter: string | undefined = undefined;
-              let edgeClass = "";
-
-              if (isEdgeMastered) {
-                stroke = isLightMode ? "#9333ea" : "#a855f7";
-                strokeWidth = 2.5;
-                filter = isLightMode ? undefined : "url(#constellation-glow-violet)";
-              } else if (isEdgeActiveConduit && (isSrcActive || isTgtActive || isSrcMastered)) {
-                stroke = isLightMode ? "#0284c7" : "#06b6d4";
-                strokeWidth = 2;
-                strokeDasharray = "4 4";
-                filter = isLightMode ? undefined : "url(#constellation-glow-cyan)";
-                edgeClass = "constellation-edge-active";
+              let d: string;
+              if (srcNode.x === tgtNode.x) {
+                d = `M ${srcNode.x} ${srcNode.y} L ${tgtNode.x} ${tgtNode.y}`;
+              } else {
+                const midY = (srcNode.y + tgtNode.y) / 2;
+                d = `M ${srcNode.x} ${srcNode.y} C ${srcNode.x} ${midY}, ${tgtNode.x} ${midY}, ${tgtNode.x} ${tgtNode.y}`;
               }
+
+              const edgeGradient = isLightMode
+                ? "url(#global-tree-gradient-light)"
+                : "url(#global-tree-gradient-dark)";
 
               const isSearchActive =
                 Boolean(searchQuery && searchQuery.trim().length > 0) ||
@@ -704,39 +814,56 @@ export function SubjectConstellationCanvas({
                 !isSearchActive ||
                 matchingNodeIds?.includes(srcId) ||
                 matchingNodeIds?.includes(tgtId);
-              const edgeOpacity = isSearchActive ? (isEdgeMatching ? 0.9 : 0.12) : 1;
+              const edgeOpacity = isSearchActive ? (isEdgeMatching ? 1 : 0.15) : 1;
 
               return (
-                <path
-                  key={`edge-${srcId}-${tgtId}-${idx}`}
-                  d={d}
-                  fill="none"
-                  stroke={stroke}
-                  strokeWidth={strokeWidth}
-                  strokeDasharray={strokeDasharray}
-                  filter={filter}
-                  strokeLinecap="round"
-                  style={{ opacity: edgeOpacity }}
-                  className={`transition-all duration-300 ${edgeClass}`}
-                />
+                <g key={`edge-${srcId}-${tgtId}-${idx}`} style={{ opacity: edgeOpacity }}>
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke={edgeGradient}
+                    strokeWidth={isEdgeMastered ? 2.6 : 1.8}
+                    strokeLinecap="round"
+                    strokeOpacity={isEdgeMastered ? 0.95 : 0.75}
+                    filter={isEdgeMastered ? (isLightMode ? undefined : "url(#celestial-glow-violet)") : undefined}
+                    className="transition-all duration-300"
+                  />
+
+                  {isEdgeActive && (
+                    <path
+                      d={d}
+                      fill="none"
+                      stroke={edgeGradient}
+                      strokeWidth={2}
+                      strokeDasharray="4 6"
+                      strokeOpacity="0.9"
+                      strokeLinecap="round"
+                      className="constellation-active-edge"
+                    />
+                  )}
+                </g>
               );
             })}
           </g>
 
-          {/* ─── 48 Constellation Nodes ────────────────────────────── */}
+          {/* ═══════════════════════════════════════════════════════════════
+              3. 48 CELESTIAL MEDALLION NODES
+             ═══════════════════════════════════════════════════════════════ */}
           <g className="nodes-layer">
             {SKELETON_NODES.map((node) => {
               const live = liveMap.get(node.id);
               const isSelected = selectedNodeId === node.id;
               const isApex = node.tier === 10;
+              const isRoot = node.tier === 1;
 
               const progress = live?.progress ?? 0;
               const isMastered = live?.isMastered || progress >= 100;
               const isStarted = progress > 0 && !isMastered;
-              const isUntouched = progress === 0 && !isMastered;
-
               const isApexReady = isApex && mintedSP >= 115;
-              const isApexSealed = isApex && mintedSP < 115;
+
+              const theme = getTierTheme(node.tier);
+              const nodeCode = getNodeDisplayCode(node.id);
+              const spReward = live?.spAward || 0;
 
               const isSearchActive =
                 Boolean(searchQuery && searchQuery.trim().length > 0) ||
@@ -744,12 +871,13 @@ export function SubjectConstellationCanvas({
                   matchingNodeIds !== null &&
                   matchingNodeIds.length < SKELETON_NODES.length);
               const isNodeMatching = !isSearchActive || matchingNodeIds?.includes(node.id);
-              const nodeOpacity = isSearchActive ? (isNodeMatching ? 1 : 0.2) : 1;
+              const nodeOpacity = isSearchActive ? (isNodeMatching ? 1 : 0.22) : 1;
 
-              const r = getNodeRadius(node.shape);
-              const shapePath = getShapePath(node.shape, r);
-              const nodeCode = getNodeDisplayCode(node.id);
-              const spReward = live?.spAward || 0;
+              const baseRadius = isRoot ? 34 : isApex ? 48 : 20;
+
+              const strokeColor = isLightMode ? theme.strokeLight : theme.strokeDark;
+              const textColor = isLightMode ? theme.textLight : theme.textDark;
+              const fillUrl = isLightMode ? `url(#tier-fill-${node.tier}-light)` : `url(#tier-fill-${node.tier}-dark)`;
 
               return (
                 <g
@@ -759,248 +887,269 @@ export function SubjectConstellationCanvas({
                     e.stopPropagation();
                     handleNodeClick(node);
                   }}
-                  className="cursor-pointer group transition-opacity duration-300"
+                  className="cursor-pointer group transition-all duration-300"
                   style={{ opacity: nodeOpacity }}
                 >
-                  {/* Invisible Hitbox for touch targets (>= 44x44px) */}
-                  <circle r={r + 12} fill="transparent" pointerEvents="all" />
+                  <circle r={baseRadius + 14} fill="transparent" pointerEvents="all" />
 
                   {/* Selection Ring */}
                   {isSelected && (
-                    <circle
-                      r={r + 8}
-                      fill="none"
-                      stroke={accentColor}
-                      strokeWidth={2.5}
-                      strokeDasharray="4 4"
-                      className="animate-spin-slow opacity-90"
-                      style={{ animationDuration: "12s" }}
-                    />
-                  )}
-
-                  {/* Pulsing Aura for Active or Apex-Ready Nodes */}
-                  {(isStarted || isApexReady) && (
-                    <circle
-                      r={r + 6}
-                      fill="none"
-                      stroke={
-                        isApexReady
-                          ? isLightMode
-                            ? "#d97706"
-                            : "#f59e0b"
-                          : isLightMode
-                          ? "#0284c7"
-                          : "#06b6d4"
-                      }
-                      strokeWidth={1.5}
-                      className="animate-ping opacity-30"
-                      style={{ animationDuration: "3s" }}
-                    />
-                  )}
-
-                  {/* ─── 4-Tier Node Visual Hierarchy ─── */}
-
-                  {/* 1. APEX NODE */}
-                  {isApex ? (
-                    <>
-                      <path
-                        d={shapePath}
-                        fill={
-                          isApexReady
-                            ? "url(#constellation-grad-apex)"
-                            : isLightMode
-                            ? "#e2e8f0"
-                            : "#18181b"
-                        }
-                        stroke={
-                          isSelected
-                            ? isLightMode
-                              ? "#0f172a"
-                              : "#ffffff"
-                            : isApexReady
-                            ? isLightMode
-                              ? "#b45309"
-                              : "#f59e0b"
-                            : isLightMode
-                            ? "#94a3b8"
-                            : "#3f3f46"
-                        }
-                        strokeWidth={isSelected ? 3.5 : isApexReady ? 3 : 2}
-                        strokeLinejoin="round"
-                        filter={isApexReady ? "url(#constellation-glow-gold)" : undefined}
-                        className="transition-all duration-300 group-hover:scale-105"
-                        style={{ transformOrigin: "0px 0px" }}
-                      />
-                      <g transform="translate(-10, -10)" className="pointer-events-none">
-                        {isApexReady ? (
-                          <Flame
-                            className={`w-5 h-5 ${
-                              isLightMode
-                                ? "text-amber-950 drop-shadow-sm"
-                                : "text-amber-100 drop-shadow-[0_0_8px_rgba(245,158,11,1)]"
-                            }`}
-                          />
-                        ) : (
-                          <Lock
-                            className={`w-5 h-5 ${
-                              isLightMode ? "text-slate-500" : "text-zinc-500"
-                            }`}
-                          />
-                        )}
-                      </g>
-                    </>
-                  ) : isMastered ? (
-                    /* 2. MASTERED NODE */
-                    <>
-                      <path
-                        d={shapePath}
-                        fill={
-                          isLightMode
-                            ? "url(#constellation-grad-mastered-light)"
-                            : "url(#constellation-grad-mastered)"
-                        }
-                        stroke={
-                          isSelected
-                            ? isLightMode
-                              ? "#0f172a"
-                              : "#ffffff"
-                            : isLightMode
-                            ? "#7c3aed"
-                            : "#c084fc"
-                        }
-                        strokeWidth={isSelected ? 3 : 2.5}
-                        strokeLinejoin="round"
-                        filter={isLightMode ? undefined : "url(#constellation-glow-violet)"}
-                        className="transition-all duration-300 group-hover:scale-105"
-                        style={{ transformOrigin: "0px 0px" }}
-                      />
-
-                      {/* Center Checkmark Icon */}
-                      <path
-                        d="M -5 0.5 L -1.5 4.5 L 6 -3.5"
+                    <g className="celestial-spin">
+                      <circle
+                        r={baseRadius + 9}
                         fill="none"
-                        stroke="#ffffff"
-                        strokeWidth="2.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="pointer-events-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]"
+                        stroke={strokeColor}
+                        strokeWidth="2"
+                        strokeDasharray="5 4"
+                        opacity="0.9"
+                      />
+                      <circle cx={baseRadius + 9} cy="0" r="2.5" fill={strokeColor} />
+                      <circle cx={-(baseRadius + 9)} cy="0" r="2.5" fill={strokeColor} />
+                      <circle cx="0" cy={baseRadius + 9} r="2.5" fill={strokeColor} />
+                      <circle cx="0" cy={-(baseRadius + 9)} r="2.5" fill={strokeColor} />
+                    </g>
+                  )}
+
+                  {/* Sparkle star on keystones */}
+                  {SPARKLE_NODE_IDS.has(node.id) && (
+                    <path
+                      d={sparklePath}
+                      transform={`translate(${node.x > 500 ? 18 : node.x < 500 ? -18 : 0}, -20)`}
+                      fill={strokeColor}
+                      opacity={isLightMode ? 0.75 : 0.9}
+                      className="celestial-pulse"
+                    />
+                  )}
+
+                  {/* ════════════════════════════════════════════════════
+                      CASE A: ROOT NODE (#01) WITH BOTANICAL LAUREL WREATH
+                     ════════════════════════════════════════════════════ */}
+                  {isRoot ? (
+                    <g className="transition-transform duration-300 group-hover:scale-105">
+                      <g
+                        fill={strokeColor}
+                        stroke={strokeColor}
+                        strokeWidth="1.2"
+                        opacity={isLightMode ? "0.88" : "0.95"}
+                      >
+                        <path d={leftLaurel.stem} fill="none" strokeWidth="1.6" strokeLinecap="round" />
+                        {leftLaurel.leaves.map((leaf, lIdx) => (
+                          <path key={`ll-${lIdx}`} d={leaf.d} />
+                        ))}
+                        <path d={rightLaurel.stem} fill="none" strokeWidth="1.6" strokeLinecap="round" />
+                        {rightLaurel.leaves.map((leaf, lIdx) => (
+                          <path key={`rl-${lIdx}`} d={leaf.d} />
+                        ))}
+                      </g>
+
+                      <circle
+                        r="44"
+                        fill="none"
+                        stroke={strokeColor}
+                        strokeWidth="1"
+                        strokeDasharray="3 4"
+                        opacity="0.6"
+                      />
+                      <path d={sparklePath} transform="translate(0, -44)" fill={strokeColor} />
+                      <path d={sparklePath} transform="translate(0, 44)" fill={strokeColor} />
+                      <path d={sparklePath} transform="translate(-44, 0)" fill={strokeColor} />
+                      <path d={sparklePath} transform="translate(44, 0)" fill={strokeColor} />
+
+                      <path
+                        d={rootMedallionPath}
+                        fill={fillUrl}
+                        stroke={strokeColor}
+                        strokeWidth="2.2"
+                        filter={isLightMode ? undefined : "url(#celestial-glow-gold)"}
                       />
 
-                      {/* Clean Floating SP Bonus Chip at 45° Top-Right Vertex */}
-                      {spReward > 0 && (
-                        <g transform={`translate(${r * 0.72}, ${-r * 0.72})`}>
+                      <circle
+                        r="25"
+                        fill="none"
+                        stroke={strokeColor}
+                        strokeWidth="1"
+                        opacity="0.5"
+                      />
+
+                      <text
+                        x="0"
+                        y="1"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill={textColor}
+                        className="font-['Rajdhani'] font-bold text-[18px] tracking-wide select-none pointer-events-none"
+                      >
+                        #01
+                      </text>
+                    </g>
+                  ) : isApex ? (
+                    /* ════════════════════════════════════════════════════
+                        CASE B: GRANDER MULTIFACETED APEX CELESTIAL STAR
+                       ════════════════════════════════════════════════════ */
+                    <g className="transition-transform duration-300 group-hover:scale-105">
+                      <path
+                        d={apexStarPath}
+                        fill={fillUrl}
+                        stroke={strokeColor}
+                        strokeWidth={isSelected ? 3 : 2.4}
+                        strokeLinejoin="round"
+                        filter="url(#celestial-glow-violet)"
+                      />
+
+                      {apexFacetLines.map((line, lIdx) => (
+                        <line
+                          key={`apex-facet-${lIdx}`}
+                          x1={line.x1}
+                          y1={line.y1}
+                          x2={line.x2}
+                          y2={line.y2}
+                          stroke={isLightMode ? "#c084fc" : "#a78bfa"}
+                          strokeWidth="0.9"
+                          opacity="0.65"
+                        />
+                      ))}
+
+                      <circle
+                        r="26"
+                        fill="none"
+                        stroke={isLightMode ? "#c084fc" : "#a78bfa"}
+                        strokeWidth="1"
+                        strokeDasharray="3 3"
+                        opacity="0.75"
+                      />
+
+                      <circle
+                        r="18"
+                        fill={isLightMode ? "#f3e8ff" : "#3b0764"}
+                        stroke={strokeColor}
+                        strokeWidth="1.6"
+                      />
+                      <circle
+                        r="15"
+                        fill="none"
+                        stroke={isLightMode ? "#ddd6fe" : "#7c3aed"}
+                        strokeWidth="0.8"
+                        opacity="0.8"
+                      />
+
+                      {/* 100% Mathematically Centered Vector Padlock or Flame */}
+                      {isApexReady || isMastered ? (
+                        <g transform="translate(-9, -9)" className="pointer-events-none">
+                          <Flame className="w-4.5 h-4.5 text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,1)]" />
+                        </g>
+                      ) : (
+                        <g
+                          transform="translate(0, -0.6)"
+                          className="pointer-events-none"
+                          fill="none"
+                          stroke={isLightMode ? "#7c3aed" : "#c084fc"}
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M -4.5 -1.5 V -5 C -4.5 -8 4.5 -8 4.5 -5 V -1.5" />
+                          <rect
+                            x="-6.5"
+                            y="-1.5"
+                            width="13"
+                            height="9.5"
+                            rx="2.2"
+                            fill={isLightMode ? "rgba(124, 58, 237, 0.15)" : "rgba(192, 132, 252, 0.25)"}
+                          />
+                          <circle cx="0" cy="2.2" r="1.1" fill={isLightMode ? "#7c3aed" : "#c084fc"} stroke="none" />
+                          <line x1="0" y1="3" x2="0" y2="5" strokeWidth="1.2" />
+                        </g>
+                      )}
+                    </g>
+                  ) : (
+                    /* ════════════════════════════════════════════════════
+                        CASE C: INTERMEDIATE NODES (#02 TO #47)
+                       ════════════════════════════════════════════════════ */
+                    <g className="transition-transform duration-300 group-hover:scale-105">
+                      {isStarted && (
+                        <circle
+                          r={baseRadius + 4}
+                          fill="none"
+                          stroke={strokeColor}
+                          strokeWidth="1.5"
+                          className="celestial-pulse opacity-70"
+                        />
+                      )}
+
+                      <path
+                        d={standardMedallionPath}
+                        fill={fillUrl}
+                        stroke={isSelected ? (isLightMode ? "#0f172a" : "#ffffff") : strokeColor}
+                        strokeWidth={isSelected ? 2.6 : 1.8}
+                        strokeLinejoin="round"
+                        filter={isMastered || isStarted ? (isLightMode ? undefined : "url(#celestial-glow-violet)") : undefined}
+                      />
+
+                      <circle
+                        r="13.5"
+                        fill="none"
+                        stroke={strokeColor}
+                        strokeWidth="0.8"
+                        opacity="0.45"
+                      />
+
+                      <text
+                        x="0"
+                        y="1"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill={textColor}
+                        className="font-['Rajdhani'] font-bold text-[11px] tracking-tight select-none pointer-events-none"
+                      >
+                        {nodeCode}
+                      </text>
+
+                      {isMastered && (
+                        <g transform="translate(12, -12)">
                           <circle
-                            r={8.5}
+                            r="6.5"
+                            fill={strokeColor}
+                            stroke={isLightMode ? "#ffffff" : "#090a12"}
+                            strokeWidth="1"
+                          />
+                          <Check className="w-2.5 h-2.5 text-white stroke-[3] -translate-x-[5px] -translate-y-[5px]" />
+                        </g>
+                      )}
+
+                      {isMastered && spReward > 0 && (
+                        <g transform="translate(-13, -12)">
+                          <circle
+                            r="6"
                             fill={isLightMode ? "#6d28d9" : "#3b0764"}
-                            stroke={isLightMode ? "#ede9fe" : "#c084fc"}
-                            strokeWidth={1.5}
-                            className="drop-shadow-sm"
+                            stroke={isLightMode ? "#ddd6fe" : "#c084fc"}
+                            strokeWidth="1"
                           />
                           <text
-                            x={0}
-                            y={0}
+                            x="0"
+                            y="0.5"
                             textAnchor="middle"
                             dominantBaseline="central"
-                            className="font-mono font-bold text-[8.5px] fill-white select-none pointer-events-none"
+                            className="font-mono font-bold text-[7px] fill-white select-none pointer-events-none"
                           >
                             +{spReward}
                           </text>
                         </g>
                       )}
-                    </>
-                  ) : isStarted ? (
-                    /* 3. IN PROGRESS NODE */
-                    <>
-                      <path
-                        d={shapePath}
-                        fill={
-                          isLightMode
-                            ? "url(#constellation-grad-in-progress-light)"
-                            : "url(#constellation-grad-in-progress)"
-                        }
-                        stroke={
-                          isSelected
-                            ? isLightMode
-                              ? "#0f172a"
-                              : "#ffffff"
-                            : isLightMode
-                            ? "#0284c7"
-                            : "#22d3ee"
-                        }
-                        strokeWidth={isSelected ? 3 : 2.5}
-                        strokeLinejoin="round"
-                        filter={isLightMode ? undefined : "url(#constellation-glow-cyan)"}
-                        className="transition-all duration-300 group-hover:scale-105"
-                        style={{ transformOrigin: "0px 0px" }}
-                      />
 
-                      {/* Perimeter Progress Ring Gauge */}
-                      <circle
-                        r={r + 3}
-                        fill="none"
-                        stroke={isLightMode ? "#0284c7" : "#06b6d4"}
-                        strokeWidth={2.5}
-                        strokeDasharray={`${(progress / 100) * (2 * Math.PI * (r + 3))} ${
-                          2 * Math.PI * (r + 3)
-                        }`}
-                        strokeDashoffset="0"
-                        strokeLinecap="round"
-                        transform="rotate(-90)"
-                      />
-
-                      {/* Monospace Completion Percentage */}
-                      <text
-                        x={0}
-                        y={0}
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        className={`font-mono font-bold text-[10px] tracking-tight select-none pointer-events-none ${
-                          isLightMode ? "fill-sky-950 font-extrabold" : "fill-cyan-300"
-                        }`}
-                      >
-                        {Math.round(progress)}%
-                      </text>
-                    </>
-                  ) : (
-                    /* 4. UNTOUCHED / LOCKED NODE */
-                    <>
-                      <path
-                        d={shapePath}
-                        fill={
-                          isLightMode
-                            ? "url(#constellation-grad-untouched-light)"
-                            : "url(#constellation-grad-untouched-dark)"
-                        }
-                        stroke={
-                          isSelected
-                            ? isLightMode
-                              ? "#0f172a"
-                              : "#ffffff"
-                            : isLightMode
-                            ? "#cbd5e1"
-                            : "#334155"
-                        }
-                        strokeWidth={isSelected ? 2.5 : 1.5}
-                        strokeLinejoin="round"
-                        className="transition-all duration-300 group-hover:scale-105"
-                        style={{ transformOrigin: "0px 0px" }}
-                      />
-
-                      {/* Sharp Monospace Index */}
-                      <text
-                        x={0}
-                        y={0}
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                        className={`font-mono font-bold text-[11px] tracking-wider select-none pointer-events-none transition-colors ${
-                          isLightMode
-                            ? "fill-slate-600 group-hover:fill-slate-900"
-                            : "fill-slate-400 group-hover:fill-slate-200"
-                        }`}
-                      >
-                        {nodeCode}
-                      </text>
-                    </>
+                      {isStarted && (
+                        <circle
+                          r="16"
+                          fill="none"
+                          stroke={strokeColor}
+                          strokeWidth="2"
+                          strokeDasharray={`${(progress / 100) * (2 * Math.PI * 16)} ${2 * Math.PI * 16}`}
+                          strokeDashoffset="0"
+                          strokeLinecap="round"
+                          transform="rotate(-90)"
+                          opacity="0.85"
+                        />
+                      )}
+                    </g>
                   )}
                 </g>
               );

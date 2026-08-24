@@ -196,6 +196,7 @@ model User {
   aiInsights     AiInsight[]
   dailyBriefings DailyBriefingLog[]
   quotaUsage     UserQuota[]
+  aiUsageLogs    AiUsageLog[]
 
   // Social
   friendshipsAsUser   Friendship[]              @relation("friendshipsAsUser")
@@ -372,6 +373,9 @@ model SystemMessage {
   type          SystemMessageType
   read          Boolean           @default(false)
   attachmentUrl String? // Optional URL for uploaded files (images, pdfs, etc)
+  /// Engine/model that produced this reply (e.g. "DEEPSEEK (deepseek-v4-flash)",
+  /// "Deterministic (no LLM)"). Kept out of the content so it never renders.
+  modelUsed     String?
   createdAt     DateTime          @default(now())
 
   @@index([userId, read, createdAt(sort: Desc)])
@@ -600,6 +604,27 @@ model UserQuota {
 
   @@unique([userId, feature, dateKey])
   @@index([userId])
+}
+
+/// Request-level AI cost telemetry: every successful LLM generation is
+/// recorded with token counts and an estimated USD cost so the owner can
+/// see where the API balance actually goes. Diagnostic-only.
+model AiUsageLog {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feature          String // "chat" | "planner" | "syllabus" | "other"
+  workload         String? // agent-router workload (e.g. "simple", "general_chat")
+  provider         String
+  model            String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  cacheHitTokens   Int      @default(0) // input tokens served from DeepSeek's context cache
+  estimatedCostUsd Float    @default(0)
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([feature, createdAt])
 }
 
 model UserCosmetic {

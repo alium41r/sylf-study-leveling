@@ -26,7 +26,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <GlobalSystemWrapper>
-              <div className="min-h-screen w-full bg-background text-foreground flex flex-col md:flex-row overflow-x-clip">
+              <div className="min-h-screen w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-x-clip">
                 <SidebarWrapper />
                 <main className="flex-1 w-full min-w-0 flex flex-col">
                   {children}

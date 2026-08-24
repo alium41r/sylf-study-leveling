@@ -1,26 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Calendar,
-  Lock,
-  Sparkles,
-  X,
-  Clock,
-  Check,
-  AlertCircle,
-  Brain,
-  Layers,
-} from "lucide-react";
+import { Brain, Sparkles, X } from "lucide-react";
+import AiPlannerPanel, { QuotaInfo } from "./AiPlannerPanel";
 
-export interface QuotaInfo {
-  used: number;
-  limit: number;
-  remaining: number;
-  resetsAt: string;
-  allowed?: boolean;
-}
+export type { QuotaInfo } from "./AiPlannerPanel";
 
 interface AiPlannerModalProps {
   isOpen: boolean;
@@ -31,235 +16,28 @@ interface AiPlannerModalProps {
   sessionId?: number | null;
 }
 
-export default function AiPlannerModal({
+/**
+ * Classic centered modal around the shared AiPlannerPanel.
+ * The Planner itself also lives as a tab in the /system workspace.
+ */
+export function AiPlannerModal({
   isOpen,
   onClose,
   onPlanCreated,
-  quota: propQuota,
+  quota,
   onQuotaRefresh,
   sessionId,
 }: AiPlannerModalProps) {
-  const [goalTitle, setGoalTitle] = useState("");
-  const [syllabusText, setSyllabusText] = useState("");
-  const [targetDate, setTargetDate] = useState("");
-  const [effortLevel, setEffortLevel] = useState(10); // Hours per week
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const [localQuota, setLocalQuota] = useState<QuotaInfo | null>(propQuota || null);
-  const [thoughts, setThoughts] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  const thoughtsEndRef = useRef<HTMLDivElement>(null);
-  const dateInputRef = useRef<HTMLInputElement>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
-
-  const handleClose = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    setIsGenerating(false);
-    setError(null);
-    onClose();
-  };
-
-  // Sync prop quota to local quota
-  useEffect(() => {
-    if (propQuota !== undefined) {
-      setLocalQuota(propQuota);
-    }
-  }, [propQuota]);
-
-  // Fetch latest quota on open if not provided
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchLatestQuota = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("/api/ai-usage", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.planner) {
-            setLocalQuota(data.planner);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch planner quota:", err);
-      }
-    };
-
-    fetchLatestQuota();
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (thoughtsEndRef.current) {
-      thoughtsEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [thoughts]);
-
   if (!isOpen) return null;
 
-  const isQuotaExhausted = localQuota !== null && (localQuota.remaining === 0 || localQuota.allowed === false);
-
-  const formatResetTime = (isoString?: string) => {
-    if (!isoString) return "Midnight (12:00 AM)";
-    try {
-      const target = new Date(isoString);
-      const now = new Date();
-      const diffMs = target.getTime() - now.getTime();
-
-      let countdown = "";
-      if (diffMs > 0) {
-        const totalMins = Math.floor(diffMs / (1000 * 60));
-        const hours = Math.floor(totalMins / 60);
-        const mins = totalMins % 60;
-        if (hours > 0) {
-          countdown = `in ${hours}h ${mins}m`;
-        } else {
-          countdown = `in ${mins}m`;
-        }
-      }
-
-      const localTime = target.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      });
-
-      return countdown ? `Midnight (${countdown})` : `Midnight (${localTime})`;
-    } catch {
-      return "Midnight (12:00 AM)";
-    }
-  };
-
-  const handleGenerate = async () => {
-    if (isQuotaExhausted) {
-      setError("Daily generation limit reached. Free tier accounts receive 1 AI Study Plan per day.");
-      return;
-    }
-
-    if (!goalTitle.trim()) {
-      setError("Please enter a subject or goal title.");
-      return;
-    }
-    setError(null);
-    setIsGenerating(true);
-    setThoughts(["Initializing Multi-Agent Intelligence Engine..."]);
-
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("/api/ai-planner", {
-        method: "POST",
-        signal: controller.signal,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          topic: goalTitle,
-          syllabus: syllabusText,
-          effortHours: effortLevel,
-          targetDate: targetDate || null,
-          sessionId: sessionId || undefined,
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        if (res.status === 429 || errData.error === "quota_exceeded") {
-          setLocalQuota((prev) => (prev ? { ...prev, remaining: 0, allowed: false } : null));
-          throw new Error("Daily limit reached. You have used your 1 free AI Study Plan for today.");
-        }
-        throw new Error(errData.error || "Failed to generate plan");
-      }
-
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
-
-      if (reader) {
-        let buffer = "";
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const parts = buffer.split("\n\n");
-          buffer = parts.pop() || "";
-
-          for (const part of parts) {
-            if (part.startsWith("data: ")) {
-              const dataStr = part.substring(6);
-              try {
-                const data = JSON.parse(dataStr);
-                if (data.type === "thought") {
-                  setThoughts((prev) => [...prev, data.text]);
-                } else if (data.type === "result") {
-                  setThoughts((prev) => [...prev, "Plan finalized and quests created!"]);
-
-                  // Refresh quota state
-                  if (onQuotaRefresh) onQuotaRefresh();
-                  setLocalQuota((prev) => (prev ? { ...prev, used: prev.used + 1, remaining: 0, allowed: false } : null));
-
-                  setTimeout(() => {
-                    setIsGenerating(false);
-                    if (onPlanCreated) onPlanCreated(data);
-                    onClose();
-                    setGoalTitle("");
-                    setSyllabusText("");
-                    setTargetDate("");
-                    setEffortLevel(10);
-                    setThoughts([]);
-                  }, 1200);
-                  return;
-                } else if (data.type === "error") {
-                  const displayErr =
-                    data.message === "AI_TIMEOUT" || data.message?.includes("AI_TIMEOUT")
-                      ? "Generation took longer than expected while researching multiple topics. Please try again or refine your topic scope."
-                      : data.message || "Failed to generate study plan.";
-                  setError(displayErr);
-                  setIsGenerating(false);
-                  setThoughts([]);
-                  return;
-                }
-              } catch (e) {
-                console.error("Error parsing SSE JSON:", e, dataStr);
-              }
-            }
-          }
-        }
-      }
-    } catch (err: any) {
-      if (err.name === "AbortError") {
-        setIsGenerating(false);
-        setThoughts([]);
-        return;
-      }
-      const displayErr =
-        err.message === "AI_TIMEOUT" || err.message?.includes("AI_TIMEOUT")
-          ? "Generation took longer than expected while researching multiple topics. Please try again."
-          : err.message || "Failed to generate study plan.";
-      setError(displayErr);
-      setIsGenerating(false);
-      setThoughts([]);
-    } finally {
-      abortControllerRef.current = null;
-    }
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+    <div className="fixed inset-0 z-[85] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 16 }}
-          className="rounded-2xl w-full max-w-xl overflow-hidden relative shadow-2xl border border-border-subtle bg-bg-panel/95 backdrop-blur-xl"
+          className="rounded-2xl w-full max-w-xl overflow-hidden relative shadow-2xl border border-border-subtle bg-bg-panel/95 backdrop-blur-xl max-h-[92dvh] overflow-y-auto chat-scroll"
         >
           {/* Ambient Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary-dim/20 rounded-full blur-3xl pointer-events-none" />
@@ -277,17 +55,17 @@ export default function AiPlannerModal({
                   </span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-accent-primary-dim border border-accent-primary-mid/40 text-accent-text-light flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-accent-primary" />
-                    <span>Gemini 2.5 Flash</span>
+                    <span>Multi-Agent</span>
                   </span>
-                  {localQuota && (
+                  {quota && (
                     <span
                       className={`text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded-full border ${
-                        localQuota.used >= localQuota.limit
+                        quota.used >= quota.limit
                           ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
                           : "bg-bg-abyss border-border-subtle text-text-muted"
                       }`}
                     >
-                      {localQuota.used} / {localQuota.limit} Free Daily Plan
+                      {quota.used} / {quota.limit} Free Daily Plan
                     </span>
                   )}
                 </h2>
@@ -300,7 +78,7 @@ export default function AiPlannerModal({
             {/* Always accessible close button */}
             <button
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               className="p-2 rounded-xl hover:bg-bg-abyss text-text-muted hover:text-text-primary transition-colors border border-transparent hover:border-border-subtle"
               title="Close Planner"
             >
@@ -310,251 +88,22 @@ export default function AiPlannerModal({
 
           {/* Body */}
           <div className="p-6 text-text-primary relative z-10">
-            {/* ─── CASE 1: QUOTA EXHAUSTED LOCKED VIEW ─────────── */}
-            {isQuotaExhausted && !isGenerating ? (
-              <div className="flex flex-col items-center justify-center text-center py-6 px-4 space-y-5">
-                {/* Glowing Lock Icon */}
-                <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
-                    <Lock className="w-10 h-10 animate-pulse" />
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-bg-abyss border border-border-subtle text-amber-400">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                </div>
-
-                <div className="space-y-2 max-w-md">
-                  <h3 className="text-xl font-bold font-['Rajdhani'] text-text-primary tracking-wide">
-                    Daily Planner Quota Reached
-                  </h3>
-                  <p className="text-xs text-text-secondary font-['Rajdhani'] leading-relaxed">
-                    You have already used your <span className="text-amber-400 font-bold">1 free AI Study Plan</span> for today. Free tier accounts receive 1 comprehensive multi-week syllabus generation per day.
-                  </p>
-                </div>
-
-                {/* Reset Information Card */}
-                <div className="w-full max-w-sm p-4 rounded-xl bg-bg-abyss/80 border border-border-subtle flex items-center justify-between text-xs font-['Rajdhani']">
-                  <div className="flex items-center gap-2.5 text-text-muted">
-                    <Clock className="w-4 h-4 text-accent-text-light" />
-                    <span>Daily Quota Reset:</span>
-                  </div>
-                  <span className="font-bold font-mono text-accent-text-light">
-                    {formatResetTime(localQuota?.resetsAt)}
-                  </span>
-                </div>
-
-                {/* Close Action */}
-                <div className="w-full max-w-sm pt-2">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="w-full py-3 rounded-xl bg-bg-panel hover:bg-bg-shadow border border-border-subtle hover:border-accent-primary text-xs font-['Rajdhani'] font-bold text-text-primary uppercase tracking-wider transition-all shadow-sm"
-                  >
-                    Close Planner
-                  </button>
-                </div>
-              </div>
-            ) : isGenerating ? (
-              /* ─── CASE 2: ACTIVE GENERATION SSE THOUGHT STREAM ─── */
-              <div className="flex flex-col py-4 space-y-6">
-                <div className="flex justify-center mb-2">
-                  <div className="relative w-20 h-20">
-                    <motion.div
-                      className="absolute inset-0 rounded-full border-t-2 border-accent-primary opacity-80"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-                    />
-                    <motion.div
-                      className="absolute inset-2 rounded-full border-r-2 border-accent-primary-light opacity-80"
-                      animate={{ rotate: -360 }}
-                      transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center text-accent-text-light">
-                      <Sparkles className="w-7 h-7 animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thoughts Terminal */}
-                <div className="rounded-xl p-4 h-48 overflow-y-auto font-mono text-xs bg-bg-void border border-border-subtle text-accent-text-light shadow-inner">
-                  {thoughts.map((t, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="mb-2 flex items-start gap-2"
-                    >
-                      <span className="text-text-muted select-none">{">"}</span>
-                      <span className="leading-relaxed">{t}</span>
-                    </motion.div>
-                  ))}
-                  <div ref={thoughtsEndRef} />
-                </div>
-
-                {/* Generation Status Indicator */}
-                <div className="flex items-center justify-center pt-1">
-                  <span className="text-[11px] text-text-muted font-mono flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-accent-primary animate-ping" />
-                    <span>Researching syllabus & structuring quests...</span>
-                  </span>
-                </div>
-              </div>
-            ) : (
-              /* ─── CASE 3: STANDARD FORM INPUT ─────────────────── */
-              <div className="space-y-5">
-                {error && (
-                  <div className="p-3.5 bg-rose-500/15 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-['Rajdhani'] font-bold flex items-center gap-2.5">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>{error}</span>
-                  </div>
-                )}
-
-                {/* Subject / Master Topic */}
-                <div>
-                  <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted mb-1.5">
-                    What do you want to master?
-                  </label>
-                  <input
-                    type="text"
-                    value={goalTitle}
-                    onChange={(e) => setGoalTitle(e.target.value)}
-                    placeholder="e.g., AP Physics 1, AWS Cloud Practitioner, Quantum Mechanics..."
-                    className="w-full rounded-xl px-4 py-3 bg-bg-void border border-border-subtle text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-all shadow-inner"
-                  />
-                </div>
-
-                {/* Deadline Date Picker Container with Visual Button */}
-                <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted">
-                      Deadline / Exam Date (Optional)
-                    </label>
-                    {targetDate && (
-                      <span className="text-[10px] text-accent-text-light font-mono font-bold">
-                        Selected: {targetDate}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="relative flex items-center group">
-                    <input
-                      ref={dateInputRef}
-                      type="date"
-                      value={targetDate}
-                      onChange={(e) => setTargetDate(e.target.value)}
-                      min={new Date().toISOString().split("T")[0]}
-                      className="w-full rounded-xl px-4 py-3 pl-11 pr-24 bg-bg-void border border-border-subtle text-xs font-['Rajdhani'] text-text-primary focus:outline-none focus:border-accent-primary transition-all shadow-inner cursor-pointer"
-                      style={{
-                        colorScheme: "dark",
-                      }}
-                      onClick={() => {
-                        try {
-                          dateInputRef.current?.showPicker();
-                        } catch {}
-                      }}
-                    />
-
-                    {/* Left Calendar Icon */}
-                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-accent-text-light flex items-center">
-                      <Calendar className="w-4 h-4" />
-                    </div>
-
-                    {/* Right Visual Action Buttons */}
-                    <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                      {targetDate && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setTargetDate("");
-                          }}
-                          className="p-1.5 rounded-lg hover:bg-rose-500/20 text-text-muted hover:text-rose-400 transition-colors"
-                          title="Clear date"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          try {
-                            dateInputRef.current?.showPicker();
-                          } catch {}
-                        }}
-                        className="px-2.5 py-1.5 rounded-lg bg-bg-abyss hover:bg-bg-shadow border border-border-subtle hover:border-accent-primary text-accent-text-light text-[11px] font-['Rajdhani'] font-bold flex items-center gap-1.5 transition-all shadow-sm"
-                        title="Pick Deadline Date"
-                      >
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>Pick Date</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-text-muted font-['Rajdhani'] mt-1">
-                    Leave blank for continuous learning with no strict deadlines.
-                  </p>
-                </div>
-
-                {/* Syllabus / Topics */}
-                <div>
-                  <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted mb-1.5">
-                    Syllabus / Topics (Optional)
-                  </label>
-                  <textarea
-                    value={syllabusText}
-                    onChange={(e) => setSyllabusText(e.target.value)}
-                    placeholder="Paste your chapters, topics, or course outline here..."
-                    rows={3}
-                    className="w-full rounded-xl px-4 py-3 bg-bg-void border border-border-subtle text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted resize-none focus:outline-none focus:border-accent-primary transition-all shadow-inner leading-relaxed"
-                  />
-                </div>
-
-                {/* Target Effort Level Slider */}
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted">
-                      Target Effort Level
-                    </label>
-                    <span className="text-xs text-accent-text-light font-bold font-['Rajdhani'] bg-accent-primary-dim px-3 py-1 rounded-full border border-accent-primary-mid">
-                      {effortLevel} hrs / week
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="40"
-                    value={effortLevel}
-                    onChange={(e) => setEffortLevel(Number(e.target.value))}
-                    className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-bg-void border border-border-subtle"
-                    style={{ accentColor: "var(--accent-primary)" }}
-                  />
-                  <div className="flex justify-between text-[10px] text-text-muted mt-1.5 font-['Rajdhani'] font-medium">
-                    <span>Chill (1 hr)</span>
-                    <span>Moderate (15 hrs)</span>
-                    <span>Intense (40 hrs)</span>
-                  </div>
-                </div>
-
-                {/* Submit Action */}
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  className="w-full btn-primary py-3.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider mt-2 flex items-center justify-center gap-2 shadow-md transition-all"
-                  style={{
-                    background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-                    color: "var(--text-primary)",
-                    border: "none",
-                  }}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Generate AI Study Plan</span>
-                </button>
-              </div>
-            )}
+            <AiPlannerPanel
+              quota={quota}
+              onQuotaRefresh={onQuotaRefresh}
+              sessionId={sessionId}
+              embedded={false}
+              onClose={onClose}
+              onComplete={(data) => {
+                if (onPlanCreated) onPlanCreated(data);
+                onClose();
+              }}
+            />
           </div>
         </motion.div>
       </AnimatePresence>
     </div>
   );
 }
+
+export default AiPlannerModal;

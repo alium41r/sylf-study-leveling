@@ -31,7 +31,7 @@ const TOOL_CONFIG: Record<
 };
 
 export default function FocusToolWindow() {
-  const { activeTool, closeTool, windowMode, setWindowMode, dockAnchor } = useFocusTools();
+  const { activeTool, openTool, closeTool, windowMode, setWindowMode, dockAnchor } = useFocusTools();
 
   if (!activeTool) return null;
 
@@ -45,7 +45,7 @@ export default function FocusToolWindow() {
     dockAnchor === "bottom-left" || dockAnchor === "left" || dockAnchor === "top-left";
   const isTopAnchored = dockAnchor === "top-left" || dockAnchor === "top-right";
 
-    const positionClasses = isLeftAnchored
+  const positionClasses = isLeftAnchored
     ? isTopAnchored
       ? "md:top-16 md:left-4 lg:left-8"
       : "md:bottom-20 md:left-4 lg:left-8"
@@ -61,7 +61,7 @@ export default function FocusToolWindow() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.94, y: 16 }}
         transition={{ type: "spring", damping: 26, stiffness: 350 }}
-        className={`fixed z-40 inset-x-0 bottom-0 md:inset-x-auto md:bottom-auto w-full max-w-full md:w-[460px] flex flex-col rounded-t-2xl md:rounded-2xl border border-border-subtle bg-bg-abyss/95 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.65)] overflow-hidden ${positionClasses}`}
+        className={`fixed z-50 inset-x-0 bottom-0 md:inset-x-auto md:bottom-auto w-full max-w-full md:w-[460px] flex flex-col rounded-t-2xl md:rounded-2xl border border-border-subtle bg-bg-abyss/95 backdrop-blur-2xl shadow-[0_16px_50px_rgba(0,0,0,0.65)] overflow-hidden ${positionClasses}`}
         style={{
           height: isMinimized
             ? "48px"
@@ -72,11 +72,11 @@ export default function FocusToolWindow() {
           borderColor: "var(--border-active)",
         }}
       >
-        {/* Header Bar (No Maximize/Expand button - Auto-Expanded by Default) */}
-        <div className="flex items-center justify-between px-3.5 py-2.5 bg-bg-panel/70 border-b border-border-subtle select-none">
+        {/* Header Bar */}
+        <div className="flex items-center justify-between px-3.5 py-2.5 bg-bg-panel/80 border-b border-border-subtle select-none gap-2">
           {/* Left: Icon + Title */}
           <div className="flex items-center gap-2 min-w-0">
-            <div className={`p-1.5 rounded-lg bg-bg-abyss border border-border-subtle ${currentConfig.color}`}>
+            <div className={`p-1.5 rounded-lg bg-bg-abyss border border-border-subtle shrink-0 ${currentConfig.color}`}>
               <Icon className="w-3.5 h-3.5" />
             </div>
             <span
@@ -87,26 +87,48 @@ export default function FocusToolWindow() {
             </span>
           </div>
 
-          {/* Right: Window Controls */}
-          <div className="flex items-center gap-1 text-text-muted">
+          {/* Right: Tool Switcher & Window Controls */}
+          <div className="flex items-center gap-1.5 shrink-0 text-text-muted">
+            {/* Quick Switch Icons */}
+            <div className="flex items-center gap-0.5 bg-bg-abyss/90 border border-border-subtle/80 p-0.5 rounded-lg">
+              {(["calculator", "ai", "audio", "notes", "formulas"] as const).map((tId) => {
+                const cfg = TOOL_CONFIG[tId];
+                const ToolIcon = cfg.icon;
+                const isSelected = activeTool === tId;
+                return (
+                  <button
+                    key={tId}
+                    type="button"
+                    onClick={() => openTool(tId)}
+                    className={`p-1.5 rounded-md transition-all ${
+                      isSelected
+                        ? "bg-accent-primary text-white shadow-sm"
+                        : "text-text-muted hover:text-text-primary hover:bg-bg-panel"
+                    }`}
+                    title={`Switch to ${cfg.title}`}
+                    aria-label={`Switch to ${cfg.title}`}
+                  >
+                    <ToolIcon className="w-3.5 h-3.5" />
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Minimize Toggle */}
             <button
+              type="button"
               onClick={() => setWindowMode(isMinimized ? "normal" : "minimized")}
-              className="p-1.5 rounded-lg hover:bg-bg-abyss hover:text-text-primary transition-colors"
+              className="p-1.5 rounded-lg hover:bg-bg-abyss hover:text-text-primary transition-colors ml-0.5"
               title={isMinimized ? "Restore Window" : "Minimize Window"}
             >
               {isMinimized ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
 
-            {/* Hotkey hint */}
-            <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-bg-void/60 border border-border-subtle text-text-muted">
-              ESC
-            </span>
-
             {/* Close Button */}
             <button
+              type="button"
               onClick={closeTool}
-              className="p-1.5 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-colors ml-0.5"
+              className="p-1.5 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition-colors"
               title="Close Tool (Esc)"
             >
               <X className="w-4 h-4" />

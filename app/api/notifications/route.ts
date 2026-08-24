@@ -14,9 +14,21 @@ const NOTIFICATION_TYPES = [
   "SYSTEM",
   "INFO",
   "QUEST",
-  "USER",
   "DAILY_BRIEFING",
 ] as const;
+
+/**
+ * Queries only EVENT notifications (sessionId NULL). Chat transcripts —
+ * both the AI chat and planner conversations — live in the same table
+ * with a sessionId set, and must never surface as notifications.
+ */
+const notificationWhere = (userId: number) => ({
+  userId,
+  sessionId: null,
+  type: {
+    in: [...NOTIFICATION_TYPES],
+  },
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -36,12 +48,7 @@ export async function GET(req: NextRequest) {
     let rawNotifications: any[] = [];
     try {
       rawNotifications = await prisma.systemMessage.findMany({
-        where: {
-          userId,
-          type: {
-            in: [...NOTIFICATION_TYPES],
-          },
-        },
+        where: notificationWhere(userId),
         select: {
           id: true,
           content: true,
@@ -57,10 +64,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.json([], { status: 200 });
     }
 
-    // Apply granular user preferences filter
-    const filtered = rawNotifications.filter((n) =>
-      isNotificationAllowed(n.type, n.content, preferences)
-    );
+    // Apply granular user preferences filter + chat message hard-block
+    // (text-message echoes and stale legacy rows must never render).
+    const filtered = rawNotifications.filter((n) => {
+      const lower = (n.content || "").toLowerCase();
+      if (
+        lower.includes("[direct_message]") ||
+        lower.includes("[group_chat]") ||
+        lower.includes("sent you a direct message")
+      ) {
+        return false;
+      }
+      return isNotificationAllowed(n.type, n.content, preferences);
+    });
 
     return NextResponse.json(filtered.slice(0, 15), { status: 200 });
   } catch (error) {
@@ -81,13 +97,11 @@ export async function PATCH(req: NextRequest) {
 
     const userId = payload.userId as number;
 
-    // Mark all unread notifications as read
+    // Mark all unread notifications as read (chat transcripts excluded —
+    // session-bound messages are never touched by the notification system)
     await prisma.systemMessage.updateMany({
       where: {
-        userId,
-        type: {
-          in: [...NOTIFICATION_TYPES],
-        },
+        ...notificationWhere(userId),
         read: false,
       },
       data: {
@@ -111,14 +125,10 @@ export async function DELETE(req: NextRequest) {
 
     const userId = payload.userId as number;
 
-    // Delete all notifications for the user
+    // Delete all notifications for the user (chat transcripts excluded —
+    // clearing notifications must never wipe AI chat history)
     await prisma.systemMessage.deleteMany({
-      where: {
-        userId,
-        type: {
-          in: [...NOTIFICATION_TYPES],
-        },
-      },
+      where: notificationWhere(userId),
     });
 
     return NextResponse.json({ success: true }, { status: 200 });

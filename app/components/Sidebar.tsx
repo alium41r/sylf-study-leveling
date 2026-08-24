@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PanelLeft } from "lucide-react";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,6 +53,7 @@ const NAV_ITEMS = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
       </svg>
     ),
+    badge: "AI",
   },
   {
     href: "/goals",
@@ -110,8 +112,10 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // Close notifications on click outside
+  // Close notifications on click outside (Desktop dropdown only)
   useEffect(() => {
+    if (mobile) return; // On mobile, notification panel stays open until user presses BACK button
+
     function handleClickOutside(event: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
         setShowNotifications(false);
@@ -123,7 +127,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showNotifications]);
+  }, [showNotifications, mobile]);
 
   // Poll for notifications and listen for preference updates
   useEffect(() => {
@@ -293,33 +297,33 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
                 )}
               </button>
 
-              {/* ─── Notifications Dropdown ────────────────────────── */}
+              {/* ─── Notifications Dropdown (Desktop Only) ────────── */}
               <AnimatePresence>
-                {showNotifications && (
+                {!mobile && showNotifications && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: -6 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -6 }}
                     transition={{ type: "spring", damping: 25, stiffness: 380 }}
-                    className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} ${mobile ? 'w-60' : 'w-80'} max-h-96 overflow-y-auto bg-bg-abyss border border-border-subtle shadow-2xl rounded-lg p-2 custom-scrollbar z-[100]`}
+                    className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} w-80 max-h-96 overflow-y-auto bg-bg-abyss border border-border-subtle shadow-2xl rounded-xl p-3 custom-scrollbar z-[100]`}
                   >
-                    <div className="flex items-center justify-between p-2 mb-1 border-b border-border-subtle">
-                      <h3 className="text-xs tracking-widest text-accent-light font-['Rajdhani']">
+                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
+                      <h3 className="text-xs tracking-widest text-accent-light font-['Rajdhani'] font-bold uppercase">
                         SYSTEM NOTIFICATIONS
                       </h3>
                       {notifications.length > 0 && (
                         <button 
                           onClick={handleClearNotifications}
-                          className="text-[10px] text-text-muted hover:text-red-400 transition-colors font-bold tracking-wider"
+                          className="text-[10px] text-text-muted hover:text-red-400 transition-colors font-bold tracking-wider uppercase font-['Rajdhani']"
                         >
                           CLEAR ALL
                         </button>
                       )}
                     </div>
                     {notifications.length === 0 ? (
-                      <p className="text-sm text-text-muted p-4 text-center">No recent messages.</p>
+                      <p className="text-xs text-text-muted p-4 text-center">No recent messages.</p>
                     ) : (
-                      <div className="flex flex-col">
+                      <div className="flex flex-col gap-1.5">
                         {notifications.map((n, idx) => {
                           const content = n.content || "";
                           let badgeLabel = n.type || "SYSTEM";
@@ -328,6 +332,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
                           if (content.includes("[FRIEND_REQUEST]") || content.toLowerCase().includes("friend request")) {
                             badgeLabel = "FRIEND REQUEST";
                             badgeStyle = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+                          } else if (content.includes("[GROUP_ADDED]") || content.toLowerCase().includes("added you to the group")) {
+                            badgeLabel = "GROUP";
+                            badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
                           } else if (content.includes("[DIRECT_MESSAGE]") || content.toLowerCase().includes("direct message")) {
                             badgeLabel = "DIRECT MESSAGE";
                             badgeStyle = "bg-sky-500/20 text-sky-400 border-sky-500/30";
@@ -355,19 +362,19 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
 
                           return (
                             <div key={n.id}>
-                              <div className={`p-3 rounded-lg text-sm transition-colors ${!n.read ? "bg-accent-primary-dim" : "bg-transparent hover:bg-bg-shadow/50"}`}>
-                                <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <div className={`p-2.5 rounded-lg text-sm transition-colors ${!n.read ? "bg-accent-primary-dim" : "bg-transparent hover:bg-bg-shadow/50"}`}>
+                                <div className="flex items-center justify-between gap-2 mb-1">
                                   <span className={`text-[9px] font-bold tracking-wider px-2 py-0.5 rounded border ${badgeStyle}`}>
                                     {badgeLabel}
                                   </span>
-                                  <span className="text-[11px] text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
+                                  <span className="text-[10px] font-mono text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
                                 </div>
                                 <div className="text-text-primary text-xs leading-relaxed">
                                   <MarkdownRenderer content={cleanContent} compact />
                                 </div>
                               </div>
                               {idx < notifications.length - 1 && (
-                                <hr className="border-border-subtle my-1 mx-2" />
+                                <hr className="border-border-subtle my-1 mx-1" />
                               )}
                             </div>
                           );
@@ -384,22 +391,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
           {!mobile && (
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="text-text-secondary hover:text-text-primary transition-transform duration-200 hover:scale-110 active:scale-95"
+              className="text-text-secondary hover:text-text-primary transition-all duration-200 hover:scale-110 active:scale-95 p-1 rounded-lg hover:bg-bg-shadow/50"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{
-                  transform: isCollapsed ? "rotate(180deg)" : "rotate(0deg)",
-                  transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                }}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <PanelLeft className="w-5 h-5" />
             </button>
           )}
         </div>
@@ -472,9 +468,23 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
                 {item.icon}
               </span>
               {!isCollapsed && (
-                <span className="truncate" style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 600 }}>
-                  {item.label}
-                </span>
+                <>
+                  <span className="truncate" style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 600 }}>
+                    {item.label}
+                  </span>
+                  {"badge" in item && item.badge && (
+                    <span
+                      className="ml-auto text-[8px] font-bold tracking-widest px-1.5 py-0.5 rounded border"
+                      style={{
+                        color: isActive ? "var(--accent-text-light)" : "var(--text-muted)",
+                        background: "var(--accent-primary-dim)",
+                        borderColor: "var(--accent-primary-mid)",
+                      }}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </>
               )}
             </Link>
           );
@@ -501,6 +511,127 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
           {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
+
+      {/* ─── Mobile Drawer Notifications Full-Panel View ───────────── */}
+      {mobile && (
+        <AnimatePresence>
+          {showNotifications && (
+            <motion.div
+              initial={{ opacity: 0, x: "100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 350 }}
+              className="absolute inset-0 z-50 bg-bg-panel p-4 flex flex-col h-full overflow-hidden shadow-2xl"
+            >
+              {/* Header with Back button */}
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-border-subtle shrink-0">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications(false)}
+                    className="p-1.5 rounded-lg bg-bg-abyss border border-border-subtle text-text-secondary hover:text-text-primary hover:border-border-active transition-colors flex items-center gap-1.5 text-xs font-bold font-['Rajdhani']"
+                    title="Back to Menu"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span>BACK</span>
+                  </button>
+                  <h3 className="text-xs tracking-widest text-accent-light font-['Rajdhani'] font-bold uppercase">
+                    NOTIFICATIONS
+                  </h3>
+                </div>
+
+                {notifications.length > 0 && (
+                  <button 
+                    onClick={handleClearNotifications}
+                    className="text-[10px] text-text-muted hover:text-red-400 transition-colors font-bold tracking-wider uppercase font-['Rajdhani']"
+                  >
+                    CLEAR ALL
+                  </button>
+                )}
+              </div>
+
+              {/* Notification List */}
+              <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col gap-2.5 pr-1">
+                {notifications.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                    <div className="w-12 h-12 rounded-xl bg-bg-abyss border border-border-subtle flex items-center justify-center text-xl mb-2 text-text-muted">
+                      🔔
+                    </div>
+                    <p className="text-sm font-['Rajdhani'] font-bold text-text-muted uppercase tracking-wider">
+                      No Recent Messages
+                    </p>
+                    <p className="text-xs text-text-muted/70 mt-1">
+                      You&apos;re all caught up!
+                    </p>
+                  </div>
+                ) : (
+                  notifications.map((n) => {
+                    const content = n.content || "";
+                    let badgeLabel = n.type || "SYSTEM";
+                    let badgeStyle = "bg-blue-500/20 text-blue-400 border-blue-500/30";
+
+                    if (content.includes("[FRIEND_REQUEST]") || content.toLowerCase().includes("friend request")) {
+                      badgeLabel = "FRIEND REQUEST";
+                      badgeStyle = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+                    } else if (content.includes("[GROUP_ADDED]") || content.toLowerCase().includes("added you to the group")) {
+                      badgeLabel = "GROUP";
+                      badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
+                    } else if (content.includes("[DIRECT_MESSAGE]") || content.toLowerCase().includes("direct message")) {
+                      badgeLabel = "DIRECT MESSAGE";
+                      badgeStyle = "bg-sky-500/20 text-sky-400 border-sky-500/30";
+                    } else if (content.includes("[GROUP_CHAT]") || content.toLowerCase().includes("group chat")) {
+                      badgeLabel = "GROUP CHAT";
+                      badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
+                    } else if (content.includes("[ACHIEVEMENT]") || n.type === "REWARD") {
+                      badgeLabel = "ACHIEVEMENT";
+                      badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+                    } else if (n.type === "LEVEL_UP" || content.toLowerCase().includes("level up")) {
+                      badgeLabel = "LEVEL UP";
+                      badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+                    } else if (n.type === "STREAK" || content.toLowerCase().includes("streak")) {
+                      badgeLabel = "STREAK";
+                      badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+                    } else if (n.type === "QUEST" || content.toLowerCase().includes("quest")) {
+                      badgeLabel = "QUEST";
+                      badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+                    } else if (n.type === "WARNING") {
+                      badgeLabel = "ALERT";
+                      badgeStyle = "bg-red-500/20 text-red-400 border-red-500/30";
+                    }
+
+                    const cleanContent = content.replace(/^\[[A-Z_]+\]\s*/, "");
+
+                    return (
+                      <div
+                        key={n.id}
+                        className={`p-3 rounded-xl border transition-colors ${
+                          !n.read
+                            ? "bg-accent-primary-dim/20 border-accent-primary-mid/40 shadow-sm"
+                            : "bg-bg-abyss/70 border-border-subtle"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className={`text-[9px] font-bold tracking-wider px-2 py-0.5 rounded border ${badgeStyle}`}>
+                            {badgeLabel}
+                          </span>
+                          <span className="text-[10px] font-mono text-text-muted">
+                            {new Date(n.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="text-text-primary text-xs leading-relaxed">
+                          <MarkdownRenderer content={cleanContent} compact />
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </aside>
   );
 }

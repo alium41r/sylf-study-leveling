@@ -641,3 +641,32 @@ export function getToolsForAgent(agent: AgentType): NormalizedTool[] {
   return tools;
 }
 
+// ─── Simple-Tier Tool Whitelist ───────────────────────────────
+// The lightweight tier only handles short imperative requests
+// (show/list/check/move/clear/swap/complete...). Describing ~20 tool
+// schemas costs ~2-3k input tokens per call, so we send only the tools
+// a quick action can actually need. Planner/analytics/memory/shop tools
+// are excluded — any message that needs them (planning verbs, deep
+// analysis) is routed to the full tier by the classifier.
+
+const SIMPLE_CORE_TOOL_NAMES = new Set([
+  "getUserStats",
+  "getGoals",
+  "getQuests",
+  "getStudySessions",
+  "getWeeklySummary",
+  "getAppState",
+  "moveQuest",
+  "swapQuests",
+  "clearDay",
+  "completeQuest",
+  "handoff",
+]);
+
+export function getSimpleToolsForAgent(agent: AgentType): NormalizedTool[] {
+  const all = getToolsForAgent(agent);
+  const filtered = all.filter((t) => SIMPLE_CORE_TOOL_NAMES.has(t.name));
+  // Never send an empty toolset — fall back to the full agent tools.
+  return filtered.length > 0 ? filtered : all;
+}
+

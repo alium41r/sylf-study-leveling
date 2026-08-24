@@ -149,6 +149,7 @@ export default function BackgroundsSettingsPage() {
           document.body.style.backgroundSize = bgData.size || "cover";
           document.body.style.backgroundAttachment = "fixed";
         }
+        window.dispatchEvent(new Event("background-updated"));
 
         setShowApplied(true);
         setTimeout(() => setShowApplied(false), 2000);

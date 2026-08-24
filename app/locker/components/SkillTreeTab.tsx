@@ -38,6 +38,8 @@ interface SubjectSummary {
   color: string;
   nodesCount: number;
   todaySeconds: number;
+  /** Set once the subject's syllabus has been compiled — a one-time action. */
+  lastCompiledAt: string | null;
 }
 
 const TIER_NAMES: Record<number, string> = {
@@ -54,16 +56,16 @@ const TIER_NAMES: Record<number, string> = {
 };
 
 const TIER_BADGE_STYLES: Record<number, string> = {
-  1: "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
-  2: "border-slate-300 bg-slate-100 text-slate-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  3: "border-slate-300 bg-slate-100 text-slate-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  4: "border-blue-500/50 bg-blue-500/10 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-  5: "border-purple-500/50 bg-purple-500/10 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300",
-  6: "border-blue-500/50 bg-blue-500/10 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-  7: "border-indigo-500/50 bg-indigo-500/10 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300",
-  8: "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
-  9: "border-orange-500/50 bg-orange-500/10 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
-  10: "border-amber-500/80 bg-amber-500/15 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 animate-pulse",
+  1: "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
+  2: "border-orange-500/50 bg-orange-500/10 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
+  3: "border-orange-400/50 bg-orange-400/10 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
+  4: "border-rose-400/50 bg-rose-400/10 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300",
+  5: "border-rose-500/50 bg-rose-500/10 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300",
+  6: "border-fuchsia-500/50 bg-fuchsia-500/10 text-fuchsia-700 dark:bg-fuchsia-950/40 dark:text-fuchsia-300",
+  7: "border-purple-500/50 bg-purple-500/10 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300",
+  8: "border-indigo-400/50 bg-indigo-400/10 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300",
+  9: "border-indigo-600/50 bg-indigo-600/10 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300",
+  10: "border-purple-500/80 bg-purple-500/15 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 animate-pulse",
 };
 
 export function SkillTreeTab() {
@@ -216,9 +218,10 @@ export function SkillTreeTab() {
     []
   );
 
-  // Trigger Background AI Syllabus Compilation
+  // Trigger one-time AI Syllabus Compilation (compile once per subject, forever)
   const handleCompileSyllabus = async () => {
     if (!token || !activeSubjectId || isCompiling) return;
+    if (activeSubject?.lastCompiledAt) return;
     setIsCompiling(true);
     setCompilationError(null);
 
@@ -235,6 +238,8 @@ export function SkillTreeTab() {
 
       // Re-fetch fresh live nodes immediately
       await fetchSubjectNodes(activeSubjectId);
+      // The subject is now compiled — refresh so the button disappears.
+      fetchSubjects();
     } catch (err: any) {
       console.error("AI Syllabus Compilation error:", err);
       setCompilationError(err.message || "Failed to compile syllabus");
@@ -265,17 +270,6 @@ export function SkillTreeTab() {
       setIsForgingApex(false);
     }
   };
-
-  // Check if active subject has default placeholder titles
-  const isUncompiled = useMemo(() => {
-    if (nodes.length === 0) return false;
-    return nodes.some(
-      (n) =>
-        n.title.includes("Node N") ||
-        n.title.includes("Foundational Principles - N1") ||
-        n.description.includes("Curriculum node for")
-    );
-  }, [nodes]);
 
   // Compute live node map
   const liveNodeMap = useMemo(() => {
@@ -456,32 +450,33 @@ export function SkillTreeTab() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            {/* AI Compilation Action Trigger */}
-            <button
-              type="button"
-              onClick={handleCompileSyllabus}
-              disabled={isCompiling}
-              className={`px-3.5 py-2 rounded-xl text-xs font-rajdhani font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-sm ${
-                isCompiling
-                  ? "bg-purple-500/10 border border-purple-500/40 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 cursor-wait animate-pulse"
-                  : isUncompiled
-                  ? "bg-purple-600 hover:bg-purple-500 text-white shadow-md scale-[1.02]"
-                  : "bg-bg-abyss hover:bg-bg-shadow border border-border-subtle text-text-secondary hover:text-text-primary"
-              }`}
-              title="Decompose syllabus chapters using Google Gemini"
-            >
-              {isCompiling ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-500 dark:text-purple-300" />
-                  <span>Decomposing Syllabus (AI)...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-300" />
-                  <span>{isUncompiled ? "⚡ Compile Syllabus (AI)" : "Recompile Syllabus"}</span>
-                </>
-              )}
-            </button>
+            {/* One-time AI Syllabus Compilation — only before the first compile.
+                After that the subject is locked; no recompile, ever. */}
+            {!activeSubject.lastCompiledAt && (
+              <button
+                type="button"
+                onClick={handleCompileSyllabus}
+                disabled={isCompiling}
+                className={`px-3.5 py-2 rounded-xl text-xs font-rajdhani font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-sm ${
+                  isCompiling
+                    ? "bg-purple-500/10 border border-purple-500/40 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 cursor-wait animate-pulse"
+                    : "bg-purple-600 hover:bg-purple-500 text-white shadow-md scale-[1.02]"
+                }`}
+                title="Decompose syllabus chapters using Google Gemini (one-time)"
+              >
+                {isCompiling ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-500 dark:text-purple-300" />
+                    <span>Decomposing Syllabus (AI)...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Compile Syllabus (AI)</span>
+                  </>
+                )}
+              </button>
+            )}
 
             {/* SP Progress Meter */}
             <div className="flex flex-col gap-1.5 md:w-56">
@@ -693,7 +688,7 @@ export function SkillTreeTab() {
 
         {/* Right Column: Sticky Node Inspector Dock */}
         <div className="lg:col-span-4 xl:col-span-3">
-          <div className="sticky top-6 flex flex-col gap-4">
+          <div className="lg:sticky lg:top-6 flex flex-col gap-4">
             {selectedSkeleton ? (
               <div className="p-5 rounded-2xl bg-bg-panel/90 border border-border-subtle backdrop-blur-xl shadow-card flex flex-col gap-4">
                 {/* Inspector Header */}

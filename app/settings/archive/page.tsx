@@ -21,6 +21,7 @@ export default function ArchivePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [recents, setRecents] = useState<string[]>([]);
+  const [mobileView, setMobileView] = useState<"list" | "detail">("list");
 
   // Load local storage
   useEffect(() => {
@@ -70,6 +71,11 @@ export default function ArchivePage() {
 
   const totalRecords = ARCHIVE_ENTRIES.length;
 
+  const handleSelectEntry = (id: string) => {
+    setActiveId(id);
+    setMobileView("detail");
+  };
+
   if (!user) {
     return (
       <div className="settings-page-container">
@@ -83,16 +89,18 @@ export default function ArchivePage() {
   }
 
   return (
-    <div className="settings-page-container flex flex-col h-[calc(100vh-2rem)] max-h-screen overflow-hidden">
+    <div className="settings-page-container flex flex-col h-[calc(100dvh-5rem)] md:h-[calc(100vh-2rem)] max-h-screen overflow-hidden">
       <div className="shrink-0 mb-2">
         <BackToSettings />
         <p className="settings-page-breadcrumb">System → Archive (Codex)</p>
       </div>
 
-      <div className="flex flex-1 gap-6 min-h-0 pb-4">
-        {/* ─── LEFT PANE: NAVIGATION ─────────────────────────── */}
+      <div className="flex flex-1 gap-6 min-h-0 pb-4 overflow-hidden">
+        {/* ─── LEFT PANE: NAVIGATION (Master List) ───────────── */}
         <div
-          className="w-full md:w-1/3 max-w-[360px] flex flex-col rounded-2xl overflow-hidden shadow-lg border shrink-0"
+          className={`${
+            mobileView === "list" ? "flex" : "hidden md:flex"
+          } w-full md:w-1/3 md:max-w-[360px] flex-col rounded-2xl overflow-hidden shadow-lg border shrink-0`}
           style={{
             background: "var(--bg-panel)",
             borderColor: "var(--border-subtle)"
@@ -193,7 +201,7 @@ export default function ArchivePage() {
                       entry={entry}
                       active={activeId === entry.id}
                       isFavorite={favorites.includes(entry.id)}
-                      onClick={() => setActiveId(entry.id)}
+                      onClick={() => handleSelectEntry(entry.id)}
                     />
                   ))}
                   {filteredEntries.length === 0 && (
@@ -220,7 +228,7 @@ export default function ArchivePage() {
                           entry={entry}
                           active={activeId === entry.id}
                           isFavorite={favorites.includes(entry.id)}
-                          onClick={() => setActiveId(entry.id)}
+                          onClick={() => handleSelectEntry(entry.id)}
                         />
                       ))}
                     </div>
@@ -231,9 +239,11 @@ export default function ArchivePage() {
           </div>
         </div>
 
-        {/* ─── RIGHT PANE: CONTENT ───────────────────────────── */}
+        {/* ─── RIGHT PANE: CONTENT (Detail View) ────────────── */}
         <div
-          className="flex-1 flex flex-col rounded-2xl border shadow-lg relative overflow-hidden"
+          className={`${
+            mobileView === "detail" ? "flex" : "hidden md:flex"
+          } flex-1 flex-col rounded-2xl border shadow-lg relative overflow-hidden w-full`}
           style={{
             background: "var(--bg-panel)",
             borderColor: "var(--border-subtle)"
@@ -241,16 +251,28 @@ export default function ArchivePage() {
         >
           {/* Header */}
           <div
-            className="shrink-0 p-6 md:p-8 pb-5 border-b relative z-10 flex justify-between items-start"
+            className="shrink-0 p-4 sm:p-6 md:p-8 pb-4 sm:pb-5 border-b relative z-10 flex justify-between items-start gap-2"
             style={{
               borderColor: "var(--border-subtle)",
               background: "var(--bg-shadow)"
             }}
           >
             <div>
-              <div className="flex items-center gap-3 mb-2">
+              {/* Mobile Back Button inside card header */}
+              <button
+                type="button"
+                onClick={() => setMobileView("list")}
+                className="md:hidden flex items-center gap-1 text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-accent-text-light mb-2.5 hover:text-text-primary transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>← Back to Archive List</span>
+              </button>
+
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
                 <span
-                  className="text-xs font-['Rajdhani'] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md"
+                  className="text-[10px] sm:text-xs font-['Rajdhani'] uppercase tracking-widest font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md"
                   style={{
                     background: "var(--bg-abyss)",
                     border: "1px solid var(--border-subtle)",
@@ -260,7 +282,7 @@ export default function ArchivePage() {
                   {activeEntry.categoryId}
                 </span>
                 <span
-                  className="text-xs font-['Rajdhani'] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md text-emerald-500 flex items-center gap-1.5"
+                  className="text-[10px] sm:text-xs font-['Rajdhani'] uppercase tracking-widest font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-emerald-500 flex items-center gap-1.5"
                   style={{
                     background: "rgba(16, 185, 129, 0.1)",
                     border: "1px solid rgba(16, 185, 129, 0.25)"
@@ -270,7 +292,7 @@ export default function ArchivePage() {
                   SYSTEM RECORD
                 </span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold font-['Rajdhani'] tracking-wide text-text-primary">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold font-['Rajdhani'] tracking-wide text-text-primary">
                 {activeEntry.title}
               </h1>
             </div>
@@ -365,7 +387,7 @@ export default function ArchivePage() {
                       return (
                         <button
                           key={rId}
-                          onClick={() => setActiveId(rId)}
+                          onClick={() => handleSelectEntry(rId)}
                           className="px-4 py-2 rounded-xl transition-all duration-200 text-sm font-['Rajdhani'] font-semibold text-text-primary flex items-center gap-2 group cursor-pointer hover:border-accent-primary"
                           style={{
                             background: "var(--bg-shadow)",

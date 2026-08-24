@@ -84,11 +84,13 @@ export default function FocusToolsDock({
 }) {
   const {
     activeTool,
+    openTool,
     toggleTool,
     isDockExpanded,
     setIsDockExpanded,
     dockAnchor,
-    setDockAnchor,
+    dockPosition,
+    setDockPosition,
   } = useFocusTools();
 
   const acoustics = useAcoustics();
@@ -97,12 +99,24 @@ export default function FocusToolsDock({
   const [hoveredTool, setHoveredTool] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [showMobileSheet, setShowMobileSheet] = useState<boolean>(false);
 
   const dockRef = useRef<HTMLDivElement>(null);
   const pointerStartRef = useRef<{ x: number; y: number; originX: number; originY: number } | null>(null);
   const hasMovedRef = useRef<boolean>(false);
 
-  // Compute Anchor Positioning Classes
+  // Track mobile viewport dynamically
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Compute Anchor Positioning Classes (if no custom freeform position set)
   const getAnchorClasses = (anchor: DockAnchor) => {
     switch (anchor) {
       case "bottom-left":
@@ -123,9 +137,9 @@ export default function FocusToolsDock({
     }
   };
 
-  // Pointer Down Handler for Dragging
+  // ─── Silky Smooth Freeform Dragging ────────────────────────
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Only primary button
+    // Only primary mouse/touch button
     if (e.button !== 0) return;
 
     const dockEl = dockRef.current;
@@ -139,101 +153,58 @@ export default function FocusToolsDock({
       originY: rect.top,
     };
     hasMovedRef.current = false;
-  };
 
-  // Pointer Move Handler
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) return;
+    const handleWindowPointerMove = (moveEvent: PointerEvent) => {
+      if (!pointerStartRef.current) return;
 
-    const dx = e.clientX - pointerStartRef.current.x;
-    const dy = e.clientY - pointerStartRef.current.y;
-    const dist = Math.hypot(dx, dy);
+      const dx = moveEvent.clientX - pointerStartRef.current.x;
+      const dy = moveEvent.clientY - pointerStartRef.current.y;
+      const dist = Math.hypot(dx, dy);
 
-    if (dist > 6) {
-      if (!hasMovedRef.current) {
-        hasMovedRef.current = true;
-        setIsDragging(true);
-        try {
-          e.currentTarget.setPointerCapture(e.pointerId);
-        } catch {}
-      }
-
-      const newX = pointerStartRef.current.originX + dx;
-      const newY = pointerStartRef.current.originY + dy;
-
-      const dockEl = dockRef.current;
-      const dockWidth = dockEl?.offsetWidth || 180;
-      const dockHeight = dockEl?.offsetHeight || 52;
-
-      // Clamp within screen boundaries
-      const clampedX = Math.max(12, Math.min(window.innerWidth - dockWidth - 12, newX));
-      const clampedY = Math.max(12, Math.min(window.innerHeight - dockHeight - 12, newY));
-
-      setDragOffset({ x: clampedX, y: clampedY });
-    }
-  };
-
-  // Pointer Up & Edge Snapping
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (!pointerStartRef.current) return;
-
-    try {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId);
-      }
-    } catch {}
-
-    if (hasMovedRef.current && dragOffset) {
-      // Calculate snap zone based on drop coordinates
-      const dockEl = dockRef.current;
-      const dockWidth = dockEl?.offsetWidth || 180;
-      const dockHeight = dockEl?.offsetHeight || 52;
-
-      const centerX = dragOffset.x + dockWidth / 2;
-      const centerY = dragOffset.y + dockHeight / 2;
-
-      const W = window.innerWidth;
-      const H = window.innerHeight;
-
-      const distLeft = centerX;
-      const distRight = W - centerX;
-      const distTop = centerY;
-      const distBottom = H - centerY;
-
-      const minDist = Math.min(distLeft, distRight, distTop, distBottom);
-
-      let snappedAnchor: DockAnchor = "bottom-right";
-
-      if (minDist === distBottom) {
-        if (centerX < W * 0.35) {
-          snappedAnchor = "bottom-left";
-        } else if (centerX > W * 0.65) {
-          snappedAnchor = "bottom-right";
-        } else {
-          snappedAnchor = "bottom-center";
+      if (dist > 4) {
+        if (!hasMovedRef.current) {
+          hasMovedRef.current = true;
+          setIsDragging(true);
         }
-      } else if (minDist === distLeft) {
-        snappedAnchor = "left";
-      } else if (minDist === distRight) {
-        snappedAnchor = "right";
-      } else if (minDist === distTop) {
-        if (centerX < W * 0.5) {
-          snappedAnchor = "top-left";
-        } else {
-          snappedAnchor = "top-right";
-        }
+
+        const newX = pointerStartRef.current.originX + dx;
+        const newY = pointerStartRef.current.originY + dy;
+
+        const currentWidth = dockEl?.offsetWidth || 180;
+        const currentHeight = dockEl?.offsetHeight || 50;
+
+        // Clamp smoothly within screen boundaries with 10px safe margin
+        const clampedX = Math.max(10, Math.min(window.innerWidth - currentWidth - 10, newX));
+        const clampedY = Math.max(10, Math.min(window.innerHeight - currentHeight - 10, newY));
+
+        setDragOffset({ x: clampedX, y: clampedY });
+      }
+    };
+
+    const handleWindowPointerUp = () => {
+      window.removeEventListener("pointermove", handleWindowPointerMove);
+      window.removeEventListener("pointerup", handleWindowPointerUp);
+      window.removeEventListener("pointercancel", handleWindowPointerUp);
+
+      if (hasMovedRef.current) {
+        setDragOffset((latest) => {
+          if (latest) {
+            setDockPosition({ x: latest.x, y: latest.y });
+          }
+          return null;
+        });
       }
 
-      setDockAnchor(snappedAnchor);
-    }
+      pointerStartRef.current = null;
+      setTimeout(() => {
+        setIsDragging(false);
+        hasMovedRef.current = false;
+      }, 50);
+    };
 
-    // Reset drag state
-    pointerStartRef.current = null;
-    setDragOffset(null);
-    setTimeout(() => {
-      setIsDragging(false);
-      hasMovedRef.current = false;
-    }, 60);
+    window.addEventListener("pointermove", handleWindowPointerMove);
+    window.addEventListener("pointerup", handleWindowPointerUp);
+    window.addEventListener("pointercancel", handleWindowPointerUp);
   };
 
   const handleToggleClick = (e: React.MouseEvent) => {
@@ -244,7 +215,12 @@ export default function FocusToolsDock({
     }
     e.preventDefault();
     e.stopPropagation();
-    setIsDockExpanded(!isDockExpanded);
+
+    if (isMobile) {
+      setShowMobileSheet((prev) => !prev);
+    } else {
+      setIsDockExpanded(!isDockExpanded);
+    }
   };
 
   const handleToolClick = (e: React.MouseEvent, toolId: NonNullable<ToolType>) => {
@@ -256,6 +232,9 @@ export default function FocusToolsDock({
     e.preventDefault();
     e.stopPropagation();
     toggleTool(toolId);
+    if (isMobile) {
+      setShowMobileSheet(false);
+    }
   };
 
   const handleDimClick = (e: React.MouseEvent) => {
@@ -269,79 +248,89 @@ export default function FocusToolsDock({
     dimControl?.onToggleDim();
   };
 
-  return (
-    <div
-      ref={dockRef}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      style={
-        dragOffset
-          ? {
-              position: "fixed",
-              left: `${dragOffset.x}px`,
-              top: `${dragOffset.y}px`,
-              zIndex: 50,
-              touchAction: "none",
-              cursor: "grabbing",
-            }
-          : {
-              touchAction: "none",
-              // Keep bottom-anchored dock clear of iOS/Android home indicators
-              ...(dockAnchor.startsWith("bottom")
-                ? { bottom: "calc(1.5rem + env(safe-area-inset-bottom))" }
-                : {}),
-            }
-      }
-      className={`fixed z-40 flex items-center select-none ${
-        dragOffset ? "" : getAnchorClasses(dockAnchor)
-      }`}
-    >
-      {/* Floating Action Pill Container */}
-      <motion.div
-        layout
-        transition={{ type: "spring", damping: 28, stiffness: 400 }}
-        className={`flex items-center gap-2 p-2 rounded-full border border-border-subtle bg-bg-abyss/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.5)] hover:border-accent-primary-mid transition-colors duration-200 cursor-grab active:cursor-grabbing ${
-          isDragging ? "ring-2 ring-accent-primary/60 shadow-2xl scale-[1.02]" : ""
-        }`}
-        style={{
-          borderColor: isDragging ? "var(--accent-primary)" : "var(--border-subtle)",
-        }}
-      >
-        {/* Subtle Drag Grip Indicator */}
-        <div
-          className="pl-1 pr-0.5 text-text-muted hover:text-text-primary transition-colors cursor-grab flex items-center"
-          title="Drag to reposition dock anywhere"
-        >
-          <GripVertical className="w-3.5 h-3.5 opacity-60" />
-        </div>
+  // ─── Overlap Prevention on Mobile ──────────────────────────
+  // If a tool window is active on mobile, hide the floating dock so it never
+  // overlaps keypad buttons, input textareas, or controls!
+  if (isMobile && activeTool !== null) {
+    return null;
+  }
 
-        {/* Toggle Pill Button */}
-        <button
-          onClick={handleToggleClick}
-          onPointerDown={(e) => e.stopPropagation()}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto ${
-            isDockExpanded || activeTool !== null
-              ? "bg-accent-primary text-white shadow-md shadow-accent-primary/40"
-              : "bg-bg-panel/70 text-text-secondary hover:text-text-primary hover:bg-bg-panel border border-border-subtle"
+  // Active coordinates (dragOffset takes priority during live drag, then saved dockPosition, then CSS class)
+  const activePos = dragOffset || dockPosition;
+
+  return (
+    <>
+      <div
+        ref={dockRef}
+        onPointerDown={handlePointerDown}
+        style={
+          activePos
+            ? {
+                position: "fixed",
+                left: `${activePos.x}px`,
+                top: `${activePos.y}px`,
+                zIndex: 45,
+                touchAction: "none",
+              }
+            : {
+                touchAction: "none",
+                ...(dockAnchor.startsWith("bottom")
+                  ? { bottom: "calc(1.5rem + env(safe-area-inset-bottom))" }
+                  : {}),
+              }
+        }
+        className={`fixed z-45 flex items-center select-none ${
+          activePos ? "" : getAnchorClasses(dockAnchor)
+        }`}
+      >
+        {/* Floating Action Pill Container */}
+        <motion.div
+          layout
+          transition={{ type: "spring", damping: 28, stiffness: 400 }}
+          className={`flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-full border border-border-subtle bg-bg-abyss/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.5)] hover:border-accent-primary-mid transition-all duration-200 cursor-grab active:cursor-grabbing ${
+            isDragging ? "ring-2 ring-accent-primary/60 shadow-2xl scale-[1.03] cursor-grabbing" : ""
           }`}
-          title="Toggle Study Utilities Dock (Alt+D • Drag grip to re-position)"
+          style={{
+            borderColor: isDragging ? "var(--accent-primary)" : "var(--border-subtle)",
+          }}
         >
-          <div className="relative">
-            <Wrench className="w-4 h-4" />
-            {isAudioPlaying && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            )}
-          </div>
-          <span
-            className="text-xs font-bold tracking-widest uppercase"
-            style={{ fontFamily: "'Rajdhani', sans-serif" }}
+          {/* Dedicated Drag Grip Indicator */}
+          <div
+            className="pl-1 pr-0.5 text-text-muted hover:text-text-primary transition-colors cursor-grab active:cursor-grabbing flex items-center shrink-0"
+            title="Drag to reposition anywhere on screen"
           >
-            Tools
-          </span>
-          {isDockExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
-        </button>
+            <GripVertical className="w-3.5 h-3.5 opacity-60" />
+          </div>
+
+          {/* Toggle Pill Button */}
+          <button
+            onClick={handleToggleClick}
+            onPointerDown={(e) => e.stopPropagation()}
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto shrink-0 ${
+              isDockExpanded || showMobileSheet || activeTool !== null
+                ? "bg-accent-primary text-white shadow-md shadow-accent-primary/40"
+                : "bg-bg-panel/70 text-text-secondary hover:text-text-primary hover:bg-bg-panel border border-border-subtle"
+            }`}
+            title="Toggle Study Utilities Dock (Alt+D • Drag grip to re-position)"
+          >
+            <div className="relative">
+              <Wrench className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              {isAudioPlaying && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              )}
+            </div>
+            <span
+              className="text-xs font-bold tracking-widest uppercase"
+              style={{ fontFamily: "'Rajdhani', sans-serif" }}
+            >
+              Tools
+            </span>
+            {isDockExpanded || showMobileSheet ? (
+              <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            ) : (
+              <ChevronUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            )}
+          </button>
 
           {/* Eye-Comfort Dim Toggle (Light Mode only) */}
           {dimControl && (
@@ -356,7 +345,7 @@ export default function FocusToolsDock({
               }
               aria-label={dimControl.isDimActive ? "Dim screen on" : "Dim screen off"}
               aria-pressed={dimControl.isDimActive}
-              className={`flex items-center gap-1.5 px-2.5 py-2 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto border ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-full transition-all duration-200 cursor-pointer pointer-events-auto border shrink-0 ${
                 dimControl.isDimActive
                   ? "bg-cyan-400/10 text-cyan-300 border-cyan-400/60 shadow-[0_0_12px_rgba(6,182,212,0.35)]"
                   : dimControl.isLightMode
@@ -365,9 +354,9 @@ export default function FocusToolsDock({
               }`}
             >
               {dimControl.isDimActive ? (
-                <SunDim className="w-4 h-4" />
+                <SunDim className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               ) : (
-                <SunMedium className="w-4 h-4" />
+                <SunMedium className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               )}
               <span
                 className="text-[0.65rem] font-bold tracking-widest uppercase"
@@ -378,69 +367,190 @@ export default function FocusToolsDock({
             </button>
           )}
 
-        {/* Expanded Quick-Launch Tool Icons */}
-        <AnimatePresence>
-          {isDockExpanded && (
+          {/* Expanded Quick-Launch Tool Icons (Desktop Only) */}
+          <AnimatePresence>
+            {!isMobile && isDockExpanded && (
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ type: "spring", damping: 24, stiffness: 350 }}
+                className="flex items-center gap-2 px-1"
+              >
+                {DOCK_ITEMS.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTool === item.id;
+                  const isHovered = hoveredTool === item.id;
+
+                  return (
+                    <div key={item.id} className="relative group">
+                      <button
+                        onClick={(e) => handleToolClick(e, item.id)}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onMouseEnter={() => setHoveredTool(item.id)}
+                        onMouseLeave={() => setHoveredTool(null)}
+                        className={`relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-150 border cursor-pointer pointer-events-auto ${
+                          isActive
+                            ? item.activeBorder
+                            : "bg-bg-panel/70 border-border-subtle hover:bg-bg-panel hover:border-accent-primary-mid hover:text-text-primary"
+                        }`}
+                        aria-label={item.label}
+                      >
+                        <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? "text-accent-text-light" : item.color}`} />
+
+                        {/* Playing music badge on Audio icon */}
+                        {item.id === "audio" && isAudioPlaying && (
+                          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        )}
+                      </button>
+
+                      {/* Tooltip on Hover */}
+                      <AnimatePresence>
+                        {isHovered && !isDragging && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 6 }}
+                            transition={{ duration: 0.12 }}
+                            className="absolute bottom-12 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-bg-abyss/95 border border-border-subtle shadow-xl text-center whitespace-nowrap pointer-events-none z-50 flex flex-col items-center"
+                          >
+                            <span className="text-[11px] font-bold text-text-primary">
+                              {item.label}
+                            </span>
+                            <span className="text-[9px] font-mono text-accent-text-light">
+                              {item.hotkey}
+                            </span>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+
+      {/* ─── Dedicated Mobile Focus Tools Quick-Launch Sheet ─── */}
+      <AnimatePresence>
+        {isMobile && showMobileSheet && (
+          <div className="fixed inset-0 z-50 flex flex-col justify-end">
+            {/* Backdrop */}
             <motion.div
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "auto" }}
-              exit={{ opacity: 0, width: 0 }}
-              transition={{ type: "spring", damping: 24, stiffness: 350 }}
-              className="flex items-center gap-2 px-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobileSheet(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+
+            {/* Bottom Drawer */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 360 }}
+              className="relative z-10 w-full bg-bg-panel/95 border-t border-border-active rounded-t-3xl p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-2xl backdrop-blur-2xl flex flex-col gap-4"
             >
-              {DOCK_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTool === item.id;
-                const isHovered = hoveredTool === item.id;
+              {/* Drag Handle Bar */}
+              <div className="w-12 h-1.5 rounded-full bg-border-subtle self-center mb-1 opacity-70" />
 
-                return (
-                  <div key={item.id} className="relative group">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between border-b border-border-subtle pb-3">
+                <div className="flex items-center gap-2">
+                  <Wrench className="w-4 h-4 text-accent-light" />
+                  <h3 className="text-sm font-bold tracking-widest text-text-primary font-['Rajdhani'] uppercase">
+                    Study Utilities
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowMobileSheet(false)}
+                  className="p-1.5 rounded-lg bg-bg-abyss text-text-muted hover:text-text-primary border border-border-subtle text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Tool Cards Grid */}
+              <div className="grid grid-cols-1 gap-2.5">
+                {DOCK_ITEMS.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTool === item.id;
+                  return (
                     <button
-                      onClick={(e) => handleToolClick(e, item.id)}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onMouseEnter={() => setHoveredTool(item.id)}
-                      onMouseLeave={() => setHoveredTool(null)}
-                      className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-150 border cursor-pointer pointer-events-auto ${
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        openTool(item.id);
+                        setShowMobileSheet(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-3 rounded-2xl border transition-all duration-200 text-left ${
                         isActive
-                          ? item.activeBorder
-                          : "bg-bg-panel/70 border-border-subtle hover:bg-bg-panel hover:border-accent-primary-mid hover:text-text-primary"
+                          ? "bg-accent-primary-dim/30 border-accent-primary-mid shadow-md"
+                          : "bg-bg-abyss/80 border-border-subtle hover:border-accent-primary-mid/40 hover:bg-bg-abyss"
                       }`}
-                      aria-label={item.label}
                     >
-                      <Icon className={`w-4 h-4 ${isActive ? "text-accent-text-light" : item.color}`} />
+                      <div className="flex items-center gap-3.5">
+                        <div className={`p-2.5 rounded-xl bg-bg-panel border border-border-subtle ${item.color}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm font-['Rajdhani'] text-text-primary uppercase tracking-wide">
+                              {item.label}
+                            </span>
+                            {item.id === "audio" && isAudioPlaying && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                PLAYING
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs text-text-muted">
+                            {item.id === "calculator" && "Scientific & STEM Keypad"}
+                            {item.id === "ai" && "Interactive Study Assistant"}
+                            {item.id === "audio" && "Ambient Lo-Fi & Focus Beats"}
+                            {item.id === "notes" && "Session Scratchpad & Notes"}
+                            {item.id === "formulas" && "Dynamic Cheat Sheets"}
+                          </span>
+                        </div>
+                      </div>
 
-                      {/* Playing music badge on Audio icon */}
-                      {item.id === "audio" && isAudioPlaying && (
-                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      )}
+                      <span className="text-xs font-mono text-accent-text-light px-2 py-1 rounded bg-bg-panel border border-border-subtle">
+                        {item.hotkey}
+                      </span>
                     </button>
+                  );
+                })}
+              </div>
 
-                    {/* Tooltip on Hover */}
-                    <AnimatePresence>
-                      {isHovered && !isDragging && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 6 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 6 }}
-                          transition={{ duration: 0.12 }}
-                          className="absolute bottom-12 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-bg-abyss/95 border border-border-subtle shadow-xl text-center whitespace-nowrap pointer-events-none z-50 flex flex-col items-center"
-                        >
-                          <span className="text-[11px] font-bold text-text-primary">
-                            {item.label}
-                          </span>
-                          <span className="text-[9px] font-mono text-accent-text-light">
-                            {item.hotkey}
-                          </span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+              {/* Eye Comfort Dim Option in Mobile Drawer */}
+              {dimControl && dimControl.isLightMode && (
+                <div className="pt-2 border-t border-border-subtle flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <SunDim className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-bold text-text-secondary font-['Rajdhani'] uppercase tracking-wider">
+                      Eye Comfort Dim Mode
+                    </span>
                   </div>
-                );
-              })}
+                  <button
+                    type="button"
+                    onClick={dimControl.onToggleDim}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold font-['Rajdhani'] uppercase tracking-wider border transition-all ${
+                      dimControl.isDimActive
+                        ? "bg-cyan-400/20 text-cyan-300 border-cyan-400/50"
+                        : "bg-bg-abyss text-text-muted border-border-subtle"
+                    }`}
+                  >
+                    {dimControl.isDimActive ? "ACTIVE" : "TURN ON"}
+                  </button>
+                </div>
+              )}
             </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

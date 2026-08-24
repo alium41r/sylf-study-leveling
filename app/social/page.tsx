@@ -5,6 +5,7 @@ import { useAuth } from "../components/AuthProvider";
 import { useProfileModal } from "../components/ProfileModalContext";
 import { AddFriendModal } from "../components/AddFriendModal";
 import { CharacterRenderer } from "../components/character/CharacterRenderer";
+import { getDefaultCharacterConfig } from "@/lib/character-traits";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -378,6 +379,20 @@ function SocialContent() {
     return user?.todayStudySeconds ?? (user?.completedTodaySeconds ?? 0);
   }, [user, tick]);
 
+  const isUserStudying = Boolean(user?.activeSessionStartedAt);
+
+  const shouldShowUserCard = useMemo(() => {
+    if (!user) return false;
+    if (statusFilter === "STUDYING" && !isUserStudying) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchName = user.name && user.name.toLowerCase().includes(q);
+      const matchUsername = user.username && user.username.toLowerCase().includes(q);
+      if (!matchName && !matchUsername) return false;
+    }
+    return true;
+  }, [user, statusFilter, isUserStudying, searchQuery]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -398,17 +413,22 @@ function SocialContent() {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen min-w-0 flex flex-col gap-6">
       {/* ─── Top Header & Title ──────────────────────────────── */}
       <div className="flex items-center justify-between gap-4">
-        <h1
-          className="text-3xl sm:text-4xl font-bold uppercase tracking-wider text-text-primary drop-shadow-sm"
-          style={{ fontFamily: "'Rajdhani', sans-serif" }}
-        >
-          Social
-        </h1>
+        <div>
+          <p className="text-xs tracking-widest mb-1 text-accent-text-light font-['Rajdhani'] font-bold uppercase">
+            SCHOLAR NETWORK
+          </p>
+          <h1
+            className="text-3xl sm:text-4xl font-bold uppercase tracking-wider text-text-primary drop-shadow-sm"
+            style={{ fontFamily: "'Rajdhani', sans-serif" }}
+          >
+            Social
+          </h1>
+        </div>
 
         <button
           type="button"
           onClick={() => setShowAddFriend(true)}
-          className="btn-primary text-xs sm:text-sm font-['Rajdhani'] font-bold uppercase tracking-wider py-2 px-4 rounded-xl flex items-center gap-2 shadow-md transition-all"
+          className="btn-primary text-xs sm:text-sm font-['Rajdhani'] font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-md transition-all"
           style={{
             background:
               "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
@@ -419,106 +439,6 @@ function SocialContent() {
           <UserPlus className="w-4 h-4" />
           <span>Add Friend</span>
         </button>
-      </div>
-
-      {/* ─── User Profile & Today's Focus Banner (Clean & Non-overlapping) ─── */}
-      <div className="relative overflow-hidden rounded-2xl bg-bg-panel/90 border border-border-subtle p-5 shadow-xl">
-        <div className="absolute inset-0 bg-gradient-to-r from-accent-primary-dim/20 via-transparent to-cyan-500/10 pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          {/* Left: User Character & Identity */}
-          <div className="flex items-center gap-4">
-            <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-2xl border border-border-subtle bg-bg-abyss flex items-center justify-center overflow-hidden shadow-md">
-                {user?.characterConfig ? (
-                  <CharacterRenderer
-                    config={user.characterConfig}
-                    seed={user.username}
-                    size={72}
-                    showPedestal={false}
-                    showAura={false}
-                  />
-                ) : user?.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.username}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-3xl font-bold font-['Rajdhani'] text-emerald-400 select-none">
-                    {(user?.name || user?.username || "S").charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-bg-panel shadow-sm" />
-            </div>
-
-            <div className="flex flex-col">
-              {/* Badges row with zero collision */}
-              <div className="flex items-center gap-2 mb-1">
-                <span className="px-2 py-0.5 rounded-md bg-accent-primary-dim/30 border border-accent-primary-mid/40 text-[10px] font-bold font-mono text-accent-text-light">
-                  Rank {user?.hunterRank || "E"}
-                </span>
-                <span className="text-xs font-mono font-bold text-text-muted">
-                  Lv. {user?.level || 1}
-                </span>
-              </div>
-
-              {/* User display name & handle */}
-              <h2 className="text-xl font-bold font-['Rajdhani'] text-text-primary leading-tight">
-                {user?.name || user?.username || "User"}
-              </h2>
-              <span className="text-xs font-mono text-text-muted">
-                @{user?.username}
-              </span>
-            </div>
-          </div>
-
-          {/* Center: Live Today Focus Time */}
-          <div className="flex items-center justify-center bg-bg-abyss/80 border border-border-subtle px-8 py-3.5 rounded-xl w-full md:w-auto shrink-0">
-            <div className="text-center">
-              <span className="text-[10px] uppercase font-bold font-['Rajdhani'] tracking-widest text-text-muted block">
-                Today&apos;s Study Time
-              </span>
-              <div className="flex items-baseline justify-center gap-3 mt-0.5">
-                <span className="text-3xl sm:text-4xl font-mono font-bold text-accent-text-light drop-shadow-[0_0_12px_var(--accent-primary)]">
-                  {formatHHMMSS(userTodaySeconds)}
-                </span>
-                <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400 flex items-center gap-1">
-                  <Flame className="w-3.5 h-3.5 text-amber-400" />
-                  {user?.streakDays || 0} {user?.streakDays === 1 ? "Week" : "Weeks"} Streak
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Roster Statistics & Quick Timer Launch */}
-          <div className="flex items-center justify-between md:justify-end gap-5 w-full md:w-auto shrink-0">
-            <div className="text-left md:text-right">
-              <span className="text-[10px] uppercase font-bold font-['Rajdhani'] tracking-wider text-text-muted block">
-                Friends Status
-              </span>
-              <div className="flex items-center md:justify-end gap-3 mt-1 text-xs font-['Rajdhani'] font-bold">
-                <span className="text-text-primary flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-accent-primary" />
-                  {friends.length} Friends
-                </span>
-                <span className="text-emerald-400 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  {studyingFriendsCount} Studying
-                </span>
-              </div>
-            </div>
-
-            <Link
-              href="/timer"
-              className="px-4 py-2.5 rounded-xl bg-accent-primary hover:bg-accent-primary-light text-white text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 shrink-0"
-            >
-              <Play className="w-3.5 h-3.5 fill-white" />
-              <span>Start Timer</span>
-            </Link>
-          </div>
-        </div>
       </div>
 
       {/* ─── Main Tabs Navigation ─────────────────────────────── */}
@@ -593,21 +513,6 @@ function SocialContent() {
           </button>
         </div>
 
-        {activeTab === "groups" && (
-          <button
-            type="button"
-            onClick={() => setShowCreateGroup(true)}
-            className="btn-primary text-xs py-1.5 px-3 rounded-lg"
-            style={{
-              background:
-                "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-              border: "none",
-              color: "var(--text-primary)",
-            }}
-          >
-            + Create Group
-          </button>
-        )}
       </div>
 
       {/* ─── TAB 1: FRIENDS (YPT 2-3 COLUMN GRID) ─────────────── */}
@@ -697,7 +602,7 @@ function SocialContent() {
             <div className="py-24 text-center text-text-muted font-['Rajdhani'] font-bold animate-pulse">
               Loading Friends...
             </div>
-          ) : filteredFriends.length === 0 ? (
+          ) : !shouldShowUserCard && filteredFriends.length === 0 ? (
             <div className="system-card p-12 text-center flex flex-col items-center justify-center max-w-lg mx-auto">
               <div className="w-16 h-16 rounded-2xl bg-bg-abyss border border-border-subtle flex items-center justify-center mb-4 text-3xl">
                 👥
@@ -731,6 +636,130 @@ function SocialContent() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* ─── Self / User Card (Always Appears First) ─── */}
+              {shouldShowUserCard && (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`relative rounded-2xl border transition-all duration-300 flex flex-col justify-between overflow-hidden group shadow-lg p-5 ${
+                    isUserStudying
+                      ? "bg-bg-panel border-cyan-500/40 shadow-[0_0_24px_rgba(6,182,212,0.15)] hover:border-cyan-400"
+                      : "bg-bg-panel/90 border-accent-primary/40 hover:border-accent-primary shadow-[0_0_16px_var(--accent-primary-dim)]"
+                  }`}
+                >
+                  {/* Atmospheric Glow */}
+                  {isUserStudying ? (
+                    <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent pointer-events-none" />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-b from-accent-primary-dim/15 via-transparent to-transparent pointer-events-none" />
+                  )}
+
+                  {/* Top Status Header */}
+                  <div className="flex items-center justify-between z-10 mb-2">
+                    <div className="flex items-center gap-2">
+                      {isUserStudying ? (
+                        <span className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                          <span>● Studying</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          <span>Online</span>
+                        </span>
+                      )}
+                      <span className="px-2 py-0.5 rounded-md bg-accent-primary/20 border border-accent-primary/40 text-[10px] font-bold font-['Rajdhani'] text-accent-text-light uppercase tracking-wider">
+                        YOU
+                      </span>
+                    </div>
+
+                    {/* Rank & Level Badges */}
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-accent-primary-dim/30 border border-accent-primary-mid/40 text-[10px] font-bold font-mono text-accent-text-light">
+                        Rank {user?.hunterRank || "E"}
+                      </span>
+                      <span className="text-xs font-mono font-bold text-text-muted">
+                        Lv. {user?.level || 1}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Character Stage (Large 135px Showcase) */}
+                  <div
+                    onClick={() => user?.username && openProfile(user.username)}
+                    className="relative min-h-[170px] flex flex-col items-center justify-center cursor-pointer group-hover:scale-105 transition-transform duration-300 py-3 z-10"
+                    title="View My Profile"
+                  >
+                    <CharacterRenderer
+                      config={user?.characterConfig || getDefaultCharacterConfig(user?.username || "scholar")}
+                      seed={user?.username || "scholar"}
+                      size={135}
+                      showPedestal={true}
+                      showAura={isUserStudying}
+                    />
+
+                    {/* Name & Handle */}
+                    <div className="text-center mt-3 w-full px-2">
+                      <h3 className="text-lg font-bold font-['Rajdhani'] text-text-primary truncate hover:text-accent-text-light transition-colors">
+                        {user?.name || user?.username || "Scholar"}
+                      </h3>
+                      <p className="text-xs font-mono text-text-muted truncate">
+                        @{user?.username}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Digital Study Timer Box */}
+                  <div className="z-10 flex flex-col gap-3 mt-2">
+                    <div
+                      className={`p-3.5 rounded-xl text-center border transition-all ${
+                        isUserStudying
+                          ? "bg-bg-abyss/95 border-cyan-500/40 shadow-[inset_0_0_15px_rgba(6,182,212,0.12)]"
+                          : "bg-bg-abyss/70 border-border-subtle"
+                      }`}
+                    >
+                      <span className="text-[10px] uppercase font-bold font-['Rajdhani'] tracking-widest text-text-muted block">
+                        Today&apos;s Study Time
+                      </span>
+                      <span
+                        className={`text-2xl font-mono font-bold tracking-tight block mt-0.5 ${
+                          isUserStudying
+                            ? "text-cyan-300 drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]"
+                            : userTodaySeconds > 0
+                            ? "text-text-primary"
+                            : "text-text-muted"
+                        }`}
+                      >
+                        {formatHHMMSS(userTodaySeconds)}
+                      </span>
+                    </div>
+
+                    {/* Action Buttons: View Profile & Start Timer */}
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => user?.username && openProfile(user.username)}
+                        className="px-3 py-2 rounded-xl bg-bg-abyss hover:bg-bg-shadow border border-border-subtle hover:border-accent-primary text-xs font-['Rajdhani'] font-bold uppercase tracking-wider text-text-primary transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-accent-primary" />
+                        <span>My Profile</span>
+                      </button>
+
+                      <Link
+                        href="/timer"
+                        className="px-3 py-2 rounded-xl bg-accent-primary hover:bg-accent-primary-light border border-accent-primary-light/40 text-xs font-['Rajdhani'] font-bold uppercase tracking-wider text-white transition-all flex items-center justify-center gap-1.5 shadow-md"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-white" />
+                        <span>Start Timer</span>
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ─── Friends Cards ─── */}
               {filteredFriends.map((friend) => {
                 // Calculate live dynamic seconds if studying
                 let liveSeconds = friend.todaySeconds;
@@ -907,10 +936,10 @@ function SocialContent() {
                   animate={{ opacity: 1, y: 0 }}
                   className="system-card p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-border-subtle bg-bg-panel hover:border-accent-primary/50 transition-all shadow-md"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                     {/* Sender Avatar / Character */}
                     <div className="relative shrink-0">
-                      <div className="w-14 h-14 rounded-xl bg-bg-abyss border border-border-subtle flex items-center justify-center overflow-hidden">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-bg-abyss border border-border-subtle flex items-center justify-center overflow-hidden">
                         {req.sender.characterConfig ? (
                           <CharacterRenderer
                             config={req.sender.characterConfig}
@@ -933,23 +962,23 @@ function SocialContent() {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="px-1.5 py-0.2 rounded bg-accent-primary-dim/30 text-[9px] font-mono font-bold text-accent-text-light border border-accent-primary-mid/30">
+                        <span className="px-1.5 py-0.2 rounded bg-accent-primary-dim/30 text-[9px] font-mono font-bold text-accent-text-light border border-accent-primary-mid/30 shrink-0">
                           Rank {req.sender.hunterRank}
                         </span>
-                        <span className="text-xs font-mono text-text-muted">
+                        <span className="text-xs font-mono text-text-muted shrink-0">
                           Lv. {req.sender.level}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={() => openProfile(req.sender.username)}
-                        className="text-base font-bold font-['Rajdhani'] text-text-primary hover:text-accent-text-light transition-colors text-left block"
+                        className="text-base font-bold font-['Rajdhani'] text-text-primary hover:text-accent-text-light transition-colors text-left block truncate w-full"
                       >
                         {req.sender.name || req.sender.username}
                       </button>
-                      <p className="text-xs text-text-muted font-mono">
+                      <p className="text-xs text-text-muted font-mono truncate w-full">
                         @{req.sender.username}
                       </p>
                     </div>
@@ -1023,10 +1052,10 @@ function SocialContent() {
                     key={dm.id}
                     className="block group"
                   >
-                    <div className="flex items-center justify-between p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm">
-                      <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm gap-3">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                         {/* Dynamic Participant Profile Picture */}
-                        <div className="relative w-12 h-12 rounded-xl shrink-0 overflow-hidden bg-bg-abyss border border-border-subtle flex items-center justify-center shadow-sm">
+                        <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl shrink-0 overflow-hidden bg-bg-abyss border border-border-subtle flex items-center justify-center shadow-sm">
                           <div className={`rank-badge rank-${other?.hunterRank || "E"} w-full h-full text-sm font-mono font-bold flex items-center justify-center overflow-hidden`}>
                             {other?.avatarUrl ? (
                               <img
@@ -1043,10 +1072,10 @@ function SocialContent() {
                           )}
                         </div>
 
-                        <div>
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <p
-                              className={`font-bold font-['Rajdhani'] text-base ${
+                              className={`font-bold font-['Rajdhani'] text-base truncate ${
                                 dm.hasUnread
                                   ? "text-text-primary"
                                   : "text-text-secondary"
@@ -1055,13 +1084,13 @@ function SocialContent() {
                               {dm.name}
                             </p>
                             {other && (
-                              <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-accent-primary-dim/30 border border-accent-primary-mid/40 text-accent-text-light">
+                              <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-accent-primary-dim/30 border border-accent-primary-mid/40 text-accent-text-light shrink-0">
                                 Rank {other.hunterRank || "E"}
                               </span>
                             )}
                           </div>
                           <p
-                            className={`text-xs max-w-md truncate ${
+                            className={`text-xs truncate w-full ${
                               dm.hasUnread
                                 ? "text-accent-primary font-bold"
                                 : "text-text-muted"
@@ -1073,7 +1102,7 @@ function SocialContent() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         {dm.lastMessage && (
                           <p className="text-[10px] text-text-muted font-mono mb-1">
                             {new Date(dm.lastMessage.createdAt).toLocaleTimeString(
@@ -1139,30 +1168,32 @@ function SocialContent() {
                   key={group.id}
                   className="block group"
                 >
-                  <div className="flex items-center justify-between p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-bold uppercase font-['Rajdhani'] text-lg shrink-0 shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl hover:bg-white/[0.04] transition-all bg-bg-panel border border-border-subtle group-hover:border-accent-primary/50 shadow-sm gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-bold uppercase font-['Rajdhani'] text-lg shrink-0 shadow-sm overflow-hidden">
                         {group.avatarUrl ? (
                           <img src={group.avatarUrl} alt={group.name} className="w-full h-full object-cover" />
                         ) : (
                           <Users className="w-5 h-5 text-indigo-400" />
                         )}
                       </div>
-                      <div>
-                        <p
-                          className={`font-bold font-['Rajdhani'] text-base ${
-                            group.hasUnread
-                              ? "text-text-primary"
-                              : "text-text-secondary"
-                          }`}
-                        >
-                          {group.name}{" "}
-                          <span className="text-xs text-text-muted font-normal ml-2 font-mono">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p
+                            className={`font-bold font-['Rajdhani'] text-base truncate ${
+                              group.hasUnread
+                                ? "text-text-primary"
+                                : "text-text-secondary"
+                            }`}
+                          >
+                            {group.name}
+                          </p>
+                          <span className="text-xs text-text-muted font-normal font-mono shrink-0">
                             {group.participants.length} Members
                           </span>
-                        </p>
+                        </div>
                         <p
-                          className={`text-xs max-w-md truncate ${
+                          className={`text-xs truncate w-full ${
                             group.hasUnread
                               ? "text-accent-primary font-bold"
                               : "text-text-muted"
@@ -1174,7 +1205,7 @@ function SocialContent() {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       {group.lastMessage && (
                         <p className="text-[10px] text-text-muted font-mono mb-1">
                           {new Date(group.lastMessage.createdAt).toLocaleTimeString(

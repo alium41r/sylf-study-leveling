@@ -87,85 +87,129 @@ const BG_MAP: Record<string, { value: string; size?: string; lightValue: string 
       "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(to bottom, #0d1117, #0d1117)",
     size: "30px 30px, 30px 30px, auto",
     lightValue: 
-      "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.1) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.1) 100%), linear-gradient(to bottom, #f8fafc, #f8fafc)"
+      "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(to bottom, #f8fafc, #f8fafc)"
   },
   "sakura-fall": {
     value:
-      "radial-gradient(circle at top right, rgba(244, 114, 182, 0.15), transparent 40%), linear-gradient(to bottom, #0f0a0c, #0a0507)",
+      "radial-gradient(circle at top right, rgba(244, 114, 182, 0.25), transparent 45%), linear-gradient(to bottom, #0f0a0c, #0a0507)",
     lightValue: 
-      "radial-gradient(circle at top right, rgba(244, 114, 182, 0.15), transparent 40%), linear-gradient(to bottom, #fff5f7, #fdf2f8)"
+      "radial-gradient(circle at top right, rgba(244, 114, 182, 0.25), transparent 50%), linear-gradient(to bottom, #fff5f7, #fdf2f8)"
   },
   "abyssal-glow": {
     value:
-      "radial-gradient(circle at center, rgba(124, 58, 237, 0.15) 0%, transparent 60%), linear-gradient(to bottom, #0a0a14, #05050a)",
+      "radial-gradient(circle at center, rgba(124, 58, 237, 0.25) 0%, transparent 65%), linear-gradient(to bottom, #0a0a14, #05050a)",
     lightValue: 
-      "radial-gradient(circle at center, rgba(124, 58, 237, 0.1) 0%, transparent 60%), linear-gradient(to bottom, #f5f3ff, #ede9fe)"
+      "radial-gradient(circle at center, rgba(124, 58, 237, 0.18) 0%, transparent 65%), linear-gradient(to bottom, #f5f3ff, #ede9fe)"
   },
   "neon-sunrise": {
     value:
-      "linear-gradient(to top, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.05), transparent), linear-gradient(to bottom, #0f0a0a, #050505)",
+      "linear-gradient(to top, rgba(239, 68, 68, 0.18), rgba(245, 158, 11, 0.1), transparent), linear-gradient(to bottom, #0f0a0a, #050505)",
     lightValue: 
-      "linear-gradient(to top, rgba(239, 68, 68, 0.08), rgba(245, 158, 11, 0.05), transparent), linear-gradient(to bottom, #f8fafc, #f1f5f9)"
+      "linear-gradient(to top, rgba(239, 68, 68, 0.12), rgba(245, 158, 11, 0.08), transparent), linear-gradient(to bottom, #f8fafc, #f1f5f9)"
   },
   "matrix-rain": {
     value:
-      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.03) 0px, transparent 1px, transparent 20px), linear-gradient(to bottom, #050f0a, #020503)",
+      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.05) 0px, transparent 1px, transparent 20px), linear-gradient(to bottom, #050f0a, #020503)",
     lightValue: 
-      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.03) 0px, transparent 1px, transparent 20px), linear-gradient(to bottom, #ecfdf5, #d1fae5)"
+      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.05) 0px, transparent 1px, transparent 20px), linear-gradient(to bottom, #ecfdf5, #d1fae5)"
   },
   "aurora-borealis": {
     value:
-      "radial-gradient(ellipse at top, rgba(6, 182, 212, 0.12) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.1) 0%, transparent 50%), linear-gradient(to bottom, #060610, #050508)",
+      "radial-gradient(ellipse at top, rgba(6, 182, 212, 0.18) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.15) 0%, transparent 50%), linear-gradient(to bottom, #060610, #050508)",
     lightValue: 
-      "radial-gradient(ellipse at top, rgba(6, 182, 212, 0.1) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.08) 0%, transparent 50%), linear-gradient(to bottom, #f0fdfa, #e0f2fe)"
+      "radial-gradient(ellipse at top, rgba(6, 182, 212, 0.15) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.12) 0%, transparent 50%), linear-gradient(to bottom, #f0fdfa, #e0f2fe)"
   },
   "deep-ocean": {
     value:
-      "radial-gradient(circle at bottom, rgba(59, 130, 246, 0.12) 0%, transparent 60%), linear-gradient(to bottom, #040810, #020406)",
+      "radial-gradient(circle at bottom, rgba(59, 130, 246, 0.18) 0%, transparent 60%), linear-gradient(to bottom, #040810, #020406)",
     lightValue: 
-      "radial-gradient(circle at bottom, rgba(59, 130, 246, 0.1) 0%, transparent 60%), linear-gradient(to bottom, #eff6ff, #dbeafe)"
+      "radial-gradient(circle at bottom, rgba(59, 130, 246, 0.15) 0%, transparent 60%), linear-gradient(to bottom, #eff6ff, #dbeafe)"
   },
 };
 
 import { ProfileModalProvider } from "./ProfileModalContext";
 import { PublicProfileModal } from "./PublicProfileModal";
+import { useAuth } from "./AuthProvider";
+import { SystemAIProvider } from "./system/SystemAIProvider";
+
+export function applyGlobalBackground(bgId?: string | null, mode?: string | null) {
+  if (typeof window === "undefined") return;
+  const currentMode = mode || document.documentElement.getAttribute("data-mode") || localStorage.getItem("app_mode") || "dark";
+  const currentBg = bgId || localStorage.getItem("app_background") || "void";
+  const bgData = BG_MAP[currentBg] || BG_MAP["void"];
+  if (bgData) {
+    document.body.style.background = currentMode === "light" ? bgData.lightValue : bgData.value;
+    document.body.style.backgroundSize = bgData.size || "cover";
+    document.body.style.backgroundAttachment = "fixed";
+  }
+}
+
+export function applyGlobalTheme(themeId?: string | null) {
+  if (typeof window === "undefined") return;
+  const currentTheme = themeId || localStorage.getItem("app_theme") || "cyberpunk";
+  const vars = THEME_MAP[currentTheme];
+  if (vars) {
+    for (const [prop, val] of Object.entries(vars)) {
+      document.documentElement.style.setProperty(prop, val);
+    }
+  }
+}
 
 export function GlobalSystemWrapper({ children }: { children: React.ReactNode }) {
   useHeartbeat();
+  const { user } = useAuth();
 
-  // Apply saved theme + background on mount
+  // Apply saved theme + background on mount & sync when user or storage updates
   useEffect(() => {
     // Mode
     const savedMode = localStorage.getItem("app_mode") || "dark";
     document.documentElement.setAttribute("data-mode", savedMode);
 
     // Theme
-    const savedTheme = localStorage.getItem("app_theme");
-    if (savedTheme && THEME_MAP[savedTheme]) {
-      const vars = THEME_MAP[savedTheme];
-      for (const [prop, val] of Object.entries(vars)) {
-        document.documentElement.style.setProperty(prop, val);
-      }
+    const activeTheme = user?.activeTheme || localStorage.getItem("app_theme") || "cyberpunk";
+    if (user?.activeTheme && user.activeTheme !== localStorage.getItem("app_theme")) {
+      localStorage.setItem("app_theme", user.activeTheme);
     }
+    applyGlobalTheme(activeTheme);
 
     // Background
-    const savedBg = localStorage.getItem("app_background");
-    if (savedBg && BG_MAP[savedBg]) {
-      document.body.style.background = savedMode === "light" ? BG_MAP[savedBg].lightValue : BG_MAP[savedBg].value;
-      document.body.style.backgroundSize = BG_MAP[savedBg].size || "cover";
-      document.body.style.backgroundAttachment = "fixed";
-    } else {
-      document.body.style.background = savedMode === "light" ? BG_MAP["void"].lightValue : BG_MAP["void"].value;
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundAttachment = "fixed";
+    const activeBg = user?.activeBackground || localStorage.getItem("app_background") || "void";
+    if (user?.activeBackground && user.activeBackground !== localStorage.getItem("app_background")) {
+      localStorage.setItem("app_background", user.activeBackground);
     }
-  }, []);
+    applyGlobalBackground(activeBg, savedMode);
+
+    const handleBgUpdate = () => {
+      const latestBg = localStorage.getItem("app_background") || "void";
+      const latestMode = localStorage.getItem("app_mode") || "dark";
+      applyGlobalBackground(latestBg, latestMode);
+    };
+
+    const handleThemeUpdate = () => {
+      const latestTheme = localStorage.getItem("app_theme") || "cyberpunk";
+      applyGlobalTheme(latestTheme);
+    };
+
+    window.addEventListener("background-updated", handleBgUpdate);
+    window.addEventListener("theme-updated", handleThemeUpdate);
+    window.addEventListener("storage", handleBgUpdate);
+    window.addEventListener("storage", handleThemeUpdate);
+
+    return () => {
+      window.removeEventListener("background-updated", handleBgUpdate);
+      window.removeEventListener("theme-updated", handleThemeUpdate);
+      window.removeEventListener("storage", handleBgUpdate);
+      window.removeEventListener("storage", handleThemeUpdate);
+    };
+  }, [user?.activeBackground, user?.activeTheme]);
 
   return (
     <AcousticsProvider>
       <SettingsProvider>
         <ProfileModalProvider>
-          {children}
+          <SystemAIProvider>
+            {children}
+          </SystemAIProvider>
           <PublicProfileModal />
           <AcousticsDynamicIsland />
           <SessionInviteToast />

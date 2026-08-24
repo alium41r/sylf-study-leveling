@@ -71,4 +71,39 @@ export const PROVIDER_ENDPOINTS = {
   deepseek: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
 } as const;
 
+/**
+ * Approximate USD cost per 1M tokens, used ONLY for usage telemetry
+ * (the /api/ai-costs diagnostic). Defaults track DeepSeek's published
+ * deepseek-chat / deepseek-reasoner pricing tiers; override per model via
+ * env vars if your plan differs. DeepSeek's automatic context cache bills
+ * cache-hit input tokens at ~10% of the normal input price — we model that
+ * with `inputCached` so telemetry reflects the REAL spend. Providers not
+ * listed here (Groq/Gemini free keys) are treated as $0.
+ */
+export const AI_COST_USD_PER_1M: Record<
+  string,
+  { input: number; output: number; inputCached?: number }
+> = {
+  "deepseek-v4-flash": {
+    input: Number(process.env.DEEPSEEK_FLASH_IN_PER_1M ?? 0.27),
+    output: Number(process.env.DEEPSEEK_FLASH_OUT_PER_1M ?? 1.1),
+    inputCached: Number(process.env.DEEPSEEK_FLASH_IN_CACHED_PER_1M ?? 0.027),
+  },
+  "deepseek-v4-flash-vision-exp": {
+    input: Number(process.env.DEEPSEEK_FLASH_IN_PER_1M ?? 0.27),
+    output: Number(process.env.DEEPSEEK_FLASH_OUT_PER_1M ?? 1.1),
+    inputCached: Number(process.env.DEEPSEEK_FLASH_IN_CACHED_PER_1M ?? 0.027),
+  },
+  "deepseek-v4-pro": {
+    input: Number(process.env.DEEPSEEK_PRO_IN_PER_1M ?? 0.55),
+    output: Number(process.env.DEEPSEEK_PRO_OUT_PER_1M ?? 2.19),
+    inputCached: Number(process.env.DEEPSEEK_PRO_IN_CACHED_PER_1M ?? 0.055),
+  },
+  "deepseek-reasoner": {
+    input: Number(process.env.DEEPSEEK_PRO_IN_PER_1M ?? 0.55),
+    output: Number(process.env.DEEPSEEK_PRO_OUT_PER_1M ?? 2.19),
+    inputCached: Number(process.env.DEEPSEEK_PRO_IN_CACHED_PER_1M ?? 0.055),
+  },
+} as const;
+
 

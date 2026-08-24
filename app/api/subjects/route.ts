@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
         level: true,
         color: true,
         createdAt: true,
+        lastCompiledAt: true,
         _count: {
           select: { nodes: true },
         },
@@ -78,6 +79,7 @@ export async function GET(req: NextRequest) {
         level: sub.level,
         color: sub.color,
         createdAt: sub.createdAt,
+        lastCompiledAt: sub.lastCompiledAt,
         nodesCount: sub._count?.nodes || 0,
         todaySeconds,
       };

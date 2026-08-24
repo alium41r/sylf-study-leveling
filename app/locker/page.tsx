@@ -54,10 +54,10 @@ function LockerContent() {
   };
 
   return (
-    <div className="px-4 py-6 sm:p-8 max-w-6xl mx-auto min-h-screen">
+    <div className="px-3 sm:px-6 md:px-8 py-6 max-w-6xl mx-auto min-h-screen w-full min-w-0">
       {/* ─── Top Switcher Bar ──────────────────────────── */}
-      <div className="w-full flex mb-8">
-        <div className="bg-bg-panel/80 backdrop-blur-md border border-border-subtle p-1.5 rounded-2xl flex items-center justify-center gap-1 shadow-xl max-w-full mx-auto flex-wrap">
+      <div className="w-full flex mb-6 sm:mb-8 justify-center">
+        <div className="bg-bg-panel/80 backdrop-blur-md border border-border-subtle p-1 sm:p-1.5 rounded-2xl flex items-center justify-center gap-1 shadow-xl max-w-full overflow-x-auto scrollbar-none">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id;
 
@@ -66,7 +66,7 @@ function LockerContent() {
                 key={tab.id}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`relative px-6 sm:px-8 py-2.5 rounded-xl font-['Rajdhani'] font-bold text-xs sm:text-sm tracking-widest uppercase transition-colors duration-200 z-10 shrink-0 flex items-center gap-2 ${
+                className={`relative px-4 sm:px-8 py-2 sm:py-2.5 rounded-xl font-['Rajdhani'] font-bold text-xs sm:text-sm tracking-widest uppercase transition-colors duration-200 z-10 shrink-0 flex items-center gap-1.5 sm:gap-2 ${
                   isActive
                     ? "text-accent-primary-light text-shadow-glow"
                     : "text-text-secondary hover:text-text-primary"
@@ -79,7 +79,7 @@ function LockerContent() {
                     transition={{ type: "spring", stiffness: 450, damping: 32 }}
                   />
                 )}
-                <span className="relative z-10 flex items-center gap-2">
+                <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                   {tab.icon}
                   {tab.label}
                 </span>
@@ -97,6 +97,7 @@ function LockerContent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
+          className="w-full min-w-0"
         >
           {activeTab === "identity" && <IdentityTab />}
           {activeTab === "items" && <ItemsTab />}

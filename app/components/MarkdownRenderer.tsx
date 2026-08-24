@@ -19,12 +19,16 @@ interface MarkdownRendererProps {
  */
 function preprocessLatex(text: string): string {
   if (!text) return "";
-  
+
   let formatted = text;
-  
+
+  // Sweep any legacy `<!-- model: X -->` comments before rendering so they
+  // never appear as visible text (model identity is a data field now).
+  formatted = formatted.replace(/\s*<!--[\s\S]*?-->\s*/g, "");
+
   // Replace \[ ... \] with $$ ... $$
   formatted = formatted.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `\n$$\n${math.trim()}\n$$\n`);
-  
+
   // Replace \( ... \) with $ ... $
   formatted = formatted.replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => `$${math.trim()}$`);
 

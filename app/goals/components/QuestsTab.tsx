@@ -41,6 +41,16 @@ export function QuestsTab() {
   const [newQuestDifficulty, setNewQuestDifficulty] = useState("NORMAL");
   const [newQuestDate, setNewQuestDate] = useState("");
   const [newQuestGoalId, setNewQuestGoalId] = useState("");
+  const [isSubmittingQuest, setIsSubmittingQuest] = useState(false);
+  const [questFormError, setQuestFormError] = useState<string | null>(null);
+
+  const getTodayLocalDate = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   // Editing state for quests
   const [editingQuestId, setEditingQuestId] = useState<number | null>(null);
@@ -128,35 +138,55 @@ export function QuestsTab() {
   /** Create a manually dispatched quest, optionally linked to an objective. */
   const handleCreateQuest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
+    if (!token || isSubmittingQuest) return;
+
+    const trimmedTitle = newQuestTitle.trim();
+    if (!trimmedTitle) {
+      setQuestFormError("Please enter a quest title before dispatching.");
+      return;
+    }
+
+    setQuestFormError(null);
+    setIsSubmittingQuest(true);
 
     // Duration clamp: 15 - 240 minutes
     const durationMinutes = Math.min(240, Math.max(15, Math.round(newQuestMinutes) || 45));
+    const targetDate = newQuestDate || getTodayLocalDate();
 
     try {
       const res = await fetch("/api/quests", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          title: newQuestTitle,
-          description: newQuestDescription || undefined,
+          title: trimmedTitle,
+          description: newQuestDescription.trim() || undefined,
           targetMinutes: durationMinutes,
           difficulty: newQuestDifficulty,
-          scheduledFor: newQuestDate || undefined,
+          scheduledFor: targetDate,
           goalId: newQuestGoalId ? Number(newQuestGoalId) : undefined,
         }),
       });
+
       if (res.ok) {
         setNewQuestTitle("");
         setNewQuestDescription("");
         setNewQuestMinutes(45);
         setNewQuestDifficulty("NORMAL");
         setNewQuestGoalId("");
+        setQuestFormError(null);
         setIsNewQuestPanelOpen(false);
         fetchQuests();
+      } else {
+        const errorData = await res.json().catch(() => null);
+        setQuestFormError(
+          errorData?.message || errorData?.error || `Failed to dispatch quest (HTTP ${res.status})`
+        );
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to create quest", err);
+      setQuestFormError(err?.message || "A network error occurred. Please try again.");
+    } finally {
+      setIsSubmittingQuest(false);
     }
   };
 
@@ -193,7 +223,11 @@ export function QuestsTab() {
           ) : (
             <>
               <button 
-                onClick={() => setIsNewQuestPanelOpen(true)}
+                onClick={() => {
+                  setQuestFormError(null);
+                  if (!newQuestDate) setNewQuestDate(getTodayLocalDate());
+                  setIsNewQuestPanelOpen(true);
+                }}
                 className="px-4 py-2 bg-accent-primary text-white font-bold rounded-lg hover:opacity-90 hover:scale-105 active:scale-95 transition-all text-sm shadow-md flex items-center gap-1.5"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
@@ -454,12 +488,31 @@ export function QuestsTab() {
                   DISPATCH NEW QUEST
                 </h2>
                 <button
-                  onClick={() => setIsNewQuestPanelOpen(false)}
+                  onClick={() => {
+                    setQuestFormError(null);
+                    setIsNewQuestPanelOpen(false);
+                  }}
                   className="text-text-muted hover:text-text-primary transition-colors p-2"
                 >
                   ✕
                 </button>
               </div>
+
+              {questFormError && (
+                <div className="p-3 rounded-lg bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-['Rajdhani'] flex items-center justify-between gap-2 shadow-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-rose-400 font-bold">⚠️</span>
+                    <span>{questFormError}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setQuestFormError(null)}
+                    className="text-rose-400 hover:text-rose-200 p-1 text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
 
               <form onSubmit={handleCreateQuest} className="flex flex-col gap-5 flex-1">
                 <div>
@@ -566,10 +619,18 @@ export function QuestsTab() {
                 <div className="mt-auto pt-6">
                   <button
                     type="submit"
-                    className="w-full py-4 bg-accent-primary hover:opacity-90 active:scale-[0.98] rounded-lg text-text-primary font-bold tracking-widest transition-all shadow-md hover:shadow-lg"
+                    disabled={isSubmittingQuest}
+                    className="w-full py-4 bg-accent-primary hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 rounded-lg text-text-primary font-bold tracking-widest transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                     style={{ fontFamily: "'Rajdhani', sans-serif" }}
                   >
-                    DISPATCH QUEST
+                    {isSubmittingQuest ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        DISPATCHING...
+                      </>
+                    ) : (
+                      "DISPATCH QUEST"
+                    )}
                   </button>
                 </div>
               </form>

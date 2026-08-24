@@ -42,6 +42,12 @@ export interface LLMUsage {
   promptTokens: number;
   completionTokens: number;
   totalTokens: number;
+  /**
+   * DeepSeek-only: portion of input tokens served from the automatic
+   * context cache — billed at ~10% of the normal input price. Leveraging
+   * this (stable system prompt prefix) is the biggest real cost lever.
+   */
+  cacheHitTokens?: number;
 }
 
 export interface LLMResponse {
@@ -69,6 +75,12 @@ export interface LLMGenerateOptions {
   responseFormat?: "json_object" | "text";
   temperature?: number;
   maxTokens?: number;
+  /**
+   * DeepSeek-only: control the reasoning/thinking mode for models that
+   * support it. "disabled" skips generating (and billing) reasoning tokens
+   * — ideal for simple/fast tiers. Adapters that don't support it ignore it.
+   */
+  thinking?: "enabled" | "disabled";
   /** Aborts the upstream HTTP request immediately when signalled. */
   signal?: AbortSignal;
 }

@@ -73,6 +73,10 @@ export function ChatInputBar({ onSendMessage, isSending, disabled }: ChatInputBa
       textareaRef.current.style.height = "auto";
     }
     await onSendMessage(textToSend);
+    // Keep focus so the user can keep typing without re-tapping the box.
+    requestAnimationFrame(() => {
+      if (!disabled) textareaRef.current?.focus();
+    });
   };
 
   const handleInsertEmoji = (emoji: string) => {
@@ -142,12 +146,12 @@ export function ChatInputBar({ onSendMessage, isSending, disabled }: ChatInputBa
       </AnimatePresence>
 
       {/* ─── Input Bar Row ─────────────────────────────────────── */}
-      <div className="flex items-end gap-2 bg-bg-abyss/80 border border-white/10 rounded-2xl p-2 focus-within:border-accent-primary/60 focus-within:shadow-[0_0_15px_rgba(124,58,237,0.2)] transition-all">
+      <div className="flex items-end gap-2 bg-bg-abyss/80 border border-white/10 rounded-2xl p-1.5 focus-within:border-accent-primary/60 focus-within:shadow-[0_0_15px_rgba(124,58,237,0.2)] transition-all">
         {/* Emoji Button */}
         <button
           type="button"
           onClick={() => setShowEmojiPicker((prev) => !prev)}
-          className={`p-2.5 rounded-xl transition-colors shrink-0 ${
+          className={`min-w-[44px] min-h-[44px] rounded-xl transition-colors shrink-0 flex items-center justify-center ${
             showEmojiPicker ? "bg-accent-primary-dim text-accent-text-light" : "text-text-muted hover:text-text-primary hover:bg-white/5"
           }`}
           title="Add emoji"
@@ -155,16 +159,18 @@ export function ChatInputBar({ onSendMessage, isSending, disabled }: ChatInputBa
           <Smile className="w-5 h-5" />
         </button>
 
-        {/* Multi-line Auto-expanding Textarea */}
+        {/* Multi-line Auto-expanding Textarea (never disabled by isSending —
+            disabling it is what stole focus between sends) */}
         <textarea
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type a message... (Shift+Enter for newline)"
+          placeholder="Message…"
+          title="Enter to send · Shift+Enter for a new line"
           rows={1}
-          disabled={disabled || isSending}
-          className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none resize-none py-2 px-1 max-h-[140px] leading-relaxed custom-scrollbar font-sans"
+          disabled={disabled}
+          className="flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none resize-none py-2.5 px-1 max-h-[140px] leading-relaxed custom-scrollbar font-sans"
         />
 
         {/* Send Button */}
@@ -172,7 +178,7 @@ export function ChatInputBar({ onSendMessage, isSending, disabled }: ChatInputBa
           type="button"
           onClick={handleSend}
           disabled={!content.trim() || isSending || disabled}
-          className="p-2.5 rounded-xl bg-accent-primary hover:opacity-90 active:scale-95 text-white disabled:opacity-40 disabled:hover:opacity-40 disabled:active:scale-100 transition-all shrink-0 shadow-md flex items-center justify-center"
+          className="min-w-[44px] min-h-[44px] rounded-xl bg-accent-primary hover:opacity-90 active:scale-95 text-white disabled:opacity-40 disabled:hover:opacity-40 disabled:active:scale-100 transition-all shrink-0 shadow-md flex items-center justify-center"
           title="Send message (Enter)"
         >
           <Send className="w-4 h-4" />

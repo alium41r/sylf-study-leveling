@@ -12,6 +12,13 @@ export interface DeepSeekAdapterOptions {
   responseFormat?: "json_object" | "text";
   temperature?: number;
   maxTokens?: number;
+  /**
+   * Toggles DeepSeek's thinking/reasoning mode for models that support it
+   * (deepseek-chat / deepseek-reasoner, V3.1+). "disabled" skips generating
+   * and billing reasoning tokens — used for simple/fast tiers. If the API
+   * rejects the param, the request retries automatically without it.
+   */
+  thinking?: "enabled" | "disabled";
   /** Aborts the upstream HTTP request immediately when signalled. */
   signal?: AbortSignal;
 }
@@ -200,7 +207,11 @@ export class DeepSeekAdapter implements LLMAdapter {
       payload.max_tokens = options.maxTokens;
     }
 
-    try {
+    if (options?.thinking) {
+      payload.thinking = { type: options.thinking };
+    }
+
+    const doRequest = async (reqPayload: Record<string, any>): Promise<any> => {
       const endpoint = `${this.baseURL}/chat/completions`;
       const response = await fetch(endpoint, {
         method: "POST",
@@ -208,7 +219,7 @@ export class DeepSeekAdapter implements LLMAdapter {
           "Content-Type": "application/json",
           Authorization: `Bearer ${this.apiKey}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(reqPayload),
         signal: options?.signal,
       });
 
@@ -226,15 +237,41 @@ export class DeepSeekAdapter implements LLMAdapter {
         else if (statusCode === 429) errorCode = "rate_limit";
         else if (statusCode >= 500) errorCode = "server_error";
 
-        throw new LLMProviderError(
+        const err = new LLMProviderError(
           "deepseek",
           `DeepSeek API responded with HTTP ${statusCode}: ${errorBody || response.statusText}`,
           errorBody,
           errorCode
-        );
+        ) as LLMProviderError & { status: number };
+        err.status = statusCode;
+        throw err;
       }
 
-      const data = await response.json();
+      return response.json();
+    };
+
+    try {
+      let data: any;
+      try {
+        data = await doRequest(payload);
+      } catch (err: any) {
+        // If the deployed model doesn't accept the `thinking` param, retry
+        // once without it instead of cascading to fallback providers.
+        if (
+          options?.thinking &&
+          err instanceof LLMProviderError &&
+          (err as any).status === 400 &&
+          typeof err.originalError === "string" &&
+          /thinking/i.test(err.originalError)
+        ) {
+          console.warn("[DeepSeek] 'thinking' param rejected by the API — retrying without it.");
+          delete payload.thinking;
+          data = await doRequest(payload);
+        } else {
+          throw err;
+        }
+      }
+
       const choice = data.choices?.[0];
       const message = choice?.message;
 
@@ -291,6 +328,7 @@ export class DeepSeekAdapter implements LLMAdapter {
               promptTokens: data.usage.prompt_tokens || 0,
               completionTokens: data.usage.completion_tokens || 0,
               totalTokens: data.usage.total_tokens || 0,
+              cacheHitTokens: data.usage.prompt_cache_hit_tokens || 0,
             }
           : undefined,
       };

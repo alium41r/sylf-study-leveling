@@ -28,6 +28,8 @@ export interface StudyPlanResult {
   goalDescription: string;
   quests: GeneratedQuest[];
   modelUsed?: string;
+  /** Summed token usage across all agent generations (telemetry). */
+  usage?: { promptTokens: number; completionTokens: number };
 }
 
 export class AiStudyOrchestrator {
@@ -96,6 +98,32 @@ export class AiStudyOrchestrator {
     }
   }
 
+  /** Sum LLMResponse usage objects for telemetry. */
+  private static sumUsage(
+    ...usages: Array<{ promptTokens?: number; completionTokens?: number } | undefined>
+  ): { promptTokens: number; completionTokens: number } {
+    let promptTokens = 0;
+    let completionTokens = 0;
+    for (const u of usages) {
+      if (!u) continue;
+      promptTokens += u.promptTokens || 0;
+      completionTokens += u.completionTokens || 0;
+    }
+    return { promptTokens, completionTokens };
+  }
+
+  /** Extract usage from a GoogleGenAI raw response (usageMetadata). */
+  private static geminiUsage(response: any): {
+    promptTokens: number;
+    completionTokens: number;
+  } {
+    const meta = response?.usageMetadata;
+    return {
+      promptTokens: meta?.promptTokenCount || 0,
+      completionTokens: meta?.candidatesTokenCount || 0,
+    };
+  }
+
   /**
    * 1. Researcher Agent
    * Primary: deepseek-v4-pro with Google Search tool calling.
@@ -106,7 +134,7 @@ export class AiStudyOrchestrator {
     syllabus: string,
     onProgress?: (msg: string) => void,
     signal?: AbortSignal
-  ): Promise<{ data: string; model: string }> {
+  ): Promise<{ data: string; model: string; usage?: { promptTokens: number; completionTokens: number } }> {
     const hasSyllabus = !!syllabus && syllabus.trim().length > 0;
     const searchTarget = hasSyllabus ? `${topic} (Scope: ${syllabus})` : topic;
 
@@ -195,6 +223,7 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
             return {
               data: secondRes.text,
               model: `DeepSeek (${DEEPSEEK_MODELS.planner}) + Google Search`,
+              usage: this.sumUsage(initialRes.usage, secondRes.usage),
             };
           }
         } else if (initialRes.text && initialRes.text.trim().length > 50) {
@@ -202,6 +231,7 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
           return {
             data: initialRes.text,
             model: `DeepSeek (${DEEPSEEK_MODELS.planner})`,
+            usage: this.sumUsage(initialRes.usage),
           };
         }
       } catch (deepseekErr: any) {
@@ -233,6 +263,7 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
         return {
           data: response.text || "No research data found.",
           model: `Gemini (${GEMINI_MODELS.research})`,
+          usage: this.geminiUsage(response),
         };
       } catch (geminiErr: any) {
         this.rethrowIfAborted(geminiErr, signal);
@@ -252,6 +283,7 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
           return {
             data: response.text || "No research data found.",
             model: "Gemini 3.7 Flash",
+            usage: this.geminiUsage(response),
           };
         } catch (e) {
           console.warn("[Researcher Agent] Gemini 3.7 Flash fallback failed, trying Groq:", e);
@@ -272,6 +304,7 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
       return {
         data: groqRes.text || "No research data found.",
         model: `Groq (${GROQ_MODELS.default})`,
+        usage: this.sumUsage(groqRes.usage),
       };
     } catch (groqErr: any) {
       this.rethrowIfAborted(groqErr, signal);
@@ -292,7 +325,7 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
     pastSessions: StudySessionData[],
     onProgress?: (msg: string) => void,
     signal?: AbortSignal
-  ): Promise<{ data: string; model: string }> {
+  ): Promise<{ data: string; model: string; usage?: { promptTokens: number; completionTokens: number } }> {
     onProgress?.(`[Analyst • DeepSeek & Gemini] Reviewing ${pastSessions.length} past study sessions...`);
     if (!pastSessions || pastSessions.length === 0) {
       onProgress?.(`[Analyst] No past history. Recommending standard 45-min Pomodoro sessions.`);
@@ -317,7 +350,11 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
         );
         if (res.text) {
           onProgress?.(`[Analyst • DeepSeek] Extracted ideal study durations and focus patterns.`);
-          return { data: res.text, model: `DeepSeek (${DEEPSEEK_MODELS.chat})` };
+          return {
+            data: res.text,
+            model: `DeepSeek (${DEEPSEEK_MODELS.chat})`,
+            usage: this.sumUsage(res.usage),
+          };
         }
       } catch (err) {
         this.rethrowIfAborted(err, signal);
@@ -341,7 +378,11 @@ Your job is to search the web for the exact, canonical syllabus structure, resol
           },
         });
         onProgress?.(`[Analyst • Gemini] Extracted ideal study durations and focus patterns.`);
-        return { data: response.text || "Assume standard 45-minute sessions.", model: "Gemini 3.7 Flash" };
+        return {
+          data: response.text || "Assume standard 45-minute sessions.",
+          model: "Gemini 3.7 Flash",
+          usage: this.geminiUsage(response),
+        };
       } catch (e) {
         console.warn("[Analyst Agent] Gemini failed:", e);
       }
@@ -409,11 +450,11 @@ OUTPUT FORMAT:
 Return ONLY a valid JSON object matching this exact schema:
 {
   "goalTitle": "Motivating catchy goal title",
-  "goalDescription": "Concise summary of all chapters covered and total hours planned",
+  "goalDescription": "One to two concise sentences: which chapters are covered and the total planned hours. No preamble, no filler.",
   "quests": [
     {
       "title": "Ch 1: Physical Quantities & Units",
-      "description": "Specific summary of key theory concepts, formulas to master, and practice problems to complete.",
+      "description": "One concise sentence: the key concepts/formulas to master and the practice to complete.",
       "requiredMinutes": 45,
       "xpReward": 45,
       "sylphReward": 10
@@ -454,6 +495,7 @@ Remember:
         const parsed = this.parsePlanPayload(res.text || "", topic);
         if (parsed && parsed.quests.length > 0) {
           parsed.modelUsed = `DeepSeek (${DEEPSEEK_MODELS.planner})`;
+          parsed.usage = this.sumUsage(res.usage);
           return parsed;
         }
       } catch (deepseekErr: any) {
@@ -478,6 +520,7 @@ Remember:
         const parsed = this.parsePlanPayload(res.text || "", topic);
         if (parsed && parsed.quests.length > 0) {
           parsed.modelUsed = `Gemini (${GEMINI_MODELS.research})`;
+          parsed.usage = this.sumUsage(res.usage);
           return parsed;
         }
       } catch (geminiErr: any) {
@@ -492,6 +535,7 @@ Remember:
           const parsed = this.parsePlanPayload(res.text || "", topic);
           if (parsed && parsed.quests.length > 0) {
             parsed.modelUsed = "Gemini 3.7 Flash";
+            parsed.usage = this.sumUsage(res.usage);
             return parsed;
           }
         } catch (flashErr) {
@@ -510,6 +554,7 @@ Remember:
       const parsed = this.parsePlanPayload(groqRes.text || "", topic);
       if (parsed && parsed.quests.length > 0) {
         parsed.modelUsed = `Groq (${GROQ_MODELS.default})`;
+        parsed.usage = this.sumUsage(groqRes.usage);
         return parsed;
       }
       throw new Error("Groq planner output failed schema validation");
@@ -561,6 +606,9 @@ Remember:
       onProgress,
       signal
     );
+
+    // Sum token usage across all agents for cost telemetry.
+    finalPlan.usage = this.sumUsage(researchData.usage, analystData.usage, finalPlan.usage);
 
     // 4: Mathematical Post-Processing to enforce exact target minutes & canonical rewards
     if (finalPlan.quests && finalPlan.quests.length > 0) {

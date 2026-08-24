@@ -27,6 +27,8 @@ export interface UserStats {
   activeTitle?: string;
   activeAura?: string;
   activeNameColor?: string;
+  activeTheme?: string;
+  activeBackground?: string;
   characterConfig?: any;
   socialLinks?: any;
   hunterRank: string;

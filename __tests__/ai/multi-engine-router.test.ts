@@ -66,16 +66,17 @@ describe("Multi-Engine AI Architecture & Dynamic Router Tests", () => {
   });
 
   describe("2. Autonomous Study Planner & Syllabus Compiler Routing", () => {
-    it("routes planner tasks to deepseek-v4-pro with gemini-3.1-pro research fallback", () => {
+    it("routes in-chat planner CRUD to the cheap flash tier with groq/gemini fallbacks", () => {
       const route = classifyWorkload("Create a 4-week study plan for Cambridge AS Physics", undefined, {
+
         isPlanner: true,
       });
 
       expect(route.workload).toBe("planner");
       expect(route.route.primary.provider).toBe("deepseek");
-      expect(route.route.primary.model).toBe(DEEPSEEK_MODELS.planner);
-      expect(route.route.fallback.provider).toBe("gemini");
-      expect(route.route.fallback.model).toBe(GEMINI_MODELS.research);
+      expect(route.route.primary.model).toBe(DEEPSEEK_MODELS.chat);
+      expect(route.route.fallback.provider).toBe("groq");
+      expect(route.route.fallback.model).toBe(GROQ_MODELS.chatFallback);
     });
 
     it("routes syllabus constellation compilation to deepseek-v4-pro with gemini-3.1-pro fallback", () => {
@@ -215,6 +216,7 @@ describe("Multi-Engine AI Architecture & Dynamic Router Tests", () => {
         "calendar",
         "coach",
         "analyst",
+        "simple",
       ];
 
       for (const wl of workloads) {
@@ -224,7 +226,55 @@ describe("Multi-Engine AI Architecture & Dynamic Router Tests", () => {
         expect(entry.primary.model).toBeDefined();
         expect(entry.fallback.provider).toBeDefined();
         expect(entry.fallback.model).toBeDefined();
+        expect(typeof entry.outputTokenCap).toBe("number");
+        expect(entry.outputTokenCap).toBeGreaterThan(0);
       }
+
+      // Token-saving invariants: the cheap tiers skip reasoning tokens.
+      expect(WORKLOAD_ROUTING_TABLE.simple.thinking).toBe("disabled");
+      expect(WORKLOAD_ROUTING_TABLE.simple.outputTokenCap).toBeLessThan(
+        WORKLOAD_ROUTING_TABLE.general_chat.outputTokenCap
+      );
+    });
+
+    it("routes short imperative actions to the simple tier (no reasoning tokens)", () => {
+      const moveRoute = classifyWorkload("Move my Physics quest to Friday", undefined, {});
+      expect(moveRoute.workload).toBe("simple");
+      expect(moveRoute.route.thinking).toBe("disabled");
+
+      const clearRoute = classifyWorkload("Clear Wednesday", undefined, {});
+      expect(clearRoute.workload).toBe("simple");
+    });
+
+    it("routes quest lookups with polite lead-ins to the simple tier", () => {
+      const route = classifyWorkload(
+        "can you tell me what quests do i have right now",
+        undefined,
+        {}
+      );
+      expect(route.workload).toBe("simple");
+      expect(route.route.thinking).toBe("disabled");
+    });
+
+    it("keeps date-specific schedule questions on the full calendar tier", () => {
+      const route = classifyWorkload("What is my schedule for next Tuesday?", undefined, {});
+      expect(route.workload).not.toBe("simple");
+      expect(route.agent).toBe("calendar");
+
+      const weekRoute = classifyWorkload("what quests do i have this week", undefined, {});
+      expect(weekRoute.workload).not.toBe("simple");
+    });
+
+    it("keeps long-form and reasoning-heavy prompts out of the simple tier", () => {
+      const explainRoute = classifyWorkload(
+        "Explain how Taylor series approximations work for differential equations",
+        undefined,
+        {}
+      );
+      expect(explainRoute.workload).not.toBe("simple");
+
+      const stemRoute = classifyWorkload("Prove this theorem step by step", undefined, {});
+      expect(stemRoute.workload).toBe("complex_stem");
     });
   });
 });

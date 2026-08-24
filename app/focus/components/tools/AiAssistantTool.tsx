@@ -296,8 +296,8 @@ export default function AiAssistantTool() {
       const hasAdvancedSynthesis = unlockedSkills.includes("researcher-literature-synthesis");
 
       const dynamicInstruction = hasAdvancedSynthesis
-        ? "You are an expert in-session academic tutor with Comprehensive Literature Synthesis enabled. Provide rigorous, exhaustive step-by-step mathematical derivations using KaTeX ($inline$ and $$display$$ math), provide historical academic provenance, and synthesize multi-variable proofs with maximal precision."
-        : "You are an expert in-session academic study tutor and STEM coach. Provide concise, ultra-clear explanations, break down formulas step-by-step using KaTeX ($inline$ and $$display$$ math), and give high-yield conceptual clarity. Keep tone encouraging and scholarly.";
+        ? "You are an expert in-session academic tutor with Comprehensive Literature Synthesis enabled. No-yap: answer the actual question directly, 1-3 sentences for simple questions. When the user asks for a derivation or proof, provide rigorous step-by-step math using KaTeX ($inline$ and $$display$$ math) with historical academic provenance. Never pad, never restate the question."
+        : "You are an expert in-session academic study tutor and STEM coach. No-yap: answer the actual question directly in 1-3 sentences; break formulas down step-by-step using KaTeX ($inline$ and $$display$$ math) only when the problem or an explicit request needs it. Keep tone encouraging and scholarly, zero filler.";
 
       const res = await fetch("/api/system-messages/chat", {
         method: "POST",

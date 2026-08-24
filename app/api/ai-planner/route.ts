@@ -8,6 +8,7 @@ import { calculateRecommendedDifficulty } from "@/lib/difficulty-engine";
 
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
+import { logAiUsage } from "@/lib/ai/usage-logger";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120; // Extended execution window on Vercel for multi-agent reasoning
@@ -249,14 +250,15 @@ export async function POST(req: NextRequest) {
           });
 
           // Create formatted Assistant System Message in the AI chat
+          // (No-yap: facts only — no intro, no filler, one closing line.)
           const questsPreview = questsToCreate
             .slice(0, 5)
             .map((q, i) => `${i + 1}. **${q.title}** (${q.requiredMinutes}m)`)
             .join("\n");
-          const moreQuestsNote = questsToCreate.length > 5 ? `\n*...and ${questsToCreate.length - 5} more quests scheduled across your calendar.*` : "";
+          const moreQuestsNote = questsToCreate.length > 5 ? `\n*...and ${questsToCreate.length - 5} more quests scheduled.*` : "";
 
           const plannerModelName = planResult.modelUsed || "Gemini 3.7 Flash";
-          const assistantContent = `<!-- model: ${plannerModelName} -->\n### 🎓 Study Plan Generated: **${planResult.goalTitle}**\n\nI have researched your curriculum and generated a personalized study schedule.\n\n- **Goal**: ${planResult.goalTitle}\n- **Workload**: ${questsToCreate.length} quests totaling ~${Math.round(actualTotalMinutes / 60)} hours\n- **Effort Level**: ${mappedEffortLevel} (${effortHours} hrs/week)\n\n#### 📋 Scheduled Quests Preview:\n${questsPreview}${moreQuestsNote}\n\n✨ *Your quests are now active on your dashboard & calendar. You can ask me to modify, reschedule, split, or add new quests anytime!*`;
+          const assistantContent = `### 🎓 Study Plan Generated: **${planResult.goalTitle}**\n\n- **Workload**: ${questsToCreate.length} quests · ~${Math.round(actualTotalMinutes / 60)} hours total\n- **Effort**: ${mappedEffortLevel} (${effortHours} hrs/week)${targetDate ? `\n- **Deadline**: ${targetDate}` : ""}\n\n#### Scheduled Quest Preview:\n${questsPreview}${moreQuestsNote}\n\nQuests are live on your calendar — ask me to modify, reschedule, or split any of them.`;
 
           await prisma.systemMessage.create({
             data: {
@@ -265,6 +267,7 @@ export async function POST(req: NextRequest) {
               content: assistantContent,
               type: "SYSTEM",
               read: true,
+              modelUsed: plannerModelName,
             },
           });
 
@@ -277,6 +280,17 @@ export async function POST(req: NextRequest) {
           if (!consumed.allowed) {
             console.warn(`[Planner] Quota race: plan succeeded but consumeQuota was not charged for user ${userId}`);
           }
+
+          // Request-level cost telemetry (best-effort — never blocks the result).
+          await logAiUsage({
+            userId,
+            feature: "planner",
+            workload: "planner",
+            provider: "deepseek",
+            model: planResult.modelUsed || "unknown",
+            promptTokens: planResult.usage?.promptTokens || 0,
+            completionTokens: planResult.usage?.completionTokens || 0,
+          });
 
           controller.close();
         } catch (err: any) {

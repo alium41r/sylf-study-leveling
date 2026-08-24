@@ -92,6 +92,21 @@ export function isNotificationAllowed(
   const upperType = (type || "").toUpperCase();
   const lowerContent = (content || "").toLowerCase();
 
+  // 0. CHAT MESSAGES NEVER NOTIFY — hard block, before every toggle.
+  // Individual and group text messages (and any legacy rows already
+  // stored with these markers) are permanently excluded from the inbox.
+  if (
+    upperType === "DIRECT_MESSAGE" ||
+    upperType === "GROUP_CHAT" ||
+    upperType === "MENTION" ||
+    lowerContent.includes("[direct_message]") ||
+    lowerContent.includes("[group_chat]") ||
+    lowerContent.includes("sent you a direct message") ||
+    lowerContent.includes("sent you a group chat")
+  ) {
+    return false;
+  }
+
   // 1. Level & Rank Promotions
   if (
     upperType === "LEVEL_UP" ||
@@ -167,6 +182,8 @@ export function isNotificationAllowed(
   }
 
   // 8. Private Direct Messages
+  // (Deliberately inert: chat messages no longer create notifications —
+  //  the inbox is reserved for important events only.)
   if (
     upperType === "DIRECT_MESSAGE" ||
     lowerContent.includes("[direct_message]") ||
@@ -176,14 +193,16 @@ export function isNotificationAllowed(
     return prefs.directMessages;
   }
 
-  // 9. Group Chat Activity & Mentions
+  // 9. Group Activity & Mentions (covers "added you to a group" events)
   if (
     upperType === "GROUP_CHAT" ||
     upperType === "MENTION" ||
-    lowerContent.includes("[group_chat]") ||
+    upperType === "GROUP_ADDED" ||
+    lowerContent.includes("[group_added]") ||
     lowerContent.includes("group chat") ||
     lowerContent.includes("study room") ||
-    lowerContent.includes("mentioned you")
+    lowerContent.includes("mentioned you") ||
+    lowerContent.includes("added you to the group")
   ) {
     return prefs.groupActivity;
   }

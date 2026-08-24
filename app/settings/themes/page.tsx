@@ -59,6 +59,34 @@ const THEMES: ThemeOption[] = [
     color: "#6366f1",
     colorLight: "#a5b4fc",
   },
+  {
+    id: "volt",
+    name: "Volt",
+    description: "Electric lime — high-voltage energy for sprint sessions.",
+    color: "#84cc16",
+    colorLight: "#bef264",
+  },
+  {
+    id: "plasma",
+    name: "Plasma",
+    description: "Hot magenta — a neon glow for pumping sessions.",
+    color: "#d946ef",
+    colorLight: "#f0abfc",
+  },
+  {
+    id: "glacier",
+    name: "Glacier",
+    description: "Icy cyan — crisp, cold and razor sharp focus.",
+    color: "#06b6d4",
+    colorLight: "#67e8f9",
+  },
+  {
+    id: "solar",
+    name: "Solar",
+    description: "Vivid orange — a burning drive for long grind sessions.",
+    color: "#f97316",
+    colorLight: "#fdba74",
+  },
 ];
 
 /* ─── Mini Dashboard Preview ───────────────────────────────── */

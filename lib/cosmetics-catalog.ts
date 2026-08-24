@@ -113,6 +113,10 @@ export const COSMETICS_CATALOG: Record<CosmeticCategory, CosmeticItem[]> = {
     { id: "crimson", category: "THEME", name: "Crimson", description: "Intense fiery reds for high-energy sessions.", unlockCondition: "E-Rank", value: "crimson", rarity: "Rare", source: "Rank Reward" },
     { id: "amber", category: "THEME", name: "Amber", description: "Warm, prestigious tones of gold — rewarding and bold.", unlockCondition: "B-Rank", value: "amber", rarity: "Epic", source: "Rank Reward" },
     { id: "abyss", category: "THEME", name: "Abyss", description: "Ultra-cool indigo for immersive deep work.", unlockCondition: "S-Rank", value: "abyss", rarity: "Mythic", source: "Rank Reward" },
+    { id: "volt", category: "THEME", name: "Volt", description: "Electric lime — high-voltage energy for sprint sessions.", unlockCondition: "A-Rank", value: "volt", rarity: "Legendary", source: "Rank Reward" },
+    { id: "plasma", category: "THEME", name: "Plasma", description: "Hot magenta — a neon glow for pumping sessions.", unlockCondition: "S-Rank", value: "plasma", rarity: "Mythic", source: "Rank Reward" },
+    { id: "glacier", category: "THEME", name: "Glacier", description: "Icy cyan — crisp, cold and razor sharp focus.", unlockCondition: "B-Rank", value: "glacier", rarity: "Epic", source: "Rank Reward" },
+    { id: "solar", category: "THEME", name: "Solar", description: "Vivid orange — a burning drive for long grind sessions.", unlockCondition: "A-Rank", value: "solar", rarity: "Legendary", source: "Rank Reward" },
   ],
   BACKGROUND: [
     { id: "void", category: "BACKGROUND", name: "The Void", description: "Pure, distraction-free darkness. The original.", unlockCondition: "Default", value: "void", bgCategory: "gradient", rarity: "Common", source: "Base System" },

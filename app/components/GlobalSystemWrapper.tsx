@@ -75,55 +75,98 @@ const THEME_MAP: Record<string, Record<string, string>> = {
     "--accent-cyan": "#a5b4fc",
     "--accent-blue": "#6366f1",
   },
+  volt: {
+    "--accent-primary": "#84cc16",
+    "--accent-primary-light": "#bef264",
+    "--accent-primary-dim": "rgba(132, 204, 22, 0.15)",
+    "--accent-primary-mid": "rgba(132, 204, 22, 0.4)",
+    "--accent-primary-dark": "#4d7c0f",
+    "--accent-purple": "#84cc16",
+    "--accent-cyan": "#bef264",
+    "--accent-blue": "#84cc16",
+  },
+  plasma: {
+    "--accent-primary": "#d946ef",
+    "--accent-primary-light": "#f0abfc",
+    "--accent-primary-dim": "rgba(217, 70, 239, 0.15)",
+    "--accent-primary-mid": "rgba(217, 70, 239, 0.4)",
+    "--accent-primary-dark": "#a21caf",
+    "--accent-purple": "#d946ef",
+    "--accent-cyan": "#f0abfc",
+    "--accent-blue": "#d946ef",
+  },
+  glacier: {
+    "--accent-primary": "#06b6d4",
+    "--accent-primary-light": "#67e8f9",
+    "--accent-primary-dim": "rgba(6, 182, 212, 0.15)",
+    "--accent-primary-mid": "rgba(6, 182, 212, 0.4)",
+    "--accent-primary-dark": "#0e7490",
+    "--accent-purple": "#06b6d4",
+    "--accent-cyan": "#67e8f9",
+    "--accent-blue": "#06b6d4",
+  },
+  solar: {
+    "--accent-primary": "#f97316",
+    "--accent-primary-light": "#fdba74",
+    "--accent-primary-dim": "rgba(249, 115, 22, 0.15)",
+    "--accent-primary-mid": "rgba(249, 115, 22, 0.4)",
+    "--accent-primary-dark": "#c2410c",
+    "--accent-purple": "#f97316",
+    "--accent-cyan": "#fdba74",
+    "--accent-blue": "#f97316",
+  },
 };
 
 const BG_MAP: Record<string, { value: string; size?: string; lightValue: string }> = {
-  void: { 
-    value: "linear-gradient(to bottom, #090d16, #0d1117)",
-    lightValue: "linear-gradient(to bottom, #f8fafc, #f1f5f9)"
+  void: {
+    value:
+      "radial-gradient(ellipse at top, rgba(129, 140, 248, 0.20) 0%, transparent 55%), radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.10) 0%, transparent 60%), linear-gradient(180deg, #0d0f1e 0%, #070811 55%, #04050c 100%)",
+    lightValue:
+      "radial-gradient(ellipse at top, rgba(129, 140, 248, 0.28) 0%, transparent 55%), radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.18) 0%, transparent 60%), linear-gradient(180deg, #eef2ff 0%, #e4e9f5 55%, #dde3ef 100%)",
   },
   "cyber-grid": {
     value:
-      "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(to bottom, #0d1117, #0d1117)",
-    size: "30px 30px, 30px 30px, auto",
-    lightValue: 
-      "linear-gradient(transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(90deg, transparent 95%, rgba(6, 182, 212, 0.15) 100%), linear-gradient(to bottom, #f8fafc, #f8fafc)"
+      "linear-gradient(transparent 94%, rgba(6, 182, 212, 0.28) 100%), linear-gradient(90deg, transparent 94%, rgba(6, 182, 212, 0.28) 100%), radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.38) 0%, transparent 55%), linear-gradient(to bottom, #0b1220, #060a16)",
+    size: "30px 30px, 30px 30px, auto, auto",
+    lightValue:
+      "linear-gradient(transparent 94%, rgba(6, 182, 212, 0.35) 100%), linear-gradient(90deg, transparent 94%, rgba(6, 182, 212, 0.35) 100%), radial-gradient(ellipse at bottom, rgba(129, 140, 248, 0.30) 0%, transparent 55%), linear-gradient(to bottom, #eef6fd, #e2ecfa)",
+    // size matches the 4 layers above (grid-x, grid-y, glow, base)
   },
   "sakura-fall": {
     value:
-      "radial-gradient(circle at top right, rgba(244, 114, 182, 0.25), transparent 45%), linear-gradient(to bottom, #0f0a0c, #0a0507)",
-    lightValue: 
-      "radial-gradient(circle at top right, rgba(244, 114, 182, 0.25), transparent 50%), linear-gradient(to bottom, #fff5f7, #fdf2f8)"
+      "radial-gradient(circle at top right, rgba(244, 114, 182, 0.50) 0%, transparent 48%), radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.30) 0%, transparent 52%), radial-gradient(circle at 25% 65%, rgba(251, 207, 232, 0.10) 0%, transparent 45%), linear-gradient(to bottom, #1d0b16, #0e0510)",
+    lightValue:
+      "radial-gradient(circle at top right, rgba(249, 168, 212, 0.65) 0%, transparent 50%), radial-gradient(circle at bottom left, rgba(244, 114, 182, 0.40) 0%, transparent 55%), linear-gradient(to bottom, #fff0f6, #fbdfec)",
   },
   "abyssal-glow": {
     value:
-      "radial-gradient(circle at center, rgba(124, 58, 237, 0.25) 0%, transparent 65%), linear-gradient(to bottom, #0a0a14, #05050a)",
-    lightValue: 
-      "radial-gradient(circle at center, rgba(124, 58, 237, 0.18) 0%, transparent 65%), linear-gradient(to bottom, #f5f3ff, #ede9fe)"
+      "radial-gradient(circle at center, rgba(168, 85, 247, 0.50) 0%, rgba(124, 58, 237, 0.30) 24%, transparent 62%), radial-gradient(circle at 5% 10%, rgba(59, 130, 246, 0.22) 0%, transparent 48%), radial-gradient(circle at 95% 90%, rgba(217, 70, 239, 0.22) 0%, transparent 50%), linear-gradient(to bottom, #14102a, #080613)",
+    lightValue:
+      "radial-gradient(circle at center, rgba(167, 139, 250, 0.55) 0%, rgba(196, 181, 253, 0.35) 30%, transparent 66%), radial-gradient(circle at 5% 10%, rgba(147, 197, 253, 0.30) 0%, transparent 50%), radial-gradient(circle at 95% 90%, rgba(240, 171, 252, 0.32) 0%, transparent 52%), linear-gradient(to bottom, #f3efff, #e7e3fb)",
   },
   "neon-sunrise": {
     value:
-      "linear-gradient(to top, rgba(239, 68, 68, 0.18), rgba(245, 158, 11, 0.1), transparent), linear-gradient(to bottom, #0f0a0a, #050505)",
-    lightValue: 
-      "linear-gradient(to top, rgba(239, 68, 68, 0.12), rgba(245, 158, 11, 0.08), transparent), linear-gradient(to bottom, #f8fafc, #f1f5f9)"
+      "linear-gradient(to top, rgba(239, 68, 68, 0.55) 0%, rgba(245, 158, 11, 0.35) 26%, rgba(168, 85, 247, 0.18) 48%, transparent 70%), radial-gradient(circle at bottom, rgba(239, 68, 68, 0.28) 0%, transparent 45%), linear-gradient(to bottom, #170c10, #070508)",
+    lightValue:
+      "linear-gradient(to top, rgba(251, 113, 133, 0.55) 0%, rgba(251, 191, 36, 0.32) 30%, rgba(216, 180, 254, 0.20) 55%, transparent 75%), linear-gradient(to bottom, #fff5f3, #fde4d0)",
   },
   "matrix-rain": {
     value:
-      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.05) 0px, transparent 1px, transparent 20px), linear-gradient(to bottom, #050f0a, #020503)",
-    lightValue: 
-      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.05) 0px, transparent 1px, transparent 20px), linear-gradient(to bottom, #ecfdf5, #d1fae5)"
+      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.16) 0px, transparent 1px, transparent 18px), repeating-linear-gradient(90deg, rgba(16, 185, 129, 0.06) 0px, transparent 1px, transparent 90px), radial-gradient(circle at bottom, rgba(16, 185, 129, 0.30) 0%, transparent 60%), linear-gradient(to bottom, #06130c, #02100a)",
+    lightValue:
+      "repeating-linear-gradient(0deg, rgba(16, 185, 129, 0.22) 0px, transparent 1px, transparent 18px), repeating-linear-gradient(90deg, rgba(16, 185, 129, 0.10) 0px, transparent 1px, transparent 90px), radial-gradient(circle at bottom, rgba(52, 211, 153, 0.35) 0%, transparent 60%), linear-gradient(to bottom, #d8fce9, #b7f2d2)",
   },
   "aurora-borealis": {
     value:
-      "radial-gradient(ellipse at top, rgba(6, 182, 212, 0.18) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.15) 0%, transparent 50%), linear-gradient(to bottom, #060610, #050508)",
-    lightValue: 
-      "radial-gradient(ellipse at top, rgba(6, 182, 212, 0.15) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(124, 58, 237, 0.12) 0%, transparent 50%), linear-gradient(to bottom, #f0fdfa, #e0f2fe)"
+      "radial-gradient(ellipse 120% 65% at 15% -10%, rgba(34, 211, 238, 0.40) 0%, transparent 55%), radial-gradient(ellipse 130% 70% at 85% 15%, rgba(139, 92, 246, 0.38) 0%, transparent 58%), radial-gradient(ellipse 140% 70% at 50% 110%, rgba(52, 211, 153, 0.28) 0%, transparent 58%), linear-gradient(to bottom, #070b18, #05050f)",
+    lightValue:
+      "radial-gradient(ellipse 120% 65% at 15% -10%, rgba(103, 232, 249, 0.55) 0%, transparent 55%), radial-gradient(ellipse 130% 70% at 85% 15%, rgba(196, 181, 253, 0.55) 0%, transparent 58%), radial-gradient(ellipse 140% 70% at 50% 110%, rgba(167, 243, 208, 0.45) 0%, transparent 58%), linear-gradient(to bottom, #eafcff, #dfe9ff)",
   },
   "deep-ocean": {
     value:
-      "radial-gradient(circle at bottom, rgba(59, 130, 246, 0.18) 0%, transparent 60%), linear-gradient(to bottom, #040810, #020406)",
-    lightValue: 
-      "radial-gradient(circle at bottom, rgba(59, 130, 246, 0.15) 0%, transparent 60%), linear-gradient(to bottom, #eff6ff, #dbeafe)"
+      "radial-gradient(circle at 50% 78%, rgba(59, 130, 246, 0.50) 0%, rgba(14, 165, 233, 0.18) 30%, transparent 62%), radial-gradient(circle at 8% 8%, rgba(34, 211, 238, 0.16) 0%, transparent 45%), linear-gradient(to bottom, #051222, #020710)",
+    lightValue:
+      "radial-gradient(circle at 50% 78%, rgba(96, 165, 250, 0.55) 0%, rgba(125, 211, 252, 0.22) 30%, transparent 62%), radial-gradient(circle at 8% 8%, rgba(103, 232, 249, 0.30) 0%, transparent 45%), linear-gradient(to bottom, #dcefff, #c8e4fb)",
   },
 };
 

@@ -182,38 +182,35 @@ export function applyGlobalBackground(bgId?: string | null, mode?: string | null
   const bgData = BG_MAP[currentBg] || BG_MAP["void"];
   if (!bgData) return;
 
-  // Paint the wallpaper on a dedicated viewport-fixed layer (#app-bg-layer)
-  // on desktop, but on mobile browsers (<768px) paint it scroll-attached on
-  // <body> instead. `position: fixed` layers are rasterized lazily while
-  // scrolling on Android Chrome / iOS Safari, so the wallpaper visibly
-  // "cuts off" during a scroll and only catches up after the gesture ends.
-  // A scroll-attached body background spans the whole document and moves
-  // with the content, so it is always fully painted. (Plain
-  // `background-attachment: fixed` is even worse on mobile — ignored on
-  // iOS, mis-painted on Android — so it is never used.)
+  // The wallpaper lives on a dedicated in-flow layer (#app-bg-layer) that is
+  // absolutely positioned inside a `position: relative` wrapper around the
+  // page content, so it spans the FULL document height and scrolls with the
+  // content on every device.
+  //
+  // Why not a viewport-fixed element or a <body> background?
+  //   • `background-attachment: fixed` — ignored on iOS Safari, mis-painted
+  //     on Android Chrome (the original mobile "cut off" bug).
+  //   • `position: fixed` layer — Android Chrome rasterizes fixed layers
+  //     lazily during scroll gestures, so the wallpaper lags behind and
+  //     catches up ~0.1s after scrolling stops.
+  //   • <body> background — promoted to the canvas (because <html> carries
+  //     no background), and mobile Chrome re-tiles that canvas background in
+  //     viewport-sized chunks. The gradient repeats instead of running the
+  //     full document, producing a visible seam past the first viewport.
+  //   An in-flow element is painted eagerly and exactly once, covering the
+  //   full document — none of the above rendering quirks apply.
   const layer = document.getElementById("app-bg-layer") as HTMLElement | null;
-  const value = currentMode === "light" ? bgData.lightValue : bgData.value;
-  const size = bgData.size || "cover";
-  const isMobile = window.matchMedia("(max-width: 767px)").matches;
-
-  if (isMobile) {
-    const bodyStyle = document.body.style;
-    bodyStyle.background = value;
-    bodyStyle.backgroundSize = size;
-    bodyStyle.backgroundAttachment = "scroll";
-    // Hide the fixed layer so no stale paint lingers behind the body.
-    if (layer) layer.style.background = "none";
-    return;
+  if (layer) {
+    layer.style.background = currentMode === "light" ? bgData.lightValue : bgData.value;
+    layer.style.backgroundSize = bgData.size || "cover";
+    // `no-repeat` guarantees a single seamless paint (never re-tiled, so no
+    // seam can appear when the wallpaper is re-applied or the doc resizes).
+    layer.style.backgroundRepeat = "no-repeat";
   }
-
-  const target = layer?.style ?? document.body.style;
-  target.background = value;
-  target.backgroundSize = size;
-  // If we previously painted the body for mobile, clear it — it would cover
-  // the fixed layer (body backgrounds paint above negative z-index children).
-  if (layer) document.body.style.background = "";
-  // Note: no `background-attachment` here — the layer element is itself
-  // position: fixed, so the background is viewport-anchored on desktop.
+  // Never leave a stale background paint on <body>: the layer is the single
+  // source of truth, and a body paint would cover it (body backgrounds paint
+  // above negative z-index children).
+  document.body.style.background = "";
 }
 
 export function applyGlobalTheme(themeId?: string | null) {
@@ -262,60 +259,54 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
       applyGlobalTheme(latestTheme);
     };
 
-    // Re-apply on viewport resize: mobile uses a scroll-attached body
-    // wallpaper while desktop uses the fixed layer, so crossing the md
-    // breakpoint (rotate, resize, split-screen) must re-paint.
-    const handleResize = () => {
-      const latestBg = localStorage.getItem("app_background") || "void";
-      const latestMode = localStorage.getItem("app_mode") || "dark";
-      applyGlobalBackground(latestBg, latestMode);
-    };
+    // Re-apply on viewport resize/rotate is unnecessary: the wallpaper layer
+    // is an in-flow element that spans the document, which is stable across
+    // breakpoints by construction.
 
     window.addEventListener("background-updated", handleBgUpdate);
     window.addEventListener("theme-updated", handleThemeUpdate);
     window.addEventListener("storage", handleBgUpdate);
     window.addEventListener("storage", handleThemeUpdate);
-    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("background-updated", handleBgUpdate);
       window.removeEventListener("theme-updated", handleThemeUpdate);
       window.removeEventListener("storage", handleBgUpdate);
       window.removeEventListener("storage", handleThemeUpdate);
-      window.removeEventListener("resize", handleResize);
     };
   }, [user?.activeBackground, user?.activeTheme]);
 
   return (
-    <>
-      {/* Global background wallpaper — a viewport-fixed layer that never
-          intercepts pointer events (see applyGlobalBackground above). */}
-      <div
-        id="app-bg-layer"
-        aria-hidden="true"
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: -10,
-          pointerEvents: "none",
-        }}
-      />
-      <AcousticsProvider>
-        <SettingsProvider>
-          <ProfileModalProvider>
-            <SystemAIProvider>
+    <AcousticsProvider>
+      <SettingsProvider>
+        <ProfileModalProvider>
+          <SystemAIProvider>
+            {/* Wallpaper layer: in-flow, absolutely positioned against this
+                relative wrapper so it spans the full document height and
+                scrolls with the content — see applyGlobalBackground. */}
+            <div className="relative">
+              <div
+                id="app-bg-layer"
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: -10,
+                  pointerEvents: "none",
+                }}
+              />
               {children}
-            </SystemAIProvider>
-            <PublicProfileModal />
-            <AcousticsDynamicIsland />
-            <SessionInviteToast />
-            <SessionEndToast />
-            <TopRightBar />
-            <SettingsPanel />
-          </ProfileModalProvider>
-        </SettingsProvider>
-      </AcousticsProvider>
-    </>
+            </div>
+          </SystemAIProvider>
+          <PublicProfileModal />
+          <AcousticsDynamicIsland />
+          <SessionInviteToast />
+          <SessionEndToast />
+          <TopRightBar />
+          <SettingsPanel />
+        </ProfileModalProvider>
+      </SettingsProvider>
+    </AcousticsProvider>
   );
 }
 

@@ -4,6 +4,7 @@ import {
   calculateLevelFromXp,
   getRankFromLevel,
   getLevelProgress,
+  xpForNextLevel,
   RANK_THRESHOLDS,
   clampCognitiveStat,
   COGNITIVE_STAT_MIN,
@@ -125,17 +126,28 @@ describe("Game Engine Phase 1 — Deterministic Progression & Cognitive Vectors"
   });
 
   describe("UI Progress Bracket Derivation: getLevelProgress", () => {
-    it("calculates progress inside Level 1 bracket", () => {
+    it("calculates progress inside Level 1 bracket (base = 100 entry threshold)", () => {
       const startProg = getLevelProgress(0, 1);
-      expect(startProg.currentLevelBaseXp).toBe(0);
+      expect(startProg.currentLevelBaseXp).toBe(100);
       expect(startProg.nextLevelTargetXp).toBe(282);
-      expect(startProg.xpIntoCurrentLevel).toBe(0);
-      expect(startProg.xpForCurrentBracket).toBe(282);
+      expect(startProg.xpIntoCurrentLevel).toBe(0); // clamped at the entry threshold
+      expect(startProg.xpForCurrentBracket).toBe(182); // 282 - 100
       expect(startProg.progressPercentage).toBe(0);
 
       const midProg = getLevelProgress(141, 1);
-      expect(midProg.xpIntoCurrentLevel).toBe(141);
-      expect(midProg.progressPercentage).toBe(50);
+      expect(midProg.xpIntoCurrentLevel).toBe(41); // 141 - 100
+      expect(midProg.progressPercentage).toBe(Math.floor((41 / 182) * 100)); // 22%
+    });
+
+    it("per-level buckets are strictly monotonic (no level harder than the next)", () => {
+      // 1→2 = 182, 2→3 = 237, 3→4 = 281, 4→5 = 318
+      expect(xpForNextLevel(1)).toBe(182);
+      expect(xpForNextLevel(2)).toBe(237);
+      expect(xpForNextLevel(3)).toBe(281);
+      expect(xpForNextLevel(4)).toBe(318);
+      for (let l = 1; l <= 20; l++) {
+        expect(xpForNextLevel(l + 1)).toBeGreaterThan(xpForNextLevel(l));
+      }
     });
 
     it("calculates progress inside Level 2 bracket", () => {

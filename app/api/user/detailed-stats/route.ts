@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
         maxHp: true,
         streakDays: true,
         totalStudyMinutes: true,
+        totalStudySeconds: true,
         createdAt: true,
         timezone: true,
       },
@@ -64,6 +65,7 @@ export async function GET(req: NextRequest) {
           id: true,
           durationMinutes: true,
           durationSeconds: true,
+          breakSeconds: true,
           focusRate: true,
           startedAt: true,
           endedAt: true,
@@ -82,9 +84,14 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Aggregate daily study minutes for the last 30 local calendar days
+    // Aggregate daily study time for the last 30 local calendar days.
+    // EXACT-SECOND accounting: sub-minute sessions (15s, 40s) are real study
+    // time and must show up — the old floor(durationSeconds/60) made them
+    // invisible (a day of 4×15s showed as "0 min", skewing the chart AND the
+    // active-days count). Minutes are kept at 1-decimal precision so small
+    // days still render a visible sliver.
     const last30Days = TimezoneService.getDateRangeInUserTimezone(timezone, -29, 0);
-    const dailyMap: Record<string, number> = {};
+    const dailyMap: Record<string, number> = {}; // seconds
     for (const dateStr of last30Days) {
       dailyMap[dateStr] = 0;
     }
@@ -92,31 +99,43 @@ export async function GET(req: NextRequest) {
     for (const s of sessions) {
       const localDay = TimezoneService.getUserLocalDate(timezone, s.startedAt);
       if (dailyMap[localDay] !== undefined) {
-        dailyMap[localDay] += s.durationMinutes;
+        dailyMap[localDay] += s.durationSeconds || s.durationMinutes * 60 || 0;
       }
     }
-    const dailyStudy = Object.entries(dailyMap).map(([date, minutes]) => ({
+    const dailyStudy = Object.entries(dailyMap).map(([date, seconds]) => ({
       date,
-      minutes,
+      minutes: seconds > 0 ? Math.max(0.1, Math.round((seconds / 60) * 10) / 10) : 0,
     }));
 
-    // Subject breakdown
-    const subjectMap: Record<number, { name: string; color: string; minutes: number; sessions: number }> = {};
+    // The user's LOCAL "today" date (not UTC) so the chart marks the right bar.
+    const todayDate = TimezoneService.getUserLocalDate(timezone, new Date());
+
+    // Subject breakdown — exact seconds, 1-decimal minutes, per-subject
+    // session counts. (Same precision fix as the daily chart.)
+    const subjectMap: Record<number, { name: string; color: string; seconds: number; sessions: number }> = {};
     for (const s of sessions) {
       if (s.subject) {
         if (!subjectMap[s.subject.id]) {
           subjectMap[s.subject.id] = {
             name: s.subject.name,
             color: s.subject.color || "#7c3aed",
-            minutes: 0,
+            seconds: 0,
             sessions: 0,
           };
         }
-        subjectMap[s.subject.id].minutes += s.durationMinutes;
+        subjectMap[s.subject.id].seconds += s.durationSeconds || s.durationMinutes * 60 || 0;
         subjectMap[s.subject.id].sessions += 1;
       }
     }
-    const subjectBreakdown = Object.values(subjectMap).sort((a, b) => b.minutes - a.minutes);
+    const subjectBreakdown = Object.values(subjectMap)
+      .map((sub) => ({
+        name: sub.name,
+        color: sub.color,
+        seconds: sub.seconds,
+        minutes: sub.seconds > 0 ? Math.max(0.1, Math.round((sub.seconds / 60) * 10) / 10) : 0,
+        sessions: sub.sessions,
+      }))
+      .sort((a, b) => b.seconds - a.seconds);
 
     // Individual session log (most recent first) — one entry per completed
     // focus block so users can review "30 min in the morning, 50 min at night".
@@ -127,6 +146,7 @@ export async function GET(req: NextRequest) {
         endedAt: s.endedAt,
         durationMinutes: s.durationMinutes,
         durationSeconds: s.durationSeconds > 0 ? s.durationSeconds : s.durationMinutes * 60,
+        breakSeconds: s.breakSeconds || 0,
         focusRate: s.focusRate,
         subjectName: s.subject?.name ?? null,
         subjectColor: s.subject?.color ?? null,
@@ -153,13 +173,21 @@ export async function GET(req: NextRequest) {
       completed: goals.filter((g) => g.status === "COMPLETED").length,
     };
 
-    // Compute derived stats
+    // Compute derived stats — EXACT-second accuracy everywhere:
+    // totals are summed in seconds, then converted for display.
     const totalSessions = sessions.length;
-    const avgSessionMinutes = totalSessions > 0
-      ? Math.round(sessions.reduce((sum, s) => sum + s.durationMinutes, 0) / totalSessions)
+    const totalSessionSeconds = sessions.reduce(
+      (sum, s) => sum + (s.durationSeconds || s.durationMinutes * 60 || 0),
+      0
+    );
+    const avgSessionSeconds = totalSessions > 0
+      ? Math.round(totalSessionSeconds / totalSessions)
       : 0;
-    const activeDays = Object.values(dailyMap).filter((m) => m > 0).length;
-    const longestSession = sessions.reduce((max, s) => Math.max(max, s.durationMinutes), 0);
+    const activeDays = Object.values(dailyMap).filter((sec) => sec > 0).length;
+    const longestSessionSeconds = sessions.reduce(
+      (max, s) => Math.max(max, s.durationSeconds || s.durationMinutes * 60 || 0),
+      0
+    );
 
     // Account age in days
     const accountAgeDays = Math.floor(
@@ -173,11 +201,14 @@ export async function GET(req: NextRequest) {
       sessionLog,
       questStats,
       goalStats,
+      todayDate,
       summary: {
         totalSessions,
-        avgSessionMinutes,
+        avgSessionMinutes: avgSessionSeconds > 0 ? Math.round(avgSessionSeconds / 60) : 0,
+        avgSessionSeconds,
         activeDaysLast30: activeDays,
-        longestSession,
+        longestSession: longestSessionSeconds > 0 ? Math.round(longestSessionSeconds / 60) : 0,
+        longestSessionSeconds,
         accountAgeDays,
         completionRate:
           questStats.total > 0

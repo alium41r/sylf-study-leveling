@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { PanelLeft } from "lucide-react";
 import Sidebar from "./Sidebar";
+import UserAvatar from "./UserAvatar";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { lockPageScroll } from "../../lib/scroll-lock";
@@ -117,8 +118,8 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
 
   return (
     <header className="h-14 w-full flex items-center justify-between gap-2 px-3 md:hidden border-b border-border-subtle bg-background/80 backdrop-blur-md sticky top-0 z-30 shrink-0">
-      {/* Left: hamburger + rank badge */}
-      <div className="flex items-center gap-3 min-w-0">
+      {/* Left: hamburger + pfp + name */}
+      <div className="flex items-center gap-2.5 min-w-0">
         <button
           type="button"
           onClick={onOpenMenu}
@@ -128,6 +129,15 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
         >
           <PanelLeft className="w-5 h-5 text-text-secondary" />
         </button>
+
+        <UserAvatar
+          src={user?.avatarUrl}
+          name={user?.name}
+          username={user?.username}
+          size="sm"
+          shape="rounded"
+          className="w-9 h-9"
+        />
 
         <div className="min-w-0">
           <p className="text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary truncate">

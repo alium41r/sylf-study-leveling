@@ -4,7 +4,7 @@ import { Relationship } from "@/lib/privacy-types";
 import { isUserBlocked } from "@/lib/block-service";
 import { TimezoneService } from "@/lib/timezone-service";
 import { unstable_cache } from "next/cache";
-import { getLevelProgress } from "@/lib/game-engine";
+import { getLevelProgress, calculateRequiredXp } from "@/lib/game-engine";
 import { cachedWithRedis } from "@/lib/redis";
 
 export interface ProfileDossierResult {
@@ -54,6 +54,7 @@ async function fetchTargetUserData(normalized: string) {
       totalStudySeconds: true,
       timezone: true,
       lastActiveDate: true,
+      lastSeenAt: true,
       activeAvatar: true,
       activeFrame: true,
       activeTitle: true,
@@ -287,7 +288,35 @@ export async function getProfileDossier(
       discipline: targetUser.statDiscipline ?? 10,
       synthesis: targetUser.statSynthesis ?? 10,
     };
-    const levelProgress = getLevelProgress(userStats.xp, userStats.level).progressPercentage;
+
+    // XP PROGRESSION (canonical, level-correct):
+    // `getLevelProgress` needs the LIFETIME cumulative XP. If the canonical
+    // UserStats row exists, it holds the lifetime total; otherwise we rebuilt
+    // `userStats.xp` from `User.currentXP` (which is XP INTO the current
+    // level) — so reconstruct the lifetime total before computing progress.
+    //
+    // The dashboard reads `User.currentXP` / `User.xpToNextLevel` directly,
+    // and both are into-level / per-level-bucket values maintained by the
+    // canonical progression RPC. We used to override `currentXP` with the
+    // LIFETIME cumulative number while leaving the per-level bucket, which
+    // produced "7412 / 627 XP" on a friend's level-17 card — the lifetime
+    // total divided by a single level's bucket. Now the numerator is the
+    // exact XP INTO the friend's current level and the denominator is the
+    // total XP required to clear THAT level (either matches perfectly).
+    const statLevel = userStats.level || targetUser.level || 1;
+    const lifetimeXp = targetUser.stats
+      ? userStats.xp
+      : calculateRequiredXp(statLevel) + (targetUser.currentXP || 0);
+
+    const levelProgress = getLevelProgress(lifetimeXp, statLevel);
+
+    // Online status — mirrors the friends roster: online only if this user's
+    // heartbeat (`lastSeenAt`, refreshed ~every 60s while the app is open) is
+    // fresh within 2 minutes. Older than that → offline (the card must never
+    // show a green dot for someone who walked away).
+    const isOnline =
+      !!targetUser.lastSeenAt &&
+      Date.now() - new Date(targetUser.lastSeenAt).getTime() <= 2 * 60 * 1000;
 
     const rawProfileData = {
       id: targetUser.id,
@@ -299,10 +328,10 @@ export async function getProfileDossier(
       bannerUrl: targetUser.bannerUrl,
       bio: targetUser.bio,
       hunterRank: userStats.rank || targetUser.hunterRank,
-      level: userStats.level || targetUser.level,
-      currentXP: userStats.xp || targetUser.currentXP,
-      xpToNextLevel: targetUser.xpToNextLevel,
-      levelProgress,
+      level: statLevel,
+      currentXP: levelProgress.xpIntoCurrentLevel,
+      xpToNextLevel: levelProgress.xpForCurrentBracket,
+      levelProgress: levelProgress.progressPercentage,
       hp: targetUser.hp,
       maxHp: targetUser.maxHp,
       streakDays: targetUser.streakDays,
@@ -312,6 +341,7 @@ export async function getProfileDossier(
       todayStudySeconds,
       completedTodaySeconds,
       isStudying,
+      isOnline,
       activeSessionStartedAt,
       activeAvatar: targetUser.activeAvatar,
       activeFrame: targetUser.activeFrame,
@@ -395,6 +425,7 @@ export async function getProfileDossier(
         recentAchievements: showAchievements ? rawProfileData.recentAchievements : undefined,
         achievementsCount: showAchievements ? rawProfileData.achievementsCount : undefined,
         lastActiveDate: showOnline ? rawProfileData.lastActiveDate : undefined,
+        isOnline: showOnline ? rawProfileData.isOnline : undefined,
       };
     }
 

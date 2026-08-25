@@ -4,6 +4,8 @@ import { DEEPSEEK_MODELS, GEMINI_MODELS } from "./config";
 import { NormalizedMessage } from "./providers/types";
 import { extractJson } from "./json-extractor";
 import { z } from "zod";
+import { executeGoogleSearch } from "./chat-tool-executor";
+import { logAiUsage } from "./usage-logger";
 
 export interface CompiledSyllabusNode {
   nodeId: string; // "N1_1" through "N10_1"
@@ -27,6 +29,105 @@ export interface CompileSyllabusInput {
   code: string;
   examBoard?: string;
   level?: string;
+  /**
+   * Free-text book / syllabus / class details the user entered when adding
+   * the subject (onboarding or timer page). This is what lets the compiler
+   * research the user's EXACT syllabus — textbook, exam-spec name, class year.
+   */
+  syllabusNote?: string;
+  /** Optional — enables AI usage telemetry (AiUsageLog) for this compile. */
+  userId?: number;
+}
+
+/**
+ * Hard caps against runaway generations: 48 nodes ≈ 3–4k output tokens, so an
+ * 8k ceiling keeps the compile fast without ever truncating the full payload.
+ */
+const COMPILE_SYNTHESIS_TIMEOUT_MS = 120_000;
+const COMPILE_RESEARCH_TIMEOUT_MS = 30_000;
+const COMPILE_MAX_OUTPUT_TOKENS = 8192;
+
+/** Abort a promise (best-effort) after ms — used for the grounded search. */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`Syllabus compile step timed out after ${ms}ms`)),
+      ms
+    );
+    promise.then(
+      (v) => { clearTimeout(timer); resolve(v); },
+      (e) => { clearTimeout(timer); reject(e); }
+    );
+  });
+}
+
+/** Timeout-aware AbortSignal: fires when either the caller or the timer aborts. */
+function timeoutSignal(signal: AbortSignal | undefined, ms: number): AbortSignal {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error(`timed out after ${ms}ms`)), ms);
+  const onParentAbort = () => controller.abort(signal?.reason);
+  if (signal) {
+    if (signal.aborted) controller.abort(signal.reason);
+    else signal.addEventListener("abort", onParentAbort, { once: true });
+  }
+  controller.signal.addEventListener(
+    "abort",
+    () => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", onParentAbort);
+    },
+    { once: true }
+  );
+  return controller.signal;
+}
+
+const GENERIC_SEARCH_FALLBACK_SOURCE = "Academic Curriculum Knowledge Engine";
+
+/**
+ * Grounded curriculum research via Gemini's Google Search grounding. The
+ * search runs FIRST and ALWAYS (deterministically) — the model only ever
+ * SYNTHESIZES real findings, it is never trusted to research from memory
+ * (DeepSeek's tool calling routinely skips Google Search and hallucinates).
+ */
+async function runGroundedResearch(input: {
+  name: string;
+  code: string;
+  examBoard: string;
+  level: string;
+  syllabusNote?: string;
+}): Promise<{ findings: string; source: string }> {
+  const qualification = [
+    input.level,
+    input.syllabusNote ? `User book/class details: ${input.syllabusNote}` : "",
+  ]
+    .filter(Boolean)
+    .join(" — ");
+
+  try {
+    const searchResult = await withTimeout(
+      executeGoogleSearch({
+        query: `${input.name} (${input.code}) — ${input.examBoard} official syllabus`,
+        qualification: qualification || undefined,
+      }),
+      COMPILE_RESEARCH_TIMEOUT_MS
+    );
+    // Only trust REAL grounded findings — the executor's generic placeholder
+    // snippet (no API key / search unavailable) is junk for the compiler, so
+    // treat it as "no research" instead of feeding the model boilerplate.
+    if (
+      searchResult?.summary &&
+      String(searchResult.summary).trim().length > 0 &&
+      searchResult.source !== GENERIC_SEARCH_FALLBACK_SOURCE
+    ) {
+      return {
+        findings: String(searchResult.summary).trim(),
+        source: searchResult.source || "grounded search",
+      };
+    }
+  } catch (searchErr: any) {
+    console.warn("[SyllabusCompiler] Grounded research unavailable:", searchErr?.message);
+  }
+  return { findings: "", source: "no live research (compiling from official curriculum knowledge)" };
 }
 
 /**
@@ -137,9 +238,6 @@ export function validateAndSanitizeCompiledNodes(
 }
 
 /**
- * Main Service: Compiles a syllabus using multi-engine router (DeepSeek primary with Gemini research fallback).
- */
-/**
  * Raw LLM node shape — deliberately loose; validateAndSanitizeCompiledNodes
  * enforces the strict 48-node invariant downstream.
  */
@@ -166,6 +264,14 @@ function parseSyllabusPayload(responseText: string): any[] {
   return rawArray.length > 0 ? rawArray : [];
 }
 
+/**
+ * Main Service: Compiles a syllabus from GROUNDED research (Gemini Google
+ * Search grounding) synthesized by Gemini. DeepSeek is only an offline
+ * fallback — it can't use the Google Search tool and is never asked to
+ * research. Exactly ONE LLM synthesis attempt per provider (plus one
+ * deterministic search), each under a hard timeout and an output-token cap,
+ * so a compile never cascades into hours of redundant generations.
+ */
 export async function compileSyllabus(
   input: CompileSyllabusInput,
   signal?: AbortSignal
@@ -174,6 +280,19 @@ export async function compileSyllabus(
   const code = input.code.trim().toUpperCase();
   const examBoard = (input.examBoard || "CAIE").trim().toUpperCase();
   const level = (input.level || "A-Level").trim();
+  const syllabusNote = (input.syllabusNote || "").trim();
+  const userId = input.userId;
+
+  // ── 0. GROUNDED RESEARCH (deterministic, Gemini Google Search) ──────
+  // Always runs first so the compile is based on the user's EXACT syllabus
+  // (board + code + the book/class details they entered), never memory.
+  const { findings, source } = await runGroundedResearch({
+    name: subjectName,
+    code,
+    examBoard,
+    level,
+    syllabusNote: syllabusNote || undefined,
+  });
 
   const userPrompt = `Decompose syllabus ${examBoard} ${code} (${subjectName}, ${level}) into the 48-node constellation graph. Output JSON only.`;
   const systemInstruction = `
@@ -186,6 +305,16 @@ Target Syllabus:
 - Syllabus Code: "${code}"
 - Examination Board: "${examBoard}"
 - Academic Level: "${level}"
+${syllabusNote ? `- User Book / Syllabus / Class Details: "${syllabusNote}"` : ""}
+
+GROUNDED RESEARCH FINDINGS (${source}):
+${findings || "No live research available — use only well-established official curriculum knowledge for this qualification and mark anything uncertain."}
+
+FIDELITY RULES:
+- Base every node on the LIVE RESEARCH FINDINGS when present. Use the exact chapter titles, topic names and exam-board conventions they contain (e.g. "Pure Mathematics 1", "Mechanics", "Organic Chemistry").
+- When the user gave book/class details, honor that textbook/specifier (e.g. Which book, which chapters the class covers).
+- NEVER invent chapters that contradict the findings; if findings don't cover this syllabus, fall back to official curriculum knowledge and keep nodes generic-safe.
+- No markdown, no commentary — JSON only.
 
 Structural Node Invariant (Exact 48 Nodes):
 You must output an array of exactly 48 objects corresponding to Node IDs 'N1_1' through 'N10_1':
@@ -199,11 +328,11 @@ Node IDs to provide in order:
 ${SKELETON_NODES.map((n) => `${n.id} (Tier ${n.tier})`).join(", ")}
 
 Output Requirements:
-- Return ONLY a valid, parseable JSON array of 48 objects with properties:
+- Return ONLY a valid, parseable JSON array of exactly 48 objects with properties:
   - "nodeId": string (e.g. "N1_1")
   - "tier": number (1 to 10)
-  - "title": string (3-7 words, concrete academic topic name, NO generic placeholders)
-  - "description": string (1-2 clear sentences outlining the learning objectives and past-paper competencies)
+  - "title": string (2-4 words, the concrete topic name from the syllabus — NO generic placeholders like "Advanced Concepts")
+  - "description": ONE sentence (≤220 chars) stating the learning objective and past-paper competency
   - "difficulty": number (integer between 1 and 5)
 `.trim();
 
@@ -211,66 +340,89 @@ Output Requirements:
     { role: "user", content: userPrompt },
   ];
 
-  // Attempt 1: DeepSeek Primary Engine (deepseek-v4-pro)
-  if (process.env.DEEPSEEK_API_KEY) {
+  const geminiKey =
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_GENAI_API_KEY ||
+    process.env.GOOGLE_API_KEY;
+
+  // ── Attempt 1: GEMINI PRIMARY ENGINE — grounded research synthesis ──
+  if (geminiKey) {
     try {
-      const deepseekAdapter = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.compiler);
-      const res = await deepseekAdapter.generateResponse(messages, systemInstruction, [], {
+      const geminiAdapter = LLMFactory.getAdapter("gemini", GEMINI_MODELS.compiler);
+      const res = await geminiAdapter.generateResponse(messages, systemInstruction, [], {
         responseFormat: "json_object",
-        signal,
+        temperature: 0.3,
+        maxTokens: COMPILE_MAX_OUTPUT_TOKENS,
+        signal: timeoutSignal(signal, COMPILE_SYNTHESIS_TIMEOUT_MS),
       });
 
       const rawArray = parseSyllabusPayload(res.text || "");
       if (rawArray.length > 0) {
         const nodes = validateAndSanitizeCompiledNodes(rawArray, input);
+        await logAiUsage({
+          userId: userId ?? 0,
+          feature: "syllabus",
+          workload: `${examBoard} ${code} — ${subjectName}`,
+          provider: "gemini",
+          model: GEMINI_MODELS.compiler,
+          promptTokens: res.usage?.promptTokens ?? 0,
+          completionTokens: res.usage?.completionTokens ?? 0,
+        });
         return {
           subjectName,
           code,
           examBoard,
           level,
           nodes,
-          modelUsed: `DeepSeek (${DEEPSEEK_MODELS.compiler})`,
+          modelUsed: `Gemini (${GEMINI_MODELS.compiler}) + ${source}`,
         };
       }
     } catch (err: any) {
-      console.warn("[SyllabusCompiler] Primary DeepSeek engine failed, attempting Gemini research fallback:", err.message);
+      console.warn("[SyllabusCompiler] Gemini primary engine failed, attempting DeepSeek fallback:", err.message);
     }
   }
 
-  // Attempt 2: Gemini Research Fallback Engine (gemini-3.1-pro / gemini-2.5-flash)
-  const geminiKey =
-    process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_GENAI_API_KEY ||
-    process.env.GOOGLE_API_KEY;
+  // ── Attempt 2: DEEPSEEK FALLBACK — pure synthesis of the SAME findings,
+  //    NO tools, thinking disabled (DeepSeek skips Google Search; it only
+  //    formats the grounded findings into the 48-node JSON).
+  if (process.env.DEEPSEEK_API_KEY) {
+    try {
+      const deepseekAdapter = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.compiler);
+      const res = await deepseekAdapter.generateResponse(messages, systemInstruction, [], {
+        responseFormat: "json_object",
+        temperature: 0.2,
+        maxTokens: 4096,
+        thinking: "disabled",
+        signal: timeoutSignal(signal, 60_000),
+      });
 
-  if (geminiKey) {
-    const candidateModels = [GEMINI_MODELS.research, "gemini-3.7-flash", "gemini-3.6-flash"];
-    for (const modelName of candidateModels) {
-      try {
-        const geminiAdapter = LLMFactory.getAdapter("gemini", modelName);
-        const res = await geminiAdapter.generateResponse(messages, systemInstruction, [], {
-          signal,
+      const rawArray = parseSyllabusPayload(res.text || "");
+      if (rawArray.length > 0) {
+        const nodes = validateAndSanitizeCompiledNodes(rawArray, input);
+        await logAiUsage({
+          userId: userId ?? 0,
+          feature: "syllabus",
+          workload: `${examBoard} ${code} — ${subjectName}`,
+          provider: "deepseek",
+          model: DEEPSEEK_MODELS.compiler,
+          promptTokens: res.usage?.promptTokens ?? 0,
+          completionTokens: res.usage?.completionTokens ?? 0,
         });
-
-        const rawArray = parseSyllabusPayload(res.text || "");
-        if (rawArray.length > 0) {
-          const nodes = validateAndSanitizeCompiledNodes(rawArray, input);
-          return {
-            subjectName,
-            code,
-            examBoard,
-            level,
-            nodes,
-            modelUsed: `Gemini (${modelName})`,
-          };
-        }
-      } catch (geminiErr: any) {
-        console.warn(`[SyllabusCompiler] Gemini ${modelName} fallback failed:`, geminiErr.message);
+        return {
+          subjectName,
+          code,
+          examBoard,
+          level,
+          nodes,
+          modelUsed: `DeepSeek (${DEEPSEEK_MODELS.compiler}) + ${source}`,
+        };
       }
+    } catch (err: any) {
+      console.warn("[SyllabusCompiler] DeepSeek fallback failed:", err.message);
     }
   }
 
-  // Attempt 3: Deterministic Skeleton Engine
+  // ── Attempt 3: Deterministic Skeleton Engine ──
   console.warn("[SyllabusCompiler] All LLM endpoints offline, generating deterministic syllabus.");
   return generateFallbackSyllabus(input);
 }

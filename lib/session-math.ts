@@ -34,6 +34,29 @@ export function clampSessionSeconds(
 }
 
 /**
+ * Clamp a claimed break amount. Invariant: focus + break can never exceed the
+ * wall-clock session window (+ grace), so a spoofed "20h break" on a 5h
+ * session with 3h of focus is capped at ~2h. Break time is informational
+ * only (never rewarded), but it still has to stay honest for the logs.
+ */
+export function clampSessionBreakSeconds(
+  claimedBreakSeconds: number,
+  startedAtMs: number,
+  focusSeconds: number,
+  serverNowMs: number = Date.now()
+): number {
+  if (!Number.isFinite(claimedBreakSeconds)) return 0;
+  const claimed = Math.max(0, Math.floor(claimedBreakSeconds));
+  if (!Number.isFinite(startedAtMs)) return claimed;
+  const elapsed = Math.max(0, Math.floor((serverNowMs - startedAtMs) / 1000));
+  const wallBudget = Math.max(
+    0,
+    elapsed + SESSION_GRACE_SECONDS - Math.max(0, Math.floor(focusSeconds || 0))
+  );
+  return Math.min(claimed, wallBudget);
+}
+
+/**
  * Exact delta of newly-credited seconds since the previous credit.
  * Repeated cumulative flushes (180, 360, 540, ... 10800) therefore
  * credit exactly 10800 seconds in total.

@@ -9,7 +9,10 @@ import {
 } from "@/lib/game-engine";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 import { revalidateTag } from "next/cache";
-import { clampSessionSeconds } from "@/lib/session-math";
+import {
+  clampSessionSeconds,
+  clampSessionBreakSeconds,
+} from "@/lib/session-math";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
@@ -20,6 +23,7 @@ const endSessionSchema = z.object({
   id: z.number().int(),
   durationMinutes: z.number().int().min(0),
   durationSeconds: z.number().int().min(0).optional(),
+  breakSeconds: z.number().int().min(0).optional(),
   questId: z.number().int().optional(),
   completeQuest: z.boolean().optional(),
   final: z.boolean().optional(),
@@ -176,7 +180,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const { id, durationMinutes, durationSeconds, questId, completeQuest, final } = validation.data;
+    const { id, durationMinutes, durationSeconds, breakSeconds, questId, completeQuest, final } = validation.data;
     const claimedSeconds = durationSeconds ?? durationMinutes * 60;
 
     // ─── PARALLEL READ PHASE ────────────────────────────────────
@@ -224,6 +228,11 @@ export async function PATCH(req: NextRequest) {
       ? clampSessionSeconds(claimedSeconds, startedAtMs)
       : Math.max(0, Math.floor(claimedSeconds || 0));
     const actualMinutes = Math.floor(actualSeconds / 60);
+    // Break time is informational only (never rewarded), but must stay
+    // honest: focus + break can never exceed the wall-clock window + grace.
+    const actualBreakSeconds = Number.isFinite(startedAtMs)
+      ? clampSessionBreakSeconds(breakSeconds ?? 0, startedAtMs, actualSeconds)
+      : Math.max(0, Math.floor(breakSeconds || 0));
 
     // Execute atomic PostgreSQL complete_study_session RPC.
     // The RPC performs exact delta accounting against the previously
@@ -238,6 +247,7 @@ export async function PATCH(req: NextRequest) {
         ${actualSeconds},
         ${questId ?? null},
         null,
+        ${actualBreakSeconds},
         80,
         ${final === true}
       ) AS complete_study_session

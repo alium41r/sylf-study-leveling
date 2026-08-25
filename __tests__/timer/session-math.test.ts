@@ -5,6 +5,7 @@ import * as auth from "@/lib/auth";
 import { PATCH as patchSession } from "@/app/api/sessions/route";
 import {
   clampSessionSeconds,
+  clampSessionBreakSeconds,
   sessionDeltaSeconds,
   sessionMultiplierForSeconds,
   streakMultiplierForWeeks,
@@ -57,6 +58,25 @@ describe("Session Duration Math — exact time parity", () => {
   it("a 120-second session records exactly 120 seconds and 2 minutes", () => {
     expect(sessionDeltaSeconds(0, 120)).toBe(120);
     expect(Math.floor(clampSessionSeconds(120, Date.now() - 130_000) / 60)).toBe(2);
+  });
+
+  it("clamps break time so focus + break never exceed the wall-clock window", () => {
+    const now = 1_000_000_000_000; // fixed server now
+    const started5hAgo = now - 5 * 3_600_000; // 12pm → 5pm window
+
+    // Honest 3h focus + 2h break inside a 5h window → break passes untouched.
+    expect(clampSessionBreakSeconds(7200, started5hAgo, 10800, now)).toBe(7200);
+
+    // Spoofed 20h break on a 5h session with 3h focus →
+    // budget = 5h + grace − 3h focus = 7260s.
+    expect(clampSessionBreakSeconds(72000, started5hAgo, 10800, now)).toBe(7200 + SESSION_GRACE_SECONDS);
+
+    // Garbage / negative claims floor at 0.
+    expect(clampSessionBreakSeconds(-5, started5hAgo, 10800, now)).toBe(0);
+
+    // Break beyond the wall-clock window with no grace room → capped at 0.
+    const started10m = now - 10 * 60_000;
+    expect(clampSessionBreakSeconds(600, started10m, 600 + SESSION_GRACE_SECONDS, now)).toBe(0);
   });
 });
 
@@ -187,15 +207,17 @@ describe("PATCH /api/sessions — clamped, single-award pipeline", () => {
 
     expect(res.status).toBe(200);
 
-    // Template-literal call: (strings, userId, id, minutes, seconds, questId, final)
-    // (the literal subjectId null and focus rate 80 stay inline in the SQL text)
+    // Template-literal call: (strings, userId, id, minutes, seconds, questId,
+    // breakSeconds, final) — the literal subjectId null and focus rate 80 stay
+    // inline in the SQL text.
     const args = rpcSpy.mock.calls[0] as unknown[];
     expect(args[1]).toBe(1); // userId
     expect(args[2]).toBe(5); // sessionId
     expect(args[3]).toBe(11); // clamped minutes = floor(660/60)
     expect(args[4]).toBe(660); // clamped seconds = 600 elapsed + 60 grace
     expect(args[5]).toBe(null); // questId
-    expect(args[6]).toBe(true); // final flag → single canonical award point
+    expect(args[6]).toBe(0); // breakSeconds (no breaks on this flush)
+    expect(args[7]).toBe(true); // final flag → single canonical award point
   });
 
   it("marks non-final checkpoint flushes with final=false", async () => {
@@ -253,6 +275,7 @@ describe("PATCH /api/sessions — clamped, single-award pipeline", () => {
     expect(res.status).toBe(200);
     const args = rpcSpy.mock.calls[0] as unknown[];
     expect(args[4]).toBe(180);
-    expect(args[6]).toBe(false); // auto-save flush: no reward award
+    expect(args[6]).toBe(0); // breakSeconds (no breaks on this flush)
+    expect(args[7]).toBe(false); // auto-save flush: no reward award
   });
 });

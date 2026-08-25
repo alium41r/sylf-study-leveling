@@ -9,6 +9,7 @@ export const SESSION_SUMMARY_KEY = "sylf_last_session_summary";
 
 export interface SessionEndSummary {
   durationSeconds: number;
+  breakSeconds?: number;
   subjectName: string | null;
   questTitle: string | null;
 }
@@ -108,6 +109,14 @@ export default function SessionEndToast() {
                   {summary.subjectName ? ` · ${summary.subjectName}` : ""}
                   {summary.questTitle ? ` — ${summary.questTitle}` : ""}
                 </p>
+                {(summary.breakSeconds ?? 0) > 0 && (
+                  <p
+                    className="text-[0.65rem] font-bold uppercase tracking-[0.15em] text-accent-green/80 mt-0.5"
+                    style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                  >
+                    incl. {formatDuration(summary.breakSeconds || 0)} break — study time only
+                  </p>
+                )}
               </div>
 
               {/* Progress-style ring hint */}

@@ -56,6 +56,7 @@ export const DEEPSEEK_MODELS = {
 
 export const GEMINI_MODELS = {
   research: "gemini-3.1-pro",
+  compiler: "gemini-3.7-flash", // Fast + grounded Google Search — syllabus compiler PRIMARY engine
   vision: "gemini-3.7-flash", // Dedicated vision model for image/diagram prompts
   visionFallback: "gemini-3.6-flash", // In-adapter cascade only
   stemFallback: "gemini-3.7-flash",

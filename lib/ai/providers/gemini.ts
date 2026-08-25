@@ -129,6 +129,7 @@ export class GeminiAdapter implements LLMAdapter {
               options?.responseFormat === "json_object"
                 ? "application/json"
                 : undefined,
+            maxOutputTokens: options?.maxTokens,
             temperature: options?.temperature,
             abortSignal: options?.signal,
           }

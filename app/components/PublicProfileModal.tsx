@@ -57,6 +57,7 @@ interface ProfileDossier {
   todayStudySeconds?: number;
   completedTodaySeconds?: number;
   isStudying?: boolean;
+  isOnline?: boolean;
   activeSessionStartedAt?: string | null;
   activeAvatar?: string;
   activeFrame?: string;
@@ -462,9 +463,36 @@ export function PublicProfileModal() {
                         </span>
                       )}
                     </div>
-                    {/* Status Dot */}
+                    {/* Status Dot — reflects the REAL online state (heartbeat
+                        within 2 min). Green = online now; grey = offline;
+                        emerald ring + label when currently studying. */}
                     {dossier && !dossier.isRestricted && (
-                      <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-bg-panel shadow-sm" />
+                      <>
+                        <span
+                          title={dossier.isOnline
+                            ? dossier.isStudying
+                              ? "Online · Studying"
+                              : "Online"
+                            : "Offline"}
+                          className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-bg-panel shadow-sm ${
+                            dossier.isOnline
+                              ? dossier.isStudying
+                                ? "bg-cyan-400 ring-2 ring-cyan-400/40 animate-pulse"
+                                : "bg-emerald-500"
+                              : "bg-slate-500/70"
+                          }`}
+                        />
+                        {(dossier.isOnline || dossier.isStudying) && (
+                          <span
+                            className="absolute -bottom-1.5 -right-0.5 text-[0.55rem] font-['Rajdhani'] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-bg-abyss/90 border border-border-subtle"
+                            style={{
+                              color: dossier.isStudying ? "var(--accent-cyan)" : "#10b981",
+                            }}
+                          >
+                            {dossier.isStudying ? "Focusing" : "Online"}
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
 
@@ -1018,12 +1046,18 @@ export function PublicProfileModal() {
                               <span className="text-[10px] text-text-muted font-['Rajdhani'] uppercase">
                                 Last Active
                               </span>
-                              <span className="text-sm font-bold font-['Rajdhani'] text-text-primary mt-0.5 truncate">
-                                {dossier.lastActiveDate
-                                  ? new Date(dossier.lastActiveDate).toLocaleDateString(undefined, {
+                              <span
+                                className={`text-sm font-bold font-['Rajdhani'] mt-0.5 truncate ${
+                                  dossier.isOnline ? "text-emerald-400" : "text-text-primary"
+                                }`}
+                              >
+                                {dossier.isOnline
+                                  ? "Online now"
+                                  : dossier.lastActiveDate
+                                  ? `Last ${new Date(dossier.lastActiveDate).toLocaleDateString(undefined, {
                                       day: "numeric",
                                       month: "short",
-                                    })
+                                    })}`
                                   : "Classified"}
                               </span>
                             </div>

@@ -4,6 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../components/AuthProvider";
 import LevelUpOverlay from "../components/LevelUpOverlay";
+import {
+  EXAM_BOARDS,
+  ACADEMIC_LEVELS,
+  ACCENT_COLORS,
+  DEFAULT_EXAM_BOARD,
+  DEFAULT_ACADEMIC_LEVEL,
+  DEFAULT_SUBJECT_COLOR,
+} from "@/lib/study-systems";
 
 interface Subject {
   id: number;
@@ -12,6 +20,7 @@ interface Subject {
   examBoard?: string;
   level?: string;
   color?: string;
+  syllabusNote?: string;
   nodesCount?: number;
   todaySeconds: number;
 }
@@ -27,9 +36,10 @@ export default function TimerPage() {
   const [showAddSubject, setShowAddSubject] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState("");
   const [newSubjectCode, setNewSubjectCode] = useState("");
-  const [newExamBoard, setNewExamBoard] = useState("CAIE");
-  const [newSubjectAcademicLevel, setNewSubjectAcademicLevel] = useState("A-Level");
-  const [newColor, setNewColor] = useState("#8B5CF6");
+  const [newExamBoard, setNewExamBoard] = useState(DEFAULT_EXAM_BOARD);
+  const [newSubjectAcademicLevel, setNewSubjectAcademicLevel] = useState(DEFAULT_ACADEMIC_LEVEL);
+  const [newSyllabusNote, setNewSyllabusNote] = useState("");
+  const [newColor, setNewColor] = useState(DEFAULT_SUBJECT_COLOR);
   const [isAdding, setIsAdding] = useState(false);
 
   // Level up tracking
@@ -92,9 +102,10 @@ export default function TimerPage() {
         body: JSON.stringify({
           name: newSubjectName.trim(),
           code: newSubjectCode.trim().toUpperCase(),
-          examBoard: newExamBoard.trim() || "CAIE",
-          level: newSubjectAcademicLevel.trim() || "A-Level",
-          color: newColor || "#8B5CF6",
+          examBoard: newExamBoard.trim() || DEFAULT_EXAM_BOARD,
+          level: newSubjectAcademicLevel.trim() || DEFAULT_ACADEMIC_LEVEL,
+          color: newColor || DEFAULT_SUBJECT_COLOR,
+          syllabusNote: newSyllabusNote.trim() || undefined,
         }),
       });
       
@@ -103,6 +114,7 @@ export default function TimerPage() {
         setSubjects([...subjects, data]);
         setNewSubjectName("");
         setNewSubjectCode("");
+        setNewSyllabusNote("");
         setShowAddSubject(false);
       }
     } catch (err) {
@@ -285,6 +297,11 @@ export default function TimerPage() {
                           {subject.examBoard} {subject.level ? `• ${subject.level}` : ""}
                         </p>
                       )}
+                      {subject.syllabusNote && (
+                        <p className="text-[11px] text-text-muted/80 mt-0.5 truncate" title={subject.syllabusNote}>
+                          {subject.syllabusNote}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="font-mono tabular-nums tracking-tight text-xl text-text-primary shrink-0">
@@ -337,12 +354,9 @@ export default function TimerPage() {
                       onChange={(e) => setNewExamBoard(e.target.value)}
                       className="w-full bg-bg-void/50 border border-border-subtle rounded p-2.5 text-text-primary text-xs focus:outline-none focus:border-accent-mid transition-colors"
                     >
-                      <option value="CAIE">CAIE</option>
-                      <option value="Edexcel">Edexcel</option>
-                      <option value="AQA">AQA</option>
-                      <option value="AP">AP</option>
-                      <option value="IB">IB</option>
-                      <option value="University">University</option>
+                      {EXAM_BOARDS.map((b) => (
+                        <option key={b.value} value={b.value}>{b.label}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -354,12 +368,45 @@ export default function TimerPage() {
                       onChange={(e) => setNewSubjectAcademicLevel(e.target.value)}
                       className="w-full bg-bg-void/50 border border-border-subtle rounded p-2.5 text-text-primary text-xs focus:outline-none focus:border-accent-mid transition-colors"
                     >
-                      <option value="A-Level">A-Level</option>
-                      <option value="AS-Level">AS-Level</option>
-                      <option value="AP">AP</option>
-                      <option value="IB">IB</option>
-                      <option value="University">University</option>
+                      {ACADEMIC_LEVELS.map((l) => (
+                        <option key={l.value} value={l.value}>{l.label}</option>
+                      ))}
                     </select>
+                  </div>
+                </div>
+
+                {/* Book / syllabus / class details — shared vocabulary with onboarding */}
+                <div>
+                  <label className="text-xs font-mono uppercase text-text-secondary mb-1 block">
+                    Book / Syllabus / Class Details <span className="normal-case text-text-muted">(optional)</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={newSyllabusNote}
+                    onChange={(e) => setNewSyllabusNote(e.target.value)}
+                    placeholder="e.g. 'Cambridge International AS & A Level Mathematics (9709) — Pure 1 & 2, Hodder Education, Year 12'"
+                    className="w-full bg-bg-void/50 border border-border-subtle rounded p-2.5 text-text-primary text-xs focus:outline-none focus:border-accent-mid transition-colors resize-y min-h-[52px]"
+                  />
+                  <p className="mt-1 text-[10px] text-text-muted font-mono leading-relaxed">
+                    Include the textbook / exam-spec name, syllabus code and class level — the AI uses these to dissect your exact syllabus.
+                  </p>
+                </div>
+
+                {/* Accent color — matching the onboarding custom-subject form */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] font-mono uppercase text-text-secondary">Accent Color:</span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {ACCENT_COLORS.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setNewColor(c)}
+                        className={`w-6 h-6 rounded-full border-2 transition-transform ${
+                          newColor === c ? "scale-125 border-white shadow-md" : "border-transparent opacity-70 hover:opacity-100"
+                        }`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
                   </div>
                 </div>
 

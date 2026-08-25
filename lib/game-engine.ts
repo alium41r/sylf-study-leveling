@@ -73,7 +73,7 @@ export type EffortLevel = keyof typeof EFFORT_CONFIG;
 
 /**
  * XP required to reach a specific level governed by XP_req(L) = floor(100 * L^1.5).
- * Level 1 base entry threshold is 100 XP (with base starting at 0).
+ * Level 1 entry threshold is 100 XP (cumulative base for the level-1 bracket).
  */
 export function calculateRequiredXp(level: number): number {
   if (level <= 1) return 100;
@@ -136,7 +136,11 @@ export interface LevelProgress {
  */
 export function getLevelProgress(totalXp: number, currentLevel: number): LevelProgress {
   const safeLevel = Math.max(1, currentLevel);
-  const currentLevelBaseXp = safeLevel === 1 ? 0 : calculateRequiredXp(safeLevel);
+  // Base = the cumulative XP required to ENTER this level — including level 1
+  // (XP_req(1) = 100). This keeps the per-level bucket strictly monotonic:
+  // 1→2 = 182, 2→3 = 237, 3→4 = 281 … (the old level-1 base of 0 made the
+  // first bucket 282, larger than the second — a non-monotonic curve).
+  const currentLevelBaseXp = calculateRequiredXp(safeLevel);
   const nextLevelTargetXp = calculateRequiredXp(safeLevel + 1);
   const xpForCurrentBracket = Math.max(1, nextLevelTargetXp - currentLevelBaseXp);
   const xpIntoCurrentLevel = Math.max(0, totalXp - currentLevelBaseXp);
@@ -175,15 +179,17 @@ export function clampCognitiveStat(value: number): number {
  * Derived strictly from the canonical cumulative curve
  * XP_req(L) = floor(100 * L^1.5):
  *
- *   xpForNextLevel(L) = XP_req(L + 1) − (L ≤ 1 ? 0 : XP_req(L))
+ *   xpForNextLevel(L) = XP_req(L + 1) − XP_req(L)      (for EVERY L)
  *
- * Level 1 → 282 XP, Level 5 → 351 XP, Level 10 → 604 XP, etc.
+ * Level 1 → 182 XP, Level 2 → 237, Level 3 → 281, Level 5 → 351,
+ * Level 10 → 486 … — strictly increasing, so no level is harder than
+ * the next one (the old level-1 base of 0 made 1→2 cost 282, more
+ * than 2→3's 237).
  * This replaces the retired legacy curve 200 * L^1.2.
  */
 export function xpForNextLevel(level: number): number {
   const safeLevel = Math.max(1, Math.floor(level));
-  const base = safeLevel <= 1 ? 0 : calculateRequiredXp(safeLevel);
-  return calculateRequiredXp(safeLevel + 1) - base;
+  return calculateRequiredXp(safeLevel + 1) - calculateRequiredXp(safeLevel);
 }
 
 // ─── XP Award & Level Up ────────────────────────────────────
@@ -320,7 +326,8 @@ export function getWeeklyBounds(refDate: Date = new Date(), timezone: string = "
  */
 export function calculateWeeklyQuestReward(level: number): { xpReward: number; sylphReward: number } {
   const nextLevelCapacity = xpForNextLevel(level);
-  // Milestone XP payout for 3-hour weekly focus (282 XP at Level 1, canonical curve)
+  // Milestone XP payout for 3-hour weekly focus, scaled to the level bucket
+  // (min 200 XP at Level 1 — the 182 XP bucket is floored up to 200).
   const xpReward = Math.max(200, Math.round(nextLevelCapacity * 1.0));
   // Balanced currency reward (50 Sylph base + 15 per level)
   const sylphReward = Math.round(50 + level * 15);

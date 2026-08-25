@@ -131,7 +131,7 @@ model User {
   hunterRank              String             @default("E")
   level                   Int                @default(1)
   currentXP               Int                @default(0)
-  xpToNextLevel           Int                @default(282)
+  xpToNextLevel           Int                @default(182)
   hp                      Int                @default(100)
   maxHp                   Int                @default(100)
   streakDays              Int                @default(0)
@@ -354,6 +354,7 @@ model StudySession {
   subject         Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   durationMinutes Int
   durationSeconds Int       @default(0)
+  breakSeconds     Int       @default(0) // break/rest time inside this session — NEVER counted as study time
   focusRate       Int       @default(80) // Added for AI study planning
   rewardsClaimed  Boolean   @default(false) // Quest rewards claimed via claim_session_reward_atomic
   startedAt       DateTime  @default(now())

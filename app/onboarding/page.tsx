@@ -8,6 +8,14 @@ import { COSMETICS_CATALOG, CosmeticItem } from "@/lib/cosmetics-catalog";
 import { THEME_MAP, BG_MAP, applyGlobalBackground } from "../components/GlobalSystemWrapper";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { Moon, Sun, Sparkles, Check, BookOpen, Plus, X } from "lucide-react";
+import {
+  EXAM_BOARDS,
+  ACADEMIC_LEVELS,
+  ACCENT_COLORS,
+  DEFAULT_EXAM_BOARD,
+  DEFAULT_ACADEMIC_LEVEL,
+  DEFAULT_SUBJECT_COLOR,
+} from "@/lib/study-systems";
 
 // --- Extensible Onboarding Types ---
 type OnboardingStep = "BOOT" | "IDENTITY" | "SUBJECTS" | "THEME" | "INITIALIZING";
@@ -23,49 +31,12 @@ export interface ConfiguredSubject {
   syllabusNote?: string;
 }
 
-// Exam boards across international, Pakistani and Indian systems.
-const EXAM_BOARDS: { value: string; label: string }[] = [
-  { value: "CAIE", label: "CAIE — Cambridge International" },
-  { value: "Edexcel", label: "Edexcel (Pearson)" },
-  { value: "Oxford AQA International", label: "Oxford AQA International" },
-  { value: "AQA", label: "AQA (UK)" },
-  { value: "OCR", label: "OCR (UK)" },
-  { value: "WJEC/Eduqas", label: "WJEC / Eduqas (Wales)" },
-  { value: "CCEA", label: "CCEA (Northern Ireland)" },
-  { value: "AP", label: "AP (College Board)" },
-  { value: "IB", label: "IB (International Baccalaureate)" },
-  { value: "FBISE", label: "FBISE — Federal Board (Pakistan)" },
-  { value: "BISE Punjab", label: "BISE Punjab (Lahore)" },
-  { value: "BISE Sindh", label: "BISE Sindh (Karachi)" },
-  { value: "BISE KPK", label: "BISE KPK (Peshawar)" },
-  { value: "BISE Balochistan", label: "BISE Balochistan (Quetta)" },
-  { value: "AKU-EB", label: "AKU-EB (Aga Khan University)" },
-  { value: "CBSE", label: "CBSE (India)" },
-  { value: "CISCE", label: "CISCE — ICSE / ISC (India)" },
-  { value: "NIOS", label: "NIOS (India — Open Schooling)" },
-  { value: "State Board", label: "State Board (India)" },
-  { value: "University", label: "University" },
-  { value: "Other", label: "Other" },
-];
+// Exam boards / academic levels / accent colors now live in
+// lib/study-systems.ts so they are shared verbatim with the timer
+// page's "Add Subject" form.
 
 // Academic levels spanning international, Pakistani (Matric/Intermediate)
 // and Indian (Middle/Secondary/Senior Secondary) systems.
-const ACADEMIC_LEVELS: { value: string; label: string }[] = [
-  { value: "A-Level", label: "A-Level" },
-  { value: "AS-Level", label: "AS-Level" },
-  { value: "IGCSE", label: "IGCSE" },
-  { value: "GCSE", label: "GCSE" },
-  { value: "O-Level", label: "O-Level" },
-  { value: "AP", label: "AP (Advanced Placement)" },
-  { value: "IB HL", label: "IB Higher Level (HL)" },
-  { value: "IB SL", label: "IB Standard Level (SL)" },
-  { value: "Middle School", label: "Middle School (Class 6-8)" },
-  { value: "Matric / SSC", label: "Matriculation / SSC (Class 9-10)" },
-  { value: "Intermediate / HSSC", label: "Intermediate / HSSC (Class 11-12)" },
-  { value: "High School", label: "High School" },
-  { value: "University", label: "Undergraduate" },
-  { value: "Other", label: "Other" },
-];
 
 export default function OnboardingFlow() {
   const router = useRouter();
@@ -699,17 +670,6 @@ interface SubjectIntakeStepProps {
   canProceed: boolean;
 }
 
-const ACCENT_COLORS = [
-  "#8B5CF6", // Violet
-  "#06B6D4", // Cyan
-  "#EC4899", // Pink
-  "#10B981", // Emerald
-  "#F59E0B", // Amber
-  "#3B82F6", // Blue
-  "#EF4444", // Red
-  "#6366F1", // Indigo
-];
-
 function SubjectIntakeStep({
   title,
   subtitle,
@@ -721,9 +681,9 @@ function SubjectIntakeStep({
 }: SubjectIntakeStepProps) {
   const [customName, setCustomName] = useState("");
   const [customCode, setCustomCode] = useState("");
-  const [customExamBoard, setCustomExamBoard] = useState("CAIE");
-  const [customLevel, setCustomLevel] = useState("A-Level");
-  const [customColor, setCustomColor] = useState("#8B5CF6");
+  const [customExamBoard, setCustomExamBoard] = useState(DEFAULT_EXAM_BOARD);
+  const [customLevel, setCustomLevel] = useState(DEFAULT_ACADEMIC_LEVEL);
+  const [customColor, setCustomColor] = useState(DEFAULT_SUBJECT_COLOR);
   const [customSyllabusNote, setCustomSyllabusNote] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [validationError, setValidationError] = useState("");

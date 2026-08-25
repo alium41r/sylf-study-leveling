@@ -139,8 +139,8 @@ describe("Phase 1: API Route Handlers", () => {
       expect(data.scholarId).toBe("#000099");
       expect(data.verificationStatus).toBe("VERIFIED");
       expect(data.level).toBe(1);
-      // Canonical Lv-1 bucket: XP_req(2) = floor(100 * 2^1.5) = 282
-      expect(data.xpToNextLevel).toBe(282);
+      // Canonical Lv-1 bucket: XP_req(2) − XP_req(1) = 282 − 100 = 182
+      expect(data.xpToNextLevel).toBe(182);
     });
   });
 

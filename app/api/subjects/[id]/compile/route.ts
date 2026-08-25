@@ -5,6 +5,10 @@ import { compileSyllabus } from "@/lib/ai/syllabus-compiler";
 import { checkQuota, consumeQuota } from "@/lib/ai/usage-limiter";
 import { revalidateTag } from "next/cache";
 
+// The compile runs a grounded research call + one large LLM generation;
+// give the serverless function a generous window (Vercel Pro allows 300s).
+export const maxDuration = 300;
+
 async function getUserId(req: NextRequest): Promise<number | null> {
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) return null;
@@ -49,6 +53,7 @@ export async function POST(
         code: true,
         examBoard: true,
         level: true,
+        syllabusNote: true,
         lastCompiledAt: true,
         user: {
           select: {
@@ -93,13 +98,18 @@ export async function POST(
       );
     }
 
-    // 4. Call AI Syllabus Compiler to decompose the curriculum into 48 nodes
+    // 4. Call AI Syllabus Compiler to decompose the curriculum into 48 nodes.
+    //    The compile is grounded on Gemini's Google Search and uses the
+    //    subject's exact book/syllabus/class details (syllabusNote) that the
+    //    user entered when adding the subject.
     const compilationResult = await compileSyllabus(
       {
         name: subject.name,
         code: subject.code,
         examBoard: subject.examBoard,
         level: subject.level,
+        syllabusNote: subject.syllabusNote || undefined,
+        userId,
       },
       req.signal
     );

@@ -37,8 +37,10 @@ interface GoalStats {
 interface Summary {
   totalSessions: number;
   avgSessionMinutes: number;
+  avgSessionSeconds: number;
   activeDaysLast30: number;
   longestSession: number;
+  longestSessionSeconds: number;
   accountAgeDays: number;
   completionRate: number;
 }
@@ -49,6 +51,7 @@ interface SessionLogEntry {
   endedAt: string | null;
   durationMinutes: number;
   durationSeconds: number;
+  breakSeconds: number;
   focusRate: number;
   subjectName: string | null;
   subjectColor: string | null;
@@ -67,6 +70,7 @@ interface DetailedStats {
     maxHp: number;
     streakDays: number;
     totalStudyMinutes: number;
+    totalStudySeconds?: number;
     createdAt: string;
   };
   dailyStudy: DailyStudy[];
@@ -74,6 +78,7 @@ interface DetailedStats {
   sessionLog: SessionLogEntry[];
   questStats: QuestStats;
   goalStats: GoalStats;
+  todayDate?: string;
   summary: Summary;
 }
 
@@ -86,6 +91,25 @@ function formatSessionDuration(totalSeconds: number): string {
   if (h > 0) return `${h}h ${m}m`;
   if (m > 0) return `${m}m${s > 0 ? ` ${s}s` : ""}`;
   return `${s}s`;
+}
+
+/** "0h 17m" / "1h 02m" — lifetime study total (never a bare rounded hour). */
+function formatStudyHours(totalSeconds: number): string {
+  const sec = Math.max(0, Math.floor(totalSeconds));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  return `${h}h ${m.toString().padStart(2, "0")}m`;
+}
+
+/** "4m", "2.4m", "1h 05m" — 1-decimal-safe minute labels for breakdowns. */
+function formatMinutes(minutes: number): string {
+  const m = Math.max(0, Math.round(minutes * 10) / 10);
+  if (m >= 60) {
+    const h = Math.floor(m / 60);
+    const rem = Math.round(m % 60);
+    return `${h}h ${rem}m`;
+  }
+  return `${m % 1 === 0 ? Math.round(m) : m.toFixed(1)}m`;
 }
 
 /** "Today · 09:15" or "Aug 26 · 21:40" for a session timestamp. */
@@ -108,9 +132,17 @@ function periodOfDay(iso: string): string {
   return "Night";
 }
 
-/* ─── Mini Bar Chart Component ──────────────────────────────── */
+/* ─── 30-Day Activity Chart (overview) + Last-7-Days breakdown ── */
 
-function StudyChart({ data }: { data: DailyStudy[] }) {
+/**
+ * 30-day bar overview. Design rules for readability:
+ *  - ONE bar per day, evenly spaced, no per-day label noise.
+ *  - X-axis anchors ONLY at meaningful dates: first day of the window,
+ *    1st of a month, mid-month (15th), and Today.
+ *  - Value chips above nonzero bars (desktop); tooltip on tap (mobile).
+ *  - Empty days render a faint 3px stub so the baseline is continuous.
+ */
+function StudyChart({ data, todayDate }: { data: DailyStudy[]; todayDate?: string }) {
   const maxMinutes = Math.max(...data.map((d) => d.minutes), 1);
   const [animated, setAnimated] = useState(false);
 
@@ -120,60 +152,196 @@ function StudyChart({ data }: { data: DailyStudy[] }) {
   }, []);
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: "3px", height: "140px", width: "100%" }}>
+    <div style={{ display: "flex", alignItems: "flex-end", gap: "2px", height: "150px", width: "100%" }}>
       {data.map((d, i) => {
         const pct = (d.minutes / maxMinutes) * 100;
-        const dayLabel = new Date(d.date + "T12:00:00").toLocaleDateString("en", { weekday: "narrow" });
-        const isToday = d.date === new Date().toISOString().split("T")[0];
+        const dateObj = new Date(d.date + "T12:00:00");
+        const isToday = todayDate ? d.date === todayDate : i === data.length - 1;
+        const isMonthStart = dateObj.getDate() === 1;
+        const isMidMonth = dateObj.getDate() === 15;
+
+        // Only meaningful anchors on the X axis.
+        const showLabel = i === 0 || isMonthStart || isMidMonth || isToday;
+        const labelText = isToday
+          ? "Today"
+          : isMonthStart
+          ? dateObj.toLocaleDateString("en", { month: "short" })
+          : i === 0
+          ? dateObj.toLocaleDateString("en", { month: "short", day: "numeric" })
+          : String(dateObj.getDate());
 
         return (
           <div
             key={d.date}
             style={{
               flex: 1,
+              minWidth: 0,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "4px",
+              gap: "3px",
               height: "100%",
               justifyContent: "flex-end",
             }}
-            title={`${d.date}: ${d.minutes} min`}
+            title={`${d.date} — ${d.minutes > 0 ? formatMinutes(d.minutes) : "no study"}`}
           >
+            {/* Value chip above the bar (desktop only; mobile uses the tooltip) */}
+            {d.minutes > 0 && (
+              <span
+                className="hidden md:block"
+                style={{
+                  fontSize: "0.5rem",
+                  color: isToday ? "var(--accent-cyan)" : "var(--text-secondary)",
+                  fontFamily: "'Rajdhani', sans-serif",
+                  fontWeight: 700,
+                  lineHeight: 1,
+                  marginBottom: "2px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {formatMinutes(d.minutes)}
+              </span>
+            )}
+            {/* The bar — a faint stub keeps the baseline continuous on quiet days */}
             <div
               style={{
                 width: "100%",
-                maxWidth: "18px",
-                height: animated ? `${Math.max(pct, d.minutes > 0 ? 4 : 0)}%` : "0%",
+                height: animated ? `${Math.max(pct, d.minutes > 0 ? 4 : 2)}%` : "0%",
+                minHeight: "2px",
                 background: isToday
-                  ? "linear-gradient(180deg, var(--accent-cyan), rgba(6, 182, 212, 0.4))"
+                  ? "linear-gradient(180deg, var(--accent-cyan), rgba(6, 182, 212, 0.35))"
                   : d.minutes > 0
                   ? "linear-gradient(180deg, var(--accent-primary), var(--accent-primary-mid))"
-                  : "rgba(255, 255, 255, 0.03)",
-                borderRadius: "3px 3px 0 0",
+                  : "rgba(255, 255, 255, 0.04)",
+                borderRadius: "3px",
                 transition: `height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)`,
-                transitionDelay: `${i * 25}ms`,
+                transitionDelay: `${i * 20}ms`,
                 boxShadow: d.minutes > 0
                   ? isToday
-                    ? "0 0 8px rgba(6, 182, 212, 0.3)"
+                    ? "0 0 10px rgba(6, 182, 212, 0.35)"
                     : "0 0 4px var(--accent-primary-dim)"
                   : "none",
-                minHeight: d.minutes > 0 ? "4px" : "0px",
               }}
             />
-            {/* Show day labels only every 5th bar to avoid crowding */}
-            {(i % 5 === 0 || isToday) && (
+            {/* Anchor label only at meaningful dates — no random day letters */}
+            {showLabel && (
               <span
                 style={{
                   fontSize: "0.55rem",
                   color: isToday ? "var(--accent-cyan)" : "var(--text-muted)",
                   fontFamily: "'Rajdhani', sans-serif",
-                  fontWeight: isToday ? 700 : 400,
+                  fontWeight: isToday ? 700 : 500,
+                  whiteSpace: "nowrap",
                 }}
               >
-                {isToday ? "Today" : dayLabel}
+                {labelText}
               </span>
             )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * "Last 7 days" day-by-day breakdown — the analyzable companion to the
+ * 30-day overview. One row per day (newest first) with an exact-minute
+ * bar scaled against the best day.
+ */
+function Last7DaysTable({ data, todayDate }: { data: DailyStudy[]; todayDate?: string }) {
+  const last7 = data.slice(-7).reverse(); // newest first
+  const best = Math.max(...last7.map((d) => d.minutes), 1);
+  const [animated, setAnimated] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      {last7.map((d, i) => {
+        const dateObj = new Date(d.date + "T12:00:00");
+        const isToday = todayDate ? d.date === todayDate : i === 0;
+        const dayName = isToday
+          ? "Today"
+          : i === 1
+          ? "Yesterday"
+          : dateObj.toLocaleDateString("en", { weekday: "long" });
+        const dateLabel = dateObj.toLocaleDateString("en", { month: "short", day: "numeric" });
+        const pct = d.minutes > 0 ? Math.max((d.minutes / best) * 100, 3) : 0;
+
+        return (
+          <div
+            key={d.date}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              padding: "8px 12px",
+              borderRadius: "10px",
+              background: isToday ? "var(--accent-primary-dim)" : "rgba(255,255,255,0.02)",
+              border: isToday ? "1px solid var(--accent-primary-mid)" : "1px solid transparent",
+            }}
+          >
+            <div style={{ width: "92px", flexShrink: 0, minWidth: 0 }}>
+              <p
+                style={{
+                  fontFamily: "'Rajdhani', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "0.8rem",
+                  color: isToday ? "var(--accent-cyan)" : "var(--text-primary)",
+                  lineHeight: 1.1,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {dayName}
+              </p>
+              <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", fontFamily: "'Rajdhani', sans-serif", lineHeight: 1.2 }}>
+                {dateLabel}
+              </p>
+            </div>
+
+            {/* Exact-total bar scaled against the best day */}
+            <div
+              style={{
+                flex: 1,
+                height: "8px",
+                borderRadius: "4px",
+                background: "rgba(255,255,255,0.04)",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  width: animated ? `${pct}%` : "0%",
+                  height: "100%",
+                  borderRadius: "4px",
+                  background: isToday
+                    ? "linear-gradient(90deg, var(--accent-cyan), rgba(6, 182, 212, 0.4))"
+                    : "linear-gradient(90deg, var(--accent-primary), var(--accent-primary-mid))",
+                  boxShadow: isToday ? "0 0 8px rgba(6, 182, 212, 0.35)" : "none",
+                  transition: "width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                }}
+              />
+            </div>
+
+            <span
+              style={{
+                fontFamily: "'Rajdhani', sans-serif",
+                fontWeight: 700,
+                fontSize: "0.8rem",
+                color: d.minutes > 0 ? (isToday ? "var(--accent-cyan)" : "var(--text-primary)") : "var(--text-muted)",
+                minWidth: "52px",
+                textAlign: "right",
+                flexShrink: 0,
+              }}
+            >
+              {d.minutes > 0 ? formatMinutes(d.minutes) : "—"}
+            </span>
           </div>
         );
       })}
@@ -269,13 +437,16 @@ function ProgressRing({
 function SubjectBar({
   subject,
   maxMinutes,
+  totalMinutes,
   delay,
 }: {
   subject: SubjectBreakdown;
   maxMinutes: number;
+  totalMinutes: number;
   delay: number;
 }) {
   const pct = maxMinutes > 0 ? (subject.minutes / maxMinutes) * 100 : 0;
+  const sharePct = totalMinutes > 0 ? Math.round((subject.minutes / totalMinutes) * 100) : 0;
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
@@ -283,12 +454,9 @@ function SubjectBar({
     return () => clearTimeout(timer);
   }, [delay]);
 
-  const hours = Math.floor(subject.minutes / 60);
-  const mins = subject.minutes % 60;
-
   return (
     <div style={{ marginBottom: "12px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", marginBottom: "4px" }}>
         <span
           style={{
             fontFamily: "'Rajdhani', sans-serif",
@@ -304,9 +472,11 @@ function SubjectBar({
             fontFamily: "'Rajdhani', sans-serif",
             fontSize: "0.75rem",
             color: "var(--text-secondary)",
+            textAlign: "right",
           }}
         >
-          {hours > 0 ? `${hours}h ${mins}m` : `${mins}m`} • {subject.sessions} sessions
+          {formatMinutes(subject.minutes)} • {subject.sessions} session{subject.sessions === 1 ? "" : "s"}
+          {totalMinutes > 0 && ` • ${sharePct}% of study time`}
         </span>
       </div>
       <div
@@ -320,6 +490,8 @@ function SubjectBar({
       >
         <div
           style={{
+            // When a subject IS the largest, its bar reads as a full bar by
+            // design — the % of study time label above explains that clearly.
             width: animated ? `${Math.max(pct, 2)}%` : "0%",
             height: "100%",
             background: `linear-gradient(90deg, ${subject.color}, ${subject.color}88)`,
@@ -392,6 +564,13 @@ export default function StatsSettingsPage() {
   const [data, setData] = useState<DetailedStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Session log pagination: newest 6 at a time, "Load More" reveals the rest.
+  const [visibleSessionCount, setVisibleSessionCount] = useState(6);
+
+  // Reset pagination whenever fresh stats arrive.
+  useEffect(() => {
+    setVisibleSessionCount(6);
+  }, [data]);
 
   useEffect(() => {
     if (!token) return;
@@ -449,8 +628,13 @@ export default function StatsSettingsPage() {
   }
 
   const { user, dailyStudy, subjectBreakdown, sessionLog, questStats, goalStats, summary } = data;
-  const totalHours = Math.floor(user.totalStudyMinutes / 60);
+  // Exact-sum of the last-30-days chart (1-decimal minutes from exact seconds).
+  const totalMinutes30 = dailyStudy.reduce((sum, d) => sum + (d.minutes || 0), 0);
+  const maxDayMinutes = dailyStudy.reduce((max, d) => Math.max(max, d.minutes || 0), 0);
   const maxSubjectMinutes = subjectBreakdown.length > 0 ? subjectBreakdown[0].minutes : 0;
+  const totalSubjectMinutes = subjectBreakdown.reduce((sum, s) => sum + (s.minutes || 0), 0);
+  // Session log: newest N first, "Load More" reveals older entries.
+  const shownSessions = sessionLog.slice(0, visibleSessionCount);
 
   return (
     <div className="settings-page-container">
@@ -508,8 +692,8 @@ export default function StatsSettingsPage() {
       {/* ─── Quick Stat Cards ─────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px", marginBottom: "24px" }}>
         <StatCard
-          label="Total Hours"
-          value={totalHours}
+          label="Total Study Time"
+          value={formatStudyHours(user.totalStudySeconds ?? user.totalStudyMinutes * 60)}
           color="var(--accent-cyan)"
           delay={100}
           icon={
@@ -542,7 +726,7 @@ export default function StatsSettingsPage() {
         />
         <StatCard
           label="Avg Session"
-          value={`${summary.avgSessionMinutes}m`}
+          value={summary.avgSessionSeconds > 0 ? formatSessionDuration(summary.avgSessionSeconds) : "0s"}
           color="var(--accent-blue)"
           delay={400}
           icon={
@@ -564,7 +748,7 @@ export default function StatsSettingsPage() {
         />
         <StatCard
           label="Longest Session"
-          value={`${summary.longestSession}m`}
+          value={summary.longestSessionSeconds > 0 ? formatSessionDuration(summary.longestSessionSeconds) : "—"}
           color="var(--accent-red)"
           delay={600}
           icon={
@@ -577,7 +761,7 @@ export default function StatsSettingsPage() {
 
       {/* ─── 30-Day Activity Chart ────────────────────────── */}
       <div className="system-card" style={{ padding: "24px", marginBottom: "24px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", marginBottom: "18px", flexWrap: "wrap" }}>
           <h3
             style={{
               fontFamily: "'Rajdhani', sans-serif",
@@ -597,13 +781,38 @@ export default function StatsSettingsPage() {
               color: "var(--text-muted)",
             }}
           >
-            {summary.activeDaysLast30} active days
+            {summary.activeDaysLast30} active day{summary.activeDaysLast30 === 1 ? "" : "s"}
+            {totalMinutes30 > 0 && ` • ${formatMinutes(totalMinutes30)} total`}
+            {maxDayMinutes > 0 && ` • Best: ${formatMinutes(maxDayMinutes)}`}
           </span>
         </div>
-        <StudyChart data={dailyStudy} />
+
+        <StudyChart data={dailyStudy} todayDate={data.todayDate} />
+
+        {/* Day-by-day breakdown — the analyzable companion to the overview */}
+        <div style={{ marginTop: "22px", paddingTop: "18px", borderTop: "1px solid var(--border-subtle)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "10px" }}>
+            <span
+              style={{
+                fontFamily: "'Rajdhani', sans-serif",
+                fontWeight: 700,
+                fontSize: "0.7rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                color: "var(--text-secondary)",
+              }}
+            >
+              Day by Day — Last 7 Days
+            </span>
+            <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.62rem", color: "var(--text-muted)" }}>
+              scaled against your best day
+            </span>
+          </div>
+          <Last7DaysTable data={dailyStudy} todayDate={data.todayDate} />
+        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "24px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px", marginBottom: "24px" }}>
         {/* ─── Quest Progress Rings ──────────────────────── */}
         <div className="system-card" style={{ padding: "24px" }}>
           <h3
@@ -676,7 +885,13 @@ export default function StatsSettingsPage() {
             </p>
           ) : (
             subjectBreakdown.map((subject, i) => (
-              <SubjectBar key={subject.name} subject={subject} maxMinutes={maxSubjectMinutes} delay={200 + i * 100} />
+              <SubjectBar
+                key={subject.name}
+                subject={subject}
+                maxMinutes={maxSubjectMinutes}
+                totalMinutes={totalSubjectMinutes}
+                delay={200 + i * 100}
+              />
             ))
           )}
         </div>
@@ -699,10 +914,11 @@ export default function StatsSettingsPage() {
           </h3>
           <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.7rem", color: "var(--text-muted)" }}>
             {sessionLog.length} session{sessionLog.length === 1 ? "" : "s"} recorded
+            {sessionLog.length > 0 && ` • showing ${Math.min(visibleSessionCount, sessionLog.length)}`}
           </span>
         </div>
         <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "16px" }}>
-          Every focus block is logged separately — morning, night, or in between.
+          Every focus block is logged separately — morning, night, or in between. Newest first.
         </p>
 
         {sessionLog.length === 0 ? (
@@ -710,9 +926,12 @@ export default function StatsSettingsPage() {
             No study sessions recorded yet. Start a focus session and end it to log your first entry.
           </p>
         ) : (
+          <>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            {sessionLog.slice(0, 25).map((s) => {
+            {shownSessions.map((s) => {
               const accent = s.subjectColor || "var(--accent-primary)";
+              const breakSecs = s.breakSeconds || 0;
+              const sessionTotal = (s.durationSeconds || 0) + breakSecs;
               return (
                 <div
                   key={s.id}
@@ -782,6 +1001,17 @@ export default function StatsSettingsPage() {
                     </p>
                     <p style={{ fontSize: "0.68rem", color: "var(--text-muted)", fontFamily: "'Rajdhani', sans-serif" }}>
                       {formatSessionTime(s.startedAt)}
+                      {/* Total active session time (focus + break) and how much
+                          of it was break — break NEVER counts as study time. */}
+                      {breakSecs > 0 && (
+                        <>
+                          {" • "}Session {formatSessionDuration(sessionTotal)}
+                          {" • "}
+                          <span style={{ color: "var(--accent-green)" }}>
+                            {formatSessionDuration(breakSecs)} break
+                          </span>
+                        </>
+                      )}
                       {s.focusRate ? ` • ${s.focusRate}% focus` : ""}
                     </p>
                   </div>
@@ -801,6 +1031,30 @@ export default function StatsSettingsPage() {
               );
             })}
           </div>
+          {visibleSessionCount < sessionLog.length && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", marginTop: "14px" }}>
+              <button
+                onClick={() => setVisibleSessionCount((prev) => Math.min(prev + 10, sessionLog.length))}
+                className="px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
+                style={{
+                  fontFamily: "'Rajdhani', sans-serif",
+                  color: "var(--accent-text-light)",
+                  background: "var(--accent-primary-dim)",
+                  border: "1px solid var(--accent-primary-mid)",
+                }}
+              >
+                Load More Sessions ({sessionLog.length - visibleSessionCount} remaining)
+              </button>
+              <button
+                onClick={() => setVisibleSessionCount(sessionLog.length)}
+                className="text-[0.65rem] uppercase tracking-wider text-text-muted hover:text-text-primary transition-colors"
+                style={{ fontFamily: "'Rajdhani', sans-serif" }}
+              >
+                Show all {sessionLog.length}
+              </button>
+            </div>
+          )}
+          </>
         )}
       </div>
 

@@ -116,7 +116,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
+    <section className="relative pt-24 pb-14 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28 overflow-hidden">
       {/* Background radial glow */}
       <div
         className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[450px] opacity-30 dark:opacity-40 pointer-events-none -z-10"
@@ -127,7 +127,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-8 items-center">
           {/* Left Column: Core Value & Waitlist Form */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
@@ -137,7 +137,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
           >
             {/* System Status Label */}
             <div
-              className="inline-flex items-center gap-2 mb-6 px-3.5 py-1.5 rounded-full text-xs tracking-[0.2em] uppercase font-bold border shadow-sm backdrop-blur-md"
+              className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs tracking-[0.2em] uppercase font-bold border shadow-sm backdrop-blur-md"
               style={{
                 background: "var(--accent-primary-dim)",
                 borderColor: "var(--accent-primary-mid)",
@@ -151,7 +151,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
 
             {/* Main Headline */}
             <h1
-              className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-text-primary mb-6 leading-[1.1]"
+              className="text-[32px] leading-[1.12] sm:text-5xl md:text-6xl font-extrabold tracking-tight text-text-primary mb-5 sm:mb-6 text-balance"
               style={{ fontFamily: "'Rajdhani', sans-serif" }}
             >
               Turn Every Study Hour Into{" "}
@@ -169,7 +169,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-base sm:text-lg text-text-secondary mb-8 max-w-2xl leading-relaxed">
+            <p className="text-[15px] leading-relaxed sm:text-lg text-text-secondary mb-7 sm:mb-8 max-w-2xl text-pretty">
               Sylf transforms your coursework and exam prep into structured AI quests, logs clean deep focus minutes, and rewards your daily consistency with XP, ranks, and cognitive stat growth.
             </p>
 
@@ -196,7 +196,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="btn-primary flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm sm:text-base font-bold tracking-wider uppercase cursor-pointer disabled:opacity-70 shadow-lg shrink-0"
+                      className="btn-primary flex items-center justify-center gap-2 py-3.5 sm:py-3 px-6 rounded-xl text-sm sm:text-base font-bold tracking-wider uppercase cursor-pointer disabled:opacity-70 shadow-lg shrink-0"
                     >
                       {isSubmitting ? (
                         <>
@@ -227,8 +227,8 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                       maxLength={100}
                       value={targetExam}
                       onChange={(e) => setTargetExam(e.target.value)}
-                      placeholder="e.g. MCAT, USMLE, A-Levels, Computer Science, Bar Exam"
-                      className="text-xs py-2 px-3 rounded-lg border border-border-subtle/70 bg-bg-void/40 text-text-secondary placeholder:text-text-muted/60 focus:border-accent-primary/60 focus:outline-none w-full transition-colors"
+                      placeholder="e.g. MCAT, A-Levels, Computer Science"
+                      className="text-[12px] sm:text-xs py-2.5 px-3 rounded-lg border border-border-subtle/70 bg-bg-void/40 text-text-secondary placeholder:text-text-muted/60 focus:border-accent-primary/60 focus:outline-none w-full transition-colors"
                     />
                   </div>
 
@@ -243,8 +243,8 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                     </div>
                   )}
 
-                  <p className="text-[11px] text-text-muted mt-1 flex items-center gap-1.5">
-                    <Shield className="w-3 h-3 text-accent-primary-light shrink-0" />
+                  <p className="text-[11px] text-text-muted mt-2 flex items-start gap-1.5 sm:items-center">
+                    <Shield className="w-3.5 h-3.5 text-accent-primary-light shrink-0 mt-0.5 sm:mt-0" />
                     <span>Free early access invitations sent in weekly rolling waves. No spam.</span>
                   </p>
                 </form>
@@ -289,29 +289,45 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
               )}
             </div>
 
-            {/* Micro Trust Points */}
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-text-muted">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            {/* Micro Trust Points (vertical checklist on mobile, inline row from sm up) */}
+            <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6 text-xs sm:text-[13px] text-text-muted">
+              <span className="flex items-center gap-2 sm:gap-1.5">
+                <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
                 <span>Zero Account Setup Required</span>
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="flex items-center gap-2 sm:gap-1.5">
+                <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
                 <span>AI Syllabus Dissection</span>
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="flex items-center gap-2 sm:gap-1.5">
+                <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
                 <span>Built for Serious Academics</span>
+              </span>
+            </div>
+
+            {/* Mobile-only quick stats (replaces the full system card on phones) */}
+            <div className="flex md:hidden items-center gap-2 flex-wrap mt-5 w-full max-w-xl">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-subtle bg-bg-abyss/70 text-[11px] font-bold text-accent-text-light font-['Rajdhani'] uppercase tracking-wider">
+                <Sparkles className="w-3 h-3 text-accent-primary-light" />
+                Lv. 14 Scholar
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-subtle bg-bg-abyss/70 text-[11px] font-bold text-cyan-300 font-mono">
+                425 ✦ Sylph
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border-subtle bg-bg-abyss/70 text-[11px] font-bold text-emerald-400 font-mono">
+                14-Day Streak
               </span>
             </div>
           </motion.div>
 
           {/* Right Column: Live Interface Mockup (Authentic Sylf UI) */}
+          {/* Hidden on phones — the hero stays focused on one CTA on mobile;
+              product mockups still appear in Core Features below. */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-            className="lg:col-span-5 relative"
+            className="hidden md:block lg:col-span-5 relative"
           >
             {/* Ambient Back Glow */}
             <div className="absolute inset-0 bg-accent-primary/20 rounded-3xl blur-2xl -z-10 transform scale-95" />

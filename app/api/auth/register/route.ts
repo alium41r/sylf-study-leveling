@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { initializeUserProfile } from "@/lib/auth-service";
 import { AUTH_COOKIE_OPTIONS } from "@/lib/auth";
+import { isPrelaunchMode } from "@/lib/prelaunch";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -17,6 +18,17 @@ const registerSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // Prelaunch lockdown: no new accounts while the landing page is live.
+    if (isPrelaunchMode()) {
+      return NextResponse.json(
+        {
+          error:
+            "Registration is closed right now. Join the waitlist and we'll email you when the app is ready.",
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const validation = registerSchema.safeParse(body);
 

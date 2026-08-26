@@ -50,10 +50,10 @@ export default function FaqSection() {
   };
 
   return (
-    <section id="faq" className="py-20 md:py-28 relative">
+    <section id="faq" className="py-16 sm:py-20 md:py-28 relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
           <div
             className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full text-xs tracking-[0.2em] uppercase font-bold border"
             style={{
@@ -68,13 +68,13 @@ export default function FaqSection() {
           </div>
 
           <h2
-            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tight"
+            className="text-[26px] leading-tight sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-3 sm:mb-4 tracking-tight text-balance"
             style={{ fontFamily: "'Rajdhani', sans-serif" }}
           >
             Frequently Asked Questions
           </h2>
 
-          <p className="text-base text-text-secondary leading-relaxed">
+          <p className="text-[15px] sm:text-base text-text-secondary leading-relaxed">
             Everything you need to know about Sylf, early access waves, and our academic progression engine.
           </p>
         </div>
@@ -96,16 +96,16 @@ export default function FaqSection() {
                   onClick={() => toggleFaq(index)}
                   aria-expanded={isOpen}
                   aria-controls={`faq-panel-${index}`}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer"
+                  className="w-full p-4 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer"
                 >
                   <span
-                    className="text-base sm:text-lg font-bold text-text-primary tracking-wide"
+                    className="text-[15px] sm:text-lg font-bold text-text-primary tracking-wide"
                     style={{ fontFamily: "'Rajdhani', sans-serif" }}
                   >
                     {faq.question}
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 text-text-muted shrink-0 transition-transform duration-200 ${
+                    className={`w-4 h-4 sm:w-5 sm:h-5 text-text-muted shrink-0 transition-transform duration-200 ${
                       isOpen ? "rotate-180 text-accent-primary-light" : ""
                     }`}
                   />
@@ -120,7 +120,7 @@ export default function FaqSection() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                     >
-                      <div className="px-5 sm:px-6 pb-5 sm:pb-6 text-sm sm:text-base text-text-secondary leading-relaxed border-t border-border-subtle/50 pt-3">
+                      <div className="px-4 sm:px-6 pb-4 sm:pb-6 text-[13px] sm:text-base text-text-secondary leading-relaxed border-t border-border-subtle/50 pt-3">
                         {faq.answer}
                       </div>
                     </motion.div>

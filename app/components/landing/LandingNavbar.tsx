@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sun, Moon, Sparkles, ChevronRight, Menu, X, LogIn } from "lucide-react";
+import { Sun, Moon, Sparkles, ChevronRight, Menu, X } from "lucide-react";
 
 interface LandingNavbarProps {
   /** When a fixed logged-in banner sits above the navbar, shift it down. */
@@ -56,20 +56,20 @@ export default function LandingNavbar({ hasBanner = false }: LandingNavbarProps)
         hasBanner ? "top-8" : "top-0"
       } ${
         hasScrolled
-          ? "bg-bg-void/90 backdrop-blur-md border-b border-border-subtle shadow-lg py-3"
-          : "bg-transparent py-4"
+          ? "bg-bg-void/90 backdrop-blur-md border-b border-border-subtle shadow-lg py-2.5 sm:py-3"
+          : "bg-transparent py-3.5 sm:py-5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Left: Brand Identity */}
         <Link href="/" className="flex items-center gap-3 group select-none">
-          <div className="w-9 h-9 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light group-hover:scale-105 transition-transform duration-300 shadow-sm">
-            <Sparkles className="w-5 h-5 text-accent-primary-light animate-pulse" />
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light group-hover:scale-105 transition-transform duration-300 shadow-sm">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-accent-primary-light animate-pulse" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
               <span
-                className="text-2xl font-bold tracking-wider text-text-primary"
+                className="text-xl sm:text-2xl font-bold tracking-wider text-text-primary"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 Sylf
@@ -115,15 +115,6 @@ export default function LandingNavbar({ hasBanner = false }: LandingNavbarProps)
             {isLightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-300" />}
           </button>
 
-          {/* Login Link for existing testers */}
-          <Link
-            href="/login"
-            className="hidden sm:inline-flex items-center gap-1 text-xs uppercase tracking-wider font-bold text-text-secondary hover:text-text-primary px-3 py-2 transition-colors font-['Rajdhani']"
-          >
-            <LogIn className="w-3.5 h-3.5" />
-            Login
-          </Link>
-
           {/* Primary Waitlist CTA */}
           <button
             onClick={() => scrollToSection("waitlist")}
@@ -158,16 +149,9 @@ export default function LandingNavbar({ hasBanner = false }: LandingNavbarProps)
             </button>
           ))}
           <div className="pt-3 mt-3 border-t border-border-subtle/60 flex items-center gap-3">
-            <Link
-              href="/login"
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border border-border-subtle text-xs uppercase tracking-wider font-bold text-text-secondary hover:text-text-primary transition-colors font-['Rajdhani']"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              Login
-            </Link>
             <button
               onClick={() => scrollToSection("waitlist")}
-              className="flex-1 btn-primary inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase cursor-pointer"
+              className="w-full btn-primary inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase cursor-pointer"
             >
               Join Waitlist
               <ChevronRight className="w-3.5 h-3.5" />

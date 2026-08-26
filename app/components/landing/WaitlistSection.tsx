@@ -198,7 +198,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
   };
 
   return (
-    <section id="waitlist" className="py-20 md:py-28 relative">
+    <section id="waitlist" className="py-16 sm:py-20 md:py-28 relative">
       {/* Background Glow */}
       <div
         className="absolute inset-0 opacity-20 pointer-events-none -z-10"
@@ -208,7 +208,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 sm:p-12 rounded-3xl border border-border-active bg-bg-abyss shadow-2xl relative overflow-hidden">
+        <div className="p-6 sm:p-12 rounded-2xl sm:rounded-3xl border border-border-active bg-bg-abyss shadow-2xl relative overflow-hidden">
           {/* Top Decorative Border */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-accent-primary to-transparent opacity-80" />
 
@@ -229,13 +229,13 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
               </div>
 
               <h2
-                className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tight"
+                className="text-[26px] leading-tight sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-3 sm:mb-4 tracking-tight text-balance"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 Secure Your Scholar Access Pass
               </h2>
 
-              <p className="text-sm sm:text-base text-text-secondary max-w-xl mx-auto mb-8 leading-relaxed">
+              <p className="text-sm sm:text-base text-text-secondary max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed">
                 Join the waitlist to receive early beta access invitations. No credit card, no ads, and no complicated setup.
               </p>
 
@@ -279,7 +279,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Alex"
-                      className="input-field w-full text-sm py-2.5 px-3 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
+                      className="input-field w-full text-sm py-3 px-3 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
                     />
                   </div>
 
@@ -298,7 +298,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                       value={targetExam}
                       onChange={(e) => setTargetExam(e.target.value)}
                       placeholder="e.g. MCAT, CS, A-Levels"
-                      className="input-field w-full text-sm py-2.5 px-3 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
+                      className="input-field w-full text-sm py-3 px-3 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
@@ -317,7 +317,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary w-full py-3.5 rounded-xl text-base font-bold tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-xl disabled:opacity-70 mt-2"
+                  className="btn-primary w-full py-4 sm:py-3.5 rounded-xl text-base font-bold tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-xl disabled:opacity-70 mt-2"
                 >
                   {isSubmitting ? (
                     <>
@@ -354,7 +354,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
               </span>
 
               <h3
-                className="text-3xl font-extrabold text-text-primary mb-2"
+                className="text-2xl sm:text-3xl font-extrabold text-text-primary mb-2 text-balance"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 You Are #{waitlistPass.position} on the Waitlist
@@ -365,7 +365,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
               </p>
 
               {/* Digital Pass Card */}
-              <div className="p-5 rounded-2xl border border-accent-primary-mid/50 bg-bg-void/90 text-left mb-6 shadow-inner font-mono">
+              <div className="p-4 sm:p-5 rounded-2xl border border-accent-primary-mid/50 bg-bg-void/90 text-left mb-6 shadow-inner font-mono">
                 <div className="flex justify-between items-center pb-3 mb-3 border-b border-border-subtle text-xs">
                   <span className="text-accent-primary-light font-bold font-['Rajdhani'] uppercase tracking-wider">
                     SYLF SCHOLAR PASS

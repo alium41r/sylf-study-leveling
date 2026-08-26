@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { exchangeOAuthCode, isOAuthProvider, type OAuthProvider } from "@/lib/oauth";
 import { handleOAuthSignInOrRegister, linkOAuthAccountToUser } from "@/lib/auth-service";
 import { AUTH_COOKIE_OPTIONS, getSession } from "@/lib/auth";
+import { isPrelaunchMode } from "@/lib/prelaunch";
 
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ provider: string }> }
 ) {
+  // Prelaunch lockdown: OAuth sign-in would create accounts — not allowed yet.
+  if (isPrelaunchMode()) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
   const origin = req.nextUrl.origin;
   const searchParams = req.nextUrl.searchParams;
   const code = searchParams.get("code");

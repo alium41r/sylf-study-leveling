@@ -183,3 +183,48 @@ describe("Phase 2: Next.js Edge Middleware Route Guards", () => {
     expect(res.headers.get("location")).toBeNull();
   });
 });
+
+describe("Prelaunch lockdown (PRELAUNCH_MODE=true)", () => {
+  const original = process.env.PRELAUNCH_MODE;
+
+  afterEach(() => {
+    if (original === undefined) delete process.env.PRELAUNCH_MODE;
+    else process.env.PRELAUNCH_MODE = original;
+  });
+
+  it("redirects /login to the landing page when prelaunch is enabled", async () => {
+    process.env.PRELAUNCH_MODE = "true";
+    const req = new NextRequest("http://localhost:3000/login");
+    const res = await middleware(req);
+
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("http://localhost:3000/");
+  });
+
+  it("redirects /register to the landing page when prelaunch is enabled", async () => {
+    process.env.PRELAUNCH_MODE = "1";
+    const req = new NextRequest("http://localhost:3000/register");
+    const res = await middleware(req);
+
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("http://localhost:3000/");
+  });
+
+  it("redirects /onboarding to the landing page when prelaunch is enabled", async () => {
+    process.env.PRELAUNCH_MODE = "true";
+    const req = new NextRequest("http://localhost:3000/onboarding");
+    const res = await middleware(req);
+
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("http://localhost:3000/");
+  });
+
+  it("keeps the landing page public when prelaunch is enabled", async () => {
+    process.env.PRELAUNCH_MODE = "true";
+    const req = new NextRequest("http://localhost:3000/");
+    const res = await middleware(req);
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("location")).toBeNull();
+  });
+});

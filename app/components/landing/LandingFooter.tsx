@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { Sparkles, Sun, Moon } from "lucide-react";
 
 export default function LandingFooter() {
@@ -32,7 +31,7 @@ export default function LandingFooter() {
 
   return (
     <footer className="border-t border-border-subtle bg-bg-void/80 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           {/* Brand Info */}
           <div className="md:col-span-5 flex flex-col items-start">
@@ -41,7 +40,7 @@ export default function LandingFooter() {
                 <Sparkles className="w-4 h-4 text-accent-primary-light" />
               </div>
               <span
-                className="text-2xl font-bold tracking-wider text-text-primary"
+                className="text-xl sm:text-2xl font-bold tracking-wider text-text-primary"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 Sylf
@@ -100,11 +99,6 @@ export default function LandingFooter() {
                   </button>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-text-primary">
-                    Scholar Login
-                  </Link>
-                </li>
-                <li>
                   <button onClick={() => setModalContent("privacy")} className="hover:text-text-primary cursor-pointer">
                     Privacy Policy
                   </button>
@@ -134,7 +128,7 @@ export default function LandingFooter() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 mt-8 border-t border-border-subtle/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-text-muted">
+        <div className="pt-6 mt-6 sm:pt-8 sm:mt-8 border-t border-border-subtle/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-text-muted">
           <p>© {new Date().getFullYear()} Sylf. All rights reserved. Built for scholars worldwide.</p>
           <div className="flex items-center gap-4">
             <button onClick={() => setModalContent("privacy")} className="hover:text-text-primary cursor-pointer">

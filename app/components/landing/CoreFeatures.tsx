@@ -150,10 +150,10 @@ export default function CoreFeatures() {
     FEATURE_PILLARS.find((p) => p.id === activeTab) || FEATURE_PILLARS[0];
 
   return (
-    <section id="features" className="py-20 md:py-28 relative">
+    <section id="features" className="py-16 sm:py-20 md:py-28 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
           <div
             className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full text-xs tracking-[0.2em] uppercase font-bold border"
             style={{
@@ -168,19 +168,19 @@ export default function CoreFeatures() {
           </div>
 
           <h2
-            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tight"
+            className="text-[26px] leading-tight sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-3 sm:mb-4 tracking-tight text-balance"
             style={{ fontFamily: "'Rajdhani', sans-serif" }}
           >
             Built For Real Study Sessions, Not Gimmicks
           </h2>
 
-          <p className="text-base sm:text-lg text-text-secondary leading-relaxed">
+          <p className="text-[15px] sm:text-lg text-text-secondary leading-relaxed">
             Every feature in Sylf is designed around real cognitive science and genuine academic progression.
           </p>
         </div>
 
-        {/* Feature Navigation Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar justify-start lg:justify-center">
+        {/* Feature Navigation Tabs (bleeds + snaps on mobile) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 sm:mb-8 no-scrollbar justify-start lg:justify-center -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
           {FEATURE_PILLARS.map((pillar) => {
             const Icon = pillar.icon;
             const isActive = activeTab === pillar.id;
@@ -189,7 +189,7 @@ export default function CoreFeatures() {
               <button
                 key={pillar.id}
                 onClick={() => setActiveTab(pillar.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold font-['Rajdhani'] uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer border ${
+                className={`flex shrink-0 snap-start items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-sm font-bold font-['Rajdhani'] uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer border ${
                   isActive
                     ? "bg-accent-primary text-white border-accent-primary shadow-lg"
                     : "bg-bg-abyss text-text-secondary border-border-subtle hover:border-border-active hover:text-text-primary"
@@ -203,28 +203,28 @@ export default function CoreFeatures() {
         </div>
 
         {/* Active Feature Showcase Box */}
-        <div className="p-6 sm:p-10 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="p-5 sm:p-10 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
             {/* Feature Copy */}
             <div className="lg:col-span-6 flex flex-col items-start text-left">
-              <span className="text-xs uppercase font-bold tracking-widest text-accent-text-light font-['Rajdhani'] mb-2">
+              <span className="text-[11px] sm:text-xs uppercase font-bold tracking-widest text-accent-text-light font-['Rajdhani'] mb-2">
                 {currentFeature.badge}
               </span>
 
               <h3
-                className="text-2xl sm:text-3xl font-extrabold text-text-primary mb-3"
+                className="text-xl sm:text-3xl font-extrabold text-text-primary mb-3 text-balance"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 {currentFeature.tagline}
               </h3>
 
-              <p className="text-sm sm:text-base text-text-secondary leading-relaxed mb-6">
+              <p className="text-[13.5px] sm:text-base text-text-secondary leading-relaxed mb-5 sm:mb-6">
                 {currentFeature.description}
               </p>
 
-              <div className="space-y-3 w-full mb-6">
+              <div className="space-y-2.5 sm:space-y-3 w-full mb-5 sm:mb-6">
                 {currentFeature.highlights.map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-text-primary">
+                  <div key={idx} className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-primary">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </div>

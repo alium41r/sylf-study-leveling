@@ -15,10 +15,10 @@ import {
 
 export default function WhatIsSylf() {
   return (
-    <section id="what-is-sylf" className="py-20 md:py-28 relative">
+    <section id="what-is-sylf" className="py-16 sm:py-20 md:py-28 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
           <div
             className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full text-xs tracking-[0.2em] uppercase font-bold border"
             style={{
@@ -33,34 +33,34 @@ export default function WhatIsSylf() {
           </div>
 
           <h2
-            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-4 tracking-tight"
+            className="text-[26px] leading-tight sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-3 sm:mb-4 tracking-tight text-balance"
             style={{ fontFamily: "'Rajdhani', sans-serif" }}
           >
             Why Do Games Feel Rewarding, But Studying Feels Like a Chore?
           </h2>
 
-          <p className="text-base sm:text-lg text-text-secondary leading-relaxed">
+          <p className="text-[15px] sm:text-lg text-text-secondary leading-relaxed">
             Games give you instant feedback, clear objectives, and visible progression. Standard study apps only give you empty to-do lists and guilt. Sylf bridges the gap by making academic mastery a measurable RPG journey.
           </p>
         </div>
 
         {/* Comparison Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto">
           {/* Left: Traditional Study Method */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="p-6 sm:p-8 rounded-2xl border border-red-500/20 bg-bg-abyss relative overflow-hidden"
+            className="p-5 sm:p-8 rounded-2xl border border-red-500/20 bg-bg-abyss relative overflow-hidden"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
                 <XCircle className="w-5 h-5" />
               </div>
               <div>
                 <h3
-                  className="text-xl font-bold text-text-primary tracking-wide"
+                  className="text-lg sm:text-xl font-bold text-text-primary tracking-wide"
                   style={{ fontFamily: "'Rajdhani', sans-serif" }}
                 >
                   Traditional Study Methods
@@ -69,8 +69,8 @@ export default function WhatIsSylf() {
               </div>
             </div>
 
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3 text-sm text-text-secondary">
+            <ul className="space-y-3 sm:space-y-4">
+              <li className="flex items-start gap-3 text-[13px] sm:text-sm text-text-secondary">
                 <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <span><strong>Endless To-Do Lists:</strong> 500-page textbooks without clear daily priorities create decision fatigue.</span>
               </li>
@@ -95,19 +95,19 @@ export default function WhatIsSylf() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="p-6 sm:p-8 rounded-2xl border border-accent-primary-mid bg-bg-abyss relative overflow-hidden shadow-card"
+            className="p-5 sm:p-8 rounded-2xl border border-accent-primary-mid bg-bg-abyss relative overflow-hidden shadow-card"
           >
             <div className="absolute top-0 right-0 px-3 py-1 rounded-bl-xl bg-accent-primary-dim border-l border-b border-accent-primary-mid text-[10px] uppercase font-bold tracking-widest text-accent-text-light font-['Rajdhani']">
               The System
             </div>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light">
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center text-accent-text-light">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
                 <h3
-                  className="text-xl font-bold text-text-primary tracking-wide"
+                  className="text-lg sm:text-xl font-bold text-text-primary tracking-wide"
                   style={{ fontFamily: "'Rajdhani', sans-serif" }}
                 >
                   The Sylf Progression Loop
@@ -116,8 +116,8 @@ export default function WhatIsSylf() {
               </div>
             </div>
 
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3 text-sm text-text-primary">
+            <ul className="space-y-3 sm:space-y-4">
+              <li className="flex items-start gap-3 text-[13px] sm:text-sm text-text-primary">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <span><strong>AI-Generated Quests:</strong> Syllabi are dissected into prioritized, bite-sized daily objectives with target durations.</span>
               </li>

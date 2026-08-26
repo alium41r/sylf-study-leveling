@@ -69,8 +69,10 @@ describe("Study Timer Accuracy & Synchronization Tests", () => {
       const data = await res.json();
 
       expect(data.completedTodaySeconds).toBe(1200);
-      expect(data.todayStudySeconds).toBeGreaterThanOrEqual(1318);
-      expect(data.todayStudyMinutes).toBeGreaterThanOrEqual(21);
+      // The active session contributes its stored (flushed) seconds only —
+      // a pre-first-flush session has 0 stored, so no heuristic inflation.
+      expect(data.todayStudySeconds).toBe(1200);
+      expect(data.todayStudyMinutes).toBe(20);
       expect(data.activeSessionStartedAt).toBe(activeStarted.toISOString());
     });
   });

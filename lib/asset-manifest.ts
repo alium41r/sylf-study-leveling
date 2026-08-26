@@ -21,9 +21,9 @@ export interface AssetIngestionContract {
     width: 90;
     height: 90;
     aspectRatio: "1:1";
-    groundAnchorY: 72;
-    horizontalCenterX: 56.5;
-    renderOffsetCorrection: "-11.67% (-10.5px)";
+    groundAnchorY: 79;
+    horizontalCenterX: 45;
+    renderOffsetCorrection: "0px (Centered)";
   };
   layers: {
     layer1_pedestal: {
@@ -36,8 +36,8 @@ export interface AssetIngestionContract {
       zIndex: 20;
       directory: "/sprites/character/forms/";
       filePattern: "form_{archetype}_{tier}.png | {sku}.png";
-      defaultFallback: "/sprites/character/forms/default_hunter.png";
-      format: "8-bit RGBA PNG (90x90)";
+      defaultFallback: string;
+      format: string;
     };
     layer3_aura: {
       zIndex: 30;
@@ -64,9 +64,9 @@ export const ASSET_INGESTION_CONTRACT: AssetIngestionContract = {
     width: 90,
     height: 90,
     aspectRatio: "1:1",
-    groundAnchorY: 72,
-    horizontalCenterX: 56.5,
-    renderOffsetCorrection: "-11.67% (-10.5px)",
+    groundAnchorY: 79,
+    horizontalCenterX: 45,
+    renderOffsetCorrection: "0px (Centered)",
   },
   layers: {
     layer1_pedestal: {
@@ -79,7 +79,7 @@ export const ASSET_INGESTION_CONTRACT: AssetIngestionContract = {
       zIndex: 20,
       directory: "/sprites/character/forms/",
       filePattern: "form_{archetype}_{tier}.png | {sku}.png",
-      defaultFallback: "/sprites/character/forms/default_hunter.png",
+      defaultFallback: "/sprites/character/forms/form_tanjiro.png",
       format: "8-bit RGBA PNG (90x90)",
     },
     layer3_aura: {
@@ -107,7 +107,7 @@ export const ASSET_INGESTION_CONTRACT: AssetIngestionContract = {
  */
 export function resolveFormUrl(formKey?: string | null): string {
   if (!formKey || formKey === "none" || formKey === "default_hunter") {
-    return "/sprites/character/forms/default_hunter.png";
+    return "/sprites/character/forms/form_tanjiro.png";
   }
   if (formKey.startsWith("/")) return formKey;
   return `/sprites/character/forms/${formKey}.png`;

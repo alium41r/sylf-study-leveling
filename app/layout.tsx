@@ -6,9 +6,15 @@ import SidebarWrapper from "./components/SidebarWrapper";
 import { GlobalSystemWrapper } from "./components/GlobalSystemWrapper";
 
 export const metadata: Metadata = {
-  title: "The System | Study Leveling",
+  title: "Sylf — Study Leveling",
   description:
-    "An AI-driven gamified study tracker inspired by Solo Leveling. Level up your knowledge. The System is watching.",
+    "Sylf turns your coursework and exam prep into structured AI quests, XP, ranks, and cognitive stat growth. Join the early access waitlist.",
+  openGraph: {
+    title: "Sylf — Study Leveling",
+    description:
+      "Turn every study hour into rank & progression. AI quests, XP, streaks, and cognitive stat growth.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

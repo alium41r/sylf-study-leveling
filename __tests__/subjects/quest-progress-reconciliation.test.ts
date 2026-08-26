@@ -43,22 +43,30 @@ vi.mock("@/lib/prisma", () => ({
     $queryRawUnsafe: vi.fn(),
     $queryRaw: vi.fn().mockResolvedValue([
       {
-        complete_study_session: {
+        settle_study_session_atomic: {
+          success: true,
           sessionId: 1,
-          userId: 101,
-          durationMinutes: 45,
+          isFinal: false,
+          alreadyClaimed: false,
           durationSeconds: 2700,
+          breakSeconds: 0,
           deltaSeconds: 2700,
           awarded: true,
           xpGained: 225,
           sylphGained: 22,
           totalSylphEarned: 22,
+          questCompleted: true,
+          questXp: 225,
+          questSylph: 22,
+          hpHealed: 0,
           level: 1,
           currentXP: 225,
           xpToNextLevel: 500,
           hunterRank: "E",
           levelsGained: 0,
           didRankUp: false,
+          nodeProgress: 100.0,
+          masteryGranted: false,
         },
       },
     ]),
@@ -263,58 +271,37 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
   });
 
   describe("3. Focus Session Progress Reconciliation (`PATCH /api/sessions`)", () => {
-    it("reconciles subject node progress and mints SP on initial mastery transition", async () => {
+    it("settles quest + node progress + mastery inside the unified atomic RPC", async () => {
       const token = await signToken({ userId: 101, username: "scholar_test" });
-
-      (prisma.studySession.findFirst as any).mockResolvedValue({
-        id: 701,
-        userId: 101,
-        startedAt: new Date(Date.now() - 60 * 60 * 1000), // 1h ago — clamp window
-      });
-
-      (prisma.quest.findFirst as any).mockResolvedValue({
-        id: 501,
-        userId: 101,
-        subjectNodeId: 10,
-        targetMinutes: 45,
-        scopeWeight: 0.50,
-        status: "ACTIVE",
-        // Post-RPC state: complete_study_session already credited the
-        // 2700s flush delta into elapsedSeconds.
-        elapsedSeconds: 2700,
-        xpReward: 225,
-        sylphReward: 22,
-        subjectNode: {
-          id: 10,
-          nodeId: "N2_1",
-          title: "Calculus Derivatives",
-          progress: 80.0,
-          isMastered: false,
-          masteredAt: null,
-          spAward: 1,
-        },
-      });
 
       (prisma.user.findUnique as any).mockResolvedValue({
         id: 101,
+        username: "scholar_test",
         timezone: "UTC",
         lastActiveDate: "",
         streakDays: 1,
         level: 1,
       });
 
-      (prisma.studySession.findUnique as any).mockResolvedValue({
-        id: 701,
-        durationMinutes: 45,
-      });
-
-      // Atomic claim RPC: node 80% + delta 50% → mastery granted
-      (prisma.$queryRawUnsafe as any).mockResolvedValue([
+      // Unified settlement RPC result: quest completed, node mastered, HP healed.
+      (prisma.$queryRaw as any).mockResolvedValue([
         {
-          claim_session_reward_atomic: {
+          settle_study_session_atomic: {
             success: true,
+            sessionId: 701,
+            isFinal: false,
+            alreadyClaimed: false,
+            durationSeconds: 2700,
+            breakSeconds: 0,
+            deltaSeconds: 2700,
+            awarded: true,
             xpGained: 225,
             sylphGained: 22,
+            totalSylphEarned: 22,
+            questCompleted: true,
+            questXp: 225,
+            questSylph: 22,
+            hpHealed: 20,
             level: 1,
             currentXP: 225,
             xpToNextLevel: 282,
@@ -340,86 +327,59 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
 
       const res = await endSessionPATCH(req);
       expect(res.status).toBe(200);
+      const data = await res.json();
 
-      // Verify Quest was completed (elapsed credit now happens inside the
-      // complete_study_session RPC via delta accounting — not re-written here)
-      expect(prisma.quest.update).toHaveBeenCalledWith({
-        where: { id: 501 },
-        data: expect.objectContaining({ status: "COMPLETED" }),
-      });
-
-      // Verify node progress was delegated to the atomic RPC
-      // (80% + floor(0.50 * 100) = 130 -> clamped to 100% inside Postgres)
-      expect(prisma.$queryRawUnsafe).toHaveBeenCalledWith(
-        expect.stringContaining("claim_session_reward_atomic"),
-        "101",
-        "701",
-        225,
-        22,
-        "10",
-        "50"
+      // Everything settles in ONE RPC call (no two-step claim, no separate
+      // quest.update or message writes in Node).
+      expect(prisma.$queryRaw).toHaveBeenCalledWith(
+        expect.anything(),
+        101,
+        701,
+        2700,
+        0,
+        501,
+        null,
+        false,
+        false,
+        expect.any(String)
       );
-
-      // Verify mastery congratulatory system message emitted
-      expect(prisma.systemMessage.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          userId: 101,
-          type: "REWARD",
-          content: expect.stringContaining("Calculus Derivatives"),
-        }),
-      });
+      expect(prisma.quest.update).not.toHaveBeenCalled();
+      expect(data.questCompletedNow).toBe(true);
+      expect(data.masteryGranted).toBe(true);
+      expect(data.hpHealed).toBe(20);
     });
 
-    it("does NOT re-mint SP on repeat completions of an already mastered node", async () => {
+    it("does NOT re-mint mastery for an already mastered node", async () => {
       const token = await signToken({ userId: 101, username: "scholar_test" });
-
-      (prisma.studySession.findFirst as any).mockResolvedValue({
-        id: 702,
-        userId: 101,
-        startedAt: new Date(Date.now() - 60 * 60 * 1000),
-      });
-
-      (prisma.quest.findFirst as any).mockResolvedValue({
-        id: 502,
-        userId: 101,
-        subjectNodeId: 10,
-        targetMinutes: 45,
-        scopeWeight: 0.30,
-        status: "ACTIVE",
-        elapsedSeconds: 2700, // post-RPC credit
-        xpReward: 225,
-        sylphReward: 22,
-        subjectNode: {
-          id: 10,
-          nodeId: "N2_1",
-          title: "Calculus Derivatives",
-          progress: 100.0,
-          isMastered: true, // Already mastered!
-          masteredAt: new Date("2026-08-20T10:00:00Z"),
-          spAward: 1,
-        },
-      });
 
       (prisma.user.findUnique as any).mockResolvedValue({
         id: 101,
+        username: "scholar_test",
         timezone: "UTC",
         lastActiveDate: "",
         streakDays: 1,
         level: 1,
       });
 
-      (prisma.studySession.findUnique as any).mockResolvedValue({
-        id: 702,
-        durationMinutes: 45,
-      });
-
-      // Atomic claim RPC: node already at 100% → no mastery transition
-      (prisma.$queryRawUnsafe as any).mockResolvedValue([
+      // Unified settlement RPC: node already at 100% → no mastery transition.
+      (prisma.$queryRaw as any).mockResolvedValue([
         {
-          claim_session_reward_atomic: {
+          settle_study_session_atomic: {
             success: true,
+            sessionId: 702,
+            isFinal: false,
+            alreadyClaimed: false,
+            durationSeconds: 2700,
+            breakSeconds: 0,
+            deltaSeconds: 2700,
+            awarded: true,
             xpGained: 225,
             sylphGained: 22,
+            totalSylphEarned: 22,
+            questCompleted: true,
+            questXp: 225,
+            questSylph: 22,
+            hpHealed: 0,
             level: 1,
             currentXP: 225,
             xpToNextLevel: 282,
@@ -445,109 +405,64 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
 
       const res = await endSessionPATCH(req);
       expect(res.status).toBe(200);
+      const data = await res.json();
 
-      // Verify the claim was delegated to the atomic RPC
-      expect(prisma.$queryRawUnsafe).toHaveBeenCalledWith(
-        expect.stringContaining("claim_session_reward_atomic"),
-        "101",
-        "702",
-        expect.any(Number),
-        expect.any(Number),
-        "10",
-        "30"
+      // Settled via the unified RPC; no mastery side effects in Node.
+      expect(prisma.$queryRaw).toHaveBeenCalledWith(
+        expect.anything(),
+        101,
+        702,
+        2700,
+        0,
+        502,
+        null,
+        false,
+        false,
+        expect.any(String)
       );
-
-      // Verify node mastery systemMessage was NOT emitted since node was already mastered
-      expect(prisma.systemMessage.create).not.toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            content: expect.stringContaining("SYLLABUS NODE MASTERED"),
-          }),
-        })
-      );
+      expect(data.questCompletedNow).toBe(true);
+      expect(data.masteryGranted).toBe(false);
+      expect(prisma.systemMessage.create).not.toHaveBeenCalled();
     });
 
-    it("keeps quest ACTIVE when user ends session early without reaching target duration", async () => {
+    it("keeps quest ACTIVE when the user ends early without reaching target duration", async () => {
       const token = await signToken({ userId: 101, username: "scholar_test" });
-
-      (prisma.studySession.findFirst as any).mockResolvedValue({
-        id: 703,
-        userId: 101,
-        startedAt: new Date(Date.now() - 60 * 60 * 1000),
-      });
-
-      (prisma.quest.findFirst as any).mockResolvedValue({
-        id: 503,
-        userId: 101,
-        subjectNodeId: 10,
-        targetMinutes: 60,
-        scopeWeight: 0.50,
-        status: "ACTIVE",
-        // Post-RPC: the 10s flush delta was credited by the RPC itself.
-        elapsedSeconds: 10,
-        xpReward: 300,
-        sylphReward: 30,
-        subjectNode: {
-          id: 10,
-          nodeId: "N1_1",
-          title: "Mechanics & Vectors",
-          progress: 10.0,
-          isMastered: false,
-          masteredAt: null,
-          spAward: 1,
-        },
-      });
-
-      // complete_study_session result for this 10-second flush
-      (prisma.$queryRaw as any).mockResolvedValue([
-        {
-          complete_study_session: {
-            sessionId: 703,
-            userId: 101,
-            durationMinutes: 0,
-            durationSeconds: 10,
-            deltaSeconds: 10,
-            awarded: false,
-            xpGained: 0,
-            sylphGained: 0,
-            totalSylphEarned: 0,
-            level: 1,
-            currentXP: 0,
-            xpToNextLevel: 500,
-            hunterRank: "E",
-            levelsGained: 0,
-            didRankUp: false,
-          },
-        },
-      ]);
 
       (prisma.user.findUnique as any).mockResolvedValue({
         id: 101,
+        username: "scholar_test",
         timezone: "UTC",
         lastActiveDate: "",
         streakDays: 1,
         level: 1,
       });
 
-      (prisma.studySession.findUnique as any).mockResolvedValue({
-        id: 703,
-        durationMinutes: 0,
-      });
-
-      // Partial-progress claim: no rewards, zero delta (10s < 30s floor)
-      (prisma.$queryRawUnsafe as any).mockResolvedValue([
+      // Unified settlement RPC result for this 10-second flush.
+      (prisma.$queryRaw as any).mockResolvedValue([
         {
-          claim_session_reward_atomic: {
+          settle_study_session_atomic: {
             success: true,
+            sessionId: 703,
+            isFinal: false,
+            alreadyClaimed: false,
+            durationSeconds: 10,
+            breakSeconds: 0,
+            deltaSeconds: 10,
+            awarded: false,
             xpGained: 0,
             sylphGained: 0,
+            totalSylphEarned: 0,
+            questCompleted: false,
+            questXp: 0,
+            questSylph: 0,
+            hpHealed: 0,
             level: 1,
             currentXP: 0,
             xpToNextLevel: 282,
             hunterRank: "E",
             levelsGained: 0,
             didRankUp: false,
-            nodeProgress: 10.0,
+            nodeProgress: 0.0,
             masteryGranted: false,
           },
         },
@@ -567,99 +482,57 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
 
       const res = await endSessionPATCH(req);
       expect(res.status).toBe(200);
+      const data = await res.json();
 
-      // Quest stays ACTIVE; elapsed credit happens inside the RPC's delta
-      // accounting, so the route must NOT re-write elapsedSeconds.
+      // Quest stays ACTIVE — the RPC decides completion internally.
       expect(prisma.quest.update).not.toHaveBeenCalled();
+      expect(data.questCompletedNow).toBe(false);
 
-      // Verify the zero-reward node progress call went through the atomic RPC
-      expect(prisma.$queryRawUnsafe).toHaveBeenCalledWith(
-        expect.stringContaining("claim_session_reward_atomic"),
-        "101",
-        "703",
+      expect(prisma.$queryRaw).toHaveBeenCalledWith(
+        expect.anything(),
+        101,
+        703,
+        10,
         0,
-        0,
-        "10",
-        "0"
+        503,
+        null,
+        false,
+        false,
+        expect.any(String)
       );
     });
 
     it("marks quest COMPLETED and awards XP when completeQuest flag is explicitly set true", async () => {
       const token = await signToken({ userId: 101, username: "scholar_test" });
 
-      (prisma.studySession.findFirst as any).mockResolvedValue({
-        id: 704,
-        userId: 101,
-        startedAt: new Date(Date.now() - 60 * 60 * 1000),
+      (prisma.user.findUnique as any).mockResolvedValue({
+        id: 101,
+        username: "scholar_test",
+        timezone: "UTC",
+        lastActiveDate: "",
+        streakDays: 1,
+        level: 1,
       });
 
-      (prisma.quest.findFirst as any).mockResolvedValue({
-        id: 504,
-        userId: 101,
-        subjectNodeId: 10,
-        targetMinutes: 60,
-        scopeWeight: 0.50,
-        status: "ACTIVE",
-        elapsedSeconds: 300,
-        xpReward: 300,
-        sylphReward: 30,
-        subjectNode: {
-          id: 10,
-          nodeId: "N1_1",
-          title: "Mechanics & Vectors",
-          progress: 10.0,
-          isMastered: false,
-          masteredAt: null,
-          spAward: 1,
-        },
-      });
-
-      // complete_study_session result for this 300-second flush
+      // Unified settlement RPC result: full quest rewards granted.
       (prisma.$queryRaw as any).mockResolvedValue([
         {
-          complete_study_session: {
+          settle_study_session_atomic: {
+            success: true,
             sessionId: 704,
-            userId: 101,
-            durationMinutes: 5,
+            isFinal: false,
+            alreadyClaimed: false,
             durationSeconds: 300,
+            breakSeconds: 0,
             deltaSeconds: 300,
             awarded: true,
             xpGained: 30,
             sylphGained: 5,
             totalSylphEarned: 5,
-            level: 1,
-            currentXP: 30,
-            xpToNextLevel: 500,
-            hunterRank: "E",
-            levelsGained: 0,
-            didRankUp: false,
-          },
-        },
-      ]);
-
-      (prisma.user.findUnique as any).mockResolvedValue({
-        id: 101,
-        username: "scholar_test",
-        level: 1,
-        currentXP: 0,
-        sylph: 50,
-        timezone: "UTC",
-        lastActiveDate: "",
-        streakDays: 1,
-      });
-
-      (prisma.studySession.findUnique as any).mockResolvedValue({
-        id: 704,
-        durationMinutes: 5,
-      });
-
-      // Atomic claim RPC: full quest rewards + node delta
-      (prisma.$queryRawUnsafe as any).mockResolvedValue([
-        {
-          claim_session_reward_atomic: {
-            success: true,
-            xpGained: 300,
-            sylphGained: 30,
+            questCompleted: true,
+            questXp: 300,
+            questSylph: 30,
+            hpHealed: 20,
             level: 1,
             currentXP: 300,
             xpToNextLevel: 282,
@@ -686,26 +559,24 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
 
       const res = await endSessionPATCH(req);
       expect(res.status).toBe(200);
+      const data = await res.json();
 
-      // Verify Quest marked COMPLETED (elapsed credit handled by the RPC)
-      expect(prisma.quest.update).toHaveBeenCalledWith({
-        where: { id: 504 },
-        data: expect.objectContaining({
-          status: "COMPLETED",
-        }),
-      });
-
-      // Verify XP/Sylph/node progress were delegated to the atomic RPC
-      // (no read-modify-write prisma.user.update loop remains)
-      expect(prisma.$queryRawUnsafe).toHaveBeenCalledWith(
-        expect.stringContaining("claim_session_reward_atomic"),
-        "101",
-        "704",
+      // completeQuest flag plumbed into the unified RPC (arg index 7).
+      expect(prisma.$queryRaw).toHaveBeenCalledWith(
+        expect.anything(),
+        101,
+        704,
         300,
-        30,
-        "10",
-        "50"
+        0,
+        504,
+        null,
+        true,
+        false,
+        expect.any(String)
       );
+      expect(prisma.quest.update).not.toHaveBeenCalled();
+      expect(data.questCompletedNow).toBe(true);
+      expect(data.questXp).toBe(300);
     });
   });
 

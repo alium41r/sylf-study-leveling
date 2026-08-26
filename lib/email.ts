@@ -278,3 +278,171 @@ export async function sendSecurityOtpEmail({
 
   return { sent: true, provider: "console_dev" };
 }
+
+// ─── Waitlist Welcome / Thank-You ──────────────────────────────
+
+export interface SendWaitlistWelcomeParams {
+  to: string;
+  name?: string | null;
+  queuePosition: number;
+  referralCode: string;
+  targetExam?: string | null;
+}
+
+/**
+ * Sent immediately after a brand-new waitlist signup. Confirms the scholar's
+ * queue position and pass code, and promises a follow-up invitation the moment
+ * the app launches. Uses the same SMTP → Resend → console fallback chain as
+ * the other dispatch functions.
+ */
+export async function sendWaitlistWelcomeEmail({
+  to,
+  name,
+  queuePosition,
+  referralCode,
+  targetExam,
+}: SendWaitlistWelcomeParams): Promise<{ sent: boolean; provider: string; error?: string }> {
+  const recipientName = (name && name.trim()) || "";
+  const goal = targetExam || "General Academic";
+
+  const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
+  const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
+  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+  const smtpPort = Number(process.env.SMTP_PORT) || 465;
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.EMAIL_FROM || (smtpUser ? `"Sylf" <${smtpUser}>` : "Sylf <onboarding@resend.dev>");
+
+  const subject = `You're on the waitlist — #${queuePosition}`;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          body { margin: 0; padding: 40px 16px; background-color: #090d16; color: #e2e8f0; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+          .card { max-width: 560px; margin: 0 auto; background-color: #0d1117; border: 1px solid rgba(124, 58, 237, 0.4); border-radius: 16px; overflow: hidden; }
+          .bar { height: 4px; background: linear-gradient(90deg, rgba(124,58,237,0) 0%, #7c3aed 50%, rgba(124,58,237,0) 100%); }
+          .inner { padding: 40px 36px; }
+          .tag { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; color: #a78bfa; text-transform: uppercase; text-align: center; margin-bottom: 12px; }
+          .title { font-size: 26px; font-weight: 800; color: #ffffff; text-align: center; margin: 0 0 16px; letter-spacing: 0.02em; }
+          .hello { font-size: 15px; line-height: 1.6; color: #94a3b8; text-align: center; margin: 0 0 24px; }
+          .hello strong { color: #e2e8f0; }
+          .pass { background-color: #090d16; border: 1px solid rgba(124, 58, 237, 0.35); border-radius: 12px; padding: 6px 20px; margin-bottom: 24px; }
+          .pass td { padding: 12px 0; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #64748b; }
+          .pass td + td { width: 45%; text-align: right; padding-left: 16px; letter-spacing: normal; text-transform: none; font-size: 14px; color: #a78bfa; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-word; }
+          .pass td.num { color: #e2e8f0; font-size: 16px; }
+          .note { font-size: 13px; line-height: 1.6; color: #94a3b8; text-align: center; margin: 0; }
+          .note strong { color: #a78bfa; }
+          .footer { text-align: center; font-size: 11px; color: #475569; margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(124, 58, 237, 0.15); }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="bar"></div>
+          <div class="inner">
+            <div class="tag">Sylf &bull; Study Leveling</div>
+            <h1 class="title">You're on the Waitlist</h1>
+            <p class="hello">
+              Thanks for joining${recipientName ? `, <strong>${recipientName}</strong>` : ""}.<br/>
+              Your spot is locked in. We're putting the finishing touches on the app &mdash; the moment it goes live, an invitation will land in this inbox.
+            </p>
+
+            <table class="pass" role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>Queue Number</td>
+                <td class="num">#${queuePosition}</td>
+              </tr>
+              <tr>
+                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">Goal</td>
+                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">${goal}</td>
+              </tr>
+              <tr>
+                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">Scholar Pass Code</td>
+                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">${referralCode}</td>
+              </tr>
+            </table>
+
+            <p class="note">
+              We'll email you here as soon as the app is published, so you can be among the first in. Until then, <strong>rank &amp; progression await.</strong>
+            </p>
+
+            <div class="footer">
+              Sylf &bull; Turn every study hour into rank &amp; progression<br/>
+              You can ignore this email if you didn't sign up for the waitlist.
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  const textContent = `Thanks for joining the Sylf waitlist${recipientName ? `, ${recipientName}` : ""}!\n\nYou're locked in at queue position #${queuePosition} (Goal: ${goal}).\nYour Scholar Pass Code: ${referralCode}\n\nWe'll email you at this address the moment the app is published so you can be among the first in.\n\n— Sylf (Study Leveling)`;
+
+  // 1. SMTP / Gmail
+  if (smtpUser && smtpPass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: { user: smtpUser, pass: smtpPass },
+      });
+
+      await transporter.sendMail({
+        from: fromEmail,
+        to,
+        subject,
+        text: textContent,
+        html: htmlContent,
+      });
+
+      console.log(`✅ [WAITLIST EMAIL] Sent welcome email to ${to} via SMTP`);
+      return { sent: true, provider: "smtp" };
+    } catch (err: any) {
+      console.error("❌ [WAITLIST SMTP ERROR]:", err);
+      return { sent: false, provider: "smtp", error: err?.message };
+    }
+  }
+
+  // 2. Resend API
+  if (resendApiKey) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: [to],
+          subject,
+          html: htmlContent,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        return { sent: false, provider: "resend", error: errorData?.message || "Failed to send email" };
+      }
+
+      console.log(`✅ [WAITLIST EMAIL] Sent welcome email to ${to} via Resend`);
+      return { sent: true, provider: "resend" };
+    } catch (err: any) {
+      return { sent: false, provider: "resend", error: err?.message };
+    }
+  }
+
+  // 3. Dev Console
+  console.log("\n=======================================================");
+  console.log("📨 [WAITLIST WELCOME EMAIL - SYLF]");
+  console.log(`Recipient: ${to}`);
+  console.log(`Queue Position: #${queuePosition}`);
+  console.log(`Scholar Pass Code: ${referralCode}`);
+  console.log("(Add SMTP_USER/SMTP_PASS or RESEND_API_KEY to send real emails.)");
+  console.log("=======================================================\n");
+
+  return { sent: true, provider: "console_dev" };
+}

@@ -252,11 +252,20 @@ export async function getProfileDossier(
 
   for (const s of todaySessions) {
     if (!s.endedAt) {
+      // Active (unended) session: count its already-flushed stored seconds.
+      // Live = freshly started (≤3 min) OR has flushed progress and is not a
+      // zombie (>12h). Stale 0-second rows are ignored.
       const started = new Date(s.startedAt);
       const elapsed = Math.floor((now.getTime() - started.getTime()) / 1000);
-      if (elapsed >= 0 && elapsed <= 180) {
-        activeSessionStartedAt = s.startedAt ? new Date(s.startedAt).toISOString() : null;
-        todayStudySeconds += elapsed;
+      const stored = (s.durationSeconds || (s.durationMinutes * 60) || 0);
+      const isLive =
+        (elapsed >= 0 && elapsed <= 180) ||
+        (stored > 0 && elapsed > 0 && elapsed <= 12 * 3600);
+      if (isLive) {
+        todayStudySeconds += stored;
+        if (!activeSessionStartedAt) {
+          activeSessionStartedAt = s.startedAt ? new Date(s.startedAt).toISOString() : null;
+        }
       }
     } else {
       const sec = (s.durationSeconds || (s.durationMinutes * 60) || 0);

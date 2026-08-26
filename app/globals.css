@@ -964,3 +964,14 @@ input[type="search"]::-webkit-search-results-decoration {
     padding: 14px;
   }
 }
+
+/* ═══ Landing Page Anchor Offsets ════════════════════════════
+   The navbar is fixed, so smooth-scrolled sections must clear
+   it (and the logged-in banner) with scroll-margin. */
+#what-is-sylf,
+#features,
+#how-it-works,
+#waitlist,
+#faq {
+  scroll-margin-top: 96px;
+}

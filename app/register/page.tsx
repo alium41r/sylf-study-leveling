@@ -7,6 +7,18 @@ import { useAuth } from "../components/AuthProvider";
 import OAuthButtons from "../components/OAuthButtons";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Sparkles,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  User,
+  AtSign,
+  Mail,
+  Lock,
+  Zap,
+} from "lucide-react";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -97,21 +109,16 @@ function RegisterForm() {
   }, [username]);
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Live sanitize to lowercase alphanumeric and underscores
-    const raw = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
-    setUsername(raw.slice(0, 20));
+    const cleanVal = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+    setUsername(cleanVal);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (usernameStatus === "taken") {
-      setError("This username is already taken. Please choose another.");
-      return;
-    }
-
-    if (usernameStatus === "checking") {
+    if (usernameStatus === "taken" || usernameStatus === "invalid") {
+      setError(usernameMsg || "Please choose a valid available username.");
       return;
     }
 
@@ -124,32 +131,23 @@ function RegisterForm() {
       return;
     }
 
-    let detectedTimezone = "UTC";
-    try {
-      detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-    } catch {
-      detectedTimezone = "UTC";
-    }
-
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, username, email, password, timezone: detectedTimezone }),
+        body: JSON.stringify({ name, username, email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Automatically log in and begin onboarding
         login(data.token, data.user);
-        window.location.href = "/onboarding";
+        router.push("/onboarding");
       } else {
         setError(data.error || "Registration failed. Please try again.");
       }
     } catch {
-      setError("Network error. Unable to contact authentication server.");
+      setError("Network error. Could not reach authentication servers.");
     } finally {
       setIsLoading(false);
     }
@@ -164,100 +162,162 @@ function RegisterForm() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 py-12 relative"
-      style={{ background: "var(--bg-void)" }}
+      className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden"
+      style={{ backgroundColor: "var(--bg-void)", color: "var(--text-primary)" }}
     >
-      {/* Background ambient effect */}
+      {/* ─── Layered Ambient Atmosphere ──────────────────────── */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-25"
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[900px] h-[500px] pointer-events-none -z-10 opacity-30 dark:opacity-50"
         style={{
-          background:
-            "radial-gradient(ellipse at 50% 40%, var(--accent-primary-dim) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse at center, var(--accent-primary) 0%, rgba(0,0,0,0) 70%)",
+          filter: "blur(100px)",
+        }}
+      />
+      <div
+        className="absolute bottom-10 left-10 w-[400px] h-[400px] pointer-events-none -z-10 opacity-20"
+        style={{
+          background: "radial-gradient(circle, var(--accent-primary-light) 0%, transparent 70%)",
+          filter: "blur(90px)",
         }}
       />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="system-card p-8 w-full max-w-md relative z-10 border rounded-2xl shadow-card"
+      {/* Cyber Grid Texture */}
+      <div
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none -z-20"
         style={{
-          background: "var(--bg-abyss)",
-          borderColor: "var(--border-subtle)",
+          backgroundImage:
+            "linear-gradient(var(--accent-primary) 1px, transparent 1px), linear-gradient(90deg, var(--accent-primary) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      {/* ─── Top Floating Navigation Bar ──────────────────────── */}
+      <div className="w-full max-w-lg mb-6 flex items-center justify-between z-20">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-secondary hover:text-text-primary px-4 py-2 rounded-xl border border-border-subtle bg-bg-abyss/80 hover:border-accent-primary transition-all group backdrop-blur-md cursor-pointer shadow-sm hover:shadow-[0_0_15px_var(--accent-primary-dim)]"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-accent-primary-light" />
+          <span>Back to Sylf</span>
+        </Link>
+
+        {/* Telemetry Status Chip */}
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border-subtle bg-bg-abyss/60 text-[10px] font-mono text-text-muted backdrop-blur-md">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>REGISTRATION: ACTIVE</span>
+        </div>
+      </div>
+
+      {/* ─── Main HUD System Terminal Card ────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-lg relative z-10 p-7 sm:p-10 rounded-2xl sm:rounded-3xl border border-border-active bg-bg-abyss/90 backdrop-blur-2xl shadow-2xl overflow-hidden"
+        style={{
+          boxShadow: "0 20px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px -10px var(--accent-primary-dim)",
         }}
       >
-        {/* Header */}
+        {/* Glowing Top Neon Accent Bar */}
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-accent-primary to-transparent opacity-90 shadow-[0_0_12px_var(--accent-primary)]" />
+
+        {/* Corner HUD Accents */}
+        <div className="absolute top-3 left-3 w-2 h-2 border-t-2 border-l-2 border-accent-primary/60" />
+        <div className="absolute top-3 right-3 w-2 h-2 border-t-2 border-r-2 border-accent-primary/60" />
+        <div className="absolute bottom-3 left-3 w-2 h-2 border-b-2 border-l-2 border-accent-primary/60" />
+        <div className="absolute bottom-3 right-3 w-2 h-2 border-b-2 border-r-2 border-accent-primary/60" />
+
+        {/* Card Header */}
         <div className="text-center mb-6">
-          <p
-            className="text-xs tracking-[0.2em] uppercase font-bold mb-2"
-            style={{ color: "var(--accent-text-light)", fontFamily: "'Rajdhani', sans-serif" }}
+          <div
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] tracking-[0.25em] uppercase font-bold border mb-3.5 shadow-sm"
+            style={{
+              background: "var(--accent-primary-dim)",
+              borderColor: "var(--accent-primary-mid)",
+              color: "var(--accent-text-light)",
+              fontFamily: "'Rajdhani', sans-serif",
+            }}
           >
-            INITIALIZE PLAYER DATA
-          </p>
+            <Sparkles className="w-3.5 h-3.5 text-accent-primary-light animate-pulse" />
+            <span>INITIALIZE PLAYER DATA</span>
+          </div>
+
           <h1
-            className="text-3xl font-bold uppercase tracking-wide"
-            style={{ fontFamily: "'Rajdhani', sans-serif", color: "var(--text-primary)" }}
+            className="text-3xl sm:text-4xl font-extrabold uppercase tracking-wider text-text-primary mb-1"
+            style={{
+              fontFamily: "'Rajdhani', sans-serif",
+              letterSpacing: "0.08em",
+            }}
           >
             Create Account
           </h1>
-          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+          <p className="text-xs mt-1.5 text-text-muted">
             Register qualifications to awaken as an E-Rank Scholar.
           </p>
         </div>
 
         {/* Error notification */}
         {error && (
-          <div
-            className="p-3 mb-4 rounded border text-xs flex items-center gap-2"
-            style={{
-              background: "rgba(239, 68, 68, 0.1)",
-              borderColor: "rgba(239, 68, 68, 0.3)",
-              color: "var(--accent-red)",
-              fontFamily: "'Rajdhani', sans-serif",
-            }}
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="p-3.5 mb-5 rounded-xl border text-xs flex items-center gap-2.5 bg-red-500/10 border-red-500/30 text-red-400 font-['Rajdhani'] font-semibold"
           >
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>{error}</span>
-          </div>
+          </motion.div>
         )}
 
         {/* OAuth Buttons */}
-        <OAuthButtons isLoading={isLoading} />
+        <div className="mb-6">
+          <OAuthButtons isLoading={isLoading} />
+        </div>
 
-        {/* Divider */}
+        {/* Hairline Divider */}
         <div className="relative my-6 text-center">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-border-subtle" />
           </div>
           <span
-            className="relative px-4 text-xs uppercase tracking-widest font-bold"
-            style={{ background: "var(--bg-abyss)", color: "var(--text-muted)" }}
+            className="relative px-3 py-0.5 text-[10px] tracking-[0.25em] uppercase font-bold font-['Rajdhani'] bg-bg-abyss text-text-muted border border-border-subtle/50 rounded-md"
           >
             OR CREDENTIALS
           </span>
         </div>
 
-        {/* Form */}
+        {/* Registration Form */}
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <label className="stat-label block mb-1">Display Name</label>
-            <input
-              type="text"
-              placeholder="Your full name"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input-field"
-              disabled={isLoading}
-              maxLength={30}
-            />
+            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
+              Display Name
+            </label>
+            <div className="relative flex items-center">
+              <div className="absolute left-3.5 text-text-muted pointer-events-none">
+                <User className="w-4 h-4" />
+              </div>
+              <input
+                type="text"
+                placeholder="Your full name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full text-sm py-3 pl-10 pr-4 rounded-xl border border-border-subtle bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none transition-all"
+                disabled={isLoading}
+                maxLength={30}
+              />
+            </div>
           </div>
 
           <div>
-            <label className="stat-label block mb-1">Scholar Username</label>
-            <div className="relative">
+            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
+              Scholar Username
+            </label>
+            <div className="relative flex items-center">
+              <div className="absolute left-3.5 text-text-muted pointer-events-none">
+                <AtSign className="w-4 h-4" />
+              </div>
               <input
                 type="text"
                 placeholder="your_username"
@@ -266,28 +326,28 @@ function RegisterForm() {
                 maxLength={20}
                 value={username}
                 onChange={handleUsernameChange}
-                className={`input-field font-mono text-sm pr-8 ${
+                className={`w-full font-mono text-sm py-3 pl-10 pr-10 rounded-xl border bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:outline-none transition-all ${
                   usernameStatus === "taken" || usernameStatus === "invalid"
-                    ? "border-red-500/70 focus:border-red-500"
+                    ? "border-red-500/70 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                     : usernameStatus === "available"
-                    ? "border-green-500/70 focus:border-green-500"
-                    : ""
+                    ? "border-emerald-500/70 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                    : "border-border-subtle focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
                 }`}
                 disabled={isLoading}
               />
               {usernameStatus === "checking" && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
+                <div className="absolute right-3.5 w-4 h-4 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
               )}
             </div>
 
             {/* Real-time username feedback */}
             {usernameMsg && (
               <p
-                className={`text-xs mt-1 font-['Rajdhani'] font-semibold ${
+                className={`text-xs mt-1.5 font-['Rajdhani'] font-semibold ${
                   usernameStatus === "taken" || usernameStatus === "invalid"
                     ? "text-red-400"
                     : usernameStatus === "available"
-                    ? "text-green-400"
+                    ? "text-emerald-400"
                     : "text-text-muted"
                 }`}
               >
@@ -296,28 +356,40 @@ function RegisterForm() {
             )}
 
             {!usernameMsg && (
-              <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+              <p className="text-[11px] mt-1.5 text-text-muted font-['Rajdhani']">
                 3-20 characters: lowercase letters, numbers, and underscores only.
               </p>
             )}
           </div>
 
           <div>
-            <label className="stat-label block mb-1">Email Address</label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
-              className="input-field"
-              disabled={isLoading}
-            />
+            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
+              Email Address
+            </label>
+            <div className="relative flex items-center">
+              <div className="absolute left-3.5 text-text-muted pointer-events-none">
+                <Mail className="w-4 h-4" />
+              </div>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
+                className="w-full text-sm py-3 pl-10 pr-4 rounded-xl border border-border-subtle bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none transition-all"
+                disabled={isLoading}
+              />
+            </div>
           </div>
 
           <div>
-            <label className="stat-label block mb-1">Password</label>
-            <div className="relative">
+            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
+              Password
+            </label>
+            <div className="relative flex items-center">
+              <div className="absolute left-3.5 text-text-muted pointer-events-none">
+                <Lock className="w-4 h-4" />
+              </div>
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="At least 6 characters"
@@ -325,26 +397,20 @@ function RegisterForm() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-field pr-10"
+                className="w-full text-sm py-3 pl-10 pr-11 rounded-xl border border-border-subtle bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none transition-all"
                 disabled={isLoading}
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
-                style={{ color: "var(--text-muted)" }}
+                className="absolute right-3 text-text-muted hover:text-text-primary transition-colors cursor-pointer p-1 rounded"
                 tabIndex={-1}
               >
                 {showPassword ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                  </svg>
+                  <EyeOff className="w-4 h-4" />
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
+                  <Eye className="w-4 h-4" />
                 )}
               </button>
             </div>
@@ -353,9 +419,12 @@ function RegisterForm() {
 
           <button
             type="submit"
-            className="btn-primary mt-2 w-full flex items-center justify-center gap-2"
+            className="btn-primary mt-3 w-full py-3.5 rounded-xl text-sm sm:text-base font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-[0_0_20px_var(--accent-primary-mid)] active:scale-[0.99] transition-all"
             disabled={isLoading || !isFormValid}
-            style={{ opacity: isLoading || !isFormValid ? 0.6 : 1, cursor: isFormValid ? "pointer" : "not-allowed" }}
+            style={{
+              opacity: isLoading || !isFormValid ? 0.6 : 1,
+              cursor: isFormValid ? "pointer" : "not-allowed",
+            }}
           >
             {isLoading ? (
               <>
@@ -363,19 +432,21 @@ function RegisterForm() {
                 <span>INITIALIZING SCHOLAR...</span>
               </>
             ) : (
-              <span>INITIALIZE SCHOLAR</span>
+              <>
+                <Zap className="w-4 h-4" />
+                <span>INITIALIZE SCHOLAR</span>
+              </>
             )}
           </button>
         </form>
 
         {/* Footer Link */}
-        <div className="text-center mt-6">
-          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+        <div className="text-center mt-7">
+          <p className="text-xs text-text-muted font-medium">
             Already have an active link?{" "}
             <Link
               href="/login?force=true"
-              className="font-bold hover:underline"
-              style={{ color: "var(--accent-text-light)" }}
+              className="font-bold hover:underline text-accent-text-light font-['Rajdhani'] ml-1 transition-colors"
             >
               Access System
             </Link>

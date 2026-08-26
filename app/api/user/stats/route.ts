@@ -90,12 +90,19 @@ export async function GET(req: NextRequest) {
 
     for (const s of todaySessions) {
       if (!s.endedAt) {
+        // Active (unended) session: count its already-flushed stored seconds.
+        // A session is "live" when it is freshly started (pre-first-flush,
+        // within 3 minutes) or has real flushed progress and is not a zombie
+        // (> 12h since start). Stale 0-second rows are ignored entirely.
         const started = new Date(s.startedAt);
         const elapsed = Math.floor((now.getTime() - started.getTime()) / 1000);
-        // Only count as actively in-progress if started recently (within last 3 minutes)
-        if (elapsed >= 0 && elapsed <= 180) {
-          activeSessionStartedAt = s.startedAt.toISOString();
-          todayStudySeconds += elapsed;
+        const stored = (s.durationSeconds || (s.durationMinutes * 60) || 0);
+        const isLive =
+          (elapsed >= 0 && elapsed <= 180) ||
+          (stored > 0 && elapsed > 0 && elapsed <= 12 * 3600);
+        if (isLive) {
+          todayStudySeconds += stored;
+          if (!activeSessionStartedAt) activeSessionStartedAt = s.startedAt.toISOString();
         }
       } else {
         const sec = (s.durationSeconds || (s.durationMinutes * 60) || 0);

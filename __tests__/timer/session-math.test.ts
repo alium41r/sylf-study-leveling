@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as auth from "@/lib/auth";
-import { PATCH as patchSession } from "@/app/api/sessions/route";
+import { PATCH as patchSession, POST as startSession } from "@/app/api/sessions/route";
 import {
   clampSessionSeconds,
   clampSessionBreakSeconds,
@@ -134,9 +134,10 @@ describe("Canonical Session Rewards", () => {
 });
 
 /* ═══════════════════════════════════════════════════════════
-   Route-level — server-side clamping + final-flag plumbed to RPC
+   Route-level — unified atomic settlement + final-flag plumbed to RPC
+   (wall-clock clamping now lives inside settle_study_session_atomic)
    ═══════════════════════════════════════════════════════════ */
-describe("PATCH /api/sessions — clamped, single-award pipeline", () => {
+describe("PATCH /api/sessions — unified settle pipeline", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(auth.verifyToken).mockResolvedValue({ userId: 1 } as any);
@@ -150,38 +151,44 @@ describe("PATCH /api/sessions — clamped, single-award pipeline", () => {
     });
   }
 
-  it("clamps an impossible duration and passes final=true to the RPC", async () => {
-    // Session started 10 minutes ago.
-    const startedAt = new Date(Date.now() - 10 * 60_000);
-    vi.spyOn(prisma.studySession, "findFirst").mockResolvedValue({
-      id: 5,
-      userId: 1,
-      startedAt,
-    } as any);
-
-    const rpcSpy = vi.spyOn(prisma, "$queryRaw").mockResolvedValue([
+  function settleMock(final: boolean, durationSeconds: number) {
+    return [
       {
-        complete_study_session: {
+        settle_study_session_atomic: {
+          success: true,
           sessionId: 5,
-          userId: 1,
-          durationMinutes: 11,
-          durationSeconds: 660,
-          deltaSeconds: 660,
-          awarded: true,
+          isFinal: final,
+          alreadyClaimed: false,
+          durationSeconds,
+          breakSeconds: 0,
+          deltaSeconds: durationSeconds,
+          awarded: final && durationSeconds >= 60,
           xpGained: 0,
           sylphGained: 0,
           totalSylphEarned: 0,
+          questCompleted: false,
+          questXp: 0,
+          questSylph: 0,
+          hpHealed: 0,
           level: 1,
           currentXP: 0,
           xpToNextLevel: 282,
           hunterRank: "E",
           levelsGained: 0,
           didRankUp: false,
+          nodeProgress: null,
+          masteryGranted: false,
         },
       },
-    ] as any);
+    ];
+  }
 
-    // Weekly-milestone dependencies
+  it("passes the claimed duration and final=true to the unified settle RPC", async () => {
+    const rpcSpy = vi
+      .spyOn(prisma, "$queryRaw")
+      .mockResolvedValue(settleMock(true, 7200) as any);
+
+    // Weekly-milestone dependencies (aggregate < 180 min → no streak write)
     vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
       id: 1,
       timezone: "UTC",
@@ -192,63 +199,36 @@ describe("PATCH /api/sessions — clamped, single-award pipeline", () => {
     vi.spyOn(prisma.studySession, "aggregate").mockResolvedValue({
       _sum: { durationMinutes: 10 },
     } as any);
-    vi.spyOn(prisma.studySession, "findUnique").mockResolvedValue({
-      id: 5,
-      durationMinutes: 11,
-      durationSeconds: 660,
-      startedAt,
-      endedAt: new Date(),
-    } as any);
 
-    // Client lies: claims 2 hours (7200s) for a 10-minute-old session.
+    // Client claims 2 hours (7200s) — the route no longer pre-clamps; the
+    // wall-clock clamp runs inside the RPC against the locked session row.
     const res = await patchSession(
       authedPatch({ id: 5, durationMinutes: 120, durationSeconds: 7200, final: true })
     );
 
     expect(res.status).toBe(200);
 
-    // Template-literal call: (strings, userId, id, minutes, seconds, questId,
-    // breakSeconds, final) — the literal subjectId null and focus rate 80 stay
-    // inline in the SQL text.
+    // Template-literal call: (strings, userId, id, seconds, breakSeconds,
+    // questId, subjectId, completeQuest, final, userLocalDate)
     const args = rpcSpy.mock.calls[0] as unknown[];
     expect(args[1]).toBe(1); // userId
     expect(args[2]).toBe(5); // sessionId
-    expect(args[3]).toBe(11); // clamped minutes = floor(660/60)
-    expect(args[4]).toBe(660); // clamped seconds = 600 elapsed + 60 grace
+    expect(args[3]).toBe(7200); // claimed seconds (RPC clamps internally)
+    expect(args[4]).toBe(0); // breakSeconds (no breaks on this flush)
     expect(args[5]).toBe(null); // questId
-    expect(args[6]).toBe(0); // breakSeconds (no breaks on this flush)
-    expect(args[7]).toBe(true); // final flag → single canonical award point
+    expect(args[6]).toBe(null); // subjectId (session row already owns it)
+    expect(args[7]).toBe(false); // completeQuest
+    expect(args[8]).toBe(true); // final flag → single canonical award point
+    expect(args[9]).toEqual(expect.any(String)); // user-local date
+
+    const data = await res.json();
+    expect(data.questCompletedNow).toBe(false);
   });
 
   it("marks non-final checkpoint flushes with final=false", async () => {
-    const startedAt = new Date(Date.now() - 10 * 60_000);
-    vi.spyOn(prisma.studySession, "findFirst").mockResolvedValue({
-      id: 5,
-      userId: 1,
-      startedAt,
-    } as any);
-
-    const rpcSpy = vi.spyOn(prisma, "$queryRaw").mockResolvedValue([
-      {
-        complete_study_session: {
-          sessionId: 5,
-          userId: 1,
-          durationMinutes: 3,
-          durationSeconds: 180,
-          deltaSeconds: 180,
-          awarded: false,
-          xpGained: 0,
-          sylphGained: 0,
-          totalSylphEarned: 0,
-          level: 1,
-          currentXP: 0,
-          xpToNextLevel: 282,
-          hunterRank: "E",
-          levelsGained: 0,
-          didRankUp: false,
-        },
-      },
-    ] as any);
+    const rpcSpy = vi
+      .spyOn(prisma, "$queryRaw")
+      .mockResolvedValue(settleMock(false, 180) as any);
 
     vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
       id: 1,
@@ -260,13 +240,6 @@ describe("PATCH /api/sessions — clamped, single-award pipeline", () => {
     vi.spyOn(prisma.studySession, "aggregate").mockResolvedValue({
       _sum: { durationMinutes: 3 },
     } as any);
-    vi.spyOn(prisma.studySession, "findUnique").mockResolvedValue({
-      id: 5,
-      durationMinutes: 3,
-      durationSeconds: 180,
-      startedAt,
-      endedAt: new Date(),
-    } as any);
 
     const res = await patchSession(
       authedPatch({ id: 5, durationMinutes: 3, durationSeconds: 180 })
@@ -274,8 +247,66 @@ describe("PATCH /api/sessions — clamped, single-award pipeline", () => {
 
     expect(res.status).toBe(200);
     const args = rpcSpy.mock.calls[0] as unknown[];
-    expect(args[4]).toBe(180);
-    expect(args[6]).toBe(0); // breakSeconds (no breaks on this flush)
-    expect(args[7]).toBe(false); // auto-save flush: no reward award
+    expect(args[3]).toBe(180);
+    expect(args[8]).toBe(false); // auto-save flush: no reward award, no endedAt
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════
+   POST /api/sessions — validation & start-RPC plumbing (T3)
+   ═══════════════════════════════════════════════════════════ */
+describe("POST /api/sessions — validation", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(auth.verifyToken).mockResolvedValue({ userId: 1 } as any);
+  });
+
+  function authedPost(body: unknown) {
+    return new NextRequest("http://localhost/api/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer t" },
+      body: JSON.stringify(body),
+    });
+  }
+
+  it("returns 400 for invalid initialSeconds", async () => {
+    const res = await startSession(authedPost({ initialSeconds: -5 }));
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 401 without a token", async () => {
+    const res = await startSession(
+      new NextRequest("http://localhost/api/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      })
+    );
+    expect(res.status).toBe(401);
+  });
+
+  it("passes subjectId and initialSeconds through to the start RPC", async () => {
+    const rpcSpy = vi.spyOn(prisma, "$queryRaw").mockResolvedValue([
+      {
+        start_study_session: {
+          id: 77,
+          userId: 1,
+          questId: null,
+          subjectId: 3,
+          durationMinutes: 0,
+          durationSeconds: 0,
+          focusRate: 80,
+          startedAt: "2026-08-26T00:00:00.000Z",
+        },
+      },
+    ] as any);
+
+    const res = await startSession(authedPost({ subjectId: 3, initialSeconds: 900 }));
+    expect(res.status).toBe(201);
+    const args = rpcSpy.mock.calls[0] as unknown[];
+    expect(args[1]).toBe(1); // userId
+    expect(args[2]).toBe(null); // questId
+    expect(args[3]).toBe(3); // subjectId
+    expect(args[4]).toBe(900); // initialSeconds (bounded server-side by the RPC)
   });
 });

@@ -30,6 +30,15 @@ export function isRedisEnabled(): boolean {
   return getRedisClient() !== null;
 }
 
+/**
+ * The raw Redis client (or null when not configured). Exposed for
+ * counter-style operations (e.g. rate limiting) that need atomic
+ * INCR/EXPIRE rather than the read-through cache helper.
+ */
+export function getRedisInstance(): Redis | null {
+  return getRedisClient();
+}
+
 // ── In-process fallback cache (LRU-ish, bounded) ──────────────
 const MAX_MEMORY_ENTRIES = 500;
 const memoryCache = new Map<string, { value: unknown; expiresAt: number }>();

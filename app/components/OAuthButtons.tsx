@@ -23,24 +23,11 @@ export default function OAuthButtons({ isLoading: parentLoading }: OAuthButtonsP
         type="button"
         onClick={handleGoogleClick}
         disabled={isBusy}
-        className="group relative w-full flex items-center justify-center gap-3 px-4 py-3 rounded border transition-all duration-200"
+        className="group relative w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-void/60 hover:bg-bg-void/90 text-text-primary hover:border-border-active transition-all duration-200 shadow-sm cursor-pointer disabled:opacity-60"
         style={{
-          background: "var(--bg-abyss)",
-          borderColor: "var(--border-subtle)",
-          color: "var(--text-primary)",
           fontFamily: "'Rajdhani', sans-serif",
-          fontWeight: 600,
-          letterSpacing: "0.05em",
-        }}
-        onMouseEnter={(e) => {
-          if (!isBusy) {
-            e.currentTarget.style.borderColor = "var(--border-active)";
-            e.currentTarget.style.boxShadow = "var(--glow-purple)";
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "var(--border-subtle)";
-          e.currentTarget.style.boxShadow = "none";
+          fontWeight: 700,
+          letterSpacing: "0.06em",
         }}
       >
         {loadingProvider === "google" ? (
@@ -71,7 +58,7 @@ export default function OAuthButtons({ isLoading: parentLoading }: OAuthButtonsP
             />
           </svg>
         )}
-        <span className="text-sm uppercase">
+        <span className="text-sm uppercase tracking-wider font-bold">
           {loadingProvider === "google"
             ? "Connecting to Google..."
             : "Continue with Google"}

@@ -68,7 +68,9 @@ export async function GET(req: NextRequest) {
 
     const enriched = subjects.map((sub: any) => {
       const todaySeconds = sub.sessions.reduce((acc: number, session: any) => {
-        if (!session.endedAt) return acc;
+        // Both ended sessions and active (unended) sessions contribute their
+        // stored durationSeconds — active sessions keep endedAt = NULL between
+        // flushes now, so their flushed progress must still count.
         return acc + (session.durationSeconds || (session.durationMinutes * 60) || 0);
       }, 0);
 

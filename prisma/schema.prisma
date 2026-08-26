@@ -799,3 +799,21 @@ model FloatingRestDay {
   @@unique([userId, dateKey])
   @@index([userId, weekKey])
 }
+
+// ─── Pre-Launch Waitlist ──────────────────────────────────────
+model WaitlistEntry {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  name          String?
+  targetExam    String?  // e.g. "MCAT", "USMLE", "A-Levels", "AP Exams", "Computer Science", "Engineering", "General Study"
+  scholarClass  String?  // e.g. "SCHOLAR", "ANALYST", "ENGINEER", "SCIENTIST", "RESEARCHER", "PSYCHOLOGIST", "STRATEGIST", "CREATIVE"
+  referralCode  String   @unique
+  referredBy    String?  // referralCode of who referred them
+  referralCount Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@index([email])
+  @@index([referralCode])
+  @@index([createdAt(sort: Desc)])
+}
+

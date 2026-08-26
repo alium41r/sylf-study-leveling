@@ -38,14 +38,15 @@ describe("Gamification Engine Phase 5 — Surface Layer, Edge Projections & Stud
     });
 
     it("derives levelProgress accurately on profile cards using getLevelProgress", () => {
-      // Level 1: 0 to 282 XP. At 141 XP -> 50%
-      expect(getLevelProgress(141, 1).progressPercentage).toBe(50);
+      // Level 1 bracket: base 100 → bucket 182 (282 − 100). At 191 lifetime XP (91 in) → 50%
+      expect(getLevelProgress(191, 1).progressPercentage).toBe(50);
 
-      // Level 1: At 0 XP -> 0%
+      // Level 1: at/below the 100 XP entry threshold → 0%
+      expect(getLevelProgress(100, 1).progressPercentage).toBe(0);
       expect(getLevelProgress(0, 1).progressPercentage).toBe(0);
 
-      // Level 2: 282 to 520 XP (Diff = 238 XP). At 401 XP (Diff = 119) -> 50%
-      expect(getLevelProgress(401, 2).progressPercentage).toBe(50);
+      // Level 2: 282 to 519 (bucket 237). At 400 XP (118 in) → 49%
+      expect(getLevelProgress(400, 2).progressPercentage).toBe(Math.floor((118 / 237) * 100));
     });
   });
 

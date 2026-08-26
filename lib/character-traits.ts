@@ -1,7 +1,7 @@
 import { resolveFormUrl, resolvePedestalUrl, resolveRelicUrl } from "./asset-manifest";
 
 export interface CharacterConfig {
-  outfit: string; // Active Hunter Form key (default: "default_hunter")
+  outfit: string; // Active Hunter Form key (default: "form_tanjiro")
   pedestal: string; // Active platform SVG (default: "pedestal_cyber")
   pedestalKey?: string; // Backwards-compatible alias for pedestal
   aura?: string; // Active aura key (default: "none")
@@ -25,7 +25,7 @@ export interface CharacterConfig {
 }
 
 export const DEFAULT_CHARACTER_CONFIG: CharacterConfig = {
-  outfit: "default_hunter",
+  outfit: "form_tanjiro",
   pedestal: "pedestal_cyber",
   pedestalKey: "pedestal_cyber",
   aura: "none",
@@ -52,19 +52,151 @@ export interface HairStyleOption extends TraitOption {
   base: number;
 }
 
-// ─── 1. Baseline Hunter Forms (Single Default Base Model) ───────
+// ─── 1. Baseline Hunter Forms ────────────────────────────────────
 
 export const FULL_BODY_FORMS: TraitOption[] = [
   {
-    id: "form_default_hunter",
-    label: "Default Hunter Base",
-    value: "default_hunter",
-    tier: 1,
-    rarity: "COMMON",
+    id: "form_tanjiro",
+    label: "Tanjiro Kamado",
+    value: "form_tanjiro",
+    tier: 2,
+    rarity: "RARE",
     requiredRank: "RANK E",
     requiredLevel: 1,
-    description: "Standard Hunter recruit base model with neural focus readiness.",
-    imagePath: "/sprites/character/forms/default_hunter.png",
+    description: "Sun-breathing demon slayer swordsman clad in the iconic black and green checkered haori.",
+    imagePath: "/sprites/character/forms/form_tanjiro.png",
+  },
+  {
+    id: "form_gojo",
+    label: "Satoru Gojo",
+    value: "form_gojo",
+    tier: 5,
+    rarity: "MYTHIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Special Grade jujutsu sorcerer wielding the Six Eyes and limitless spatial infinity.",
+    imagePath: "/sprites/character/forms/form_gojo.png",
+  },
+  {
+    id: "form_uzui",
+    label: "Tengen Uzui",
+    value: "form_uzui",
+    tier: 4,
+    rarity: "EPIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Flamboyant Sound Hashira adorned in gemstone headwear and tactical shinobi garb.",
+    imagePath: "/sprites/character/forms/form_uzui.png",
+  },
+  {
+    id: "form_itadori",
+    label: "Yuji Itadori",
+    value: "form_itadori",
+    tier: 2,
+    rarity: "RARE",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Superhuman jujutsu vessel with radiant red hood collar and explosive physical prowess.",
+    imagePath: "/sprites/character/forms/form_itadori.png",
+  },
+  {
+    id: "form_shinobu",
+    label: "Shinobu Kocho",
+    value: "form_shinobu",
+    tier: 3,
+    rarity: "EPIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Insect Hashira moving with butterfly lightness and lethal wisteria poison finesse.",
+    imagePath: "/sprites/character/forms/form_shinobu.png",
+  },
+  {
+    id: "form_mitsuri",
+    label: "Mitsuri Kanroji",
+    value: "form_mitsuri",
+    tier: 3,
+    rarity: "EPIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Love Hashira wielding flexible whip-like blade with boundless passion and power.",
+    imagePath: "/sprites/character/forms/form_mitsuri.png",
+  },
+  {
+    id: "form_megumi",
+    label: "Megumi Fushiguro",
+    value: "form_megumi",
+    tier: 3,
+    rarity: "RARE",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Ten Shadows sorcerer summoning divine hounds and shadow shikigami.",
+    imagePath: "/sprites/character/forms/form_megumi.png",
+  },
+  {
+    id: "form_nezuko",
+    label: "Nezuko Kamado",
+    value: "form_nezuko",
+    tier: 4,
+    rarity: "EPIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Awakened demon girl wielding ferocious blood demon art pyrokinesis in pink kimono.",
+    imagePath: "/sprites/character/forms/form_nezuko.png",
+  },
+  {
+    id: "form_nobara",
+    label: "Nobara Kugisaki",
+    value: "form_nobara",
+    tier: 2,
+    rarity: "RARE",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Fearless Tokyo sorceress wielding straw doll resonance with hammer and nails.",
+    imagePath: "/sprites/character/forms/form_nobara.png",
+  },
+  {
+    id: "form_rengoku",
+    label: "Kyojuro Rengoku",
+    value: "form_rengoku",
+    tier: 5,
+    rarity: "MYTHIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Valiant Flame Hashira setting his heart ablaze with devastating ninth form flame breathing.",
+    imagePath: "/sprites/character/forms/form_rengoku.png",
+  },
+  {
+    id: "form_megumin",
+    label: "Megumin",
+    value: "form_megumin",
+    tier: 4,
+    rarity: "EPIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Crimson Magic arch-wizard unleashing unrivaled Explosion magic with wizard hat and staff.",
+    imagePath: "/sprites/character/forms/form_megumin.png",
+  },
+  {
+    id: "form_choso",
+    label: "Choso",
+    value: "form_choso",
+    tier: 4,
+    rarity: "EPIC",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Eldest Death Painting Womb master wielding lethal Blood Manipulation and Piercing Blood.",
+    imagePath: "/sprites/character/forms/form_choso.png",
+  },
+  {
+    id: "form_eren",
+    label: "Eren Yeager",
+    value: "form_eren",
+    tier: 4,
+    rarity: "LEGENDARY",
+    requiredRank: "RANK E",
+    requiredLevel: 1,
+    description: "Scout Regiment vanguard equipped with Omni-Directional Mobility gear and dual snap-blades.",
+    imagePath: "/sprites/character/forms/form_eren.png",
   },
 ];
 
@@ -146,7 +278,7 @@ export const ACCESSORY_STYLES: TraitOption[] = [{ id: "none", label: "No Headgea
  */
 export function getDefaultCharacterConfig(seed: string = "scholar"): CharacterConfig {
   return {
-    outfit: "default_hunter",
+    outfit: "form_tanjiro",
     pedestal: "pedestal_cyber",
     pedestalKey: "pedestal_cyber",
     aura: "none",
@@ -162,7 +294,7 @@ export function getDefaultCharacterConfig(seed: string = "scholar"): CharacterCo
 export function generateRandomCharacterConfig(): CharacterConfig {
   const randomSeed = Math.random().toString(36).substring(2, 9);
   return {
-    outfit: "default_hunter",
+    outfit: "form_tanjiro",
     pedestal: "pedestal_cyber",
     pedestalKey: "pedestal_cyber",
     aura: "none",
@@ -185,7 +317,7 @@ export function getSpriteLayers(config?: CharacterConfig | null, seedFallback: s
 
   const pedestalKey = cfg.pedestal || cfg.pedestalKey || "pedestal_cyber";
   const auraKey = cfg.aura || "none";
-  const outfitKey = cfg.outfit || "default_hunter";
+  const outfitKey = cfg.outfit && cfg.outfit !== "default_hunter" ? cfg.outfit : "form_tanjiro";
   const relicKey = cfg.relic && cfg.relic !== "none" ? cfg.relic : cfg.weapon && cfg.weapon !== "none" ? cfg.weapon : null;
 
   const pedestalUrl = resolvePedestalUrl(pedestalKey);

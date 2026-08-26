@@ -9,14 +9,12 @@ import {
 } from "@/lib/game-engine";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 import { revalidateTag } from "next/cache";
-import {
-  clampSessionSeconds,
-  clampSessionBreakSeconds,
-} from "@/lib/session-math";
+import { TimezoneService } from "@/lib/timezone-service";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
   subjectId: z.number().int().optional(),
+  initialSeconds: z.number().int().min(0).optional(),
 });
 
 const endSessionSchema = z.object({
@@ -29,19 +27,22 @@ const endSessionSchema = z.object({
   final: z.boolean().optional(),
 });
 
-interface SessionRewardClaimInput {
-  userId: number;
-  sessionId: number;
-  xp: number;
-  sylph: number;
-  nodeId: number | null;
-  progressDelta: number;
-}
-
-interface SessionRewardClaimResult {
+interface SettleResult {
   success: boolean;
+  sessionId: number;
+  isFinal: boolean;
+  alreadyClaimed: boolean;
+  durationSeconds: number;
+  breakSeconds: number;
+  deltaSeconds: number;
+  awarded: boolean;
   xpGained: number;
   sylphGained: number;
+  totalSylphEarned: number;
+  questCompleted: boolean;
+  questXp: number;
+  questSylph: number;
+  hpHealed: number;
   level: number;
   currentXP: number;
   xpToNextLevel: number;
@@ -52,68 +53,14 @@ interface SessionRewardClaimResult {
   masteryGranted: boolean;
 }
 
-const EMPTY_SESSION_CLAIM: SessionRewardClaimResult = {
-  success: false,
-  xpGained: 0,
-  sylphGained: 0,
-  level: 1,
-  currentXP: 0,
-  xpToNextLevel: 282,
-  hunterRank: "E",
-  levelsGained: 0,
-  didRankUp: false,
-  nodeProgress: null,
-  masteryGranted: false,
-};
-
-/**
- * Delegates XP/Sylph/node-progress mutations to the atomic,
- * row-locked SECURITY DEFINER RPC claim_session_reward_atomic.
- * ALREADY_CLAIMED (S0001) is absorbed into a no-op result so
- * client retries never double-award and never hard-fail.
- */
-async function claimSessionRewardAtomic(input: SessionRewardClaimInput): Promise<SessionRewardClaimResult> {
-  try {
-    const rows = await prisma.$queryRawUnsafe<
-      Array<{
-        claim_session_reward_atomic: {
-          success: boolean;
-          xpGained: number;
-          sylphGained: number;
-          level: number;
-          currentXP: number;
-          xpToNextLevel: number;
-          hunterRank: string;
-          levelsGained: number;
-          didRankUp: boolean;
-          nodeProgress: number | null;
-          masteryGranted: boolean;
-        };
-      }>
-    >(
-      `SELECT public.claim_session_reward_atomic($1::text, $2::text, $3::int, $4::int, $5::text, $6::numeric) AS claim_session_reward_atomic`,
-      String(input.userId),
-      String(input.sessionId),
-      input.xp,
-      input.sylph,
-      input.nodeId === null ? null : String(input.nodeId),
-      String(input.progressDelta)
-    );
-    const result = rows[0]?.claim_session_reward_atomic;
-    if (!result) throw new Error("claim_session_reward_atomic returned no result");
-    return result;
-  } catch (err: any) {
-    if (err?.code === "S0001" || /ALREADY_CLAIMED/.test(err?.message || "")) {
-      return { ...EMPTY_SESSION_CLAIM, success: true };
-    }
-    throw err;
-  }
-}
-
 /**
  * POST /api/sessions
- * Start a new study session. Optionally link it to a quest.
- */export async function POST(req: NextRequest) {
+ * Start a new study session (optionally linked to a quest). When the client
+ * has already accumulated focus seconds before the row existed (lazy start),
+ * initialSeconds backdates the session's startedAt so the server-side
+ * wall-clock clamp never truncates legitimate carried-over time.
+ */
+export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -134,7 +81,7 @@ async function claimSessionRewardAtomic(input: SessionRewardClaimInput): Promise
       );
     }
 
-    const { questId, subjectId } = validation.data;
+    const { questId, subjectId, initialSeconds } = validation.data;
 
     // Execute atomic PostgreSQL start_study_session RPC
     const rows = await prisma.$queryRaw<
@@ -143,7 +90,8 @@ async function claimSessionRewardAtomic(input: SessionRewardClaimInput): Promise
       SELECT public.start_study_session(
         ${payload.userId as number},
         ${questId ?? null},
-        ${subjectId ?? null}
+        ${subjectId ?? null},
+        ${initialSeconds ?? 0}
       ) AS start_study_session
     `;
 
@@ -157,7 +105,11 @@ async function claimSessionRewardAtomic(input: SessionRewardClaimInput): Promise
 
 /**
  * PATCH /api/sessions
- * End a study session. Updates duration and the user's total study minutes.
+ * Heartbeat / final settlement. ALL session + quest + node + progression
+ * mutations happen inside a single atomic PostgreSQL RPC
+ * (settle_study_session_atomic): session duration (exact delta accounting),
+ * quest completion (with early/GateKey/streak modifiers and HP heal),
+ * syllabus node progress, XP/Sylph progression, ledgers, and system messages.
  */
 export async function PATCH(req: NextRequest) {
   try {
@@ -183,205 +135,52 @@ export async function PATCH(req: NextRequest) {
     const { id, durationMinutes, durationSeconds, breakSeconds, questId, completeQuest, final } = validation.data;
     const claimedSeconds = durationSeconds ?? durationMinutes * 60;
 
-    // ─── PARALLEL READ PHASE ────────────────────────────────────
-    // Session ownership, quest (+ node) and user profile are independent —
-    // fetching them in parallel instead of sequentially removes several
-    // round-trips (~2-3s → sub-second), which is what made "End Session"
-    // feel unresponsive and pushed the request toward function timeouts.
-    const [existing, quest, userRow] = await Promise.all([
-      prisma.studySession.findFirst({
-        where: { id, userId: payload.userId as number },
-      }),
-      questId
-        ? prisma.quest.findFirst({
-            where: { id: Number(questId), userId: payload.userId as number },
-            include: {
-              subjectNode: {
-                select: {
-                  id: true,
-                  progress: true,
-                  isMastered: true,
-                  masteredAt: true,
-                  spAward: true,
-                  nodeId: true,
-                  title: true,
-                },
-              },
-            },
-          })
-        : Promise.resolve(null),
-      prisma.user.findUnique({
-        where: { id: payload.userId as number },
-        select: { id: true, username: true, timezone: true, lastActiveDate: true, streakDays: true, level: true },
-      }) as Promise<{ id: number; username: string | null; timezone: string | null; lastActiveDate: string | null; streakDays: number; level: number } | null>,
-    ]);
-    if (!existing) {
-      return NextResponse.json({ error: "Session not found" }, { status: 404 });
-    }
+    const userRow = await prisma.user.findUnique({
+      where: { id: payload.userId as number },
+      select: { id: true, username: true, timezone: true, lastActiveDate: true, streakDays: true, level: true },
+    }).catch(() => null);
 
-    // ─── SERVER-SIDE TIMESTAMP CLAMPING ───────────────────────
-    // The claimed duration can never exceed wall-clock elapsed time
-    // since session start (+ a small grace window). This defeats both
-    // unit-mismatch inflation (seconds passed as minutes) and spoofing.
-    const startedAtMs = new Date(existing.startedAt).getTime();
-    const actualSeconds = Number.isFinite(startedAtMs)
-      ? clampSessionSeconds(claimedSeconds, startedAtMs)
-      : Math.max(0, Math.floor(claimedSeconds || 0));
-    const actualMinutes = Math.floor(actualSeconds / 60);
-    // Break time is informational only (never rewarded), but must stay
-    // honest: focus + break can never exceed the wall-clock window + grace.
-    const actualBreakSeconds = Number.isFinite(startedAtMs)
-      ? clampSessionBreakSeconds(breakSeconds ?? 0, startedAtMs, actualSeconds)
-      : Math.max(0, Math.floor(breakSeconds || 0));
+    const userLocalDate = userRow
+      ? TimezoneService.getUserLocalDate(userRow.timezone || "UTC")
+      : null;
 
-    // Execute atomic PostgreSQL complete_study_session RPC.
-    // The RPC performs exact delta accounting against the previously
-    // credited duration and awards canonical rewards only on final.
-    const rows = await prisma.$queryRaw<
-      [{ complete_study_session: { sessionId: number; userId: number; durationMinutes: number; durationSeconds: number; deltaSeconds: number; awarded: boolean; xpGained: number; sylphGained: number; totalSylphEarned: number; level: number; currentXP: number; xpToNextLevel: number; hunterRank: string; levelsGained: number; didRankUp: boolean } }]
-    >`
-      SELECT public.complete_study_session(
-        ${payload.userId as number},
-        ${id},
-        ${actualMinutes},
-        ${actualSeconds},
-        ${questId ?? null},
-        null,
-        ${actualBreakSeconds},
-        80,
-        ${final === true}
-      ) AS complete_study_session
-    `;
-
-    const rpcResult = rows[0]?.complete_study_session;
-    const sessionDeltaSeconds = rpcResult?.deltaSeconds ?? 0;
-    let questCompletedNow = false;
-
-    // Reconcile Quest & Subject Node Progress.
-    // NOTE: the RPC has already added THIS flush's delta to
-    // Quest.elapsedSeconds — re-read the fresh value so completion
-    // checks and node-progress ratios never double-count.
-    if (questId && quest) {
-      // Quests are open (completable / progressable) in any of these states.
-      // Quests started from the Timer page are moved to IN_PROGRESS by
-      // PATCH /api/quests/:id, and restricting to "ACTIVE" meant those quests
-      // could NEVER be completed — they stayed "In Progress" forever.
-      const isOpenQuest =
-        quest.status === "ACTIVE" ||
-        quest.status === "IN_PROGRESS" ||
-        quest.status === "PENDING";
-      if (isOpenQuest) {
-        const targetDuration = (quest.targetMinutes || quest.requiredMinutes || 45) * 60;
-        // The RPC added THIS flush's delta to Quest.elapsedSeconds; the quest
-        // row above was read before the RPC, so fold the delta in to get the
-        // FRESH total for completion checks and reward scaling.
-        const totalQuestElapsed = (quest.elapsedSeconds || 0) + Math.max(0, sessionDeltaSeconds);
-        const shouldComplete = completeQuest === true || totalQuestElapsed >= targetDuration;
-
-        if (shouldComplete) {
-          // Reward policy:
-          //  • Full duration reached (or exceeded) → FULL quest reward.
-          //  • Explicit "Complete Quest" press with less time → the quest is
-          //    still marked COMPLETED, but rewards scale with the fraction of
-          //    time actually studied — the full XP/Sylph is NOT granted
-          //    unless the quest's total duration was genuinely completed.
-          const completionRatio = Math.min(1.0, targetDuration > 0 ? totalQuestElapsed / targetDuration : 1);
-          const fullDurationReached = totalQuestElapsed >= targetDuration;
-          const xpAward = fullDurationReached
-            ? quest.xpReward
-            : Math.floor(quest.xpReward * completionRatio);
-          const sylphAward = fullDurationReached
-            ? quest.sylphReward
-            : Math.floor(quest.sylphReward * completionRatio);
-
-          // Node progress mirrors the reward: full scope weight at full
-          // completion, scaled by studied time otherwise.
-          const deltaProgress = fullDurationReached
-            ? Math.min(100.0, Math.max(5.0, Math.floor(quest.scopeWeight * 100)))
-            : Math.min(100.0, Math.max(0, Math.floor(quest.scopeWeight * 100 * completionRatio)));
-
-          const claimResult = await claimSessionRewardAtomic({
-            userId: payload.userId as number,
-            sessionId: id,
-            xp: xpAward,
-            sylph: sylphAward,
-            nodeId: quest.subjectNodeId ?? null,
-            progressDelta: deltaProgress,
-          });
-
-          // 2. Mark Quest as Completed (status only — elapsedSeconds was
-          //    already credited exactly by the RPC's delta accounting).
-          await prisma.quest.update({
-            where: { id: quest.id },
-            data: {
-              status: "COMPLETED",
-              completedAt: new Date(),
-            },
-          });
-          questCompletedNow = true;
-
-          // 3. Reward & mastery announcements
-          await prisma.systemMessage.create({
-            data: {
-              userId: payload.userId as number,
-              type: "REWARD",
-              content: fullDurationReached
-                ? `**🏆 QUEST COMPLETED: ${quest.title}**\n\nTarget Duration: ${quest.targetMinutes || quest.requiredMinutes || 45} mins.\n\nRewards Claimed: **+${quest.xpReward} XP** • **+${quest.sylphReward} Sylph**.`
-                : `**🏆 QUEST COMPLETED EARLY: ${quest.title}**\n\nStudied ${Math.floor(completionRatio * 100)}% of the target — rewards scaled to time studied.\n\nRewards Claimed: **+${xpAward} XP** • **+${sylphAward} Sylph** (full reward unlocks at ${quest.targetMinutes || quest.requiredMinutes || 45} mins).`,
-            },
-          });
-
-          if (claimResult.masteryGranted && quest.subjectNode) {
-            await prisma.systemMessage.create({
-              data: {
-                userId: payload.userId as number,
-                type: "REWARD",
-                content: `**🎯 SYLLABUS NODE MASTERED: ${quest.subjectNode.title}**\n\nYou achieved 100% mastery on node **${quest.subjectNode.nodeId}**!\n\nReward Minted: **+${quest.subjectNode.spAward} Subject SP**.`,
-              },
-            });
-          }
-        } else {
-          // Quest is NOT completed yet. elapsedSeconds was already credited
-          // exactly by the RPC (delta accounting) — advance the syllabus node
-          // proportionally to THIS flush's delta only.
-          if (quest.subjectNodeId && quest.subjectNode) {
-            const node = quest.subjectNode;
-            const completionRatio = Math.min(1.0, sessionDeltaSeconds / targetDuration);
-            const rawDelta = Math.floor(quest.scopeWeight * 100 * completionRatio);
-            const deltaProgress = sessionDeltaSeconds >= 30 ? Math.min(100.0, Math.max(1.0, rawDelta)) : 0;
-
-            const claimResult = await claimSessionRewardAtomic({
-              userId: payload.userId as number,
-              sessionId: id,
-              xp: 0,
-              sylph: 0,
-              nodeId: node.id,
-              progressDelta: deltaProgress,
-            });
-
-            if (claimResult.masteryGranted) {
-              await prisma.systemMessage.create({
-                data: {
-                  userId: payload.userId as number,
-                  type: "REWARD",
-                  content: `**🎯 SYLLABUS NODE MASTERED: ${node.title}**\n\nYou achieved 100% mastery on node **${node.nodeId}**!\n\nReward Minted: **+${node.spAward} Subject SP**.`,
-                },
-              });
-            }
-          }
-        }
+    // ─── SINGLE ATOMIC SETTLEMENT ──────────────────────────────
+    // Session upsert, wall-clock clamp, exact delta accounting, quest
+    // completion, node progress, progression, ledgers, and messages all
+    // commit or roll back together inside this one RPC call.
+    let rpcResult: SettleResult;
+    try {
+      const rows = await prisma.$queryRaw<[{ settle_study_session_atomic: SettleResult }]>`
+        SELECT public.settle_study_session_atomic(
+          ${payload.userId as number},
+          ${id},
+          ${claimedSeconds},
+          ${breakSeconds ?? 0},
+          ${questId ?? null},
+          ${null},
+          ${completeQuest === true},
+          ${final === true},
+          ${userLocalDate}
+        ) AS settle_study_session_atomic
+      `;
+      rpcResult = rows[0]?.settle_study_session_atomic;
+    } catch (err: any) {
+      const msg = err?.message || "";
+      if (/Session not found/.test(msg)) {
+        return NextResponse.json({ error: "Session not found" }, { status: 404 });
       }
+      throw err;
     }
 
-    // Handle weekly milestone check. The weekly aggregation is skipped as
-    // soon as this week's streak was already recorded (the common case) —
-    // it was one of the slowest queries on every flush.
+    if (!rpcResult) {
+      return NextResponse.json({ error: "Settlement failed" }, { status: 500 });
+    }
+
+    // ─── WEEKLY STREAK (idempotent conditional update) ─────────
     let weeklyAwarded = false;
     if (userRow) {
       const bounds = getWeeklyBounds(new Date(), userRow.timezone || "UTC");
-      if (userRow.lastActiveDate === bounds.weekKey) {
-        weeklyAwarded = true; // already recorded this week
-      } else {
+      if (userRow.lastActiveDate !== bounds.weekKey) {
         const weekSessions = await prisma.studySession.aggregate({
           _sum: { durationMinutes: true },
           where: {
@@ -406,23 +205,13 @@ export async function PATCH(req: NextRequest) {
             !!freezeItem
           );
 
-          if (streakResult.freezeUsed && freezeItem) {
-            await prisma.inventoryItem.update({
-              where: { id: freezeItem.id },
-              data: { quantity: { decrement: 1 } },
-            });
-            await prisma.systemMessage.create({
-              data: {
-                userId: userRow.id,
-                content: `**Weekly Streak Freeze Consumed**\n\nYour Streak Freeze protected your weekly streak after a missed cycle. Streak continues at **${streakResult.newStreak} weeks**!`,
-                type: "STREAK",
-              },
-            });
-          }
-
           const weeklyReward = calculateWeeklyQuestReward(userRow.level);
-          await prisma.user.update({
-            where: { id: userRow.id },
+
+          // Conditional update: exactly ONE concurrent request wins the
+          // streak write for this week (rowCount === 1). Losers skip cleanly
+          // instead of double-awarding sylph/messages.
+          const updated = await prisma.user.updateMany({
+            where: { id: userRow.id, lastActiveDate: { not: bounds.weekKey } },
             data: {
               streakDays: streakResult.newStreak,
               lastActiveDate: bounds.weekKey,
@@ -430,14 +219,31 @@ export async function PATCH(req: NextRequest) {
             },
           });
 
-          await prisma.systemMessage.create({
-            data: {
-              userId: userRow.id,
-              content: `**Weekly Mission Complete: 3 Hours of Focus!**\n\nYou completed the weekly 3-hour study target. Weekly streak is now **${streakResult.newStreak} week${streakResult.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
-              type: "STREAK",
-            },
-          });
-          weeklyAwarded = true;
+          if (updated.count > 0) {
+            weeklyAwarded = true;
+
+            if (streakResult.freezeUsed && freezeItem) {
+              await prisma.inventoryItem.updateMany({
+                where: { id: freezeItem.id, quantity: { gt: 0 } },
+                data: { quantity: { decrement: 1 } },
+              });
+              await prisma.systemMessage.create({
+                data: {
+                  userId: userRow.id,
+                  content: `**Weekly Streak Freeze Consumed**\n\nYour Streak Freeze protected your weekly streak after a missed cycle. Streak continues at **${streakResult.newStreak} weeks**!`,
+                  type: "STREAK",
+                },
+              });
+            }
+
+            await prisma.systemMessage.create({
+              data: {
+                userId: userRow.id,
+                content: `**Weekly Mission Complete: 3 Hours of Focus!**\n\nYou completed the weekly 3-hour study target. Weekly streak is now **${streakResult.newStreak} week${streakResult.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
+                type: "STREAK",
+              },
+            });
+          }
         }
       }
     }
@@ -455,8 +261,8 @@ export async function PATCH(req: NextRequest) {
     // Respond immediately with the RPC result — no trailing re-read.
     return NextResponse.json(
       {
-        ...(rpcResult || {}),
-        questCompletedNow,
+        ...rpcResult,
+        questCompletedNow: rpcResult.questCompleted,
         weeklyAwarded,
       },
       { status: 200 }

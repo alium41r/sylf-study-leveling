@@ -150,12 +150,6 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       dataToUpdate.completedAt = status === "COMPLETED" ? new Date() : null;
     }
 
-    // Update the quest fields
-    const updatedQuest = await prisma.quest.update({
-      where: { id: parseInt(id) },
-      data: dataToUpdate,
-    });
-
     const tz = await getUserTimezone(payload.userId as number);
     const today = TimezoneService.getUserLocalDate(tz);
 
@@ -163,6 +157,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     const isNewlyFailed = status === "FAILED" && quest.status !== "FAILED";
 
     // ─── Handle COMPLETED ─────────────────────────────────────
+    // T3: claim FIRST. claim_quest_reward atomically marks the quest
+    // COMPLETED and mints rewards in one transaction — a crash or network
+    // drop between the claim and the field update below can therefore
+    // never leave a COMPLETED quest with a permanently lost reward.
     if (isNewlyCompleted) {
       const rows = await prisma.$queryRaw<
         [{ claim_quest_reward: { success: boolean; questId: number; status: string; xpGained?: number; sylphGained?: number; totalSylphEarned?: number; hpHealed?: number; currentHp?: number; level?: number; currentXP?: number; xpToNextLevel?: number; hunterRank?: string; levelsGained?: number; didRankUp?: boolean; penalty?: { hpLost: number; currentHp: number } } }]
@@ -177,6 +175,14 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       const claimResult = rows[0]?.claim_quest_reward;
 
       if (claimResult?.status === "FAILED") {
+        // The RPC already set the quest FAILED and applied the HP penalty
+        // atomically. Persist any OTHER field edits without clobbering the
+        // FAILED status.
+        const { status: _s, completedAt: _c, ...restData } = dataToUpdate;
+        const updatedQuest = await prisma.quest.update({
+          where: { id: parseInt(id) },
+          data: restData,
+        });
         return NextResponse.json({
           quest: { ...updatedQuest, status: "FAILED" },
           penalty: claimResult.penalty,
@@ -184,6 +190,14 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       }
 
       invalidateRankingsCache();
+
+      // Apply the (idempotent) field update AFTER the atomic claim — purely
+      // for response-shape parity; the RPC already persisted status and
+      // completedAt inside its own transaction.
+      const updatedQuest = await prisma.quest.update({
+        where: { id: parseInt(id) },
+        data: dataToUpdate,
+      });
 
       return NextResponse.json(
         {
@@ -203,6 +217,12 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         { status: 200 }
       );
     }
+
+    // Update the quest fields (non-completion paths)
+    const updatedQuest = await prisma.quest.update({
+      where: { id: parseInt(id) },
+      data: dataToUpdate,
+    });
 
     // ─── Handle FAILED ────────────────────────────────────────
     if (isNewlyFailed) {

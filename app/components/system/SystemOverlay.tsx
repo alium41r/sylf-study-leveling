@@ -31,7 +31,6 @@ interface OverlayMessage {
 interface SystemOverlayProps {
   open: boolean;
   presence: PagePresence | null;
-  token: string | null;
   chatQuota: QuotaInfo | null;
   sessionId: number | null;
   onSessionChange: (id: number | null, session?: { id: number; title: string } | null) => void;
@@ -50,7 +49,6 @@ interface SystemOverlayProps {
 export default function SystemOverlay({
   open,
   presence,
-  token,
   chatQuota,
   sessionId,
   onSessionChange,
@@ -133,9 +131,6 @@ export default function SystemOverlay({
     };
   }, []);
 
-  const activeToken = () =>
-    token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-
   const stopGeneration = useCallback(() => {
     abortRef.current?.abort();
     if (revealTimerRef.current) {
@@ -184,12 +179,10 @@ export default function SystemOverlay({
     abortRef.current = controller;
 
     try {
-      const t = activeToken();
       const res = await fetch("/api/system-messages/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(t ? { Authorization: `Bearer ${t}` } : {}),
         },
         body: JSON.stringify({
           message: text,

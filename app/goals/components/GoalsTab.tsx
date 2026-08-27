@@ -40,7 +40,7 @@ interface GoalsTabProps {
 }
 
 export function GoalsTab() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedGoalIds, setSelectedGoalIds] = useState<number[]>([]);
@@ -87,10 +87,10 @@ export function GoalsTab() {
   })();
 
   const fetchGoals = () => {
-    if (!token) return;
+    if (!user) return;
     // Stale-while-revalidate: repeat visits to /goals paint instantly.
     fetchCachedJSON<any[]>("/api/goals",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 15_000, staleMs: 120_000 })
       .then((data) => {
         if (data) setGoals(Array.isArray(data) ? data : []);
@@ -101,18 +101,17 @@ export function GoalsTab() {
 
   useEffect(() => {
     fetchGoals();
-  }, [token]);
+  }, [user?.id]);
 
   const handleCreateGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
+    if (!user) return;
     
     try {
       const res = await fetch("/api/goals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           title,
@@ -138,7 +137,7 @@ export function GoalsTab() {
   };
 
   const handleAdjustEffort = async (goalId: number, newWeeks: number) => {
-    if (!token) return;
+    if (!user) return;
     
     // First, ask for confirmation because this is a destructive action
     const proceed = confirm(
@@ -152,7 +151,6 @@ export function GoalsTab() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ targetWeeks: newWeeks }),
       });
@@ -176,7 +174,7 @@ export function GoalsTab() {
   const handleDeleteGoal = async (id: number) => {
     if (!confirm("Are you sure you want to abandon this goal and delete all its quests?")) return;
     try {
-      await fetch(`/api/goals/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      await fetch(`/api/goals/${id}`, { method: "DELETE" });
       setGoals(goals.filter(g => g.id !== id));
       setSelectedGoalIds(prev => prev.filter(selectedId => selectedId !== id));
     } catch (err) {
@@ -190,7 +188,7 @@ export function GoalsTab() {
     try {
       await fetch(`/api/goals`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ids: selectedGoalIds })
       });
       setGoals(goals.filter(g => !selectedGoalIds.includes(g.id)));
@@ -205,7 +203,7 @@ export function GoalsTab() {
     try {
       await fetch(`/api/goals/${id}`, { 
         method: "PATCH", 
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: editGoalTitle, description: editGoalDescription, color: editGoalColor })
       });
       setEditingGoalId(null);
@@ -226,7 +224,7 @@ export function GoalsTab() {
       const weeks = targetDateToWeeks(parsed);
       await fetch(`/api/goals/${goal.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetDate: newDeadline, targetWeeks: weeks }),
       });
       setEditingDeadlineId(null);

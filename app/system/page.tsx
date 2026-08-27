@@ -22,7 +22,7 @@ type WorkspaceTab = "conversation" | "planner";
  * continue any conversation it started.
  */
 export default function SystemPage() {
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   // Multi-session state
   const [sessions, setSessions] = useState<SystemChatSession[]>([]);
@@ -51,11 +51,9 @@ export default function SystemPage() {
   const openUsage = async () => {
     setUsageOpen(true);
     setUsageData(null);
-    if (!token) return;
+    if (!user) return;
     try {
-      const res = await fetch("/api/ai-costs", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch("/api/ai-costs");
       if (res.ok) setUsageData(await res.json());
     } catch (e) {
       console.error("Failed to fetch AI costs:", e);
@@ -110,12 +108,12 @@ export default function SystemPage() {
 
   // ── Quotas ────────────────────────────────────────────────────
   const fetchQuotas = useCallback(async () => {
-    if (!token) return;
+    if (!user) return;
     try {
       // Stale-while-revalidate: reopening the workspace paints instantly.
       const data = await fetchCachedJSON<{ chat?: QuotaInfo; planner?: QuotaInfo }>(
         "/api/ai-usage",
-        { headers: { Authorization: `Bearer ${token}` } },
+        {},
         { ttlMs: 30_000, staleMs: 120_000 }
       );
       if (data) {
@@ -125,7 +123,7 @@ export default function SystemPage() {
     } catch (e) {
       console.error("Failed to fetch quotas:", e);
     }
-  }, [token]);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchQuotas();
@@ -133,14 +131,14 @@ export default function SystemPage() {
 
   // ── Sessions ──────────────────────────────────────────────────
   const fetchSessions = useCallback(async () => {
-    if (!token) return;
+    if (!user) return;
     try {
       // Stale-while-revalidate: reopening the workspace shows the last
       // session list instantly and refreshes in the background.
       const data = await fetchCachedJSON<{ sessions?: SystemChatSession[] }>(
         "/api/chats",
-        { headers: { Authorization: `Bearer ${token}` } },
-        { ttlMs: 10_000, staleMs: 120_000, storageKey: `chats:${token.slice(-12)}` }
+        {},
+        { ttlMs: 10_000, staleMs: 120_000, storageKey: `chats:${user?.id ?? 0}` }
       );
       if (data) {
         const sessions = data.sessions || [];
@@ -155,7 +153,7 @@ export default function SystemPage() {
     } catch (e) {
       console.error("Failed to fetch sessions:", e);
     }
-  }, [token]);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchSessions();
@@ -172,7 +170,6 @@ export default function SystemPage() {
       await fetch(`/api/chats/${id}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ title: newTitle }),
@@ -187,7 +184,6 @@ export default function SystemPage() {
     try {
       await fetch(`/api/chats/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (activeSessionId === id) {
         autoSelectRef.current = true;
@@ -333,7 +329,6 @@ export default function SystemPage() {
         {/* ── Tab Content ── */}
         {tab === "conversation" ? (
           <ConversationPanel
-            token={token}
             sessionId={activeSessionId}
             sessionTitle={activeSessionTitle}
             chatQuota={chatQuota}

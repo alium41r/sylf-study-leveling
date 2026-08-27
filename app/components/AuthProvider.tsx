@@ -8,7 +8,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { clearClientCache } from "@/lib/client-data-cache";
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -53,12 +53,11 @@ export interface UserStats {
 
 interface AuthContextType {
   user: UserStats | null;
-  token: string | null;
   isLoading: boolean;
-  login: (token: string, userData: UserStats) => void;
+  login: (userData: UserStats) => void;
   logout: () => Promise<void>;
   refreshStats: () => Promise<void>;
-  mutateUser: (user: UserStats) => void;
+  mutateUser: (user: UserStats | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,49 +66,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserStats | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-  const pathname = usePathname();
 
   const mutateUser = useCallback((newUserData: UserStats | null) => {
+    // S3: in-memory only — no user profile is persisted to localStorage.
     setUser(newUserData);
-    if (typeof window !== "undefined") {
-      if (newUserData) {
-        localStorage.setItem("user_data", JSON.stringify(newUserData));
-      } else {
-        localStorage.removeItem("user_data");
-      }
-    }
   }, []);
 
-  // Fetch fresh stats from the server
+  // Fetch fresh stats from the server (httpOnly cookie authenticates; no JWT
+  // in JS and no Bearer headers anywhere).
   const refreshStats = useCallback(async () => {
-    const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
-      const res = await fetch("/api/user/stats", {
-        credentials: "include",
-        headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
-      });
+      const res = await fetch("/api/user/stats", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         setUser(data);
-        if (typeof window !== "undefined") {
-          localStorage.setItem("user_data", JSON.stringify(data));
-          if (data.token) {
-            localStorage.setItem("token", data.token);
-            setToken(data.token);
-          } else if (storedToken) {
-            setToken(storedToken);
-          }
-        }
       } else if (res.status === 401) {
-        // Explicitly unauthorized — clear everything
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user_data");
-        }
-        setToken(null);
         setUser(null);
       }
       // Other errors (500, network issues): don't nuke the session
@@ -118,36 +90,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // On mount: hydrate from localStorage first, then validate with server
+  // On mount: validate the cookie session with the server.
   useEffect(() => {
-    // 1. Synchronously restore cached state from localStorage
-    const cachedUser = localStorage.getItem("user_data");
-    const cachedToken = localStorage.getItem("token");
-
-    if (cachedToken) {
-      setToken(cachedToken);
-    }
-    if (cachedUser) {
-      try {
-        const parsed = JSON.parse(cachedUser);
-        if (parsed && parsed.id) {
-          setUser(parsed);
-        }
-      } catch {
-        localStorage.removeItem("user_data");
-      }
-    }
-
-    // 2. Validate with server in the background
     refreshStats().finally(() => setIsLoading(false));
   }, [refreshStats]);
 
-  const login = useCallback((newToken: string, userData: UserStats) => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("token", newToken);
-      localStorage.setItem("user_data", JSON.stringify(userData));
-    }
-    setToken(newToken);
+  const login = useCallback((userData: UserStats) => {
     setUser(userData);
     setIsLoading(false);
   }, []);
@@ -158,18 +106,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.error("Logout API error:", e);
     }
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user_data");
-    }
-    setToken(null);
+    // S3: clear cached API payloads and scratchpad drafts so the next user
+    // on a shared device cannot replay this session's data.
+    clearClientCache();
     setUser(null);
     window.location.href = "/login";
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, login, logout, refreshStats, mutateUser }}
+      value={{ user, isLoading, login, logout, refreshStats, mutateUser }}
     >
       {children}
     </AuthContext.Provider>

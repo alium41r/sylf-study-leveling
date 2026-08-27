@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { sendSecurityOtpEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +13,18 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
     const { action } = body;
+
+    // S4: per-user OTP dispatch throttle.
+    const otpLimit = await rateLimit(`otp:user:${session.userId}`, {
+      limit: 3,
+      windowMs: 10 * 60_000,
+    });
+    if (!otpLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many security codes requested. Please wait a few minutes." },
+        { status: 429, headers: { "Retry-After": String(otpLimit.retryAfterSeconds) } }
+      );
+    }
 
     if (action !== "RESET_PROGRESS" && action !== "DELETE_ACCOUNT") {
       return NextResponse.json(

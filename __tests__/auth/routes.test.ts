@@ -68,7 +68,8 @@ describe("Phase 1: API Route Handlers", () => {
       expect(data.user.hunterRank).toBe("E");
       expect(data.user.level).toBe(1);
       expect(data.user.hp).toBe(100);
-      expect(typeof data.token).toBe("string");
+      // S3: the session JWT is cookie-only and must NOT be returned in the body.
+      expect(data.token).toBeUndefined();
       expect(res.cookies.get("hunter_token")).toBeDefined();
     });
 

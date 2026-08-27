@@ -16,6 +16,11 @@ describe("Social System - Friend Requests & Direct Message Notifications", () =>
   beforeEach(async () => {
     vi.restoreAllMocks();
     vi.spyOn(prisma, "$queryRaw").mockResolvedValue([] as any);
+    // S3: privacy checks read UserPrivacy (defaults: PUBLIC policies).
+    vi.spyOn(prisma.userPrivacy, "findUnique").mockResolvedValue({
+      allowFriendRequests: "PUBLIC",
+      allowDirectMessages: "PUBLIC",
+    } as any);
     senderToken = await signToken({ userId: senderId, email: "sender@system.dev" });
     receiverToken = await signToken({ userId: receiverId, email: "receiver@system.dev" });
   });
@@ -109,6 +114,8 @@ describe("Social System - Friend Requests & Direct Message Notifications", () =>
         userId: senderId,
         conversationId,
       } as any);
+      // S3: block check on send inspects other participants (none → no block).
+      vi.spyOn(prisma.conversationParticipant, "findMany").mockResolvedValue([] as any);
 
       vi.spyOn(prisma, "$transaction").mockResolvedValue([
         {

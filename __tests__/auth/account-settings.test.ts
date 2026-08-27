@@ -135,14 +135,10 @@ describe("Phase 3: Account Settings Data Binding & Profile Management", () => {
       expect(res.status).toBe(200);
       expect(data.user.username).toBe("monarch_hunter");
       expect(data.user.name).toBe("Sung Jin-Woo");
-      expect(data.token).toBeDefined();
+      // S3: the session JWT is cookie-only and must NOT be in the body.
+      expect(data.token).toBeUndefined();
 
-      // Verify token contains fresh username and name
-      const verified = await verifyToken(data.token);
-      expect(verified?.username).toBe("monarch_hunter");
-      expect(verified?.name).toBe("Sung Jin-Woo");
-
-      // Verify cookie was set
+      // Verify the cookie was set (the fresh session travels there).
       const cookieHeader = res.headers.get("set-cookie");
       expect(cookieHeader).toContain("hunter_token=");
     });
@@ -195,9 +191,10 @@ describe("Phase 3: Account Settings Data Binding & Profile Management", () => {
       expect(res.status).toBe(200);
       expect(data.user.verificationStatus).toBe("UNVERIFIED");
 
-      // Check that token also reflects UNVERIFIED
-      const verified = await verifyToken(data.token);
-      expect(verified?.verificationStatus).toBe("UNVERIFIED");
+      // S3: the refreshed session travels in the cookie, not the body.
+      expect(data.token).toBeUndefined();
+      const cookieHeader = res.headers.get("set-cookie");
+      expect(cookieHeader).toContain("hunter_token=");
     });
   });
 

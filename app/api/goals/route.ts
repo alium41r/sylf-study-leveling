@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import {
   GOAL_COLOR_TOKENS,
   isGoalColorToken,
@@ -24,18 +24,13 @@ const createGoalSchema = z.object({
  */
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
     const goals = await prisma.goal.findMany({
-      where: { userId: payload.userId as number },
+      where: { userId: session.userId },
       include: {
         quests: {
           select: {
@@ -64,14 +59,9 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -104,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     const goal = await prisma.goal.create({
       data: {
-        userId: payload.userId as number,
+        userId: session.userId,
         title,
         description: description || null,
         targetWeeks: effectiveTargetWeeks ?? 4,
@@ -117,7 +107,7 @@ export async function POST(req: NextRequest) {
     // Create a system message confirming the goal
     await prisma.systemMessage.create({
       data: {
-        userId: payload.userId as number,
+        userId: session.userId,
         content: `**New Goal Detected**\n\nObjective: "${title}"\nTimeline: ${effectiveTargetWeeks ?? 4} weeks${effectiveTargetDate ? `\nDeadline: ${effectiveTargetDate.toISOString().slice(0, 10)}` : ""}\nEffort Level: ${effortLevel}\n\nThe System has registered your objective. Talk to The System in the chat to generate and schedule quests for this goal!`,
         type: "SYSTEM",
       },
@@ -136,14 +126,9 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -158,14 +143,14 @@ export async function DELETE(req: NextRequest) {
     // Let's delete the quests first to be safe, then the goals.
     await prisma.quest.deleteMany({
       where: {
-        userId: payload.userId as number,
+        userId: session.userId,
         goalId: { in: ids },
       },
     });
 
     const result = await prisma.goal.deleteMany({
       where: {
-        userId: payload.userId as number,
+        userId: session.userId,
         id: { in: ids },
       },
     });

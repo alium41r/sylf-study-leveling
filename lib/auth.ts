@@ -1,5 +1,4 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
-import { type NextRequest } from "next/server";
 
 export const AUTH_COOKIE_NAME = "hunter_token";
 
@@ -14,18 +13,42 @@ export interface AuthTokenPayload extends JWTPayload {
   level?: number;
   hasCompletedOnboarding?: boolean;
   hasPassword?: boolean;
+  /** Session-revocation counter: getSession rejects tokens whose version no
+   *  longer matches the user's current tokenVersion. */
   tokenVersion?: number;
   timezone?: string;
 }
 
+// ─── JWT configuration (S3 hardening) ─────────────────────────────
+// Issuer/audience come from environment (with stable defaults) so tokens are
+// scoped to this application and cannot be accepted from another issuer.
+// JWT_SECRET is REQUIRED: sign/verify fail closed when it is missing.
+
+const JWT_ISSUER = () => process.env.JWT_ISSUER || "sylf";
+const JWT_AUDIENCE = () => process.env.JWT_AUDIENCE || "sylf-app";
+
+export function getJwtIssuer(): string {
+  return JWT_ISSUER();
+}
+
+export function getJwtAudience(): string {
+  return JWT_AUDIENCE();
+}
+
 export function getAuthSecret(): Uint8Array {
-  return new TextEncoder().encode(
-    process.env.JWT_SECRET || "hunter-system-secret-key-change-in-production"
-  );
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error(
+      "JWT_SECRET is not configured. Refusing to sign or verify session tokens."
+    );
+  }
+  return new TextEncoder().encode(secret);
 }
 
 /**
  * Signs a new JWT session token with standard 30-day expiration.
+ * Adds issuer + audience claims (validated on verify) and carries the
+ * user's tokenVersion for revocation.
  */
 export async function signToken(
   payload: AuthTokenPayload,
@@ -34,6 +57,8 @@ export async function signToken(
   const secret = getAuthSecret();
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(getJwtIssuer())
+    .setAudience(getJwtAudience())
     .setIssuedAt()
     .setExpirationTime(expiresIn)
     .sign(secret);
@@ -41,11 +66,16 @@ export async function signToken(
 
 /**
  * Verifies a JWT token and returns the payload if valid.
+ * Enforces signature, issuer, audience and expiration. Returns null on any
+ * failure (do not distinguish error types to callers).
  */
 export async function verifyToken(token: string): Promise<AuthTokenPayload | null> {
   try {
     const secret = getAuthSecret();
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, secret, {
+      issuer: getJwtIssuer(),
+      audience: getJwtAudience(),
+    });
     if (!payload || !payload.userId) return null;
     return {
       ...payload,
@@ -57,51 +87,25 @@ export async function verifyToken(token: string): Promise<AuthTokenPayload | nul
 }
 
 /**
- * Extracts and verifies session token from either:
- * 1. Authorization: Bearer <token> header
- * 2. system_token cookie
+ * Pure cookie-only session extraction (no database access). Used by the
+ * middleware (edge runtime) and by lib/auth-server as the first step.
+ * Browser sessions are cookie-only; the Authorization: Bearer path was
+ * removed in S3.
  */
-export async function getSession(
-  req: NextRequest | Request
-): Promise<AuthTokenPayload | null> {
-  // 1. Check HTTP-only Cookie first (authoritative source for browser sessions)
-  if ("cookies" in req && typeof req.cookies?.get === "function") {
-    const cookieVal = req.cookies.get(AUTH_COOKIE_NAME)?.value;
-    if (cookieVal) {
-      const payload = await verifyToken(cookieVal);
-      if (payload) return payload;
-    }
-  } else {
-    // Standard Request cookies header fallback
-    const cookieHeader = req.headers.get("cookie");
-    if (cookieHeader) {
-      const match = cookieHeader
-        .split(";")
-        .map((c) => c.trim())
-        .find((c) => c.startsWith(`${AUTH_COOKIE_NAME}=`));
-      if (match) {
-        const token = match.substring(`${AUTH_COOKIE_NAME}=`.length);
-        const payload = await verifyToken(token);
-        if (payload) return payload;
-      }
-    }
-  }
-
-  // 2. Fallback to Authorization: Bearer <token> header (for API callers & integration tests)
-  const authHeader = req.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.split(" ")[1]?.trim();
-    if (token) {
-      const payload = await verifyToken(token);
-      if (payload) return payload;
-    }
-  }
-
-  return null;
+export async function getCookieSession(req: Request): Promise<AuthTokenPayload | null> {
+  const cookieHeader = req.headers.get("cookie");
+  if (!cookieHeader) return null;
+  const match = cookieHeader
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith(`${AUTH_COOKIE_NAME}=`));
+  if (!match) return null;
+  const token = match.substring(`${AUTH_COOKIE_NAME}=`.length);
+  return verifyToken(token);
 }
 
 /**
- * Standard cookie configuration for the system_token cookie.
+ * Standard cookie configuration for the session cookie.
  */
 export const AUTH_COOKIE_OPTIONS = {
   name: AUTH_COOKIE_NAME,

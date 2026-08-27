@@ -1,23 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { TimezoneService } from "@/lib/timezone-service";
 import { SKELETON_NODES } from "@/lib/skill-tree-skeleton";
 import { revalidateTag } from "next/cache";
 
 async function getUserId(req: NextRequest): Promise<number | null> {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) return null;
-  const token = authHeader.split(" ")[1];
-  try {
-    const payload = await verifyToken(token);
-    if (payload && payload.userId) {
-      return payload.userId as number;
-    }
-    return null;
-  } catch {
-    return null;
+  const session = await getSession(req);
+  if (session && session.userId) {
+    return session.userId as number;
   }
+  return null;
 }
 
 export async function GET(req: NextRequest) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { areUsersBlocked } from "@/lib/block-service";
 
 const SENDER_SELECT = {
   id: true,
@@ -23,18 +24,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { id } = await params;
     const conversationId = parseInt(id);
-    const userId = payload.userId as number;
+    const userId = session.userId;
 
     const participant = await prisma.conversationParticipant.findUnique({
       where: { userId_conversationId: { userId, conversationId } },
@@ -71,18 +68,14 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { id } = await params;
     const conversationId = parseInt(id);
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const body = await req.json();
 
     if (!body.content || !body.content.trim()) {
@@ -95,6 +88,21 @@ export async function POST(
     });
     if (!participant) {
       return NextResponse.json({ error: "Not a participant" }, { status: 403 });
+    }
+
+    // S3 block enforcement: a blocked participant (either direction) cannot
+    // send into a shared conversation — even if a stale membership row exists.
+    const otherParticipants = await prisma.conversationParticipant.findMany({
+      where: { conversationId, userId: { not: userId } },
+      select: { userId: true },
+    });
+    for (const p of otherParticipants) {
+      if (await areUsersBlocked(userId, p.userId)) {
+        return NextResponse.json(
+          { error: "You cannot message this conversation." },
+          { status: 403 }
+        );
+      }
     }
 
     const [message] = await prisma.$transaction([

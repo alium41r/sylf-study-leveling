@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { getProfileDossier } from "@/lib/profile-service";
 
 export const dynamic = "force-dynamic";
@@ -13,16 +13,10 @@ export async function GET(req: NextRequest, props: { params: Promise<{ username:
       return NextResponse.json({ error: "Username is required" }, { status: 400 });
     }
 
-    // Optional Authentication (viewer might be a guest or logged-in user)
-    let viewerId: number | null = null;
-    const authHeader = req.headers.get("authorization");
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      const token = authHeader.split(" ")[1];
-      const payload = await verifyToken(token);
-      if (payload) {
-        viewerId = payload.userId as number;
-      }
-    }
+    // Optional Authentication (viewer might be a guest or logged-in user) —
+    // cookie session only.
+    const session = await getSession(req);
+    const viewerId = session?.userId ?? null;
 
     const result = await getProfileDossier(username, viewerId);
 

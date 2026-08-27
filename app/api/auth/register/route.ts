@@ -3,6 +3,7 @@ import { z } from "zod";
 import { initializeUserProfile } from "@/lib/auth-service";
 import { AUTH_COOKIE_OPTIONS } from "@/lib/auth";
 import { isPrelaunchMode } from "@/lib/prelaunch";
+import { rateLimit, getClientIp, ipKey } from "@/lib/rate-limit";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -26,6 +27,18 @@ export async function POST(req: NextRequest) {
             "Registration is closed right now. Join the waitlist and we'll email you when the app is ready.",
         },
         { status: 403 }
+      );
+    }
+
+    // S4: per-IP registration throttle (account-farming friction).
+    const ipLimit = await rateLimit(`register:ip:${ipKey(getClientIp(req))}`, {
+      limit: 5,
+      windowMs: 15 * 60_000,
+    });
+    if (!ipLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many registration attempts. Please wait a few minutes." },
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
       );
     }
 
@@ -53,7 +66,6 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json(
       {
         message: "Scholar registered successfully!",
-        token,
         user,
       },
       { status: 201 }

@@ -560,7 +560,7 @@ function StatCard({
 /* ─── Main Page ─────────────────────────────────────────────── */
 
 export default function StatsSettingsPage() {
-  const { token } = useAuth();
+  const { user: currentUser } = useAuth();
   const [data, setData] = useState<DetailedStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -573,13 +573,13 @@ export default function StatsSettingsPage() {
   }, [data]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!currentUser) return;
 
     // Stale-while-revalidate: revisiting the stats page paints the previous
     // snapshot instantly, then refreshes in the background.
     fetchCachedJSON<DetailedStats>(
       "/api/user/detailed-stats",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 30_000, staleMs: 300_000 }
     )
       .then((d) => {
@@ -588,7 +588,7 @@ export default function StatsSettingsPage() {
       })
       .catch((e) => setError(e.message))
       .finally(() => setIsLoading(false));
-  }, [token]);
+  }, [currentUser?.id]);
 
   if (isLoading) {
     return (

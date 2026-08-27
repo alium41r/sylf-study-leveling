@@ -8,7 +8,7 @@ import { PrivacyLevel } from "@/lib/privacy-types";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 export default function PrivacyInformation() {
-  const { token, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   
   const [privacyState, setPrivacyState] = useState<Record<string, string>>({
     profileVisibility: "PUBLIC",
@@ -28,12 +28,12 @@ export default function PrivacyInformation() {
 
   useEffect(() => {
     async function fetchPrivacy() {
-      if (!token) return;
+      if (!user) return;
       try {
         // Stale-while-revalidate: reopening account paints instantly.
         const data = await fetchCachedJSON<{ id?: number; userId?: number; [key: string]: any }>(
           "/api/user/privacy",
-          { headers: { Authorization: `Bearer ${token}` } },
+          {},
           { ttlMs: 30_000, staleMs: 120_000 }
         );
         if (data) {
@@ -49,7 +49,7 @@ export default function PrivacyInformation() {
       }
     }
     fetchPrivacy();
-  }, [token]);
+  }, [user?.id]);
 
   const isDirty = initialState && JSON.stringify(privacyState) !== JSON.stringify(initialState);
 
@@ -75,7 +75,7 @@ export default function PrivacyInformation() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isDirty || !token) return;
+    if (!isDirty) return;
     
     setIsSaving(true);
     setStatus({ type: null, message: null });
@@ -85,7 +85,6 @@ export default function PrivacyInformation() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(privacyState),
       });

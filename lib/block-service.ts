@@ -62,7 +62,9 @@ export async function removeFriendship(userA: number, userB: number): Promise<bo
 }
 
 /**
- * Blocks a target user: deletes any existing friendship/requests and inserts a block record.
+ * Blocks a target user: deletes any existing friendship/requests, inserts a
+ * block record, and severs both users' membership in their shared 1:1
+ * conversations (S3) so a stale participant row cannot bypass the block.
  */
 export async function blockUser(userId: number, targetUserId: number): Promise<boolean> {
   try {
@@ -74,6 +76,24 @@ export async function blockUser(userId: number, targetUserId: number): Promise<b
       INSERT INTO "BlockedUser" ("userId", "blockedId", "createdAt")
       VALUES (${userId}, ${targetUserId}, NOW())
       ON CONFLICT ("userId", "blockedId") DO NOTHING
+    `;
+
+    // S3: remove both memberships from every shared NON-GROUP conversation.
+    // Groups are left intact (members can still be in the same group), but the
+    // message-send path re-checks blocks so neither party can message there.
+    await prisma.$executeRaw`
+      DELETE FROM "ConversationParticipant" cp
+      USING "Conversation" c
+      WHERE cp."conversationId" = c.id
+        AND c."isGroup" = false
+        AND cp."conversationId" IN (
+          SELECT cpA."conversationId"
+          FROM "ConversationParticipant" cpA
+          JOIN "ConversationParticipant" cpB
+            ON cpB."conversationId" = cpA."conversationId"
+          WHERE cpA."userId" = ${userId}
+            AND cpB."userId" = ${targetUserId}
+        )
     `;
 
     return true;

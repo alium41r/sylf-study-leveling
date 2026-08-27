@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
 import { HpPenaltyService } from "@/lib/hp-penalty-service";
 

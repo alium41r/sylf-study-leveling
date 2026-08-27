@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 
 /**
  * GET /api/conversations/[id]
@@ -12,18 +12,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { id } = await params;
     const conversationId = parseInt(id);
-    const userId = payload.userId as number;
+    const userId = session.userId;
 
     // Verify user is a participant
     const participant = await prisma.conversationParticipant.findUnique({
@@ -152,18 +148,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { id } = await params;
     const conversationId = parseInt(id);
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const body = await req.json();
 
     // Verify user is a participant
@@ -179,6 +171,21 @@ export async function PATCH(
     });
     if (!conversation || !conversation.isGroup) {
       return NextResponse.json({ error: "Can only modify group conversations" }, { status: 400 });
+    }
+
+    // S3: group administration is creator-only. A normal participant must not
+    // rename the group, change its avatar, or add/remove members (including
+    // promoting themselves). UI hiding is not a control — this is.
+    const isGroupMutation =
+      body.name !== undefined ||
+      body.avatarUrl !== undefined ||
+      (Array.isArray(body.addMemberIds) && body.addMemberIds.length > 0) ||
+      (Array.isArray(body.removeMemberIds) && body.removeMemberIds.length > 0);
+    if (isGroupMutation && conversation.createdBy !== userId) {
+      return NextResponse.json(
+        { error: "Only the group creator can manage this group." },
+        { status: 403 }
+      );
     }
 
     // Atomically update conversation fields

@@ -41,7 +41,6 @@ function getMessageModelBadge(msg: SystemMsg, currentModelPref?: string): string
 }
 
 interface ConversationPanelProps {
-  token: string | null;
   sessionId: number | null;
   sessionTitle: string;
   chatQuota: QuotaInfo | null;
@@ -53,7 +52,6 @@ interface ConversationPanelProps {
 }
 
 export default function ConversationPanel({
-  token,
   sessionId,
   sessionTitle,
   chatQuota,
@@ -80,15 +78,13 @@ export default function ConversationPanel({
 
   // Fetch messages when the active session changes
   useEffect(() => {
-    if (!token) return;
-
     if (sessionId) {
       setIsLoadingMessages(true);
       // Stale-while-revalidate per session: switching between chats paints
       // the cached thread instantly and refreshes in the background.
       fetchCachedJSON<{ messages?: SystemMsg[] }>(
         `/api/system-messages?limit=100&sessionId=${sessionId}`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        {},
         { ttlMs: 3_000, staleMs: 120_000, storageKey: `sys-msgs:${sessionId}` }
       )
         .then((data) => {
@@ -108,11 +104,10 @@ export default function ConversationPanel({
       setMessages([]);
       setSelectedFile(null);
     }
-  }, [token, sessionId]);
+  }, [sessionId]);
 
   const sendMessage = async (text: string, file: File | null) => {
     if (!text.trim() && !file) return;
-    if (!token) return;
 
     const optimisticUserMsg: SystemMsg = {
       id: Date.now(),
@@ -138,7 +133,6 @@ export default function ConversationPanel({
     try {
       const res = await fetch("/api/system-messages/chat", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -183,8 +177,7 @@ export default function ConversationPanel({
           if (targetId) {
             try {
               const refetch = await fetch(
-                `/api/system-messages?limit=100&sessionId=${targetId}`,
-                { headers: { Authorization: `Bearer ${token}` } }
+                `/api/system-messages?limit=100&sessionId=${targetId}`
               );
               if (refetch.ok) {
                 const refetched = await refetch.json();

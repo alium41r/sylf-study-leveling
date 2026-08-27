@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import fs from "fs/promises";
 import path from "path";
 import { getToolsForAgent, getSimpleToolsForAgent, AgentType, ALLOWED_HANDOFFS } from "@/lib/ai/chat-tools";
 import { executeChatTool } from "@/lib/ai/chat-tool-executor";
 import { LLMFactory } from "@/lib/ai/providers/factory";
 import { NormalizedMessage, LLMUsage } from "@/lib/ai/providers/types";
-import { checkQuota, consumeQuota } from "@/lib/ai/usage-limiter";
+import { reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
+import { validateUpload } from "@/lib/upload-security";
 import { AI_LIMITS, DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "@/lib/ai/config";
 import { resolveCheapAnswer } from "@/lib/ai/cheap-answers";
 import { logAiUsage } from "@/lib/ai/usage-logger";
@@ -97,18 +98,15 @@ async function resolveChatSession(
 }
 
 export async function POST(req: NextRequest) {
+  let sessionUserId: number | null = null;
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    const userId = payload.userId as number;
+    const userId = session.userId;
+    sessionUserId = userId;
 
     // ── Parse the request body (before quota so deterministic replies
     //    can be served without touching the LLM quota pool) ──
@@ -138,6 +136,15 @@ export async function POST(req: NextRequest) {
       sessionIdStr = body.sessionId ? String(body.sessionId) : null;
       modelPreference = body.modelPreference || "auto";
       contextOverride = body.contextOverride || null;
+    }
+
+    // S4: bounded prompt input — prevents multi-MB messages being injected
+    // into LLM prompts (cost amplification).
+    if (typeof messageText === "string" && messageText.length > 4000) {
+      return NextResponse.json(
+        { error: "Message is too long (max 4000 characters)." },
+        { status: 400 }
+      );
     }
 
     if (!messageText && !file) {
@@ -206,7 +213,9 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Quota enforcement (shared 10-prompt daily pool for General Chat + Focus Drawer) ──
-    const quota = await checkQuota(userId, "chat");
+    // S4: RESERVE the unit atomically BEFORE any LLM call; release on failure.
+    const quota = await reserveQuota(userId, "chat");
+    let quotaReserved = quota.allowed;
     if (!quota.allowed) {
       return NextResponse.json(
         {
@@ -238,12 +247,26 @@ export async function POST(req: NextRequest) {
 
     if (file && file.size > 0) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const filename = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
-      const uploadDir = path.join(process.cwd(), "public/uploads");
-      await fs.writeFile(path.join(uploadDir, filename), buffer);
-      attachmentUrl = `/uploads/${filename}`;
+      // S4: size cap + magic-byte content sniffing + generated storage name.
+      // The client filename is never used as a path component.
+      const validation = validateUpload(file, buffer);
+      if (!validation.ok) {
+        if (quotaReserved) await releaseQuota(userId, "chat").catch(() => {});
+        return NextResponse.json({ error: validation.error }, { status: validation.status });
+      }
       base64Data = buffer.toString("base64");
-      mimeType = file.type;
+      mimeType = validation.mime;
+      // Best-effort persistence (read-only filesystems simply skip the write —
+      // the attachment is still analyzed in this request, just not archived).
+      try {
+        const uploadDir = path.join(process.cwd(), "public/uploads");
+        await fs.mkdir(uploadDir, { recursive: true });
+        await fs.writeFile(path.join(uploadDir, validation.filename), buffer);
+        attachmentUrl = `/uploads/${validation.filename}`;
+      } catch (err) {
+        console.warn("[chat] attachment persistence skipped:", (err as any)?.message ?? err);
+        attachmentUrl = null;
+      }
     }
 
     // ── Save user message to DB ─────────────────────────────
@@ -621,6 +644,10 @@ export async function POST(req: NextRequest) {
       if (req.signal) req.signal.removeEventListener("abort", onClientAbort);
     }
 
+    if (quotaReserved && !generationSucceeded) {
+      await releaseQuota(userId, "chat");
+    }
+
     // ── Save AI response to DB ──────────────────────────────
     const aiMessage = await prisma.systemMessage.create({
       data: {
@@ -633,15 +660,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // ── Quota consumption: charged ONLY on successful generation.
-    //    Model errors, timeouts and client aborts never consume quota;
-    //    the atomic guarded upsert prevents parallel-request bypass. ──
+    // ── S4 reservation lifecycle: reserved BEFORE generation, refunded on
+    //    failure/timeout/abort. Successful generations keep the charge. ──
     if (generationSucceeded) {
-      const consumed = await consumeQuota(userId, "chat");
-      if (!consumed.allowed) {
-        console.warn(`[Chat Route] Quota race: generation succeeded but consumeQuota was not charged for user ${userId}`);
-      }
-
       // Request-level cost telemetry (best-effort — never blocks the reply).
       await logAiUsage({
         userId,
@@ -667,6 +688,11 @@ export async function POST(req: NextRequest) {
     }, { status: 200 });
   } catch (error: any) {
     console.error("Chat API Error:", error);
+    // S4: refund any outstanding reservation when the request fails outside
+    // the generation pipeline (the guarded decrement is safe to call once).
+    try {
+      if (sessionUserId !== null) await releaseQuota(sessionUserId, "chat");
+    } catch {}
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

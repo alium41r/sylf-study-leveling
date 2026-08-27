@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { areUsersBlocked } from "@/lib/block-service";
 
 /**
  * GET /api/friends/requests
@@ -8,18 +9,14 @@ import { verifyToken } from "@/lib/auth";
  */
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const requests = await prisma.friendRequest.findMany({
       where: {
-        receiverId: payload.userId as number,
+        receiverId: session.userId,
         status: "PENDING",
       },
       include: {
@@ -56,16 +53,12 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
 
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const body = await req.json();
     const { username } = body;
 
@@ -87,7 +80,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if either user has blocked the other
-    const { areUsersBlocked } = await import("@/lib/block-service");
     const isBlocked = await areUsersBlocked(userId, targetUser.id);
     if (isBlocked) {
       return NextResponse.json({ error: "Unable to send friend request" }, { status: 403 });
@@ -104,6 +96,27 @@ export async function POST(req: NextRequest) {
 
     if (existingFriendship) {
       return NextResponse.json({ error: "You are already friends" }, { status: 400 });
+    }
+
+    // S3: enforce the target's allowFriendRequests privacy setting.
+    const targetPrivacy = await prisma.userPrivacy.findUnique({
+      where: { userId: targetUser.id },
+      select: { allowFriendRequests: true },
+    });
+    const requestPolicy = targetPrivacy?.allowFriendRequests ?? "PUBLIC";
+    if (requestPolicy === "PRIVATE") {
+      return NextResponse.json(
+        { error: "This user is not accepting friend requests." },
+        { status: 403 }
+      );
+    }
+    // FRIENDS policy is already satisfied here: an existing friendship would
+    // have returned 400 above, so a FRIENDS-only user rejects non-friends.
+    if (requestPolicy === "FRIENDS") {
+      return NextResponse.json(
+        { error: "This user only accepts friend requests from friends." },
+        { status: 403 }
+      );
     }
 
     // Check for existing pending request (either direction)

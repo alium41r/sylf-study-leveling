@@ -89,7 +89,7 @@ type TabType = "OVERVIEW" | "STATS" | "ACHIEVEMENTS";
 
 export function PublicProfileModal() {
   const { isOpen, username, closeProfile } = useProfileModal();
-  const { user: currentUser, token } = useAuth();
+  const { user: currentUser } = useAuth();
   const router = useRouter();
 
   const [dossier, setDossier] = useState<ProfileDossier | null>(null);
@@ -156,11 +156,6 @@ export function PublicProfileModal() {
       setIsLoading(true);
       setError(null);
       try {
-        const headers: HeadersInit = {};
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
         // Stale-while-revalidate: re-opening a recently viewed profile paints
         // the cached dossier instantly and refreshes in the background.
         const data = await fetchCachedJSON<{
@@ -171,7 +166,7 @@ export function PublicProfileModal() {
           privacySettings?: any;
         }>(
           `/api/profile/${username}`,
-          { headers },
+          {},
           { ttlMs: 15_000, staleMs: 300_000, storageKey: `profile:${username.toLowerCase()}:${currentUser?.id ?? "guest"}` }
         );
 
@@ -192,7 +187,7 @@ export function PublicProfileModal() {
     };
 
     fetchProfile();
-  }, [isOpen, username, token, currentUser?.id]);
+  }, [isOpen, username, currentUser?.id]);
 
   // ─── Keyboard Shortcut to Close (ESC) ──────────────────────
   useEffect(() => {
@@ -212,14 +207,13 @@ export function PublicProfileModal() {
   };
 
   const handleSendMessage = async () => {
-    if (!dossier || !token || actionLoading) return;
+    if (!dossier || actionLoading) return;
     setActionLoading(true);
     try {
       const res = await fetch("/api/conversations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ participantIds: [dossier.id] }),
       });
@@ -240,14 +234,13 @@ export function PublicProfileModal() {
   };
 
   const handleAddFriend = async () => {
-    if (!dossier || !token || actionLoading) return;
+    if (!dossier || actionLoading) return;
     setActionLoading(true);
     try {
       const res = await fetch("/api/friends/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ receiverId: dossier.id }),
       });
@@ -274,7 +267,6 @@ export function PublicProfileModal() {
       const headers: HeadersInit = {
         "Content-Type": "application/json",
       };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
 
       if (confirmModal.type === "REMOVE_FRIEND") {
         const res = await fetch("/api/friends/remove", {

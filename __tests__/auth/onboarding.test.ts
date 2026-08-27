@@ -82,10 +82,8 @@ describe("Onboarding Flow & Token Re-issuance", () => {
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.user.hasCompletedOnboarding).toBe(true);
-    expect(data.token).toBeDefined();
-
-    const verified = await verifyToken(data.token);
-    expect(verified?.hasCompletedOnboarding).toBe(true);
+    // S3: session is cookie-only — the body must not carry the JWT.
+    expect(data.token).toBeUndefined();
 
     const cookieHeader = res.headers.get("set-cookie");
     expect(cookieHeader).toContain("hunter_token=");
@@ -126,6 +124,7 @@ describe("Onboarding Flow & Token Re-issuance", () => {
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.user.hasCompletedOnboarding).toBe(true);
-    expect(data.token).toBeDefined();
+    // S3: session is cookie-only — the body must not carry the JWT.
+    expect(data.token).toBeUndefined();
   });
 });

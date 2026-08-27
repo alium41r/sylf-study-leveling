@@ -20,7 +20,7 @@ interface SessionItem {
 }
 
 export default function SessionsInformation() {
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
   const router = useRouter();
 
   const [sessions, setSessions] = useState<SessionItem[]>([]);
@@ -37,15 +37,11 @@ export default function SessionsInformation() {
     try {
       setIsLoading(true);
       setError(null);
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
 
       // Stale-while-revalidate: reopening account paints instantly.
       const data = await fetchCachedJSON<{ sessions?: SessionItem[]; error?: string }>(
         "/api/user/sessions",
-        { headers, credentials: "include" },
+        { credentials: "include" },
         { ttlMs: 20_000, staleMs: 120_000 }
       );
       if (data && !data.error) {
@@ -59,7 +55,7 @@ export default function SessionsInformation() {
     } finally {
       setIsLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchSessions();
@@ -73,16 +69,11 @@ export default function SessionsInformation() {
     if (!modalState.sessionId) return;
     setIsRevoking(true);
     try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
       const res = await fetch("/api/user/sessions", {
         method: "DELETE",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify({ sessionId: modalState.sessionId }),
       });

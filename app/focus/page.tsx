@@ -49,7 +49,7 @@ function getSetting(mode: ModeConfig, key: string, fallback: number | boolean | 
 function FocusContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { token, refreshStats } = useAuth();
+  const { refreshStats } = useAuth();
 
   // Eye-Comfort Dimming (Light Mode only) — zero-IOPS client state
   const { isDimActive, isLightMode, toggleDim } = useFocusEyeComfort();
@@ -116,7 +116,6 @@ function FocusContent() {
   const elapsedSecondsRef = useRef<number>(0);
   const breakSecondsRef = useRef<number>(0);
   const sessionIdRef = useRef<number | null>(null);
-  const tokenRef = useRef<string | null>(token || null);
   const lastSyncedSecondsRef = useRef<number>(0);
   const lastSyncedBreakSecondsRef = useRef<number>(0);
   const isSyncingRef = useRef<boolean>(false);
@@ -141,10 +140,6 @@ function FocusContent() {
   const transitionPhaseRef = useRef<() => void>(() => {});
 
   // Keep refs in sync with React state
-  useEffect(() => {
-    tokenRef.current = token || null;
-  }, [token]);
-
   useEffect(() => {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
@@ -469,11 +464,10 @@ function FocusContent() {
       const currSeconds = elapsedSecondsRef.current;
       const currBreakSeconds = breakSecondsRef.current;
       const currentSessionId = sessionIdRef.current;
-      const currentToken = tokenRef.current;
 
       // Mirror tabs never write to the server — only the primary tab flushes.
       if (!isPrimaryRef.current) return false;
-      if (!currentToken || !currentSessionId) return false;
+      if (!currentSessionId) return false;
       // Skip redundant zero-delta writes if not final (break time is a SET on
       // the server, so it must still be sent whenever it advanced too).
       if (
@@ -494,7 +488,6 @@ function FocusContent() {
           const res = await fetch("/api/sessions", {
             method: "PATCH",
             headers: {
-              Authorization: `Bearer ${currentToken}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -545,10 +538,9 @@ function FocusContent() {
   // ─── Fire-and-forget unload flush (no awaits — keepalive survives) ──
   const sendBeaconFlush = useCallback(() => {
     const sid = sessionIdRef.current;
-    const tok = tokenRef.current;
     // Mirror tabs never write to the server — only the primary tab flushes.
     if (!isPrimaryRef.current) return;
-    if (!sid || !tok) return;
+    if (!sid) return;
     try {
       const payload = JSON.stringify({
         id: sid,
@@ -561,7 +553,6 @@ function FocusContent() {
       fetch("/api/sessions", {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${tok}`,
           "Content-Type": "application/json",
         },
         body: payload,
@@ -572,16 +563,14 @@ function FocusContent() {
 
   // ─── Fetch Quest Data if questId is present ────────
   useEffect(() => {
-    if (!questId || !token) return;
-    fetch(`/api/quests/${questId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    if (!questId) return;
+    fetch(`/api/quests/${questId}`)
       .then(async (res) => (res.ok ? res.json().catch(() => ({})) : {}))
       .then(data => {
         if (data.id) setQuestData(data);
       })
       .catch(console.error);
-  }, [questId, token]);
+  }, [questId]);
 
   // ─── Initialize Timer Based on Mode ────────────────
   useEffect(() => {
@@ -881,12 +870,10 @@ function FocusContent() {
   // clamp never truncates legitimate carried-over time.
   const ensureSession = useCallback(async (initialSeconds: number = 0): Promise<number | null> => {
     if (sessionIdRef.current) return sessionIdRef.current;
-    if (!tokenRef.current) return null;
     try {
       const res = await fetch("/api/sessions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${tokenRef.current}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -915,14 +902,14 @@ function FocusContent() {
   // focus — so merely visiting /focus no longer leaks abandoned 0-second
   // rows. A carried-over legacy timer is attached immediately instead.
   useEffect(() => {
-    if (!token || sessionStartedRef.current) return;
+    if (sessionStartedRef.current) return;
     sessionStartedRef.current = true;
 
     async function startSessionAndFetchData() {
       try {
         const [subRes, statsRes] = await Promise.all([
-          fetch("/api/subjects", { headers: { Authorization: `Bearer ${token}` } }),
-          fetch("/api/user/stats", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("/api/subjects"),
+          fetch("/api/user/stats"),
         ]);
 
         let total = 0;
@@ -967,7 +954,7 @@ function FocusContent() {
     }
 
     startSessionAndFetchData();
-  }, [token, subjectId, cacheKey, persistTimerState, ensureSession]);
+  }, [subjectId, cacheKey, persistTimerState, ensureSession]);
 
   // ─── Main Timer Tick (derivation only — no accumulation) ──
   const tick = useCallback(() => {
@@ -1002,7 +989,6 @@ function FocusContent() {
     if (isPrimaryRef.current) {
       if (
         !sessionIdRef.current &&
-        tokenRef.current &&
         snap.phase === "focus" &&
         d.focusSec >= 15 &&
         !sessionStartPendingRef.current
@@ -1131,7 +1117,7 @@ function FocusContent() {
   };
 
   const handleEndSession = async () => {
-    if (!tokenRef.current || isEnding) return;
+    if (isEnding) return;
     setIsEnding(true);
     setEndError(null);
 
@@ -1168,7 +1154,7 @@ function FocusContent() {
   };
 
   const handleCompleteQuest = async () => {
-    if (!tokenRef.current || isEnding) return;
+    if (isEnding) return;
     setIsEnding(true);
     setEndError(null);
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 
 /**
  * GET /api/system-messages
@@ -11,14 +11,9 @@ import { verifyToken } from "@/lib/auth";
  */
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -28,7 +23,7 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get("type");
 
     const where: Record<string, unknown> = {
-      userId: payload.userId as number,
+      userId: session.userId,
     };
     if (unreadOnly) {
       where.read = false;
@@ -50,7 +45,7 @@ export async function GET(req: NextRequest) {
 
     // Also return the unread count for notification badges
     const unreadCount = await prisma.systemMessage.count({
-      where: { userId: payload.userId as number, read: false },
+      where: { userId: session.userId, read: false },
     });
 
     return NextResponse.json({ messages, unreadCount }, { status: 200 });
@@ -66,28 +61,23 @@ export async function GET(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
 
     if (body.markAllRead) {
       await prisma.systemMessage.updateMany({
-        where: { userId: payload.userId as number, read: false },
+        where: { userId: session.userId, read: false },
         data: { read: true },
       });
     } else if (body.messageIds && Array.isArray(body.messageIds)) {
       await prisma.systemMessage.updateMany({
         where: {
           id: { in: body.messageIds },
-          userId: payload.userId as number,
+          userId: session.userId,
         },
         data: { read: true },
       });
@@ -105,32 +95,27 @@ export async function PATCH(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const authSession = await getSession(req);
+    if (!authSession) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
     
     let sessionId = body.sessionId;
     if (!sessionId) {
-      const session = await prisma.chatSession.create({
+      const chatSession = await prisma.chatSession.create({
         data: { 
-          userId: payload.userId as number, 
+          userId: authSession.userId, 
           title: "Study Planner Updates" 
         }
       });
-      sessionId = session.id;
+      sessionId = chatSession.id;
     }
 
     const message = await prisma.systemMessage.create({
       data: {
-        userId: payload.userId as number,
+        userId: authSession.userId,
         sessionId: sessionId,
         content: body.content,
         type: body.type || "SYSTEM",

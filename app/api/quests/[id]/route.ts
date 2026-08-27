@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { awardXP, getStreakMultiplier } from "@/lib/game-engine";
 import { DIFFICULTY_CONFIG } from "@/lib/difficulty-engine";
 import { TimezoneService } from "@/lib/timezone-service";
@@ -25,20 +25,15 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const quest = await prisma.quest.findFirst({
       where: {
         id: parseInt(id),
-        userId: payload.userId as number,
+        userId: session.userId,
       },
     });
 
@@ -65,14 +60,9 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -88,7 +78,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     // Verify quest ownership
     const quest = await prisma.quest.findFirst({
-      where: { id: parseInt(id), userId: payload.userId as number },
+      where: { id: parseInt(id), userId: session.userId },
     });
     if (!quest) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });
@@ -97,7 +87,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     // Goal relink: verify the target goal belongs to the user before applying.
     if (goalId !== undefined && goalId !== null) {
       const goal = await prisma.goal.findFirst({
-        where: { id: goalId, userId: payload.userId as number },
+        where: { id: goalId, userId: session.userId },
         select: { id: true },
       });
       if (!goal) {
@@ -115,7 +105,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         );
       }
       const isRestDay = await StudyScheduleService.isUserRestDay(
-        payload.userId as number,
+        session.userId,
         scheduledFor
       );
       if (isRestDay) {
@@ -131,7 +121,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     // Get current user stats
     const user = await prisma.user.findUnique({
-      where: { id: payload.userId as number },
+      where: { id: session.userId },
     });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -150,7 +140,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       dataToUpdate.completedAt = status === "COMPLETED" ? new Date() : null;
     }
 
-    const tz = await getUserTimezone(payload.userId as number);
+    const tz = await getUserTimezone(session.userId);
     const today = TimezoneService.getUserLocalDate(tz);
 
     const isNewlyCompleted = status === "COMPLETED" && quest.status !== "COMPLETED";
@@ -166,7 +156,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         [{ claim_quest_reward: { success: boolean; questId: number; status: string; xpGained?: number; sylphGained?: number; totalSylphEarned?: number; hpHealed?: number; currentHp?: number; level?: number; currentXP?: number; xpToNextLevel?: number; hunterRank?: string; levelsGained?: number; didRankUp?: boolean; penalty?: { hpLost: number; currentHp: number } } }]
       >`
         SELECT public.claim_quest_reward(
-          ${payload.userId as number},
+          ${session.userId},
           ${parseInt(id)},
           ${today}
         ) AS claim_quest_reward
@@ -287,18 +277,13 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
     const quest = await prisma.quest.findFirst({
-      where: { id: parseInt(id), userId: payload.userId as number },
+      where: { id: parseInt(id), userId: session.userId },
     });
     if (!quest) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });

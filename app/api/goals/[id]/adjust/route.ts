@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { previewEffortAdjustment, EFFORT_CONFIG, type EffortLevel } from "@/lib/game-engine";
 
 const adjustSchema = z.object({
@@ -25,14 +25,9 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function POST(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -46,7 +41,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     // Get the existing goal
     const goal = await prisma.goal.findFirst({
-      where: { id: parseInt(id), userId: payload.userId as number },
+      where: { id: parseInt(id), userId: session.userId },
       include: { quests: true },
     });
 
@@ -92,7 +87,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     // Add system message
     await prisma.systemMessage.create({
       data: {
-        userId: payload.userId as number,
+        userId: session.userId,
         content: `[TIMELINE COMPRESSED]\n\nGoal: "${goal.title}"\nNew Timeline: ${newWeeks} weeks\nNew Effort Level: ${newEffortLevelStr}\n\nThe System has re-evaluated your timeline. Please talk to The System in the chat to regenerate your quests.`,
         type: "WARNING",
       },

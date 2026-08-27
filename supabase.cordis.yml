@@ -7,9 +7,8 @@
         command: npx
         args:
           - '-y'
-          - '@supabase/mcp-server-supabase'
+          - '@supabase/mcp-server-supabase@0.11.0'
           - '--project-ref'
           - 'gjkwkdqdoekzllmnsejo'
-          - '--read-only'
         env:
           SUPABASE_ACCESS_TOKEN: !!js process.env.SUPABASE_ACCESS_TOKEN

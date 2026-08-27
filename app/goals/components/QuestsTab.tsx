@@ -26,7 +26,7 @@ interface GoalOption {
 }
 
 export function QuestsTab() {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const [quests, setQuests] = useState<Quest[]>([]);
   const [weeklyQuest, setWeeklyQuest] = useState<any>(null);
   const [goals, setGoals] = useState<GoalOption[]>([]);
@@ -59,15 +59,14 @@ export function QuestsTab() {
   const [editQuestMinutes, setEditQuestMinutes] = useState(30);
 
   const fetchQuests = () => {
-    if (!token) return;
-    const headers = { Authorization: `Bearer ${token}` };
+    if (!user) return;
     Promise.all([
       // Stale-while-revalidate: repeat visits to /goals paint instantly.
-      fetchCachedJSON<any[]>("/api/quests?all=true", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
+      fetchCachedJSON<any[]>("/api/quests?all=true", {}, { ttlMs: 15_000, staleMs: 120_000 })
         .catch(() => []),
-      fetchCachedJSON<any>("/api/quests/weekly", { headers }, { ttlMs: 30_000, staleMs: 300_000 })
+      fetchCachedJSON<any>("/api/quests/weekly", {}, { ttlMs: 30_000, staleMs: 300_000 })
         .catch(() => null),
-      fetchCachedJSON<any[]>("/api/goals", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
+      fetchCachedJSON<any[]>("/api/goals", {}, { ttlMs: 15_000, staleMs: 120_000 })
         .catch(() => []),
     ])
       .then(([questsData, weeklyData, goalsData]) => {
@@ -83,7 +82,7 @@ export function QuestsTab() {
     fetchQuests();
     const d = new Date();
     setNewQuestDate(d.toISOString().split("T")[0]);
-  }, [token]);
+  }, [user?.id]);
 
   if (isLoading) {
     return (
@@ -96,7 +95,7 @@ export function QuestsTab() {
   const handleDeleteQuest = async (id: number) => {
     if (!confirm("Are you sure you want to delete this quest?")) return;
     try {
-      await fetch(`/api/quests/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      await fetch(`/api/quests/${id}`, { method: "DELETE" });
       setQuests(quests.filter(q => q.id !== id));
       setSelectedQuestIds(prev => prev.filter(selectedId => selectedId !== id));
     } catch (err) {
@@ -110,7 +109,7 @@ export function QuestsTab() {
     try {
       await fetch(`/api/quests`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ids: selectedQuestIds })
       });
       setQuests(quests.filter(q => !selectedQuestIds.includes(q.id)));
@@ -125,7 +124,7 @@ export function QuestsTab() {
     try {
       await fetch(`/api/quests/${id}`, { 
         method: "PATCH", 
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: editQuestTitle, requiredMinutes: editQuestMinutes })
       });
       setEditingQuestId(null);
@@ -138,7 +137,7 @@ export function QuestsTab() {
   /** Create a manually dispatched quest, optionally linked to an objective. */
   const handleCreateQuest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token || isSubmittingQuest) return;
+    if (isSubmittingQuest) return;
 
     const trimmedTitle = newQuestTitle.trim();
     if (!trimmedTitle) {
@@ -156,7 +155,7 @@ export function QuestsTab() {
     try {
       const res = await fetch("/api/quests", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: trimmedTitle,
           description: newQuestDescription.trim() || undefined,

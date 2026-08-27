@@ -26,7 +26,7 @@ interface Subject {
 }
 
 export default function TimerPage() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -60,11 +60,11 @@ export default function TimerPage() {
   }, [user]);
 
   const fetchSubjectsAndQuests = async () => {
-    if (!token) return;
+    if (!user) return;
     try {
       const [subRes, questRes] = await Promise.all([
-        fetch("/api/subjects", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("/api/quests", { headers: { Authorization: `Bearer ${token}` } })
+        fetch("/api/subjects"),
+        fetch("/api/quests")
       ]);
       
       if (subRes.ok) {
@@ -85,18 +85,17 @@ export default function TimerPage() {
 
   useEffect(() => {
     fetchSubjectsAndQuests();
-  }, [token]);
+  }, [user?.id]);
 
   const handleAddSubject = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSubjectName.trim() || !newSubjectCode.trim() || !token) return;
+    if (!newSubjectName.trim() || !newSubjectCode.trim()) return;
     setIsAdding(true);
 
     try {
       const res = await fetch("/api/subjects", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

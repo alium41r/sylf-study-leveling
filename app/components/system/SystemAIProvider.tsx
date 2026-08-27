@@ -58,7 +58,7 @@ export function useSystemAI(): SystemAIContextValue {
 
 export function SystemAIProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
 
   const [presence, setPresence] = useState<PagePresence | null>(null);
   const [overlayOpen, setOverlayOpen] = useState(false);
@@ -68,14 +68,12 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
   const [plannerOpen, setPlannerOpen] = useState(false);
 
   const refreshQuotas = useCallback(async () => {
-    const t = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-    if (!t) return;
     try {
       // Stale-while-revalidate: quota info mounts on every page; reuse a
       // fresh-enough snapshot instead of re-querying on each full load.
       const data = await fetchCachedJSON<{ chat?: QuotaInfo | null; planner?: QuotaInfo | null }>(
         "/api/ai-usage",
-        { headers: { Authorization: `Bearer ${t}` } },
+        {},
         { ttlMs: 30_000, staleMs: 120_000 }
       );
       if (data) {
@@ -85,7 +83,7 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.error("Failed to fetch AI usage:", e);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (user) refreshQuotas();
@@ -170,7 +168,6 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
       <SystemOverlay
         open={overlayOpen && !!presence}
         presence={presence}
-        token={token}
         chatQuota={chatQuota}
         sessionId={overlaySessionId}
         onSessionChange={setOverlaySession}

@@ -79,10 +79,7 @@ export default function AiPlannerPanel({
   useEffect(() => {
     const fetchLatestQuota = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("/api/ai-usage", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await fetch("/api/ai-usage");
         if (res.ok) {
           const data = await res.json();
           if (data?.planner) {
@@ -171,13 +168,11 @@ export default function AiPlannerPanel({
     abortControllerRef.current = controller;
 
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch("/api/ai-planner", {
         method: "POST",
         signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           topic: goalTitle,

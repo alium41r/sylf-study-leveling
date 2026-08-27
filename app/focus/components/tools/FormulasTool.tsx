@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import MarkdownRenderer from "@/app/components/MarkdownRenderer";
-import { useAuth } from "@/app/components/AuthProvider";
 import {
   Search,
   Copy,
@@ -328,7 +327,6 @@ export const INITIAL_BUNDLED_FORMULAS: FormulaItem[] = [
 ];
 
 export default function FormulasTool() {
-  const { token } = useAuth();
   const [formulas, setFormulas] = useState<FormulaItem[]>(INITIAL_BUNDLED_FORMULAS);
   const [search, setSearch] = useState<string>("");
   const [activeSubject, setActiveSubject] = useState<FormulaSubject>("All");
@@ -426,7 +424,6 @@ export default function FormulasTool() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           message: `Generate accurate academic formula details for "${search.trim()}". Return JSON format with fields: name, subject (Math/Physics/Chemistry/Computer Science/Constants), category, gradeLevel (array like ["High School", "University"]), latex (LaTeX $$...$$ formula), description, variables (key-value dictionary of symbol to description), keywords (array).`,

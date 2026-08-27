@@ -21,6 +21,7 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       findFirst: vi.fn(),
       upsert: vi.fn(),
+      create: vi.fn(),
     },
     userPrivacy: {
       create: vi.fn(),
@@ -209,5 +210,90 @@ describe("OAuth 2.0 Providers & Account Linking", () => {
       expect(res.status).toBe(307);
       expect(res.headers.get("location")).toContain("error=Invalid%20or%20expired%20OAuth%20state");
     });
+  });
+});
+
+describe("S3: OAuth unverified-email account takeover protection", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.clearAllMocks();
+  });
+
+  const existingUser = {
+    id: 7,
+    email: "victim@system.dev",
+    username: "victim",
+    name: "Victim Scholar",
+    scholarId: "#000007",
+    verificationStatus: "UNVERIFIED",
+    hunterRank: "E",
+    level: 1,
+    password: "hash",
+    tokenVersion: 1,
+    timezone: "UTC",
+    hasCompletedOnboarding: false,
+  } as any;
+
+  it("verified provider email links and signs in the existing user", async () => {
+    (prisma.connectedAccount.findUnique as any).mockResolvedValueOnce(null);
+    (prisma.user.findUnique as any).mockResolvedValueOnce(existingUser); // email match
+    (prisma.connectedAccount.upsert as any).mockResolvedValueOnce({});
+    (prisma.user.update as any).mockResolvedValueOnce(existingUser); // UNVERIFIED -> VERIFIED
+
+    const result = await handleOAuthSignInOrRegister({
+      provider: "google",
+      providerAccountId: "g-123",
+      email: "victim@system.dev",
+      name: "Victim Scholar",
+      username: "victim",
+      avatarUrl: null,
+      emailVerified: true,
+    });
+
+    expect(result.isNewUser).toBe(false);
+    expect(result.user.id).toBe(7);
+    expect(result.token).toBeTruthy();
+    expect(prisma.connectedAccount.upsert).toHaveBeenCalled();
+  });
+
+  it("unverified provider email matching an existing user is REJECTED (takeover blocked)", async () => {
+    (prisma.connectedAccount.findUnique as any).mockResolvedValueOnce(null);
+    (prisma.user.findUnique as any).mockResolvedValueOnce(existingUser); // email match
+
+    await expect(
+      handleOAuthSignInOrRegister({
+        provider: "github",
+        providerAccountId: "gh-attacker",
+        email: "victim@system.dev",
+        name: "Attacker",
+        username: "attacker",
+        avatarUrl: null,
+        emailVerified: false,
+      })
+    ).rejects.toThrow(/not verified/i);
+
+    expect(prisma.connectedAccount.upsert).not.toHaveBeenCalled();
+  });
+
+  it("unverified email with NO matching user still creates a fresh account", async () => {
+    (prisma.connectedAccount.findUnique as any).mockResolvedValueOnce(null);
+    (prisma.user.findUnique as any).mockResolvedValue(null);
+    (prisma.user.create as any).mockResolvedValueOnce({ ...existingUser, id: 8, email: "fresh@system.dev" });
+    (prisma.user.update as any).mockResolvedValueOnce({ ...existingUser, id: 8, email: "fresh@system.dev" });
+    (prisma.systemMessage.create as any).mockResolvedValueOnce({});
+
+    const result = await handleOAuthSignInOrRegister({
+      provider: "discord",
+      providerAccountId: "d-fresh",
+      email: "fresh@system.dev",
+      name: "Fresh Scholar",
+      username: "fresh",
+      avatarUrl: null,
+      emailVerified: false,
+    });
+
+    expect(result.isNewUser).toBe(true);
+    expect(result.user.id).toBe(8);
+    expect(prisma.connectedAccount.upsert).not.toHaveBeenCalled();
   });
 });

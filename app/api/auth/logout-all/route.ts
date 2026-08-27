@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, AUTH_COOKIE_NAME } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
@@ -40,7 +41,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Invalidate all sessions by creating a revocation marker in VerificationToken
+    // S3 real revocation: bump tokenVersion. getSession rejects any token
+    // whose tokenVersion no longer matches, so every previously issued JWT
+    // (all devices) becomes invalid immediately. Clean up the legacy
+    // REVOKED_SESSIONS markers that nothing ever read.
     await prisma.verificationToken.deleteMany({
       where: {
         userId: user.id,
@@ -48,12 +52,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await prisma.verificationToken.create({
-      data: {
-        userId: user.id,
-        token: `REVOKED_SESSIONS:${Date.now()}`,
-        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
-      },
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { tokenVersion: { increment: 1 } },
     });
 
     const response = NextResponse.json(

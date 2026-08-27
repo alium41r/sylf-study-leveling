@@ -32,7 +32,7 @@ export interface RealtimePresence {
 }
 
 export function useRealtimePresence(): RealtimePresence {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const userId = user?.id;
 
   const [enabled, setEnabled] = useState(false);
@@ -42,7 +42,7 @@ export function useRealtimePresence(): RealtimePresence {
   const enabledRef = useRef(false);
 
   useEffect(() => {
-    if (!token || !userId || !isRealtimeConfigured()) {
+    if (!userId || !isRealtimeConfigured()) {
       setRealtimeStatus({ enabled: false, connected: false });
       return;
     }
@@ -64,7 +64,7 @@ export function useRealtimePresence(): RealtimePresence {
     };
 
     (async () => {
-      const sb = await attachRealtimeAuth(token);
+      const sb = await attachRealtimeAuth();
       if (!sb || cancelled) return;
       if (!enabledRef.current) {
         enabledRef.current = true;
@@ -107,7 +107,7 @@ export function useRealtimePresence(): RealtimePresence {
       setConnected(false);
       setRealtimeStatus({ enabled: false, connected: false });
     };
-  }, [token, userId]);
+  }, [userId]);
 
   return { enabled, connected, onlineUserIds };
 }

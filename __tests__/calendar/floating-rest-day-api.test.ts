@@ -2,14 +2,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { prisma } from "../../lib/prisma";
 import * as auth from "../../lib/auth";
+import * as authServer from "../../lib/auth-server";
 import { StudyScheduleService } from "../../lib/study-schedule-service";
 import { POST as toggleFloatingRest, GET as getFloatingRestStatus } from "../../app/api/user/study-schedule/floating-rest-day/route";
 import { POST as createQuest } from "../../app/api/quests/route";
 import { PATCH as updateQuest } from "../../app/api/quests/[id]/route";
 
 vi.mock("../../lib/auth", () => ({
-  getSession: vi.fn(),
   verifyToken: vi.fn(),
+}));
+vi.mock("../../lib/auth-server", () => ({
+  getSession: vi.fn(),
 }));
 
 vi.mock("../../lib/timezone-server", () => ({
@@ -26,7 +29,7 @@ const authedJson = (url: string, method: string, body: unknown) =>
 describe("Floating Rest Day Toggle API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(auth.getSession).mockResolvedValue({ userId: 1 } as any);
+    vi.mocked(authServer.getSession).mockResolvedValue({ userId: 1 } as any);
     vi.mocked(auth.verifyToken).mockResolvedValue({ userId: 1 } as any);
   });
 

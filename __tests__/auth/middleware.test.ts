@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { proxy as middleware } from "@/proxy";
 import { signToken } from "@/lib/auth";
 import { NextRequest } from "next/server";
@@ -145,7 +145,7 @@ describe("Phase 2: Next.js Edge Middleware Route Guards", () => {
     expect(res.headers.get("location")).toBe("http://localhost:3000/dashboard");
   });
 
-  it("allows user with existing cookie to access /login when force=true is supplied", async () => {
+  it("S3: force/logout GET params no longer clear a valid session cookie", async () => {
     const token = await signToken({
       userId: 1,
       email: "veteran@system.dev",
@@ -153,34 +153,18 @@ describe("Phase 2: Next.js Edge Middleware Route Guards", () => {
       hasCompletedOnboarding: true,
     });
 
-    const req = new NextRequest("http://localhost:3000/login?force=true", {
-      headers: {
-        cookie: `hunter_token=${token}`,
-      },
-    });
-
-    const res = await middleware(req);
-    expect(res.status).toBe(200);
-    expect(res.headers.get("location")).toBeNull();
-  });
-
-  it("allows user with existing cookie to access /register when force=true is supplied", async () => {
-    const token = await signToken({
-      userId: 1,
-      email: "veteran@system.dev",
-      username: "veteran",
-      hasCompletedOnboarding: true,
-    });
-
-    const req = new NextRequest("http://localhost:3000/register?force=true", {
-      headers: {
-        cookie: `hunter_token=${token}`,
-      },
-    });
-
-    const res = await middleware(req);
-    expect(res.status).toBe(200);
-    expect(res.headers.get("location")).toBeNull();
+    for (const param of ["force", "logout", "error"]) {
+      const req = new NextRequest(`http://localhost:3000/login?${param}=true`, {
+        headers: { cookie: `hunter_token=${token}` },
+      });
+      const res = await middleware(req);
+      // Authenticated user on a guest route is redirected to the dashboard and
+      // the cookie is NOT cleared.
+      expect(res.status).toBe(307);
+      expect(res.headers.get("location")).toBe("http://localhost:3000/dashboard");
+      // The response must NOT emit a cookie-clearing header (no GET logout).
+      expect(res.headers.get("set-cookie") ?? "").not.toContain("hunter_token=;");
+    }
   });
 });
 

@@ -42,12 +42,6 @@ function LoginForm() {
     const errorParam = searchParams.get("error");
     const registeredParam = searchParams.get("registered");
     const verifiedParam = searchParams.get("verified");
-    const isForce = searchParams.get("force") === "true";
-
-    if (isForce && typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user_data");
-    }
 
     if (errorParam) {
       setError(decodeURIComponent(errorParam));
@@ -84,7 +78,7 @@ function LoginForm() {
       const data = await response.json();
 
       if (response.ok) {
-        login(data.token, data.user);
+        login(data.user);
         const redirectTarget = searchParams.get("redirect");
         const destination =
           redirectTarget && redirectTarget.startsWith("/") && !redirectTarget.startsWith("//")

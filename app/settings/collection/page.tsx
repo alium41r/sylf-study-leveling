@@ -8,7 +8,7 @@ import BackToSettings from "@/app/components/BackToSettings";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 
 export default function SettingsInventoryPage() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   
   const [activeTab, setActiveTab] = useState<"ITEMS" | "COSMETICS" | "STATS">("ITEMS");
   const [stats, setStats] = useState({ totalEarned: 0, totalSpent: 0, totalHpLost: 0 });
@@ -16,16 +16,15 @@ export default function SettingsInventoryPage() {
   const [cosmetics, setCosmetics] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
 
-    const headers = { Authorization: `Bearer ${token}` };
     const cacheKey = `collection:${user?.id ?? 0}`;
 
     // All three reads are cached (stale-while-revalidate) so reopening the
     // collection paints instantly and refreshes in the background.
     fetchCachedJSON<{ totalEarned: number; totalSpent: number; totalHpLost: number }>(
       "/api/currency/stats",
-      { headers },
+      {},
       { ttlMs: 20_000, staleMs: 120_000, storageKey: `${cacheKey}:stats` }
     )
       .then(data => { if (data) setStats(data); })
@@ -33,7 +32,7 @@ export default function SettingsInventoryPage() {
 
     fetchCachedJSON<{ inventoryItems?: { itemKey: string; quantity: number }[] }>(
       "/api/inventory",
-      { headers },
+      {},
       { ttlMs: 30_000, staleMs: 120_000, storageKey: `${cacheKey}:items` }
     )
       .then(data => { if (data) setInventoryItems(data.inventoryItems || []); })
@@ -41,7 +40,7 @@ export default function SettingsInventoryPage() {
 
     fetchCachedJSON<{ cosmetics?: any[] }>(
       "/api/cosmetics",
-      { headers },
+      {},
       { ttlMs: 30_000, staleMs: 120_000, storageKey: `${cacheKey}:cosmetics` }
     )
       .then((data) => {
@@ -49,7 +48,7 @@ export default function SettingsInventoryPage() {
       })
       .catch(console.error);
 
-  }, [token, user?.id]);
+  }, [user?.id]);
 
   if (!user) return <div className="text-text-muted">Loading collection...</div>;
 

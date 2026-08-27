@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { isNotificationAllowed } from "@/lib/notification-preferences";
 import { getDbNotificationPreferences } from "@/lib/db-notification-preferences";
 

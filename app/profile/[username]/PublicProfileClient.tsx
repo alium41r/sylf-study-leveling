@@ -119,7 +119,7 @@ export function PublicProfileClient({
   initialPermissions = null,
   initialError = null,
 }: PublicProfileClientProps) {
-  const { user: currentUser, token, isLoading: authLoading } = useAuth();
+  const { user: currentUser, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const [profile, setProfile] = useState<ProfileData | null>(initialProfile);
@@ -173,17 +173,12 @@ export function PublicProfileClient({
 
     if (authLoading) return; // Wait for auth to settle
 
-    // If initialProfile was provided on server, we only re-fetch if token changes relationship
-    if (initialProfile && !token) return;
+    // If initialProfile was provided on server, we only re-fetch if the logged-in user changes relationship
+    if (initialProfile && !currentUser) return;
 
     const fetchProfile = async () => {
       try {
-        const headers: HeadersInit = {};
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        const res = await fetch(`/api/profile/${username}`, { headers });
+        const res = await fetch(`/api/profile/${username}`);
         if (!res.ok) {
           if (res.status === 404) setError("Scholar not found in the system.");
           else setError("An error occurred while accessing system records.");
@@ -202,17 +197,16 @@ export function PublicProfileClient({
     };
 
     fetchProfile();
-  }, [username, currentUser, token, authLoading, router, initialProfile]);
+  }, [username, currentUser, authLoading, router, initialProfile]);
 
   const handleMessage = async () => {
-    if (!profile || !token || actionLoading) return;
+    if (!profile || actionLoading) return;
     setActionLoading(true);
     try {
       const res = await fetch("/api/conversations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ participantIds: [profile.id] }),
       });
@@ -232,14 +226,13 @@ export function PublicProfileClient({
   };
 
   const handleAddFriend = async () => {
-    if (!profile || !token || actionLoading) return;
+    if (!profile || actionLoading) return;
     setActionLoading(true);
     try {
       const res = await fetch("/api/friends/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ receiverId: profile.id }),
       });
@@ -266,7 +259,6 @@ export function PublicProfileClient({
       const headers: HeadersInit = {
         "Content-Type": "application/json",
       };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
 
       if (confirmModal.type === "REMOVE_FRIEND") {
         const res = await fetch("/api/friends/remove", {

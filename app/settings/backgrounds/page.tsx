@@ -76,7 +76,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 /* ─── Main Page ─────────────────────────────────────────────── */
 
 export default function BackgroundsSettingsPage() {
-  const { user, token, mutateUser } = useAuth();
+  const { user, mutateUser } = useAuth();
   const [activeBgId, setActiveBgId] = useState<string>("void");
   const [appliedBgId, setAppliedBgId] = useState<string>("void");
   const [showApplied, setShowApplied] = useState(false);
@@ -90,12 +90,12 @@ export default function BackgroundsSettingsPage() {
     const savedMode = localStorage.getItem("app_mode") as "light" | "dark";
     if (savedMode) setMode(savedMode);
 
-    if (!token) return;
+    if (!user) return;
     
     // Stale-while-revalidate: reopening backgrounds paints instantly.
     fetchCachedJSON<{ cosmetics?: any[]; active?: { activeBackground?: string | null } }>(
       "/api/cosmetics",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 30_000, staleMs: 120_000, storageKey: "cosmetics:owned" }
     )
       .then((data) => {
@@ -113,7 +113,7 @@ export default function BackgroundsSettingsPage() {
         }
       })
       .catch(console.error);
-  }, [token]);
+  }, [user?.id]);
 
   const hasCosmetic = (itemKey: string) => {
     return true; // Temporarily unlocked for testing Light Mode
@@ -128,8 +128,7 @@ export default function BackgroundsSettingsPage() {
       const res = await fetch("/api/cosmetics", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ category: "BACKGROUND", itemKey: bg.id })
       });

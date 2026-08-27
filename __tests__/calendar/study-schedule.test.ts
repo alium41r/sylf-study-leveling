@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { prisma } from "../../lib/prisma";
 import * as auth from "../../lib/auth";
+import * as authServer from "../../lib/auth-server";
 import { GET as getStudySchedule, PATCH as patchStudySchedule } from "../../app/api/user/study-schedule/route";
 import { GET as getCalendarMonth } from "../../app/api/calendar/month/route";
 import { StudyScheduleService } from "../../lib/study-schedule-service";
@@ -10,8 +11,10 @@ import { calculateDailyCapacity } from "../../lib/ai/planning-engine";
 import { TimezoneService } from "../../lib/timezone-service";
 
 vi.mock("../../lib/auth", () => ({
-  getSession: vi.fn(),
   verifyToken: vi.fn(),
+}));
+vi.mock("../../lib/auth-server", () => ({
+  getSession: vi.fn(),
 }));
 
 describe("Study Schedule & Calendar Engine", () => {
@@ -21,14 +24,14 @@ describe("Study Schedule & Calendar Engine", () => {
 
   describe("API: /api/user/study-schedule", () => {
     it("returns 401 when unauthorized", async () => {
-      vi.mocked(auth.getSession).mockResolvedValueOnce(null);
+      vi.mocked(authServer.getSession).mockResolvedValueOnce(null);
       const req = new NextRequest("http://localhost/api/user/study-schedule");
       const res = await getStudySchedule(req);
       expect(res.status).toBe(401);
     });
 
     it("returns user study schedule settings on GET", async () => {
-      vi.mocked(auth.getSession).mockResolvedValueOnce({ userId: 1 });
+      vi.mocked(authServer.getSession).mockResolvedValueOnce({ userId: 1 });
       vi.spyOn(prisma.user, "findUnique").mockResolvedValueOnce({
         id: 1,
         dailyGoalMinutes: 90,
@@ -49,7 +52,7 @@ describe("Study Schedule & Calendar Engine", () => {
     });
 
     it("updates study schedule settings on PATCH", async () => {
-      vi.mocked(auth.getSession).mockResolvedValueOnce({ userId: 1 });
+      vi.mocked(authServer.getSession).mockResolvedValueOnce({ userId: 1 });
       vi.spyOn(prisma.user, "update").mockResolvedValueOnce({
         dailyGoalMinutes: 150,
         restDays: [0],
@@ -76,7 +79,7 @@ describe("Study Schedule & Calendar Engine", () => {
     });
 
     it("rejects invalid goal minutes (e.g. < 10) on PATCH", async () => {
-      vi.mocked(auth.getSession).mockResolvedValueOnce({ userId: 1 });
+      vi.mocked(authServer.getSession).mockResolvedValueOnce({ userId: 1 });
 
       const req = new NextRequest("http://localhost/api/user/study-schedule", {
         method: "PATCH",

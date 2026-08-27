@@ -458,7 +458,13 @@ async function executeCreateQuest(
 ) {
   const title = args.title || "New Quest";
   const description = args.description || null;
-  const requiredMinutes = Number(args.requiredMinutes) || 30;
+  // S4: reward-driving values are clamped server-side — the LLM (or a
+  // crafted tool call) can never inflate XP/Sylph through huge minutes.
+  const MIN_QUEST_MINUTES = 15;
+  const MAX_QUEST_MINUTES = 240;
+  let requiredMinutes = Number(args.requiredMinutes);
+  if (!Number.isFinite(requiredMinutes) || requiredMinutes <= 0) requiredMinutes = 30;
+  requiredMinutes = Math.min(MAX_QUEST_MINUTES, Math.max(MIN_QUEST_MINUTES, Math.round(requiredMinutes)));
   const tz = await getUserTimezone(userId);
   const scheduledFor =
     args.scheduledFor || TimezoneService.getUserLocalDate(tz);
@@ -590,10 +596,13 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
   if (args.title !== undefined) dataToUpdate.title = args.title;
   if (args.description !== undefined) dataToUpdate.description = args.description;
   if (args.requiredMinutes !== undefined) {
-    dataToUpdate.requiredMinutes = Number(args.requiredMinutes);
+    // S4: clamp reward-driving minutes on updates too (15–240).
+    let reqMins = Number(args.requiredMinutes);
+    if (!Number.isFinite(reqMins) || reqMins <= 0) reqMins = 30;
+    reqMins = Math.min(240, Math.max(15, Math.round(reqMins)));
+    dataToUpdate.requiredMinutes = reqMins;
     const user = await prisma.user.findUnique({ where: { id: userId } });
     const userLevel = user?.level || 1;
-    const reqMins = dataToUpdate.requiredMinutes;
     const diff = calculateRecommendedDifficulty(reqMins);
     const rewards = calculateQuestRewards(reqMins, diff, userLevel);
     dataToUpdate.difficulty = diff;

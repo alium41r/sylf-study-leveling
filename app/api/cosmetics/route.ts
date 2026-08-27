@@ -1,24 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload || !payload.userId) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     // @ts-ignore - Prisma types are cached in IDE
     const user = await prisma.user.findUnique({
-      where: { id: payload.userId as number },
+      where: { id: session.userId },
       // @ts-ignore
       include: { cosmetics: true },
     }) as any;
@@ -47,14 +42,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload || !payload.userId) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -78,7 +68,7 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await prisma.user.update({
-      where: { id: payload.userId as number },
+      where: { id: session.userId },
       data: updateData,
     });
 

@@ -36,7 +36,6 @@ interface ChatDetailsDrawerProps {
   onLeaveGroup: () => Promise<void>;
   onUpdateGroupName: (name: string) => Promise<void>;
   onUpdateGroupAvatar?: (avatarUrl: string | null) => Promise<void>;
-  token: string | null;
 }
 
 export function ChatDetailsDrawer({
@@ -49,7 +48,6 @@ export function ChatDetailsDrawer({
   onLeaveGroup,
   onUpdateGroupName,
   onUpdateGroupAvatar,
-  token,
 }: ChatDetailsDrawerProps) {
   const { openProfile } = useProfileModal();
   const [isMuted, setIsMuted] = useState(false);
@@ -139,7 +137,7 @@ export function ChatDetailsDrawer({
 
   // Search scholars for group invite
   useEffect(() => {
-    if (!searchQuery || searchQuery.length < 2 || !token || !conversation.isGroup) {
+    if (!searchQuery || searchQuery.length < 2 || !conversation.isGroup) {
       setSearchResults([]);
       return;
     }
@@ -147,9 +145,7 @@ export function ChatDetailsDrawer({
     const timer = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`);
         if (res.ok) {
           const data = await res.json();
           const currentMemberIds = conversation.participants.map((p) => p.id);
@@ -163,7 +159,7 @@ export function ChatDetailsDrawer({
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, token, conversation.participants, conversation.isGroup]);
+  }, [searchQuery, conversation.participants, conversation.isGroup]);
 
   const handleSaveGroupName = async () => {
     if (!groupNameInput.trim() || groupNameInput.trim() === conversation.name) {

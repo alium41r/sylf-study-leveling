@@ -89,7 +89,7 @@ describe("Danger Zone Security & Verification Architecture", () => {
 
   describe("2. Log Out All Devices (Password Protected)", () => {
     it("rejects request if password is missing or incorrect", async () => {
-      const token = await signToken({ userId: 1, email: "hunter@system.dev" });
+      const token = await signToken({ userId: 1, email: "hunter@system.dev", tokenVersion: 1 });
       const hashedPassword = await bcrypt.hash("correct_password_123", 10);
 
       (prisma.user.findUnique as any).mockResolvedValueOnce({
@@ -99,7 +99,7 @@ describe("Danger Zone Security & Verification Architecture", () => {
 
       const req = new NextRequest("http://localhost:3000/api/auth/logout-all", {
         method: "POST",
-        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        headers: { cookie: `hunter_token=${token}`, "content-type": "application/json" },
         body: JSON.stringify({ password: "wrong_password" }),
       });
 
@@ -110,8 +110,8 @@ describe("Danger Zone Security & Verification Architecture", () => {
       expect(data.error).toContain("Incorrect password");
     });
 
-    it("creates revocation marker and clears cookie on valid password", async () => {
-      const token = await signToken({ userId: 1, email: "hunter@system.dev" });
+    it("S3: bumps tokenVersion (real revocation) and clears cookie on valid password", async () => {
+      const token = await signToken({ userId: 1, email: "hunter@system.dev", tokenVersion: 1 });
       const hashedPassword = await bcrypt.hash("monarch_pass_2026", 10);
 
       (prisma.user.findUnique as any).mockResolvedValueOnce({
@@ -119,11 +119,11 @@ describe("Danger Zone Security & Verification Architecture", () => {
         password: hashedPassword,
       });
       (prisma.verificationToken.deleteMany as any).mockResolvedValueOnce({});
-      (prisma.verificationToken.create as any).mockResolvedValueOnce({});
+      const updateSpy = vi.spyOn(prisma.user, "update").mockResolvedValueOnce({ id: 1, tokenVersion: 2 } as any);
 
       const req = new NextRequest("http://localhost:3000/api/auth/logout-all", {
         method: "POST",
-        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        headers: { cookie: `hunter_token=${token}`, "content-type": "application/json" },
         body: JSON.stringify({ password: "monarch_pass_2026" }),
       });
 
@@ -132,12 +132,14 @@ describe("Danger Zone Security & Verification Architecture", () => {
 
       expect(res.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(prisma.verificationToken.create).toHaveBeenCalledWith(
+      // Legacy dead markers are cleaned up (never re-created) ...
+      expect(prisma.verificationToken.deleteMany).toHaveBeenCalled();
+      expect(prisma.verificationToken.create).not.toHaveBeenCalled();
+      // ... and every previously issued token dies via the version bump.
+      expect(updateSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
-            userId: 1,
-            token: expect.stringMatching(/^REVOKED_SESSIONS:\d+$/),
-          }),
+          where: { id: 1 },
+          data: { tokenVersion: { increment: 1 } },
         })
       );
       expect(res.headers.get("set-cookie")).toContain("hunter_token=;");
@@ -248,7 +250,8 @@ describe("Danger Zone Security & Verification Architecture", () => {
       expect(data.success).toBe(true);
       expect(data.user.level).toBe(1);
       expect(data.user.hunterRank).toBe("E");
-      expect(data.token).toBeDefined();
+      // S3: the session JWT is cookie-only and must NOT be returned in the body.
+      expect(data.token).toBeUndefined();
     });
   });
 

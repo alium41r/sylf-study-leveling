@@ -17,16 +17,15 @@ import {
  * 60-second cadence.
  */
 export function useHeartbeat() {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
 
     const sendHeartbeat = () => {
       fetch("/api/user/heartbeat", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
       }).catch(() => {}); // Silently fail
     };
 
@@ -50,5 +49,5 @@ export function useHeartbeat() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       unsubscribe();
     };
-  }, [token]);
+  }, [user?.id]);
 }

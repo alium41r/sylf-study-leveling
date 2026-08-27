@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, signToken, AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { signToken, AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { invalidateRankingsCache } from "@/lib/cache-service";
@@ -105,6 +106,7 @@ export async function POST(req: NextRequest) {
       level: updatedUser.level,
       hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
       hasPassword: updatedUser.password !== null,
+      tokenVersion: updatedUser.tokenVersion,
     });
 
     const response = NextResponse.json(
@@ -122,7 +124,6 @@ export async function POST(req: NextRequest) {
           streakDays: updatedUser.streakDays,
           totalStudyMinutes: updatedUser.totalStudyMinutes,
         },
-        token: newToken,
       },
       { status: 200 }
     );

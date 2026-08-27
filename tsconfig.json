@@ -30,6 +30,6 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "ai-agent"]
+  "exclude": ["node_modules", "ai-agent", "archive"]
 }
 

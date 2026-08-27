@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { compileSyllabus } from "@/lib/ai/syllabus-compiler";
-import { checkQuota, consumeQuota } from "@/lib/ai/usage-limiter";
+import { checkQuota, reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
 import { revalidateTag } from "next/cache";
 
 // The compile runs a grounded research call + one large LLM generation;
@@ -10,18 +10,11 @@ import { revalidateTag } from "next/cache";
 export const maxDuration = 300;
 
 async function getUserId(req: NextRequest): Promise<number | null> {
-  const authHeader = req.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) return null;
-  const token = authHeader.split(" ")[1];
-  try {
-    const payload = await verifyToken(token);
-    if (payload && payload.userId) {
-      return payload.userId as number;
-    }
-    return null;
-  } catch {
-    return null;
+  const session = await getSession(req);
+  if (session && session.userId) {
+    return session.userId as number;
   }
+  return null;
 }
 
 export async function POST(
@@ -84,6 +77,7 @@ export async function POST(
     // 3. Daily rate limit for syllabus compilations (1/day per user). Combined
     //    with the one-compile-per-subject rule above, a user can compile at
     //    most ONE subject per day, and never the same subject twice.
+    // S4: this check is informational — the atomic reserve happens in step 4.
     const quota = await checkQuota(userId, "compile");
     if (!quota.allowed) {
       return NextResponse.json(
@@ -143,9 +137,6 @@ export async function POST(
       data: { lastCompiledAt: new Date() },
     });
 
-    // 6. Charge quota atomically ONLY after successful compilation.
-    await consumeQuota(userId, "compile");
-
     // 7. Invalidate edge cache tags
     if (subject.user?.username) {
       try {
@@ -162,6 +153,10 @@ export async function POST(
     });
   } catch (error) {
     console.error("POST /api/subjects/[id]/compile error:", error);
+    // S4: refund the reservation on any failure after it was made.
+    try {
+      if (typeof userId !== "undefined") await releaseQuota(userId, "compile");
+    } catch {}
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

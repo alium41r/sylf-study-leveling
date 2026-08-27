@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { getOAuthAuthorizationUrl, isOAuthProvider, type OAuthProvider } from "@/lib/oauth";
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 
 export async function GET(
   req: NextRequest,

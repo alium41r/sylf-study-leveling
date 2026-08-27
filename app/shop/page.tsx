@@ -100,7 +100,7 @@ const TABS: { id: TabType; label: string; icon: typeof Store }[] = [
 // ═════════════════════════════════════════════════════════════════
 
 export default function ShopPage() {
-  const { user, token, mutateUser } = useAuth();
+  const { user, mutateUser } = useAuth();
   const router = useRouter();
 
   // ─── Core State ─────────────────────────────────────────────
@@ -154,7 +154,7 @@ export default function ShopPage() {
         inventory: any[];
       }>(
         "/api/shop",
-        token ? { headers: { Authorization: `Bearer ${token}` } } : {},
+        {},
         { ttlMs: 30_000, staleMs: 300_000, storageKey: `shop:data:${user?.id ?? 0}` }
       );
 
@@ -186,7 +186,7 @@ export default function ShopPage() {
     } finally {
       setLoading(false);
     }
-  }, [token, user?.id]);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchShopData();
@@ -285,7 +285,7 @@ export default function ShopPage() {
   // ─── Purchase Handler ──────────────────────────────────────
 
   const handlePurchase = async (item: ShopItem) => {
-    if (!token) {
+    if (!user) {
       router.push("/login");
       return;
     }
@@ -340,7 +340,6 @@ export default function ShopPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ itemId: item.id }),
       });

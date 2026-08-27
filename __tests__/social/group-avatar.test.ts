@@ -86,6 +86,11 @@ describe("Group Profile Picture & Conversation Avatar System", () => {
       vi.spyOn(prisma.conversation, "findUnique").mockResolvedValue({
         id: conversationId,
         isGroup: true,
+        createdBy: currentUserId,
+        name: "Shadow Guild",
+        avatarUrl: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as any);
 
       const updateSpy = vi.spyOn(prisma.conversation, "update").mockResolvedValue({
@@ -120,6 +125,11 @@ describe("Group Profile Picture & Conversation Avatar System", () => {
       vi.spyOn(prisma.conversation, "findUnique").mockResolvedValue({
         id: conversationId,
         isGroup: true,
+        createdBy: currentUserId,
+        name: "Shadow Guild",
+        avatarUrl: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       } as any);
 
       const updateSpy = vi.spyOn(prisma.conversation, "update").mockResolvedValue({

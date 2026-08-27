@@ -1,22 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ACHIEVEMENTS_CATALOG } from "@/lib/achievements-catalog";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 
 export const dynamic = "force-dynamic";
 
 // Helper to authenticate
 async function getUserId(request: Request): Promise<number | null> {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
-  const token = authHeader.split(" ")[1];
-  try {
-    const payload = await verifyToken(token);
-    return payload ? (payload.userId as number) : null;
-  } catch {
-    return null;
-  }
+  const session = await getSession(request);
+  return session ? (session.userId as number) : null;
 }
 
 // Fetch all achievements with dynamic progress and claim status

@@ -18,7 +18,7 @@ export default function ModernChatPage({
 }: {
   params: Promise<{ conversationId: string }>;
 }) {
-  const { user, token, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const { openProfile } = useProfileModal();
   const router = useRouter();
   const { conversationId } = use(params);
@@ -120,7 +120,7 @@ export default function ModernChatPage({
   // Full load: conversation detail + recent messages
   // (stale-while-revalidate cache → returning to a chat paints instantly)
   const fetchChat = async (silent = false, refresh = false) => {
-    if (!token) return;
+    if (!user) return;
     try {
       const url = `/api/conversations/${conversationId}${refresh ? "?refresh=1" : ""}`;
       const data = await fetchCachedJSON<{
@@ -129,7 +129,7 @@ export default function ModernChatPage({
         hasMore?: boolean;
       }>(
         url,
-        { headers: { Authorization: `Bearer ${token}` } },
+        {},
         { ttlMs: 3000, staleMs: 45000 }
       );
       if (data && data.conversation) {
@@ -154,11 +154,10 @@ export default function ModernChatPage({
   // Lightweight incremental poll — only fetches messages newer than we have.
   // No-ops until the initial full load has established the baseline id.
   const fetchNewMessages = async () => {
-    if (!token || lastServerIdRef.current === 0) return;
+    if (lastServerIdRef.current === 0) return;
     try {
       const res = await fetch(
-        `/api/conversations/${conversationId}/messages?after=${lastServerIdRef.current}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/api/conversations/${conversationId}/messages?after=${lastServerIdRef.current}`
       );
       if (res.ok) {
         const data = await res.json();
@@ -170,7 +169,7 @@ export default function ModernChatPage({
   };
 
   useEffect(() => {
-    if (token) {
+    if (user) {
       // Initial full load, incremental poll for new messages, and a slower
       // full refresh for presence dots. With Realtime push connected the
       // polls become slow safety nets instead of the live path.
@@ -182,7 +181,7 @@ export default function ModernChatPage({
         clearInterval(refreshInterval);
       };
     }
-  }, [token, conversationId, pushConnected]);
+  }, [user?.id, conversationId, pushConnected]);
 
   // Track if user is near bottom of scroll window (within 100px)
   const handleScroll = () => {
@@ -236,7 +235,6 @@ export default function ModernChatPage({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content }),
       });
@@ -276,7 +274,6 @@ export default function ModernChatPage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content: newContent }),
       });
@@ -304,9 +301,6 @@ export default function ModernChatPage({
     try {
       const res = await fetch(`/api/conversations/${conversationId}/messages/${messageId}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!res.ok) {
@@ -326,7 +320,6 @@ export default function ModernChatPage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ addMemberIds: [memberId] }),
       });
@@ -346,7 +339,6 @@ export default function ModernChatPage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ removeMemberIds: [memberId] }),
       });
@@ -366,7 +358,6 @@ export default function ModernChatPage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ name }),
       });
@@ -388,7 +379,6 @@ export default function ModernChatPage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ avatarUrl }),
       });
@@ -416,7 +406,6 @@ export default function ModernChatPage({
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ removeMemberIds: [user.id] }),
       });
@@ -555,7 +544,6 @@ export default function ModernChatPage({
         onLeaveGroup={handleLeaveGroup}
         onUpdateGroupName={handleUpdateGroupName}
         onUpdateGroupAvatar={handleUpdateGroupAvatar}
-        token={token}
       />
     </div>
   );

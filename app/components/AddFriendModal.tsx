@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "./AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface SearchResult {
@@ -18,7 +17,6 @@ interface AddFriendModalProps {
 }
 
 export function AddFriendModal({ onClose }: AddFriendModalProps) {
-  const { token } = useAuth();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -34,9 +32,7 @@ export function AddFriendModal({ onClose }: AddFriendModalProps) {
     const timer = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`);
         if (res.ok) {
           const data = await res.json();
           setResults(Array.isArray(data) ? data : []);
@@ -49,7 +45,7 @@ export function AddFriendModal({ onClose }: AddFriendModalProps) {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [query, token]);
+  }, [query]);
 
   const handleSendRequest = async (username: string) => {
     setError("");
@@ -58,7 +54,6 @@ export function AddFriendModal({ onClose }: AddFriendModalProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ username }),
       });

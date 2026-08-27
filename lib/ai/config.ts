@@ -25,6 +25,14 @@ export const AI_QUOTAS = {
     /** Window type for the quota */
     window: "day" as const,
   },
+  scope: {
+    /** Scope evaluations (quest coverage % via AI) per user per DAY. Each
+     *  evaluation can run up to 3 Gemini generations — this quota keeps the
+     *  spend bounded without hurting normal quest planning. */
+    limit: 20,
+    /** Window type for the quota */
+    window: "day" as const,
+  },
 } as const;
 
 /** AI features that consume a daily quota (single source of truth). */

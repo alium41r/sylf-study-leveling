@@ -10,7 +10,14 @@ export async function GET(req: NextRequest) {
   try {
     // 1. Cron Authentication
     const authHeader = req.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET || "default_cron_secret_for_dev";
+    // S4: fail closed — no fallback cron secret.
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret) {
+      return NextResponse.json(
+        { error: "CRON_SECRET is not configured" },
+        { status: 503 }
+      );
+    }
     
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

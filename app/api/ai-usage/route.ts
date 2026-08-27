@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { getUsageReport } from "@/lib/ai/usage-limiter";
 
 export const dynamic = "force-dynamic";
@@ -11,17 +11,12 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    const report = await getUsageReport(payload.userId as number);
+    const report = await getUsageReport(session.userId);
     return NextResponse.json(report, { status: 200 });
   } catch (error) {
     console.error("GET /api/ai-usage error:", error);

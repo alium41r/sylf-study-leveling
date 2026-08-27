@@ -16,7 +16,7 @@ import { ProfileStudioView } from "./identity/ProfileStudioView";
 export type IdentityViewMode = "hub" | "character-studio" | "profile-studio";
 
 export function IdentityTab() {
-  const { user, token, mutateUser } = useAuth();
+  const { user, mutateUser } = useAuth();
   const { openProfile } = useProfileModal();
 
   const [viewMode, setViewMode] = useState<IdentityViewMode>("hub");
@@ -54,9 +54,9 @@ export function IdentityTab() {
 
   // ─── Initial Data Sync ─────────────────────────────────────
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
 
-    fetch("/api/cosmetics", { headers: { Authorization: `Bearer ${token}` } })
+    fetch("/api/cosmetics")
       .then(async (res) => (res.ok ? res.json().catch(() => null) : null))
       .then((data) => {
         if (!data) return;
@@ -66,7 +66,7 @@ export function IdentityTab() {
       })
       .catch(console.error);
 
-    fetch("/api/user/connections", { headers: { Authorization: `Bearer ${token}` } })
+    fetch("/api/user/connections")
       .then(async (res) => (res.ok ? res.json().catch(() => null) : null))
       .then((data) => {
         if (!data?.connections) return;
@@ -83,14 +83,14 @@ export function IdentityTab() {
       })
       .catch(console.error);
 
-    fetch("/api/profile/stats", { headers: { Authorization: `Bearer ${token}` } })
+    fetch("/api/profile/stats")
       .then(async (res) => (res.ok ? res.json().catch(() => null) : null))
       .then((data) => {
         if (data?.stats) setStats(data);
       })
       .catch(console.error)
       .finally(() => setInitialLoad(false));
-  }, [token]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (user) {
@@ -119,7 +119,7 @@ export function IdentityTab() {
     bio !== (user.bio || "");
 
   const handleSaveAll = async () => {
-    if (saving || !token) return;
+    if (saving) return;
     setSaving(true);
 
     try {
@@ -127,7 +127,6 @@ export function IdentityTab() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           characterConfig,

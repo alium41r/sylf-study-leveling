@@ -7,7 +7,7 @@ import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
 
 export default function SecurityInformation() {
-  const { user, isLoading, login, token } = useAuth();
+  const { user, isLoading, login } = useAuth();
   
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -61,7 +61,6 @@ export default function SecurityInformation() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           action: "password",
@@ -76,8 +75,8 @@ export default function SecurityInformation() {
       if (res.ok) {
         setStatus({ type: "success", message: data.message });
         // Replace current session seamlessly
-        if (data.token && user) {
-          login(data.token, user);
+        if (user) {
+          login(user);
         }
         // Auto close after 1.5s on success
         setTimeout(() => {

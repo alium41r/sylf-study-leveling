@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 
 export const dynamic = "force-dynamic";
 
@@ -10,14 +10,9 @@ export async function PATCH(
 ) {
   try {
     const params = await props.params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const authSession = await getSession(req);
+    if (!authSession) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const sessionId = parseInt(params.id);
@@ -34,7 +29,7 @@ export async function PATCH(
       where: { id: sessionId },
     });
 
-    if (!session || session.userId !== (payload.userId as number)) {
+    if (!session || session.userId !== authSession.userId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
@@ -56,14 +51,9 @@ export async function DELETE(
 ) {
   try {
     const params = await props.params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const authSession = await getSession(req);
+    if (!authSession) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const sessionId = parseInt(params.id);
@@ -75,7 +65,7 @@ export async function DELETE(
       where: { id: sessionId },
     });
 
-    if (!session || session.userId !== (payload.userId as number)) {
+    if (!session || session.userId !== authSession.userId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 

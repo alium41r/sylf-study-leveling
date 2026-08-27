@@ -153,7 +153,7 @@ function FriendStudyTimer({ friend }: { friend: Friend }) {
 }
 
 function SocialContent() {
-  const { user, token, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const { openProfile } = useProfileModal();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -237,24 +237,24 @@ function SocialContent() {
   // Repeat visits paint instantly; background refresh keeps data current.
   const loadFriends = useCallback(async () => {
     const data = await fetchCachedJSON<Friend[]>("/api/friends",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:friends:${user?.id ?? 0}` });
     if (data) setFriends(Array.isArray(data) ? data : []);
-  }, [token, user?.id]);
+  }, [user?.id]);
 
   const loadRequests = useCallback(async () => {
     const data = await fetchCachedJSON<FriendRequest[]>("/api/friends/requests",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 20_000, staleMs: 120_000, storageKey: `social:requests:${user?.id ?? 0}` });
     if (data) setRequests(Array.isArray(data) ? data : []);
-  }, [token, user?.id]);
+  }, [user?.id]);
 
   const loadConversations = useCallback(async () => {
     const data = await fetchCachedJSON<Conversation[]>("/api/conversations",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:convos:${user?.id ?? 0}` });
     if (data) setConversations(Array.isArray(data) ? data : []);
-  }, [token, user?.id]);
+  }, [user?.id]);
 
   // ─── Supabase Realtime: presence + postgres_changes push ────
   // Presence replaces the lastSeenAt window for online dots (instant on/off);
@@ -306,7 +306,7 @@ function SocialContent() {
   // With Realtime push connected the intervals become slow safety nets;
   // without it they carry the live updates as before.
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
 
     let cancelled = false;
     const initial = async () => {
@@ -333,7 +333,7 @@ function SocialContent() {
       clearInterval(requestsInterval);
       clearInterval(convosInterval);
     };
-  }, [token, user?.id, pushConnected, presence.connected, loadFriends, loadRequests, loadConversations]);
+  }, [user?.id, pushConnected, presence.connected, loadFriends, loadRequests, loadConversations]);
 
   // ─── Presence overlay for online dots ─────────────────────
   // When the presence channel is live, a friend is online if EITHER the
@@ -377,16 +377,13 @@ function SocialContent() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ action }),
       });
       if (res.ok) {
         setRequests((prev) => prev.filter((req) => req.id !== requestId));
         if (action === "ACCEPT") {
-          const friendsRes = await fetch("/api/friends", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const friendsRes = await fetch("/api/friends");
           if (friendsRes.ok) setFriends(await friendsRes.json());
         }
       }
@@ -403,7 +400,6 @@ function SocialContent() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ participantIds: [friendId] }),
       });
@@ -423,7 +419,6 @@ function SocialContent() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           participantIds: selectedFriends,

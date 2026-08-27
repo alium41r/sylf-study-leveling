@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { generateEmailVerificationToken } from "@/lib/auth-service";
 import { sendVerificationEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,6 +25,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { message: "Account is already verified." },
         { status: 200 }
+      );
+    }
+
+    // S4: per-user verification-email throttle.
+    const vLimit = await rateLimit(`verify:user:${session.userId}`, {
+      limit: 3,
+      windowMs: 10 * 60_000,
+    });
+    if (!vLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many verification emails requested. Please wait a few minutes." },
+        { status: 429, headers: { "Retry-After": String(vLimit.retryAfterSeconds) } }
       );
     }
 

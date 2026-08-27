@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "./AuthProvider";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,18 +19,13 @@ interface Invite {
 }
 
 export function SessionInviteToast() {
-  const { token } = useAuth();
   const router = useRouter();
   const [invites, setInvites] = useState<Invite[]>([]);
 
   useEffect(() => {
-    if (!token) return;
-
     const fetchInvites = async () => {
       try {
-        const res = await fetch("/api/invites", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await fetch("/api/invites");
         if (res.ok) {
           const data = await res.json();
           setInvites(data);
@@ -44,15 +38,14 @@ export function SessionInviteToast() {
     fetchInvites();
     const interval = setInterval(fetchInvites, 30000); // 30s
     return () => clearInterval(interval);
-  }, [token]);
+  }, []);
 
   const handleAction = async (inviteId: number, action: "ACCEPTED" | "DECLINED", subjectId?: number) => {
     try {
       await fetch(`/api/invites/${inviteId}`, {
         method: "PATCH",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ action })
       });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { CATALOG_ITEMS } from "@/lib/shop-items";
 import { cachedWithRedis } from "@/lib/redis";
 
@@ -9,12 +9,9 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   try {
     let userId: number | null = null;
-    const authHeader = req.headers.get("authorization");
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      const payload = await verifyToken(authHeader.split(" ")[1]);
-      if (payload) {
-        userId = payload.userId as number;
-      }
+    const session = await getSession(req);
+    if (session) {
+      userId = session.userId;
     }
 
     // Strict projection: filter out quarantined legacy equipment and set

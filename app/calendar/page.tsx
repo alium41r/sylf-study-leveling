@@ -6,14 +6,14 @@ import { useAuth } from "../components/AuthProvider";
 import StudyCalendar from "../components/Calendar/StudyCalendar";
 
 export default function CalendarPage() {
-  const { user, token } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!token) {
+    if (!isLoading && !user) {
       router.push("/login");
     }
-  }, [token, router]);
+  }, [isLoading, user, router]);
 
   if (!user) {
     return <div className="p-8 text-center text-gray-400 font-['Rajdhani']">Loading Calendar...</div>;

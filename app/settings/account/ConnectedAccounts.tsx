@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useAuth } from "@/app/components/AuthProvider";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 
@@ -62,7 +61,6 @@ interface ConnectedAccountInfo {
 }
 
 export default function ConnectedAccounts() {
-  const { token } = useAuth();
   const [connections, setConnections] = useState<Record<string, ConnectedAccountInfo>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -78,14 +76,10 @@ export default function ConnectedAccounts() {
 
   const fetchConnections = useCallback(async () => {
     try {
-      const storedToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
       // Stale-while-revalidate: reopening account paints instantly.
       const data = await fetchCachedJSON<{ connections?: ConnectedAccountInfo[] }>(
         "/api/user/connections",
-        {
-          credentials: "include",
-          headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
-        },
+        { credentials: "include" },
         { ttlMs: 30_000, staleMs: 120_000 }
       );
       if (data?.connections) {
@@ -100,7 +94,7 @@ export default function ConnectedAccounts() {
     } finally {
       setIsLoading(false);
     }
-  }, [token]);
+  }, []);
 
   // Check URL params for OAuth status (e.g. ?connected=github or ?error=...)
   useEffect(() => {
@@ -146,7 +140,6 @@ export default function ConnectedAccounts() {
     try {
       const res = await fetch(`/api/user/connections/${providerId}`, {
         method: "DELETE",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
       const data = await res.json();

@@ -8,9 +8,9 @@
  * Consumption is enforced ATOMICALLY in Postgres via a guarded upsert
  * (`INSERT ... ON CONFLICT DO UPDATE ... WHERE used < limit`), which
  * closes the parallel-request bypass that a check-then-record sequence
- * is vulnerable to. Quota is only charged AFTER a successful generation
- * — callers invoke `checkQuota` up-front (non-charging) and
- * `consumeQuota` only once the generation completed successfully.
+ * is vulnerable to. S4: the unit is RESERVED before generation begins
+ * (reserveQuota) and refunded via releaseQuota on failure/timeout/abort,
+ * so parallel requests either reserve or receive 429 before any spend.
  */
 
 import { prisma } from "@/lib/prisma";
@@ -79,14 +79,15 @@ export async function checkQuota(userId: number, feature: QuotaFeature): Promise
 }
 
 /**
- * Atomically consume one unit of quota for a feature.
- *
- * The guarded upsert increments `used` only while it is still below the
- * limit; concurrent requests serialize on the unique row and cannot
- * collectively exceed the daily cap. Call this ONLY after a generation
- * succeeded — never on model errors, timeouts, or client aborts.
+ * Atomically RESERVE one unit of quota for a feature. This is the charging
+ * operation and it runs BEFORE any expensive generation: concurrent requests
+ * serialize on the unique (userId, feature, dateKey) row and the guarded
+ * upsert only increments while `used` is still below the limit, so N parallel
+ * requests can never collectively exceed the cap — they either reserve or get
+ * 429 before spending a token. Callers MUST call releaseQuota on failure,
+ * timeout, or client abort to refund the reservation.
  */
-export async function consumeQuota(userId: number, feature: QuotaFeature): Promise<QuotaConsumeResult> {
+export async function reserveQuota(userId: number, feature: QuotaFeature): Promise<QuotaConsumeResult> {
   const config = AI_QUOTAS[feature];
   const { dateKey, resetsAt } = await getQuotaContext(userId, feature);
 
@@ -114,15 +115,36 @@ export async function consumeQuota(userId: number, feature: QuotaFeature): Promi
 }
 
 /**
+ * Refund a reservation (failed/timed-out/aborted generation). Guarded so a
+ * double-release can never push `used` below zero.
+ */
+export async function releaseQuota(userId: number, feature: QuotaFeature): Promise<void> {
+  const { dateKey } = await getQuotaContext(userId, feature);
+  try {
+    await prisma.$queryRawUnsafe(
+      `UPDATE "UserQuota" SET "used" = "UserQuota"."used" - 1, "updatedAt" = NOW()
+       WHERE "userId" = $1::int AND "feature" = $2::text AND "dateKey" = $3::text
+         AND "used" > 0`,
+      userId,
+      feature,
+      dateKey
+    );
+  } catch (err) {
+    console.warn(`[quota] releaseQuota failed for user ${userId} (${feature}):`, err);
+  }
+}
+
+/**
  * Get full usage report for all features.
  * Used by the /api/ai-usage endpoint.
  */
 export async function getUsageReport(userId: number): Promise<Record<QuotaFeature, QuotaCheckResult>> {
-  const [chat, planner, compile] = await Promise.all([
+  const [chat, planner, compile, scope] = await Promise.all([
     checkQuota(userId, "chat"),
     checkQuota(userId, "planner"),
     checkQuota(userId, "compile"),
+    checkQuota(userId, "scope"),
   ]);
 
-  return { chat, planner, compile };
+  return { chat, planner, compile, scope };
 }

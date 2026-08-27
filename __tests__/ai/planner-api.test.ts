@@ -75,7 +75,7 @@ describe("Planner API Integration Test", () => {
     // Mock Prisma responses
     vi.mocked(prisma.systemMessage.count).mockResolvedValue(0); // 0 quota used today
     vi.mocked(prisma.userQuota.findUnique).mockResolvedValue(null); // 0 quota used today
-    vi.mocked(prisma.$queryRawUnsafe).mockResolvedValue([{ used: 1 }] as any); // atomic consumeQuota
+    vi.mocked(prisma.$queryRawUnsafe).mockResolvedValue([{ used: 1 }] as any); // atomic reserveQuota
     vi.mocked(prisma.studySession.findMany).mockResolvedValue([]);
     vi.mocked(prisma.goal.create).mockResolvedValue({
       id: goalId,

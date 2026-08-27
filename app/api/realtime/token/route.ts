@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { SignJWT } from "jose";
 
 /**
@@ -7,6 +7,9 @@ import { SignJWT } from "jose";
  * Mints a short-lived Supabase-format JWT for the authenticated user so the
  * browser can join Realtime presence + postgres_changes channels as
  * `authenticated` (sub = the app's integer user id).
+ *
+ * S3: authenticates via the httpOnly session cookie (no Bearer header) and
+ * the minted token is held in memory only — never localStorage.
  *
  * Requires SUPABASE_JWT_SECRET (the "JWT secret" from Supabase → Settings →
  * API). Without it the route reports `enabled: false` and clients gracefully
@@ -17,13 +20,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ enabled: false, reason: "SUPABASE_JWT_SECRET not configured" });
   }
 
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const payload = await verifyToken(authHeader.split(" ")[1]);
+  const payload = await getSession(req);
   if (!payload) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const secret = new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET);
@@ -41,11 +40,11 @@ export async function GET(req: NextRequest) {
     .setAudience("authenticated")
     .setIssuer("sylf")
     .setIssuedAt()
-    .setExpirationTime("1h")
+    .setExpirationTime("30m")
     .sign(secret);
 
   return NextResponse.json(
-    { enabled: true, token, expiresIn: 3600 },
+    { enabled: true, token, expiresIn: 1800 },
     { headers: { "Cache-Control": "no-store" } }
   );
 }

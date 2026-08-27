@@ -5,7 +5,7 @@ import { useAuth } from "@/app/components/AuthProvider";
 import { TimezoneService } from "@/lib/timezone-service";
 
 export default function AccountInformation() {
-  const { user, token, isLoading, mutateUser, refreshStats, login } = useAuth();
+  const { user, isLoading, mutateUser, refreshStats, login } = useAuth();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -124,7 +124,7 @@ export default function AccountInformation() {
   };
 
   const handleSendVerification = async () => {
-    if (!token && !user) return;
+    if (!user) return;
     if (verificationCooldown > 0) return;
 
     setIsSendingVerification(true);
@@ -134,7 +134,6 @@ export default function AccountInformation() {
     try {
       const res = await fetch("/api/auth/verify-email/send", {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
       const data = await res.json();
@@ -215,7 +214,6 @@ export default function AccountInformation() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           username: formData.username,
@@ -228,8 +226,8 @@ export default function AccountInformation() {
       const data = await res.json();
 
       if (res.ok) {
-        if (data.token && data.user) {
-          login(data.token, data.user);
+        if (data.user) {
+          login(data.user);
         }
         setStatus({
           type: "success",

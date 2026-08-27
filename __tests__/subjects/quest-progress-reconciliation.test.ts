@@ -171,6 +171,8 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
     });
 
     it("evaluates scope via evaluate-scope API endpoint (`POST /api/quests/evaluate-scope`)", async () => {
+      // S4: the route reserves the "scope" quota atomically before the AI call.
+      (prisma.$queryRawUnsafe as any).mockResolvedValue([{ used: 1 }]);
       const token = await signToken({ userId: 101, username: "scholar_test" });
       const req = new NextRequest("http://localhost:3000/api/quests/evaluate-scope", {
         method: "POST",
@@ -224,6 +226,8 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
     });
 
     it("creates node-bound quest with computed scope weight, xpReward, and sylphReward", async () => {
+      // S4: quest creation reserves the "scope" quota before the AI evaluation.
+      (prisma.$queryRawUnsafe as any).mockResolvedValue([{ used: 1 }]);
       const token = await signToken({ userId: 101, username: "scholar_test" });
 
       (prisma.subjectNode.findFirst as any).mockResolvedValue({

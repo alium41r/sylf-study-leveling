@@ -20,11 +20,15 @@ interface ConfirmationPayload {
 }
 
 function secret(): string {
-  return (
-    process.env.JWT_SECRET ||
-    process.env.TOOL_CONFIRMATION_SECRET ||
-    "sylf-dev-tool-confirmation-secret"
-  );
+  // S4: fail closed — no fallback secret. Confirmation tokens simply cannot
+  // be minted/verified until a real secret is configured.
+  const value = process.env.TOOL_CONFIRMATION_SECRET || process.env.JWT_SECRET;
+  if (!value) {
+    throw new Error(
+      "TOOL_CONFIRMATION_SECRET (or JWT_SECRET) is not configured. Refusing to sign confirmation tokens."
+    );
+  }
+  return value;
 }
 
 /**

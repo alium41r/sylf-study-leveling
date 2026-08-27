@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 
 /**
  * PATCH /api/conversations/[id]/messages/[messageId]
@@ -12,23 +12,27 @@ export async function PATCH(
   props: { params: Promise<{ id: string; messageId: string }> }
 ) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { id, messageId } = await props.params;
     const conversationId = parseInt(id);
     const msgId = parseInt(messageId);
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const body = await req.json();
 
     if (!body.content || !body.content.trim()) {
       return NextResponse.json({ error: "Message content cannot be empty" }, { status: 400 });
+    }
+
+    // S3: current membership is required at mutation time, not just at fetch.
+    const participant = await prisma.conversationParticipant.findUnique({
+      where: { userId_conversationId: { userId, conversationId } },
+    });
+    if (!participant) {
+      return NextResponse.json({ error: "Not a participant" }, { status: 403 });
     }
 
     // Verify message exists and belongs to conversation
@@ -82,19 +86,23 @@ export async function DELETE(
   props: { params: Promise<{ id: string; messageId: string }> }
 ) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { id, messageId } = await props.params;
     const conversationId = parseInt(id);
     const msgId = parseInt(messageId);
-    const userId = payload.userId as number;
+    const userId = session.userId;
+
+    // S3: current membership is required at mutation time.
+    const participant = await prisma.conversationParticipant.findUnique({
+      where: { userId_conversationId: { userId, conversationId } },
+    });
+    if (!participant) {
+      return NextResponse.json({ error: "Not a participant" }, { status: 403 });
+    }
 
     const message = await prisma.message.findUnique({
       where: { id: msgId },

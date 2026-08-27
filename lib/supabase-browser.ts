@@ -7,6 +7,9 @@
 // a createClient() instance so Realtime presence + postgres_changes channels
 // run as `authenticated` with the user's real id.
 //
+// S3: the minted token is held IN MEMORY ONLY (never localStorage) and is
+// requested with the httpOnly session cookie (credentials: "include").
+//
 // Everything degrades gracefully: if NEXT_PUBLIC_SUPABASE_URL /
 // NEXT_PUBLIC_SUPABASE_ANON_KEY are not set, or the token route reports
 // `enabled: false` (no SUPABASE_JWT_SECRET), every hook that uses this module
@@ -16,8 +19,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let client: SupabaseClient | null = null;
 
-const JWT_STORAGE_KEY = "sylf_realtime_jwt";
-const JWT_CACHE_MS = 50 * 60 * 1000; // minted tokens live 1h; refresh at 50min
+// In-memory minted-JWT cache (module scope). Survives client-side navigations
+// but NOT page reloads — a reload simply re-mints through the cookie session.
+let cachedJwt: { token: string; expiresAt: number } | null = null;
+const JWT_CACHE_MS = 25 * 60 * 1000; // minted tokens live 30min; refresh at 25min
 
 export function isRealtimeConfigured(): boolean {
   return Boolean(
@@ -46,42 +51,28 @@ export function getSupabaseBrowser(): SupabaseClient | null {
 }
 
 /**
- * Obtain a Supabase-format JWT for the current user. The server route returns
- * `{ enabled: false }` when Realtime isn't configured — callers treat that as
- * "stay on polling".
+ * Obtain a Supabase-format JWT for the current user from the server.
+ * Authenticates with the httpOnly session cookie; the result is cached in
+ * memory only. Returns null when Realtime isn't configured or the user is
+ * not authenticated.
  */
-export async function getRealtimeJwt(appToken: string): Promise<string | null> {
+export async function getRealtimeJwt(): Promise<string | null> {
   if (typeof window === "undefined") return null;
 
-  // 1. Reuse a still-valid cached token (survives client-side navigations
-  //    and full reloads, so we only re-mint once per hour).
-  try {
-    const raw = window.localStorage.getItem(JWT_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as { token?: string; expiresAt?: number };
-      if (parsed?.token && parsed?.expiresAt && parsed.expiresAt > Date.now()) {
-        return parsed.token;
-      }
-    }
-  } catch {
-    // Ignore corrupt cache.
+  // 1. Reuse a still-valid in-memory token (survives client-side navigations).
+  if (cachedJwt && cachedJwt.expiresAt > Date.now() && cachedJwt.token) {
+    return cachedJwt.token;
   }
 
   try {
     const res = await fetch("/api/realtime/token", {
-      headers: { Authorization: `Bearer ${appToken}` },
+      credentials: "include",
+      cache: "no-store",
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { enabled?: boolean; token?: string };
     if (!data?.enabled || !data?.token) return null;
-    try {
-      window.localStorage.setItem(
-        JWT_STORAGE_KEY,
-        JSON.stringify({ token: data.token, expiresAt: Date.now() + JWT_CACHE_MS })
-      );
-    } catch {
-      // Quota — non-fatal.
-    }
+    cachedJwt = { token: data.token, expiresAt: Date.now() + JWT_CACHE_MS };
     return data.token;
   } catch (err) {
     console.warn("[realtime] failed to fetch minted JWT — staying on polling:", err);
@@ -90,10 +81,10 @@ export async function getRealtimeJwt(appToken: string): Promise<string | null> {
 }
 
 /** Attach the minted JWT to the client so Realtime authenticates as the user. */
-export async function attachRealtimeAuth(appToken: string): Promise<SupabaseClient | null> {
+export async function attachRealtimeAuth(): Promise<SupabaseClient | null> {
   const sb = getSupabaseBrowser();
   if (!sb) return null;
-  const jwt = await getRealtimeJwt(appToken);
+  const jwt = await getRealtimeJwt();
   if (!jwt) return null;
   try {
     await sb.auth.setSession({ access_token: jwt, refresh_token: jwt });

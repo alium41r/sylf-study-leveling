@@ -12,18 +12,18 @@ type EnrichedAchievement = AchievementDef & {
 };
 
 export default function AchievementsPage() {
-  const { user, token, mutateUser } = useAuth();
+  const { user, mutateUser } = useAuth();
   const [achievements, setAchievements] = useState<EnrichedAchievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const fetchAchievements = () => {
-    if (!token) return;
+    if (!user) return;
     // Stale-while-revalidate: reopen the achievements page instantly.
     fetchCachedJSON<{ achievements?: EnrichedAchievement[] }>(
       "/api/achievements",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 30_000, staleMs: 120_000, storageKey: `achievements:${user?.id ?? 0}` }
     )
       .then(data => {
@@ -37,18 +37,17 @@ export default function AchievementsPage() {
 
   useEffect(() => {
     fetchAchievements();
-  }, [token]);
+  }, [user?.id]);
 
   const handleClaim = async (id: string) => {
-    if (claiming || !token) return;
+    if (claiming) return;
     setClaiming(id);
     setError("");
     try {
       const res = await fetch("/api/achievements", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ achievementId: id })
       });

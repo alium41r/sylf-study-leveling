@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession, signToken, type AuthTokenPayload } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
@@ -116,22 +116,6 @@ export async function GET(req: NextRequest) {
     const xpToNextLevel = xpForNextLevel(user.level);
     const hasPassword = user.password !== null;
 
-    const tokenPayload: AuthTokenPayload = {
-      userId: user.id,
-      email: user.email,
-      username: user.username,
-      name: user.name,
-      scholarId,
-      verificationStatus: user.verificationStatus,
-      hunterRank: user.hunterRank,
-      level: user.level,
-      hasCompletedOnboarding: user.hasCompletedOnboarding,
-      hasPassword,
-      timezone: user.timezone || "UTC",
-    };
-
-    const token = await signToken(tokenPayload);
-
     const { password: _, ...userStats } = user;
 
     return NextResponse.json(
@@ -140,7 +124,6 @@ export async function GET(req: NextRequest) {
         scholarId,
         xpToNextLevel,
         hasPassword,
-        token,
         completedTodaySeconds,
         todayStudySeconds,
         todayStudyMinutes,

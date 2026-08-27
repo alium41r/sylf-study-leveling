@@ -316,7 +316,7 @@ function DayCell({
 }
 
 export default function StudyCalendar() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const now = useMemo(() => new Date(), []);
 
   const [year, setYear] = useState(now.getFullYear());
@@ -347,13 +347,11 @@ export default function StudyCalendar() {
 
   // Fetch month data
   const fetchMonthData = useCallback(async () => {
-    if (!token) return;
+    if (!user) return;
     setIsLoading(true);
 
     try {
-      const res = await fetch(`/api/calendar/month?year=${year}&month=${month}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(`/api/calendar/month?year=${year}&month=${month}`);
 
       if (res.ok) {
         const data = await res.json();
@@ -372,7 +370,7 @@ export default function StudyCalendar() {
     } finally {
       setIsLoading(false);
     }
-  }, [token, year, month]);
+  }, [user?.id, year, month]);
 
   useEffect(() => {
     fetchMonthData();
@@ -394,11 +392,10 @@ export default function StudyCalendar() {
   // Live floating-rest-day status for the currently selected day
   const loadFloatingRestStatus = useCallback(
     async (dateKey: string) => {
-      if (!token) return;
+      if (!user) return;
       try {
         const res = await fetch(
-          `/api/user/study-schedule/floating-rest-day?dateKey=${dateKey}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          `/api/user/study-schedule/floating-rest-day?dateKey=${dateKey}`
         );
         if (res.ok) {
           const status = await res.json();
@@ -408,7 +405,7 @@ export default function StudyCalendar() {
         console.error("Failed to load floating rest day status:", err);
       }
     },
-    [token]
+    [user?.id]
   );
 
   useEffect(() => {
@@ -421,12 +418,12 @@ export default function StudyCalendar() {
 
   /** Toggle the selected day as a floating (ad-hoc) rest day. */
   const handleToggleFloatingRest = async () => {
-    if (!token || !selectedDay) return;
+    if (!selectedDay) return;
     setIsTogglingFloatingRest(true);
     try {
       const res = await fetch("/api/user/study-schedule/floating-rest-day", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dateKey: selectedDay.date }),
       });
       if (res.ok) {
@@ -861,7 +858,6 @@ export default function StudyCalendar() {
         onSaveSuccess={() => {
           fetchMonthData();
         }}
-        token={token}
       />
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

@@ -207,25 +207,35 @@ export async function exchangeOAuthCode(
 
       const profile = await userRes.json();
 
-      // If profile email is null, attempt to fetch verified primary email
-      let email = profile.email;
-      if (!email) {
-        try {
-          const emailsRes = await fetch("https://api.github.com/user/emails", {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "User-Agent": "Sylf-App",
-              Accept: "application/json",
-            },
-          });
-          if (emailsRes.ok) {
-            const emails: { email: string; primary: boolean; verified: boolean }[] = await emailsRes.json();
-            const primaryEmail = emails.find((e) => e.primary && e.verified) || emails.find((e) => e.verified) || emails[0];
-            if (primaryEmail) email = primaryEmail.email;
+      // S3 fix (OAuth takeover): a GitHub email counts as verified ONLY when
+      // /user/emails returns it with verified=true. The public profile email
+      // and the old `emails[0]` fallback are attacker-influenceable and must
+      // never authorize linking to an existing account.
+      let email = profile.email || null;
+      let emailVerified = false;
+      try {
+        const emailsRes = await fetch("https://api.github.com/user/emails", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "User-Agent": "Sylf-App",
+            Accept: "application/json",
+          },
+        });
+        if (emailsRes.ok) {
+          const emails: { email: string; primary: boolean; verified: boolean }[] = await emailsRes.json();
+          const verifiedPrimary =
+            emails.find((e) => e.primary && e.verified) || emails.find((e) => e.verified);
+          if (verifiedPrimary?.email) {
+            email = verifiedPrimary.email;
+            emailVerified = true;
+          } else if (email && emails.some((e) => e.email === email && e.verified)) {
+            // The public profile email is itself verified.
+            emailVerified = true;
           }
-        } catch {
-          // Non-blocking fallback
+          // Otherwise email may still be set, but stays unverified.
         }
+      } catch {
+        // Non-blocking fallback: email remains unverified.
       }
 
       const username = (profile.login || "").toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 20);
@@ -238,7 +248,7 @@ export async function exchangeOAuthCode(
         username: username || "hunter",
         providerUsername: profile.login || null,
         avatarUrl: profile.avatar_url || null,
-        emailVerified: Boolean(email),
+        emailVerified,
       };
     }
 

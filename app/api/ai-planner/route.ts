@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { AiStudyOrchestrator, StudySessionData } from "@/lib/ai/orchestrator";
-import { checkQuota, consumeQuota } from "@/lib/ai/usage-limiter";
+import { reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
 import { AI_LIMITS } from "@/lib/ai/config";
 import { calculateRecommendedDifficulty } from "@/lib/difficulty-engine";
 
@@ -15,20 +15,17 @@ export const maxDuration = 120; // Extended execution window on Vercel for multi
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
-    const userId = payload.userId as number;
+    const userId = session.userId;
 
     // ── Quota enforcement ─────────────────────────────────
-    const quota = await checkQuota(userId, "planner");
+    // S4: RESERVE before the (expensive, multi-agent) generation begins;
+    // failures/aborts refund the unit.
+    const quota = await reserveQuota(userId, "planner");
     if (!quota.allowed) {
       return NextResponse.json(
         { error: "quota_exceeded", feature: "planner", remaining: 0, limit: quota.limit, resetsAt: quota.resetsAt },
@@ -274,13 +271,6 @@ export async function POST(req: NextRequest) {
           // Final response with targetSessionId and modelUsed
           sendEvent("result", { goal, sessionId: targetSessionId, modelUsed: plannerModelName });
 
-          // Quota charged atomically ONLY after the plan was successfully
-          // generated AND persisted (never on errors, timeouts, or aborts).
-          const consumed = await consumeQuota(userId, "planner");
-          if (!consumed.allowed) {
-            console.warn(`[Planner] Quota race: plan succeeded but consumeQuota was not charged for user ${userId}`);
-          }
-
           // Request-level cost telemetry (best-effort — never blocks the result).
           await logAiUsage({
             userId,
@@ -295,6 +285,8 @@ export async function POST(req: NextRequest) {
           controller.close();
         } catch (err: any) {
           console.error("Planner API Error:", err);
+          // S4: refund the reservation — the plan was never delivered.
+          await releaseQuota(userId, "planner").catch(() => {});
           const errorMsg =
             err.message === "AI_TIMEOUT"
               ? "The AI took longer than expected to research your topics. Please try again with a slightly more concise topic or syllabus."

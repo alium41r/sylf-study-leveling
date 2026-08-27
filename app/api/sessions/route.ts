@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import {
   calculateWeeklyStreak,
   getWeeklyBounds,
@@ -62,15 +62,12 @@ interface SettleResult {
  */
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const authSession = await getSession(req);
+    if (!authSession) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
+    const userId = authSession.userId;
 
     const body = await req.json();
     const validation = startSessionSchema.safeParse(body);
@@ -88,7 +85,7 @@ export async function POST(req: NextRequest) {
       [{ start_study_session: { id: number; userId: number; questId: number | null; subjectId: number | null; durationMinutes: number; durationSeconds: number; focusRate: number; startedAt: string } }]
     >`
       SELECT public.start_study_session(
-        ${payload.userId as number},
+        ${userId},
         ${questId ?? null},
         ${subjectId ?? null},
         ${initialSeconds ?? 0}
@@ -97,8 +94,16 @@ export async function POST(req: NextRequest) {
 
     const session = rows[0]?.start_study_session;
     return NextResponse.json(session, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("POST /api/sessions error:", error);
+    // S5: map RPC ownership rejections to clean 4xx (cross-user quest/subject).
+    const msg = String(error?.message || "");
+    if (/unauthorized|not found/i.test(msg)) {
+      return NextResponse.json(
+        { error: "Quest or subject not found or unauthorized" },
+        { status: 403 }
+      );
+    }
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -113,14 +118,9 @@ export async function POST(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -135,8 +135,28 @@ export async function PATCH(req: NextRequest) {
     const { id, durationMinutes, durationSeconds, breakSeconds, questId, completeQuest, final } = validation.data;
     const claimedSeconds = durationSeconds ?? durationMinutes * 60;
 
+    // ─── S4: SETTLE-CYCLE FLOOD GUARD ──────────────────────────
+    // The settle RPC grants a small wall-clock grace (+60s), so a rapid
+    // start→settle→start→settle loop could farm XP. Cap final settlements to
+    // 6 per rolling 60 seconds per user (real studying never trips this).
+    if (final === true) {
+      const recentSettles = await prisma.studySession.count({
+        where: {
+          userId: session.userId,
+          endedAt: { gte: new Date(Date.now() - 60_000) },
+          NOT: { id },
+        },
+      }).catch(() => 0);
+      if (recentSettles >= 6) {
+        return NextResponse.json(
+          { error: "Too many session settlements. Please wait a moment." },
+          { status: 429, headers: { "Retry-After": "30" } }
+        );
+      }
+    }
+
     const userRow = await prisma.user.findUnique({
-      where: { id: payload.userId as number },
+      where: { id: session.userId },
       select: { id: true, username: true, timezone: true, lastActiveDate: true, streakDays: true, level: true },
     }).catch(() => null);
 
@@ -152,7 +172,7 @@ export async function PATCH(req: NextRequest) {
     try {
       const rows = await prisma.$queryRaw<[{ settle_study_session_atomic: SettleResult }]>`
         SELECT public.settle_study_session_atomic(
-          ${payload.userId as number},
+          ${session.userId},
           ${id},
           ${claimedSeconds},
           ${breakSeconds ?? 0},

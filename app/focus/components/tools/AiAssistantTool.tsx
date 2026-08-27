@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useAuth } from "@/app/components/AuthProvider";
 import { useFocusTools } from "../FocusToolsContext";
 import MarkdownRenderer from "@/app/components/MarkdownRenderer";
 import {
@@ -42,7 +41,6 @@ const INITIAL_GREETING =
   "Greetings, Scholar. I'm ready to assist with your active subject. What concept, formula, or problem should we tackle?";
 
 export default function AiAssistantTool() {
-  const { token } = useAuth();
   const { subjectName, questTitle, openTool } = useFocusTools();
 
   const [input, setInput] = useState<string>("");
@@ -69,10 +67,6 @@ export default function AiAssistantTool() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const streamTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const getActiveToken = useCallback(() => {
-    return token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-  }, [token]);
-
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (typeof messagesEndRef.current?.scrollIntoView === "function") {
       messagesEndRef.current.scrollIntoView({ behavior });
@@ -91,19 +85,12 @@ export default function AiAssistantTool() {
     };
   }, []);
 
-  // Fetch all chat sessions on mount or when token is available
+  // Fetch all chat sessions on mount
   const fetchSessions = useCallback(async () => {
-    const activeToken = getActiveToken();
-    if (!activeToken) return;
-
     try {
       const [chatsRes, skillsRes] = await Promise.all([
-        fetch("/api/chats", {
-          headers: { Authorization: `Bearer ${activeToken}` },
-        }),
-        fetch("/api/skills", {
-          headers: { Authorization: `Bearer ${activeToken}` },
-        }).catch(() => null),
+        fetch("/api/chats"),
+        fetch("/api/skills").catch(() => null),
       ]);
 
       if (chatsRes.ok) {
@@ -122,7 +109,7 @@ export default function AiAssistantTool() {
     } catch (err) {
       console.error("Failed to fetch chat sessions or skills:", err);
     }
-  }, [getActiveToken]);
+  }, []);
 
   useEffect(() => {
     fetchSessions();
@@ -131,17 +118,11 @@ export default function AiAssistantTool() {
   // Load past conversation messages for a selected session
   const loadSessionMessages = useCallback(
     async (targetSessionId: number) => {
-      const activeToken = getActiveToken();
-      if (!activeToken) return;
-
       setIsLoadingHistory(true);
       setShowHistoryDrawer(false);
       try {
         const res = await fetch(
-          `/api/system-messages?sessionId=${targetSessionId}&limit=100`,
-          {
-            headers: { Authorization: `Bearer ${activeToken}` },
-          }
+          `/api/system-messages?sessionId=${targetSessionId}&limit=100`
         );
 
         if (res.ok) {
@@ -186,7 +167,7 @@ export default function AiAssistantTool() {
         setIsLoadingHistory(false);
       }
     },
-    [getActiveToken]
+    []
   );
 
   // Start a new empty chat session
@@ -214,13 +195,10 @@ export default function AiAssistantTool() {
   // Delete a past session
   const handleDeleteSession = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
-    const activeToken = getActiveToken();
-    if (!activeToken) return;
 
     try {
       const res = await fetch(`/api/chats/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${activeToken}` },
       });
       if (res.ok) {
         setSessions((prev) => prev.filter((s) => s.id !== id));
@@ -291,7 +269,6 @@ export default function AiAssistantTool() {
 
     try {
       abortControllerRef.current = new AbortController();
-      const activeToken = getActiveToken();
 
       const hasAdvancedSynthesis = unlockedSkills.includes("researcher-literature-synthesis");
 
@@ -303,7 +280,6 @@ export default function AiAssistantTool() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
         },
         body: JSON.stringify({
           message: textToSend,

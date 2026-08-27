@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import {
   GOAL_COLOR_TOKENS,
   isGoalColorToken,
@@ -28,20 +28,15 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const goal = await prisma.goal.findFirst({
       where: {
         id: parseInt(id),
-        userId: payload.userId as number,
+        userId: session.userId,
       },
       include: {
         quests: {
@@ -67,14 +62,9 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -88,7 +78,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     // Verify ownership
     const existing = await prisma.goal.findFirst({
-      where: { id: parseInt(id), userId: payload.userId as number },
+      where: { id: parseInt(id), userId: session.userId },
     });
     if (!existing) {
       return NextResponse.json({ error: "Goal not found" }, { status: 404 });
@@ -138,19 +128,14 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     // Verify ownership
     const existing = await prisma.goal.findFirst({
-      where: { id: parseInt(id), userId: payload.userId as number },
+      where: { id: parseInt(id), userId: session.userId },
     });
     if (!existing) {
       return NextResponse.json({ error: "Goal not found" }, { status: 404 });

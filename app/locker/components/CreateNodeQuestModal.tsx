@@ -31,7 +31,6 @@ interface CreateNodeQuestModalProps {
   } | null;
   skeletonNode: SkeletonNode | null;
   liveNode: LiveSubjectNode | null;
-  token: string | null;
   onQuestCreated?: (quest: any) => void;
 }
 
@@ -50,7 +49,6 @@ export function CreateNodeQuestModal({
   subject,
   skeletonNode,
   liveNode,
-  token,
   onQuestCreated,
 }: CreateNodeQuestModalProps) {
   const router = useRouter();
@@ -99,7 +97,7 @@ export function CreateNodeQuestModal({
 
   // Debounced real-time LLM AI evaluation endpoint call
   useEffect(() => {
-    if (!isOpen || !token || !description.trim()) {
+    if (!isOpen || !description.trim()) {
       setAiEvaluation(null);
       return;
     }
@@ -112,7 +110,6 @@ export function CreateNodeQuestModal({
         const res = await fetch("/api/quests/evaluate-scope", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -141,13 +138,13 @@ export function CreateNodeQuestModal({
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [isOpen, token, description, title, targetMinutes, nodeTitle, nodeDesc, skeletonNode]);
+  }, [isOpen, description, title, targetMinutes, nodeTitle, nodeDesc, skeletonNode]);
 
   if (!isOpen || !skeletonNode || !subject) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token || !liveNode?.id) {
+    if (!liveNode?.id) {
       setError("Unable to locate syllabus node identifier.");
       return;
     }
@@ -164,7 +161,6 @@ export function CreateNodeQuestModal({
       const res = await fetch("/api/quests", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

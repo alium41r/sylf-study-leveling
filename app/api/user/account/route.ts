@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession, signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
 import { formatScholarId } from "@/lib/scholar-id";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { TimezoneService } from "@/lib/timezone-service";
@@ -126,6 +127,7 @@ export async function PATCH(req: NextRequest) {
       hunterRank: updatedUser.hunterRank,
       level: updatedUser.level,
       hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
+      tokenVersion: updatedUser.tokenVersion,
       timezone: updatedUser.timezone || "UTC",
     };
 
@@ -134,7 +136,6 @@ export async function PATCH(req: NextRequest) {
     const response = NextResponse.json(
       {
         message: "Account information updated successfully.",
-        token: newToken,
         user: {
           id: updatedUser.id,
           email: updatedUser.email,

@@ -14,7 +14,7 @@ interface DangerAction {
 }
 
 export default function DangerZone() {
-  const { user, token, logout, refreshStats } = useAuth();
+  const { user, logout, refreshStats } = useAuth();
   const router = useRouter();
 
   const isVerified = user?.verificationStatus === "VERIFIED";
@@ -97,7 +97,6 @@ export default function DangerZone() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ password }),
       });
@@ -127,7 +126,6 @@ export default function DangerZone() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ action }),
       });
@@ -170,7 +168,6 @@ export default function DangerZone() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify(payload),
       });
@@ -208,7 +205,6 @@ export default function DangerZone() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify(payload),
       });

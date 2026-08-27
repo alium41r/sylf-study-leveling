@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { areUsersBlocked } from "@/lib/block-service";
 
 /**
  * GET /api/conversations
@@ -8,16 +9,12 @@ import { verifyToken } from "@/lib/auth";
  */
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
 
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const twoMinAgo = new Date(Date.now() - 2 * 60 * 1000);
 
     const participantRecords = await prisma.conversationParticipant.findMany({
@@ -126,16 +123,12 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
 
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const body = await req.json();
     const { participantIds, name, isGroup, avatarUrl } = body;
 
@@ -150,9 +143,37 @@ export async function POST(req: NextRequest) {
     if (!isGroup && allParticipants.length === 2) {
       const otherId = allParticipants.find((id) => id !== userId)!;
 
-      const { areUsersBlocked } = await import("@/lib/block-service");
       if (await areUsersBlocked(userId, otherId)) {
         return NextResponse.json({ error: "Cannot start conversation with this user" }, { status: 403 });
+      }
+
+      // S3: enforce the recipient's allowDirectMessages privacy setting.
+      const targetPrivacy = await prisma.userPrivacy.findUnique({
+        where: { userId: otherId },
+        select: { allowDirectMessages: true },
+      });
+      const dmPolicy = targetPrivacy?.allowDirectMessages ?? "FRIENDS";
+      if (dmPolicy === "PRIVATE") {
+        return NextResponse.json(
+          { error: "This user has disabled direct messages." },
+          { status: 403 }
+        );
+      }
+      if (dmPolicy === "FRIENDS") {
+        const friendship = await prisma.friendship.findFirst({
+          where: {
+            OR: [
+              { userId, friendId: otherId },
+              { userId: otherId, friendId: userId },
+            ],
+          },
+        });
+        if (!friendship) {
+          return NextResponse.json(
+            { error: "This user only accepts messages from friends." },
+            { status: 403 }
+          );
+        }
       }
 
       const existingDM = await prisma.conversation.findFirst({

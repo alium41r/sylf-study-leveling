@@ -45,7 +45,7 @@ describe("Background AI Syllabus Compiler Service & Node Ingestion (Phase 4)", (
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(prisma.userQuota.findUnique).mockResolvedValue(null); // 0 used today
-    vi.mocked(prisma.$queryRawUnsafe).mockResolvedValue([{ used: 1 }] as any); // atomic consumeQuota
+    vi.mocked(prisma.$queryRawUnsafe).mockResolvedValue([{ used: 1 }] as any); // atomic reserveQuota
   });
 
   describe("1. Curriculum Schema & Topological Parity Invariant", () => {

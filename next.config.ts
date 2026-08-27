@@ -1,11 +1,66 @@
 import type { NextConfig } from "next";
 
+// ─── S3 security headers ──────────────────────────────────────────
+// Carefully scoped CSP that keeps the app working:
+//   • script-src 'self' 'unsafe-inline' — Next.js App Router ships inline
+//     bootstrap scripts (RSC payload); removing 'unsafe-inline' breaks every
+//     page without a nonce pipeline.
+//   • style-src/style-src-attr 'unsafe-inline' — framer-motion drives
+//     animation through inline style attributes; Tailwind v4 compiles to
+//     stylesheets, KaTeX assets are self-hosted.
+//   • connect-src adds the Supabase Realtime websocket origin (derived from
+//     NEXT_PUBLIC_SUPABASE_URL) — the only third-party connection the client
+//     opens besides same-origin API calls.
+//   • img-src allows data:/blob:/https: for user avatars and uploads.
+const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+  : null;
+const connectSrc = [
+  "'self'",
+  ...(supabaseOrigin ? [supabaseOrigin, supabaseOrigin.replace(/^https/, "wss")] : []),
+].join(" ");
+
+const securityHeaders = [
+  {
+    key: "Content-Security-Policy",
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "style-src-attr 'unsafe-inline'",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data:",
+      `connect-src ${connectSrc}`,
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+    ].join("; "),
+  },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "X-Frame-Options", value: "DENY" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  },
+  { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+];
+
 const nextConfig: NextConfig = {
   typescript: {
     // !! WARN !!
     // Dangerously allow production builds to successfully complete even if
     // your project has type errors.
     ignoreBuildErrors: true,
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: securityHeaders,
+      },
+    ];
   },
 };
 

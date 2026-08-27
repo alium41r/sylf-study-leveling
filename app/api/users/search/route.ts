@@ -1,23 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 
 /**
  * GET /api/users/search?q=searchterm
- * Search users by username. Excludes current user and already-friended users.
+ * Search users by username. Excludes current user, already-friended users,
+ * blocked users (both directions), and PRIVATE profiles (S3).
  */
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
 
-    const userId = payload.userId as number;
+    const userId = session.userId;
     const q = req.nextUrl.searchParams.get("q");
 
     if (!q || q.length < 2) {
@@ -37,11 +34,24 @@ export async function GET(req: NextRequest) {
     });
     friendIds.delete(userId); // remove self
 
-    // Search users by username (contains match)
+    // S3: exclude blocked users (either direction) from search results.
+    const blockedRows = await prisma.$queryRaw<Array<{ blockedId: number; userId: number }>>`
+      SELECT "blockedId", "userId" FROM "BlockedUser"
+      WHERE "userId" = ${userId} OR "blockedId" = ${userId}
+    `.catch(() => []);
+    const blockedIds = new Set<number>(
+      blockedRows.flatMap((r) => [r.blockedId, r.userId]).filter((id) => id !== userId)
+    );
+
+    // Search users by username (contains match); PRIVATE profiles are hidden.
     const users = await prisma.user.findMany({
       where: {
-        id: { not: userId },
+        id: {
+          not: userId,
+          ...(blockedIds.size > 0 ? { notIn: [...blockedIds] } : {}),
+        },
         username: { contains: q.toLowerCase() },
+        privacy: { is: { profileVisibility: { not: "PRIVATE" } } },
       },
       select: {
         id: true,

@@ -1,10 +1,22 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { formatScholarId, generateRandomScholarId } from "@/lib/scholar-id";
-import { signToken, verifyToken, getSession, type AuthTokenPayload } from "@/lib/auth";
+import { signToken, verifyToken, type AuthTokenPayload } from "@/lib/auth";
 import { validateUsername, generateUniqueUsername } from "@/lib/auth-service";
 import { isOAuthProvider, getOAuthAuthorizationUrl } from "@/lib/oauth";
+import { prisma } from "@/lib/prisma";
 import { NextRequest } from "next/server";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    user: { findUnique: vi.fn() },
+  },
+}));
+
+// The global vitest.setup shim mocks lib/auth-server for route tests. These
+// tests exercise the REAL revocation semantics, so resolve the actual module.
+const authServer = await vi.importActual<typeof import("@/lib/auth-server")>("@/lib/auth-server");
+const getSession = authServer.getSession;
 
 describe("Phase 1: Scholar ID Formatting & Generation", () => {
   it("formats numeric IDs into 6-digit zero-padded Scholar IDs", () => {
@@ -46,7 +58,13 @@ describe("Phase 1: Core JWT Auth Engine & Session Extraction", () => {
     verificationStatus: "VERIFIED",
     hunterRank: "S",
     level: 50,
+    tokenVersion: 1,
   };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ tokenVersion: 1 } as any);
+  });
 
   it("signs and verifies JWT tokens with complete payload integrity", async () => {
     const token = await signToken(mockPayload, "1h");
@@ -68,7 +86,33 @@ describe("Phase 1: Core JWT Auth Engine & Session Extraction", () => {
     expect(verified).toBeNull();
   });
 
-  it("extracts session from Authorization Bearer header", async () => {
+  it("S3: tokens carry issuer and audience and verify against them", async () => {
+    const token = await signToken(mockPayload, "1h");
+    const parts = token.split(".");
+    const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString());
+    expect(payload.iss).toBe(process.env.JWT_ISSUER || "sylf");
+    expect(payload.aud).toBe(process.env.JWT_AUDIENCE || "sylf-app");
+    expect(await verifyToken(token)).not.toBeNull();
+  });
+
+  it("S3: rejects tokens signed with a different issuer/audience", async () => {
+    const originalIssuer = process.env.JWT_ISSUER;
+    const originalAudience = process.env.JWT_AUDIENCE;
+    // Mint under a different configuration...
+    process.env.JWT_ISSUER = "evil-issuer";
+    const forged = await signToken(mockPayload, "1h");
+    process.env.JWT_ISSUER = originalIssuer;
+    process.env.JWT_AUDIENCE = originalAudience;
+    // ...and verify under ours: must fail.
+    expect(await verifyToken(forged)).toBeNull();
+
+    process.env.JWT_AUDIENCE = "evil-audience";
+    const forgedAud = await signToken(mockPayload, "1h");
+    process.env.JWT_AUDIENCE = originalAudience;
+    expect(await verifyToken(forgedAud)).toBeNull();
+  });
+
+  it("S3: Bearer header alone no longer authenticates (cookie-only)", async () => {
     const token = await signToken(mockPayload, "1h");
     const req = new NextRequest("http://localhost:3000/api/user/stats", {
       headers: {
@@ -77,9 +121,7 @@ describe("Phase 1: Core JWT Auth Engine & Session Extraction", () => {
     });
 
     const session = await getSession(req);
-    expect(session).not.toBeNull();
-    expect(session?.userId).toBe(101);
-    expect(session?.username).toBe("jinwoo");
+    expect(session).toBeNull();
   });
 
   it("extracts session from hunter_token cookie", async () => {
@@ -94,6 +136,31 @@ describe("Phase 1: Core JWT Auth Engine & Session Extraction", () => {
     expect(session).not.toBeNull();
     expect(session?.userId).toBe(101);
     expect(session?.scholarId).toBe("#000101");
+  });
+
+  it("S3: rejects a cookie token whose tokenVersion no longer matches (revocation)", async () => {
+    const token = await signToken(mockPayload, "1h");
+    const req = new NextRequest("http://localhost:3000/api/user/stats", {
+      headers: { cookie: `hunter_token=${token}` },
+    });
+
+    // logout-all / password change bumped the version in the DB.
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ tokenVersion: 2 } as any);
+    const revoked = await getSession(req);
+    expect(revoked).toBeNull();
+
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ tokenVersion: 1 } as any);
+    const active = await getSession(req);
+    expect(active).not.toBeNull();
+  });
+
+  it("S3: rejects when the user record is missing", async () => {
+    const token = await signToken(mockPayload, "1h");
+    const req = new NextRequest("http://localhost:3000/api/user/stats", {
+      headers: { cookie: `hunter_token=${token}` },
+    });
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
+    expect(await getSession(req)).toBeNull();
   });
 });
 

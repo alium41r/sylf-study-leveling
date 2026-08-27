@@ -37,7 +37,7 @@ interface Friend {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, token, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [quests, setQuests] = useState<Quest[]>([]);
   const [weeklyQuest, setWeeklyQuest] = useState<any>(() => {
     if (typeof window !== "undefined") {
@@ -57,7 +57,7 @@ export default function DashboardPage() {
     try {
       await fetch("/api/system-messages", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messageIds: [id] })
       });
     } catch (e) {
@@ -66,12 +66,10 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (!token) return;
-
-    const headers = { Authorization: `Bearer ${token}` };
+    if (!user) return;
 
     // 1. Fetch weekly focus quest independently (fast delta)
-    fetch("/api/quests/weekly", { headers })
+    fetch("/api/quests/weekly", {})
       .then((r) => (r.ok ? r.json().catch(() => null) : null))
       .then((weeklyData) => {
         if (weeklyData && !weeklyData.error) {
@@ -85,13 +83,13 @@ export default function DashboardPage() {
 
     // 2-5. Cached stale-while-revalidate loads: repeat visits paint the
     // last-known data instantly and refresh in the background.
-    fetchCachedJSON<any[]>("/api/quests", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
+    fetchCachedJSON<any[]>("/api/quests", {}, { ttlMs: 15_000, staleMs: 120_000 })
       .then((questsData) => {
         if (questsData) setQuests(Array.isArray(questsData) ? questsData : []);
       })
       .catch(console.error);
 
-    fetchCachedJSON<any[]>("/api/friends", { headers }, { ttlMs: 15_000, staleMs: 120_000 })
+    fetchCachedJSON<any[]>("/api/friends", {}, { ttlMs: 15_000, staleMs: 120_000 })
       .then((friendsData) => {
         if (friendsData) setFriends(Array.isArray(friendsData) ? friendsData : []);
       })
@@ -99,7 +97,7 @@ export default function DashboardPage() {
 
     fetchCachedJSON<any>(
       "/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true",
-      { headers },
+      {},
       { ttlMs: 20_000, staleMs: 120_000 }
     )
       .then((briefingsData) => {
@@ -107,18 +105,16 @@ export default function DashboardPage() {
       })
       .catch(console.error);
 
-    fetchCachedJSON<any[]>("/api/insights", { headers }, { ttlMs: 30_000, staleMs: 300_000 })
+    fetchCachedJSON<any[]>("/api/insights", {}, { ttlMs: 30_000, staleMs: 300_000 })
       .then((insightsData) => {
         if (insightsData) setInsights(Array.isArray(insightsData) ? insightsData : []);
       })
       .catch(console.error);
-  }, [token]);
+  }, [user?.id]);
 
   useEffect(() => {
     if (!isLoading && !user) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user_data");
         document.cookie = "hunter_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         window.location.href = "/login?force=true";
       }
@@ -145,8 +141,6 @@ export default function DashboardPage() {
         <button
           onClick={() => {
             if (typeof window !== "undefined") {
-              localStorage.removeItem("token");
-              localStorage.removeItem("user_data");
               document.cookie = "system_token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
               window.location.href = "/login?force=true";
             }

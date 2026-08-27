@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-import { AUTH_COOKIE_NAME, getAuthSecret, type AuthTokenPayload } from "./lib/auth";
+import {
+  AUTH_COOKIE_NAME,
+  getAuthSecret,
+  getJwtIssuer,
+  getJwtAudience,
+  type AuthTokenPayload,
+} from "./lib/auth";
 import { isPrelaunchMode } from "./lib/prelaunch";
 
 const GUEST_ONLY_ROUTES = ["/login", "/register"];
@@ -34,27 +40,10 @@ export async function proxy(request: NextRequest) {
 
   const isOnboardingRoute = pathname === "/onboarding" || pathname.startsWith("/onboarding/");
 
-  const isForceBypass =
-    request.nextUrl.searchParams.has("force") ||
-    request.nextUrl.searchParams.has("logout") ||
-    request.nextUrl.searchParams.has("error");
-
   // Prelaunch lockdown: no one may even reach the login/register pages while
   // the landing page is collecting waitlist interest. Set PRELAUNCH_MODE=true.
   if (isPrelaunchMode() && (isGuestRoute || isOnboardingRoute)) {
     return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // If user explicitly asks to visit a guest page with force/logout, clear cookie and allow it
-  if (isGuestRoute && isForceBypass) {
-    const response = NextResponse.next();
-    response.cookies.set({
-      name: AUTH_COOKIE_NAME,
-      value: "",
-      maxAge: 0,
-      path: "/",
-    });
-    return response;
   }
 
   // 1. Extract session token from cookie
@@ -64,7 +53,12 @@ export async function proxy(request: NextRequest) {
   if (token) {
     try {
       const secret = getAuthSecret();
-      const { payload } = await jwtVerify(token, secret);
+      // S3: issuer + audience validated here as well (UX layer; API routes
+      // enforce the full session through lib/auth-server).
+      const { payload } = await jwtVerify(token, secret, {
+        issuer: getJwtIssuer(),
+        audience: getJwtAudience(),
+      });
       session = payload as AuthTokenPayload;
     } catch {
       // Token is expired or invalid — clear it so the user isn't trapped

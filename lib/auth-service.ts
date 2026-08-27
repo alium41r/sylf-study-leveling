@@ -177,6 +177,7 @@ export async function initializeUserProfile(params: RegisterParams) {
     level: result.level,
     hasCompletedOnboarding: result.hasCompletedOnboarding,
     hasPassword: !!result.password,
+    tokenVersion: result.tokenVersion,
     timezone: result.timezone || "UTC",
   };
 
@@ -263,6 +264,7 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
       username: user.username,
       name: user.name,
       scholarId: user.scholarId || formatScholarId(user.id),
+      tokenVersion: user.tokenVersion,
       verificationStatus: user.verificationStatus,
       hunterRank: user.hunterRank,
       level: user.level,
@@ -273,14 +275,26 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
     return { user, token, isNewUser: false };
   }
 
-  // 2. Check if a user with this email already exists
+  // 2. Check if a user with this email already exists.
+  // S3 (OAuth account-takeover fix): an account is ONLY linked/signed-in via
+  // an email match when the provider explicitly verified that email. An
+  // attacker who attaches the victim's address to their own provider account
+  // (unverified) must never inherit the victim's session.
   if (oauthUser.email) {
     const existingUser = await prisma.user.findUnique({
       where: { email: oauthUser.email.toLowerCase() },
     });
 
+    if (existingUser && !oauthUser.emailVerified) {
+      // Do NOT link, do NOT sign in. The provider email is unverified and
+      // matches an existing account — this is the takeover pattern.
+      throw new Error(
+        `This ${providerUpper} account's email is not verified. Please verify your email address with ${providerUpper} before signing in.`
+      );
+    }
+
     if (existingUser) {
-      // Link the provider to this existing user
+      // Link the provider to this existing user (verified email only — see above)
       await prisma.connectedAccount.upsert({
         where: {
           userId_provider: {
@@ -302,9 +316,9 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
         },
       });
 
-      // If OAuth is verified, upgrade user status to VERIFIED
+      // Verified OAuth upgrades the account to VERIFIED.
       let updatedUser = existingUser;
-      if (oauthUser.emailVerified && existingUser.verificationStatus !== "VERIFIED") {
+      if (existingUser.verificationStatus !== "VERIFIED") {
         updatedUser = await prisma.user.update({
           where: { id: existingUser.id },
           data: { verificationStatus: "VERIFIED" },
@@ -322,6 +336,7 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
         level: updatedUser.level,
         hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
         hasPassword: !!updatedUser.password,
+        tokenVersion: updatedUser.tokenVersion,
         timezone: updatedUser.timezone || "UTC",
       };
       const token = await signToken(tokenPayload);

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { Prisma } from "@prisma/client";
 import {
   StudyScheduleService,

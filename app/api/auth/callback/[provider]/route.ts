@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exchangeOAuthCode, isOAuthProvider, type OAuthProvider } from "@/lib/oauth";
 import { handleOAuthSignInOrRegister, linkOAuthAccountToUser } from "@/lib/auth-service";
-import { AUTH_COOKIE_OPTIONS, getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { AUTH_COOKIE_OPTIONS } from "@/lib/auth";
 import { isPrelaunchMode } from "@/lib/prelaunch";
 
 export async function GET(

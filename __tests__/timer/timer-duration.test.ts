@@ -1,15 +1,11 @@
+/** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import * as auth from "@/lib/auth";
+import { signToken } from "@/lib/auth";
+import * as authServer from "@/lib/auth-server";
 import { GET as getSubjects } from "@/app/api/subjects/route";
 import { GET as getUserStats } from "@/app/api/user/stats/route";
-
-vi.mock("@/lib/auth", () => ({
-  getSession: vi.fn(),
-  verifyToken: vi.fn(),
-  signToken: vi.fn().mockResolvedValue("mock-jwt-token"),
-}));
 
 describe("Study Timer & Session Calculation Accuracy", () => {
   beforeEach(() => {
@@ -17,8 +13,6 @@ describe("Study Timer & Session Calculation Accuracy", () => {
   });
 
   it("calculates exact studied seconds without phantom ghost elapsed time for stale sessions in /api/subjects", async () => {
-    vi.mocked(auth.verifyToken).mockResolvedValue({ userId: 101 } as any);
-
     vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
       id: 101,
       timezone: "UTC",
@@ -63,8 +57,9 @@ describe("Study Timer & Session Calculation Accuracy", () => {
       },
     ] as any);
 
+    const sessionToken = await signToken({ userId: 101 });
     const req = new NextRequest("http://localhost/api/subjects", {
-      headers: { Authorization: "Bearer mock-token" },
+      headers: { cookie: `hunter_token=${sessionToken}` },
     });
 
     const res = await getSubjects(req);
@@ -79,7 +74,7 @@ describe("Study Timer & Session Calculation Accuracy", () => {
   });
 
   it("calculates exact todayStudySeconds in /api/user/stats without accumulating unended ghost hours", async () => {
-    vi.mocked(auth.getSession).mockResolvedValue({ userId: 101 } as any);
+    vi.mocked(authServer.getSession).mockResolvedValue({ userId: 101 } as any);
 
     vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
       id: 101,

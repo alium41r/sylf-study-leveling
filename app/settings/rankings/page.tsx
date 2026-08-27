@@ -234,27 +234,27 @@ function LeaderboardRow({
 /* ─── Main Page ─────────────────────────────────────────────── */
 
 export default function RankingsSettingsPage() {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const [data, setData] = useState<RankingsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>("level");
   const [tab, setTab] = useState<TabOption>("global");
 
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
     setIsLoading(true);
 
     // Stale-while-revalidate: reopening rankings paints instantly from the
     // previous leaderboard and refreshes in the background.
     fetchCachedJSON<RankingsData>(
       `/api/user/rankings?sortBy=${sortBy}`,
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 30_000, staleMs: 120_000, storageKey: `rankings:${sortBy}` }
     )
       .then((d) => { if (d) setData(d); })
       .catch(console.error)
       .finally(() => setIsLoading(false));
-  }, [token, sortBy]);
+  }, [user?.id, sortBy]);
 
   const entries = data ? (tab === "friends" ? data.friends : data.global) : [];
 

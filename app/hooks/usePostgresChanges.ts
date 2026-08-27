@@ -18,7 +18,6 @@ import type {
   RealtimeChannel,
   RealtimePostgresChangesPayload,
 } from "@supabase/supabase-js";
-import { useAuth } from "@/app/components/AuthProvider";
 import { attachRealtimeAuth, isRealtimeConfigured } from "@/lib/supabase-browser";
 
 export interface PostgresChangeFilter {
@@ -32,12 +31,11 @@ export function usePostgresChanges(
   filters: PostgresChangeFilter[],
   onEvent: (payload: RealtimePostgresChangesPayload<any>) => void
 ): { enabled: boolean; connected: boolean } {
-  const { token } = useAuth();
   const [connected, setConnected] = useState(false);
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (!token || !isRealtimeConfigured() || filters.length === 0) {
+    if (!isRealtimeConfigured() || filters.length === 0) {
       setConnected(false);
       return;
     }
@@ -46,7 +44,7 @@ export function usePostgresChanges(
     let channel: RealtimeChannel | null = null;
 
     (async () => {
-      const sb = await attachRealtimeAuth(token);
+      const sb = await attachRealtimeAuth();
       if (!sb || cancelled) return;
       setEnabled(true);
 
@@ -84,7 +82,7 @@ export function usePostgresChanges(
       setConnected(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, JSON.stringify(filters)]);
+  }, [JSON.stringify(filters)]);
 
   return { enabled, connected };
 }

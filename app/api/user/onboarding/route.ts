@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession, signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
+import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
         hunterRank: currentUser.hunterRank,
         level: currentUser.level,
         hasCompletedOnboarding: true,
+        tokenVersion: currentUser.tokenVersion,
         timezone: currentUser.timezone || "UTC",
       };
 
@@ -48,7 +50,6 @@ export async function POST(req: NextRequest) {
         {
           success: true,
           message: "Onboarding already completed.",
-          token: freshToken,
           user: {
             id: currentUser.id,
             email: currentUser.email,
@@ -239,6 +240,7 @@ export async function POST(req: NextRequest) {
       hunterRank: updatedUser.hunterRank,
       level: updatedUser.level,
       hasCompletedOnboarding: true,
+      tokenVersion: updatedUser.tokenVersion,
       timezone: updatedUser.timezone || "UTC",
     };
 
@@ -247,7 +249,6 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json(
       {
         success: true,
-        token: newToken,
         user: {
           id: updatedUser.id,
           email: updatedUser.email,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { NotificationPreferencesSchema } from "@/lib/notification-preferences";
 import {
   getDbNotificationPreferences,

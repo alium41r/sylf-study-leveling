@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
 import { formatScholarId } from "@/lib/scholar-id";
+import { rateLimit, getClientIp, ipKey } from "@/lib/rate-limit";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email or username is required").optional(),
@@ -26,6 +27,28 @@ export async function POST(req: NextRequest) {
 
     if (!loginTarget) {
       return NextResponse.json({ error: "Email or username is required" }, { status: 400 });
+    }
+
+    // S4: brute-force protection — per-IP window plus per-identifier window.
+    const ipLimit = await rateLimit(`login:ip:${ipKey(getClientIp(req))}`, {
+      limit: 10,
+      windowMs: 60_000,
+    });
+    if (!ipLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please wait a minute." },
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
+      );
+    }
+    const idLimit = await rateLimit(`login:id:${ipKey(loginTarget.toLowerCase())}`, {
+      limit: 10,
+      windowMs: 15 * 60_000,
+    });
+    if (!idLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many login attempts for this account. Please wait a few minutes." },
+        { status: 429, headers: { "Retry-After": String(idLimit.retryAfterSeconds) } }
+      );
     }
 
     // Find user by email OR username (case-insensitive)
@@ -64,7 +87,8 @@ export async function POST(req: NextRequest) {
 
     const scholarId = user.scholarId || formatScholarId(user.id);
 
-    // Build JWT with user stats
+    // Build JWT with user stats (S3: cookie-only session — the token is never
+    // returned to the browser)
     const tokenPayload: AuthTokenPayload = {
       userId: user.id,
       email: user.email,
@@ -75,15 +99,16 @@ export async function POST(req: NextRequest) {
       hunterRank: user.hunterRank,
       level: user.level,
       hasCompletedOnboarding: user.hasCompletedOnboarding,
+      tokenVersion: user.tokenVersion,
     };
 
     const token = await signToken(tokenPayload);
 
-    // Return token + full user stats
+    // Return user profile only — the session token travels exclusively in the
+    // httpOnly cookie set below.
     const response = NextResponse.json(
       {
         message: "Login successful!",
-        token,
         user: {
           id: user.id,
           email: user.email,

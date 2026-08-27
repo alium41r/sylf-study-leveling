@@ -50,15 +50,6 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const { login } = useAuth();
 
-  // Clear previous session if forced
-  useEffect(() => {
-    const isForce = searchParams.get("force") === "true";
-    if (isForce && typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user_data");
-    }
-  }, [searchParams]);
-
   // Debounced check username availability
   useEffect(() => {
     if (debounceTimerRef.current) {
@@ -141,7 +132,7 @@ function RegisterForm() {
       const data = await response.json();
 
       if (response.ok) {
-        login(data.token, data.user);
+        login(data.user);
         router.push("/onboarding");
       } else {
         setError(data.error || "Registration failed. Please try again.");

@@ -105,7 +105,7 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout, token, refreshStats } = useAuth();
+  const { user, logout, refreshStats } = useAuth();
   const { openSettings } = useSettings();
 
   const [notifications, setNotifications] = useState<SystemMessage[]>([]);
@@ -135,13 +135,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
     
     const fetchNotifications = async () => {
       try {
-        const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-        const headers: Record<string, string> = {};
-        if (activeToken) {
-          headers["Authorization"] = `Bearer ${activeToken}`;
-        }
         const res = await fetch("/api/notifications", {
-          headers,
           credentials: "include",
         });
         if (res.ok) {
@@ -190,7 +184,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
       window.removeEventListener("focus", handleUpdate);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [token, user]);
+  }, [user]);
 
   if (!user) return null;
 
@@ -202,12 +196,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
     if (willOpen) {
       // Immediately refresh notifications on open
       try {
-        const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-        const headers: Record<string, string> = {};
-        if (activeToken) {
-          headers["Authorization"] = `Bearer ${activeToken}`;
-        }
-        fetch("/api/notifications", { headers, credentials: "include" })
+        fetch("/api/notifications", { credentials: "include" })
           .then(r => r.ok ? r.json() : [])
           .then(data => Array.isArray(data) && setNotifications(data))
           .catch(() => null);
@@ -215,7 +204,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
         if (unreadCount > 0) {
           await fetch("/api/notifications", {
             method: "PATCH",
-            headers,
             credentials: "include",
           });
           setNotifications(notifications.map(n => ({ ...n, read: true })));
@@ -228,14 +216,8 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
 
   const handleClearNotifications = async () => {
     try {
-      const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-      const headers: Record<string, string> = {};
-      if (activeToken) {
-        headers["Authorization"] = `Bearer ${activeToken}`;
-      }
       await fetch("/api/notifications", {
         method: "DELETE",
-        headers,
         credentials: "include",
       });
       setNotifications([]);

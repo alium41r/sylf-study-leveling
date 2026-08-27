@@ -40,7 +40,7 @@ export interface ConfiguredSubject {
 
 export default function OnboardingFlow() {
   const router = useRouter();
-  const { user, token, mutateUser, login, refreshStats } = useAuth();
+  const { user, login, refreshStats } = useAuth();
 
   const [currentStep, setCurrentStep] = useState<OnboardingStep>("BOOT");
   
@@ -202,7 +202,7 @@ export default function OnboardingFlow() {
   }, [selectedTheme, selectedBackground, selectedMode]);
 
   const submitOnboarding = async () => {
-    if (!token && !user) return;
+    if (!user) return;
     setIsSubmitting(true);
     setError("");
     
@@ -221,7 +221,6 @@ export default function OnboardingFlow() {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           classId: "class_scholar",
@@ -254,11 +253,9 @@ export default function OnboardingFlow() {
       if (selectedBackground) localStorage.setItem("app_background", selectedBackground);
       localStorage.setItem("app_mode", selectedMode);
 
-      // Mutate user and session token so Edge route guard allows /dashboard
-      if (data.token && data.user) {
-        login(data.token, data.user);
-      } else if (data.user) {
-        mutateUser(data.user);
+      // Mutate user so the route guard allows /dashboard (S3: cookie session)
+      if (data.user) {
+        login(data.user);
       }
       
       await refreshStats();

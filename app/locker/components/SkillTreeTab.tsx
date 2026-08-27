@@ -69,7 +69,7 @@ const TIER_BADGE_STYLES: Record<number, string> = {
 };
 
 export function SkillTreeTab() {
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   const [subjects, setSubjects] = useState<SubjectSummary[]>([]);
   const [activeSubjectId, setActiveSubjectId] = useState<number | null>(null);
@@ -142,12 +142,10 @@ export function SkillTreeTab() {
 
   // 1. Fetch user subjects on mount
   const fetchSubjects = useCallback(async () => {
-    if (!token) return;
+    if (!user) return;
     setIsLoadingSubjects(true);
     try {
-      const res = await fetch("/api/subjects", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch("/api/subjects");
       if (res.ok) {
         const data = await res.json();
         const list: SubjectSummary[] = Array.isArray(data) ? data : [];
@@ -161,7 +159,7 @@ export function SkillTreeTab() {
     } finally {
       setIsLoadingSubjects(false);
     }
-  }, [token, activeSubjectId]);
+  }, [user?.id, activeSubjectId]);
 
   useEffect(() => {
     fetchSubjects();
@@ -170,13 +168,11 @@ export function SkillTreeTab() {
   // 2. Fetch subject nodes whenever activeSubjectId changes
   const fetchSubjectNodes = useCallback(
     async (subjectId: number) => {
-      if (!token) return;
+      if (!user) return;
       setIsLoadingNodes(true);
       setCompilationError(null);
       try {
-        const res = await fetch(`/api/subjects/${subjectId}/nodes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(`/api/subjects/${subjectId}/nodes`);
         if (res.ok) {
           const data = await res.json();
           const liveNodes: LiveSubjectNode[] = Array.isArray(data.nodes) ? data.nodes : [];
@@ -195,7 +191,7 @@ export function SkillTreeTab() {
         setIsLoadingNodes(false);
       }
     },
-    [token, selectedSkeleton]
+    [user?.id, selectedSkeleton]
   );
 
   useEffect(() => {
@@ -220,7 +216,7 @@ export function SkillTreeTab() {
 
   // Trigger one-time AI Syllabus Compilation (compile once per subject, forever)
   const handleCompileSyllabus = async () => {
-    if (!token || !activeSubjectId || isCompiling) return;
+    if (!activeSubjectId || isCompiling) return;
     if (activeSubject?.lastCompiledAt) return;
     setIsCompiling(true);
     setCompilationError(null);
@@ -228,7 +224,6 @@ export function SkillTreeTab() {
     try {
       const res = await fetch(`/api/subjects/${activeSubjectId}/compile`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
@@ -250,12 +245,11 @@ export function SkillTreeTab() {
 
   // Trigger Apex Keystone Forging
   const handleForgeApex = async () => {
-    if (!token || !activeSubjectId || isForgingApex) return;
+    if (!activeSubjectId || isForgingApex) return;
     setIsForgingApex(true);
     try {
       const res = await fetch(`/api/subjects/${activeSubjectId}/forge-apex`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       if (!res.ok) {
@@ -880,7 +874,6 @@ export function SkillTreeTab() {
         subject={activeSubject}
         skeletonNode={selectedSkeleton}
         liveNode={selectedLive}
-        token={token}
         onQuestCreated={() => {
           if (activeSubjectId) fetchSubjectNodes(activeSubjectId);
         }}

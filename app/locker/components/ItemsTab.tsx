@@ -200,7 +200,7 @@ const RARITY_STYLES: Record<
 // ═════════════════════════════════════════════════════════════════
 
 export function ItemsTab() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
 
   // ─── State ───────────────────────────────────────────────────
   const [inventory, setInventory] = useState<InventoryItemData[]>([]);
@@ -222,12 +222,10 @@ export function ItemsTab() {
 
   // ─── Fetch Inventory ─────────────────────────────────────────
   const fetchInventory = useCallback(async () => {
-    if (!token) return;
+    if (!user) return;
     try {
       setIsLoading(true);
-      const res = await fetch("/api/inventory", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch("/api/inventory");
       if (res.ok) {
         const data = await res.json();
         setInventory(data.inventory || []);
@@ -237,7 +235,7 @@ export function ItemsTab() {
     } finally {
       setIsLoading(false);
     }
-  }, [token]);
+  }, [user?.id]);
 
   useEffect(() => {
     fetchInventory();
@@ -300,7 +298,7 @@ export function ItemsTab() {
 
   // ─── Atomic Equip / Unequip Action ───────────────────────────
   const handleToggleEquip = async (itemEntry: InventoryItemData) => {
-    if (!token || actionLoadingId !== null) return;
+    if (actionLoadingId !== null) return;
     const targetId = itemEntry.id;
     setActionLoadingId(targetId);
 
@@ -336,7 +334,6 @@ export function ItemsTab() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ inventoryId: targetId }),
       });

@@ -14,7 +14,6 @@ interface StudyScheduleModalProps {
     restDays: number[];
     enableHpPenalty: boolean;
   }) => void;
-  token: string | null;
 }
 
 const DAYS_OF_WEEK = [
@@ -34,7 +33,6 @@ export default function StudyScheduleModal({
   initialRestDays,
   initialEnableHpPenalty,
   onSaveSuccess,
-  token,
 }: StudyScheduleModalProps) {
   const [goalMinutes, setGoalMinutes] = useState(initialGoalMinutes || 120);
   const [restDays, setRestDays] = useState<number[]>(initialRestDays || [0]);
@@ -59,7 +57,6 @@ export default function StudyScheduleModal({
   };
 
   const handleSave = async () => {
-    if (!token) return;
     setIsSaving(true);
     setErrorMsg(null);
 
@@ -67,7 +64,6 @@ export default function StudyScheduleModal({
       const res = await fetch("/api/user/study-schedule", {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

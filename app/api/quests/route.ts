@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getSession } from "@/lib/auth-server";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
 import { QuestDifficulty } from "@prisma/client";
@@ -8,6 +8,7 @@ import { revalidateTag } from "next/cache";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
 
 import { calculateSemanticScopeWeight, evaluateSyllabusScopeWithAI } from "@/lib/ai/scope-evaluator";
+import { reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
 import { calculateQuestRewards } from "@/lib/difficulty-engine";
 
 /**
@@ -34,20 +35,15 @@ export function calculateScopeWeight(
  */
 export async function GET(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const isAll = searchParams.get("all") === "true";
 
-    const tz = await getUserTimezone(payload.userId as number);
+    const tz = await getUserTimezone(session.userId);
     let date = searchParams.get("date");
     if (!date) {
       date = TimezoneService.getUserLocalDate(tz);
@@ -56,7 +52,7 @@ export async function GET(req: NextRequest) {
     const goalId = searchParams.get("goalId");
 
     const where: Record<string, unknown> = {
-      userId: payload.userId as number,
+      userId: session.userId,
     };
 
     if (!isAll) {
@@ -148,14 +144,9 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload || !payload.userId) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -174,7 +165,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Quest title is required" }, { status: 400 });
     }
 
-    const userId = payload.userId as number;
+    const userId = session.userId;
     // Manual creation clamp: 15-240 minutes (kept in sync with the modal).
     const parsedMinutes = Number(rawTargetMinutes);
     const targetMinutes = Number.isFinite(parsedMinutes)
@@ -259,15 +250,38 @@ export async function POST(req: NextRequest) {
 
       subjectNodeId = node.id;
       subjectId = node.subjectId;
-      const evalResult = await evaluateSyllabusScopeWithAI({
-        nodeTitle: node.title,
-        nodeDescription: node.description,
-        nodeTier: node.tier,
-        questTitle: title.trim(),
-        planDescription: description && typeof description === "string" ? description.trim() : "",
-        targetMinutes,
-      });
-      scopeWeight = evalResult.scopeWeight;
+      // S4: scope evaluation is quota-reserved like the dedicated endpoint.
+      const scopeQuota = await reserveQuota(userId, "scope");
+      if (scopeQuota.allowed) {
+        try {
+          const evalResult = await evaluateSyllabusScopeWithAI({
+            nodeTitle: node.title,
+            nodeDescription: node.description,
+            nodeTier: node.tier,
+            questTitle: title.trim(),
+            planDescription: description && typeof description === "string" ? description.trim() : "",
+            targetMinutes,
+          });
+          scopeWeight = evalResult.scopeWeight;
+        } catch (err) {
+          await releaseQuota(userId, "scope").catch(() => {});
+          scopeWeight = calculateSemanticScopeWeight({
+            nodeTitle: node.title,
+            nodeDescription: node.description,
+            questTitle: title.trim(),
+            planDescription: description || "",
+            targetMinutes,
+          }).scopeWeight;
+        }
+      } else {
+        scopeWeight = calculateSemanticScopeWeight({
+          nodeTitle: node.title,
+          nodeDescription: node.description,
+          questTitle: title.trim(),
+          planDescription: description || "",
+          targetMinutes,
+        }).scopeWeight;
+      }
     }
 
     // 2. Map difficulty and compute rewards (canonical unified standard)
@@ -352,14 +366,9 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const session = await getSession(req);
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const payload = await verifyToken(authHeader.split(" ")[1]);
-    if (!payload) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -371,7 +380,7 @@ export async function DELETE(req: NextRequest) {
 
     const result = await prisma.quest.deleteMany({
       where: {
-        userId: payload.userId as number,
+        userId: session.userId,
         id: { in: ids },
       },
     });

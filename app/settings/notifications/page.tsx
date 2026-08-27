@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import BackToSettings from "../../components/BackToSettings";
-import { useAuth } from "../../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
@@ -100,7 +99,6 @@ function ToggleItem({
 }
 
 export default function NotificationsSettingsPage() {
-  const { token } = useAuth();
   const [preferences, setPreferences] = useState<NotificationPreferences>(
     DEFAULT_NOTIFICATION_PREFERENCES
   );
@@ -113,16 +111,10 @@ export default function NotificationsSettingsPage() {
   const fetchPreferences = useCallback(async () => {
     setIsLoading(true);
     try {
-      const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-      const headers: Record<string, string> = {};
-      if (activeToken) {
-        headers["Authorization"] = `Bearer ${activeToken}`;
-      }
-
       // Stale-while-revalidate: reopening alerts paints instantly.
       const data = await fetchCachedJSON<{ preferences?: NotificationPreferences }>(
         "/api/notifications/preferences",
-        { headers, credentials: "include" },
+        { credentials: "include" },
         { ttlMs: 20_000, staleMs: 120_000 }
       );
 
@@ -135,7 +127,7 @@ export default function NotificationsSettingsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchPreferences();
@@ -157,17 +149,11 @@ export default function NotificationsSettingsPage() {
     setErrorMessage(null);
 
     try {
-      const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (activeToken) {
-        headers["Authorization"] = `Bearer ${activeToken}`;
-      }
-
       const res = await fetch("/api/notifications/preferences", {
         method: "PATCH",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify({ [key]: value }),
       });
@@ -198,17 +184,11 @@ export default function NotificationsSettingsPage() {
     setErrorMessage(null);
 
     try {
-      const activeToken = token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (activeToken) {
-        headers["Authorization"] = `Bearer ${activeToken}`;
-      }
-
       const res = await fetch("/api/notifications/preferences", {
         method: "PATCH",
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify(DEFAULT_NOTIFICATION_PREFERENCES),
       });

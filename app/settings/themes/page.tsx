@@ -156,7 +156,7 @@ function MiniPreview({ theme }: { theme: ThemeOption }) {
 /* ─── Main Page ─────────────────────────────────────────────── */
 
 export default function ThemesSettingsPage() {
-  const { user, token, mutateUser } = useAuth();
+  const { user, mutateUser } = useAuth();
   const [appliedThemeId, setAppliedThemeId] = useState<string>("cyberpunk");
   const [mode, setMode] = useState<"light" | "dark">("dark");
   const [showApplied, setShowApplied] = useState(false);
@@ -167,12 +167,12 @@ export default function ThemesSettingsPage() {
     const savedMode = localStorage.getItem("app_mode") as "light" | "dark";
     if (savedMode) setMode(savedMode);
 
-    if (!token) return;
+    if (!user) return;
     
     // Stale-while-revalidate: reopening themes paints instantly.
     fetchCachedJSON<{ cosmetics?: any[]; active?: { activeTheme?: string | null } }>(
       "/api/cosmetics",
-      { headers: { Authorization: `Bearer ${token}` } },
+      {},
       { ttlMs: 30_000, staleMs: 120_000, storageKey: "cosmetics:owned" }
     )
       .then((data) => {
@@ -188,7 +188,7 @@ export default function ThemesSettingsPage() {
         }
       })
       .catch(console.error);
-  }, [token]);
+  }, [user?.id]);
 
   const hasCosmetic = (itemKey: string) => {
     return true; // Temporarily unlocked for testing Light Mode
@@ -213,8 +213,7 @@ export default function ThemesSettingsPage() {
       const res = await fetch("/api/cosmetics", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({ category: "THEME", itemKey: theme.id })
       });

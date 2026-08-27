@@ -19,6 +19,39 @@ const inflight = new Map<string, Promise<unknown>>();
 
 const MAX_MEMORY_ENTRIES = 200;
 
+// S3: never persist these endpoints to localStorage — they contain private
+// AI content (daily briefings, insights) that must not outlive the session
+// on a shared device. They still benefit from the in-memory cache.
+const NO_PERSIST_FRAGMENTS = ["briefing", "insights", "ai-memory", "ai-insight"];
+
+function isPersistable(key: string): boolean {
+  const k = key.toLowerCase();
+  return !NO_PERSIST_FRAGMENTS.some((f) => k.includes(f));
+}
+
+/** Clear every client-side cache key that carries user data (S3 logout hygiene). */
+export function clearClientCache(): void {
+  if (typeof window === "undefined") return;
+  try {
+    const doomed: string[] = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (
+        key &&
+        (key.startsWith("sylf_cache:") ||
+          key.startsWith("focus_scratchpad") ||
+          key.startsWith("focus_notes"))
+      ) {
+        doomed.push(key);
+      }
+    }
+    for (const key of doomed) window.localStorage.removeItem(key);
+  } catch {
+    // Quota/corruption — nothing critical.
+  }
+  memoryCache.clear();
+}
+
 function pruneMemory() {
   if (memoryCache.size <= MAX_MEMORY_ENTRIES) return;
   const entries = [...memoryCache.entries()].sort(
@@ -108,7 +141,11 @@ function doFetch(url: string, init?: RequestInit, storageKey?: string): Promise<
       const data = await res.json();
       const entry: CacheEntry = { data, fetchedAt: Date.now() };
       memoryCache.set(url, entry);
-      if (storageKey) writeStorage(storageKey, entry);
+      // S3: sensitive endpoints stay memory-only even when a storageKey was
+      // requested.
+      if (storageKey && isPersistable(storageKey) && isPersistable(url)) {
+        writeStorage(storageKey, entry);
+      }
       pruneMemory();
       return data;
     } catch {

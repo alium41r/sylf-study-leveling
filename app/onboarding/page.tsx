@@ -1141,6 +1141,7 @@ function ThemeAndModeStep({
                       // React's shorthand-vs-longhand re-render warning.
                       backgroundImage: bgGradient,
                       backgroundSize: bgData.size || "cover",
+                      backgroundRepeat: bgData.repeat || "no-repeat",
                     }}
                   >
                     <span className="absolute bottom-1.5 right-2 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider bg-bg-abyss/80 text-text-secondary border border-border-subtle backdrop-blur-sm">

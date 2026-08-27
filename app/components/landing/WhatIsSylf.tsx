@@ -40,8 +40,7 @@ export default function WhatIsSylf() {
           </h2>
 
           <p className="text-[15px] sm:text-lg text-text-secondary leading-relaxed">
-            <span className="sm:hidden">Games give instant feedback and visible progression. Sylf brings that same dopamine loop to your coursework.</span>
-            <span className="hidden sm:inline">Games give you instant feedback, clear objectives, and visible progression. Standard study apps only give you empty to-do lists and guilt. Sylf bridges the gap by making academic mastery a measurable RPG journey.</span>
+            Games provide immediate feedback and clear goals. Traditional studying brings overwhelm and guilt. Sylf bridges the gap with a real RPG progression loop.
           </p>
         </div>
 
@@ -73,23 +72,19 @@ export default function WhatIsSylf() {
             <ul className="space-y-3 sm:space-y-4">
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-secondary">
                 <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">500-page textbook overwhelm & decision fatigue</span>
-                <span className="hidden sm:inline"><strong>Endless To-Do Lists:</strong> 500-page textbooks without clear daily priorities create decision fatigue.</span>
+                <span><strong>Endless To-Do Lists:</strong> Unprioritized material causing decision fatigue.</span>
               </li>
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-secondary">
                 <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">Zero visible feedback or tangible sense of progress</span>
-                <span className="hidden sm:inline"><strong>Zero Sense of Progress:</strong> You study 4 hours but feel like you made no tangible headway.</span>
+                <span><strong>No Feedback:</strong> Hours of effort without a clear sense of progress.</span>
               </li>
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-secondary">
                 <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">Guilt-inducing broken streaks & procrastination loops</span>
-                <span className="hidden sm:inline"><strong>Fragile Motivation:</strong> One missed day breaks generic streaks, inducing guilt and procrastination loops.</span>
+                <span><strong>Fragile Streaks:</strong> Missed days cause guilt and broken momentum.</span>
               </li>
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-secondary">
                 <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">Isolated, unmeasured grind with no mastery indicator</span>
-                <span className="hidden sm:inline"><strong>Isolated Effort:</strong> Studying alone in silence with no feedback, progression, or mastery indicators.</span>
+                <span><strong>Isolated Grind:</strong> Unmeasured study with no mastery indicators.</span>
               </li>
             </ul>
           </motion.div>
@@ -124,23 +119,19 @@ export default function WhatIsSylf() {
             <ul className="space-y-3 sm:space-y-4">
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-primary">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">AI-dissected daily quests with calibrated focus targets</span>
-                <span className="hidden sm:inline"><strong>AI-Generated Quests:</strong> Syllabi are dissected into prioritized, bite-sized daily objectives with target durations.</span>
+                <span><strong>AI Quests:</strong> Syllabi broken down into bite-sized daily objectives.</span>
               </li>
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-primary">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">Rank E → Monarch ascension with mathematical XP</span>
-                <span className="hidden sm:inline"><strong>Mathematical Leveling:</strong> Every focus session awards XP. Level up and ascend from Rank E to Monarch.</span>
+                <span><strong>Rank Ascension:</strong> Climb from Rank E to Monarch with mathematical XP.</span>
               </li>
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-primary">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">Rest days & streak shields protect your consistency</span>
-                <span className="hidden sm:inline"><strong>Cognitive Stat Matrix:</strong> Track measurable stamina (Endurance, Tenacity, Velocity, Discipline, Synthesis).</span>
+                <span><strong>Cognitive Stats:</strong> Track Endurance, Tenacity, and study velocity.</span>
               </li>
               <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-text-primary">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="sm:hidden">Deep work Focus Room with 40Hz binaural soundscapes</span>
-                <span className="hidden sm:inline"><strong>Focus Room & Acoustics:</strong> Study in an ambient soundscape environment calibrated for deep concentration.</span>
+                <span><strong>Focus Acoustics:</strong> Distraction-free timer with calibrated 40Hz soundscapes.</span>
               </li>
             </ul>
           </motion.div>

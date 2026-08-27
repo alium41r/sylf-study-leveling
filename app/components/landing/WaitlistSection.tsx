@@ -236,7 +236,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
               </h2>
 
               <p className="text-sm sm:text-base text-text-secondary max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed">
-                Join the waitlist to receive early beta access invitations. No credit card, no ads, and no complicated setup.
+                Join the waitlist for rolling beta access. Free forever, zero spam.
               </p>
 
               <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4 text-left">
@@ -334,7 +334,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
 
                 <p className="text-[11px] text-text-muted text-center flex items-center justify-center gap-1.5 pt-2">
                   <Shield className="w-3.5 h-3.5 text-accent-primary-light" />
-                  <span>Your email is strictly used for beta notifications. No third-party sharing.</span>
+                  <span>Strictly for beta notifications. Zero spam.</span>
                 </p>
               </form>
             </div>
@@ -361,7 +361,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
               </h3>
 
               <p className="text-xs sm:text-sm text-text-secondary mb-6 leading-relaxed">
-                We are admitting scholars in rolling beta batches. We will send an email to you as soon as your access wave is ready.
+                Admitting scholars in rolling batches. We'll email you when your wave opens.
               </p>
 
               {/* Digital Pass Card */}
@@ -395,7 +395,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
               {/* Referral Sharing Action Block */}
               <div className="space-y-3">
                 <p className="text-xs text-text-muted font-medium">
-                  Invite your study partners to prioritize your beta wave:
+                  Invite friends to move up in line:
                 </p>
 
                 <div className="flex items-center gap-2">

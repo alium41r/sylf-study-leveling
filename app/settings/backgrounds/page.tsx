@@ -279,6 +279,7 @@ export default function BackgroundsSettingsPage() {
                         backgroundImage: mode === "light" ? bgData?.lightValue : bgData?.value,
                         backgroundColor: mode === "light" ? "#f8fafc" : "#0a0a0f",
                         backgroundSize: bgData?.size || "cover",
+                        backgroundRepeat: bgData?.repeat || "no-repeat",
                         position: "relative",
                         overflow: "hidden",
                         opacity: unlocked ? 1 : 0.2,

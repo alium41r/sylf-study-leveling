@@ -42,12 +42,12 @@ const FEATURE_PILLARS: FeaturePillar[] = [
     badge: "AI Syllabus Dissection",
     tagline: "Your curriculum broken down into actionable daily quests.",
     description:
-      "Paste your syllabus or lecture topics. The AI breaks them into prioritized daily quests with target focus durations, difficulty ratings, and guaranteed XP rewards.",
+      "Paste your syllabus or topics. The AI creates prioritized daily study quests with calibrated focus targets and XP rewards.",
     icon: Brain,
     highlights: [
-      "Auto-generates daily study missions from raw syllabus notes",
-      "Adaptive difficulty matching your personal study velocity",
-      "XP and rewards granted on verified session completion",
+      "Instant daily missions from raw syllabus notes",
+      "Adaptive difficulty tailored to your pace",
+      "XP and rewards on verified completion",
     ],
     mockup: { type: "quests" },
   },
@@ -57,12 +57,12 @@ const FEATURE_PILLARS: FeaturePillar[] = [
     badge: "E → Monarch Ladder",
     tagline: "Every hour of study counts towards your next rank.",
     description:
-      "Climb the 8-tier rank ladder (E, D, C, B, A, S, National, and Monarch). XP requirements scale with your level so high ranks reflect real academic dedication.",
+      "Ascend from Rank E to Monarch. XP thresholds scale with your level so higher ranks reflect genuine academic dedication.",
     icon: TrendingUp,
     highlights: [
-      "Rigorous mathematical XP progression curve",
-      "Rank ascension unlocks new titles and system privileges",
-      "Weekly streak multipliers reward unbroken consistency",
+      "Mathematical XP progression across 8 tiers",
+      "Unlock titles, badges, and system privileges",
+      "Weekly streak multipliers for consistency",
     ],
     mockup: { type: "ranks" },
   },
@@ -70,14 +70,14 @@ const FEATURE_PILLARS: FeaturePillar[] = [
     id: "focus-acoustics",
     title: "Focus Room & Acoustics",
     badge: "Deep Work Engine",
-    tagline: "Zero distraction study timer with built-in ambient soundscapes.",
+    tagline: "Zero-distraction study timer with ambient acoustics.",
     description:
-      "Track clean study sessions with Pomodoro or stopwatch modes. Drop into deep concentration with ambient soundscapes like Night Campfire, Rain on Window, Forest Wind, and Deep Brown Noise.",
+      "Track clean sessions with Pomodoro or stopwatch modes, backed by 40Hz binaural beats, rain, campfire, and brown noise.",
     icon: Headphones,
     highlights: [
-      "Night Campfire, Rain on Window, Forest Wind, and Deep Brown Noise",
-      "Light-mode eye-comfort dimming overlay to reduce glare",
-      "Accurate visibility-based study tracking with break guards",
+      "Night Campfire, Rain, Forest Wind & Brown Noise",
+      "Light-mode eye-comfort overlay to reduce glare",
+      "Accurate tab-visibility and break tracking",
     ],
     mockup: { type: "focus" },
   },
@@ -87,12 +87,12 @@ const FEATURE_PILLARS: FeaturePillar[] = [
     badge: "5 Core Attributes",
     tagline: "Measure your real academic stamina and velocity.",
     description:
-      "Watch your stats evolve as you study: Endurance (long sessions), Tenacity (streak resilience), Velocity (quest throughput), Discipline (consistency), and Synthesis.",
+      "Track your evolving study stamina across 5 core attributes: Endurance, Tenacity, Velocity, Discipline, and Synthesis.",
     icon: Layers,
     highlights: [
-      "Endurance, Tenacity, Velocity, Discipline, and Synthesis",
-      "Live telemetry radar reflecting your genuine study habits",
-      "Highlights study bottlenecks and consistency trends",
+      "5 core attributes updated in real time",
+      "Live radar telemetry reflecting actual habits",
+      "Identifies fatigue points and velocity trends",
     ],
     mockup: { type: "stats" },
   },
@@ -100,14 +100,14 @@ const FEATURE_PILLARS: FeaturePillar[] = [
     id: "character-studio",
     title: "Character & Profile Studio",
     badge: "Scholar Identity",
-    tagline: "Customize your character and profile for yourself and others to see.",
+    tagline: "Personalize your scholar dossier and 3D avatar.",
     description:
-      "Personalize your scholar dossier with 3D avatars, custom titles, banners, pedestals, and auras to showcase your academic milestones and verified study statistics.",
+      "Showcase milestones with 3D avatars, custom titles, banners, pedestals, and verified study statistics.",
     icon: User,
     highlights: [
-      "Customize avatar, profile banner, titles, and holographic auras",
-      "Public scholar dossier displaying verified study hours & rank",
-      "Visual progression reflecting your real study achievements",
+      "Avatars, profile banners, titles, and auras",
+      "Public dossier showing verified hours & rank",
+      "Cosmetics earned through real academic effort",
     ],
     mockup: { type: "character" },
   },
@@ -117,12 +117,12 @@ const FEATURE_PILLARS: FeaturePillar[] = [
     badge: "Academic Community",
     tagline: "Connect with study partners, track presence, and climb rankings.",
     description:
-      "Study alongside friends with real-time presence indicators, send instant co-study session invites, and compare weekly focus hours on global and friend leaderboards.",
+      "Study alongside friends with live presence, instant co-study invites, and global or friend leaderboards.",
     icon: Users,
     highlights: [
-      "Live presence indicators showing friends in active study sessions",
-      "Direct co-study invites to focus together in real-time",
-      "Global and friend rankings based on verified focus time & XP",
+      "Live friend presence and active study status",
+      "Instant co-study invites for synchronized focus",
+      "Weekly leaderboards ranked by verified XP",
     ],
     mockup: { type: "social" },
   },
@@ -130,14 +130,14 @@ const FEATURE_PILLARS: FeaturePillar[] = [
     id: "study-schedule",
     title: "Study Schedule & Calendar",
     badge: "Consistency Engine",
-    tagline: "Structured planning with streak maintenance and designated rest days.",
+    tagline: "Structured planning with rest days and streak shields.",
     description:
-      "Map out your weekly study goals, schedule sessions ahead of time, and designate rest days so unplanned life events don't break your momentum.",
+      "Map weekly goals, schedule upcoming sessions, and set rest days so unexpected events never break your streak.",
     icon: Calendar,
     highlights: [
       "Customizable daily study target minutes",
       "Designated rest days & weekly streak shields",
-      "Automatic quest rescheduling for postponed sessions",
+      "Automatic quest rescheduling for missed days",
     ],
     mockup: { type: "schedule" },
   },
@@ -175,7 +175,7 @@ export default function CoreFeatures() {
           </h2>
 
           <p className="text-[15px] sm:text-lg text-text-secondary leading-relaxed">
-            Every feature in Sylf is designed around real cognitive science and genuine academic progression.
+            Designed for real cognitive endurance and genuine academic progression.
           </p>
         </div>
 
@@ -255,7 +255,7 @@ export default function CoreFeatures() {
               AI Quest Master
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Turns raw syllabus notes into bite-sized daily focus missions with calibrated XP rewards.
+              Turns raw syllabus notes into bite-sized missions with calibrated XP rewards.
             </p>
             <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
               <span className="text-text-primary font-bold truncate max-w-[180px]">Calculus: Multivariable</span>
@@ -277,7 +277,7 @@ export default function CoreFeatures() {
               Rank Ascension
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Every verified study session awards XP. Ascend from Rank E to Monarch as your hours stack.
+              Earn XP on verified study sessions and ascend from Rank E to Monarch.
             </p>
             <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
               <span className="text-text-primary font-bold">Rank C • Lv. 14</span>
@@ -299,7 +299,7 @@ export default function CoreFeatures() {
               Focus Room & Soundscapes
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Distraction-free timer paired with 40Hz binaural beats, brown noise, and night campfire audio.
+              Distraction-free timer with 40Hz binaural beats, brown noise, and campfire audio.
             </p>
             <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
               <span className="text-text-muted">Soundscape:</span>
@@ -321,7 +321,7 @@ export default function CoreFeatures() {
               Cognitive Telemetry
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Live radar attributes measuring your actual study stamina: Endurance, Tenacity, & Velocity.
+              Live attribute radar measuring Endurance, Tenacity, and study velocity.
             </p>
             <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
               <span className="text-purple-300 font-bold">14-Day Streak</span>

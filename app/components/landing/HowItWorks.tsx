@@ -16,29 +16,25 @@ const STEPS = [
   {
     step: "01",
     title: "Input Curriculum",
-    mobileDesc: "Enter your target exam, syllabus code, or lecture notes.",
-    desktopDesc: "Enter your target subject, exam board (e.g. CAIE, AP, IB, University), or paste your lecture topics.",
+    description: "Enter your target exam, syllabus, or lecture topics.",
     icon: FileText,
   },
   {
     step: "02",
     title: "AI Generates Quests",
-    mobileDesc: "Receive prioritized daily missions with calibrated XP rewards.",
-    desktopDesc: "The system breaks the syllabus into manageable daily quests with calibrated target durations and XP rewards.",
+    description: "Receive prioritized daily study missions with XP rewards.",
     icon: Brain,
   },
   {
     step: "03",
     title: "Focus & Study",
-    mobileDesc: "Distraction-free timer backed by 40Hz ambient acoustics.",
-    desktopDesc: "Study in the distraction-free Focus Room with built-in 40Hz binaural acoustics and verified timer sessions.",
+    description: "Track deep work with distraction-free timers and 40Hz audio.",
     icon: Timer,
   },
   {
     step: "04",
     title: "Level Up & Ascend",
-    mobileDesc: "Earn XP, ascend from Rank E to Monarch, and scale stats.",
-    desktopDesc: "Earn XP, rise from Rank E to Monarch, scale your cognitive stats, and claim earned Sylph currency rewards.",
+    description: "Earn XP, ascend from Rank E to Monarch, and scale your stats.",
     icon: Award,
   },
 ];
@@ -70,7 +66,7 @@ export default function HowItWorks() {
           </h2>
 
           <p className="text-[15px] sm:text-lg text-text-secondary leading-relaxed">
-            From textbook overwhelm to unambiguous daily progression in four simple steps.
+            From textbook overwhelm to daily progression in 4 simple steps.
           </p>
         </div>
 
@@ -109,8 +105,7 @@ export default function HowItWorks() {
                   </h3>
 
                   <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-                    <span className="sm:hidden">{item.mobileDesc}</span>
-                    <span className="hidden sm:inline">{item.desktopDesc}</span>
+                    {item.description}
                   </p>
                 </div>
 

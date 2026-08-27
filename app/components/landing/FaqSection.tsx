@@ -13,32 +13,32 @@ const FAQS: FaqItem[] = [
   {
     question: "What is Sylf?",
     answer:
-      "Sylf is an AI-driven gamified study platform that turns your academic coursework and exam prep into structured RPG progression. You input your curriculum, the AI creates sequenced daily quests, and your focused study sessions award XP, level you up from Rank E to Monarch, and scale your cognitive attributes.",
+      "Sylf is an AI-powered study RPG that turns your curriculum into sequenced daily quests. Study sessions award XP, level you up from Rank E to Monarch, and scale cognitive attributes.",
   },
   {
     question: "Who is Sylf built for?",
     answer:
-      "Sylf is designed for dedicated students tackling heavy curricula: Medical (MCAT, USMLE), STEM & Engineering, Law (Bar Exam), Finance (CFA), High School (A-Levels, AP, IB), and competitive exam candidates who need structure and motivation.",
+      "Students tackling demanding material: STEM, Medicine (MCAT/USMLE), Law, Finance, and high school exams (AP, IB, A-Levels) who want structured daily momentum.",
   },
   {
     question: "When is Sylf launching?",
     answer:
-      "Sylf is currently in closed testing. We are admitting waitlist signups in scheduled rolling beta waves to ensure platform stability. Joining the waitlist reserves your place in upcoming waves.",
+      "We are rolling out invitations in scheduled beta waves. Joining the waitlist reserves your place for the next cohort.",
   },
   {
     question: "Is Sylf free to use?",
     answer:
-      "Yes. Sylf will offer a generous free tier covering core features: AI syllabus quest generation, deep work focus tracking, leveling and ranks, and acoustic soundscapes.",
+      "Yes. Core features—including AI quest generation, focus timers, ambient soundscapes, and rank progression—are free.",
   },
   {
     question: "What happens after I join the waitlist?",
     answer:
-      "You receive an instant Scholar Access Pass with your queue number and a referral link. As soon as your beta cohort is admitted, we will email your invitation directly to your inbox.",
+      "You receive an instant Scholar Pass and queue number. We'll email your invite link as soon as your beta cohort is admitted.",
   },
   {
     question: "How does Sylf handle privacy and data security?",
     answer:
-      "Your email and study data are stored securely and never sold to third parties or advertisers. We do not require account setup or credit card info just to join the waitlist.",
+      "Your data is encrypted and never sold or shared with advertisers. No credit card is required.",
   },
 ];
 
@@ -75,7 +75,7 @@ export default function FaqSection() {
           </h2>
 
           <p className="text-[15px] sm:text-base text-text-secondary leading-relaxed">
-            Everything you need to know about Sylf, early access waves, and our academic progression engine.
+            Common questions about Sylf, beta waves, and our academic progression engine.
           </p>
         </div>
 

@@ -117,7 +117,7 @@ const THEME_MAP: Record<string, Record<string, string>> = {
   },
 };
 
-const BG_MAP: Record<string, { value: string; size?: string; lightValue: string }> = {
+const BG_MAP: Record<string, { value: string; size?: string; repeat?: string; lightValue: string }> = {
   void: {
     value:
       "radial-gradient(ellipse at top, rgba(129, 140, 248, 0.20) 0%, transparent 55%), radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.10) 0%, transparent 60%), linear-gradient(180deg, #0d0f1e 0%, #070811 55%, #04050c 100%)",
@@ -126,11 +126,11 @@ const BG_MAP: Record<string, { value: string; size?: string; lightValue: string 
   },
   "cyber-grid": {
     value:
-      "linear-gradient(transparent 94%, rgba(6, 182, 212, 0.28) 100%), linear-gradient(90deg, transparent 94%, rgba(6, 182, 212, 0.28) 100%), radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.38) 0%, transparent 55%), linear-gradient(to bottom, #0b1220, #060a16)",
-    size: "30px 30px, 30px 30px, auto, auto",
+      "linear-gradient(transparent 94%, rgba(6, 182, 212, 0.32) 100%), linear-gradient(90deg, transparent 94%, rgba(6, 182, 212, 0.32) 100%), radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.38) 0%, transparent 55%), linear-gradient(to bottom, #0b1220, #060a16)",
+    size: "30px 30px, 30px 30px, 100% 100%, 100% 100%",
+    repeat: "repeat, repeat, no-repeat, no-repeat",
     lightValue:
-      "linear-gradient(transparent 94%, rgba(6, 182, 212, 0.35) 100%), linear-gradient(90deg, transparent 94%, rgba(6, 182, 212, 0.35) 100%), radial-gradient(ellipse at bottom, rgba(129, 140, 248, 0.30) 0%, transparent 55%), linear-gradient(to bottom, #eef6fd, #e2ecfa)",
-    // size matches the 4 layers above (grid-x, grid-y, glow, base)
+      "linear-gradient(transparent 94%, rgba(6, 182, 212, 0.40) 100%), linear-gradient(90deg, transparent 94%, rgba(6, 182, 212, 0.40) 100%), radial-gradient(ellipse at bottom, rgba(129, 140, 248, 0.30) 0%, transparent 55%), linear-gradient(to bottom, #eef6fd, #e2ecfa)",
   },
   "sakura-fall": {
     value:
@@ -203,9 +203,7 @@ export function applyGlobalBackground(bgId?: string | null, mode?: string | null
   if (layer) {
     layer.style.background = currentMode === "light" ? bgData.lightValue : bgData.value;
     layer.style.backgroundSize = bgData.size || "cover";
-    // `no-repeat` guarantees a single seamless paint (never re-tiled, so no
-    // seam can appear when the wallpaper is re-applied or the doc resizes).
-    layer.style.backgroundRepeat = "no-repeat";
+    layer.style.backgroundRepeat = bgData.repeat || "no-repeat";
   }
   // Never leave a stale background paint on <body>: the layer is the single
   // source of truth, and a body paint would cover it (body backgrounds paint

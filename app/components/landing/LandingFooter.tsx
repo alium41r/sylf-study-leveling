@@ -49,7 +49,7 @@ export default function LandingFooter() {
             </div>
 
             <p className="text-xs sm:text-sm text-text-secondary max-w-sm mb-4 leading-relaxed">
-              The AI-powered gamified study leveling system. Transform curriculum into daily quests, log deep work, and ascend your scholar rank.
+              AI-powered study leveling. Turn curriculum into quests, track deep work, and level up your rank.
             </p>
 
             {/* System Telemetry Badge */}

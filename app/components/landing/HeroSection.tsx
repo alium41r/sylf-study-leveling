@@ -171,8 +171,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
 
             {/* Subtitle */}
             <p className="text-[15px] sm:text-lg text-text-secondary mb-6 sm:mb-8 max-w-2xl leading-relaxed text-pretty">
-              <span className="sm:hidden">Turn coursework and exams into structured AI quests. Level up from Rank E to Monarch with verified focus.</span>
-              <span className="hidden sm:inline">Sylf transforms your coursework and exam prep into structured AI quests, logs clean deep focus minutes, and rewards your daily consistency with XP, ranks, and cognitive stat growth.</span>
+              Convert coursework into structured AI quests, track deep focus, and level up from Rank E to Monarch.
             </p>
 
             {/* Waitlist Capture Card */}
@@ -276,7 +275,7 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                   </div>
 
                   <p className="text-xs text-text-secondary leading-relaxed">
-                    You hold position <strong className="text-text-primary">#{successData.position}</strong> in the early access queue. We will email you the moment your beta wave opens.
+                    You hold position <strong className="text-text-primary">#{successData.position}</strong>. We will email you when your beta wave opens.
                   </p>
 
                   <div className="p-3 rounded-xl border border-accent-primary-mid/40 bg-accent-primary-dim/20 flex items-center justify-between gap-3">

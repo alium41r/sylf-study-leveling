@@ -179,8 +179,8 @@ export default function CoreFeatures() {
           </p>
         </div>
 
-        {/* Feature Navigation Tabs (bleeds + snaps on mobile) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 sm:mb-8 no-scrollbar justify-start lg:justify-center -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+        {/* ─── Desktop Feature Navigation Tabs ─── */}
+        <div className="hidden md:flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 pb-2 mb-6 sm:mb-8 max-w-5xl mx-auto">
           {FEATURE_PILLARS.map((pillar) => {
             const Icon = pillar.icon;
             const isActive = activeTab === pillar.id;
@@ -189,21 +189,21 @@ export default function CoreFeatures() {
               <button
                 key={pillar.id}
                 onClick={() => setActiveTab(pillar.id)}
-                className={`flex shrink-0 snap-start items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-sm font-bold font-['Rajdhani'] uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer border ${
+                className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-[13px] font-bold font-['Rajdhani'] uppercase tracking-wider transition-all cursor-pointer border ${
                   isActive
-                    ? "bg-accent-primary text-white border-accent-primary shadow-lg"
-                    : "bg-bg-abyss text-text-secondary border-border-subtle hover:border-border-active hover:text-text-primary"
+                    ? "bg-accent-primary text-white border-accent-primary shadow-lg shadow-accent-primary/20"
+                    : "bg-bg-abyss text-text-secondary border-border-subtle hover:border-border-active hover:text-text-primary hover:bg-bg-void/40"
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 <span>{pillar.title}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Active Feature Showcase Box */}
-        <div className="p-5 sm:p-10 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card">
+        {/* ─── Desktop Active Feature Showcase Box ─── */}
+        <div className="hidden md:block p-5 sm:p-10 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
             {/* Feature Copy */}
             <div className="lg:col-span-6 flex flex-col items-start text-left">
@@ -235,6 +235,97 @@ export default function CoreFeatures() {
             {/* Feature Mockup Preview */}
             <div className="lg:col-span-6">
               <FeatureMockup type={currentFeature.mockup.type} />
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Mobile Clean Showcase (4 Core Superpowers) ─── */}
+        <div className="md:hidden flex flex-col gap-4">
+          {/* Card 1: AI Quests */}
+          <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
+                AI Syllabus Dissection
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
+                <Brain className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
+              AI Quest Master
+            </h3>
+            <p className="text-xs text-text-secondary leading-relaxed mb-3">
+              Turns raw syllabus notes into bite-sized daily focus missions with calibrated XP rewards.
+            </p>
+            <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
+              <span className="text-text-primary font-bold truncate max-w-[180px]">Calculus: Multivariable</span>
+              <span className="text-accent-primary-light font-bold shrink-0">+150 XP</span>
+            </div>
+          </div>
+
+          {/* Card 2: 8-Tier Leveling */}
+          <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
+                E → Monarch Progression
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
+              Rank Ascension
+            </h3>
+            <p className="text-xs text-text-secondary leading-relaxed mb-3">
+              Every verified study session awards XP. Ascend from Rank E to Monarch as your hours stack.
+            </p>
+            <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
+              <span className="text-text-primary font-bold">Rank C • Lv. 14</span>
+              <span className="text-cyan-400 font-bold shrink-0">425 ✦ Sylph</span>
+            </div>
+          </div>
+
+          {/* Card 3: Focus Acoustics */}
+          <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
+                Deep Work Engine
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
+                <Headphones className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
+              Focus Room & Soundscapes
+            </h3>
+            <p className="text-xs text-text-secondary leading-relaxed mb-3">
+              Distraction-free timer paired with 40Hz binaural beats, brown noise, and night campfire audio.
+            </p>
+            <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
+              <span className="text-text-muted">Soundscape:</span>
+              <span className="text-emerald-400 font-bold">Night Campfire 40Hz</span>
+            </div>
+          </div>
+
+          {/* Card 4: Cognitive Stats */}
+          <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
+                5 Core Attributes
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
+                <Layers className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
+              Cognitive Telemetry
+            </h3>
+            <p className="text-xs text-text-secondary leading-relaxed mb-3">
+              Live radar attributes measuring your actual study stamina: Endurance, Tenacity, & Velocity.
+            </p>
+            <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
+              <span className="text-purple-300 font-bold">14-Day Streak</span>
+              <span className="text-accent-primary-light font-bold">3.4 Quests / Day</span>
             </div>
           </div>
         </div>

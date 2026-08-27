@@ -56,9 +56,7 @@ export default function OnboardingFlow() {
   const usernameDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Academic Curriculum & Subject Intake
-  const [configuredSubjects, setConfiguredSubjects] = useState<ConfiguredSubject[]>([
-    { id: "preset-9709", name: "Mathematics", code: "9709", examBoard: "CAIE", level: "A-Level", color: "#8B5CF6" },
-  ]);
+  const [configuredSubjects, setConfiguredSubjects] = useState<ConfiguredSubject[]>([]);
 
   // Cosmetic & Mode Selections
   const [selectedBackground, setSelectedBackground] = useState<string | null>(null);
@@ -195,10 +193,8 @@ export default function OnboardingFlow() {
       }
     }
     
-    if (selectedBackground && BG_MAP[selectedBackground]) {
-      // Paint on the viewport-fixed background layer (mobile-safe)
-      applyGlobalBackground(selectedBackground, selectedMode);
-    }
+    // Paint on the viewport-fixed background layer (mobile-safe)
+    applyGlobalBackground(selectedBackground || "void", selectedMode);
   }, [selectedTheme, selectedBackground, selectedMode]);
 
   const submitOnboarding = async () => {
@@ -287,7 +283,7 @@ export default function OnboardingFlow() {
   }, [currentStep, isSubmitting]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center overflow-hidden relative" style={{ backgroundColor: "var(--bg-void)", zIndex: 50 }}>
+    <div className="min-h-screen w-full flex items-center justify-center overflow-hidden relative bg-transparent">
       {/* Ambient Particles */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-primary rounded-full mix-blend-screen filter blur-[128px] animate-pulse"></div>
@@ -883,8 +879,18 @@ function SubjectIntakeStep({
               <BookOpen className="w-8 h-8 text-text-muted opacity-40" />
               <p className="text-sm text-text-secondary font-rajdhani">No subjects selected yet.</p>
               <p className="text-xs text-text-muted font-mono">
-                Add each subject with its code, exam board and syllabus details below.
+                Add each subject with its code, exam board and syllabus details to get started.
               </p>
+              {!showCustomForm && (
+                <button
+                  type="button"
+                  onClick={() => setShowCustomForm(true)}
+                  className="mt-2 text-xs font-rajdhani font-bold uppercase tracking-wider text-accent-text-light hover:text-white flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded bg-bg-panel border border-border-subtle hover:border-accent-primary"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Custom Subject</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">

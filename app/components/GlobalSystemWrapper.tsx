@@ -210,7 +210,8 @@ export function applyGlobalBackground(bgId?: string | null, mode?: string | null
   // Never leave a stale background paint on <body>: the layer is the single
   // source of truth, and a body paint would cover it (body backgrounds paint
   // above negative z-index children).
-  document.body.style.background = "";
+  document.body.style.background = "transparent";
+  document.body.style.backgroundColor = "transparent";
 }
 
 export function applyGlobalTheme(themeId?: string | null) {
@@ -284,7 +285,7 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
             {/* Wallpaper layer: in-flow, absolutely positioned against this
                 relative wrapper so it spans the full document height and
                 scrolls with the content — see applyGlobalBackground. */}
-            <div className="relative">
+            <div className="relative isolate">
               <div
                 id="app-bg-layer"
                 aria-hidden="true"
@@ -293,6 +294,7 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
                   inset: 0,
                   zIndex: -10,
                   pointerEvents: "none",
+                  transition: "background 0.3s ease",
                 }}
               />
               {children}

@@ -166,3 +166,17 @@ describe("S4: cron fail-closed behavior", () => {
     process.env.JWT_SECRET = originalJwt;
   });
 });
+
+describe("S5 regression: reservation 'charged' semantics (off-by-one guard)", () => {
+  it("a successful reservation at the limit returns charged=true even when allowed=false", async () => {
+    vi.clearAllMocks();
+    // planner limit is 1; the guarded upsert returning used=1 means the FIRST
+    // reservation succeeded. `allowed` (used < limit) is then false, but the
+    // authoritative success flag is `charged`.
+    vi.mocked(prisma.$queryRawUnsafe).mockResolvedValueOnce([{ used: 1 }]);
+    const res = await reserveQuota(1, "planner");
+    expect(res.charged).toBe(true);
+    // Fix must gate routes on charged, not allowed — 1 < 1 is false.
+    expect(res.allowed).toBe(false);
+  });
+});

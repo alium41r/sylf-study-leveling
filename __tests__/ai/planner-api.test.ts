@@ -45,6 +45,7 @@ vi.mock("../../lib/prisma", () => ({
 vi.mock("../../lib/timezone-service", () => ({
   TimezoneService: {
     getUserLocalDate: vi.fn().mockReturnValue("2026-08-15"),
+    getUserLocalWeekKey: vi.fn().mockReturnValue({ weekKey: "2026-W33", resetsAt: new Date("2026-08-17T00:00:00Z") }),
     getStartOfDayUTC: vi.fn().mockReturnValue(new Date("2026-08-15T00:00:00Z")),
     getEndOfDayUTC: vi.fn().mockReturnValue(new Date("2026-08-15T23:59:59.999Z")),
     getNextMidnightUTC: vi.fn().mockReturnValue(new Date("2026-08-16T00:00:00Z")),

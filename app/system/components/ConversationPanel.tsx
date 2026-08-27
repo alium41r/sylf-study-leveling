@@ -203,14 +203,26 @@ export default function ConversationPanel({
         scrollToBottom();
         onQuotaRefresh();
       } else {
-        console.error("Chat error", await res.text());
+        // Surface the server's actual error (e.g. upload validation: 413 "File
+        // is too large", 400 "Unsupported file type") instead of a misleading
+        // generic message.
+        let errorMsg = "The system is temporarily unavailable. Please try again.";
+        try {
+          const errData = await res.json();
+          if (errData?.error && typeof errData.error === "string") {
+            errorMsg = errData.error;
+          }
+        } catch {
+          // Non-JSON body — keep the generic message.
+        }
+        console.error("Chat error", errorMsg);
         setMessages((prev) => {
           const updated = prev.map((m) => (m.id === optimisticUserMsg.id ? { ...m, failed: true } : m));
           return [
             ...updated,
             {
               id: Date.now() + 1,
-              content: "The system is temporarily unavailable. Please try again.",
+              content: errorMsg,
               type: "INFO",
               read: true,
               createdAt: new Date().toISOString(),

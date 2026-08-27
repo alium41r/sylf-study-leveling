@@ -206,12 +206,12 @@ export function getScallopedMedallionPath(
 
 /**
  * Generates an 8-point multifaceted grand celestial apex star path.
- * Grander, larger proportions ($R_{outer} = 48$, $R_{inner} = 22$).
+ * Grander, majestic proportions ($R_{outer} = 68$, $R_{inner} = 32$).
  * Centered at (0, 0).
  */
 export function getApexCelestialStarPath(
-  outerRadius: number = 48,
-  innerRadius: number = 22
+  outerRadius: number = 68,
+  innerRadius: number = 32
 ): string {
   const points: [number, number][] = [];
   for (let i = 0; i < 16; i++) {
@@ -239,8 +239,8 @@ export function getApexCelestialStarPath(
  * Generates the faceted bevel lines inside the Apex Star.
  */
 export function getApexStarFacetLines(
-  outerRadius: number = 48,
-  innerRadius: number = 22
+  outerRadius: number = 68,
+  innerRadius: number = 32
 ): Array<{ x1: number; y1: number; x2: number; y2: number }> {
   const lines: Array<{ x1: number; y1: number; x2: number; y2: number }> = [];
   for (let i = 0; i < 16; i++) {
@@ -256,6 +256,36 @@ export function getApexStarFacetLines(
     });
   }
   return lines;
+}
+
+/**
+ * Generates an outer glowing ethereal corona star path for the grand Apex.
+ * R_outer = 82, R_inner = 40.
+ */
+export function getApexCoronaStarPath(
+  outerRadius: number = 82,
+  innerRadius: number = 40
+): string {
+  const points: [number, number][] = [];
+  for (let i = 0; i < 16; i++) {
+    const angle = (i * Math.PI) / 8 - Math.PI / 2;
+    let r = innerRadius;
+    if (i % 4 === 0) {
+      r = outerRadius;
+    } else if (i % 2 === 0) {
+      r = outerRadius * 0.85;
+    } else {
+      r = innerRadius;
+    }
+    points.push([r * Math.cos(angle), r * Math.sin(angle)]);
+  }
+
+  let d = `M ${points[0][0].toFixed(2)} ${points[0][1].toFixed(2)}`;
+  for (let i = 1; i < points.length; i++) {
+    d += ` L ${points[i][0].toFixed(2)} ${points[i][1].toFixed(2)}`;
+  }
+  d += " Z";
+  return d;
 }
 
 /**
@@ -296,33 +326,69 @@ export function getLaurelLeavesSVG(side: "left" | "right", color: string) {
 }
 
 /**
+ * Piecewise constellation envelope guide widths from root to apex.
+ * Ensures the flow lines safely clear every node tier (especially Tier 9 nodes #45 and #47)
+ * with a harmonious, balanced margin (~40-60px outside node rims).
+ */
+const CONSTELLATION_ENVELOPE: Array<[number, number]> = [
+  [1120, 52],  // Below Root #01 (y=1100)
+  [1100, 76],  // Root #01 clearance (clears laurels at ~48px)
+  [990, 280],  // Tier 2: N2_1 / N2_3 (x=280/720, dist=220), margin = 60px
+  [880, 385],  // Tier 3: N3_1 / N3_6 (x=180/820, dist=320), margin = 65px
+  [770, 455],  // Tier 4: N4_1 / N4_8 (x=120/880, dist=380), margin = 75px
+  [660, 420],  // Tier 5: N5_1 / N5_6 (x=180/820, dist=320), margin = 100px
+  [550, 448],  // Tier 6: N6_1 / N6_8 (x=140/860, dist=360), margin = 88px
+  [440, 410],  // Tier 7: N7_1 / N7_7 (x=180/820, dist=320), margin = 90px
+  [330, 345],  // Tier 8: N8_1 / N8_5 (x=240/760, dist=260), margin = 85px
+  [220, 260],  // Tier 9: N9_1 / N9_3 (x=320/680, dist=180), margin = 80px! (Clears #45 and #47 with ~58px margin)
+  [150, 190],  // Graceful transition funnel between Tier 9 and Apex
+  [100, 125],  // Apex level (y=100, star R_outer=68), margin = 57px outside star tips
+  [50, 70],    // Spire lead-in
+  [15, 26],    // Top needle tip
+];
+
+function getEnvelopeHalfWidth(y: number): number {
+  if (y >= CONSTELLATION_ENVELOPE[0][0]) return CONSTELLATION_ENVELOPE[0][1];
+  const last = CONSTELLATION_ENVELOPE[CONSTELLATION_ENVELOPE.length - 1];
+  if (y <= last[0]) return last[1];
+
+  for (let i = 0; i < CONSTELLATION_ENVELOPE.length - 1; i++) {
+    const [y0, w0] = CONSTELLATION_ENVELOPE[i];
+    const [y1, w1] = CONSTELLATION_ENVELOPE[i + 1];
+    if (y <= y0 && y >= y1) {
+      const u = (y0 - y) / (y0 - y1);
+      const smoothU = u * u * (3 - 2 * u);
+      return w0 + (w1 - w0) * smoothU;
+    }
+  }
+  return 100;
+}
+
+/**
  * Generates an organic, undulating wavy whirlwind mana stream path.
- * side: 'left' | 'right'
- * phaseOffset: number (0 to Math.PI*2)
- * waveAmp: amplitude of the wavy undulation (e.g. 24px)
- * waveFreq: number of full wave cycles (e.g. 3.5)
+ * Guaranteed to stay outside all node bounding boxes with proper breathing room.
  */
 export function getWhirlwindManaPath(
   side: "left" | "right",
   phaseOffset: number = 0,
-  waveAmp: number = 22,
-  waveFreq: number = 3.5
+  waveAmp: number = 14,
+  waveFreq: number = 3.2
 ): string {
   const isRight = side === "right";
-  const numSteps = 36;
+  const numSteps = 54;
   const points: [number, number][] = [];
 
   for (let i = 0; i <= numSteps; i++) {
     const t = i / numSteps; // 0 (bottom) to 1 (top)
-    const y = 1100 - t * 1060; // 1100 -> 40
+    const y = 1120 - t * 1105; // 1120 -> 15
 
-    // Smooth envelope width: starts at 50, expands to ~455 around t=0.35-0.5, then tapers to 24 at apex
-    const baseW = 455 * Math.sin(Math.PI * Math.pow(t, 0.82)) + 45 * (1 - t);
+    const baseW = getEnvelopeHalfWidth(y);
 
-    // Sinusoidal whirlwind / spiral oscillation
-    const wave = waveAmp * Math.sin(t * waveFreq * Math.PI * 2 + phaseOffset) * Math.sin(Math.PI * t);
+    // Sinusoidal whirlwind / spiral oscillation, dampening gently at apex and root
+    const waveEnvelope = Math.sin(Math.PI * Math.min(1, Math.max(0, t)));
+    const wave = waveAmp * Math.sin(t * waveFreq * Math.PI * 2 + phaseOffset) * waveEnvelope;
 
-    const totalXOffset = baseW + wave;
+    const totalXOffset = Math.max(20, baseW + wave);
     const x = isRight ? 500 + totalXOffset : 500 - totalXOffset;
     points.push([x, y]);
   }

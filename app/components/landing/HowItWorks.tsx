@@ -15,30 +15,30 @@ import {
 const STEPS = [
   {
     step: "01",
-    title: "Input Your Curriculum",
-    description:
-      "Enter your target subject, exam board (e.g. CAIE, AP, IB, University), or paste your lecture topics.",
+    title: "Input Curriculum",
+    mobileDesc: "Enter your target exam, syllabus code, or lecture notes.",
+    desktopDesc: "Enter your target subject, exam board (e.g. CAIE, AP, IB, University), or paste your lecture topics.",
     icon: FileText,
   },
   {
     step: "02",
     title: "AI Generates Quests",
-    description:
-      "The system breaks the syllabus into manageable daily quests with calibrated target durations and XP rewards.",
+    mobileDesc: "Receive prioritized daily missions with calibrated XP rewards.",
+    desktopDesc: "The system breaks the syllabus into manageable daily quests with calibrated target durations and XP rewards.",
     icon: Brain,
   },
   {
     step: "03",
-    title: "Lock In Focus Blocks",
-    description:
-      "Study in the distraction-free Focus Room with built-in 40Hz binaural acoustics and verified timer sessions.",
+    title: "Focus & Study",
+    mobileDesc: "Distraction-free timer backed by 40Hz ambient acoustics.",
+    desktopDesc: "Study in the distraction-free Focus Room with built-in 40Hz binaural acoustics and verified timer sessions.",
     icon: Timer,
   },
   {
     step: "04",
     title: "Level Up & Ascend",
-    description:
-      "Earn XP, rise from Rank E to Monarch, scale your cognitive stats, and claim earned Sylph currency rewards.",
+    mobileDesc: "Earn XP, ascend from Rank E to Monarch, and scale stats.",
+    desktopDesc: "Earn XP, rise from Rank E to Monarch, scale your cognitive stats, and claim earned Sylph currency rewards.",
     icon: Award,
   },
 ];
@@ -109,7 +109,8 @@ export default function HowItWorks() {
                   </h3>
 
                   <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-                    {item.description}
+                    <span className="sm:hidden">{item.mobileDesc}</span>
+                    <span className="hidden sm:inline">{item.desktopDesc}</span>
                   </p>
                 </div>
 

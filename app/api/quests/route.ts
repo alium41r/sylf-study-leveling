@@ -252,7 +252,7 @@ export async function POST(req: NextRequest) {
       subjectId = node.subjectId;
       // S4: scope evaluation is quota-reserved like the dedicated endpoint.
       const scopeQuota = await reserveQuota(userId, "scope");
-      if (scopeQuota.allowed) {
+      if (scopeQuota.charged) {
         try {
           const evalResult = await evaluateSyllabusScopeWithAI({
             nodeTitle: node.title,

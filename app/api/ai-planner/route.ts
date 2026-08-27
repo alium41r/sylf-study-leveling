@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     // S4: RESERVE before the (expensive, multi-agent) generation begins;
     // failures/aborts refund the unit.
     const quota = await reserveQuota(userId, "planner");
-    if (!quota.allowed) {
+    if (!quota.charged) {
       return NextResponse.json(
         { error: "quota_exceeded", feature: "planner", remaining: 0, limit: quota.limit, resetsAt: quota.resetsAt },
         { status: 429 }

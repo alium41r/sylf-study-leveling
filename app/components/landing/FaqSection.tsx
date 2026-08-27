@@ -43,7 +43,7 @@ const FAQS: FaqItem[] = [
 ];
 
 export default function FaqSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFaq = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);

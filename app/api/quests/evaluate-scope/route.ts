@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     // S4: atomic reservation BEFORE the (up to 3-generation) AI evaluation.
     const quota = await reserveQuota(session.userId, "scope");
-    if (!quota.allowed) {
+    if (!quota.charged) {
       return NextResponse.json(
         {
           error: "quota_exceeded",

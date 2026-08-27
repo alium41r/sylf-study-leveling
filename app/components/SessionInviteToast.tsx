@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "./AuthProvider";
 
 interface Invite {
   id: number;
@@ -20,9 +21,15 @@ interface Invite {
 
 export function SessionInviteToast() {
   const router = useRouter();
+  const { user } = useAuth();
   const [invites, setInvites] = useState<Invite[]>([]);
 
   useEffect(() => {
+    if (!user) {
+      setInvites([]);
+      return;
+    }
+
     const fetchInvites = async () => {
       try {
         const res = await fetch("/api/invites");
@@ -38,7 +45,7 @@ export function SessionInviteToast() {
     fetchInvites();
     const interval = setInterval(fetchInvites, 30000); // 30s
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   const handleAction = async (inviteId: number, action: "ACCEPTED" | "DECLINED", subjectId?: number) => {
     try {

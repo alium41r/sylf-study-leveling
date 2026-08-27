@@ -92,7 +92,24 @@ export async function POST(
       );
     }
 
-    // 4. Call AI Syllabus Compiler to decompose the curriculum into 48 nodes.
+    // 4. RESERVE the quota unit atomically BEFORE the expensive compile (the
+    //    authoritative concurrency guard — `charged` means the reservation
+    //    actually succeeded; a parallel request would get charged=false).
+    const reserved = await reserveQuota(userId, "compile");
+    if (!reserved.charged) {
+      return NextResponse.json(
+        {
+          error: "quota_exceeded",
+          feature: "compile",
+          remaining: 0,
+          limit: reserved.limit,
+          resetsAt: reserved.resetsAt,
+        },
+        { status: 429 }
+      );
+    }
+
+    // 5. Call AI Syllabus Compiler to decompose the curriculum into 48 nodes.
     //    The compile is grounded on Gemini's Google Search and uses the
     //    subject's exact book/syllabus/class details (syllabusNote) that the
     //    user entered when adding the subject.

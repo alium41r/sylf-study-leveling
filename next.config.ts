@@ -20,12 +20,18 @@ const connectSrc = [
   ...(supabaseOrigin ? [supabaseOrigin, supabaseOrigin.replace(/^https/, "wss")] : []),
 ].join(" ");
 
+// React/Next dev tooling needs eval() to rebuild callstacks; production never
+// does. Keep 'unsafe-eval' OUT of the production CSP (verified on the prod
+// build) and only add it for `next dev`.
+const isDev = process.env.NODE_ENV !== "production";
+const scriptSrc = ["'self'", "'unsafe-inline'", ...(isDev ? ["'unsafe-eval'"] : [])].join(" ");
+
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
       "style-src-attr 'unsafe-inline'",
       "img-src 'self' data: blob: https:",

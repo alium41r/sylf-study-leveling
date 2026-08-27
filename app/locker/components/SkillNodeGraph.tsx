@@ -14,6 +14,7 @@ import {
   getScallopedMedallionPath,
   getApexCelestialStarPath,
   getApexStarFacetLines,
+  getApexCoronaStarPath,
   getSparkleStarPath,
   getLaurelLeavesSVG,
   getWhirlwindManaPath,
@@ -206,19 +207,20 @@ export function SkillNodeGraph({
 
   const standardMedallionPath = useMemo(() => getScallopedMedallionPath(18, 12, 2.5), []);
   const rootMedallionPath = useMemo(() => getScallopedMedallionPath(32, 16, 3.2), []);
-  const apexStarPath = useMemo(() => getApexCelestialStarPath(48, 22), []);
-  const apexFacetLines = useMemo(() => getApexStarFacetLines(48, 22), []);
+  const apexStarPath = useMemo(() => getApexCelestialStarPath(68, 32), []);
+  const apexCoronaStarPath = useMemo(() => getApexCoronaStarPath(82, 40), []);
+  const apexFacetLines = useMemo(() => getApexStarFacetLines(68, 32), []);
   const sparklePath = useMemo(() => getSparkleStarPath(5.5), []);
   const largeSparklePath = useMemo(() => getSparkleStarPath(8.5), []);
   const miniSparklePath = useMemo(() => getSparkleStarPath(3.5), []);
   const leftLaurel = useMemo(() => getLaurelLeavesSVG("left", "#D97706"), []);
   const rightLaurel = useMemo(() => getLaurelLeavesSVG("right", "#D97706"), []);
 
-  // Wavy Whirlwind Mana Paths
-  const leftManaStreamA = useMemo(() => getWhirlwindManaPath("left", 0, 26, 3.2), []);
-  const leftManaStreamB = useMemo(() => getWhirlwindManaPath("left", Math.PI, 18, 3.2), []);
-  const rightManaStreamA = useMemo(() => getWhirlwindManaPath("right", 0, 26, 3.2), []);
-  const rightManaStreamB = useMemo(() => getWhirlwindManaPath("right", Math.PI, 18, 3.2), []);
+  // Wavy Whirlwind Mana Paths (calibrated to safely clear all nodes including #45 & #47)
+  const leftManaStreamA = useMemo(() => getWhirlwindManaPath("left", 0, 14, 3.2), []);
+  const leftManaStreamB = useMemo(() => getWhirlwindManaPath("left", Math.PI, 10, 3.2), []);
+  const rightManaStreamA = useMemo(() => getWhirlwindManaPath("right", 0, 14, 3.2), []);
+  const rightManaStreamB = useMemo(() => getWhirlwindManaPath("right", Math.PI, 10, 3.2), []);
 
   const centerOnCoord = useCallback(
     (wx: number, wy: number, targetZoom: number = viewportRef.current.zoom) => {
@@ -764,23 +766,23 @@ export function SkillNodeGraph({
             <circle
               cx="500"
               cy="100"
-              r="80"
+              r="96"
               fill="none"
-              stroke={isLightMode ? "rgba(139, 92, 246, 0.28)" : "rgba(168, 85, 247, 0.32)"}
-              strokeWidth="1"
-              strokeDasharray="3 5"
+              stroke={isLightMode ? "rgba(139, 92, 246, 0.32)" : "rgba(168, 85, 247, 0.36)"}
+              strokeWidth="1.1"
+              strokeDasharray="4 6"
             />
             <circle
               cx="500"
               cy="100"
-              r="130"
+              r="145"
               fill="none"
-              stroke={isLightMode ? "rgba(139, 92, 246, 0.18)" : "rgba(168, 85, 247, 0.22)"}
+              stroke={isLightMode ? "rgba(139, 92, 246, 0.2)" : "rgba(168, 85, 247, 0.24)"}
               strokeWidth="0.8"
             />
-            <line x1="500" y1="52" x2="500" y2="24" stroke={isLightMode ? "#8b5cf6" : "#c084fc"} strokeWidth="1.5" />
-            <path d={largeSparklePath} transform="translate(500, 24)" fill={isLightMode ? "#8b5cf6" : "#c084fc"} />
-            <path d={miniSparklePath} transform="translate(500, 38)" fill={isLightMode ? "#8b5cf6" : "#c084fc"} />
+            <line x1="500" y1="28" x2="500" y2="6" stroke={isLightMode ? "#8b5cf6" : "#c084fc"} strokeWidth="1.8" strokeLinecap="round" />
+            <path d={largeSparklePath} transform="translate(500, 6)" fill={isLightMode ? "#8b5cf6" : "#c084fc"} />
+            <path d={miniSparklePath} transform="translate(500, 18)" fill={isLightMode ? "#8b5cf6" : "#c084fc"} />
             <circle cx="500" cy="1100" r="62" fill="none" stroke={isLightMode ? "rgba(245, 158, 11, 0.28)" : "rgba(251, 191, 36, 0.32)"} strokeWidth="1" strokeDasharray="2 4" />
           </g>
 
@@ -947,14 +949,28 @@ export function SkillNodeGraph({
                   ) : isApex ? (
                     /* ─── CASE B: GRANDER APEX KEYSTONE ─── */
                     <g className="transition-transform duration-300 group-hover:scale-105">
+                      {/* Ethereal Corona Aura Star behind main star */}
+                      <path
+                        d={apexCoronaStarPath}
+                        fill="none"
+                        stroke={isLightMode ? "rgba(168, 85, 247, 0.4)" : "rgba(192, 132, 252, 0.55)"}
+                        strokeWidth="1.5"
+                        strokeDasharray="4 4"
+                        filter="url(#sk-glow-mana)"
+                        className="sk-celestial-pulse"
+                      />
+
+                      {/* Main Multifaceted Celestial Star */}
                       <path
                         d={apexStarPath}
                         fill={fillUrl}
                         stroke={strokeColor}
-                        strokeWidth={isSelected ? 3 : 2.4}
+                        strokeWidth={isSelected ? 3.4 : 2.6}
                         strokeLinejoin="round"
                         filter="url(#sk-glow-violet)"
                       />
+
+                      {/* Facet Bevel Radiants */}
                       {apexFacetLines.map((line, lIdx) => (
                         <line
                           key={`sk-apex-facet-${lIdx}`}
@@ -963,40 +979,63 @@ export function SkillNodeGraph({
                           x2={line.x2}
                           y2={line.y2}
                           stroke={isLightMode ? "#c084fc" : "#a78bfa"}
-                          strokeWidth="0.9"
-                          opacity="0.65"
+                          strokeWidth="1.1"
+                          opacity={lIdx % 2 === 0 ? 0.75 : 0.45}
                         />
                       ))}
-                      <circle r="26" fill="none" stroke={isLightMode ? "#c084fc" : "#a78bfa"} strokeWidth="1" strokeDasharray="3 3" opacity="0.75" />
-                      <circle r="18" fill={isLightMode ? "#f3e8ff" : "#3b0764"} stroke={strokeColor} strokeWidth="1.6" />
-                      <circle r="15" fill="none" stroke={isLightMode ? "#ddd6fe" : "#7c3aed"} strokeWidth="0.8" opacity="0.8" />
+
+                      {/* Outer Astral Orbit Dial */}
+                      <circle
+                        r="36"
+                        fill="none"
+                        stroke={isLightMode ? "#c084fc" : "#a78bfa"}
+                        strokeWidth="1.2"
+                        strokeDasharray="3 4"
+                        opacity="0.8"
+                      />
+
+                      {/* Core Sovereign Medallion */}
+                      <circle
+                        r="25"
+                        fill={isLightMode ? "#f3e8ff" : "#3b0764"}
+                        stroke={strokeColor}
+                        strokeWidth="2"
+                        filter="url(#sk-glow-violet)"
+                      />
+                      <circle
+                        r="21"
+                        fill="none"
+                        stroke={isLightMode ? "#ddd6fe" : "#7c3aed"}
+                        strokeWidth="1"
+                        opacity="0.85"
+                      />
 
                       {/* 100% Mathematically Centered Vector Padlock or Flame */}
                       {status === "UNLOCKED" ? (
-                        <g transform="translate(-9, -9)" className="pointer-events-none">
-                          <Flame className="w-4.5 h-4.5 text-amber-300 drop-shadow-[0_0_8px_rgba(245,158,11,1)]" />
+                        <g transform="translate(-13, -13)" className="pointer-events-none">
+                          <Flame className="w-6.5 h-6.5 text-amber-300 drop-shadow-[0_0_12px_rgba(245,158,11,1)]" />
                         </g>
                       ) : (
                         <g
-                          transform="translate(0, -0.6)"
+                          transform="translate(0, -1)"
                           className="pointer-events-none"
                           fill="none"
                           stroke={isLightMode ? "#7c3aed" : "#c084fc"}
-                          strokeWidth="1.8"
+                          strokeWidth="2.2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <path d="M -4.5 -1.5 V -5 C -4.5 -8 4.5 -8 4.5 -5 V -1.5" />
+                          <path d="M -6.5 -2 V -7 C -6.5 -11.5 6.5 -11.5 6.5 -7 V -2" />
                           <rect
-                            x="-6.5"
-                            y="-1.5"
-                            width="13"
-                            height="9.5"
-                            rx="2.2"
-                            fill={isLightMode ? "rgba(124, 58, 237, 0.15)" : "rgba(192, 132, 252, 0.25)"}
+                            x="-9.5"
+                            y="-2"
+                            width="19"
+                            height="14"
+                            rx="3"
+                            fill={isLightMode ? "rgba(124, 58, 237, 0.2)" : "rgba(192, 132, 252, 0.3)"}
                           />
-                          <circle cx="0" cy="2.2" r="1.1" fill={isLightMode ? "#7c3aed" : "#c084fc"} stroke="none" />
-                          <line x1="0" y1="3" x2="0" y2="5" strokeWidth="1.2" />
+                          <circle cx="0" cy="3.5" r="1.6" fill={isLightMode ? "#7c3aed" : "#c084fc"} stroke="none" />
+                          <line x1="0" y1="4.5" x2="0" y2="7.5" strokeWidth="1.8" />
                         </g>
                       )}
                     </g>

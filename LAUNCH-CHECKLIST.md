@@ -71,12 +71,21 @@ Refresh the Advisor — those 5 should clear. If other findings appear, the
 entity name in the list tells you what to fix; the app-level RLS/RPC findings
 from S2 are already resolved.
 
-### 5. Rotate the Supabase anon key — DASHBOARD ONLY
-The Management API can list keys but exposes no rotation endpoint.
-**Dashboard → Settings → API → rotate the anon key** after you've pushed the
-new `NEXT_PUBLIC_SUPABASE_ANON_KEY` to Vercel and redeployed (otherwise
-Realtime breaks). The anon key has been public since the beginning; rotation
-is hygiene.
+### 5. Client key — SWITCHED to the publishable key (DONE locally, Vercel pending)
+Pre-launch, the client key was migrated from the **legacy anon key** (public
+since the start) to the **publishable key** (`sb_publishable_…`) — a fresh
+credential that has never been exposed. Local `.env` is updated and verified
+end-to-end with the publishable key: REST behaves as anon (401, RLS holds),
+and **Realtime channel SUBSCRIBED**.
+
+**Remaining Vercel step:** copy the publishable key (from Dashboard →
+Settings → API, or from local `.env`
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`) and set it in **Vercel → Settings →
+Environment Variables → Production** (and Preview) → **Redeploy**. Nothing else
+changes: `SUPABASE_JWT_SECRET` (realtime token minting) and `DATABASE_URL` are
+independent. The legacy anon key remains in the dashboard but becomes unused —
+you may retire it later via the "Legacy anon, service_role API keys" tab
+(no API endpoint exists to revoke it).
 
 ---
 

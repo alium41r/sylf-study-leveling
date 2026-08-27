@@ -8,7 +8,7 @@ application behavior — it closes operational gaps.
 
 ## NOW — Supabase dashboard (owner, logged in to gjkwkdqdoekzllmnsejo)
 
-### 1. supabase_admin default privileges — OPTIONAL (SQL editor will fail; use the Management API)
+### 1. supabase_admin default privileges — RESOLVED as documented residual (cannot be changed via ANY path)
 **Why the SQL editor fails:** it runs as `postgres`, which is not a member of
 `supabase_admin` (verified: `SET ROLE supabase_admin` and
 `ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin` both return 42501).
@@ -33,32 +33,41 @@ defaults were locked in S2 (no anon/authenticated grants — re-verified). The
 4. You may also put the PAT in local `.env` as `SUPABASE_ACCESS_TOKEN`
    (gitignored) so the project's tooling can run it.
 
-**If you prefer to skip it:** acceptable — the risk is covered by postgres
-ownership + locked postgres defaults. Just re-run the verification query after
-any future dashboard Table Editor creation.
+**VERIFIED on <date>: BOTH the SQL editor AND the Management API
+`database/query` endpoint run as `postgres`** — `ALTER DEFAULT PRIVILEGES FOR
+ROLE supabase_admin` returns 42501 from every available path (no path exists
+to run as supabase_admin). **Final decision: documented residual.** The risk
+is covered: all 38 public tables are postgres-owned and postgres defaults were
+locked in S2 (re-verified). Re-run the `pg_default_acl` check after any future
+dashboard Table Editor creation.
 
-### 2. Disable unused Supabase Auth signups — REQUIRED (confirmed currently OPEN)
-I probed `GET /auth/v1/settings` with the anon key: `disable_signup: false`,
-meaning anyone can create rows in `auth.users` via `/auth/v1/signup` even
-though the app never uses Supabase Auth. Fix:
-**Dashboard → Authentication → Sign In / Providers → "Allow new users to sign
-up" → OFF.** (Do NOT touch anything else — the app uses its own auth.)
+### 2. Disable unused Supabase Auth signups — DONE (verified)
+Executed via Management API: `PATCH /config/auth { "disable_signup": true }`.
+**Verified from two sources:** Management API config GET shows
+`disable_signup = true`, and the public `GET /auth/v1/settings` probe shows
+`disable_signup = true`. A live `POST /auth/v1/signup` now returns 422
+(signups not allowed, no row created). Supabase Auth is now inert — the app
+continues to use its own custom JWT auth.
 
-Verify: re-run the probe and expect `disable_signup: true`.
+### 3. CORS / allowed origins — DASHBOARD ONLY (no Management API endpoint)
+The Management API exposes no CORS setting (all candidate endpoints 404);
+CORS is gateway-level. **Dashboard → Settings → API → "CORS (Restrict
+domains)"** — your app origin is `https://sylf-alium41rs-projects.vercel.app`
+(confirmed from auth config `site_url`); add it (and your custom domain if
+any) and remove `*`. Impact is defense-in-depth: the app reaches Supabase via
+Realtime websockets (not CORS-gated) and the server-side pooler.
 
-### 3. CORS / allowed origins
-**Dashboard → Settings → API → "CORS (Restrict domains)"** — add your Vercel
-app origins (e.g. `https://your-app.vercel.app` and your custom domain) and
-remove `*`. The app talks to Supabase only via Realtime websockets (not
-subject to CORS) and via the server-side Postgres pooler, so this is defense
-in depth — nothing breaks if it's restrictive.
+**Also done:** PostgREST exposed schemas narrowed `public,graphql_public` →
+`public` (verified via `PATCH /postgrest` + GET). The redirect
+`uri_allow_list` already contains your Vercel domains (verified).
 
-### 4. Security Advisor
+### 4. Security Advisor — DASHBOARD ONLY (no Management API endpoint)
 **Dashboard → Security → Security Advisor** → review + apply. The main
 advisor item relevant to you (RLS off on tables) was already addressed by the
 S2 migrations; confirm no new findings.
 
-### 5. Rotate the Supabase anon key
+### 5. Rotate the Supabase anon key — DASHBOARD ONLY
+The Management API can list keys but exposes no rotation endpoint.
 **Dashboard → Settings → API → rotate the anon key** after you've pushed the
 new `NEXT_PUBLIC_SUPABASE_ANON_KEY` to Vercel and redeployed (otherwise
 Realtime breaks). The anon key has been public since the beginning; rotation

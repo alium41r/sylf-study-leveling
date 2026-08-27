@@ -48,6 +48,11 @@ dev.db
 # vim swap files
 *.swp
 *.swo
-
-
-
+# S4: never commit database dumps, user uploads, or debug artifacts
+backups/
+backup_*
+/public/uploads/
+/public/chat_error.log
+repomix-output.md
+scratch/
+*.log

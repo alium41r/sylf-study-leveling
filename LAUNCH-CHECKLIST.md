@@ -61,10 +61,15 @@ Realtime websockets (not CORS-gated) and the server-side pooler.
 `public` (verified via `PATCH /postgrest` + GET). The redirect
 `uri_allow_list` already contains your Vercel domains (verified).
 
-### 4. Security Advisor — DASHBOARD ONLY (no Management API endpoint)
-**Dashboard → Security → Security Advisor** → review + apply. The main
-advisor item relevant to you (RLS off on tables) was already addressed by the
-S2 migrations; confirm no new findings.
+### 4. Security Advisor — MOSTLY DONE (informational; no "apply" button exists)
+The Security Advisor is informational — fixes are applied via SQL, not via an
+"apply" button. **The 5 "Function SearchPath Mutable" warnings on the
+`canonical_*` helpers were fixed directly in the database**: each function was
+recreated byte-identically with `SET search_path TO 'public'` (verified;
+math unchanged via `canonical_required_xp(1)=100`; anon still has no EXECUTE).
+Refresh the Advisor — those 5 should clear. If other findings appear, the
+entity name in the list tells you what to fix; the app-level RLS/RPC findings
+from S2 are already resolved.
 
 ### 5. Rotate the Supabase anon key — DASHBOARD ONLY
 The Management API can list keys but exposes no rotation endpoint.

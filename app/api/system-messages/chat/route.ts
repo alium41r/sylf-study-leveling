@@ -556,6 +556,16 @@ export async function POST(req: NextRequest) {
       if (req.signal.aborted) attemptRef.controller?.abort();
     }
 
+    // Groq has no vision-capable model on the current plans (its former
+    // llama-3.2-11b-vision-preview is decommissioned; the /models endpoint
+    // returns only text models). When the user prefers Groq but the request
+    // carries an image, Groq cannot fulfil it — defer to the proper vision
+    // cascade (Gemini primary → DeepSeek vision fallback) instead of calling a
+    // dead model that always errors "temporarily unavailable".
+    if (isVisionWorkload && modelPreference === "groq") {
+      modelPreference = "auto";
+    }
+
     try {
       if (modelPreference === "groq") {
         const groqModel = isVisionWorkload ? GROQ_MODELS.vision : GROQ_MODELS.default;
@@ -570,9 +580,26 @@ export async function POST(req: NextRequest) {
         actualModelUsed = "GEMINI";
         actualModelDisplayName = `Gemini (${geminiModel})`;
         actualModelId = geminiModel;
-        const loopResult = await executeAttempt("gemini", geminiModel);
-        aiResponseText = loopResult.text;
-        totalUsage = loopResult.usage;
+        try {
+          const loopResult = await executeAttempt("gemini", geminiModel);
+          aiResponseText = loopResult.text;
+          totalUsage = loopResult.usage;
+        } catch (geminiErr: any) {
+          // Gemini can stall on image workloads (SDK call hangs). Prefer the
+          // dedicated DeepSeek vision tier over surfacing "temporarily
+          // unavailable" when a working fallback exists.
+          if (!isVisionWorkload) throw geminiErr;
+          console.warn(
+            `[Chat Route] Gemini vision model failed (${geminiErr.message || geminiErr}). Falling back to ${DEEPSEEK_MODELS.vision}.`
+          );
+          const fallbackModel = DEEPSEEK_MODELS.vision;
+          actualModelUsed = "DEEPSEEK";
+          actualModelDisplayName = `DeepSeek (${fallbackModel})`;
+          actualModelId = fallbackModel;
+          const loopResult = await executeAttempt("deepseek", fallbackModel);
+          aiResponseText = loopResult.text;
+          totalUsage = loopResult.usage;
+        }
       } else if (modelPreference === "deepseek") {
         const deepseekModel = isVisionWorkload ? DEEPSEEK_MODELS.vision : primarySpec.model;
         actualModelUsed = "DEEPSEEK";

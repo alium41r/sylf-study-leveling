@@ -8,31 +8,34 @@ application behavior — it closes operational gaps.
 
 ## NOW — Supabase dashboard (owner, logged in to gjkwkdqdoekzllmnsejo)
 
-### 1. supabase_admin default privileges — REQUIRED (confirmed still open)
-I verified from the DB that `postgres` **cannot** change these (permission
-denied), and that `supabase_admin`'s defaults still grant anon/authenticated
-EXECUTE on functions and full table privileges for anything the **dashboard**
-creates in the future. Paste this into **Dashboard → SQL Editor** (it runs with
-the elevated role; the normal DB connection cannot):
+### 1. supabase_admin default privileges — OPTIONAL (SQL editor will fail; use the Management API)
+**Why the SQL editor fails:** it runs as `postgres`, which is not a member of
+`supabase_admin` (verified: `SET ROLE supabase_admin` and
+`ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin` both return 42501).
+**Why it's low risk:** all 38 public tables are owned by `postgres`, whose
+defaults were locked in S2 (no anon/authenticated grants — re-verified). The
+`supabase_admin` defaults only apply to objects supabase_admin itself creates
+(platform internals), never your app objects.
 
-```sql
--- Remove unsafe defaults for objects the dashboard/you create as supabase_admin
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-  REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-  REVOKE ALL ON TABLES FROM anon, authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public
-  REVOKE ALL ON SEQUENCES FROM anon, authenticated;
-```
+**If you want to close it anyway — Management API (runs elevated):**
+1. Dashboard → avatar → **Access Tokens** → Generate new token (`sbp_...`).
+2. `curl -s -X POST https://api.supabase.com/v1/projects/gjkwkdqdoekzllmnsejo/database/query \
+     -H "Authorization: Bearer <PAT>" -H "Content-Type: application/json" \
+     -d '{"query":"ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC, anon, authenticated; ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public REVOKE ALL ON TABLES FROM anon, authenticated; ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public REVOKE ALL ON SEQUENCES FROM anon, authenticated;"}'`
+3. Verify:
+   ```sql
+   SELECT defaclrole::regrole::text AS role, defaclobjtype, defaclacl::text
+   FROM pg_default_acl
+   WHERE defaclrole = (SELECT oid FROM pg_roles WHERE rolname = 'supabase_admin')
+     AND defaclnamespace = 'public'::regnamespace;
+   -- Expect: no "anon=…" or "authenticated=…" entries.
+   ```
+4. You may also put the PAT in local `.env` as `SUPABASE_ACCESS_TOKEN`
+   (gitignored) so the project's tooling can run it.
 
-Verify afterwards (anywhere — SQL editor or my script style):
-
-```sql
-SELECT defaclrole::regrole::text AS role, defaclobjtype, defaclacl::text
-FROM pg_default_acl
-WHERE defaclrole = (SELECT oid FROM pg_roles WHERE rolname = 'supabase_admin');
--- Expect: no "anon=…" or "authenticated=…" grants anywhere.
-```
+**If you prefer to skip it:** acceptable — the risk is covered by postgres
+ownership + locked postgres defaults. Just re-run the verification query after
+any future dashboard Table Editor creation.
 
 ### 2. Disable unused Supabase Auth signups — REQUIRED (confirmed currently OPEN)
 I probed `GET /auth/v1/settings` with the anon key: `disable_signup: false`,

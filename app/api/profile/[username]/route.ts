@@ -27,6 +27,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ username:
     return NextResponse.json({
       profile: result.profile,
       relationship: result.relationship,
+      isSelf: result.isSelf,
       permissions: result.permissions,
       privacySettings: result.privacySettings,
     }, { status: 200 });

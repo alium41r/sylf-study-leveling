@@ -113,7 +113,7 @@ export async function POST(
       data: {
         userId,
         type: "REWARD",
-        content: `**👑 APEX KEYSTONE FORGED: ${subject.name} (${subject.code})**\n\nYou have achieved 100% mastery across all 48 syllabus constellation nodes and minted 115 Subject SP.\n\nRewards Awarded: +5,000 XP • +500 Sylph • +1 SP.`,
+        content: `**👑 APEX KEYSTONE FORGED: ${subject.name} (${subject.code})**\n\nYou have achieved 100% mastery across all 48 syllabus constellation nodes and minted 115 Subject SP.\n\nRewards Awarded: +5,000 XP • +500 Sylph • +${forgeResult.sp_awarded} SP.`,
       },
     });
 

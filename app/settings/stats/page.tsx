@@ -557,6 +557,266 @@ function StatCard({
   );
 }
 
+/* ─── Cognitive Attributes (invest SP/Sylph into the 5 stats) ── */
+
+interface CognitiveAbility {
+  key: string;
+  label: string;
+  description: string;
+  perkName: string;
+  perkLadder: string;
+  value: number;
+  tier: number;
+  maxTier: number;
+  nextTierAt: number | null;
+  investable: boolean;
+  costSp: number;
+  costSylph: number;
+}
+
+interface CognitiveState {
+  stats: Record<string, number>;
+  skillPoints: number;
+  sylph: number;
+  cap: number;
+  abilities: CognitiveAbility[];
+}
+
+const COGNITIVE_STAT_COLORS: Record<string, string> = {
+  endurance: "var(--accent-red)",
+  tenacity: "var(--accent-gold)",
+  velocity: "var(--accent-cyan)",
+  discipline: "var(--accent-blue)",
+  synthesis: "var(--accent-purple)",
+};
+
+function CognitiveAttributesCard() {
+  const [state, setState] = useState<CognitiveState | null>(null);
+  const [currency, setCurrency] = useState<"sp" | "sylph">("sylph");
+  const [busyStat, setBusyStat] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
+
+  const load = async () => {
+    try {
+      const res = await fetch("/api/cognitive-stats/invest", { credentials: "include" });
+      if (res.ok) {
+        setState(await res.json());
+        setLoadError(false);
+      } else {
+        setLoadError(true);
+      }
+    } catch {
+      setLoadError(true);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const invest = async (key: string) => {
+    if (!state || busyStat) return;
+    setBusyStat(key);
+    setFeedback(null);
+    try {
+      const res = await fetch("/api/cognitive-stats/invest", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stat: key, currency }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setFeedback(
+          `${data.ability?.label ?? "Stat"} increased to ${data.ability?.value} (+${data.amount} pts · −${data.cost} ${currency === "sp" ? "SP" : "Sylph"})`
+        );
+        await load();
+      } else {
+        setFeedback(data.error || "Invest failed");
+      }
+    } catch {
+      setFeedback("Network error — try again");
+    } finally {
+      setBusyStat(null);
+    }
+  };
+
+  if (loadError) {
+    return (
+      <div className="system-card" style={{ padding: "24px", marginBottom: "24px" }}>
+        <p className="text-sm text-text-muted" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
+          Cognitive Attributes unavailable right now.
+        </p>
+      </div>
+    );
+  }
+
+  if (!state) {
+    return (
+      <div className="system-card" style={{ padding: "24px", marginBottom: "24px" }}>
+        <p className="text-sm text-text-muted animate-pulse" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
+          Loading cognitive attributes…
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="system-card" style={{ padding: "24px", marginBottom: "24px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", marginBottom: "6px", flexWrap: "wrap" }}>
+        <h3
+          style={{
+            fontFamily: "'Rajdhani', sans-serif",
+            fontWeight: 700,
+            fontSize: "0.85rem",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            color: "var(--accent-purple)",
+          }}
+        >
+          Cognitive Attributes
+        </h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.7rem", color: "var(--text-secondary)" }}>
+            <span className="text-amber-400">{state.skillPoints} SP</span> · <span className="text-cyan-400">{state.sylph} Sylph</span>
+            {" · "}Cap {state.cap}
+          </span>
+          <div
+            style={{
+              display: "flex",
+              borderRadius: "999px",
+              border: "1px solid var(--border-subtle)",
+              overflow: "hidden",
+            }}
+          >
+            {(["sp", "sylph"] as const).map((c) => (
+              <button
+                key={c}
+                onClick={() => setCurrency(c)}
+                style={{
+                  fontFamily: "'Rajdhani', sans-serif",
+                  fontSize: "0.65rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  padding: "4px 12px",
+                  color: currency === c ? "white" : "var(--text-muted)",
+                  background: currency === c ? "var(--accent-primary)" : "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                {c === "sp" ? "SP" : "Sylph"}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginBottom: "16px", fontFamily: "'Rajdhani', sans-serif" }}>
+        Invest Skill Points or Sylph into your mental vectors — each vector carries an ability that grows with it.
+      </p>
+
+      {feedback && (
+        <p
+          style={{
+            fontSize: "0.72rem",
+            fontFamily: "'Rajdhani', sans-serif",
+            fontWeight: 600,
+            color: "var(--accent-green)",
+            marginBottom: "12px",
+          }}
+        >
+          {feedback}
+        </p>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        {state.abilities.map((a) => {
+          const accent = COGNITIVE_STAT_COLORS[a.key] || "var(--accent-primary)";
+          const pct = (a.value / 100) * 100;
+          return (
+            <div
+              key={a.key}
+              style={{
+                padding: "12px 14px",
+                borderRadius: "12px",
+                background: "var(--bg-abyss)",
+                border: "1px solid var(--border-subtle)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "10px", flexWrap: "wrap" }}>
+                <div style={{ minWidth: 0 }}>
+                  <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "var(--text-primary)" }}>
+                    {a.label}
+                  </span>
+                  <span
+                    style={{
+                      marginLeft: "8px",
+                      fontFamily: "'Rajdhani', sans-serif",
+                      fontSize: "0.6rem",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      padding: "1px 8px",
+                      borderRadius: "999px",
+                      color: accent,
+                      background: "rgba(255,255,255,0.04)",
+                      border: `1px solid ${accent}44`,
+                    }}
+                  >
+                    {a.perkName} · Tier {a.tier}/{a.maxTier}
+                  </span>
+                  <p style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginTop: "2px", fontFamily: "'Rajdhani', sans-serif" }}>
+                    {a.perkLadder}
+                  </p>
+                </div>
+                <span style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: accent }}>
+                  {a.value}/100
+                </span>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "8px" }}>
+                <div style={{ flex: 1, height: "6px", borderRadius: "3px", background: "rgba(255,255,255,0.04)", overflow: "hidden" }}>
+                  <div
+                    style={{
+                      width: `${pct}%`,
+                      height: "100%",
+                      borderRadius: "3px",
+                      background: `linear-gradient(90deg, ${accent}, ${accent}88)`,
+                      transition: "width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    }}
+                  />
+                </div>
+                {a.investable ? (
+                  <button
+                    disabled={busyStat !== null}
+                    onClick={() => invest(a.key)}
+                    className="shrink-0 px-4 py-1.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+                    style={{
+                      background: "var(--accent-primary-dim)",
+                      border: "1px solid var(--accent-primary-mid)",
+                      color: "var(--accent-text-light)",
+                    }}
+                    title={a.nextTierAt ? `Next tier at ${a.nextTierAt}` : "Maxed"}
+                  >
+                    {busyStat === a.key ? "Investing…" : `+5 · ${currency === "sp" ? `${a.costSp} SP` : `${a.costSylph} Sylph`}`}
+                  </button>
+                ) : (
+                  <span
+                    className="shrink-0 px-4 py-1.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider"
+                    style={{ border: "1px solid var(--accent-green)", color: "var(--accent-green)", background: "var(--accent-green-dim, rgba(16,185,129,0.1))" }}
+                  >
+                    {a.value >= 100 ? "Maxed" : `Cap ${state.cap}`}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Page ─────────────────────────────────────────────── */
 
 export default function StatsSettingsPage() {
@@ -758,6 +1018,9 @@ export default function StatsSettingsPage() {
           }
         />
       </div>
+
+      {/* ─── Cognitive Attributes (SP/Sylph investment) ─────── */}
+      <CognitiveAttributesCard />
 
       {/* ─── 30-Day Activity Chart ────────────────────────── */}
       <div className="system-card" style={{ padding: "24px", marginBottom: "24px" }}>

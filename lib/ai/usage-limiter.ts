@@ -17,6 +17,10 @@ import { prisma } from "@/lib/prisma";
 import { AI_QUOTAS, type QuotaFeature } from "./config";
 import { TimezoneService } from "../timezone-service";
 import { getUserTimezone } from "../timezone-server";
+import {
+  getCognitiveEffects,
+  normalizeCognitiveStats,
+} from "@/lib/cognitive-stats";
 
 export type { QuotaFeature } from "./config";
 
@@ -64,18 +68,38 @@ function toResult(used: number, limit: number, resetsAt: string): QuotaCheckResu
 }
 
 /**
+ * Effective daily limit for a feature. Discipline (Regimen ability) grants
+ * +1 AI chat message per ability tier — applied here so every chat quota
+ * check and reservation uses the boosted number consistently.
+ */
+async function getEffectiveLimit(userId: number, feature: QuotaFeature): Promise<number> {
+  const base = AI_QUOTAS[feature].limit;
+  if (feature !== "chat") return base;
+  try {
+    const stats = await prisma.userStats.findUnique({
+      where: { userId },
+      select: { discipline: true },
+    });
+    const effects = getCognitiveEffects(normalizeCognitiveStats(stats ?? undefined));
+    return base + effects.bonusChatQuota;
+  } catch {
+    return base;
+  }
+}
+
+/**
  * Non-charging read of the user's current usage for a feature.
  */
 export async function checkQuota(userId: number, feature: QuotaFeature): Promise<QuotaCheckResult> {
-  const config = AI_QUOTAS[feature];
   const { dateKey, resetsAt } = await getQuotaContext(userId, feature);
+  const limit = await getEffectiveLimit(userId, feature);
 
   const row = await prisma.userQuota.findUnique({
     where: { userId_feature_dateKey: { userId, feature, dateKey } },
     select: { used: true },
   });
 
-  return toResult(row?.used ?? 0, config.limit, resetsAt);
+  return toResult(row?.used ?? 0, limit, resetsAt);
 }
 
 /**
@@ -88,8 +112,8 @@ export async function checkQuota(userId: number, feature: QuotaFeature): Promise
  * timeout, or client abort to refund the reservation.
  */
 export async function reserveQuota(userId: number, feature: QuotaFeature): Promise<QuotaConsumeResult> {
-  const config = AI_QUOTAS[feature];
   const { dateKey, resetsAt } = await getQuotaContext(userId, feature);
+  const limit = await getEffectiveLimit(userId, feature);
 
   const rows = await prisma.$queryRawUnsafe<Array<{ used: number }>>(
     `INSERT INTO "UserQuota" ("userId", "feature", "dateKey", "used", "createdAt", "updatedAt")
@@ -101,7 +125,7 @@ export async function reserveQuota(userId: number, feature: QuotaFeature): Promi
     userId,
     feature,
     dateKey,
-    config.limit
+    limit
   );
 
   // No returned row ⇒ the guarded update was skipped (limit reached).
@@ -111,7 +135,7 @@ export async function reserveQuota(userId: number, feature: QuotaFeature): Promi
   }
 
   const used = rows[0].used;
-  return { ...toResult(used, config.limit, resetsAt), charged: true };
+  return { ...toResult(used, limit, resetsAt), charged: true };
 }
 
 /**

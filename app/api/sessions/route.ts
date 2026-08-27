@@ -10,6 +10,7 @@ import {
 import { invalidateRankingsCache } from "@/lib/cache-service";
 import { revalidateTag } from "next/cache";
 import { TimezoneService } from "@/lib/timezone-service";
+import { getCognitiveEffects } from "@/lib/cognitive-stats";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
@@ -157,7 +158,15 @@ export async function PATCH(req: NextRequest) {
 
     const userRow = await prisma.user.findUnique({
       where: { id: session.userId },
-      select: { id: true, username: true, timezone: true, lastActiveDate: true, streakDays: true, level: true },
+      select: {
+        id: true,
+        username: true,
+        timezone: true,
+        lastActiveDate: true,
+        streakDays: true,
+        level: true,
+        stats: { select: { tenacity: true } },
+      },
     }).catch(() => null);
 
     const userLocalDate = userRow
@@ -213,7 +222,12 @@ export async function PATCH(req: NextRequest) {
         });
 
         const weekMinutes = weekSessions._sum.durationMinutes || 0;
-        if (weekMinutes >= 180) {
+        // Tenacity (Iron Will): each ability tier drops the 3-hour weekly
+        // milestone requirement by 5% (max −30% → 126 minutes).
+        const weeklyTargetMinutes = getCognitiveEffects({
+          tenacity: userRow.stats?.tenacity ?? undefined,
+        }).weeklyTargetMinutes;
+        if (weekMinutes >= weeklyTargetMinutes) {
           const freezeItem = await prisma.inventoryItem.findFirst({
             where: { userId: userRow.id, itemKey: "STREAK_FREEZE", quantity: { gt: 0 } },
           });
@@ -259,7 +273,7 @@ export async function PATCH(req: NextRequest) {
             await prisma.systemMessage.create({
               data: {
                 userId: userRow.id,
-                content: `**Weekly Mission Complete: 3 Hours of Focus!**\n\nYou completed the weekly 3-hour study target. Weekly streak is now **${streakResult.newStreak} week${streakResult.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
+                content: `**Weekly Mission Complete: ${Math.round(weeklyTargetMinutes / 60 * 10) / 10} Hours of Focus!**\n\nYou completed the weekly ${weeklyTargetMinutes}-minute study target (Tenacity reduces it below the standard 3h). Weekly streak is now **${streakResult.newStreak} week${streakResult.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
                 type: "STREAK",
               },
             });

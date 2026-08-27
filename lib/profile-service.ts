@@ -10,6 +10,7 @@ import { cachedWithRedis } from "@/lib/redis";
 export interface ProfileDossierResult {
   profile: any | null;
   relationship: string;
+  isSelf: boolean;
   permissions: {
     canSendFriendRequest: boolean;
     canSendMessage: boolean;
@@ -118,7 +119,7 @@ async function fetchTargetUserData(normalized: string) {
         },
       },
       achievements: {
-        take: 6,
+        take: 50,
         orderBy: { claimedAt: "desc" },
         select: {
           achievementId: true,
@@ -165,6 +166,7 @@ export async function getProfileDossier(
     return {
       profile: null,
       relationship: "PUBLIC",
+      isSelf: false,
       permissions: null,
       error: "Scholar not found in the system registry.",
       status: 404,
@@ -408,7 +410,8 @@ export async function getProfileDossier(
         inventory: undefined,
         socialLinks: undefined,
         connectedAccounts: undefined,
-        recentAchievements: [],
+        recentAchievements: undefined,
+        achievementsCount: undefined,
       };
     } else {
       const showStudy = isSelf || isVisible(privacy.showStudyHours, baseRelationship);
@@ -448,14 +451,15 @@ export async function getProfileDossier(
 
   const privacySettings = {
     isProfileVisible: isProfilePublic,
-    showRank: isVisible(privacy.showRank, baseRelationship),
-    showStudyHours: isVisible(privacy.showStudyHours, baseRelationship),
-    showAchievements: isVisible(privacy.showAchievements, baseRelationship),
+    showRank: isSelf || isVisible(privacy.showRank, baseRelationship),
+    showStudyHours: isSelf || isVisible(privacy.showStudyHours, baseRelationship),
+    showAchievements: isSelf || isVisible(privacy.showAchievements, baseRelationship),
   };
 
   return {
     profile: finalProfile,
     relationship: relationshipStatus,
+    isSelf,
     permissions,
     privacySettings,
     error: null,

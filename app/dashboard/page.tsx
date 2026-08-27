@@ -163,7 +163,14 @@ export default function DashboardPage() {
   const expPercent = Math.min(100, Math.max(0, Math.round((currentXP / xpToNextLevel) * 100)));
 
   const hp = Number(user.hp) || 0;
-  const maxHp = Number(user.maxHp) > 0 ? Number(user.maxHp) : 100;
+  // Endurance (Aegis) raises the effective HP pool above the base maxHp.
+  const effectiveMaxHp =
+    Number(user.effectiveMaxHp) > 0
+      ? Number(user.effectiveMaxHp)
+      : Number(user.maxHp) > 0
+      ? Number(user.maxHp)
+      : 100;
+  const maxHp = effectiveMaxHp;
   const hpPercent = Math.min(100, Math.max(0, Math.round((hp / maxHp) * 100)));
 
   let characterCfg = user.characterConfig;

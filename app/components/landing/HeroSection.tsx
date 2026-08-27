@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Sparkles,
@@ -244,10 +245,19 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                     </div>
                   )}
 
-                  <p className="text-[11px] text-text-muted mt-1.5 flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-accent-primary-light shrink-0" />
-                    <span>Free rolling beta waves • Zero spam</span>
-                  </p>
+                  <div className="flex items-center justify-between mt-1.5 flex-wrap gap-2 text-[11px] text-text-muted">
+                    <p className="flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-accent-primary-light shrink-0" />
+                      <span>Free rolling beta waves • Zero spam</span>
+                    </p>
+                    <Link
+                      href="/login"
+                      className="text-accent-cyan hover:underline font-['Rajdhani'] font-bold uppercase tracking-wider text-xs inline-flex items-center gap-1"
+                    >
+                      <span>Already a Scholar? Log In</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
                 </form>
               ) : (
                 /* Success Confirmation State */

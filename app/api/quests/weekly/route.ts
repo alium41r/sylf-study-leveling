@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { getWeeklyBounds, calculateWeeklyQuestReward } from "@/lib/game-engine";
 import { TimezoneService } from "@/lib/timezone-service";
+import { getCognitiveEffects } from "@/lib/cognitive-stats";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export async function GET(req: NextRequest) {
         streakDays: true,
         lastActiveDate: true,
         timezone: true,
+        stats: { select: { tenacity: true } },
       },
     });
 
@@ -35,7 +37,11 @@ export async function GET(req: NextRequest) {
     }
 
     const bounds = getWeeklyBounds(new Date(), user.timezone || "UTC");
-    const TARGET_MINUTES = 180; // 3 hours
+    // Tenacity (Iron Will): each ability tier drops the standard 3-hour
+    // weekly milestone by 5% (max −30% → 126 minutes).
+    const TARGET_MINUTES = getCognitiveEffects({
+      tenacity: user.stats?.tenacity ?? undefined,
+    }).weeklyTargetMinutes;
 
     // Aggregate all focus sessions in the current week
     const weekSessions = await prisma.studySession.aggregate({

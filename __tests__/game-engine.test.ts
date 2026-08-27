@@ -3,6 +3,7 @@ import {
   calculateRequiredXp,
   calculateLevelFromXp,
   getRankFromLevel,
+  getNextRank,
   getLevelProgress,
   xpForNextLevel,
   RANK_THRESHOLDS,
@@ -122,6 +123,19 @@ describe("Game Engine Phase 1 — Deterministic Progression & Cognitive Vectors"
       // MONARCH: 150+
       expect(getRankFromLevel(150)).toBe("MONARCH");
       expect(getRankFromLevel(250)).toBe("MONARCH");
+    });
+
+    it("determines the immediate next promotion tier using getNextRank", () => {
+      expect(getNextRank(1)).toEqual({ display: "D", db: "RANK D", level: 10 });
+      expect(getNextRank(9)).toEqual({ display: "D", db: "RANK D", level: 10 });
+      expect(getNextRank(10)).toEqual({ display: "C", db: "RANK C", level: 25 });
+      expect(getNextRank(24)).toEqual({ display: "C", db: "RANK C", level: 25 });
+      expect(getNextRank(25)).toEqual({ display: "B", db: "RANK B", level: 50 });
+      expect(getNextRank(50)).toEqual({ display: "A", db: "RANK A", level: 75 });
+      expect(getNextRank(75)).toEqual({ display: "S", db: "RANK S", level: 100 });
+      expect(getNextRank(100)).toEqual({ display: "NATIONAL", db: "NATIONAL", level: 125 });
+      expect(getNextRank(125)).toEqual({ display: "MONARCH", db: "MONARCH", level: 150 });
+      expect(getNextRank(150)).toBeNull();
     });
   });
 

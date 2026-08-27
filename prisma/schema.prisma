@@ -197,6 +197,7 @@ model User {
   dailyBriefings DailyBriefingLog[]
   quotaUsage     UserQuota[]
   aiUsageLogs    AiUsageLog[]
+  statInvests    StatInvestLedger[]
 
   // Social
   friendshipsAsUser   Friendship[]              @relation("friendshipsAsUser")
@@ -235,6 +236,21 @@ model UserStats {
 
   @@index([userId])
   @@index([level, xp])
+}
+
+model StatInvestLedger {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statKey        String // endurance | tenacity | velocity | discipline | synthesis
+  amount         Int // points granted (+5)
+  currencyUsed   String // "sp" | "sylph"
+  cost           Int // units spent
+  statValueAfter Int // stat value after this invest
+  createdAt      DateTime @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([statKey])
 }
 
 model Goal {

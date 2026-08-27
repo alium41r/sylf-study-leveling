@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { PrivacyLevel } from "@/lib/privacy-types";
+import { revalidateTag } from "next/cache";
+import { invalidateRedisKeys } from "@/lib/redis";
 
 // Reusable function to ensure a user has a privacy record
 async function getOrCreatePrivacy(userId: number) {
@@ -71,6 +73,22 @@ export async function PATCH(req: NextRequest) {
       update: updateData,
       create: { userId: payload.userId as number, ...updateData },
     });
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId as number },
+      select: { username: true },
+    });
+
+    if (user?.username) {
+      const norm = user.username.toLowerCase();
+      await invalidateRedisKeys(`user-data:${norm}`);
+      try {
+        (revalidateTag as any)(`user-${norm}`, "max");
+        (revalidateTag as any)(`profile-stats-${norm}`, "max");
+      } catch (cacheErr) {
+        console.warn("[privacy] cache revalidation error:", cacheErr);
+      }
+    }
 
     return NextResponse.json({ message: "Privacy settings updated", data: updatedPrivacy }, { status: 200 });
   } catch (error) {

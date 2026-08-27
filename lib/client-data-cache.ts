@@ -108,12 +108,13 @@ export async function fetchCachedJSON<T = unknown>(
 ): Promise<T | null> {
   const { ttlMs = 10_000, staleMs = 60_000, storageKey } = opts;
   const now = Date.now();
+  const cacheKey = storageKey || url;
 
-  const memoryHit = memoryCache.get(url);
+  const memoryHit = memoryCache.get(cacheKey);
   const entry: CacheEntry | null =
     memoryHit ?? (storageKey ? readStorage(storageKey) : null);
   if (entry) {
-    if (!memoryHit) memoryCache.set(url, entry);
+    if (!memoryHit) memoryCache.set(cacheKey, entry);
     const age = now - entry.fetchedAt;
     if (age < ttlMs) {
       return entry.data as T;
@@ -129,18 +130,19 @@ export async function fetchCachedJSON<T = unknown>(
 }
 
 function doFetch(url: string, init?: RequestInit, storageKey?: string): Promise<unknown> {
-  const existing = inflight.get(url);
+  const cacheKey = storageKey || url;
+  const existing = inflight.get(cacheKey);
   if (existing) return existing; // Single-flight: share in-flight requests.
 
   const request = (async () => {
     try {
-      const res = await fetch(url, { ...init, cache: "no-store" });
+      const res = await fetch(url, { credentials: "include", ...init, cache: "no-store" });
       if (!res.ok) {
         throw new Error(`Request failed with status ${res.status}`);
       }
       const data = await res.json();
       const entry: CacheEntry = { data, fetchedAt: Date.now() };
-      memoryCache.set(url, entry);
+      memoryCache.set(cacheKey, entry);
       // S3: sensitive endpoints stay memory-only even when a storageKey was
       // requested.
       if (storageKey && isPersistable(storageKey) && isPersistable(url)) {

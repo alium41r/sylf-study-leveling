@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { TimezoneService } from "@/lib/timezone-service";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
 import { getActiveSkillModifiers } from "@/lib/skill-tree";
+import { getCognitiveEffects } from "@/lib/cognitive-stats";
 
 export interface PenaltyReconciliationResult {
   penaltiesApplied: number;
@@ -108,6 +109,9 @@ export class HpPenaltyService {
           enableHpPenalty: true,
           lastDailyPenaltyEvaluatedDate: true,
           createdAt: true,
+          stats: {
+            select: { endurance: true },
+          },
         },
       });
     } catch (userErr) {
@@ -240,6 +244,12 @@ export class HpPenaltyService {
     const dailyGoal = Math.max(10, user.dailyGoalMinutes);
     const restDays = user.restDays || [0];
 
+    // Endurance (Aegis): each ability tier shaves 5% off the missed-day
+    // damage (15 HP base), down to −30% at tier 6.
+    const enduranceEffects = getCognitiveEffects({ endurance: user.stats?.endurance ?? undefined });
+    const aegisDamage = Math.round(15 * enduranceEffects.hpPenaltyMultiplier);
+    const aegisActive = aegisDamage < 15;
+
     // Floating (ad-hoc) rest days inside the evaluation window are exempt
     // exactly like fixed rest days — 0 HP, 0 streak impact.
     let floatingRestSet = new Set<string>();
@@ -266,7 +276,7 @@ export class HpPenaltyService {
 
       const loggedMinutes = dailyMinutesMap[dayStr] || 0;
       if (loggedMinutes < dailyGoal) {
-        const damage = 15;
+        const damage = aegisDamage;
         penaltyEvents.push({
           day: dayStr,
           minutes: loggedMinutes,
@@ -388,6 +398,8 @@ export class HpPenaltyService {
           } else if (skillMods.damageReductionPercent > 0) {
             eventDamage = Math.round(eventDamage * (1 - skillMods.damageReductionPercent / 100));
             if (!itemMitigatedName) itemMitigatedName = "Cognitive Mental Shield";
+          } else if (aegisActive && eventDamage < 15) {
+            if (!itemMitigatedName) itemMitigatedName = "Aegis (Endurance)";
           }
 
           const actualDeduction = Math.min(currentHp, eventDamage);

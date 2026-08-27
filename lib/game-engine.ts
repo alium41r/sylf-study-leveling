@@ -123,6 +123,20 @@ export function rankForLevel(level: number): HunterRank {
   return "E";
 }
 
+/**
+ * Determine the next promotion tier above the current level in the canonical rank ladder.
+ * Returns null if the scholar has achieved the apex tier (MONARCH).
+ */
+export function getNextRank(level: number) {
+  const safeLevel = Math.max(1, Math.floor(level));
+  for (let i = RANK_LADDER.length - 1; i >= 0; i--) {
+    if (RANK_LADDER[i].level > safeLevel) {
+      return RANK_LADDER[i];
+    }
+  }
+  return null;
+}
+
 export interface LevelProgress {
   currentLevelBaseXp: number;
   nextLevelTargetXp: number;

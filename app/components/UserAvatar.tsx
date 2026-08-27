@@ -11,6 +11,7 @@ interface UserAvatarProps {
   fallbackClassName?: string;
   alt?: string;
   shape?: "circle" | "rounded" | "square";
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const SIZE_MAP: Record<string, { container: string; text: string }> = {
@@ -31,6 +32,7 @@ export function UserAvatar({
   fallbackClassName = "",
   alt,
   shape = "circle",
+  onClick,
 }: UserAvatarProps) {
   const [hasError, setHasError] = useState(false);
 
@@ -45,7 +47,8 @@ export function UserAvatar({
   if (src && !hasError) {
     return (
       <div
-        className={`relative overflow-hidden shrink-0 border border-border-subtle bg-bg-abyss shadow-sm ${sizeClass} ${shapeClass} ${className}`}
+        onClick={onClick}
+        className={`relative overflow-hidden shrink-0 border border-border-subtle bg-bg-abyss shadow-sm ${sizeClass} ${shapeClass} ${onClick ? "cursor-pointer hover:opacity-90 transition-opacity" : ""} ${className}`}
         style={customStyle}
       >
         <img
@@ -60,7 +63,8 @@ export function UserAvatar({
 
   return (
     <div
-      className={`relative overflow-hidden shrink-0 border border-border-subtle bg-gradient-to-br from-emerald-950/60 via-bg-panel to-bg-abyss text-emerald-400 font-['Rajdhani'] font-bold flex items-center justify-center select-none shadow-sm ${sizeClass} ${shapeClass} ${className} ${fallbackClassName}`}
+      onClick={onClick}
+      className={`relative overflow-hidden shrink-0 border border-border-subtle bg-gradient-to-br from-emerald-950/60 via-bg-panel to-bg-abyss text-emerald-400 font-['Rajdhani'] font-bold flex items-center justify-center select-none shadow-sm ${sizeClass} ${shapeClass} ${onClick ? "cursor-pointer hover:opacity-90 transition-opacity" : ""} ${className} ${fallbackClassName}`}
       style={customStyle}
       title={displayName}
     >

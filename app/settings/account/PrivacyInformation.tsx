@@ -5,7 +5,7 @@ import { useAuth } from "../../components/AuthProvider";
 import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
 import { PrivacyLevel } from "@/lib/privacy-types";
-import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { fetchCachedJSON, clearClientCache } from "@/lib/client-data-cache";
 
 export default function PrivacyInformation() {
   const { user, isLoading } = useAuth();
@@ -92,6 +92,7 @@ export default function PrivacyInformation() {
       const data = await res.json();
 
       if (res.ok) {
+        clearClientCache();
         setStatus({ type: "success", message: data.message || "Privacy settings updated." });
         setInitialState(privacyState); // Reset dirty state
         

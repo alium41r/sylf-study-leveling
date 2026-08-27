@@ -7,6 +7,7 @@ import Sidebar from "./Sidebar";
 import UserAvatar from "./UserAvatar";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
+import { useProfileModal } from "./ProfileModalContext";
 import { lockPageScroll } from "../../lib/scroll-lock";
 
 const PUBLIC_PATHS = ["/", "/login", "/register", "/focus", "/onboarding"];
@@ -27,27 +28,28 @@ export default function SidebarWrapper() {
   const isChatPage = pathname.startsWith("/social/chat");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  // Close the mobile drawer after in-drawer navigation.
-  useEffect(() => {
+  // Close the mobile drawer after in-drawer navigation (during render)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setIsMobileMenuOpen(false);
-  }, [pathname]);
+  }
 
-  // Close the mobile drawer when the settings panel opens on top of it
-  // (opening settings does not navigate, so the pathname effect misses it).
+  // Close the mobile drawer when the settings panel or profile modal opens on top of it
   const { isOpen: isSettingsOpen } = useSettings();
-  useEffect(() => {
-    if (isSettingsOpen) setIsMobileMenuOpen(false);
-  }, [isSettingsOpen]);
+  const { isOpen: isProfileOpen } = useProfileModal();
+
+  const isDrawerOpen = isMobileMenuOpen && !isSettingsOpen && !isProfileOpen;
 
   // Lock page scroll while the drawer is open so only the drawer scrolls.
   // Both <html> and <body> must be locked — with body-only overflow:hidden
   // the document scroller stays live and the page behind the drawer can
   // still be scrolled. Ref-counted so it never fights the settings panel.
   useEffect(() => {
-    if (!isMobileMenuOpen) return;
+    if (!isDrawerOpen) return;
     return lockPageScroll();
-  }, [isMobileMenuOpen]);
+  }, [isDrawerOpen]);
 
   if (isPublicPage) return null;
 
@@ -81,17 +83,22 @@ export default function SidebarWrapper() {
         <>
           <div
             className={`fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out md:hidden shadow-2xl ${
-              isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+              isDrawerOpen ? "translate-x-0" : "-translate-x-full"
             }`}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            <Sidebar isCollapsed={false} setIsCollapsed={() => {}} mobile />
+            <Sidebar
+              isCollapsed={false}
+              setIsCollapsed={() => {}}
+              mobile
+              onCloseMobile={() => setIsMobileMenuOpen(false)}
+            />
           </div>
 
           {/* ─── Mobile Backdrop (closes drawer on tap) ─────────── */}
-          {isMobileMenuOpen && (
+          {isDrawerOpen && (
             <div
               className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
               aria-hidden="true"
@@ -110,6 +117,7 @@ export default function SidebarWrapper() {
  */
 function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const { user } = useAuth();
+  const { openProfile } = useProfileModal();
 
   const hp = Number(user?.hp ?? 0);
   const maxHp = Number(user?.maxHp ?? 100);
@@ -130,23 +138,33 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
           <PanelLeft className="w-5 h-5 text-text-secondary" />
         </button>
 
-        <UserAvatar
-          src={user?.avatarUrl}
-          name={user?.name}
-          username={user?.username}
-          size="sm"
-          shape="rounded"
-          className="w-9 h-9"
-        />
+        <button
+          type="button"
+          onClick={() => user?.username && openProfile(user.username)}
+          className="flex items-center gap-2.5 min-w-0 text-left cursor-pointer group active:scale-95 transition-all p-1 -m-1 rounded-lg hover:bg-bg-panel/50 focus:outline-none focus:ring-1 focus:ring-accent-primary"
+          title="View Profile Card"
+          aria-label="View Profile Card"
+        >
+          <div className="relative group-hover:ring-2 group-hover:ring-accent-primary/60 rounded-xl transition-all">
+            <UserAvatar
+              src={user?.avatarUrl}
+              name={user?.name}
+              username={user?.username}
+              size="sm"
+              shape="rounded"
+              className="w-9 h-9 group-hover:border-accent-primary transition-colors"
+            />
+          </div>
 
-        <div className="min-w-0">
-          <p className="text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary truncate">
-            {user?.name || user?.username || "The System"}
-          </p>
-          <p className="text-[10px] font-mono text-text-muted truncate">
-            {user?.hunterRank || "E"}-Rank • Lv. {user?.level || 1}
-          </p>
-        </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary group-hover:text-accent-primary-light transition-colors truncate">
+              {user?.name || user?.username || "The System"}
+            </p>
+            <p className="text-[10px] font-mono text-text-muted truncate">
+              {user?.hunterRank || "E"}-Rank • Lv. {user?.level || 1}
+            </p>
+          </div>
+        </button>
       </div>
 
       {/* Right: quick status (streak / HP / Sylph) */}

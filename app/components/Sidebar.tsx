@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { PanelLeft } from "lucide-react";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
+import { useProfileModal } from "./ProfileModalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import MarkdownRenderer from "./MarkdownRenderer";
 
@@ -101,12 +102,23 @@ interface SidebarProps {
    * (in-flow, full height, never collapsed) instead of the desktop fixed rail.
    */
   mobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }: SidebarProps) {
+export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout, refreshStats } = useAuth();
   const { openSettings } = useSettings();
+  const { openProfile } = useProfileModal();
+
+  const handleOpenProfile = () => {
+    if (user?.username) {
+      openProfile(user.username);
+      if (mobile && onCloseMobile) {
+        onCloseMobile();
+      }
+    }
+  };
 
   const [notifications, setNotifications] = useState<SystemMessage[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -383,10 +395,21 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
         </div>
 
         {/* ─── Scholar Profile (Compact) ──────────────── */}
-        <div className={`system-card transition-all duration-300 ${isCollapsed ? "p-2" : "p-4"}`}>
+        <button
+          type="button"
+          onClick={handleOpenProfile}
+          className={`system-card w-full text-left transition-all duration-300 cursor-pointer hover:border-accent-primary/60 hover:shadow-[0_0_16px_var(--accent-primary-dim)] hover:scale-[1.02] active:scale-[0.98] group rounded-xl select-none focus:outline-none focus:ring-1 focus:ring-accent-primary ${
+            isCollapsed ? "p-2 flex justify-center" : "p-3.5 block"
+          }`}
+          title="View Profile Card"
+          aria-label="View Profile Card"
+        >
           {isCollapsed ? (
             <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm" title={user.name || user.username || "Scholar"}>
+              <div
+                className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle group-hover:border-accent-primary-light bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 group-hover:shadow-[0_0_10px_var(--accent-primary-dim)] transition-all duration-200"
+                title={user.name || user.username || "Scholar"}
+              >
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
@@ -394,7 +417,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400">
+                  <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400 group-hover:text-accent-primary-light transition-colors">
                     {(user.name || user.username || "S").charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -402,7 +425,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
             </div>
           ) : (
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border border-border-subtle bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm">
+              <div className="w-10 h-10 rounded-xl overflow-hidden border border-border-subtle group-hover:border-accent-primary-light bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 group-hover:shadow-[0_0_12px_var(--accent-primary-dim)] transition-all duration-200">
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
@@ -410,13 +433,13 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-sm font-bold font-['Rajdhani'] text-emerald-400">
+                  <span className="text-sm font-bold font-['Rajdhani'] text-emerald-400 group-hover:text-accent-primary-light transition-colors">
                     {(user.name || user.username || "S").charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-sm truncate" style={{ color: "var(--text-primary)" }}>
+                <p className="font-bold text-sm truncate group-hover:text-accent-primary-light transition-colors" style={{ color: "var(--text-primary)" }}>
                   {user.name || "Scholar"}
                 </p>
                 <p className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>
@@ -425,7 +448,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false }:
               </div>
             </div>
           )}
-        </div>
+        </button>
       </div>
 
       {/* ─── Navigation ────────── */}

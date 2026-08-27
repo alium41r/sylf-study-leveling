@@ -37,6 +37,7 @@ export interface UserStats {
   xpToNextLevel: number;
   hp: number;
   maxHp: number;
+  effectiveMaxHp?: number;
   streakDays: number;
   totalStudyMinutes: number;
   totalStudySeconds?: number;

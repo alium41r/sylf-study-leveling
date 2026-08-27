@@ -10,6 +10,13 @@ import { CharacterRenderer } from "./character/CharacterRenderer";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 import {
+  getStatCap,
+  COGNITIVE_STATS,
+  type CognitiveStatKey,
+} from "@/lib/cognitive-stats";
+import { RANK_LADDER, getNextRank } from "@/lib/game-engine";
+import { ACHIEVEMENTS_CATALOG, RARITY_COLORS } from "@/lib/achievements-catalog";
+import {
   Edit3,
   MessageSquare,
   Check,
@@ -21,16 +28,11 @@ import {
   ChevronDown,
   MoreVertical,
   Flame,
-  Shield,
   Award,
   Sparkles,
   ExternalLink,
   Briefcase,
   MessageCircle,
-  Activity,
-  Cpu,
-  Target,
-  Zap,
   Globe,
   Code2,
   Lock,
@@ -87,6 +89,92 @@ interface ProfileDossier {
 
 type TabType = "OVERVIEW" | "STATS" | "ACHIEVEMENTS";
 
+/* ─── Pentagonal Attribute Radar (profile sheet design) ───────── */
+
+function AttributeRadar({ values }: { values: Record<CognitiveStatKey, number> }) {
+  const ORDER: { key: CognitiveStatKey; label: string }[] = [
+    { key: "endurance", label: "ENDURANCE" },
+    { key: "tenacity", label: "TENACITY" },
+    { key: "velocity", label: "VELOCITY" },
+    { key: "discipline", label: "DISCIPLINE" },
+    { key: "synthesis", label: "SYNTHESIS" },
+  ];
+  const CX = 150;
+  const CY = 138;
+  const R = 82;
+
+  const pt = (i: number, r: number): [number, number] => {
+    const angle = (Math.PI * 2 * i) / ORDER.length - Math.PI / 2;
+    return [CX + r * Math.cos(angle), CY + r * Math.sin(angle)];
+  };
+
+  const rings = [1, 2, 3].map((k) =>
+    ORDER.map((_, i) => pt(i, (R * k) / 3).join(",")).join(" ")
+  );
+  const axes = ORDER.map((_, i) => {
+    const [x, y] = pt(i, R);
+    return { x1: CX, y1: CY, x2: x, y2: y };
+  });
+  const valuePts = ORDER.map((o, i) => pt(i, (R * Math.min(100, values[o.key] ?? 0)) / 100));
+
+  return (
+    <svg viewBox="0 0 300 300" className="w-full max-w-[340px] mx-auto select-none">
+      {/* Center marker */}
+      <circle cx={CX} cy={CY} r={3.5} fill="#a855f7" opacity={0.9} />
+      {/* Grid rings */}
+      {rings.map((pts, k) => (
+        <polygon key={k} points={pts} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} />
+      ))}
+      {/* Axis spokes */}
+      {axes.map((l, i) => (
+        <line key={i} {...l} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
+      ))}
+      {/* Value polygon */}
+      <polygon
+        points={valuePts.map((p) => p.join(",")).join(" ")}
+        fill="rgba(168,85,247,0.18)"
+        stroke="#a855f7"
+        strokeWidth={1.6}
+        strokeLinejoin="round"
+        style={{ filter: "drop-shadow(0 0 6px rgba(168,85,247,0.45))" }}
+      />
+      {/* Vertex dots + axis labels */}
+      {ORDER.map((o, i) => {
+        const [vx, vy] = valuePts[i];
+        const [lx, ly] = pt(i, R + 26);
+        const value = Math.min(100, values[o.key] ?? 0);
+        return (
+          <g key={o.key}>
+            <circle cx={vx} cy={vy} r={3} fill="#c084fc" />
+            <text
+              x={lx}
+              y={ly}
+              textAnchor="middle"
+              fill="#e9d5ff"
+              fontSize="10"
+              fontWeight={700}
+              style={{ fontFamily: "'Rajdhani', sans-serif", letterSpacing: "0.12em" }}
+            >
+              {o.label}
+            </text>
+            <text
+              x={lx}
+              y={ly + 13}
+              textAnchor="middle"
+              fill="#a78bfa"
+              fontSize="10"
+              fontWeight={700}
+              style={{ fontFamily: "'Rajdhani', sans-serif" }}
+            >
+              {value}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 export function PublicProfileModal() {
   const { isOpen, username, closeProfile } = useProfileModal();
   const { user: currentUser } = useAuth();
@@ -94,6 +182,12 @@ export function PublicProfileModal() {
 
   const [dossier, setDossier] = useState<ProfileDossier | null>(null);
   const [isSelf, setIsSelf] = useState(false);
+  const [privacySettings, setPrivacySettings] = useState<{
+    isProfileVisible?: boolean;
+    showRank?: boolean;
+    showStudyHours?: boolean;
+    showAchievements?: boolean;
+  } | null>(null);
   const [relationship, setRelationship] = useState<string>("PUBLIC");
   const [permissions, setPermissions] = useState<{
     canSendFriendRequest: boolean;
@@ -126,6 +220,80 @@ export function PublicProfileModal() {
     confirmText: "",
   });
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // ─── Cognitive training (self only) ─────────────────────────
+  const [selfCog, setSelfCog] = useState<{
+    stats: Record<string, number>;
+    skillPoints: number;
+    sylph: number;
+    cap: number;
+    abilities: Array<{
+      key: string;
+      label: string;
+      perkName: string;
+      perkLadder: string;
+      value: number;
+      tier: number;
+      maxTier: number;
+      nextTierAt: number | null;
+      investable: boolean;
+      costSp: number;
+      costSylph: number;
+    }>;
+  } | null>(null);
+  const [cogCurrency, setCogCurrency] = useState<"sp" | "sylph">("sylph");
+  const [cogBusy, setCogBusy] = useState<string | null>(null);
+  const [cogFeedback, setCogFeedback] = useState<string | null>(null);
+  const [showTrain, setShowTrain] = useState(false);
+
+  const loadSelfCognitive = useRef(() => {});
+  loadSelfCognitive.current = async () => {
+    try {
+      const res = await fetch("/api/cognitive-stats/invest", { credentials: "include" });
+      if (res.ok) setSelfCog(await res.json());
+    } catch {
+      /* best-effort */
+    }
+  };
+
+  useEffect(() => {
+    const isSelfViewer = Boolean(
+      isSelf ||
+      (currentUser?.username && username && currentUser.username.toLowerCase() === username.toLowerCase())
+    );
+    if (isSelfViewer && dossier) {
+      loadSelfCognitive.current();
+    } else {
+      setSelfCog(null);
+    }
+  }, [isSelf, dossier?.id, currentUser?.username, username]);
+
+  const handleCogInvest = async (key: string) => {
+    if (cogBusy) return;
+    setCogBusy(key);
+    setCogFeedback(null);
+    try {
+      const res = await fetch("/api/cognitive-stats/invest", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stat: key, currency: cogCurrency }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCogFeedback(
+          `${data.ability?.label ?? "Stat"} → ${data.ability?.value} (+${data.amount} · −${data.cost} ${cogCurrency === "sp" ? "SP" : "Sylph"})`
+        );
+        await loadSelfCognitive.current();
+      } else {
+        setCogFeedback(data.error || "Invest failed");
+      }
+    } catch {
+      setCogFeedback("Network error — try again");
+    } finally {
+      setCogBusy(null);
+    }
+  };
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -166,7 +334,7 @@ export function PublicProfileModal() {
           privacySettings?: any;
         }>(
           `/api/profile/${username}`,
-          {},
+          { credentials: "include" },
           { ttlMs: 15_000, staleMs: 300_000, storageKey: `profile:${username.toLowerCase()}:${currentUser?.id ?? "guest"}` }
         );
 
@@ -176,9 +344,16 @@ export function PublicProfileModal() {
         }
 
         setDossier(data.profile);
-        setIsSelf(Boolean(data.isSelf));
+        const resolvedSelf = Boolean(
+          data.isSelf ||
+          data.relationship === "SELF" ||
+          (currentUser?.username && username && currentUser.username.toLowerCase() === username.toLowerCase()) ||
+          (currentUser?.id && data.profile?.id && currentUser.id === data.profile.id)
+        );
+        setIsSelf(resolvedSelf);
         setRelationship(data.relationship);
         setPermissions(data.permissions);
+        setPrivacySettings(data.privacySettings || null);
       } catch (err) {
         setError("Network error while connecting to system registry.");
       } finally {
@@ -187,7 +362,7 @@ export function PublicProfileModal() {
     };
 
     fetchProfile();
-  }, [isOpen, username, currentUser?.id]);
+  }, [isOpen, username, currentUser?.id, currentUser?.username]);
 
   // ─── Keyboard Shortcut to Close (ESC) ──────────────────────
   useEffect(() => {
@@ -345,14 +520,20 @@ export function PublicProfileModal() {
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
-  const totalStudyHours = dossier?.totalStudyMinutes !== undefined
-    ? Math.floor(dossier.totalStudyMinutes / 60)
-    : 0;
 
   const xpPercent =
     dossier && dossier.xpToNextLevel && dossier.xpToNextLevel > 0
       ? Math.min(100, Math.round(((dossier.currentXP || 0) / dossier.xpToNextLevel) * 100))
       : 0;
+
+  // Level-gated attribute cap + next-rank rung (profile sheet design).
+  const statCap = getStatCap(dossier?.level ?? 1);
+  const nextRank = getNextRank(dossier?.level ?? 1);
+
+  const isEffectiveSelf = Boolean(
+    isSelf ||
+    (currentUser?.username && username && currentUser.username.toLowerCase() === username.toLowerCase())
+  );
 
   return (
     <AnimatePresence>
@@ -524,7 +705,7 @@ export function PublicProfileModal() {
 
                 {/* Right: Primary Action Buttons */}
                 <div className="flex items-center gap-2.5 pb-1" ref={menuRef}>
-                  {isSelf ? (
+                  {isEffectiveSelf ? (
                     <button
                       type="button"
                       onClick={handleEditProfile}
@@ -826,7 +1007,7 @@ export function PublicProfileModal() {
                     {/* ─── Left Column: Character Stage (4 Cols) ────────── */}
                     <div className="lg:col-span-4 flex flex-col gap-4">
                       {/* Holographic Character Pedestal */}
-                      <div className="relative rounded-2xl bg-bg-abyss/80 border border-border-subtle p-6 flex flex-col items-center justify-center min-h-[350px] overflow-hidden group">
+                      <div className="relative rounded-2xl bg-bg-abyss/80 border border-border-subtle p-6 flex flex-col items-center justify-center min-h-[380px] lg:min-h-[460px] overflow-hidden group">
                         {/* Radial Ambient Glow */}
                         <div className="absolute inset-0 bg-gradient-to-b from-accent-primary-dim/30 via-transparent to-accent-primary-dim/10 pointer-events-none" />
 
@@ -842,58 +1023,6 @@ export function PublicProfileModal() {
                           <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mt-2">
                             {classInfo?.name || "Scholar"} Stage
                           </span>
-                        </div>
-                      </div>
-
-                      {/* Level & XP Progression */}
-                      <div className="system-card p-4 rounded-xl bg-bg-panel/90 border border-border-subtle flex flex-col gap-2">
-                        {dossier.level !== undefined ? (
-                          <>
-                            <div className="flex items-center justify-between text-xs font-['Rajdhani'] font-bold">
-                              <span className="text-text-primary">
-                                Level {dossier.level}
-                              </span>
-                              <span className="text-accent-text-light">
-                                {dossier.currentXP || 0} / {dossier.xpToNextLevel || 1000} XP ({xpPercent}%)
-                              </span>
-                            </div>
-
-                            <div className="w-full h-2 bg-bg-abyss rounded-full overflow-hidden border border-border-subtle">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${xpPercent}%` }}
-                                transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="h-full bg-gradient-to-r from-accent-primary to-accent-primary-light rounded-full"
-                              />
-                            </div>
-                          </>
-                        ) : (
-                          <div className="flex items-center justify-between text-xs font-['Rajdhani'] font-bold py-1">
-                            <span className="text-text-muted flex items-center gap-1.5">
-                              <Lock className="w-3.5 h-3.5" /> Hunter Rank & Level
-                            </span>
-                            <span className="text-text-muted">Classified</span>
-                          </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-border-subtle/50 text-center">
-                          <div className="p-2 rounded-lg bg-bg-abyss/60 border border-border-subtle">
-                            <span className="text-[10px] text-text-muted font-['Rajdhani'] uppercase block">
-                              Study Hours
-                            </span>
-                            <span className="text-sm font-bold font-['Rajdhani'] text-text-primary">
-                              {dossier.totalStudyMinutes !== undefined ? `${totalStudyHours}h` : "—"}
-                            </span>
-                          </div>
-                          <div className="p-2 rounded-lg bg-bg-abyss/60 border border-border-subtle">
-                            <span className="text-[10px] text-text-muted font-['Rajdhani'] uppercase block">
-                              Streak
-                            </span>
-                            <span className="text-sm font-bold font-['Rajdhani'] text-amber-400 flex items-center justify-center gap-1">
-                              <Flame className="w-3.5 h-3.5 text-amber-400" />
-                              <span>{dossier.streakDays !== undefined ? dossier.streakDays : "—"}</span>
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -1064,65 +1193,137 @@ export function PublicProfileModal() {
                           className="flex flex-col gap-4"
                         >
                           {dossier.stats ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                              {[
-                                {
-                                  label: "Endurance (Focus Stamina)",
-                                  val: dossier.stats.endurance,
-                                  icon: Activity,
-                                  color: "text-emerald-400",
-                                },
-                                {
-                                  label: "Tenacity (Streak Resilience)",
-                                  val: dossier.stats.tenacity,
-                                  icon: Shield,
-                                  color: "text-blue-400",
-                                },
-                                {
-                                  label: "Velocity (Pacing Speed)",
-                                  val: dossier.stats.velocity,
-                                  icon: Zap,
-                                  color: "text-amber-400",
-                                },
-                                {
-                                  label: "Synthesis (Complex Output)",
-                                  val: dossier.stats.synthesis,
-                                  icon: Cpu,
-                                  color: "text-purple-400",
-                                },
-                                {
-                                  label: "Discipline (Daily Consistency)",
-                                  val: dossier.stats.discipline,
-                                  icon: Target,
-                                  color: "text-rose-400",
-                                },
-                              ].map((stat, idx) => {
-                                const IconComponent = stat.icon;
-                                return (
-                                  <div
-                                    key={idx}
-                                    className="system-card p-4 rounded-xl bg-bg-panel/80 border border-border-subtle flex flex-col gap-2"
+                            <div className="system-card p-6 sm:p-7 rounded-2xl border border-accent-primary-mid/50 bg-gradient-to-b from-bg-void/80 to-bg-abyss/90 relative overflow-hidden">
+                              {/* Decorative diamond ornament header */}
+                              <div className="flex items-center justify-center gap-2">
+                                <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent-primary/60" />
+                                <div className="w-1.5 h-1.5 rotate-45 bg-accent-primary shadow-[0_0_8px_var(--accent-primary)]" />
+                                <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent-primary/60" />
+                              </div>
+                              <h3 className="text-center text-lg font-black font-['Rajdhani'] tracking-[0.3em] uppercase text-text-primary mt-1">
+                                Solo Player
+                              </h3>
+                              <div className="flex items-center justify-center gap-2 mt-1">
+                                <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent-primary/60" />
+                                <div className="w-1.5 h-1.5 rotate-45 bg-accent-primary shadow-[0_0_8px_var(--accent-primary)]" />
+                                <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent-primary/60" />
+                              </div>
+
+                              {/* Badges: Hunter Rank & Weekly Streak */}
+                              <div className="flex items-center justify-center gap-2.5 mt-5 flex-wrap">
+                                {dossier.hunterRank && (
+                                  <span className="px-4 py-1 rounded-full border border-emerald-400/40 text-emerald-300 text-[11px] font-bold font-['Rajdhani'] uppercase tracking-[0.2em] bg-emerald-400/5">
+                                    {dossier.hunterRank} Rank
+                                  </span>
+                                )}
+                                {dossier.streakDays !== undefined && (
+                                  <span
+                                    className="px-4 py-1 rounded-full border border-amber-400/40 text-amber-300 text-[11px] font-bold font-['Rajdhani'] uppercase tracking-[0.2em] bg-amber-400/5 flex items-center gap-1.5 shadow-[0_0_12px_rgba(251,191,36,0.08)]"
+                                    title={`Weekly Streak: ${dossier.streakDays} consecutive week${dossier.streakDays === 1 ? "" : "s"}`}
                                   >
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xs text-text-secondary font-['Rajdhani'] font-medium flex items-center gap-1.5">
-                                        <IconComponent className={`w-3.5 h-3.5 ${stat.color}`} />
-                                        <span>{stat.label}</span>
+                                    <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20" />
+                                    <span>{dossier.streakDays} {dossier.streakDays === 1 ? "Week" : "Weeks"} Streak</span>
+                                  </span>
+                                )}
+                              </div>
+
+                              {dossier.level !== undefined && (
+                                <div className="text-center mt-4">
+                                  <p className="text-[10px] uppercase tracking-[0.35em] text-text-muted font-['Rajdhani'] font-bold">
+                                    Level
+                                  </p>
+                                  <p className="text-5xl font-black font-['Rajdhani'] text-text-primary leading-none mt-1">
+                                    {dossier.level}
+                                  </p>
+                                  <div className="h-0.5 w-10 mx-auto mt-2 bg-gradient-to-r from-transparent via-accent-primary to-transparent" />
+                                </div>
+                              )}
+
+                              <div className="flex items-center justify-between mt-6 mb-1">
+                                <p className="text-sm font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary">
+                                  Attributes
+                                </p>
+                                <p className="text-[10px] font-['Rajdhani'] text-text-muted">
+                                  MAX: {statCap} (Level {dossier.level ?? 1})
+                                </p>
+                                {isSelf ? (
+                                  <button
+                                    onClick={() => setShowTrain(!showTrain)}
+                                    title={showTrain ? "Close training" : "Train attributes"}
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-lg leading-none transition-all duration-200 hover:scale-110 active:scale-95 ${
+                                      showTrain ? "bg-bg-panel border border-border-subtle text-text-primary" : "bg-accent-primary shadow-[0_0_16px_var(--accent-primary-dim)]"
+                                    }`}
+                                  >
+                                    {showTrain ? "−" : "+"}
+                                  </button>
+                                ) : (
+                                  <div className="w-8" />
+                                )}
+                              </div>
+
+                              <AttributeRadar values={dossier.stats} />
+
+                              {/* ─── XP / Next Rank (mirrors the profile sheet) ─── */}
+                              {dossier.currentXP !== undefined &&
+                                typeof dossier.xpToNextLevel === "number" &&
+                                dossier.xpToNextLevel > 0 && (
+                                  <div className="mt-6 pt-5 border-t border-border-subtle">
+                                    <div className="flex justify-between items-baseline">
+                                      <span className="text-[10px] uppercase tracking-[0.25em] text-text-muted font-['Rajdhani'] font-bold">
+                                        Experience Points
                                       </span>
-                                      <span className="text-sm font-bold font-mono text-text-primary">
-                                        {stat.val}
+                                      <span className="text-xs font-bold font-['Rajdhani'] text-accent-text-light">
+                                        {Math.min(100, Math.round((dossier.currentXP / dossier.xpToNextLevel) * 100))}%
                                       </span>
                                     </div>
-                                    <div className="w-full h-1.5 bg-bg-abyss rounded-full overflow-hidden">
+                                    <p className="text-center text-3xl font-bold font-['Rajdhani'] text-text-primary mt-2">
+                                      {dossier.currentXP.toLocaleString()}
+                                    </p>
+                                    <div className="h-2 rounded-full bg-bg-void/80 border border-border-subtle overflow-hidden mt-2">
                                       <div
-                                        className="h-full bg-accent-primary rounded-full transition-all duration-500"
+                                        className="h-full rounded-full transition-all duration-700"
                                         style={{
-                                          width: `${Math.min(100, (stat.val / 50) * 100)}%`,
+                                          width: `${xpPercent}%`,
+                                          background: "linear-gradient(90deg, var(--accent-primary), var(--accent-cyan))",
+                                          boxShadow: "0 0 12px var(--accent-primary-dim)",
                                         }}
                                       />
                                     </div>
+                                    <div className="flex justify-between items-center mt-4">
+                                      <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted font-['Rajdhani'] font-bold">
+                                        Weekly Streak
+                                      </span>
+                                      <span className="text-xs font-bold font-['Rajdhani'] text-amber-400 flex items-center gap-1">
+                                        <Flame className="w-3.5 h-3.5 text-amber-400" />
+                                        <span>{dossier.streakDays ?? 0} {(dossier.streakDays ?? 0) === 1 ? "Week" : "Weeks"}</span>
+                                      </span>
+                                    </div>
+                                    {nextRank ? (
+                                      <>
+                                        <div className="flex justify-between items-center mt-3 pt-3 border-t border-border-subtle/50">
+                                          <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted font-['Rajdhani'] font-bold">
+                                            Next Rank
+                                          </span>
+                                          <span className="text-xs font-bold font-['Rajdhani'] text-accent-cyan">
+                                            {nextRank.display} Rank
+                                          </span>
+                                        </div>
+                                        <p className="text-right text-[10px] text-text-muted font-['Rajdhani'] mt-0.5">
+                                          Level {nextRank.level} needed
+                                        </p>
+                                      </>
+                                    ) : (
+                                      <div className="flex justify-between items-center mt-3 pt-3 border-t border-border-subtle/50">
+                                        <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted font-['Rajdhani'] font-bold">
+                                          Rank Status
+                                        </span>
+                                        <span className="text-xs font-bold font-['Rajdhani'] text-amber-400">
+                                          Apex Tier (Max)
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
-                                );
-                              })}
+                                )}
                             </div>
                           ) : (
                             <div className="p-8 text-center bg-bg-panel/80 border border-border-subtle rounded-xl flex flex-col items-center justify-center">
@@ -1135,49 +1336,224 @@ export function PublicProfileModal() {
                               </p>
                             </div>
                           )}
-                        </motion.div>
-                      )}
 
-                      {activeTab === "ACHIEVEMENTS" && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="flex flex-col gap-4"
-                        >
-                          {dossier.recentAchievements && dossier.recentAchievements.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              {dossier.recentAchievements.map((ach, idx) => (
-                                <div
-                                  key={idx}
-                                  className="system-card p-4 rounded-xl bg-bg-panel/80 border border-border-subtle flex items-center gap-3.5"
-                                >
-                                  <div className="w-10 h-10 rounded-xl bg-accent-primary-dim/30 border border-accent-primary-mid flex items-center justify-center flex-shrink-0">
-                                    <Award className="w-5 h-5 text-accent-text-light" />
-                                  </div>
-                                  <div className="flex flex-col min-w-0">
-                                    <span className="text-xs font-bold font-['Rajdhani'] text-text-primary truncate">
-                                      {ach.achievementId.replace(/_/g, " ").toUpperCase()}
-                                    </span>
-                                    <span className="text-[10px] text-text-muted font-mono">
-                                      {new Date(ach.claimedAt).toLocaleDateString()}
-                                    </span>
+                          {/* ─── Train Attributes (self only, via "+") ────── */}
+                          {isEffectiveSelf && selfCog && showTrain && (
+                            <div className="system-card p-5 rounded-xl border border-accent-primary-mid bg-bg-void/60">
+                              <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                                <h4 className="text-sm font-bold font-['Rajdhani'] text-accent-text-light uppercase tracking-wider">
+                                  Train Attributes
+                                </h4>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs font-bold font-['Rajdhani'] text-text-secondary">
+                                    <span className="text-amber-400">{selfCog.skillPoints} SP</span> ·{" "}
+                                    <span className="text-cyan-400">{selfCog.sylph} Sylph</span>
+                                  </span>
+                                  <div className="flex rounded-full border border-border-subtle overflow-hidden">
+                                    {(["sp", "sylph"] as const).map((c) => (
+                                      <button
+                                        key={c}
+                                        onClick={() => setCogCurrency(c)}
+                                        className={`px-3 py-1 text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider transition-colors ${
+                                          cogCurrency === c
+                                            ? "bg-accent-primary text-white"
+                                            : "text-text-muted hover:text-text-primary"
+                                        }`}
+                                      >
+                                        {c === "sp" ? "SP" : "Sylph"}
+                                      </button>
+                                    ))}
                                   </div>
                                 </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="p-8 text-center bg-bg-panel/80 border border-border-subtle rounded-xl flex flex-col items-center justify-center">
-                              <Lock className="w-8 h-8 text-text-muted mb-2" />
-                              <h4 className="text-sm font-bold font-['Rajdhani'] text-text-primary uppercase tracking-wider">
-                                Achievement Archives Restricted
-                              </h4>
-                              <p className="text-xs text-text-muted font-['Rajdhani'] mt-1 max-w-sm">
-                                This scholar has chosen to keep their earned milestones and titles private.
+                              </div>
+                              <p className="text-[10px] text-text-muted font-['Rajdhani'] mb-3">
+                                +5 per train. Costs scale with each stat band — SP is the premium path.
                               </p>
+                              {cogFeedback && (
+                                <p className="text-[11px] font-['Rajdhani'] font-semibold text-accent-green mb-2">
+                                  {cogFeedback}
+                                </p>
+                              )}
+                              <div className="flex flex-col gap-2">
+                                {selfCog.abilities.map((a) => (
+                                  <div
+                                    key={a.key}
+                                    className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-bg-abyss/70 border border-border-subtle"
+                                  >
+                                    <div className="min-w-0">
+                                      <span className="text-xs font-bold font-['Rajdhani'] text-text-primary">
+                                        {COGNITIVE_STATS[a.key as CognitiveStatKey].label}
+                                      </span>
+                                      <span className="text-[10px] text-text-muted font-['Rajdhani'] ml-2">
+                                        {a.value}/100 · {a.perkName} T{a.tier}
+                                      </span>
+                                    </div>
+                                    {a.investable ? (
+                                      <button
+                                        disabled={cogBusy !== null}
+                                        onClick={() => handleCogInvest(a.key)}
+                                        className="shrink-0 px-3.5 py-1.5 rounded-full text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50"
+                                        style={{
+                                          background: "var(--accent-primary-dim)",
+                                          border: "1px solid var(--accent-primary-mid)",
+                                          color: "var(--accent-text-light)",
+                                        }}
+                                      >
+                                        {cogBusy === a.key
+                                          ? "Training…"
+                                          : `+5 · ${cogCurrency === "sp" ? `${a.costSp} SP` : `${a.costSylph} Sylph`}`}
+                                      </button>
+                                    ) : (
+                                      <span className="shrink-0 px-3 py-1 rounded-full text-[10px] font-bold font-['Rajdhani'] uppercase text-accent-green border border-accent-green/40 bg-accent-green/10">
+                                        {a.value >= 100 ? "Maxed" : `Cap ${selfCog.cap}`}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </motion.div>
                       )}
+
+                      {activeTab === "ACHIEVEMENTS" && (() => {
+                        const isAchievementsRestricted =
+                          !isEffectiveSelf &&
+                          (dossier.recentAchievements === undefined ||
+                           dossier.isRestricted === true ||
+                           privacySettings?.showAchievements === false);
+
+                        const hasAchievements =
+                          Array.isArray(dossier.recentAchievements) &&
+                          dossier.recentAchievements.length > 0;
+
+                        return (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex flex-col gap-4"
+                          >
+                            {isAchievementsRestricted ? (
+                              <div className="p-8 text-center bg-bg-panel/80 border border-border-subtle rounded-xl flex flex-col items-center justify-center">
+                                <div className="w-12 h-12 rounded-2xl bg-bg-abyss/80 border border-border-subtle flex items-center justify-center mb-3 text-text-muted">
+                                  <Lock className="w-6 h-6" />
+                                </div>
+                                <h4 className="text-sm font-bold font-['Rajdhani'] text-text-primary uppercase tracking-wider">
+                                  Achievement Archives Restricted
+                                </h4>
+                                <p className="text-xs text-text-muted font-['Rajdhani'] mt-1 max-w-sm">
+                                  This scholar has chosen to keep their earned milestones and titles private.
+                                </p>
+                              </div>
+                            ) : !hasAchievements ? (
+                              <div className="p-8 text-center bg-bg-panel/80 border border-border-subtle rounded-xl flex flex-col items-center justify-center">
+                                <div
+                                  className={`w-12 h-12 rounded-2xl border flex items-center justify-center mb-3 ${
+                                    isEffectiveSelf
+                                      ? "bg-accent-primary-dim/25 border-accent-primary-mid/40"
+                                      : "bg-bg-abyss/80 border-border-subtle text-text-muted"
+                                  }`}
+                                >
+                                  <Award
+                                    className={`w-6 h-6 ${
+                                      isEffectiveSelf ? "text-accent-text-light" : "text-text-muted"
+                                    }`}
+                                  />
+                                </div>
+                                <h4 className="text-sm font-bold font-['Rajdhani'] text-text-primary uppercase tracking-wider">
+                                  No Achievements Unlocked Yet
+                                </h4>
+                                <p className="text-xs text-text-muted font-['Rajdhani'] mt-1 max-w-sm">
+                                  {isEffectiveSelf
+                                    ? "Complete focus sessions, level up your hunter rank, and hit study milestones to unlock and claim rewards in your Codex."
+                                    : "This scholar hasn't claimed any milestones from the Codex yet."}
+                                </p>
+                                {isEffectiveSelf && (
+                                  <a
+                                    href="/settings/achievements"
+                                    className="mt-4 px-4 py-2 rounded-xl text-xs font-bold font-['Rajdhani'] uppercase tracking-wider transition-all duration-200 hover:scale-105 inline-flex items-center gap-1.5"
+                                    style={{
+                                      background: "var(--accent-primary-dim)",
+                                      border: "1px solid var(--accent-primary-mid)",
+                                      color: "var(--accent-text-light)",
+                                    }}
+                                  >
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>Browse Achievements Codex</span>
+                                  </a>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-3">
+                                <div className="flex items-center justify-between px-1">
+                                  <span className="text-[11px] font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted">
+                                    Claimed Milestones ({dossier.recentAchievements?.length || 0})
+                                  </span>
+                                  {isEffectiveSelf && (
+                                    <a
+                                      href="/settings/achievements"
+                                      className="text-[11px] font-bold font-['Rajdhani'] uppercase tracking-wider text-accent-cyan hover:underline inline-flex items-center gap-1"
+                                    >
+                                      <span>Open Codex</span>
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  )}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {dossier.recentAchievements?.map((ach, idx) => {
+                                    const def = ACHIEVEMENTS_CATALOG.find((a) => a.id === ach.achievementId);
+                                    const title = def?.title || ach.achievementId.replace(/_/g, " ").toUpperCase();
+                                    const category = def?.category || "Milestone";
+                                    const rarity = def?.rarity || "Common";
+                                    const colors = RARITY_COLORS[rarity] || RARITY_COLORS.Common;
+
+                                    return (
+                                      <div
+                                        key={idx}
+                                        className="system-card p-3.5 rounded-xl bg-bg-panel/80 border border-border-subtle hover:border-border-default transition-all flex items-center gap-3.5"
+                                      >
+                                        <div
+                                          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                                          style={{
+                                            background: `${colors.glow}`,
+                                            border: `1px solid ${colors.main}40`,
+                                          }}
+                                        >
+                                          <Award className="w-5 h-5" style={{ color: colors.main }} />
+                                        </div>
+                                        <div className="flex flex-col min-w-0 flex-1">
+                                          <div className="flex items-center justify-between gap-1">
+                                            <span className="text-xs font-bold font-['Rajdhani'] text-text-primary truncate">
+                                              {title}
+                                            </span>
+                                            <span
+                                              className="text-[9px] font-bold font-['Rajdhani'] uppercase tracking-wider px-1.5 py-0.5 rounded"
+                                              style={{
+                                                color: colors.main,
+                                                background: colors.glow,
+                                                border: `1px solid ${colors.main}30`,
+                                              }}
+                                            >
+                                              {rarity}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center justify-between text-[10px] text-text-muted mt-0.5 font-['Rajdhani']">
+                                            <span className="truncate">{category}</span>
+                                            <span className="font-mono text-[9px]">
+                                              {new Date(ach.claimedAt).toLocaleDateString()}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </motion.div>
+                        );
+                      })()}
                     </div>
                   </div>
                 )

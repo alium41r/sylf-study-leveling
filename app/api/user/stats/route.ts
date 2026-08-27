@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth-server";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
+import { getCognitiveEffects } from "@/lib/cognitive-stats";
 
 export async function GET(req: NextRequest) {
   try {
@@ -52,6 +53,9 @@ export async function GET(req: NextRequest) {
         sylph: true,
         timezone: true,
         hasCompletedOnboarding: true,
+        stats: {
+          select: { endurance: true },
+        },
       },
     });
 
@@ -116,7 +120,11 @@ export async function GET(req: NextRequest) {
     const xpToNextLevel = xpForNextLevel(user.level);
     const hasPassword = user.password !== null;
 
-    const { password: _, ...userStats } = user;
+    const { password: _, stats: __stats, ...userStats } = user;
+
+    // Endurance (Aegis): +5 effective max HP per ability tier.
+    const effectiveMaxHp =
+      (user.maxHp || 100) + getCognitiveEffects({ endurance: __stats?.endurance ?? undefined }).bonusMaxHp;
 
     return NextResponse.json(
       {
@@ -124,6 +132,7 @@ export async function GET(req: NextRequest) {
         scholarId,
         xpToNextLevel,
         hasPassword,
+        effectiveMaxHp,
         completedTodaySeconds,
         todayStudySeconds,
         todayStudyMinutes,

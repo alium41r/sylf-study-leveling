@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sun, Moon, Sparkles, ChevronRight, Menu, X } from "lucide-react";
+import { Sun, Moon, Sparkles, ChevronRight, Menu, X, LogIn } from "lucide-react";
 
 interface LandingNavbarProps {
   /** When a fixed logged-in banner sits above the navbar, shift it down. */
@@ -115,6 +115,15 @@ export default function LandingNavbar({ hasBanner = false }: LandingNavbarProps)
             {isLightMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-300" />}
           </button>
 
+          {/* Login Button */}
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold tracking-wider uppercase font-['Rajdhani'] border border-accent-primary-mid/50 hover:border-accent-primary bg-bg-abyss/90 hover:bg-accent-primary-dim/30 text-text-primary hover:text-accent-text-light transition-all shadow-sm cursor-pointer"
+          >
+            <LogIn className="w-3.5 h-3.5 text-accent-cyan" />
+            <span>Log In</span>
+          </Link>
+
           {/* Primary Waitlist CTA */}
           <button
             onClick={() => scrollToSection("waitlist")}
@@ -148,7 +157,14 @@ export default function LandingNavbar({ hasBanner = false }: LandingNavbarProps)
               {link.label}
             </button>
           ))}
-          <div className="pt-3 mt-3 border-t border-border-subtle/60 flex items-center gap-3">
+          <div className="pt-3 mt-3 border-t border-border-subtle/60 flex flex-col gap-2">
+            <Link
+              href="/login"
+              className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase border border-border-subtle hover:border-border-default text-text-primary bg-bg-abyss/80 transition-all cursor-pointer font-['Rajdhani']"
+            >
+              <LogIn className="w-3.5 h-3.5 text-accent-cyan" />
+              <span>Log In</span>
+            </Link>
             <button
               onClick={() => scrollToSection("waitlist")}
               className="w-full btn-primary inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-bold tracking-wider uppercase cursor-pointer"

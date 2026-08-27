@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Sparkles, Sun, Moon } from "lucide-react";
 
 export default function LandingFooter() {
@@ -93,6 +94,11 @@ export default function LandingFooter() {
                 Portal
               </h4>
               <ul className="space-y-2 text-text-secondary">
+                <li>
+                  <Link href="/login" className="hover:text-text-primary text-accent-text-light font-bold">
+                    Log In
+                  </Link>
+                </li>
                 <li>
                   <button onClick={() => scrollTo("waitlist")} className="hover:text-text-primary cursor-pointer text-accent-primary-light font-bold">
                     Join Waitlist

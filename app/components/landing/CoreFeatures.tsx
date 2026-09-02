@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ProductScreenshot from "./ProductScreenshot";
 import {
   Brain,
   TrendingUp,
@@ -38,108 +39,93 @@ interface FeaturePillar {
 const FEATURE_PILLARS: FeaturePillar[] = [
   {
     id: "ai-quests",
-    title: "AI Quest Master",
-    badge: "AI Syllabus Dissection",
-    tagline: "Your curriculum broken down into actionable daily quests.",
+    title: "AI Study Planner",
+    badge: "Study Planner",
+    tagline: "Turn your syllabus into manageable daily study work.",
     description:
-      "Paste your syllabus or topics. The AI creates prioritized daily study quests with calibrated focus targets and XP rewards.",
+      "Give Sylf your syllabus, exam topics, or lecture outlines. It organizes dense material into sequenced daily sessions with realistic focus goals and verified XP.",
     icon: Brain,
     highlights: [
-      "Instant daily missions from raw syllabus notes",
-      "Adaptive difficulty tailored to your pace",
-      "XP and rewards on verified completion",
+      "Turns raw syllabus notes into sequenced daily sessions",
+      "Realistic time estimates calibrated to your pace",
+      "Mark progress as you complete each study block",
     ],
     mockup: { type: "quests" },
   },
   {
-    id: "ranks-leveling",
-    title: "8-Tier Rank Progression",
-    badge: "E → Monarch Ladder",
-    tagline: "Every hour of study counts towards your next rank.",
-    description:
-      "Ascend from Rank E to Monarch. XP thresholds scale with your level so higher ranks reflect genuine academic dedication.",
-    icon: TrendingUp,
-    highlights: [
-      "Mathematical XP progression across 8 tiers",
-      "Unlock titles, badges, and system privileges",
-      "Weekly streak multipliers for consistency",
-    ],
-    mockup: { type: "ranks" },
-  },
-  {
     id: "focus-acoustics",
-    title: "Focus Room & Acoustics",
-    badge: "Deep Work Engine",
-    tagline: "Zero-distraction study timer with ambient acoustics.",
+    title: "Focus Sessions & Timer",
+    badge: "Focus Timer",
+    tagline: "Distraction-free study timer with ambient background soundscapes.",
     description:
-      "Track clean sessions with Pomodoro or stopwatch modes, backed by 40Hz binaural beats, rain, campfire, and brown noise.",
+      "Track clean study sessions with Free Flow, Pomodoro, 52/17, or Sprint modes. Calibrated ambient acoustics (Rain, Night Campfire, Forest Wind, 40Hz binaural) help you lock into deep focus.",
     icon: Headphones,
     highlights: [
-      "Night Campfire, Rain, Forest Wind & Brown Noise",
-      "Light-mode eye-comfort overlay to reduce glare",
-      "Accurate tab-visibility and break tracking",
+      "Seven study techniques including Free Flow, Pomodoro, and 52/17",
+      "Calibrated ambient soundscapes to drown out distractions",
+      "Accurate tab-visibility and background break tracking",
     ],
     mockup: { type: "focus" },
   },
   {
-    id: "stats-matrix",
-    title: "Cognitive Stats Matrix",
-    badge: "5 Core Attributes",
-    tagline: "Measure your real academic stamina and velocity.",
+    id: "ranks-leveling",
+    title: "XP & Rank Progression",
+    badge: "Progression Ladder",
+    tagline: "Every completed study session contributes to visible progression.",
     description:
-      "Track your evolving study stamina across 5 core attributes: Endurance, Tenacity, Velocity, Discipline, and Synthesis.",
+      "Ascend from Rank E to Monarch as you study. Verified XP rewards your genuine hours of focus, turning invisible effort into a clear, satisfying sense of accomplishment.",
+    icon: TrendingUp,
+    highlights: [
+      "Mathematical XP progression across 8 distinct rank tiers",
+      "Earn cosmetic titles, badges, and milestones through real work",
+      "Weekly streak multipliers that reward consistent daily focus",
+    ],
+    mockup: { type: "ranks" },
+  },
+  {
+    id: "study-schedule",
+    title: "Scheduling & Rest Days",
+    badge: "Calendar & Schedule",
+    tagline: "Plan realistic study weeks with built-in rest days and streak shields.",
+    description:
+      "Map weekly goals, schedule upcoming sessions, and set designated rest days so unexpected interruptions never break your consistency.",
+    icon: Calendar,
+    highlights: [
+      "Customizable daily study target minutes",
+      "Designated rest days so you never burn out",
+      "Streak shields that protect your momentum when life interrupts",
+    ],
+    mockup: { type: "schedule" },
+  },
+  {
+    id: "stats-matrix",
+    title: "Progress & Statistics",
+    badge: "Habit Insights",
+    tagline: "See how consistently and effectively you are studying.",
+    description:
+      "Move beyond simple hours. Track your real study habits through Endurance (how long you sustain focus), Tenacity (daily return consistency), and Velocity (planned work completion rate).",
     icon: Layers,
     highlights: [
-      "5 core attributes updated in real time",
-      "Live radar telemetry reflecting actual habits",
-      "Identifies fatigue points and velocity trends",
+      "Endurance: How long you sustain deep focus without breaking",
+      "Tenacity: How consistently you return to studying every day",
+      "Velocity: How reliably you complete planned coursework",
     ],
     mockup: { type: "stats" },
   },
   {
     id: "character-studio",
-    title: "Character & Profile Studio",
-    badge: "Scholar Identity",
-    tagline: "Personalize your scholar dossier and 3D avatar.",
+    title: "Scholar Profile & Identity",
+    badge: "Permanent Record",
+    tagline: "Build a long-term record of your academic dedication.",
     description:
-      "Showcase milestones with 3D avatars, custom titles, banners, pedestals, and verified study statistics.",
+      "Showcase your lifetime study hours, current rank, unlocked cosmetic titles, pedestals, and badges in your personal scholar profile.",
     icon: User,
     highlights: [
-      "Avatars, profile banners, titles, and auras",
-      "Public dossier showing verified hours & rank",
-      "Cosmetics earned through real academic effort",
+      "A comprehensive record of your lifetime study hours and milestones",
+      "Earn titles, pedestals, and badges through dedicated work",
+      "Share verified progress with study partners and friends",
     ],
     mockup: { type: "character" },
-  },
-  {
-    id: "social-leaderboards",
-    title: "Socials & Leaderboards",
-    badge: "Academic Community",
-    tagline: "Connect with study partners, track presence, and climb rankings.",
-    description:
-      "Study alongside friends with live presence, instant co-study invites, and global or friend leaderboards.",
-    icon: Users,
-    highlights: [
-      "Live friend presence and active study status",
-      "Instant co-study invites for synchronized focus",
-      "Weekly leaderboards ranked by verified XP",
-    ],
-    mockup: { type: "social" },
-  },
-  {
-    id: "study-schedule",
-    title: "Study Schedule & Calendar",
-    badge: "Consistency Engine",
-    tagline: "Structured planning with rest days and streak shields.",
-    description:
-      "Map weekly goals, schedule upcoming sessions, and set rest days so unexpected events never break your streak.",
-    icon: Calendar,
-    highlights: [
-      "Customizable daily study target minutes",
-      "Designated rest days & weekly streak shields",
-      "Automatic quest rescheduling for missed days",
-    ],
-    mockup: { type: "schedule" },
   },
 ];
 
@@ -163,19 +149,18 @@ export default function CoreFeatures() {
               fontFamily: "'Rajdhani', sans-serif",
             }}
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>CORE SYSTEM CAPABILITIES</span>
+            <span>Product Tour</span>
           </div>
 
           <h2
             className="text-[26px] leading-tight sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-3 sm:mb-4 tracking-tight text-balance"
             style={{ fontFamily: "'Rajdhani', sans-serif" }}
           >
-            Built For Real Study Sessions, Not Gimmicks
+            Everything you need to build a study system.
           </h2>
 
           <p className="text-[15px] sm:text-lg text-text-secondary leading-relaxed">
-            Designed for real cognitive endurance and genuine academic progression.
+            No decorative gimmicks. Built for real academic workloads, structured planning, and sustained focus.
           </p>
         </div>
 
@@ -234,28 +219,35 @@ export default function CoreFeatures() {
 
             {/* Feature Mockup Preview */}
             <div className="lg:col-span-6">
-              <FeatureMockup type={currentFeature.mockup.type} />
+              <ProductScreenshot
+                title={`Sylf — ${currentFeature.title}`}
+                badge="Live Feature"
+                alt={`Sylf ${currentFeature.title} preview`}
+                aspectRatio="auto"
+              >
+                <FeatureMockup type={currentFeature.mockup.type} />
+              </ProductScreenshot>
             </div>
           </div>
         </div>
 
         {/* ─── Mobile Clean Showcase (4 Core Superpowers) ─── */}
         <div className="md:hidden flex flex-col gap-4">
-          {/* Card 1: AI Quests */}
+          {/* Card 1: AI Study Planner */}
           <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
-                AI Syllabus Dissection
+                Study Planner
               </span>
               <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
                 <Brain className="w-4 h-4" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
-              AI Quest Master
+              AI Study Planner
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Turns raw syllabus notes into bite-sized missions with calibrated XP rewards.
+              Turns dense syllabus notes into sequenced daily study blocks with verified XP rewards.
             </p>
             <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
               <span className="text-text-primary font-bold truncate max-w-[180px]">Calculus: Multivariable</span>
@@ -263,43 +255,21 @@ export default function CoreFeatures() {
             </div>
           </div>
 
-          {/* Card 2: 8-Tier Leveling */}
+          {/* Card 2: Focus Sessions & Timer */}
           <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
-                E → Monarch Progression
-              </span>
-              <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-            </div>
-            <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
-              Rank Ascension
-            </h3>
-            <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Earn XP on verified study sessions and ascend from Rank E to Monarch.
-            </p>
-            <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
-              <span className="text-text-primary font-bold">Rank C • Lv. 14</span>
-              <span className="text-cyan-400 font-bold shrink-0">425 ✦ Sylph</span>
-            </div>
-          </div>
-
-          {/* Card 3: Focus Acoustics */}
-          <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
-                Deep Work Engine
+                Focus Timer
               </span>
               <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
                 <Headphones className="w-4 h-4" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
-              Focus Room & Soundscapes
+              Focus Sessions & Timer
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Distraction-free timer with 40Hz binaural beats, brown noise, and campfire audio.
+              Distraction-free timer with Free Flow, Pomodoro, and calibrated ambient soundscapes.
             </p>
             <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
               <span className="text-text-muted">Soundscape:</span>
@@ -307,21 +277,43 @@ export default function CoreFeatures() {
             </div>
           </div>
 
-          {/* Card 4: Cognitive Stats */}
+          {/* Card 3: XP & Ranks */}
           <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
-                5 Core Attributes
+                Progression Ladder
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
+              XP & Rank Progression
+            </h3>
+            <p className="text-xs text-text-secondary leading-relaxed mb-3">
+              Earn XP on verified study sessions and ascend the 8-tier rank ladder from E to Monarch.
+            </p>
+            <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
+              <span className="text-text-primary font-bold">Rank C • Lv. 14</span>
+              <span className="text-cyan-400 font-bold shrink-0">425 ✦ Sylph</span>
+            </div>
+          </div>
+
+          {/* Card 4: Progress & Statistics */}
+          <div className="p-5 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card relative overflow-hidden">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-accent-text-light font-['Rajdhani']">
+                Habit Insights
               </span>
               <div className="w-8 h-8 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center">
                 <Layers className="w-4 h-4" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-text-primary mb-1.5 font-['Rajdhani']">
-              Cognitive Telemetry
+              Progress & Statistics
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed mb-3">
-              Live attribute radar measuring Endurance, Tenacity, and study velocity.
+              Understand how you study through real metrics: Endurance, Tenacity, and study velocity.
             </p>
             <div className="p-2.5 rounded-xl bg-bg-void/80 border border-border-subtle flex items-center justify-between text-[11px] font-mono">
               <span className="text-purple-300 font-bold">14-Day Streak</span>

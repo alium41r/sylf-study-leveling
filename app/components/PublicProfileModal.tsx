@@ -1420,7 +1420,6 @@ export function PublicProfileModal() {
                         const isAchievementsRestricted =
                           !isEffectiveSelf &&
                           (dossier.recentAchievements === undefined ||
-                           dossier.isRestricted === true ||
                            privacySettings?.showAchievements === false);
 
                         const hasAchievements =

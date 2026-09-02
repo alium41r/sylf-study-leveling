@@ -3,14 +3,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import ProductScreenshot from "./ProductScreenshot";
 import {
-  Sparkles,
   ArrowRight,
   CheckCircle2,
   AlertCircle,
-  BookOpen,
   Brain,
-  Shield,
+  Headphones,
   Clock,
   Loader2,
   Copy,
@@ -38,13 +37,12 @@ export function persistWaitlistPass(data: {
   try {
     localStorage.setItem(PASS_STORAGE_KEY, JSON.stringify(data));
   } catch {
-    // storage unavailable — the in-memory success card still works
+    // storage unavailable
   }
 }
 
 export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
   const [email, setEmail] = useState("");
-  const [targetExam, setTargetExam] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
@@ -73,7 +71,6 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: email.trim(),
-          targetExam: targetExam.trim() || undefined,
           referredBy,
         }),
       });
@@ -117,87 +114,60 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative pt-24 pb-14 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28 overflow-hidden">
-      {/* Background radial glow */}
-      <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[450px] opacity-30 dark:opacity-40 pointer-events-none -z-10"
-        style={{
-          background: "radial-gradient(circle, var(--accent-primary-mid) 0%, rgba(0,0,0,0) 70%)",
-          filter: "blur(60px)",
-        }}
-      />
-
+    <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 md:pt-40 md:pb-28 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-8 items-center">
-          {/* Left Column: Core Value & Waitlist Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          {/* Left Column: Value Proposition & Capture */}
           <motion.div
-            initial={{ opacity: 0, y: 25 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="lg:col-span-7 flex flex-col items-start text-left"
           >
-            {/* System Status Label */}
-            <div
-              className="inline-flex items-center gap-2 mb-5 sm:mb-6 px-3.5 py-1.5 rounded-full text-[10px] sm:text-xs tracking-[0.2em] uppercase font-bold border shadow-sm backdrop-blur-md"
-              style={{
-                background: "var(--accent-primary-dim)",
-                borderColor: "var(--accent-primary-mid)",
-                color: "var(--accent-text-light)",
-                fontFamily: "'Rajdhani', sans-serif",
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-accent-primary-light" />
-              <span>SYSTEM INITIALIZATION // EARLY ACCESS</span>
+            {/* Category / Sub-tag */}
+            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase font-['Rajdhani'] border border-border-subtle bg-bg-abyss/80 text-text-secondary">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-primary" />
+              <span>Gamified Study Operating System</span>
             </div>
 
             {/* Main Headline */}
             <h1
-              className="text-[32px] leading-[1.12] sm:text-5xl md:text-6xl font-extrabold tracking-tight text-text-primary mb-5 sm:mb-6 text-balance"
+              className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-text-primary mb-5 leading-[1.1]"
               style={{ fontFamily: "'Rajdhani', sans-serif" }}
             >
-              Turn Every Study Hour Into{" "}
-              <span
-                style={{
-                  background:
-                    "linear-gradient(135deg, var(--accent-primary-light) 0%, var(--accent-primary) 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  filter: "drop-shadow(0 0 20px var(--accent-primary-dim))",
-                }}
-              >
-                Rank & Progression.
+              Study with purpose.{" "}
+              <span className="text-accent-text-light">
+                Level up every day.
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-[15px] sm:text-lg text-text-secondary mb-6 sm:mb-8 max-w-2xl leading-relaxed text-pretty">
-              Convert coursework into structured AI quests, track deep focus, and level up from Rank E to Monarch.
+            <p className="text-base sm:text-lg text-text-secondary mb-8 max-w-xl leading-relaxed">
+              Sylf turns dense course syllabi into actionable daily quests, tracks your deep focus sessions with ambient acoustics, and awards verified XP to build genuine academic momentum.
             </p>
 
-            {/* Waitlist Capture Card */}
-            <div className="w-full max-w-xl p-5 sm:p-6 rounded-2xl border border-border-subtle bg-bg-abyss shadow-card mb-4">
+            {/* Waitlist Capture Box */}
+            <div className="w-full max-w-xl p-4 sm:p-5 rounded-xl border border-border-subtle bg-bg-abyss/90 shadow-sm mb-6">
               {!successData ? (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1 relative">
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        autoComplete="email"
-                        maxLength={255}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your student email..."
-                        aria-invalid={!!errorMsg}
-                        aria-label="Student email address"
-                        className="input-field w-full text-sm sm:text-base py-3 px-4 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
-                      />
-                    </div>
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      autoComplete="email"
+                      maxLength={255}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your student email..."
+                      aria-invalid={!!errorMsg}
+                      aria-label="Student email address"
+                      className="input-field flex-1 text-sm py-2.5 px-3.5 rounded-lg border border-border-subtle bg-bg-void text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
+                    />
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="btn-primary flex items-center justify-center gap-2 py-3.5 sm:py-3 px-6 rounded-xl text-sm sm:text-base font-bold tracking-wider uppercase cursor-pointer disabled:opacity-70 shadow-lg shrink-0"
+                      className="btn-primary inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-xs sm:text-sm font-bold tracking-wider uppercase cursor-pointer disabled:opacity-60 shadow-sm shrink-0 font-['Rajdhani']"
                     >
                       {isSubmitting ? (
                         <>
@@ -207,66 +177,42 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                       ) : (
                         <>
                           <span>Join Waitlist</span>
-                          <ArrowRight className="w-4 h-4" />
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </>
                       )}
                     </button>
-                  </div>
-
-                  {/* Optional Target Exam or Subject Tag */}
-                  <div className="hidden sm:flex flex-col gap-1 pt-1">
-                    <label
-                      htmlFor="hero-target-exam"
-                      className="text-[10px] uppercase tracking-wider font-bold text-text-muted font-['Rajdhani']"
-                    >
-                      Goal / Exam <span className="text-text-muted/60 normal-case font-medium tracking-normal">(optional)</span>
-                    </label>
-                    <input
-                      id="hero-target-exam"
-                      name="targetExam"
-                      type="text"
-                      maxLength={100}
-                      value={targetExam}
-                      onChange={(e) => setTargetExam(e.target.value)}
-                      placeholder="e.g. MCAT, A-Levels, Computer Science"
-                      className="text-[12px] sm:text-xs py-2.5 px-3 rounded-lg border border-border-subtle/70 bg-bg-void/40 text-text-secondary placeholder:text-text-muted/60 focus:border-accent-primary/60 focus:outline-none w-full transition-colors"
-                    />
                   </div>
 
                   {errorMsg && (
                     <div
                       role="alert"
                       aria-live="polite"
-                      className="flex items-center gap-2 text-xs text-red-400 mt-1"
+                      className="flex items-center gap-2 text-xs text-red-400 mt-0.5"
                     >
                       <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                       <span>{errorMsg}</span>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between mt-1.5 flex-wrap gap-2 text-[11px] text-text-muted">
-                    <p className="flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5 text-accent-primary-light shrink-0" />
-                      <span>Free rolling beta waves • Zero spam</span>
-                    </p>
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-text-muted">
+                    <span>Free rolling beta access • No credit card</span>
                     <Link
                       href="/login"
-                      className="text-accent-cyan hover:underline font-['Rajdhani'] font-bold uppercase tracking-wider text-xs inline-flex items-center gap-1"
+                      className="text-text-secondary hover:text-text-primary hover:underline font-medium"
                     >
-                      <span>Already a Scholar? Log In</span>
-                      <ArrowRight className="w-3 h-3" />
+                      Already registered? Log in
                     </Link>
                   </div>
                 </form>
               ) : (
-                /* Success Confirmation State */
+                /* Success Card */
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   className="flex flex-col gap-3 py-1"
                 >
-                  <div className="flex items-center gap-2.5 text-emerald-400 font-semibold text-sm">
-                    <CheckCircle2 className="w-5 h-5 shrink-0" />
+                  <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs sm:text-sm">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
                     <span>
                       {successData.alreadyRegistered
                         ? "You're already on the waitlist!"
@@ -278,12 +224,12 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                     You hold position <strong className="text-text-primary">#{successData.position}</strong>. We will email you when your beta wave opens.
                   </p>
 
-                  <div className="p-3 rounded-xl border border-accent-primary-mid/40 bg-accent-primary-dim/20 flex items-center justify-between gap-3">
+                  <div className="p-3 rounded-lg border border-border-subtle bg-bg-void/80 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <span className="text-[10px] uppercase font-bold tracking-widest text-accent-text-light font-['Rajdhani']">
-                        Your Scholar Referral Code
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-text-muted font-['Rajdhani']">
+                        Queue #{successData.position} • Code
                       </span>
-                      <p className="text-sm font-mono font-bold text-text-primary truncate">
+                      <p className="text-xs sm:text-sm font-mono font-bold text-text-primary truncate">
                         {successData.referralCode}
                       </p>
                     </div>
@@ -292,164 +238,145 @@ export default function HeroSection({ onSuccessSignup }: HeroSectionProps) {
                       className="px-3 py-1.5 rounded-lg bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:opacity-90 transition-opacity cursor-pointer shrink-0 inline-flex items-center gap-1.5"
                     >
                       <Copy className="w-3.5 h-3.5" />
-                      <span>{copySuccess ? "Copied!" : "Copy Link"}</span>
+                      <span>{copySuccess ? "Copied" : "Copy Link"}</span>
                     </button>
                   </div>
                 </motion.div>
               )}
             </div>
 
-            {/* Micro Trust Points */}
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-[13px] text-text-muted pt-1">
-              <span className="flex items-center gap-1.5">
+            {/* Key Differentiators / Value Points */}
+            <div className="flex flex-wrap items-center gap-5 sm:gap-6 text-xs text-text-secondary">
+              <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Zero Setup Required</span>
-              </span>
-              <span className="flex items-center gap-1.5">
+                <span>Structured Syllabus Breakdown</span>
+              </div>
+              <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>AI Syllabus Engine</span>
-              </span>
-              <span className="hidden sm:flex items-center gap-1.5">
+                <span>Clean Focus Timer & Acoustics</span>
+              </div>
+              <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Built for Serious Academics</span>
-              </span>
+                <span>8-Tier Progression Ladder</span>
+              </div>
             </div>
           </motion.div>
 
-          {/* Right Column: Live Interface Mockup (Authentic Sylf UI) */}
-          {/* Hidden on phones — the hero stays focused on one CTA on mobile;
-              product mockups still appear in Core Features below. */}
+          {/* Right Column: Live Interface Mockup */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-            className="hidden md:block lg:col-span-5 relative"
+            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+            className="lg:col-span-5 relative"
           >
-            {/* Ambient Back Glow */}
-            <div className="absolute inset-0 bg-accent-primary/20 rounded-3xl blur-2xl -z-10 transform scale-95" />
-
-            {/* Authentic Sylf System Window Card */}
-            <div
-              className="system-card rounded-2xl border border-border-active bg-bg-abyss/90 backdrop-blur-xl shadow-2xl p-5 sm:p-6 relative overflow-hidden"
-              style={{ borderColor: "var(--border-active)" }}
+            <ProductScreenshot
+              title="sylf.app / workspace"
+              badge="Dashboard"
+              alt="Sylf scholar workspace showing active quest and XP progress"
+              aspectRatio="auto"
             >
-              {/* Window Header */}
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-border-subtle">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-accent-primary-dim border border-accent-primary-mid flex items-center justify-center font-['Rajdhani'] font-bold text-accent-text-light text-base">
-                    C
+              <div className="flex flex-col gap-3.5 text-left text-xs">
+                {/* Profile Strip */}
+                <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-accent-primary-dim border border-accent-primary-mid/60 flex items-center justify-center font-['Rajdhani'] font-bold text-accent-text-light text-xs">
+                      C
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-text-primary font-['Rajdhani'] uppercase tracking-wider text-xs">
+                          Scholar Dossier
+                        </span>
+                        <span className="text-[10px] px-1 py-0.2 rounded bg-accent-primary-dim text-accent-text-light font-mono font-semibold">
+                          Lv. 14
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-text-muted font-mono">
+                        Rank C • Pure Mathematics & Biology
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-text-primary font-['Rajdhani'] uppercase tracking-wider">
-                        Scholar Dossier
+
+                  <div className="text-right font-mono">
+                    <span className="text-[10px] uppercase text-text-muted block font-['Rajdhani'] font-bold">
+                      Sylph Currency
+                    </span>
+                    <span className="text-xs font-bold text-cyan-400">425 ✦</span>
+                  </div>
+                </div>
+
+                {/* Level Progress */}
+                <div>
+                  <div className="flex justify-between text-[11px] font-['Rajdhani'] font-bold mb-1">
+                    <span className="text-text-muted uppercase tracking-wider">Rank XP</span>
+                    <span className="text-accent-primary-light font-mono">
+                      1,420 / 1,850 XP (76%)
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-bg-void overflow-hidden border border-border-subtle">
+                    <div
+                      className="h-full rounded-full bg-accent-primary"
+                      style={{ width: "76%" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Active Focus Session */}
+                <div className="p-3 rounded-lg border border-accent-primary-mid/40 bg-accent-primary-dim/15">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text-light font-['Rajdhani'] flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> Active Study Session
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-semibold">
+                      In Flow
+                    </span>
+                  </div>
+                  <p className="text-xs font-bold text-text-primary font-['Rajdhani'] mb-1">
+                    Calculus: Multivariable Optimization
+                  </p>
+                  <div className="flex items-center justify-between text-[10px] text-text-muted font-mono">
+                    <span>32:14 remaining</span>
+                    <span className="flex items-center gap-1 text-accent-primary-light">
+                      <Headphones className="w-2.5 h-2.5" /> 40Hz Binaural Acoustics
+                    </span>
+                  </div>
+                </div>
+
+                {/* Upcoming Quests */}
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted font-['Rajdhani']">
+                    Next in Queue
+                  </span>
+                  <div className="p-2.5 rounded-lg border border-border-subtle bg-bg-void/60 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Brain className="w-3.5 h-3.5 text-accent-primary-light shrink-0" />
+                      <span className="text-[11px] font-medium text-text-primary truncate">
+                        Organic Synthesis Reaction Sets #4
                       </span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent-primary-dim text-accent-text-light font-mono font-bold">
-                        Lv. 14
-                      </span>
                     </div>
-                    <p className="text-[11px] text-text-muted font-mono">
-                      Rank C • Pure Mathematics & Biology
-                    </p>
+                    <span className="text-[10px] font-mono text-text-muted shrink-0">
+                      60m • +200 XP
+                    </span>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-[10px] uppercase font-bold text-text-muted tracking-wider block font-['Rajdhani']">
-                    Sylph Balance
-                  </span>
-                  <span className="text-xs font-mono font-bold text-cyan-400">
-                    425 ✦
-                  </span>
-                </div>
-              </div>
-
-              {/* Live XP Level Bar */}
-              <div className="mb-5">
-                <div className="flex justify-between text-xs font-['Rajdhani'] font-bold mb-1.5">
-                  <span className="text-text-muted uppercase tracking-wider">Experience</span>
-                  <span className="text-accent-primary-light font-mono text-[11px]">
-                    1,420 / 1,850 XP (76%)
-                  </span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-bg-shadow overflow-hidden border border-border-subtle">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-accent-primary to-accent-primary-light"
-                    style={{ width: "76%" }}
-                  />
-                </div>
-              </div>
-
-              {/* Active AI Study Quests */}
-              <div className="space-y-2.5 mb-5">
-                <div className="flex items-center justify-between text-xs font-['Rajdhani'] font-bold uppercase tracking-wider text-text-muted">
-                  <span>Active AI Quests</span>
-                  <span className="text-emerald-400 font-mono text-[10px]">2 in progress</span>
-                </div>
-
-                {/* Quest Item 1 */}
-                <div className="p-3 rounded-xl border border-border-subtle bg-bg-void/60 flex items-center justify-between gap-3 hover:border-accent-primary/50 transition-colors">
-                  <div className="flex items-start gap-2.5 min-w-0">
-                    <div className="w-6 h-6 rounded-lg bg-accent-primary-dim text-accent-primary-light flex items-center justify-center shrink-0 mt-0.5">
-                      <Brain className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-text-primary truncate font-['Rajdhani']">
-                        Calculus: Multivariable Optimization
-                      </p>
-                      <p className="text-[10px] text-text-muted flex items-center gap-1.5 font-mono">
-                        <Clock className="w-2.5 h-2.5" /> 45 min focus • +150 XP
-                      </p>
-                    </div>
+                {/* Metrics */}
+                <div className="pt-2 border-t border-border-subtle grid grid-cols-3 gap-2 text-center text-[10px]">
+                  <div className="p-1.5 rounded bg-bg-void/40 border border-border-subtle">
+                    <span className="text-text-muted font-['Rajdhani'] uppercase block font-bold">Focus Today</span>
+                    <span className="font-mono font-bold text-text-primary">2h 45m</span>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded font-bold font-['Rajdhani'] uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/30 shrink-0">
-                    Active
-                  </span>
-                </div>
-
-                {/* Quest Item 2 */}
-                <div className="p-3 rounded-xl border border-border-subtle bg-bg-void/60 flex items-center justify-between gap-3 hover:border-accent-primary/50 transition-colors">
-                  <div className="flex items-start gap-2.5 min-w-0">
-                    <div className="w-6 h-6 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                      <BookOpen className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-text-primary truncate font-['Rajdhani']">
-                        Organic Reaction Synthesis Set #4
-                      </p>
-                      <p className="text-[10px] text-text-muted flex items-center gap-1.5 font-mono">
-                        <Clock className="w-2.5 h-2.5" /> 60 min focus • +200 XP
-                      </p>
-                    </div>
+                  <div className="p-1.5 rounded bg-bg-void/40 border border-border-subtle">
+                    <span className="text-text-muted font-['Rajdhani'] uppercase block font-bold">Consistency</span>
+                    <span className="font-mono font-bold text-emerald-400">14-Day Streak</span>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded font-bold font-['Rajdhani'] uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30 shrink-0">
-                    Ready
-                  </span>
+                  <div className="p-1.5 rounded bg-bg-void/40 border border-border-subtle">
+                    <span className="text-text-muted font-['Rajdhani'] uppercase block font-bold">Quests Done</span>
+                    <span className="font-mono font-bold text-accent-primary-light">12 / 15</span>
+                  </div>
                 </div>
               </div>
-
-              {/* Cognitive Stats Strip */}
-              <div className="pt-3 border-t border-border-subtle grid grid-cols-3 gap-2 text-center">
-                <div className="p-2 rounded-lg bg-bg-void/40 border border-border-subtle/50">
-                  <span className="text-[9px] uppercase font-bold text-text-muted tracking-wider block font-['Rajdhani']">
-                    Endurance
-                  </span>
-                  <span className="text-xs font-bold font-mono text-text-primary">48 / 100</span>
-                </div>
-                <div className="p-2 rounded-lg bg-bg-void/40 border border-border-subtle/50">
-                  <span className="text-[9px] uppercase font-bold text-text-muted tracking-wider block font-['Rajdhani']">
-                    Tenacity
-                  </span>
-                  <span className="text-xs font-bold font-mono text-emerald-400">14 Day Streak</span>
-                </div>
-                <div className="p-2 rounded-lg bg-bg-void/40 border border-border-subtle/50">
-                  <span className="text-[9px] uppercase font-bold text-text-muted tracking-wider block font-['Rajdhani']">
-                    Velocity
-                  </span>
-                  <span className="text-xs font-bold font-mono text-purple-400">3.4 Quests/Day</span>
-                </div>
-              </div>
-            </div>
+            </ProductScreenshot>
           </motion.div>
         </div>
       </div>

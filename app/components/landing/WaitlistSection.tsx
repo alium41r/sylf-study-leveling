@@ -3,12 +3,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
-  Sparkles,
   ArrowRight,
   CheckCircle2,
   AlertCircle,
   Copy,
-  Share2,
   Shield,
   Loader2,
   RefreshCcw,
@@ -23,10 +21,7 @@ export interface WaitlistPass {
 }
 
 interface WaitlistSectionProps {
-  /** Set right after a fresh hero signup so the pass card appears without
-   *  an extra round-trip and without being mislabeled as a returning user. */
   initialPass?: WaitlistPass | null;
-  /** Backwards-compatible: still supports an externally fetched code. */
   initialCode?: string | null;
 }
 
@@ -36,7 +31,7 @@ function persistPass(pass: WaitlistPass) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(pass));
   } catch {
-    // storage unavailable (private mode / disabled) — pass still works in-memory
+    // storage unavailable
   }
 }
 
@@ -55,7 +50,7 @@ function readStoredPass(): WaitlistPass | null {
       };
     }
   } catch {
-    // corrupted entry — ignore
+    // corrupted entry
   }
   return null;
 }
@@ -71,14 +66,12 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
   const [waitlistPass, setWaitlistPass] = useState<WaitlistPass | null>(null);
 
   useEffect(() => {
-    // 1. Fresh hero signup — the parent hands us the pass directly.
     if (initialPass) {
       setWaitlistPass(initialPass);
       persistPass(initialPass);
       return;
     }
 
-    // 2. Explicit recovery link (?pass=CODE) — fetch the pass from the server.
     const urlParams = new URLSearchParams(window.location.search);
     const code = initialCode || urlParams.get("pass");
     if (code) {
@@ -101,9 +94,6 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
       return;
     }
 
-    // 3. Returning visitor — restore their saved pass so the section keeps
-    //    showing "you're already in" instead of silently asking them to
-    //    re-submit an email that is already registered.
     const saved = readStoredPass();
     if (saved) {
       setWaitlistPass(saved);
@@ -157,12 +147,11 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
     }
   };
 
-  // Lets a shared device / second scholar re-open the form.
   const handleResetPass = useCallback(() => {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch {
-      /* ignore */
+      // ignore
     }
     setWaitlistPass(null);
     setEmail("");
@@ -185,65 +174,45 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
 
   const handleShareTwitter = () => {
     const text = encodeURIComponent(
-      "I just joined the early access waitlist for Sylf — the AI-powered gamified study leveling system. Join the next beta wave with me:"
+      "I just joined the early access waitlist for Sylf — the gamified study leveling system. Check it out here:"
     );
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(shareUrl)}`, "_blank");
   };
 
   const handleShareWhatsApp = () => {
     const text = encodeURIComponent(
-      `Check out Sylf — turns studying into an RPG with AI quests and leveling: ${shareUrl}`
+      `Check out Sylf — turns study sessions into structured quests with leveling: ${shareUrl}`
     );
     window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
   };
 
   return (
     <section id="waitlist" className="py-16 sm:py-20 md:py-28 relative">
-      {/* Background Glow */}
-      <div
-        className="absolute inset-0 opacity-20 pointer-events-none -z-10"
-        style={{
-          background: "radial-gradient(circle at 50% 50%, var(--accent-primary-dim) 0%, transparent 70%)",
-        }}
-      />
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-6 sm:p-12 rounded-2xl sm:rounded-3xl border border-border-active bg-bg-abyss shadow-2xl relative overflow-hidden">
-          {/* Top Decorative Border */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-accent-primary to-transparent opacity-80" />
-
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="p-6 sm:p-10 rounded-2xl border border-border-subtle bg-bg-abyss/90 shadow-md relative overflow-hidden">
           {!waitlistPass ? (
-            /* ─── Form State ───────────────────────────────────── */
+            /* Form View */
             <div className="text-center">
-              <div
-                className="inline-flex items-center gap-2 mb-4 px-3.5 py-1.5 rounded-full text-xs tracking-[0.2em] uppercase font-bold border"
-                style={{
-                  background: "var(--accent-primary-dim)",
-                  borderColor: "var(--accent-primary-mid)",
-                  color: "var(--accent-text-light)",
-                  fontFamily: "'Rajdhani', sans-serif",
-                }}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>EARLY ACCESS INVITATION</span>
+              <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase font-['Rajdhani'] border border-border-subtle bg-bg-abyss/80 text-text-secondary">
+                <span>Early Access Beta</span>
               </div>
 
               <h2
-                className="text-[26px] leading-tight sm:text-4xl md:text-5xl font-extrabold text-text-primary mb-3 sm:mb-4 tracking-tight text-balance"
+                className="text-3xl sm:text-4xl font-extrabold text-text-primary mb-3 tracking-tight"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
-                Secure Your Scholar Access Pass
+                Join the Early Access Waitlist
               </h2>
 
-              <p className="text-sm sm:text-base text-text-secondary max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed">
-                Join the waitlist for rolling beta access. Free forever, zero spam.
+              <p className="text-sm sm:text-base text-text-secondary max-w-lg mx-auto mb-6 leading-relaxed">
+                Reserve your spot for upcoming beta cohorts. Completely free during early access with zero spam.
               </p>
 
-              <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4 text-left">
+              <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-3.5 text-left">
                 <div>
                   <label
                     htmlFor="waitlist-email"
-                    className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5"
+                    className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1"
                   >
                     Student Email Address *
                   </label>
@@ -258,15 +227,15 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="e.g. scholar@university.edu"
                     aria-invalid={!!errorMsg}
-                    className="input-field w-full text-sm sm:text-base py-3 px-4 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
+                    className="input-field w-full text-sm py-2.5 px-3.5 rounded-lg border border-border-subtle bg-bg-void text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label
                       htmlFor="waitlist-name"
-                      className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5"
+                      className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1"
                     >
                       Name or Handle (Optional)
                     </label>
@@ -279,14 +248,14 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Alex"
-                      className="input-field w-full text-sm py-3 px-3 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
+                      className="input-field w-full text-sm py-2.5 px-3 rounded-lg border border-border-subtle bg-bg-void text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="waitlist-target-exam"
-                      className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5"
+                      className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1"
                     >
                       Target Exam / Field
                     </label>
@@ -298,7 +267,7 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                       value={targetExam}
                       onChange={(e) => setTargetExam(e.target.value)}
                       placeholder="e.g. MCAT, CS, A-Levels"
-                      className="input-field w-full text-sm py-3 px-3 rounded-xl border border-border-subtle bg-bg-void/80 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
+                      className="input-field w-full text-sm py-2.5 px-3 rounded-lg border border-border-subtle bg-bg-void text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
@@ -307,9 +276,9 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                   <div
                     role="alert"
                     aria-live="polite"
-                    className="flex items-center gap-2 text-xs text-red-400 p-2.5 rounded-lg bg-red-500/10 border border-red-500/30"
+                    className="flex items-center gap-2 text-xs text-red-400 p-2 rounded-lg bg-red-500/10 border border-red-500/20"
                   >
-                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{errorMsg}</span>
                   </div>
                 )}
@@ -317,12 +286,12 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary w-full py-4 sm:py-3.5 rounded-xl text-base font-bold tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-xl disabled:opacity-70 mt-2"
+                  className="btn-primary w-full py-3 rounded-lg text-sm font-bold tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-60 font-['Rajdhani'] mt-2"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Securing Access Pass...</span>
+                      <span>Securing Pass...</span>
                     </>
                   ) : (
                     <>
@@ -332,112 +301,107 @@ export default function WaitlistSection({ initialPass, initialCode }: WaitlistSe
                   )}
                 </button>
 
-                <p className="text-[11px] text-text-muted text-center flex items-center justify-center gap-1.5 pt-2">
+                <p className="text-[11px] text-text-muted text-center flex items-center justify-center gap-1.5 pt-1">
                   <Shield className="w-3.5 h-3.5 text-accent-primary-light" />
-                  <span>Strictly for beta notifications. Zero spam.</span>
+                  <span>Strictly for cohort notifications. Zero spam.</span>
                 </p>
               </form>
             </div>
           ) : (
-            /* ─── Confirmed Access Pass ────────────────────────── */
+            /* Digital Pass View */
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center max-w-xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center max-w-lg mx-auto"
             >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto mb-3">
+                <CheckCircle2 className="w-5 h-5" />
               </div>
 
-              <span className="text-xs uppercase font-bold tracking-widest text-emerald-400 font-['Rajdhani'] block mb-1">
+              <span className="text-xs uppercase font-bold tracking-wider text-emerald-400 font-['Rajdhani'] block mb-1">
                 {waitlistPass.alreadyRegistered ? "WELCOME BACK" : "ACCESS PASS INITIALIZED"}
               </span>
 
               <h3
-                className="text-2xl sm:text-3xl font-extrabold text-text-primary mb-2 text-balance"
+                className="text-2xl font-extrabold text-text-primary mb-2"
                 style={{ fontFamily: "'Rajdhani', sans-serif" }}
               >
                 You Are #{waitlistPass.position} on the Waitlist
               </h3>
 
-              <p className="text-xs sm:text-sm text-text-secondary mb-6 leading-relaxed">
-                Admitting scholars in rolling batches. We'll email you when your wave opens.
+              <p className="text-xs sm:text-sm text-text-secondary mb-5 leading-relaxed">
+                We are onboarding scholars in rolling cohorts. We will email your invite link as soon as your batch opens.
               </p>
 
-              {/* Digital Pass Card */}
-              <div className="p-4 sm:p-5 rounded-2xl border border-accent-primary-mid/50 bg-bg-void/90 text-left mb-6 shadow-inner font-mono">
-                <div className="flex justify-between items-center pb-3 mb-3 border-b border-border-subtle text-xs">
+              {/* Scholar Digital Pass Card */}
+              <div className="p-4 rounded-xl border border-border-subtle bg-bg-void/90 text-left mb-5 font-mono text-xs shadow-inner">
+                <div className="flex justify-between items-center pb-2.5 mb-2.5 border-b border-border-subtle">
                   <span className="text-accent-primary-light font-bold font-['Rajdhani'] uppercase tracking-wider">
                     SYLF SCHOLAR PASS
                   </span>
-                  <span className="text-emerald-400 font-bold">STATUS: CONFIRMED</span>
+                  <span className="text-emerald-400 font-semibold">STATUS: CONFIRMED</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-xs mb-3">
+                <div className="grid grid-cols-2 gap-3 mb-2.5">
                   <div>
-                    <span className="text-[10px] text-text-muted uppercase block">Queue Number</span>
+                    <span className="text-[10px] text-text-muted uppercase block">Queue Position</span>
                     <span className="text-sm font-bold text-text-primary">#{waitlistPass.position}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-text-muted uppercase block">Pass Code</span>
-                    <span className="text-sm font-bold text-accent-primary-light truncate block">
+                    <span className="text-sm font-bold text-accent-text-light truncate block">
                       {waitlistPass.referralCode}
                     </span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-border-subtle/50 flex justify-between text-[11px] text-text-secondary">
+                <div className="pt-2 border-t border-border-subtle/50 flex justify-between text-[11px] text-text-muted">
                   <span>Goal: {waitlistPass.targetExam || "General Academic"}</span>
-                  <span>Invited Scholars: {waitlistPass.referralCount}</span>
+                  <span>Invited: {waitlistPass.referralCount}</span>
                 </div>
               </div>
 
-              {/* Referral Sharing Action Block */}
+              {/* Share Actions */}
               <div className="space-y-3">
-                <p className="text-xs text-text-muted font-medium">
-                  Invite friends to move up in line:
-                </p>
-
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     readOnly
                     aria-label="Your referral link"
                     value={shareUrl}
-                    className="text-xs py-2.5 px-3 rounded-xl border border-border-subtle bg-bg-void text-text-secondary w-full select-all font-mono"
+                    className="text-xs py-2 px-3 rounded-lg border border-border-subtle bg-bg-void text-text-secondary w-full select-all font-mono"
                   />
                   <button
                     onClick={handleCopyLink}
-                    className="btn-primary py-2.5 px-4 rounded-xl text-xs font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center gap-1.5 shrink-0 cursor-pointer"
+                    className="btn-primary py-2 px-3.5 rounded-lg text-xs font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center gap-1.5 shrink-0 cursor-pointer"
                   >
                     <Copy className="w-3.5 h-3.5" />
-                    <span>{copySuccess ? "Copied!" : "Copy"}</span>
+                    <span>{copySuccess ? "Copied" : "Copy"}</span>
                   </button>
                 </div>
 
-                <div className="flex items-center justify-center gap-3 pt-2">
+                <div className="flex items-center justify-center gap-2.5 pt-1">
                   <button
                     onClick={handleShareTwitter}
-                    className="px-4 py-2 rounded-xl border border-border-subtle bg-bg-void/80 hover:border-accent-primary text-text-secondary hover:text-text-primary text-xs font-semibold font-['Rajdhani'] uppercase tracking-wider transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-lg border border-border-subtle bg-bg-void hover:border-accent-primary text-text-secondary hover:text-text-primary text-xs font-semibold font-['Rajdhani'] uppercase tracking-wider transition-colors cursor-pointer"
                   >
                     Share on X
                   </button>
                   <button
                     onClick={handleShareWhatsApp}
-                    className="px-4 py-2 rounded-xl border border-border-subtle bg-bg-void/80 hover:border-emerald-500/50 text-text-secondary hover:text-text-primary text-xs font-semibold font-['Rajdhani'] uppercase tracking-wider transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-lg border border-border-subtle bg-bg-void hover:border-emerald-500/40 text-text-secondary hover:text-text-primary text-xs font-semibold font-['Rajdhani'] uppercase tracking-wider transition-colors cursor-pointer"
                   >
                     Share on WhatsApp
                   </button>
                 </div>
 
-                <div className="pt-3 border-t border-border-subtle/50 flex items-center justify-center gap-1.5">
-                  <Share2 className="w-3.5 h-3.5 text-text-muted" />
+                <div className="pt-2 border-t border-border-subtle/40">
                   <button
                     onClick={handleResetPass}
-                    className="text-[11px] text-text-muted hover:text-text-primary transition-colors inline-flex items-center gap-1 font-semibold cursor-pointer"
+                    className="text-[11px] text-text-muted hover:text-text-primary transition-colors inline-flex items-center gap-1 font-medium cursor-pointer"
                   >
                     <RefreshCcw className="w-3 h-3" />
-                    Join with a different email
+                    <span>Join with a different email</span>
                   </button>
                 </div>
               </div>

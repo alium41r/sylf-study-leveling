@@ -241,8 +241,14 @@ describe("Focus Tools Dock & Expandable Window System", () => {
       const nPrRes = evaluateMathExpression("5 nPr 2");
       expect(nPrRes.result).toBe("20");
 
-      const nCrRes = evaluateMathExpression("5 nCr 2");
-      expect(nCrRes.result).toBe("10");
+      const divRes = evaluateMathExpression("4 ÷ 6");
+      expect(divRes.result).toBe("0.666666666667");
+
+      const parenthesizedFact = evaluateMathExpression("(3+2)!");
+      expect(parenthesizedFact.result).toBe("120");
+
+      const modRes = evaluateMathExpression("17 mod 5");
+      expect(modRes.result).toBe("2");
     });
 
     it("performs basic addition and handles operations in keypad", () => {

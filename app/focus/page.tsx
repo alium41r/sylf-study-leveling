@@ -191,9 +191,27 @@ function FocusContent() {
       if (saved) {
         const parsed = JSON.parse(saved);
         const active = parsed.modes?.find((m: ModeConfig) => m.isActive);
-        if (active) setActiveMode(active);
+        if (active) {
+          setActiveMode(active);
+          return;
+        }
       }
-    } catch { /* default to freeflow */ }
+    } catch { /* default to pomodoro/freeflow */ }
+
+    setActiveMode({
+      id: "pomodoro",
+      name: "Pomodoro",
+      isActive: true,
+      settings: [
+        { key: "focusDuration", value: 25 },
+        { key: "shortBreak", value: 5 },
+        { key: "longBreak", value: 15 },
+        { key: "sessionsBeforeLong", value: 4 },
+        { key: "autoStartBreaks", value: true },
+        { key: "autoStartFocus", value: false },
+        { key: "endChime", value: true },
+      ],
+    });
 
     // Load persisted epoch snapshot (new format) or a legacy cache entry.
     try {
@@ -1268,6 +1286,8 @@ function FocusContent() {
       : sprintIntensity === "Medium"
       ? "#fbbf24"
       : "#fb923c"
+    : activeMode?.id === "freeflow" && phase === "focus"
+    ? "#10b981"
     : "var(--accent-primary)";
 
   // Mode display name
@@ -1377,6 +1397,12 @@ function FocusContent() {
             Break over — press Resume to continue focusing
           </p>
         )}
+        {/* Manual pause hint */}
+        {isPaused && pauseReason === "manual" && (
+          <p className="mt-2 font-mono text-xs sm:text-sm text-accent-gold/80 font-['Rajdhani'] font-bold uppercase tracking-wider">
+            Session paused — press Resume to continue
+          </p>
+        )}
 
         {/* Flowtime stretch-break nudge */}
         {flowNudge && (
@@ -1438,8 +1464,8 @@ function FocusContent() {
 
       {/* ─── Bottom Action Controls ──────────────── */}
       <div className="w-full flex flex-wrap justify-center items-center gap-3 sm:gap-4 shrink-0 z-10 px-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-        {/* Pause/Resume (for countdown modes + any paused state) */}
-        {phase !== "done" && (isCountdown || isPaused) && (
+        {/* Pause/Resume button */}
+        {phase !== "done" && (
           <button
             onClick={handleTogglePause}
             className="flex items-center gap-3 px-6 py-3 rounded-full bg-bg-panel hover:bg-bg-shadow hover:scale-105 active:scale-95 transition-all duration-200 border border-border-subtle hover:border-accent-primary-mid shadow-lg text-text-primary"

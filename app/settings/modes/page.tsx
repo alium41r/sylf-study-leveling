@@ -255,79 +255,95 @@ function ModeCard({
         }}
       >
         <div style={{ padding: "0 24px 20px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-          <div style={{ paddingTop: "16px" }}>
-            {mode.settings.map((setting) => (
-              <div
-                key={setting.key}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "16px",
-                  padding: "10px 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.03)",
-                }}
-              >
-                <span
+          {mode.settings.length > 0 ? (
+            <div style={{ paddingTop: "16px" }}>
+              {mode.settings.map((setting) => (
+                <div
+                  key={setting.key}
                   style={{
-                    fontFamily: "'Rajdhani', sans-serif",
-                    fontSize: "0.82rem",
-                    color: "var(--text-secondary)",
-                    minWidth: "120px",
-                    flexShrink: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "16px",
+                    padding: "10px 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.03)",
                   }}
                 >
-                  {setting.label}
-                </span>
+                  <span
+                    style={{
+                      fontFamily: "'Rajdhani', sans-serif",
+                      fontSize: "0.82rem",
+                      color: "var(--text-secondary)",
+                      minWidth: "120px",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {setting.label}
+                  </span>
 
-                {setting.type === "toggle" && (
-                  <ToggleSwitch
-                    value={setting.value as boolean}
-                    onChange={(v) => onSettingChange(setting.key, v)}
-                    color={mode.color}
-                  />
-                )}
+                  {setting.type === "toggle" && (
+                    <ToggleSwitch
+                      value={setting.value as boolean}
+                      onChange={(v) => onSettingChange(setting.key, v)}
+                      color={mode.color}
+                    />
+                  )}
 
-                {setting.type === "range" && (
-                  <RangeSlider
-                    value={setting.value as number}
-                    onChange={(v) => onSettingChange(setting.key, v)}
-                    min={setting.min || 0}
-                    max={setting.max || 100}
-                    unit={setting.unit}
-                    color={mode.color}
-                  />
-                )}
+                  {setting.type === "range" && (
+                    <RangeSlider
+                      value={setting.value as number}
+                      onChange={(v) => onSettingChange(setting.key, v)}
+                      min={setting.min || 0}
+                      max={setting.max || 100}
+                      unit={setting.unit}
+                      color={mode.color}
+                    />
+                  )}
 
-                {setting.type === "select" && (
-                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                    {setting.options?.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => onSettingChange(setting.key, opt)}
-                        style={{
-                          padding: "4px 10px",
-                          borderRadius: "4px",
-                          fontFamily: "'Rajdhani', sans-serif",
-                          fontWeight: 600,
-                          fontSize: "0.7rem",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          background: setting.value === opt ? `${mode.color}20` : "transparent",
-                          border: setting.value === opt ? `1px solid ${mode.color}40` : "1px solid rgba(255,255,255,0.06)",
-                          color: setting.value === opt ? mode.color : "var(--text-muted)",
-                          cursor: "pointer",
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  {setting.type === "select" && (
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      {setting.options?.map((opt) => (
+                        <button
+                          key={opt}
+                          onClick={() => onSettingChange(setting.key, opt)}
+                          style={{
+                            padding: "4px 10px",
+                            borderRadius: "4px",
+                            fontFamily: "'Rajdhani', sans-serif",
+                            fontWeight: 600,
+                            fontSize: "0.7rem",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                            background: setting.value === opt ? `${mode.color}20` : "transparent",
+                            border: setting.value === opt ? `1px solid ${mode.color}40` : "1px solid rgba(255,255,255,0.06)",
+                            color: setting.value === opt ? mode.color : "var(--text-muted)",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                          }}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ paddingTop: "16px", paddingBottom: "4px" }}>
+              <p
+                style={{
+                  fontFamily: "'Rajdhani', sans-serif",
+                  fontSize: "0.85rem",
+                  color: "var(--text-secondary)",
+                  margin: 0,
+                  lineHeight: 1.6,
+                }}
+              >
+                Continuous stopwatch focus with manual pause and finish controls. No fixed blocks, alarms, or countdown limits.
+              </p>
+            </div>
+          )}
 
           <button
             onClick={onActivate}
@@ -361,6 +377,19 @@ function ModeCard({
 const ICON_SIZE = "w-5 h-5";
 
 const DEFAULT_MODES: StudyMode[] = [
+  {
+    id: "freeflow",
+    name: "Free Flow",
+    description: "Open-ended, unconstrained study session. Start when you're ready, pause as needed, and stop whenever you want.",
+    bestFor: "Self-paced study, unstructured sessions, and deep focus without alarms",
+    color: "#10b981",
+    icon: (
+      <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.178 8c5.096 0 5.096 8 0 8-2.678 0-4.508-2.584-6.178-4-1.67-1.416-3.5-4-6.178-4-5.096 0-5.096 8 0 8 2.678 0 4.508-2.584 6.178-4 1.67-1.416 3.5-4 6.178-4z" />
+      </svg>
+    ),
+    settings: [],
+  },
   {
     id: "pomodoro",
     name: "Pomodoro",
@@ -561,7 +590,7 @@ export default function ModesSettingsPage() {
           lineHeight: 1.6,
         }}
       >
-        Six genuinely different study techniques, each with its own rhythm and its own rules.
+        Seven genuinely different study techniques, each with its own rhythm and its own rules.
         The active mode controls how your Focus Timer behaves — every setting below is live,
         nothing is decorative.
       </p>
@@ -574,7 +603,7 @@ export default function ModesSettingsPage() {
           lineHeight: 1.6,
         }}
       >
-        Pomodoro for getting started · 52/17 for long days · Animedoro when you need a fun
+        Free Flow for open study · Pomodoro for getting started · 52/17 for long days · Animedoro when you need a fun
         reward waiting · Deep Work for marathons · Sprint for drills · Flowtime for creative
         sessions. Switch modes anytime — the change applies to your next session.
       </p>

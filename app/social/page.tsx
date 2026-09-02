@@ -6,6 +6,7 @@ import { useProfileModal } from "../components/ProfileModalContext";
 import { useRealtimePresence } from "../hooks/useRealtimePresence";
 import { usePostgresChanges } from "../hooks/usePostgresChanges";
 import { AddFriendModal } from "../components/AddFriendModal";
+import { FriendRequestsModal } from "../components/FriendRequestsModal";
 import { CharacterRenderer } from "../components/character/CharacterRenderer";
 import { getDefaultCharacterConfig } from "@/lib/character-traits";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
@@ -17,6 +18,7 @@ import {
   Flame,
   MessageSquare,
   UserPlus,
+  UserCheck,
   Search,
   Check,
   X,
@@ -31,7 +33,7 @@ import {
   Trash2,
 } from "lucide-react";
 
-type Tab = "friends" | "requests" | "messages" | "groups";
+type Tab = "friends" | "messages" | "groups";
 
 interface Friend {
   friendshipId: number;
@@ -158,20 +160,36 @@ function SocialContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const tabParam = searchParams.get("tab") as Tab | null;
-  const [activeTab, setActiveTab] = useState<Tab>(
-    tabParam && ["friends", "requests", "messages", "groups"].includes(tabParam)
-      ? tabParam
-      : "friends"
-  );
+  const tabParam = searchParams.get("tab");
+  const activeTab: Tab =
+    tabParam && ["friends", "messages", "groups"].includes(tabParam)
+      ? (tabParam as Tab)
+      : "friends";
+
+  const handleTabChange = (newTab: Tab) => {
+    if (newTab === activeTab) return;
+    if (newTab === "friends") {
+      router.replace("/social", { scroll: false });
+    } else {
+      router.replace(`/social?tab=${newTab}`, { scroll: false });
+    }
+  };
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  const [showRequestsModal, setShowRequestsModal] = useState(false);
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
 
   useEffect(() => {
-    if (tabParam && ["friends", "requests", "messages", "groups"].includes(tabParam)) {
-      setActiveTab(tabParam);
+    if (tabParam === "requests") {
+      setShowRequestsModal(true);
     }
   }, [tabParam]);
-  const [showAddFriend, setShowAddFriend] = useState(false);
-  const [showCreateGroup, setShowCreateGroup] = useState(false);
+
+  const handleCloseRequests = () => {
+    setShowRequestsModal(false);
+    if (searchParams.get("tab") === "requests") {
+      router.replace("/social", { scroll: false });
+    }
+  };
 
   // Data states
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -550,20 +568,40 @@ function SocialContent() {
           </h1>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowAddFriend(true)}
-          className="btn-primary text-xs sm:text-sm font-['Rajdhani'] font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-md transition-all"
-          style={{
-            background:
-              "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-            border: "none",
-            color: "var(--text-primary)",
-          }}
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Add Friend</span>
-        </button>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => setShowRequestsModal(true)}
+            className={`relative text-xs sm:text-sm font-['Rajdhani'] font-bold uppercase tracking-wider py-2.5 px-3.5 sm:px-4 rounded-xl flex items-center gap-2 border transition-all active:scale-[0.98] ${
+              requests.length > 0
+                ? "bg-bg-panel border-accent-primary/60 text-text-primary shadow-[0_0_15px_rgba(244,63,94,0.15)] hover:border-accent-primary"
+                : "bg-bg-panel/80 hover:bg-bg-panel border-border-subtle hover:border-accent-primary/50 text-text-primary shadow-sm"
+            }`}
+          >
+            <UserCheck className="w-4 h-4 text-accent-text-light" />
+            <span>Requests</span>
+            {requests.length > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold animate-pulse shadow-sm">
+                {requests.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowAddFriend(true)}
+            className="btn-primary text-xs sm:text-sm font-['Rajdhani'] font-bold uppercase tracking-wider py-2.5 px-4 rounded-xl flex items-center gap-2 shadow-md transition-all"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
+              border: "none",
+              color: "var(--text-primary)",
+            }}
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Add Friend</span>
+          </button>
+        </div>
       </div>
 
       {/* ─── Main Tabs Navigation ─────────────────────────────── */}
@@ -571,7 +609,7 @@ function SocialContent() {
         <div className="flex gap-2 sm:gap-6 overflow-x-auto">
           <button
             type="button"
-            onClick={() => setActiveTab("friends")}
+            onClick={() => handleTabChange("friends")}
             className={`px-3 sm:px-4 py-2 text-xs sm:text-sm uppercase tracking-wider font-['Rajdhani'] font-bold transition-all border-b-2 flex items-center gap-2 ${
               activeTab === "friends"
                 ? "text-text-primary border-accent-primary"
@@ -589,25 +627,7 @@ function SocialContent() {
 
           <button
             type="button"
-            onClick={() => setActiveTab("requests")}
-            className={`px-3 sm:px-4 py-2 text-xs sm:text-sm uppercase tracking-wider font-['Rajdhani'] font-bold transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === "requests"
-                ? "text-text-primary border-accent-primary"
-                : "text-text-muted hover:text-text-primary border-transparent"
-            }`}
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Requests</span>
-            {requests.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold animate-pulse">
-                {requests.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("messages")}
+            onClick={() => handleTabChange("messages")}
             className={`px-3 sm:px-4 py-2 text-xs sm:text-sm uppercase tracking-wider font-['Rajdhani'] font-bold transition-all border-b-2 flex items-center gap-2 ${
               activeTab === "messages"
                 ? "text-text-primary border-accent-primary"
@@ -623,7 +643,7 @@ function SocialContent() {
 
           <button
             type="button"
-            onClick={() => setActiveTab("groups")}
+            onClick={() => handleTabChange("groups")}
             className={`px-3 sm:px-4 py-2 text-xs sm:text-sm uppercase tracking-wider font-['Rajdhani'] font-bold transition-all border-b-2 flex items-center gap-2 ${
               activeTab === "groups"
                 ? "text-text-primary border-accent-primary"
@@ -1003,129 +1023,7 @@ function SocialContent() {
         </div>
       )}
 
-      {/* ─── TAB 2: DEDICATED FRIEND REQUESTS HUB ─────────────── */}
-      {activeTab === "requests" && (
-        <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
-          <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-            <div>
-              <h2 className="text-xl font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary">
-                Friend Requests
-              </h2>
-              <p className="text-xs text-text-muted font-['Rajdhani']">
-                Manage incoming invitations to connect.
-              </p>
-            </div>
 
-            <span className="px-3 py-1 rounded-full bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid text-xs font-mono font-bold">
-              {requests.length} Pending
-            </span>
-          </div>
-
-          {requests.length === 0 ? (
-            <div className="system-card p-12 text-center flex flex-col items-center justify-center">
-              <div className="w-16 h-16 rounded-2xl bg-bg-abyss border border-border-subtle flex items-center justify-center mb-4 text-3xl">
-                ✉️
-              </div>
-              <h3 className="text-lg font-bold font-['Rajdhani'] text-text-primary uppercase tracking-wider mb-1">
-                No Pending Requests
-              </h3>
-              <p className="text-xs text-text-muted font-['Rajdhani']">
-                You&apos;re all caught up!
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {requests.map((req) => (
-                <motion.div
-                  key={req.id}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="system-card p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-border-subtle bg-bg-panel hover:border-accent-primary/50 transition-all shadow-md"
-                >
-                  <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                    {/* Sender Avatar / Character */}
-                    <div className="relative shrink-0">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-bg-abyss border border-border-subtle flex items-center justify-center overflow-hidden">
-                        {req.sender.characterConfig ? (
-                          <CharacterRenderer
-                            config={req.sender.characterConfig}
-                            seed={req.sender.username}
-                            size={52}
-                            showPedestal={false}
-                            showAura={false}
-                          />
-                        ) : req.sender.avatarUrl ? (
-                          <img
-                            src={req.sender.avatarUrl}
-                            alt={req.sender.username}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-xl font-bold font-['Rajdhani'] text-emerald-400 select-none">
-                            {(req.sender.name || req.sender.username || "S").charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="px-1.5 py-0.2 rounded bg-accent-primary-dim/30 text-[9px] font-mono font-bold text-accent-text-light border border-accent-primary-mid/30 shrink-0">
-                          Rank {req.sender.hunterRank}
-                        </span>
-                        <span className="text-xs font-mono text-text-muted shrink-0">
-                          Lv. {req.sender.level}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => openProfile(req.sender.username)}
-                        className="text-base font-bold font-['Rajdhani'] text-text-primary hover:text-accent-text-light transition-colors text-left block truncate w-full"
-                      >
-                        {req.sender.name || req.sender.username}
-                      </button>
-                      <p className="text-xs text-text-muted font-mono truncate w-full">
-                        @{req.sender.username}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-                    <button
-                      type="button"
-                      onClick={() => openProfile(req.sender.username)}
-                      className="px-3.5 py-2 rounded-xl bg-bg-abyss hover:bg-bg-shadow text-xs font-['Rajdhani'] font-bold uppercase tracking-wider text-text-primary border border-border-subtle transition-all"
-                    >
-                      View Profile
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={actionLoadingId === req.id}
-                      onClick={() => handleRequestAction(req.id, "ACCEPT")}
-                      className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Accept</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={actionLoadingId === req.id}
-                      onClick={() => handleRequestAction(req.id, "REJECT")}
-                      className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all flex items-center gap-1 disabled:opacity-50"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                      <span>Decline</span>
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* ─── TAB 3: DIRECT MESSAGES ──────────────────────────── */}
       {activeTab === "messages" && (
@@ -1338,6 +1236,17 @@ function SocialContent() {
       {/* ─── Modals ─────────────────────────────────────────── */}
       {showAddFriend && (
         <AddFriendModal onClose={() => setShowAddFriend(false)} />
+      )}
+
+      {showRequestsModal && (
+        <FriendRequestsModal
+          requests={requests}
+          actionLoadingId={actionLoadingId}
+          onAction={handleRequestAction}
+          onOpenProfile={openProfile}
+          onOpenAddFriend={() => setShowAddFriend(true)}
+          onClose={handleCloseRequests}
+        />
       )}
 
       {showCreateGroup && (

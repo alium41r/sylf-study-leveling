@@ -1,6 +1,8 @@
 import { beforeAll, afterAll, describe, it, expect, vi } from "vitest";
 import { randomUUID } from "node:crypto";
 import pg from "pg";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { connect, user } from "./database";
 import { PlannerDatabase } from "@/lib/planner/v2/server/database";
 import { AttemptService, newBudget } from "@/lib/planner/v2/server/attempts";
@@ -30,6 +32,15 @@ async function fixture(claim = true, budget = newBudget("EDUCATIONAL")) {
 }
 async function stored(attemptId: string) { return (await connection.query('SELECT artifact,payload FROM "PlannerAttempt" WHERE id=$1', [attemptId])).rows[0]; }
 describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
+  it("executes the compiled provider boundary in ordinary Node with actual durable accounting", async () => {
+    const f = await fixture(false); const a = await attempts.enqueue(f.ownerId, f.enqueue);
+    const result = await promisify(execFile)(process.execPath, ["__tests__/planner-v2/postgres/intelligence-process-fixture.cjs"], {
+      timeout: 7000, env: { NODE_ENV: "test", PATH: process.env.PATH, PLANNER_TEST_DATABASE_URL: process.env.PLANNER_TEST_DATABASE_URL,
+        PLANNER_PHASE0_REQUIRED: "true", PLANNER_PHASE0_DATABASE_MARKER: process.env.PLANNER_PHASE0_DATABASE_MARKER, PLANNER_FIXTURE_ATTEMPT: a.attemptId },
+    });
+    expect(JSON.parse(result.stdout)).toMatchObject({ compiled: true, ok: true, modelCalls: 1 });
+    expect((await connection.query('SELECT "accountingState" FROM "AiUsageLog" WHERE "attemptId"=$1', [a.attemptId])).rows[0].accountingState).toBe("SETTLED");
+  });
   it("loads 1500 historical rows without losing authoritative history/capacity or overflowing the dependency registry", async () => {
     const f = await fixture(false); const intent = { ...f.created.intent.intent, availability: { timezone: "UTC", dailyCeilingMinutes: [120,120,120,120,120,120,120], restWeekdays: [], blockedDates: [], recoveryPercent: 15, basis: "CONFIRMED_AVAILABILITY" as const } };
     await db.coordinated(f.ownerId, async sql => {
@@ -64,7 +75,7 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     const requested = [{ planId: f.created.plan.id, planRef: "first", intentId: f.created.intent.intentVersionId }, { planId: second.plan.id, planRef: "second", intentId: second.intent.intentVersionId }];
     const p = await db.coordinated(f.ownerId, sql => loadPlannerModelContext(sql, f.ownerId, requested, { start: "2026-10-05", end: "2026-10-06" }, { provisionalAvailability: provisional }));
     expect(p.view.plans[1].learning[0]).toMatchObject({ evidenceId: "weak_method", observedAt: "2026-10-01T10:00:00Z", scopeRefs: ["scope_electricity"] });
-    expect(p.contexts.map(c => c.context.dependencies.evidence.length)).toEqual([0,1]);
+    expect(p.contexts.map(c => c.context.dependencies.evidence.length)).toEqual([1,2]);
     const foreign = await fixture(false);
     await expect(db.coordinated(f.ownerId, sql => loadPlannerModelContext(sql, f.ownerId, [{ ...requested[0], intentId: foreign.created.intent.intentVersionId }], { start: "2026-10-05", end: "2026-10-06" }, { provisionalAvailability: provisional }))).rejects.toMatchObject({ detail: { code: "REFERENCE_NOT_OWNED" } });
   });
@@ -87,6 +98,14 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     await attempts.cancel(f.ownerId, f.attempt!.attemptId);
     expect((await connection.query('SELECT id FROM "AiUsageLog" WHERE "userId"=$1', [f.ownerId])).rows).toHaveLength(0);
     expect((await connection.query('SELECT used FROM "UserQuota" WHERE "userId"=$1', [f.ownerId])).rows).toEqual([{ used: 0 }]);
+  });
+  it("starts the research sub-window before search/fetch and never renews it through a fenced takeover", async () => {
+    const f = await fixture(true, newBudget("RESEARCH")); const first = await attempts.startResearchWindow(f.token!);
+    expect(first.deadline - first.now).toBe(120000); const before = await stored(f.attempt!.attemptId);
+    await attempts.release(f.token!); const token = (await attempts.claim(`research_takeover_${randomUUID()}`))!;
+    expect(token.fence).toBe(f.token!.fence + 1); const next = await attempts.startResearchWindow(token);
+    expect(next.deadline).toBe(first.deadline); expect((await stored(f.attempt!.attemptId)).artifact.budget.executionDeadlineAt).toBe(before.artifact.budget.executionDeadlineAt);
+    await expect(attempts.startResearchWindow(f.token!)).rejects.toMatchObject({ detail: { code: "LEASE_EXPIRED" } }); await attempts.cancel(f.ownerId, token.attemptId);
   });
   it("persists review and repair-verification holdbacks, then meters the verification separately", async () => {
     const f = await fixture(); const meter = workerProviderMeter(attempts, f.token!); const adapter = () => ({ generateResponse: async () => response() });

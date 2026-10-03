@@ -16,6 +16,8 @@ There is no single verified current prose specification. Start with [Planner con
 
 Frontend entry points are [Classic Planner](../../app/components/AiPlannerPanel.tsx), [Planner workspace](../../app/components/planner/PlannerWorkspace.tsx), [Quick Plan](../../app/components/planner/quick-plan/QuickPlan.tsx), and the [System Planner tab](../../app/system/components/PlannerTab.tsx). See [Planner tests](../../__tests__/planner/) and the [PostgreSQL harness](../../scripts/test-planner-postgres.mjs) for executable contracts. This index does not promote older rollout gates, model choices, quotas, or UI descriptions to current truth.
 
+[Planner V2 Phase 2 progress](reports/2026-10-03-phase-2/README.md) records the ordered intelligence/compiler rebuild. [Step 2](reports/2026-10-03-phase-2/STEP_2.md) implements bounded authoritative model context and a shared metered provider boundary. Assistant/research services and compiler handlers remain subsequent steps; the existing worker still has no activated educational handlers.
+
 ## Development sequences
 
 | Sequence | Reports in reading order | Relationship |

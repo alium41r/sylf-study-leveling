@@ -118,14 +118,21 @@
         "shared study/timezone/subject services"
       ],
       "completionGate": "Scope-filter evidence; preserve pins, actual and remaining time, closed/started content, capacity and consequential dependencies; fail explicit overflow.",
-      "status": "PENDING",
+      "status": "STEP_2_COMPLETE",
       "evidence": {
         "requiredTests": [
           "scope-relevant context, evidence contradictions and protected-history overflow",
           "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "Compiled ordinary Node with real PostgreSQL metering; owned context/provenance, fencing, cancellation, deadlines, review holdbacks, financial reconciliation and exactly-once foreground transfer. Independent educational review and actual compiler handlers remain later steps.",
+        "step2Suites": [
+          "__tests__/planner-v2/intelligence/context.test.ts",
+          "__tests__/planner-v2/intelligence/provider.test.ts",
+          "__tests__/planner-v2/intelligence/provider-adapters.test.ts",
+          "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts"
+        ],
+        "step2Gate": "documentation/planner/reports/2026-10-03-phase-2/evidence/step2-gate.json"
       }
     },
     {
@@ -153,14 +160,21 @@
         "execution context"
       ],
       "completionGate": "Completion and minutes are observations, not proof of mastery; provenance, dates and contradictions reach the model and reviewer.",
-      "status": "PENDING",
+      "status": "STEP_2_COMPLETE",
       "evidence": {
         "requiredTests": [
           "scope-relevant context, evidence contradictions and protected-history overflow",
           "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "Compiled ordinary Node with real PostgreSQL metering; owned context/provenance, fencing, cancellation, deadlines, review holdbacks, financial reconciliation and exactly-once foreground transfer. Independent educational review and actual compiler handlers remain later steps.",
+        "step2Suites": [
+          "__tests__/planner-v2/intelligence/context.test.ts",
+          "__tests__/planner-v2/intelligence/provider.test.ts",
+          "__tests__/planner-v2/intelligence/provider-adapters.test.ts",
+          "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts"
+        ],
+        "step2Gate": "documentation/planner/reports/2026-10-03-phase-2/evidence/step2-gate.json"
       }
     },
     {
@@ -189,14 +203,21 @@
         "server/attempts.ts"
       ],
       "completionGate": "Reserve before each singleAttempt dispatch, count fallback, normalize finish/truncation, retain usage/cost uncertainty, transfer foreground receipts once.",
-      "status": "PENDING",
+      "status": "STEP_2_COMPLETE",
       "evidence": {
         "requiredTests": [
           "scope-relevant context, evidence contradictions and protected-history overflow",
           "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "Compiled ordinary Node with real PostgreSQL metering; owned context/provenance, fencing, cancellation, deadlines, review holdbacks, financial reconciliation and exactly-once foreground transfer. Independent educational review and actual compiler handlers remain later steps.",
+        "step2Suites": [
+          "__tests__/planner-v2/intelligence/context.test.ts",
+          "__tests__/planner-v2/intelligence/provider.test.ts",
+          "__tests__/planner-v2/intelligence/provider-adapters.test.ts",
+          "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts"
+        ],
+        "step2Gate": "documentation/planner/reports/2026-10-03-phase-2/evidence/step2-gate.json"
       }
     },
     {
@@ -225,14 +246,21 @@
         "provider boundary"
       ],
       "completionGate": "All interpretation/research/OCR/fallback/adaptation/repair consume the frozen root budget; takeover never renews it; reserve review and repair plus verification before dispatch.",
-      "status": "PENDING",
+      "status": "STEP_2_COMPLETE",
       "evidence": {
         "requiredTests": [
           "scope-relevant context, evidence contradictions and protected-history overflow",
           "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "Compiled ordinary Node with real PostgreSQL metering; owned context/provenance, fencing, cancellation, deadlines, review holdbacks, financial reconciliation and exactly-once foreground transfer. Independent educational review and actual compiler handlers remain later steps.",
+        "step2Suites": [
+          "__tests__/planner-v2/intelligence/context.test.ts",
+          "__tests__/planner-v2/intelligence/provider.test.ts",
+          "__tests__/planner-v2/intelligence/provider-adapters.test.ts",
+          "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts"
+        ],
+        "step2Gate": "documentation/planner/reports/2026-10-03-phase-2/evidence/step2-gate.json"
       }
     },
     {

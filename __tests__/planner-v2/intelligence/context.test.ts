@@ -50,9 +50,20 @@ describe("bounded authoritative model context", () => {
     expect(p.view.weeks[0].otherCommittedMinutes).toBe(25);
   });
   it("accounts for earlier same-week actual time outside the detailed window and preserves sub-minute precision", () => {
-    const c = contextFixture(); c.sessions = [{ questId: null, durationSeconds: 61, startedAt: new Date("2026-10-05"), executionContext: { timezone: c.timezone, actualCivilDate: "2026-10-05" } } as SessionRow];
+    const c = contextFixture(); c.sessions = [{ questId: null, durationSeconds: 61, startedAt: new Date("2026-10-05"), endedAt: new Date("2026-10-05T01:00:00Z"), executionState: "ENDED", executionContext: { timezone: c.timezone, actualCivilDate: "2026-10-05" } } as SessionRow];
     const p = projectPlannerContext(c, [target()], { start: "2026-10-06", end: "2026-10-06" });
     expect(p.view.envelope.days[0].otherCommittedMinutes).toBe(0); expect(p.view.weeks[0].otherCommittedMinutes).toBe(61 / 60);
+  });
+  it("keeps zero-second legacy/standalone live sessions visible without charging their accepted actuals twice", () => {
+    const c = contextFixture(); const q = questFixture(); q.plannerSpec = null; q.executionVersion = 1; c.quests = [q];
+    c.sessions = [{ id: 1, questId: q.id, executionState: "PAUSED", executionVersion: 1, startedAt: c.now, endedAt: null, runningSince: null, durationSeconds: 0, breakSeconds: 0 } as SessionRow,
+      { id: 2, questId: null, executionState: "RUNNING", executionVersion: 1, startedAt: c.now, endedAt: null, runningSince: c.now, durationSeconds: 60, breakSeconds: 0,
+        executionContext: { timezone: c.timezone, actualCivilDate: window.start } } as SessionRow];
+    const p = projectPlannerContext(c, [target()], window);
+    expect(p.view.execution[0]).toMatchObject({ source: "LEGACY_EXECUTION", state: "PAUSED", protected: true, actualSeconds: 0 });
+    expect(p.view.runningSessions[1]).toMatchObject({ executionRef: null, state: "RUNNING", acceptedFocusSeconds: 60, accounting: "ALREADY_INCLUDED_IN_ACCEPTED_ACTUALS" });
+    expect(p.view.envelope.days[0]).toMatchObject({ otherCommittedMinutes: 31, availableMinutes: 71 });
+    c.sessions[0].executionState = null; expect(() => projectPlannerContext(c, [target()], window)).toThrow(/older timer/);
   });
   it("retains dated contradictory readiness evidence and resource provenance; saved checks remain self reports", () => {
     const c = contextFixture(); const t = target();
@@ -77,6 +88,12 @@ describe("bounded authoritative model context", () => {
     const c = contextFixture(); const q = questFixture(); const sealed = { ...c.dependencies, quests: [questDependency(q)] };
     expect(() => verifyContextCorrespondence(sealed, c.dependencies, [q])).not.toThrow(); q.executionVersion++;
     expect(() => verifyContextCorrespondence(sealed, c.dependencies, [q])).toThrow(/dependency changed/);
+  });
+  it("preserves old evidence seals while enforcing the additional dated provenance pin on new seals", () => {
+    const c = contextFixture(); const fresh = { ...c.dependencies, evidence: [{ ref: "model_learning_evidence", digest: digest() }] };
+    expect(() => verifyContextCorrespondence(c.dependencies, fresh)).not.toThrow();
+    expect(() => verifyContextCorrespondence(fresh, { ...fresh, evidence: [{ ref: "model_learning_evidence", digest: digest("b") }] })).toThrow(/evidence/);
+    expect(() => verifyContextCorrespondence(fresh, c.dependencies)).toThrow(/evidence/);
   });
   it("discloses provisional availability and applies saved rest/floating/deadline exclusions", () => {
     const c = contextFixture(); c.globalAvailability = null;

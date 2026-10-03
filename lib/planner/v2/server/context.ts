@@ -146,6 +146,13 @@ export async function loadExecutionContext(sql: Sql, ownerId: number, plans: rea
   // Preserve the existing result pin. New model projections separately pin
   // provenance/timestamps so an old sealed artifact is not relabeled.
   if (checks.length) evidence.push({ ref: "saved_checks", digest: hash("saved-checks", checks.map(({ id, planId, itemKey, result }) => ({ id, planId, itemKey, result }))) });
+  // New reviews also pin dated check provenance and the complete relevant
+  // completion/pace source. Keep the older saved_checks pin intact so sealed
+  // Phase 1 artifacts retain exactly the facts they originally reviewed.
+  const selectedPlans = new Set(plans.map(plan => plan.id));
+  const learningHistory = quests.filter(quest => quest.status === "COMPLETED" && quest.plannerSpec && selectedPlans.has(ExecutionTaskSpecV2Schema.parse(quest.plannerSpec).planId));
+  evidence.push({ ref: "model_learning_evidence", digest: hash("model-learning-evidence", { checks,
+    history: learningHistory.map(quest => ({ spec: quest.plannerSpec, actualSeconds: quest.elapsedSeconds, completedAt: quest.completedAt, executionVersion: quest.executionVersion })) }) });
   let dependencyQuests = quests;
   if (quests.length > PLANNER_V2_ENVELOPE.outstandingActivitiesPerPlan * PLANNER_V2_ENVELOPE.targets || pinnedQuestIds.length) {
     const revisions = await rows<{ v2Artifact: unknown }>(sql, 'SELECT "v2Artifact" FROM "PlannerRevision" WHERE "planId"=ANY($1::uuid[]) AND id=ANY($2::uuid[])', [plans.map(plan => plan.id), plans.map(plan => plan.activeRevisionId).filter(Boolean)]);
@@ -166,7 +173,8 @@ export async function loadExecutionContext(sql: Sql, ownerId: number, plans: rea
 /** Live progress/capacity can be revalidated against fixed placements. It cannot
  * waive changes to intent, academic sources, execution generations or Plan bases. */
 export function verifyContextCorrespondence(sealed: ContextDependenciesV2, current: ContextDependenciesV2, ownedQuests?: readonly QuestRow[]): void {
-  const relevant = (value: ContextDependenciesV2) => ({ intentDigest: value.intentDigest, evidence: [...value.evidence].sort((a, b) => a.ref.localeCompare(b.ref)),
+  const provenancePinned = sealed.evidence.some(e => e.ref === "model_learning_evidence");
+  const relevant = (value: ContextDependenciesV2) => ({ intentDigest: value.intentDigest, evidence: value.evidence.filter(e => provenancePinned || e.ref !== "model_learning_evidence").sort((a, b) => a.ref.localeCompare(b.ref)),
     planBases: [...value.planBases].sort((a, b) => a.planId.localeCompare(b.planId)) });
   if (hash("relevant-context", relevant(sealed)) !== hash("relevant-context", relevant(current))) reject("STALE_CONTEXT", "The goal, academic evidence or active baseline changed.", "APPLY");
   for (const pinned of sealed.quests) {

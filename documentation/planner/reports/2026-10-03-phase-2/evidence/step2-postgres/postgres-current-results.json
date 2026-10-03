@@ -1,9 +1,9 @@
 {
   "label": "current",
-  "files": 17,
-  "passed": 225,
+  "files": 34,
+  "passed": 450,
   "failed": 0,
   "requiredSkipped": 0,
-  "optionalProviderExcluded": 1,
+  "optionalProviderExcluded": 2,
   "failures": []
 }

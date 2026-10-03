@@ -226,7 +226,7 @@ CREATE PUBLICATION supabase_realtime;\n`;
   catch (error) { newError = error; }
   checkReport("phase1", newReport, ["__tests__/planner-v2/postgres/durable-core.postgres.ts", "__tests__/planner-v2/postgres/accounting.postgres.ts", "__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts", "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts", "__tests__/planner-v2/postgres/worker-runtime.postgres.ts", "__tests__/planner-v2/postgres/current-sql-invariants.postgres.ts", "__tests__/planner-v2/postgres/separate-connection-concurrency.postgres.ts", ...extraSuites], newError);
   const currentReport = join(temporary, "current-report.json"); let currentError;
-  try { run(join(root, "node_modules/.bin/vitest"), ["run", "--no-file-parallelism", "--reporter=json", "--outputFile", currentReport, ...currentRequired], { env: childEnvironment, timeout: 240_000 }); }
+  try { run(join(root, "node_modules/.bin/vitest"), ["run", "--no-file-parallelism", "--exclude", "scratch/**", "--reporter=json", "--outputFile", currentReport, ...currentRequired], { env: childEnvironment, timeout: 240_000 }); }
   catch (error) { currentError = error; }
   checkReport("current", currentReport, currentRequired, currentError);
   if (browserRequested) {

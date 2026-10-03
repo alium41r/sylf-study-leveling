@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-03T17:24:29.057Z",
+  "startedAt": "2026-10-03T17:54:32.563Z",
   "status": "PASSED",
   "database": "generated disposable loopback database",
   "runtime": "native",
@@ -9,7 +9,7 @@
     {
       "label": "phase1",
       "files": 8,
-      "passed": 80,
+      "passed": 82,
       "failed": 0,
       "requiredSkipped": 0,
       "optionalProviderExcluded": 0,
@@ -17,11 +17,11 @@
     },
     {
       "label": "current",
-      "files": 17,
-      "passed": 225,
+      "files": 34,
+      "passed": 450,
       "failed": 0,
       "requiredSkipped": 0,
-      "optionalProviderExcluded": 1,
+      "optionalProviderExcluded": 2,
       "failures": []
     }
   ],
@@ -137,5 +137,5 @@
   },
   "postgresVersion": 180004,
   "cleanup": "Disposable server stopped; cluster/container removed.",
-  "finishedAt": "2026-10-03T17:25:55.003Z"
+  "finishedAt": "2026-10-03T17:56:24.597Z"
 }

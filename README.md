@@ -6,6 +6,10 @@ Start at the [documentation index](documentation/README.md) for current contract
 
 ## Getting Started
 
+Use Node.js 24.x for local development and Vercel builds. The package's
+`engines.node` selects this major version on Vercel; `.node-version` pins a
+compatible local release. Install dependencies with `npm ci`.
+
 First, run the development server:
 
 ```bash

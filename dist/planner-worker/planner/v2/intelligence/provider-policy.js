@@ -19,6 +19,8 @@ function reserveProviderCapacity(budget, previous, raw, now, needsReview, pendin
     const guard = structuredClone(previous);
     if (["ADVICE", "CALENDAR_ONLY"].includes(budget.profile) && !["INTERPRETATION"].includes(policy.purpose))
         (0, database_1.reject)("BUDGET_EXHAUSTED", "This root profile does not authorize educational or research generation.");
+    if (["RESEARCH", "OCR"].includes(policy.purpose) && budget.profile !== "RESEARCH")
+        (0, database_1.reject)("BUDGET_EXHAUSTED", "Research requires an explicit research profile escalation.", "RESEARCH");
     const hold = (key, value) => {
         if (!value)
             return;

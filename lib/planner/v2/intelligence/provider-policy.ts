@@ -24,6 +24,8 @@ export function reserveProviderCapacity(budget: RuntimeBudgetV2, previous: Provi
   const policy = ProviderPolicySchema.parse(raw); const guard = structuredClone(previous);
   if (["ADVICE", "CALENDAR_ONLY"].includes(budget.profile) && !["INTERPRETATION"].includes(policy.purpose))
     reject("BUDGET_EXHAUSTED", "This root profile does not authorize educational or research generation.");
+  if (["RESEARCH", "OCR"].includes(policy.purpose) && budget.profile !== "RESEARCH")
+    reject("BUDGET_EXHAUSTED", "Research requires an explicit research profile escalation.", "RESEARCH");
   const hold = (key: "reviewReserve" | "verificationReserve", value: ProviderPolicy["reviewReserve"]) => {
     if (!value) return;
     if (guard[key] && (value.inputTokens < guard[key]!.inputTokens || value.outputTokens < guard[key]!.outputTokens))

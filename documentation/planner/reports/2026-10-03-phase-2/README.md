@@ -1,10 +1,14 @@
-# Planner V2 Phase 2 progress and Step 1 evidence
+# Planner V2 Phase 2 progress
 
-**3 October 2026. Step 1 is complete. Phase 2 remains in progress.**
+**3 October 2026. Steps 1 and 2 are complete. Phase 2 remains in progress.**
 
 The approved [execution roadmap](IMPLEMENTATION_PLAN.md) follows the repository's [V2 architecture](../../PLANNER_TARGET_ARCHITECTURE.md) and completed Phase 0/1 owners. The [requirement map](REQUIREMENTS.json) records 28 requirements, governing sections, audit findings, affected systems, required evidence and completion gates across the six ordered steps. A supporting schema is explicitly distinguished from a working runtime service.
 
-Step 1 adds bounded assistant, scheduling/allocation, research processing and compiler checkpoint schemas in `lib/planner/v2/intelligence/`. The checkpoint reader reuses the Phase 1 hashing authority, rejects request/owner/root/authorization/target/base/intent/context correspondence drift, and checks the exact source, envelope, blueprint, allocation and quality artifacts. [Supporting artifact details](SUPPORTING_ARTIFACTS.md) explain the trusted producer responsibilities and recovery boundary. This implementation changes no frozen contract, persistence schema, provider adapter, existing API route, worker handler or execution writer.
+[Step 2 completion and integration contract](STEP_2.md) records bounded execution/learning context, provenance seals, capacity projection and shared foreground/worker dispatch with durable accounting, cancellation, deadlines and review holdbacks. Its [gate](evidence/step2-gate.json) and [PostgreSQL evidence](evidence/step2-postgres/postgres-harness-run.json) are separate from Step 1's historical evidence.
+
+## Step 1 evidence
+
+Step 1 added bounded assistant, scheduling/allocation, research processing and compiler checkpoint schemas in `lib/planner/v2/intelligence/`. The checkpoint reader reuses the Phase 1 hashing authority, rejects request/owner/root/authorization/target/base/intent/context correspondence drift, and checks the exact source, envelope, blueprint, allocation and quality artifacts. [Supporting artifact details](SUPPORTING_ARTIFACTS.md) explain the trusted producer responsibilities and recovery boundary. Step 1 changed no frozen contract, persistence schema, provider adapter, existing API route, worker handler or execution writer.
 
 The reproducible gate is `node scripts/verify-planner-v2-phase2-step1.mjs`. Its [machine-readable result](evidence/step1-gate.json) records **PASSED across all 10 Step 1 checks**. The [required unit run](evidence/step1-units.json) passes **97 tests in 10 files, with zero failures or required skips**; 40 tests are new supporting-artifact/serialization coverage. Isolated and full source typechecks, warning-free ESLint, maximum-count serialization, explicit combined byte overflow and compiled normal Node loading pass. All 12 frozen contract files remain identical to Phase 0; existing Planner/runtime files remain identical to the starting baseline. The whole repository typecheck remains blocked by the two independently recorded baseline export errors.
 
@@ -22,4 +26,4 @@ The new tests exercise malformed/stale checkpoints, exact attempt and artifact b
 
 Limits of this step are deliberate: no model/provider calls or PostgreSQL transactions execute, no actual generation/publish/apply integration is newly claimed, and no Planner UI or Phase 4/5 feature work begins. Phase 1 remains the authoritative owner for those existing lifecycle guarantees. Actual compiler handlers, ownership/source verification, feasible scheduling, independent semantic review and recovery/API/ApplyService integration remain required Steps 2–6. No architectural deviation has been introduced.
 
-The next workstream is Step 2: bounded relevant context and the shared metered provider boundary. Phase 2 completion requires all later roadmap gates and a final completion report; Step 1 success alone does not satisfy that definition.
+The next workstream is Step 3: the headless assistant and bounded research services, using Step 2's context and provider owners. Phase 2 completion requires every remaining roadmap gate and a final completion report; neither supporting schemas nor the Step 2 provider foundation completes the compiler.

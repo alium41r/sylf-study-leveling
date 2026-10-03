@@ -35,13 +35,26 @@ function projectPlannerContext(context, targets, window, options = {}) {
     const registry = relevant.map((q, i) => ({ ref: `execution_${i + 1}`, questId: q.id, activityKey: specs.get(q.id)?.activityKey ?? null }));
     const byQuest = new Map(registry.map(r => [r.questId, r.ref]));
     const byActivity = new Map(registry.filter(r => r.activityKey).map(r => [r.activityKey, r.ref]));
+    const liveSessions = context.sessions.filter(s => !s.endedAt || s.executionState === "RUNNING" || s.executionState === "PAUSED");
+    if (liveSessions.some(s => !s.executionState))
+        (0, database_1.reject)("PROTECTED_EXECUTION", "An older timer must be explicitly stopped before this context can be used.", "PREFLIGHT");
+    const sessionRegistry = liveSessions.map((s, i) => ({ ref: `session_${i + 1}`, sessionId: s.id }));
+    const runningSessions = liveSessions.map((s, i) => ({ ref: sessionRegistry[i].ref, executionRef: s.questId === null ? null : byQuest.get(s.questId) ?? null,
+        state: s.executionState, executionVersion: s.executionVersion, acceptedFocusSeconds: s.durationSeconds, acceptedBreakSeconds: s.breakSeconds,
+        actualCivilDate: s.executionContext?.actualCivilDate ?? (0, context_1.civilDate)(s.startedAt, context.timezone),
+        startedAt: s.startedAt.toISOString(), runningSince: s.runningSince?.toISOString() ?? null,
+        accounting: "ALREADY_INCLUDED_IN_ACCEPTED_ACTUALS" }));
     const execution = relevant.map(q => {
         const spec = specs.get(q.id);
-        if (!spec)
+        if (!spec) {
+            const own = context.sessions.filter(s => s.questId === q.id);
+            const state = q.status === "COMPLETED" ? "COMPLETED" : own.some(s => s.executionState === "RUNNING") ? "RUNNING" :
+                own.some(s => s.executionState === "PAUSED") ? "PAUSED" : q.elapsedSeconds > 0 || own.length > 0 || q.status === "IN_PROGRESS" ? "ENDED_INCOMPLETE" : "UNSTARTED";
             return { ref: byQuest.get(q.id), planRef: null, source: "LEGACY_EXECUTION",
-                title: q.title, instructions: q.description, state: q.status, actualSeconds: q.elapsedSeconds,
+                title: q.title, instructions: q.description, state, protected: state !== "UNSTARTED" || q.executionVersion > 0, actualSeconds: q.elapsedSeconds,
                 remainingMinutes: q.remainingDisposition === "OPEN" ? Math.max(1, Math.ceil(q.requiredMinutes - q.elapsedSeconds / 60)) : 0,
                 date: q.scheduledFor, remainingDisposition: q.remainingDisposition, executionVersion: q.executionVersion };
+        }
         const live = (0, context_1.liveExecution)(q, context.sessions);
         return { ref: byQuest.get(q.id), planRef: targetById.get(spec.planId)?.planRef ?? null, source: "V2_EXECUTION",
             ...spec.content, hardDependencies: spec.content.hardDependencies.map(key => byActivity.get(key)),
@@ -124,7 +137,7 @@ function projectPlannerContext(context, targets, window, options = {}) {
         otherCommittedMinutes: [...ledger.usage].filter(([date]) => (0, context_1.weekKey)(date) === week).reduce((sum, [, n]) => sum + n, 0),
         protectedTargetMinutes: protectedExecution.filter(e => (0, context_1.weekKey)(e.date) === week).reduce((sum, e) => sum + e.remainingMinutes, 0),
         perGoalCommittedMinutes: targets.map(t => ({ planRef: t.planRef, minutes: t.intent.goalId ? ledger.perGoal.get(`${t.intent.goalId}/${week}`) ?? 0 : 0 })) }));
-    const view = { schemaVersion: 2, projectedAt: context.now.toISOString(), authority: "EXECUTION_CONTEXT", envelope, weeks, plans, execution,
+    const view = { schemaVersion: 2, projectedAt: context.now.toISOString(), authority: "EXECUTION_CONTEXT", envelope, weeks, plans, execution, runningSessions,
         actuals: days.map(d => ({ date: d.date, acceptedSeconds: ledger.actualSeconds.get(d.date) ?? 0 })),
         academicSources: (options.academicSources ?? (context.academicSource ? [{ planId: targets[0].planId, source: context.academicSource }] : [])).map(({ planId, source }) => {
             const target = targetById.get(planId);
@@ -156,7 +169,7 @@ function projectPlannerContext(context, targets, window, options = {}) {
     const bytes = Buffer.byteLength(JSON.stringify(view));
     if (bytes > maxBytes)
         (0, database_1.reject)("PAYLOAD_TOO_LARGE", "Required execution and learning evidence exceed the model context allowance; narrow the request.", "PREFLIGHT");
-    return { view, registry, bytes, digest: (0, database_1.hash)("model-context", { ...view, projectedAt: null }) };
+    return { view, registry, sessionRegistry, bytes, digest: (0, database_1.hash)("model-context", { ...view, projectedAt: null }) };
 }
 /** Use within the existing owner-coordinated transaction. Each target keeps its
  * own evidence/dependency seal; joint requests share complete execution facts. */

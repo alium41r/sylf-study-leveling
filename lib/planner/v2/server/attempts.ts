@@ -366,6 +366,16 @@ export class AttemptService {
     return this.mutate(token, async (_sql, attempt, payload, now) => ({ now: now.getTime(), deadline: Math.min(Date.parse(attempt.budget.executionDeadlineAt!),
       ["RESEARCH", "OCR"].includes(purpose) && payload.providerGuard?.researchDeadlineAt ? Date.parse(payload.providerGuard.researchDeadlineAt) : Infinity) }));
   }
+  async startResearchWindow(token: LeaseToken) {
+    return this.mutate(token, async (sql, attempt, payload, now) => {
+      if (attempt.budget.profile !== "RESEARCH") reject("BUDGET_EXHAUSTED", "Research requires an explicit research profile escalation.", "RESEARCH");
+      const providerGuard = { ...payload.providerGuard, researchDeadlineAt: payload.providerGuard?.researchDeadlineAt ??
+        new Date(Math.min(Date.parse(attempt.budget.executionDeadlineAt!), now.getTime() + 120000)).toISOString() };
+      if (Date.parse(providerGuard.researchDeadlineAt) <= now.getTime()) reject("BUDGET_EXHAUSTED", "The research processing window expired.", "RESEARCH");
+      await persistAttempt(sql, attempt, attempt, { ...payload, providerGuard });
+      return { now: now.getTime(), deadline: Date.parse(providerGuard.researchDeadlineAt) };
+    });
+  }
 }
 
 export const attemptPayloadDigest = (payload: AttemptPayload): string => hash("attempt-payload", JSON.parse(canonicalJson(payload)));

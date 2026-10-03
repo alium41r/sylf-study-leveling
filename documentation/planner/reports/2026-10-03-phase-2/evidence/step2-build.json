@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-10-03T17:38:02.121Z",
+  "finishedAt": "2026-10-03T17:38:54.519Z",
+  "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
+  "code": 1,
+  "command": "next build --webpack (private source copy)",
+  "credentialsLoaded": false,
+  "baselineRouteErrors": [
+    ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+    ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'."
+  ],
+  "sharedGeneratedFilesModified": false
+}

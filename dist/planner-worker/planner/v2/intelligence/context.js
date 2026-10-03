@@ -125,6 +125,9 @@ function projectPlannerContext(context, targets, window, options = {}) {
     // Local scope aliases are meaningful only within their owned Plan.
     const history = context.quests.filter(q => q.status === "COMPLETED" && specs.has(q.id) && targetById.has(specs.get(q.id).planId))
         .sort((a, b) => (a.completedAt?.getTime() ?? 0) - (b.completedAt?.getTime() ?? 0) || a.id - b.id);
+    const matchesLegacy = (q, t) => !!t.intent.subjectId && t.intent.subjectId === q.subjectId || !!(t.goalId ?? t.intent.goalId) && (t.goalId ?? t.intent.goalId) === q.goalId;
+    const legacyHistory = context.quests.filter(q => q.status === "COMPLETED" && !q.plannerSpec && targets.some(t => matchesLegacy(q, t)))
+        .sort((a, b) => (a.completedAt?.getTime() ?? 0) - (b.completedAt?.getTime() ?? 0) || a.id - b.id);
     const historyLimit = Math.max(0, Math.min(20, Math.floor(options.historyExamples ?? 10)));
     const examples = history.filter(q => !byQuest.has(q.id)).slice(-historyLimit || history.length).reverse().map(q => ({
         title: q.title, scopeRefs: specs.get(q.id).content.scopeRefs, completedAt: q.completedAt?.toISOString() ?? null,
@@ -132,11 +135,15 @@ function projectPlannerContext(context, targets, window, options = {}) {
     }));
     if (historyLimit === 0)
         examples.length = 0;
+    const legacyExampleCount = Math.max(0, historyLimit - examples.length);
+    const legacyExamples = legacyExampleCount ? legacyHistory.slice(-legacyExampleCount).reverse().map(q => ({ title: q.title, instructions: q.description,
+        planRefs: targets.filter(t => matchesLegacy(q, t)).map(t => t.planRef), completedAt: q.completedAt?.toISOString() ?? null, actualSeconds: q.elapsedSeconds,
+        approvedEstimateMinutes: Number.isSafeInteger(q.requiredMinutes) && q.requiredMinutes > 0 ? q.requiredMinutes : null, demonstratesReadiness: false })) : [];
     const weeks = [...new Set(days.map(d => (0, context_1.weekKey)(d.date)))].map(week => ({ week,
         // Include actuals/commitments outside the detailed window in the same week.
         otherCommittedMinutes: [...ledger.usage].filter(([date]) => (0, context_1.weekKey)(date) === week).reduce((sum, [, n]) => sum + n, 0),
         protectedTargetMinutes: protectedExecution.filter(e => (0, context_1.weekKey)(e.date) === week).reduce((sum, e) => sum + e.remainingMinutes, 0),
-        perGoalCommittedMinutes: targets.map(t => ({ planRef: t.planRef, minutes: t.intent.goalId ? ledger.perGoal.get(`${t.intent.goalId}/${week}`) ?? 0 : 0 })) }));
+        perGoalCommittedMinutes: targets.map(t => { const goalId = t.goalId ?? t.intent.goalId; return { planRef: t.planRef, minutes: goalId ? ledger.perGoal.get(`${goalId}/${week}`) ?? 0 : 0 }; }) }));
     const view = { schemaVersion: 2, projectedAt: context.now.toISOString(), authority: "EXECUTION_CONTEXT", envelope, weeks, plans, execution, runningSessions,
         actuals: days.map(d => ({ date: d.date, acceptedSeconds: ledger.actualSeconds.get(d.date) ?? 0 })),
         academicSources: (options.academicSources ?? (context.academicSource ? [{ planId: targets[0].planId, source: context.academicSource }] : [])).map(({ planId, source }) => {
@@ -159,12 +166,26 @@ function projectPlannerContext(context, targets, window, options = {}) {
                     acceptedSeconds: own.reduce((n, q) => n + q.elapsedSeconds, 0), demonstratesReadiness: false };
             })),
             demonstratesReadiness: false, examples, omittedExamples: history.length - examples.length,
-            unrelatedCompletedCount: context.quests.filter(q => q.status === "COMPLETED").length - history.length } };
+            unattributedOrOtherCompletedCount: context.quests.filter(q => q.status === "COMPLETED").length - history.length - legacyHistory.length },
+        legacyHistory: { source: "LEGACY_COMPLETION_AND_ACCEPTED_PACE", reliability: "OBSERVED_EXECUTION", scopeResolution: "UNRESOLVED", demonstratesReadiness: false,
+            sourceDigest: (0, database_1.hash)("relevant-legacy-history", legacyHistory.map(q => ({ questId: q.id, title: q.title, instructions: q.description,
+                goalId: q.goalId, subjectId: q.subjectId, subjectNodeId: q.subjectNodeId, approvedEstimateMinutes: q.requiredMinutes,
+                actualSeconds: q.elapsedSeconds, completedAt: q.completedAt, executionVersion: q.executionVersion }))), completedCount: legacyHistory.length,
+            byPlan: targets.map(t => {
+                const own = legacyHistory.filter(q => matchesLegacy(q, t));
+                return { planRef: t.planRef, completedCount: own.length,
+                    acceptedSeconds: own.reduce((n, q) => n + q.elapsedSeconds, 0), approvedEstimateMinutes: own.reduce((n, q) => n + (Number.isSafeInteger(q.requiredMinutes) && q.requiredMinutes > 0 ? q.requiredMinutes : 0), 0),
+                    unknownEstimateCount: own.filter(q => !Number.isSafeInteger(q.requiredMinutes) || q.requiredMinutes <= 0).length,
+                    firstCompletedAt: own[0]?.completedAt?.toISOString() ?? null, lastCompletedAt: own.at(-1)?.completedAt?.toISOString() ?? null };
+            }),
+            examples: legacyExamples, omittedExamples: legacyHistory.length - legacyExamples.length } };
     // Optional examples can be omitted explicitly. Consequential facts never
     // undergo prefix trimming, even when one note/instruction is very large.
     if (Buffer.byteLength(JSON.stringify(view)) > maxBytes) {
         view.history.examples = [];
         view.history.omittedExamples = history.length;
+        view.legacyHistory.examples = [];
+        view.legacyHistory.omittedExamples = legacyHistory.length;
     }
     const bytes = Buffer.byteLength(JSON.stringify(view));
     if (bytes > maxBytes)
@@ -193,6 +214,7 @@ async function loadPlannerModelContext(sql, ownerId, requested, window, options 
         const active = activeRow?.schemaVersion === 2 ? await (0, revisions_1.loadRevision)(sql, ownerId, plan.activeRevisionId) : null;
         const legacy = plan.migrationEvidence?.baselineSpecs ?? [];
         targets.push({ planId: plan.id, planRef: target.planRef, intent: version.intent,
+            goalId: plan.goalId ?? plan.reservedGoalId ?? version.intent.goalId ?? null,
             activeActivityKeys: active?.executable.map(s => s.activityKey) ?? legacy.map(s => contracts_1.ExecutionTaskSpecV2Schema.parse(s).activityKey) });
         const context = await (0, context_1.loadExecutionContext)(sql, ownerId, plans, version.intent);
         contexts.push({ planRef: target.planRef, context });

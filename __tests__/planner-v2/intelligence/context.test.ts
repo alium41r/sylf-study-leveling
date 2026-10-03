@@ -65,6 +65,19 @@ describe("bounded authoritative model context", () => {
     expect(p.view.envelope.days[0]).toMatchObject({ otherCommittedMinutes: 31, availableMinutes: 71 });
     c.sessions[0].executionState = null; expect(() => projectPlannerContext(c, [target()], window)).toThrow(/older timer/);
   });
+  it("uses the Plan's stored goal for weekly actuals even when the original intent has no goal ID", () => {
+    const c = contextFixture(); c.quests = [{ ...questFixture(), executionVersion: 1, elapsedSeconds: 600 }]; c.sessions = [{ questId: 1, durationSeconds: 600, startedAt: new Date("2026-10-05"), endedAt: c.now, executionState: "ENDED" } as SessionRow];
+    const p = projectPlannerContext(c, [{ ...target(), goalId: 1 }], window);
+    expect(p.view.weeks[0].perGoalCommittedMinutes[0].minutes).toBe(10);
+  });
+  it("preserves relevant manual completion/pace observations with unresolved scope and unknown estimates", () => {
+    const c = contextFixture(); c.quests = [1,2].map(n => ({ ...questFixture(n), plannerSpec: null, status: "COMPLETED", remainingDisposition: "COMPLETED", completedAt: c.now, elapsedSeconds: 600, requiredMinutes: n === 1 ? 30 : 0 }));
+    const p = projectPlannerContext(c, [{ ...target(), goalId: 1 }], window);
+    expect(p.view.legacyHistory).toMatchObject({ completedCount: 2, scopeResolution: "UNRESOLVED", demonstratesReadiness: false });
+    expect(p.view.legacyHistory.byPlan[0]).toMatchObject({ acceptedSeconds: 1200, approvedEstimateMinutes: 30, unknownEstimateCount: 1 });
+    expect(p.view.envelope.days[0].otherCommittedMinutes).toBe(0);
+    c.quests[0].elapsedSeconds++; expect(projectPlannerContext(c, [{ ...target(), goalId: 1 }], window).digest).not.toBe(p.digest);
+  });
   it("retains dated contradictory readiness evidence and resource provenance; saved checks remain self reports", () => {
     const c = contextFixture(); const t = target();
     t.intent.evidence = [true,false].map((ready, i) => ({ evidenceId: `evidence_${i}`, scopeKeys: [id(10)], source: "STUDENT_NOTE", observedAt: "2026-10-01T10:00:00Z", reliability: "SELF_REPORTED", statement: ready ? "Comfortable with circuits" : "Still guessing at the method", demonstratesReadiness: ready, resourceRef: "question_set" }));

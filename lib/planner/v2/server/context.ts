@@ -150,9 +150,14 @@ export async function loadExecutionContext(sql: Sql, ownerId: number, plans: rea
   // completion/pace source. Keep the older saved_checks pin intact so sealed
   // Phase 1 artifacts retain exactly the facts they originally reviewed.
   const selectedPlans = new Set(plans.map(plan => plan.id));
-  const learningHistory = quests.filter(quest => quest.status === "COMPLETED" && quest.plannerSpec && selectedPlans.has(ExecutionTaskSpecV2Schema.parse(quest.plannerSpec).planId));
+  const relevantGoals = new Set([...plans.map(plan => plan.goalId ?? plan.reservedGoalId), intent.goalId].filter(Boolean));
+  const relevantSubjects = new Set([...plans.map(plan => plan.subjectId), intent.subjectId].filter(Boolean));
+  const learningHistory = quests.filter(quest => quest.status === "COMPLETED" && (quest.plannerSpec ? selectedPlans.has(ExecutionTaskSpecV2Schema.parse(quest.plannerSpec).planId) :
+    relevantGoals.has(quest.goalId) || relevantSubjects.has(quest.subjectId)));
   evidence.push({ ref: "model_learning_evidence", digest: hash("model-learning-evidence", { checks,
-    history: learningHistory.map(quest => ({ spec: quest.plannerSpec, actualSeconds: quest.elapsedSeconds, completedAt: quest.completedAt, executionVersion: quest.executionVersion })) }) });
+    history: learningHistory.map(quest => ({ ...(quest.plannerSpec ? { spec: quest.plannerSpec } : { legacy: {
+      title: quest.title, instructions: quest.description, goalId: quest.goalId, subjectId: quest.subjectId, subjectNodeId: quest.subjectNodeId, requiredMinutes: quest.requiredMinutes } }),
+      actualSeconds: quest.elapsedSeconds, completedAt: quest.completedAt, executionVersion: quest.executionVersion })) }) });
   let dependencyQuests = quests;
   if (quests.length > PLANNER_V2_ENVELOPE.outstandingActivitiesPerPlan * PLANNER_V2_ENVELOPE.targets || pinnedQuestIds.length) {
     const revisions = await rows<{ v2Artifact: unknown }>(sql, 'SELECT "v2Artifact" FROM "PlannerRevision" WHERE "planId"=ANY($1::uuid[]) AND id=ANY($2::uuid[])', [plans.map(plan => plan.id), plans.map(plan => plan.activeRevisionId).filter(Boolean)]);

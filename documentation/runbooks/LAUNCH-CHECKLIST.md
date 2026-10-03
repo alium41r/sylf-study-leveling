@@ -111,6 +111,9 @@ of these exist (values are yours; never paste them into chat/logs):
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | rate limits/cache |
 | `PRELAUNCH_MODE` | see #7 |
 
+For waitlist email sender configuration, Gmail spam diagnosis and an optional
+verified-domain migration, see [Waitlist email](WAITLIST-EMAIL.md).
+
 ### 7. Set PRELAUNCH_MODE=true
 Vercel → project → Settings → Environment Variables → add
 `PRELAUNCH_MODE` = `true` for **Production** → Redeploy. Effect (already in

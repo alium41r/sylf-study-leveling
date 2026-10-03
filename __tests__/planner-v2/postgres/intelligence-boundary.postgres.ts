@@ -8,7 +8,7 @@ import { PlannerDatabase } from "@/lib/planner/v2/server/database";
 import { AttemptService, newBudget } from "@/lib/planner/v2/server/attempts";
 import { IntentService } from "@/lib/planner/v2/server/intents";
 import { ForegroundAccountingService } from "@/lib/planner/v2/server/accounting";
-import { loadExecutionContext } from "@/lib/planner/v2/server/context";
+import { loadExecutionContext, verifyContextCorrespondence } from "@/lib/planner/v2/server/context";
 import { projectPlannerContext } from "@/lib/planner/v2/intelligence/context";
 import { loadPlannerModelContext } from "@/lib/planner/v2/intelligence/context";
 import { dispatchMeteredProvider, workerProviderMeter, foregroundProviderMeter, type MeteredProviderRequest } from "@/lib/planner/v2/intelligence/provider";
@@ -51,7 +51,7 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     expect(c.quests).toHaveLength(1501); expect(c.dependencies.quests).toHaveLength(1);
     const p = projectPlannerContext(c, [{ planId: f.created.plan.id, planRef: "physics", intent, activeActivityKeys: [] }], { start: "2026-10-05", end: "2026-10-06" }, { provisionalAvailability: { ...intent.availability, basis: "DISCLOSED_PROVISIONAL_CEILING" } });
     expect(p.view.envelope.days[0]).toMatchObject({ otherCommittedMinutes: 20, recoveryMinutes: 18, availableMinutes: 82 });
-    expect(p.view.history.unrelatedCompletedCount).toBe(1500);
+    expect(p.view.history.unattributedOrOtherCompletedCount).toBe(1500);
   });
   it("meters fallback before each upstream dispatch and settles one quota unit for the root", async () => {
     const f = await fixture(); let n = 0;
@@ -78,6 +78,30 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     expect(p.contexts.map(c => c.context.dependencies.evidence.length)).toEqual([1,2]);
     const foreign = await fixture(false);
     await expect(db.coordinated(f.ownerId, sql => loadPlannerModelContext(sql, f.ownerId, [{ ...requested[0], intentId: foreign.created.intent.intentVersionId }], { start: "2026-10-05", end: "2026-10-06" }, { provisionalAvailability: provisional }))).rejects.toMatchObject({ detail: { code: "REFERENCE_NOT_OWNED" } });
+  });
+  it("preserves owned legacy observations and pins check provenance changes without relabeling the older result seal", async () => {
+    const ownerId = await user(connection);
+    const goalId = await db.coordinated(ownerId, async sql => (await sql.query('INSERT INTO "Goal" ("userId",title,"targetWeeks") VALUES ($1,\'Owned legacy learning\',3) RETURNING id', [ownerId])).rows[0].id);
+    // Legacy work exists before its goal becomes Planner-owned. The existing
+    // SQL guard correctly forbids bypassing ApplyService afterward.
+    await db.coordinated(ownerId, sql => sql.query('INSERT INTO "Quest" ("userId","goalId",title,status,"scheduledFor","targetMinutes","requiredMinutes","elapsedSeconds","completedAt","remainingDisposition") VALUES ($1,$2,\'Prior manual practice\',\'COMPLETED\',\'2026-10-01\',30,30,900,now(),\'COMPLETED\')', [ownerId, goalId]));
+    const intent = { ...intentFixture(), goalId }; const created = await new IntentService(db).create(ownerId, randomUUID(), intent);
+    const checkId = randomUUID();
+    await db.coordinated(ownerId, async sql => {
+      // A dated legacy self report with unresolved item/revision provenance;
+      // the projection must not pretend this is a verified readiness check.
+      await sql.query('INSERT INTO "PlannerCheckResult" (id,"planId","userId","revisionId","itemKey",result,"updatedAt") VALUES ($1,$2,$3,$4,$5,\'READY_TO_MOVE_ON\',now())', [checkId, created.plan.id, ownerId, randomUUID(), randomUUID()]);
+    });
+    const before = await db.coordinated(ownerId, sql => loadExecutionContext(sql, ownerId, [created.plan], intent));
+    const p = projectPlannerContext(before, [{ planId: created.plan.id, planRef: "physics", intent, goalId, activeActivityKeys: [] }], { start: "2026-10-05", end: "2026-10-06" },
+      { provisionalAvailability: { timezone: before.timezone, dailyCeilingMinutes: [120,120,120,120,120,120,120], restWeekdays: [], blockedDates: [], recoveryPercent: 15, basis: "DISCLOSED_PROVISIONAL_CEILING" } });
+    expect(p.view.legacyHistory.byPlan[0]).toMatchObject({ completedCount: 1, acceptedSeconds: 900 });
+    expect(p.view.plans[0].savedChecks[0]).toMatchObject({ scopeResolution: "UNRESOLVED", demonstratesReadiness: false });
+    await db.coordinated(ownerId, sql => sql.query('UPDATE "PlannerCheckResult" SET "updatedAt"="updatedAt"+interval \'1 second\' WHERE id=$1', [checkId]));
+    const after = await db.coordinated(ownerId, sql => loadExecutionContext(sql, ownerId, [created.plan], intent));
+    expect(after.dependencies.evidence.find(e => e.ref === "saved_checks")).toEqual(before.dependencies.evidence.find(e => e.ref === "saved_checks"));
+    expect(() => verifyContextCorrespondence(before.dependencies, after.dependencies, after.quests)).toThrow(/evidence/);
+    expect(() => verifyContextCorrespondence({ ...before.dependencies, evidence: before.dependencies.evidence.filter(e => e.ref !== "model_learning_evidence") }, after.dependencies, after.quests)).not.toThrow();
   });
   it("keeps known overrun spend in the financial ledger when another fallback's spend remains unknown", async () => {
     const f = await fixture(); const input = { provider: "fixture", model: "unpriced", inputTokens: 1000, outputTokens: 1000, category: "PLANNING" as const, policy };

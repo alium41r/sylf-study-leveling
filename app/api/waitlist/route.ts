@@ -232,13 +232,19 @@ export async function POST(req: NextRequest) {
     // the entry is already committed, so we swallow and log the error.
     if (!result.alreadyRegistered) {
       try {
-        await sendWaitlistWelcomeEmail({
+        const delivery = await sendWaitlistWelcomeEmail({
           to: result.entry.email,
           name: result.entry.name,
           queuePosition: result.position,
           referralCode: result.entry.referralCode,
           targetExam: result.entry.targetExam,
         });
+        if (!delivery.sent) {
+          console.error("[Waitlist] welcome email was not accepted (signup still succeeded):", {
+            provider: delivery.provider,
+            error: delivery.error,
+          });
+        }
       } catch (err) {
         console.error("[Waitlist] welcome email failed (signup still succeeded):", err);
       }

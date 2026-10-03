@@ -21,6 +21,9 @@ const sha = value => crypto.createHash("sha256").update(value).digest("hex");
 const sourceSha = file => sha(fs.readFileSync(path.join(root, file)));
 const gate = { gate: "PLANNER_V2_PHASE_2_STEP_2", startedAt: new Date().toISOString(), status: "FAILED", checks: [],
   scope: "Bounded context and shared metered provider boundary; assistant/research/compiler handlers remain later roadmap steps." };
+// First-run report links resolve before the final preservation check replaces
+// this explicitly pending placeholder with measured source correspondence.
+if (!fs.existsSync(path.join(evidence, "step2-source-preservation.json"))) fs.writeFileSync(path.join(evidence, "step2-source-preservation.json"), JSON.stringify({ status: "PENDING" }) + "\n");
 function check(name, work) { const result = work(); gate.checks.push({ name, status: "PASSED", evidence: result }); }
 function run(label, entry, args = [], input) {
   const r = spawnSync(process.execPath, [path.join(root, entry), ...args], { cwd: root, encoding: "utf8", timeout: 120000, maxBuffer: 12 * 1024 * 1024, input });
@@ -39,7 +42,7 @@ try {
     required("units", "node_modules/vitest/vitest.mjs", ["run", "__tests__/planner-v2/contracts", "__tests__/planner-v2/evidence/audit-regression-fixtures.test.ts", "__tests__/planner-v2/durable-digests.test.ts", "__tests__/planner-v2/intelligence",
       "__tests__/ai/provider-contract.test.ts", "__tests__/ai/multi-engine-router.test.ts", "--exclude", "scratch/**", "--reporter=json", `--outputFile=${output}`]);
     const r = JSON.parse(fs.readFileSync(output));
-    if (!r.success || r.numFailedTests || r.numPendingTests || r.testResults.some(f => f.assertionResults.some(t => t.status !== "passed"))) throw new Error("Unit failure or required skip");
+    if (!r.success || r.numFailedTests || r.numPendingTests || r.testResults.length !== 15 || r.testResults.some(f => f.assertionResults.some(t => t.status !== "passed"))) throw new Error("Unit failure, noncanonical test selection or required skip");
     return { files: r.testResults.length, passed: r.numPassedTests, requiredSkipped: 0 };
   });
   check("isolated and whole source TypeScript", () => {
@@ -77,7 +80,7 @@ try {
   });
   check("genuine PostgreSQL, compiled provider and existing required service regressions", () => {
     const p = JSON.parse(fs.readFileSync(path.join(evidence, "step2-postgres/postgres-harness-run.json")));
-    if (p.status !== "PASSED" || p.requiredResults.length !== 2 || p.requiredResults.some(r => r.failed || r.requiredSkipped) || p.cleanupError) throw new Error("Required PostgreSQL gate failed or incomplete");
+    if (p.status !== "PASSED" || p.requiredResults.length !== 2 || p.requiredResults.some(r => r.failed || r.requiredSkipped) || p.cleanupError || p.requiredResults.find(r => r.label === "current")?.files !== 17) throw new Error("Required PostgreSQL gate failed, noncanonical or incomplete");
     const results = JSON.parse(fs.readFileSync(path.join(evidence, "step2-postgres/postgres-phase1-results.json")));
     const suite = results.testResults.find(f => f.name.endsWith("intelligence-boundary.postgres.ts"));
     if (!suite || suite.assertionResults.length < 11 || suite.assertionResults.some(t => t.status !== "passed")) throw new Error("Step 2 compiled/provider database cases missing");
@@ -111,7 +114,7 @@ try {
     if (external.some(f => f.startsWith("lib/planner/") || f.startsWith("documentation/planner/") || f.startsWith("__tests__/planner/") || f.startsWith("__tests__/planner-v2/") || f.startsWith("lib/ai/"))) throw new Error(`Unclassified Planner/provider concurrency: ${external}`);
     const added = files.filter(f => !baseline.files[f] && !allowed.has(f) && !f.startsWith("documentation/planner/reports/2026-10-03-phase-2/evidence/"));
     if (added.some(f => f.startsWith("lib/planner/") || f.startsWith("documentation/planner/"))) throw new Error(`Unclassified new Planner files: ${added}`);
-    const preserved = { baselineFiles: Object.keys(baseline.files).length, step2ExistingEdits: changed.filter(f => allowed.has(f)),
+    const preserved = { status: "PASSED", baselineFiles: Object.keys(baseline.files).length, step2ExistingEdits: changed.filter(f => allowed.has(f)),
       unrelatedConcurrentChanges: external.map(file => ({ path: file, before: baseline.files[file].sha256, observed: fs.existsSync(path.join(root, file)) ? sourceSha(file) : null })), unrelatedNewFiles: added };
     fs.writeFileSync(path.join(evidence, "step2-source-preservation.json"), JSON.stringify(preserved, null, 2) + "\n");
     gate.sourceSha256 = Object.fromEntries([...allowed].sort().map(f => [f, sourceSha(f)])); return preserved;

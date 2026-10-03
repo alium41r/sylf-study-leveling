@@ -2,8 +2,15 @@
   "label": "phase1",
   "files": 8,
   "passed": 82,
-  "failed": 0,
+  "failed": 1,
   "requiredSkipped": 0,
   "optionalProviderExcluded": 0,
-  "failures": []
+  "failures": [
+    {
+      "name": "Phase 2 context and metered boundary on genuine PostgreSQL preserves owned legacy observations and pins check provenance changes without relabeling the older result seal",
+      "messages": [
+        "error: PLANNER_APPLY_REQUIRED\n    at /Users/aliumair/Desktop/sylf/node_modules/pg/lib/client.js:652:17\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts:88:7\n    at PlannerDatabase.coordinated (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:75:24)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts:87:5\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ]
 }

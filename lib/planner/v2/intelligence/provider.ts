@@ -53,7 +53,7 @@ export interface MeteredProviderRequest<T> {
   messages: NormalizedMessage[]; systemInstruction: string; policy: ProviderPolicy; outputTokens: number;
   workload?: WorkloadType; signal?: AbortSignal; callTimeoutMs?: number;
   /** Validate structured content before accepting a result/releasing holdbacks. */
-  validate: (response: Pick<LLMResponse, "text" | "finishReason" | "usage">) => T;
+  validate: (response: Pick<LLMResponse, "text" | "finishReason" | "usage">, signal: AbortSignal) => T | Promise<T>;
 }
 /** One upstream attempt per durable reservation. This intentionally uses shared
  * route configuration, never the older router's retrying dispatch helper. */
@@ -135,7 +135,9 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       if (response.finishReason !== "STOP" || !response.text?.trim()) throw failure("INVALID_OUTPUT", "The provider did not return a complete structured result.");
       const safe = { text: response.text, finishReason: response.finishReason, usage: response.usage };
       let value: T;
-      try { value = request.validate(safe); } catch { throw failure("INVALID_OUTPUT", "The provider result failed structured validation."); }
+      try { value = await Promise.race([Promise.resolve(request.validate(safe, controller.signal)), aborted]); }
+      catch { if (controller.signal.aborted) throw controller.signal.reason; throw failure("INVALID_OUTPUT", "The provider result failed structured validation."); }
+      if (controller.signal.aborted) throw controller.signal.reason;
       await meter.close(callId, { finishReason: response.finishReason, accepted: true });
       return { value, provider: route.provider, model: route.model, callId, attempts };
     } catch (error) {

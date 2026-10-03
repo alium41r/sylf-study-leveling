@@ -1,6 +1,6 @@
 {
   "gate": "PLANNER_V2_PHASE_2_STEP_2",
-  "startedAt": "2026-10-03T17:49:58.998Z",
+  "startedAt": "2026-10-03T18:25:47.675Z",
   "status": "FAILED",
   "checks": [
     {
@@ -15,7 +15,7 @@
       "status": "PASSED",
       "evidence": {
         "files": 15,
-        "passed": 150,
+        "passed": 153,
         "requiredSkipped": 0
       }
     },
@@ -37,9 +37,28 @@
           ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'."
         ]
       }
+    },
+    {
+      "name": "changed source lint and adapter baseline correspondence",
+      "status": "PASSED",
+      "evidence": {
+        "newErrors": 0,
+        "newWarnings": 0,
+        "existingAdapterErrors": 19,
+        "existingAdapterWarnings": 2
+      }
+    },
+    {
+      "name": "normal Node worker build and imports",
+      "status": "PASSED",
+      "evidence": {
+        "node": "v26.7.0",
+        "modules": 4,
+        "providerCredentials": false
+      }
     }
   ],
   "scope": "Bounded context and shared metered provider boundary; assistant/research/compiler handlers remain later roadmap steps.",
-  "error": "lint failed; see step2-lint.log",
-  "finishedAt": "2026-10-03T17:51:02.223Z"
+  "error": "Required PostgreSQL gate failed, noncanonical or incomplete",
+  "finishedAt": "2026-10-03T18:26:49.814Z"
 }

@@ -47,6 +47,14 @@ describe("shared metered provider dispatch", () => {
     const m = fakeMeter(); await expect(dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: async () => ({ ...response(), usage: undefined }) }) })).rejects.toMatchObject({ detail: { code: "PROVIDER_FAILURE" } });
     expect(m.settled).toHaveLength(0); expect(m.closed).toHaveLength(2);
   });
+  it("awaits structured validation within cancellation/deadline bounds before accepting or releasing a review hold", async () => {
+    const m = fakeMeter(); const controller = new AbortController(); const generate = vi.fn(async () => response());
+    await expect(dispatchMeteredProvider(m.meter, { ...request(), signal: controller.signal,
+      validate: async (_r, signal) => { expect(signal.aborted).toBe(false); controller.abort(); return new Promise<{ ok: boolean }>(() => {}); } },
+    { adapter: () => ({ generateResponse: generate }) })).rejects.toMatchObject({ detail: { code: "CANCELLED" } });
+    expect(generate).toHaveBeenCalledTimes(1); expect(m.settled).toHaveLength(1); expect(m.closed[0]).toMatchObject({ result: { errorCode: "CANCELLED" } });
+    expect(m.closed).not.toEqual(expect.arrayContaining([expect.objectContaining({ result: expect.objectContaining({ accepted: true }) })]));
+  });
   it("meters the effective DeepSeek model after alias/override resolution", async () => {
     const m = fakeMeter(); const adapter = { resolveModelName: () => "custom-deepseek", generateResponse: async () => response() };
     const result = await dispatchMeteredProvider(m.meter, request(), { adapter: () => adapter }); expect(result.model).toBe("custom-deepseek");

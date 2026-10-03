@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 import { POST, GET } from "@/app/api/waitlist/route";
 import { prisma } from "@/lib/prisma";
@@ -28,6 +28,30 @@ describe("Waitlist API (/api/waitlist)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (sendWaitlistWelcomeEmail as any).mockResolvedValue({ sent: true, provider: "console_dev" });
+  });
+  afterEach(() => { vi.restoreAllMocks(); });
+
+  it.each(["returned failure", "exception"])("preserves the signup and logs email %s", async (failure) => {
+    vi.mocked(prisma.$transaction).mockResolvedValue({
+      entry: { email: "student@example.com", referralCode: "sylf-failure123", referralCount: 0 },
+      position: 9,
+      alreadyRegistered: false,
+    });
+    if (failure === "exception") {
+      vi.mocked(sendWaitlistWelcomeEmail).mockRejectedValueOnce(new Error("SMTP unavailable"));
+    } else {
+      vi.mocked(sendWaitlistWelcomeEmail).mockResolvedValueOnce({ sent: false, provider: "smtp", error: "SMTP unavailable" });
+    }
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const req = new NextRequest("http://localhost:3000/api/waitlist", {
+      method: "POST",
+      headers: { "x-forwarded-for": failure === "exception" ? "192.0.2.1" : "192.0.2.2" },
+      body: JSON.stringify({ email: "student@example.com" }),
+    });
+    const response = await POST(req);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ success: true, position: 9, referralCode: "sylf-failure123" });
+    expect(log).toHaveBeenCalledWith(expect.stringContaining("signup still succeeded"), expect.anything());
   });
 
   it("rejects invalid email formats with 400 status", async () => {

@@ -4,6 +4,8 @@
  */
 
 import nodemailer from "nodemailer";
+import addressparser from "nodemailer/lib/addressparser";
+import { buildWaitlistWelcomeEmail } from "@/lib/emails/waitlist-welcome";
 
 export interface SendVerificationEmailParams {
   to: string;
@@ -289,160 +291,90 @@ export interface SendWaitlistWelcomeParams {
   targetExam?: string | null;
 }
 
-/**
- * Sent immediately after a brand-new waitlist signup. Confirms the scholar's
- * queue position and pass code, and promises a follow-up invitation the moment
- * the app launches. Uses the same SMTP → Resend → console fallback chain as
- * the other dispatch functions.
- */
-export async function sendWaitlistWelcomeEmail({
-  to,
-  name,
-  queuePosition,
-  referralCode,
-  targetExam,
-}: SendWaitlistWelcomeParams): Promise<{ sent: boolean; provider: string; error?: string }> {
-  const recipientName = (name && name.trim()) || "";
-  const goal = targetExam || "General Academic";
-
+/** Confirms a new signup; existing entries never receive duplicate confirmations. */
+export async function sendWaitlistWelcomeEmail(
+  params: SendWaitlistWelcomeParams,
+): Promise<{ sent: boolean; provider: string; error?: string }> {
   const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
   const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
   const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
   const smtpPort = Number(process.env.SMTP_PORT) || 465;
   const resendApiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.EMAIL_FROM || (smtpUser ? `"Sylf" <${smtpUser}>` : "Sylf <onboarding@resend.dev>");
+  const preference = process.env.WAITLIST_EMAIL_PROVIDER || "auto";
+  if (!["auto", "smtp", "resend"].includes(preference)) {
+    return { sent: false, provider: "configuration", error: "WAITLIST_EMAIL_PROVIDER must be auto, smtp or resend." };
+  }
 
-  const subject = `You're on the waitlist — #${queuePosition}`;
+  // Preserve existing SMTP precedence unless an operator explicitly selects Resend.
+  const provider = preference === "auto"
+    ? (smtpUser && smtpPass ? "smtp" : resendApiKey ? "resend" : "console_dev")
+    : preference;
+  const configuredFrom = process.env.WAITLIST_EMAIL_FROM?.trim() || process.env.EMAIL_FROM?.trim();
+  const fromEmail = configuredFrom || (provider === "smtp" && smtpUser ? `Sylf <${smtpUser}>` : "");
+  const replyTo = process.env.WAITLIST_EMAIL_REPLY_TO?.trim() || process.env.EMAIL_REPLY_TO?.trim();
+  const { subject, text, html } = buildWaitlistWelcomeEmail(params);
 
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <style>
-          body { margin: 0; padding: 40px 16px; background-color: #090d16; color: #e2e8f0; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-          .card { max-width: 560px; margin: 0 auto; background-color: #0d1117; border: 1px solid rgba(124, 58, 237, 0.4); border-radius: 16px; overflow: hidden; }
-          .bar { height: 4px; background: linear-gradient(90deg, rgba(124,58,237,0) 0%, #7c3aed 50%, rgba(124,58,237,0) 100%); }
-          .inner { padding: 40px 36px; }
-          .tag { font-size: 11px; font-weight: 700; letter-spacing: 0.22em; color: #a78bfa; text-transform: uppercase; text-align: center; margin-bottom: 12px; }
-          .title { font-size: 26px; font-weight: 800; color: #ffffff; text-align: center; margin: 0 0 16px; letter-spacing: 0.02em; }
-          .hello { font-size: 15px; line-height: 1.6; color: #94a3b8; text-align: center; margin: 0 0 24px; }
-          .hello strong { color: #e2e8f0; }
-          .pass { background-color: #090d16; border: 1px solid rgba(124, 58, 237, 0.35); border-radius: 12px; padding: 6px 20px; margin-bottom: 24px; }
-          .pass td { padding: 12px 0; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #64748b; }
-          .pass td + td { width: 45%; text-align: right; padding-left: 16px; letter-spacing: normal; text-transform: none; font-size: 14px; color: #a78bfa; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-word; }
-          .pass td.num { color: #e2e8f0; font-size: 16px; }
-          .note { font-size: 13px; line-height: 1.6; color: #94a3b8; text-align: center; margin: 0; }
-          .note strong { color: #a78bfa; }
-          .footer { text-align: center; font-size: 11px; color: #475569; margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(124, 58, 237, 0.15); }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <div class="bar"></div>
-          <div class="inner">
-            <div class="tag">Sylf &bull; Study Leveling</div>
-            <h1 class="title">You're on the Waitlist</h1>
-            <p class="hello">
-              Thanks for joining${recipientName ? `, <strong>${recipientName}</strong>` : ""}.<br/>
-              Your spot is locked in. We're putting the finishing touches on the app &mdash; the moment it goes live, an invitation will land in this inbox.
-            </p>
+  if (provider === "console_dev") {
+    if (process.env.NODE_ENV === "production") {
+      return { sent: false, provider: "configuration", error: "No waitlist email provider is configured." };
+    }
+    console.info("[Waitlist email] Development preview (not delivered):", { subject, text });
+    return { sent: true, provider: "console_dev" };
+  }
 
-            <table class="pass" role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td>Queue Number</td>
-                <td class="num">#${queuePosition}</td>
-              </tr>
-              <tr>
-                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">Goal</td>
-                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">${goal}</td>
-              </tr>
-              <tr>
-                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">Scholar Pass Code</td>
-                <td style="border-top: 1px solid rgba(124, 58, 237, 0.15);">${referralCode}</td>
-              </tr>
-            </table>
+  if ((provider === "smtp" && (!smtpUser || !smtpPass)) || (provider === "resend" && !resendApiKey)) {
+    return { sent: false, provider, error: `Missing credentials for the selected ${provider} provider.` };
+  }
 
-            <p class="note">
-              We'll email you here as soon as the app is published, so you can be among the first in. Until then, <strong>rank &amp; progression await.</strong>
-            </p>
+  // Parse a single real sender. The Resend testing domain is not a production sender.
+  const addresses = addressparser(fromEmail);
+  const fromAddress = addresses.length === 1 && "address" in addresses[0] ? addresses[0].address : "";
+  if (!fromAddress || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(fromAddress) || /[\r\n]/.test(fromEmail)) {
+    return { sent: false, provider, error: "Set WAITLIST_EMAIL_FROM (or EMAIL_FROM) to a single sender address authorized by your email provider." };
+  }
+  const senderDomain = fromAddress.split("@")[1].toLowerCase();
+  if (provider === "resend" && ["resend.dev", "gmail.com", "googlemail.com"].includes(senderDomain)) {
+    return { sent: false, provider, error: "Resend requires WAITLIST_EMAIL_FROM (or EMAIL_FROM) on your own verified sending domain." };
+  }
+  if (provider === "smtp" && smtpHost.toLowerCase() === "smtp.gmail.com" &&
+      /@(gmail|googlemail)\.com$/i.test(smtpUser!) && fromAddress.toLowerCase() !== smtpUser!.toLowerCase()) {
+    return { sent: false, provider, error: "Personal Gmail SMTP must use its authenticated account as EMAIL_FROM. Use a verified-domain provider for a Sylf domain sender." };
+  }
 
-            <div class="footer">
-              Sylf &bull; Turn every study hour into rank &amp; progression<br/>
-              You can ignore this email if you didn't sign up for the waitlist.
-            </div>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
-
-  const textContent = `Thanks for joining the Sylf waitlist${recipientName ? `, ${recipientName}` : ""}!\n\nYou're locked in at queue position #${queuePosition} (Goal: ${goal}).\nYour Scholar Pass Code: ${referralCode}\n\nWe'll email you at this address the moment the app is published so you can be among the first in.\n\n— Sylf (Study Leveling)`;
-
-  // 1. SMTP / Gmail
-  if (smtpUser && smtpPass) {
-    try {
+  const headers = { "Auto-Submitted": "auto-generated" };
+  try {
+    if (provider === "smtp") {
       const transporter = nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
         secure: smtpPort === 465,
-        auth: { user: smtpUser, pass: smtpPass },
+        requireTLS: true,
+        auth: { user: smtpUser!, pass: smtpPass! },
       });
-
-      await transporter.sendMail({
-        from: fromEmail,
-        to,
-        subject,
-        text: textContent,
-        html: htmlContent,
+      const result = await transporter.sendMail({
+        from: fromEmail, to: params.to, replyTo, subject, text, html, headers,
       });
-
-      console.log(`✅ [WAITLIST EMAIL] Sent welcome email to ${to} via SMTP`);
-      return { sent: true, provider: "smtp" };
-    } catch (err: any) {
-      console.error("❌ [WAITLIST SMTP ERROR]:", err);
-      return { sent: false, provider: "smtp", error: err?.message };
-    }
-  }
-
-  // 2. Resend API
-  if (resendApiKey) {
-    try {
-      const res = await fetch("https://api.resend.com/emails", {
+      // SMTP acceptance is not evidence of Gmail inbox placement.
+      if (!result.accepted?.length) {
+        return { sent: false, provider, error: "SMTP did not accept the waitlist recipient." };
+      }
+      console.info("[Waitlist email] Accepted by SMTP:", { messageId: result.messageId });
+    } else {
+      const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: fromEmail,
-          to: [to],
-          subject,
-          html: htmlContent,
+          from: fromEmail, to: [params.to], reply_to: replyTo, subject, text, html, headers,
         }),
       });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        return { sent: false, provider: "resend", error: errorData?.message || "Failed to send email" };
+      const result = await response.json();
+      if (!response.ok) {
+        return { sent: false, provider, error: result?.message || "Resend did not accept the email." };
       }
-
-      console.log(`✅ [WAITLIST EMAIL] Sent welcome email to ${to} via Resend`);
-      return { sent: true, provider: "resend" };
-    } catch (err: any) {
-      return { sent: false, provider: "resend", error: err?.message };
+      console.info("[Waitlist email] Accepted by Resend:", { messageId: result.id });
     }
+    return { sent: true, provider };
+  } catch (error: unknown) {
+    return { sent: false, provider, error: error instanceof Error ? error.message : "Email dispatch failed." };
   }
-
-  // 3. Dev Console
-  console.log("\n=======================================================");
-  console.log("📨 [WAITLIST WELCOME EMAIL - SYLF]");
-  console.log(`Recipient: ${to}`);
-  console.log(`Queue Position: #${queuePosition}`);
-  console.log(`Scholar Pass Code: ${referralCode}`);
-  console.log("(Add SMTP_USER/SMTP_PASS or RESEND_API_KEY to send real emails.)");
-  console.log("=======================================================\n");
-
-  return { sent: true, provider: "console_dev" };
 }

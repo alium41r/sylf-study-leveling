@@ -1,0 +1,185 @@
+.eyes {
+  pointer-events: none;
+}
+.closedPhase,
+.idleHappy {
+  opacity: 0;
+}
+.openPhase {
+  animation: eye-open-phase 24s linear infinite;
+}
+.closedPhase {
+  animation: eye-closed-phase 24s linear infinite;
+}
+.entering {
+  animation: eye-arrive 180ms ease-out both;
+}
+.leaving {
+  animation: eye-depart 140ms ease-out both;
+  pointer-events: none;
+}
+:global([data-state="IDLE"][data-expression="NEUTRAL"][data-motion="full"])
+  .idleNeutral {
+  animation: neutral-moment 24s linear infinite;
+}
+:global([data-state="IDLE"][data-expression="NEUTRAL"][data-motion="full"])
+  .idleHappy {
+  animation: happy-moment 24s linear infinite;
+}
+:global([data-state="IDLE"][data-expression="NEUTRAL"][data-motion="full"])
+  .curiousGlance {
+  animation: curious-glance 19s ease-in-out infinite;
+}
+:global([data-compact="true"]) .micro {
+  display: none;
+}
+@media (max-width: 700px) {
+  :global([data-motion-profile="journey"]) .micro {
+    display: none;
+  }
+}
+/* A drawn luminous lid replaces the detailed eye: no crushed gradients/stars. */
+@keyframes eye-open-phase {
+  0%,
+  9.5%,
+  10.5%,
+  33.5%,
+  34.5%,
+  35.1%,
+  36.1%,
+  63.5%,
+  64.5%,
+  89.5%,
+  90.5%,
+  100% {
+    opacity: 1;
+  }
+  9.8%,
+  10.2%,
+  33.8%,
+  34.2%,
+  35.4%,
+  35.8%,
+  63.8%,
+  64.2%,
+  89.8%,
+  90.2% {
+    opacity: 0;
+  }
+}
+@keyframes eye-closed-phase {
+  0%,
+  9.5%,
+  10.5%,
+  33.5%,
+  34.5%,
+  35.1%,
+  36.1%,
+  63.5%,
+  64.5%,
+  89.5%,
+  90.5%,
+  100% {
+    opacity: 0;
+  }
+  9.8%,
+  10.2%,
+  33.8%,
+  34.2%,
+  35.4%,
+  35.8%,
+  63.8%,
+  64.2%,
+  89.8%,
+  90.2% {
+    opacity: 1;
+  }
+}
+@keyframes eye-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes eye-depart {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes curious-glance {
+  0%,
+  20%,
+  25%,
+  69%,
+  74%,
+  100% {
+    transform: translate(0, 0);
+  }
+  22.5%,
+  72.5% {
+    transform: translate(4px, -5px);
+  }
+}
+@keyframes neutral-moment {
+  0%,
+  65%,
+  71%,
+  100% {
+    opacity: 1;
+  }
+  66%,
+  70% {
+    opacity: 0;
+  }
+}
+@keyframes happy-moment {
+  0%,
+  65%,
+  71%,
+  100% {
+    opacity: 0;
+  }
+  66%,
+  70% {
+    opacity: 1;
+  }
+}
+:global([data-motion="none"]) .leaving {
+  display: none;
+}
+/* Cue the existing lid without competing with the autonomous idle cadence. */
+.eyes[data-blink] .openPhase,
+.eyes[data-blink] .closedPhase {
+  transition: opacity 40ms ease;
+}
+:global([data-svg-sequence]) .openPhase,
+:global([data-svg-sequence]) .closedPhase,
+:global([data-svg-sequence][data-state][data-expression][data-motion])
+  .idleNeutral,
+:global([data-svg-sequence][data-state][data-expression][data-motion])
+  .idleHappy,
+:global([data-svg-sequence][data-state][data-expression][data-motion])
+  .curiousGlance {
+  animation: none;
+}
+.eyes[data-blink="open"] .openPhase,
+:global([data-svg-sequence]) .idleNeutral {
+  opacity: 1;
+}
+.eyes[data-blink="closed"] .openPhase,
+.eyes[data-blink="open"] .closedPhase {
+  opacity: 0;
+}
+.eyes[data-blink="closed"] .closedPhase {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .leaving {
+    display: none;
+  }
+}

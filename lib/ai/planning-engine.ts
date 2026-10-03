@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { EFFORT_CONFIG, EffortLevel } from "@/lib/game-engine";
-import { QuestDifficulty } from "@prisma/client";
+import { QuestDifficulty, type Prisma } from "@prisma/client";
 import { TimezoneService } from "../timezone-service";
 import { getUserTimezone } from "../timezone-server";
 
-export async function getHighestEffortLevel(userId: number): Promise<EffortLevel> {
-  const goal = await prisma.goal.findFirst({
+export async function getHighestEffortLevel(userId: number, client: Prisma.TransactionClient = prisma): Promise<EffortLevel> {
+  const goal = await client.goal.findFirst({
     where: { userId, status: "ACTIVE" },
     orderBy: { createdAt: "desc" }
   });
@@ -13,12 +13,12 @@ export async function getHighestEffortLevel(userId: number): Promise<EffortLevel
   return goal.effortLevel as EffortLevel;
 }
 
-export async function getSituationalFlags(userId: number): Promise<{
+export async function getSituationalFlags(userId: number, client: Prisma.TransactionClient = prisma): Promise<{
   isBurnoutRisk: boolean;
   isOverloaded: boolean;
   isStruggling: boolean;
 }> {
-  const user = await prisma.user.findUnique({
+  const user = await client.user.findUnique({
     where: { id: userId },
     select: { hp: true, streakDays: true }
   });
@@ -27,7 +27,7 @@ export async function getSituationalFlags(userId: number): Promise<{
   // 1. Burnout Risk: HP is very low (<30) OR (HP < 50 AND taking more damage than healing)
   let isBurnoutRisk = user.hp < 30;
   if (!isBurnoutRisk && user.hp < 50) {
-    const recentHp = await prisma.hpLedger.findMany({
+    const recentHp = await client.hpLedger.findMany({
       where: { userId, createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
       select: { amount: true }
     });
@@ -37,13 +37,13 @@ export async function getSituationalFlags(userId: number): Promise<{
   }
 
   // 2. Overloaded: Next 7 days scheduled minutes > 90% of total weekly capacity
-  const effortLevel = await getHighestEffortLevel(userId);
+  const effortLevel = await getHighestEffortLevel(userId, client);
   const dailyBudget = EFFORT_CONFIG[effortLevel].dailyMinutes;
   
-  const timezone = await getUserTimezone(userId);
+  const timezone = await getUserTimezone(userId, client);
   const next7Dates = TimezoneService.getDateRangeInUserTimezone(timezone, 1, 7);
   
-  const upcomingQuests = await prisma.quest.aggregate({
+  const upcomingQuests = await client.quest.aggregate({
     where: { userId, scheduledFor: { in: next7Dates } },
     _sum: { requiredMinutes: true }
   });
@@ -53,7 +53,7 @@ export async function getSituationalFlags(userId: number): Promise<{
   // 3. Struggling: 0 streak AND recent completion rate is poor (<50% over last 14 days)
   let isStruggling = false;
   if (user.streakDays === 0) {
-    const recentQuests = await prisma.quest.findMany({
+    const recentQuests = await client.quest.findMany({
       where: { userId, createdAt: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) } },
       select: { status: true }
     });
@@ -91,12 +91,13 @@ export async function calculateDailyCapacity(
   userId: number,
   effortLevel: EffortLevel,
   startDateStr: string,
-  endDateStr: string
+  endDateStr: string,
+  client: Prisma.TransactionClient = prisma
 ): Promise<CapacityMatrix> {
   let dailyBudget: number = EFFORT_CONFIG[effortLevel].dailyMinutes;
   
   // Apply deterministic workload reductions if user is burning out or overloaded
-  const flags = await getSituationalFlags(userId);
+  const flags = await getSituationalFlags(userId, client);
   if (flags.isBurnoutRisk) {
     dailyBudget = Math.floor(dailyBudget * 0.5); // cut capacity in half to force rest
   } else if (flags.isOverloaded) {
@@ -104,7 +105,7 @@ export async function calculateDailyCapacity(
   }
   
   // Get user rest days if any
-  const user = await prisma.user.findUnique({
+  const user = await client.user.findUnique({
     where: { id: userId },
     select: { restDays: true }
   });
@@ -113,20 +114,15 @@ export async function calculateDailyCapacity(
   // Floating (ad-hoc) rest days are hard-blocked exactly like fixed ones —
   // every ingestion vector that plans through the capacity matrix must
   // never allocate quests onto these dates.
-  let floatingRestDays: string[] = [];
-  try {
-    const floating = await prisma.floatingRestDay.findMany({
+  const floating = await client.floatingRestDay.findMany({
       where: { userId, dateKey: { gte: startDateStr, lte: endDateStr } },
       select: { dateKey: true },
     });
-    floatingRestDays = floating.map((r) => r.dateKey);
-  } catch {
-    floatingRestDays = [];
-  }
+  const floatingRestDays = floating.map((r) => r.dateKey);
   const floatingRestSet = new Set(floatingRestDays);
 
   // Find all quests the user has scheduled between startDate and endDate
-  const existingQuests = await prisma.quest.findMany({
+  const existingQuests = await client.quest.findMany({
     where: {
       userId,
       scheduledFor: {

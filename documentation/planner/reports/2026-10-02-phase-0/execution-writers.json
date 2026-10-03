@@ -1,0 +1,4251 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "scope": "read-only working-tree execution writer inventory; no hosted DB inspection",
+  "curated_writers": [
+    {
+      "id": "P01",
+      "area": "Planner",
+      "name": "Initial confirmation / Roadmap expansion confirmation",
+      "sources": [
+        {
+          "path": "lib/planner/server/materialize.ts",
+          "line": 106
+        },
+        {
+          "path": "lib/planner/server/materialize.ts",
+          "line": 78
+        },
+        {
+          "path": "app/api/planner/[id]/commit/route.ts",
+          "line": 1
+        }
+      ],
+      "mutation_fields": [
+        "Goal.*",
+        "Quest.title/description/date/requiredMinutes/targetMinutes/status/rewards",
+        "PlannerQuestLink.*",
+        "Plan.active/latestDraft/state/version",
+        "Revision.confirmation*"
+      ],
+      "protection": "Owned Plan/references; per-user 73641 advisory lock; serializable retry; version/digest/latest candidate/live availability; batch creation and receipt atomic. Replay transport key returns receipt; distinct key on same confirmed revision currently errors.",
+      "phase1_seam": "Retain atomic batch/ownership core; require Goal; canonical timebox/criterion/resources; verify complete semantic correspondence; joint apply and receipt identity."
+    },
+    {
+      "id": "P02",
+      "area": "Planner",
+      "name": "Rebalance confirmation",
+      "sources": [
+        {
+          "path": "lib/planner/server/rebalance.ts",
+          "line": 990
+        },
+        {
+          "path": "lib/planner/server/rebalance.ts",
+          "line": 1114
+        },
+        {
+          "path": "app/api/planner/[id]/rebalance/confirm/route.ts",
+          "line": 1
+        }
+      ],
+      "mutation_fields": [
+        "Link disposition/questId/appliedRevision/baseline",
+        "Quest DELETE/new rows",
+        "Plan active/latest/version",
+        "Revision confirmation receipt"
+      ],
+      "protection": "Same Planner transaction/version/digest/live execution guards; protected items frozen. Replacement tombstones links before deleting; new Quests batched; retained Quests not rewritten.",
+      "phase1_seam": "Use full content/effort/placement equality; shared coordinated apply; paused remaining-work overlay/withdrawal/continuation; no direct deletion of started history."
+    },
+    {
+      "id": "P03",
+      "area": "Planner",
+      "name": "Plan shells, generation/expansion attempts, revisions and archive",
+      "sources": [
+        {
+          "path": "lib/planner/server/revisions.ts",
+          "line": 26
+        },
+        {
+          "path": "lib/planner/server/revisions.ts",
+          "line": 100
+        },
+        {
+          "path": "lib/planner/server/revisions.ts",
+          "line": 492
+        },
+        {
+          "path": "lib/planner/server/operations.ts",
+          "line": 28
+        },
+        {
+          "path": "lib/planner/server/operations.ts",
+          "line": 108
+        }
+      ],
+      "mutation_fields": [
+        "Plan creation/current draft/version/state",
+        "Revision input/output/operation/lease/quota/receipt"
+      ],
+      "protection": "Planner transaction; owned references; unique creation/operation keys+hash; sealed snapshot guard; archive advances version and does not delete Quests. Current operation state is stored on Revision.",
+      "phase1_seam": "Split Intent/Attempt from immutable Revision; fenced worker; preserve existing execution on archive unless separately authorized reviewed withdrawal."
+    },
+    {
+      "id": "P04",
+      "area": "Planner",
+      "name": "Optional stretch promotion",
+      "sources": [
+        {
+          "path": "lib/planner/server/stretch.ts",
+          "line": 71
+        },
+        {
+          "path": "app/api/planner/[id]/stretch/route.ts",
+          "line": 1
+        }
+      ],
+      "mutation_fields": [
+        "Quest CREATE",
+        "Link CREATE baseline promotion",
+        "Plan.version"
+      ],
+      "protection": "Owned confirmed revision, expected version, live capacity and dependency checks; existing link makes retry no-op; transaction.",
+      "phase1_seam": "Merge into requested change/review/apply; never promote because capacity exists."
+    },
+    {
+      "id": "P05",
+      "area": "Planner",
+      "name": "Copilot generated-item release",
+      "sources": [
+        {
+          "path": "lib/planner/copilot/release.ts",
+          "line": 286
+        },
+        {
+          "path": "lib/planner/copilot/release.ts",
+          "line": 383
+        },
+        {
+          "path": "app/api/planner/intake/[id]/copilot/apply/route.ts",
+          "line": 1
+        }
+      ],
+      "mutation_fields": [
+        "Link USER_RELEASED/questId=null/removal timestamps",
+        "Quest DELETE"
+      ],
+      "protection": "Owned active revision, execution classification/user lock; unlink/tombstone before delete in one transaction; protected sessions/terminal work blocked.",
+      "phase1_seam": "Merge release into explicit diff/apply; preserve tombstones and no automatic reattachment; continuation uses withdrawal, not started-row deletion."
+    },
+    {
+      "id": "P06",
+      "area": "Planner",
+      "name": "Released-work reoffer accept/decline",
+      "sources": [
+        {
+          "path": "lib/planner/server/reoffer.ts",
+          "line": 129
+        },
+        {
+          "path": "lib/planner/server/reoffer.ts",
+          "line": 290
+        },
+        {
+          "path": "app/api/planner/[id]/reoffer/route.ts",
+          "line": 1
+        }
+      ],
+      "mutation_fields": [
+        "Replacement Quest/Link CREATE",
+        "old Link reofferState/reofferedAt",
+        "Plan.version"
+      ],
+      "protection": "Owned/versioned transaction, live capacity, past-date fallback, original tombstone retained; explicit accept/decline.",
+      "phase1_seam": "Merge into shared change/apply; restoration/continuation lineage and approved resources/criterion remain canonical."
+    },
+    {
+      "id": "P07",
+      "area": "Planner",
+      "name": "Manual linked Quest structural edit/delete escape hatch",
+      "sources": [
+        {
+          "path": "lib/planner/server/mutation-guards.ts",
+          "line": 47
+        },
+        {
+          "path": "app/api/quests/[id]/route.ts",
+          "line": 81
+        },
+        {
+          "path": "app/api/quests/[id]/route.ts",
+          "line": 298
+        }
+      ],
+      "mutation_fields": [
+        "Quest title/description/date/required+target/difficulty/rewards/goalId or DELETE",
+        "Link DETACHED/DELETED via trigger"
+      ],
+      "protection": "Owned linked lookup; Planner transaction+Quest row lock; session existence protects unsafe date/time/delete fields; title/description may change after start; terminal edits blocked. Sets transaction-local sylf.planner_manual_quest. Mixed execution/structural commands rejected.",
+      "phase1_seam": "Replace direct edit/detach with bounded reviewed Revision/apply. Keep started content immutable; add authoritative pause/version gates; do not allow generic tool bypass."
+    },
+    {
+      "id": "P08",
+      "area": "Planner",
+      "name": "Manual linked Goal edit and guarded bulk Goal deletion",
+      "sources": [
+        {
+          "path": "lib/planner/server/mutation-guards.ts",
+          "line": 19
+        },
+        {
+          "path": "lib/planner/server/mutation-guards.ts",
+          "line": 32
+        }
+      ],
+      "mutation_fields": [
+        "Goal title/description/targetWeeks/targetDate/effort/status/color",
+        "unlinked Goal/Quest DELETE"
+      ],
+      "protection": "Planner transaction and Goal row lock; manual_goal setting permits direct linked Goal update; guarded delete rejects Planner-linked records.",
+      "phase1_seam": "Goal display projection versus Plan intent must be explicit; semantic target changes create intent/proposal, cosmetic color may remain independent."
+    },
+    {
+      "id": "Q01",
+      "area": "Quest",
+      "name": "Ordinary/manual or SubjectNode Quest creation",
+      "sources": [
+        {
+          "path": "app/api/quests/route.ts",
+          "line": 148
+        },
+        {
+          "path": "app/api/quests/route.ts",
+          "line": 321
+        },
+        {
+          "path": "app/locker/components/CreateNodeQuestModal.tsx",
+          "line": 160
+        }
+      ],
+      "mutation_fields": [
+        "Quest title/description/goal/subject/node/date/target+required/difficulty/rewards/scopeWeight/status"
+      ],
+      "protection": "Cookie auth, owned Goal/Subject/node, duration clamp 15\u2013240, rest-day guard, server reward calculation; a single insert, no Planner user lock or idempotency key.",
+      "phase1_seam": "Coordinate creation consuming global capacity; one duration contract; standalone Quests remain supported; node progress is execution evidence, not verified mastery."
+    },
+    {
+      "id": "Q02",
+      "area": "Quest",
+      "name": "Ordinary field/status update and explicit completion",
+      "sources": [
+        {
+          "path": "app/api/quests/[id]/route.ts",
+          "line": 79
+        },
+        {
+          "path": "app/api/quests/[id]/route.ts",
+          "line": 160
+        },
+        {
+          "path": "app/api/quests/[id]/route.ts",
+          "line": 217
+        }
+      ],
+      "mutation_fields": [
+        "Quest title/description/requiredMinutes/date/elapsedSeconds/difficulty/goal/status/completedAt",
+        "completion RPC rewards; failure HP/ledger/message"
+      ],
+      "protection": "Linked structural helper first; owned Quest; date/rest checks. Status-only linked calls continue to normal execution. Completion uses claim_quest_reward then separate field update; failure status write precedes separate HP transaction. Unlinked requiredMinutes edits do not also synchronize targetMinutes.",
+      "phase1_seam": "Separate structural apply from authoritative execution transition; remove client elapsedSeconds writes; coordinate completion/failure and timebox aliases with RPC disposition/version guards."
+    },
+    {
+      "id": "Q03",
+      "area": "Quest",
+      "name": "Single/bulk Quest deletion",
+      "sources": [
+        {
+          "path": "app/api/quests/[id]/route.ts",
+          "line": 283
+        },
+        {
+          "path": "app/api/quests/route.ts",
+          "line": 373
+        }
+      ],
+      "mutation_fields": [
+        "Quest DELETE",
+        "StudySession.questId SET NULL",
+        "Link tombstone via trigger"
+      ],
+      "protection": "Single linked path uses helper; bulk preflight assertNoLinkedQuests; ownership filters; SQL trigger backstop. Ordinary deletes have no execution-history protection beyond FK retention.",
+      "phase1_seam": "Explicit standalone deletion policy; linked withdrawal/apply, currentness invalidation and session coordination; retain actual histories."
+    },
+    {
+      "id": "G01",
+      "area": "Goal",
+      "name": "Goal CRUD routes",
+      "sources": [
+        {
+          "path": "app/api/goals/route.ts",
+          "line": 59
+        },
+        {
+          "path": "app/api/goals/route.ts",
+          "line": 118
+        },
+        {
+          "path": "app/api/goals/[id]/route.ts",
+          "line": 62
+        },
+        {
+          "path": "app/api/goals/[id]/route.ts",
+          "line": 129
+        }
+      ],
+      "mutation_fields": [
+        "Goal title/description/targetWeeks/date/effort/status/color",
+        "Goal/associated Quest DELETE"
+      ],
+      "protection": "Cookie auth/ownership and schema validation; linked PATCH manualGoal escape; guarded linked deletion; bulk route explicitly deletes Quests then Goals. No common global lock on unlinked creates/updates.",
+      "phase1_seam": "Make Planner-linked outcome/deadline edits intent changes; preserve ordinary goals; deletion must coordinate dependencies and execution."
+    },
+    {
+      "id": "G02",
+      "area": "Goal",
+      "name": "Timeline adjustment endpoint",
+      "sources": [
+        {
+          "path": "app/api/goals/[id]/adjust/route.ts",
+          "line": 25
+        },
+        {
+          "path": "app/api/goals/[id]/adjust/route.ts",
+          "line": 75
+        }
+      ],
+      "mutation_fields": [
+        "Goal.targetWeeks/effortLevel",
+        "PENDING Quest DELETE",
+        "SystemMessage CREATE"
+      ],
+      "protection": "Owned Goal and assertNoPlannerGoals; despite preview wording POST mutates. Goal update, delete and message are separate statements, no transaction/idempotency.",
+      "phase1_seam": "Replace linked adjustment with reviewed change; ordinary path cannot race linked adoption; retirement/transport mapping must be explicit."
+    },
+    {
+      "id": "C01",
+      "area": "Chat/calendar",
+      "name": "Generic chat Goal/Quest create/update",
+      "sources": [
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 209
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 251
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 470
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 567
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 579
+        }
+      ],
+      "mutation_fields": [
+        "Goal CREATE/update target/date/title/effort/status/color",
+        "Quest CREATE/update content/time/date/rewards/status"
+      ],
+      "protection": "Server executor receives authenticated user; referenced ownership, rest-day and reward-driving clamps; linked updates rejected with assertNoPlannerGoals/assertNoLinkedQuests. Multi-Quest creation loops individual calls, no common idempotent apply.",
+      "phase1_seam": "Route authorized linked commands to shared change service; coordinate standalone calendar capacity; typed ownership registry; no parallel Planner-like materializer."
+    },
+    {
+      "id": "C02",
+      "area": "Chat/calendar",
+      "name": "Chat Goal/Quest destructive commands",
+      "sources": [
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 291
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 370
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 651
+        }
+      ],
+      "mutation_fields": [
+        "Goal/Quest single/bulk DELETE"
+      ],
+      "protection": "Bulk destructive commands require signed confirmation tokens; linked Goal deletion uses deleteUnlinkedGoals transaction and returns before old fallback code; Quest bulk checks links before delete. Tokens establish consent, not lifecycle correspondence.",
+      "phase1_seam": "Retain destructive authorization and ownership; explicit linked withdrawal/plan archive route; quiesce execution before erasure."
+    },
+    {
+      "id": "C03",
+      "area": "Chat/calendar",
+      "name": "Chat completion",
+      "sources": [
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 721
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 760
+        }
+      ],
+      "mutation_fields": [
+        "Quest.status/completedAt",
+        "User progression/currency/HP",
+        "reward ledgers/messages"
+      ],
+      "protection": "Owned Quest and authoritative claim_quest_reward RPC; linked status execution intentionally allowed.",
+      "phase1_seam": "Same disposition/version/coordination as Focus completion; no completion for withdrawn originals; evidence of work does not imply mastery."
+    },
+    {
+      "id": "C04",
+      "area": "Chat/calendar",
+      "name": "Move, swap, clear-day tools",
+      "sources": [
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 853
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 890
+        },
+        {
+          "path": "lib/ai/chat-tool-executor.ts",
+          "line": 944
+        }
+      ],
+      "mutation_fields": [
+        "Quest.scheduledFor"
+      ],
+      "protection": "Ownership/date/rest validation, linked rejection preflight; swap/clear updates transaction arrays. Clear scans fourteen days with simple capacity math. No execution-state lock or same-user Planner coordination for ordinary rows.",
+      "phase1_seam": "Calendar-only allocator and reviewed linked diff; common global capacity lock; no duplicate date/duration math; non-running check."
+    },
+    {
+      "id": "S01",
+      "area": "Focus/session",
+      "name": "Start and lazy recovery API",
+      "sources": [
+        {
+          "path": "app/api/sessions/route.ts",
+          "line": 62
+        },
+        {
+          "path": "app/api/sessions/route.ts",
+          "line": 85
+        },
+        {
+          "path": "app/focus/components/FocusScreen.tsx",
+          "line": 919
+        }
+      ],
+      "mutation_fields": [
+        "StudySession CREATE/other endedAt",
+        "Quest PENDING\u2192IN_PROGRESS"
+      ],
+      "protection": "Cookie auth\u2192four-argument SQL start_study_session; owned Quest/Subject; capped backdate; adopts matching open row; closes other open rows. No request-key or explicit same-user SQL row/advisory lock in effective body.",
+      "phase1_seam": "Durable RUNNING/PAUSED/ENDED and execution version; zero-second start protection; same user coordination; define takeover/adoption instead of implicit close."
+    },
+    {
+      "id": "S02",
+      "area": "Focus/session",
+      "name": "Heartbeat/finalize/complete API",
+      "sources": [
+        {
+          "path": "app/api/sessions/route.ts",
+          "line": 120
+        },
+        {
+          "path": "app/api/sessions/route.ts",
+          "line": 182
+        },
+        {
+          "path": "app/focus/components/FocusScreen.tsx",
+          "line": 479
+        }
+      ],
+      "mutation_fields": [
+        "StudySession durationSeconds/minutes/breakSeconds/focusRate/endedAt/rewardsClaimed",
+        "Quest elapsed/status/completedAt",
+        "SubjectNode progress/mastery",
+        "User totals/progression/HP/currency/stats",
+        "ledgers/messages"
+      ],
+      "protection": "Authenticated ownership; SQL Session\u2192Quest\u2192User\u2192Stats\u2192Node locks; cumulative monotonic deltas, wall-clock cap, reward claim anchor. API final flood guard fails open on count failure. No execution generation/pause authority; SQL can auto-complete from elapsed target.",
+      "phase1_seam": "Preserve exact delta/reward transaction; completion explicit, readiness separate; fenced transition and withdrawal guards; heartbeat cannot resurrect structural state."
+    },
+    {
+      "id": "S03",
+      "area": "Focus/session",
+      "name": "Weekly streak award after settlement",
+      "sources": [
+        {
+          "path": "app/api/sessions/route.ts",
+          "line": 210
+        },
+        {
+          "path": "app/api/sessions/route.ts",
+          "line": 247
+        }
+      ],
+      "mutation_fields": [
+        "User streakDays/lastActiveDate/sylph",
+        "InventoryItem decrement",
+        "SystemMessage"
+      ],
+      "protection": "Conditional updateMany elects one weekly winner; reward/consumable/message operations are outside settlement RPC and separate. Weekly sum uses durationMinutes.",
+      "phase1_seam": "Preserve claim behavior in writer coordination; do not reset ledgers on plan changes; canonical actual-seconds aggregation and rollback test."
+    },
+    {
+      "id": "S04",
+      "area": "Focus/session",
+      "name": "Focus Party timer state",
+      "sources": [
+        {
+          "path": "lib/focus-party-service.ts",
+          "line": 328
+        },
+        {
+          "path": "lib/focus-party-service.ts",
+          "line": 358
+        },
+        {
+          "path": "lib/focus-party-service.ts",
+          "line": 388
+        },
+        {
+          "path": "app/api/focus-party/[id]/session/timer/route.ts",
+          "line": 1
+        }
+      ],
+      "mutation_fields": [
+        "FocusSessionMember elapsed/anchor/state",
+        "FocusSession/session membership"
+      ],
+      "protection": "Party membership/ownership and SQL member locks; separate public party RPC state; does not itself write ordinary StudySession/Quest in these bodies.",
+      "phase1_seam": "Keep party participation separate; shared FocusScreen session writes still follow S01/S02. Durable study pause cannot be inferred from party member state."
+    },
+    {
+      "id": "A01",
+      "area": "Availability",
+      "name": "Weekly schedule settings",
+      "sources": [
+        {
+          "path": "app/api/user/study-schedule/route.ts",
+          "line": 58
+        },
+        {
+          "path": "app/calendar/components/StudyScheduleModal.tsx",
+          "line": 67
+        }
+      ],
+      "mutation_fields": [
+        "User.dailyGoalMinutes/restDays/enableHpPenalty"
+      ],
+      "protection": "Cookie auth, schema validation; ordinary User update, no Planner version or global lock; rest changes do not reschedule existing Quests here.",
+      "phase1_seam": "Treat goal as preference; canonical availability acceptance/source; invalidate consequential candidate dependencies; reviewed calendar adaptation."
+    },
+    {
+      "id": "A02",
+      "area": "Availability",
+      "name": "Floating rest-day toggle and automatic shifting",
+      "sources": [
+        {
+          "path": "app/api/user/study-schedule/floating-rest-day/route.ts",
+          "line": 75
+        },
+        {
+          "path": "lib/study-schedule-service.ts",
+          "line": 126
+        }
+      ],
+      "mutation_fields": [
+        "FloatingRestDay CREATE/DELETE",
+        "Quest.scheduledFor"
+      ],
+      "protection": "Auth/date/week quota; create+shift one Prisma transaction; linked preflight blocks cascade; unique race path toggles row off; removal retries swallowed. Cascade includes IN_PROGRESS ordinary tasks and uses no session guard; lookup failures use defaults.",
+      "phase1_seam": "Idempotent set-state rather than toggle retry; rest change plus reviewed linked placement; same lock and fail-closed required facts; preserve actual session dates."
+    },
+    {
+      "id": "A03",
+      "area": "Availability",
+      "name": "Deadline sweep",
+      "sources": [
+        {
+          "path": "app/api/quests/check-deadlines/route.ts",
+          "line": 7
+        },
+        {
+          "path": "app/api/quests/check-deadlines/route.ts",
+          "line": 47
+        }
+      ],
+      "mutation_fields": [
+        "Quest.status=FAILED",
+        "User.hp",
+        "HpLedger/SystemMessage"
+      ],
+      "protection": "Cron Bearer secret with fail-closed constant-time comparison; GET sweeps all users' overdue PENDING/IN_PROGRESS tasks; per-task transaction; no common Planner lock, status/HP snapshots selected before transaction. Planner structural trigger permits status changes.",
+      "phase1_seam": "Explicit execution failure policy and per-user coordinated version; fresh status and HP inside each transaction; no missed-study auto mutation incompatible with proposed recovery; penalties separate from mastery."
+    },
+    {
+      "id": "A04",
+      "area": "Availability",
+      "name": "Lazy daily-study penalty",
+      "sources": [
+        {
+          "path": "lib/hp-penalty-service.ts",
+          "line": 94
+        },
+        {
+          "path": "lib/hp-penalty-service.ts",
+          "line": 435
+        },
+        {
+          "path": "app/api/user/heartbeat/route.ts",
+          "line": 47
+        },
+        {
+          "path": "app/api/calendar/month/route.ts",
+          "line": 40
+        }
+      ],
+      "mutation_fields": [
+        "User HP/lastDailyPenaltyEvaluatedDate",
+        "consumable inventory",
+        "HpLedger/SystemMessage"
+      ],
+      "protection": "Daily actual sessions/rest/goal evaluated; idempotency cursor, transaction for penalty application; GET calendar/month and POST heartbeat can trigger evaluation; not a Quest materializer.",
+      "phase1_seam": "Retain accounting but audit date/actual-second dependency; separate desired intensity from account punishment target; lock order cannot invert shared execution lock."
+    },
+    {
+      "id": "A05",
+      "area": "Availability",
+      "name": "Timezone changes/onboarding",
+      "sources": [
+        {
+          "path": "app/api/user/account/route.ts",
+          "line": 102
+        },
+        {
+          "path": "app/api/user/onboarding/route.ts",
+          "line": 101
+        }
+      ],
+      "mutation_fields": [
+        "User.timezone"
+      ],
+      "protection": "Cookie auth and timezone validation; user update/transaction; no migration of existing civil Quest dates or Planner snapshots.",
+      "phase1_seam": "Timezone dependency currentness and explicit boundary rules; never reinterpret old session dates silently."
+    },
+    {
+      "id": "D01",
+      "area": "Subject/evidence",
+      "name": "Subject creation/onboarding",
+      "sources": [
+        {
+          "path": "app/api/subjects/route.ts",
+          "line": 124
+        },
+        {
+          "path": "app/api/user/onboarding/route.ts",
+          "line": 200
+        }
+      ],
+      "mutation_fields": [
+        "Subject CREATE/upsert academic identity",
+        "SubjectNode skeleton CREATE"
+      ],
+      "protection": "Authenticated user; transaction and unique user/code, active/archived identity checks; onboarding may update existing subject identity.",
+      "phase1_seam": "Owned source registry and consequential academic identity generations; no inference that default board/year equals verified assessment."
+    },
+    {
+      "id": "D02",
+      "area": "Subject/evidence",
+      "name": "Subject metadata edit/archive/restore",
+      "sources": [
+        {
+          "path": "app/api/subjects/[id]/route.ts",
+          "line": 167
+        },
+        {
+          "path": "app/api/subjects/[id]/route.ts",
+          "line": 228
+        },
+        {
+          "path": "app/api/subjects/[id]/restore/route.ts",
+          "line": 55
+        },
+        {
+          "path": "lib/subject-service.ts",
+          "line": 20
+        }
+      ],
+      "mutation_fields": [
+        "Subject identity/title/description/archivedAt"
+      ],
+      "protection": "Owned active subject; archive soft-delete retains Quests/sessions/plans; unended StudySession preflight blocks archive, not transactionally coordinated. Dependency counts are advisory. Restore clears archivedAt.",
+      "phase1_seam": "Owned source/evidence currentness; acknowledged execution-state check; do not physically cascade active subject history."
+    },
+    {
+      "id": "D03",
+      "area": "Subject/evidence",
+      "name": "AI syllabus compilation",
+      "sources": [
+        {
+          "path": "app/api/subjects/[id]/compile/route.ts",
+          "line": 118
+        },
+        {
+          "path": "app/api/subjects/[id]/compile/route.ts",
+          "line": 133
+        }
+      ],
+      "mutation_fields": [
+        "SubjectNode title/description/difficulty/updatedAt",
+        "Subject.lastCompiledAt"
+      ],
+      "protection": "Owned nonarchived subject/cooldown/quota; provider outside transaction; batch node update does not change progress/mastery; cooldown stamp separate.",
+      "phase1_seam": "Source-context hash and row generation currentness; freeze accepted scope/evidence instead of relabeling active tasks from fresh node text."
+    },
+    {
+      "id": "D04",
+      "area": "Rewards",
+      "name": "Apex, skills, achievements, shop and stat investments",
+      "sources": [
+        {
+          "path": "app/api/subjects/[id]/forge-apex/route.ts",
+          "line": 100
+        },
+        {
+          "path": "app/api/skills/unlock/route.ts",
+          "line": 78
+        },
+        {
+          "path": "app/api/achievements/route.ts",
+          "line": 111
+        },
+        {
+          "path": "app/api/shop/purchase/route.ts",
+          "line": 30
+        },
+        {
+          "path": "app/api/cognitive-stats/invest/route.ts",
+          "line": 158
+        }
+      ],
+      "mutation_fields": [
+        "SubjectNode mastery/progress",
+        "User/UserStats progression/currency/SP/attributes",
+        "UserAchievement/UserSkillNode/UserInventory",
+        "reward ledgers"
+      ],
+      "protection": "Owned server routes; atomic reward RPCs/claim anchors or per-route transactions. Share User/UserStats locks with settlement; unrelated XP/style must not stale proposals.",
+      "phase1_seam": "Retain economy authorities; no academic mastery inference from progression. Respect global\u2192Session/Quest\u2192User lock order where relevant; do not rewrite historical rewards."
+    },
+    {
+      "id": "D05",
+      "area": "Deletion/reset",
+      "name": "Reset progress",
+      "sources": [
+        {
+          "path": "app/api/user/reset-progress/route.ts",
+          "line": 69
+        }
+      ],
+      "mutation_fields": [
+        "User level/XP/rank/HP/streak/totalStudyMinutes",
+        "Quest/StudySession DELETE",
+        "SylphLedger/HpLedger DELETE"
+      ],
+      "protection": "Cookie auth/password or email-verification proof; Prisma transaction; no coordinated timer quiescence; linked Quest SQL guard blocks active-User reset. Does not reset totalStudySeconds/XpLedger/UserStats/Planner state in this body.",
+      "phase1_seam": "Explicit coordinated reset policy; cancel attempts and quiesce sessions; preserve or reset all correlated authorities deliberately. This is not normal replan."
+    },
+    {
+      "id": "D06",
+      "area": "Deletion/reset",
+      "name": "Account deletion and FK cascades",
+      "sources": [
+        {
+          "path": "app/api/user/account/delete/route.ts",
+          "line": 65
+        },
+        {
+          "path": "prisma/schema.prisma",
+          "line": 386
+        },
+        {
+          "path": "prisma/migrations/20260924010000_planner_foundation/migration.sql",
+          "line": 224
+        }
+      ],
+      "mutation_fields": [
+        "User DELETE",
+        "owned children CASCADE",
+        "optional academic references SET NULL",
+        "Planner links tombstone then cascade"
+      ],
+      "protection": "Authenticated password/token-confirmed irreversible erasure. Planner triggers explicitly permit account cascade after User disappears. Session/Quest/Goal/revision/link cascade order has DB implications.",
+      "phase1_seam": "Cancellation/quiescence and worker fencing before erase; keep full erasure authorized; do not emulate deletion with active-plan withdrawal."
+    },
+    {
+      "id": "X01",
+      "area": "Maintenance",
+      "name": "Development seed and QA script",
+      "sources": [
+        {
+          "path": "prisma/seed.ts",
+          "line": 64
+        },
+        {
+          "path": "prisma/seed.ts",
+          "line": 77
+        },
+        {
+          "path": "prisma/seed.ts",
+          "line": 101
+        },
+        {
+          "path": "scripts/qa-planner-session.mjs",
+          "line": 26
+        }
+      ],
+      "mutation_fields": [
+        "Synthetic Goal/Quest/StudySession/User CREATE"
+      ],
+      "protection": "Operator scripts, not production routes; no Planner lifecycle/lock. Not executed for this inventory.",
+      "phase1_seam": "Keep isolated disposable fixtures; do not run against user data or use script writes as evidence of production protections."
+    },
+    {
+      "id": "P09",
+      "area": "Planner",
+      "name": "Classic direct materializer",
+      "sources": [
+        {
+          "path": "app/api/ai-planner/route.ts",
+          "line": 148
+        },
+        {
+          "path": "app/api/ai-planner/route.ts",
+          "line": 233
+        }
+      ],
+      "mutation_fields": [
+        "Goal.*",
+        "Quest.title/description/scheduledFor/requiredMinutes/difficulty/rewards/status",
+        "ChatSession/SystemMessage"
+      ],
+      "protection": "Cookie auth/quota and owned chat-session lookup; streamed provider result writes Goal and Quests directly in separate statements. No modern Plan/Revision/Link, confirmation transaction, execution correspondence or materialization idempotency.",
+      "phase1_seam": "Retire after endpoint/client cutover. Do not reuse as fallback when modern generation fails; import existing rows as legacy unlinked work without invented provenance."
+    },
+    {
+      "id": "S05",
+      "area": "Focus/session",
+      "name": "Focus Party membership and indirect timer termination",
+      "sources": [
+        {
+          "path": "lib/focus-party-service.ts",
+          "line": 219
+        },
+        {
+          "path": "lib/focus-party-service.ts",
+          "line": 232
+        },
+        {
+          "path": "lib/focus-party-service.ts",
+          "line": 252
+        },
+        {
+          "path": "lib/focus-party-service.ts",
+          "line": 272
+        },
+        {
+          "path": "prisma/migrations/20260907030000_focus_party_single_active_membership/migration.sql",
+          "line": 203
+        }
+      ],
+      "mutation_fields": [
+        "FocusParty CREATE/disbandedAt/leaderId",
+        "FocusPartyMember CREATE/DELETE",
+        "SessionInvite.status",
+        "FocusSessionMember timer/leftAt; FocusSession.endedAt via delegated leave_focus_session"
+      ],
+      "protection": "Latest membership RPCs lock target User then Party; single-active-party/capacity triggers, owned caller/member/leader and invitation checks. Join existing membership is idempotent; leave/remove first call leave_focus_session. These mutate party execution, not StudySession.",
+      "phase1_seam": "Retain independent social timer authority; verify mixed User/Party/member lock order and account erasure cascades. Party departure must not imply ordinary study completion or authoritative StudySession pause."
+    },
+    {
+      "id": "X02",
+      "area": "Maintenance",
+      "name": "Existing PostgreSQL verification-script writers",
+      "sources": [
+        {
+          "path": "scripts/verify-focus-party.mjs",
+          "line": 51
+        },
+        {
+          "path": "scripts/verify-focus-party.mjs",
+          "line": 548
+        },
+        {
+          "path": "scripts/verify-single-active-party.mjs",
+          "line": 47
+        },
+        {
+          "path": "scripts/verify-realtime-security.mjs",
+          "line": 67
+        },
+        {
+          "path": "scripts/verify-phase2-service.mjs",
+          "line": 75
+        },
+        {
+          "path": "scripts/confirm-invites-and-rejoin.mjs",
+          "line": 47
+        }
+      ],
+      "mutation_fields": [
+        "Synthetic User INSERT/DELETE",
+        "Focus Party/session/member mutation RPCs"
+      ],
+      "protection": "Operator-run scripts create synthetic users, exercise raw RPCs and delete test users through FK cascades. They use elevated DB paths and have no Planner lifecycle protocol. No script was executed by this inventory.",
+      "phase1_seam": "Restrict to disposable fixture database and carry forward useful concurrency checks; source-level presence is not evidence that deployment or cascade tests passed."
+    }
+  ],
+  "orm_mutation_sites": [
+    {
+      "path": "app/api/ai-planner/route.ts",
+      "line": 148,
+      "model": "goal",
+      "operation": "create"
+    },
+    {
+      "path": "app/api/ai-planner/route.ts",
+      "line": 233,
+      "model": "quest",
+      "operation": "createMany"
+    },
+    {
+      "path": "app/api/goals/[id]/adjust/route.ts",
+      "line": 75,
+      "model": "goal",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/goals/[id]/adjust/route.ts",
+      "line": 85,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "app/api/goals/[id]/route.ts",
+      "line": 114,
+      "model": "goal",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/goals/[id]/route.ts",
+      "line": 146,
+      "model": "goal",
+      "operation": "delete"
+    },
+    {
+      "path": "app/api/goals/route.ts",
+      "line": 96,
+      "model": "goal",
+      "operation": "create"
+    },
+    {
+      "path": "app/api/goals/route.ts",
+      "line": 148,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "app/api/goals/route.ts",
+      "line": 155,
+      "model": "goal",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "app/api/quests/[id]/route.ts",
+      "line": 177,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/quests/[id]/route.ts",
+      "line": 192,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/quests/[id]/route.ts",
+      "line": 217,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/quests/[id]/route.ts",
+      "line": 299,
+      "model": "quest",
+      "operation": "delete"
+    },
+    {
+      "path": "app/api/quests/check-deadlines/route.ts",
+      "line": 47,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/quests/route.ts",
+      "line": 321,
+      "model": "quest",
+      "operation": "create"
+    },
+    {
+      "path": "app/api/quests/route.ts",
+      "line": 405,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "app/api/subjects/[id]/compile/route.ts",
+      "line": 133,
+      "model": "subjectNode",
+      "operation": "updateMany"
+    },
+    {
+      "path": "app/api/subjects/[id]/compile/route.ts",
+      "line": 154,
+      "model": "subject",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/subjects/[id]/restore/route.ts",
+      "line": 55,
+      "model": "subject",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/subjects/[id]/route.ts",
+      "line": 167,
+      "model": "subject",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/subjects/[id]/route.ts",
+      "line": 251,
+      "model": "subject",
+      "operation": "update"
+    },
+    {
+      "path": "app/api/subjects/route.ts",
+      "line": 124,
+      "model": "subject",
+      "operation": "upsert"
+    },
+    {
+      "path": "app/api/subjects/route.ts",
+      "line": 161,
+      "model": "subjectNode",
+      "operation": "createMany"
+    },
+    {
+      "path": "app/api/user/onboarding/route.ts",
+      "line": 200,
+      "model": "subject",
+      "operation": "upsert"
+    },
+    {
+      "path": "app/api/user/onboarding/route.ts",
+      "line": 235,
+      "model": "subjectNode",
+      "operation": "createMany"
+    },
+    {
+      "path": "app/api/user/reset-progress/route.ts",
+      "line": 86,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "app/api/user/reset-progress/route.ts",
+      "line": 89,
+      "model": "studySession",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "app/api/user/study-schedule/floating-rest-day/route.ts",
+      "line": 81,
+      "model": "floatingRestDay",
+      "operation": "delete"
+    },
+    {
+      "path": "app/api/user/study-schedule/floating-rest-day/route.ts",
+      "line": 127,
+      "model": "floatingRestDay",
+      "operation": "create"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 224,
+      "model": "goal",
+      "operation": "create"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 284,
+      "model": "goal",
+      "operation": "update"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 325,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 326,
+      "model": "goal",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 361,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 363,
+      "model": "goal",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 393,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 394,
+      "model": "goal",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 537,
+      "model": "quest",
+      "operation": "create"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 640,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 682,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 714,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 882,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 937,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 938,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 996,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "lib/ai/usage-limiter.ts",
+      "line": 332,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/ai/usage-limiter.ts",
+      "line": 339,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/copilot/release.ts",
+      "line": 383,
+      "model": "plannerQuestLink",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/copilot/release.ts",
+      "line": 394,
+      "model": "quest",
+      "operation": "delete"
+    },
+    {
+      "path": "lib/planner/server/check-result.ts",
+      "line": 54,
+      "model": "plannerCheckResult",
+      "operation": "upsert"
+    },
+    {
+      "path": "lib/planner/server/check-result.ts",
+      "line": 75,
+      "model": "plannerCheckResult",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/planner/server/friction.ts",
+      "line": 82,
+      "model": "plannerFrictionEvent",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/intake-session.ts",
+      "line": 109,
+      "model": "plannerIntakeSession",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/intake-session.ts",
+      "line": 145,
+      "model": "plannerIntakeSession",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/intake-session.ts",
+      "line": 168,
+      "model": "plannerIntakeSession",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/intake-session.ts",
+      "line": 183,
+      "model": "plannerIntakeSession",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/planner/server/intake-session.ts",
+      "line": 205,
+      "model": "plannerIntakeSession",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/planner/server/materialize.ts",
+      "line": 78,
+      "model": "quest",
+      "operation": "createManyAndReturn"
+    },
+    {
+      "path": "lib/planner/server/materialize.ts",
+      "line": 95,
+      "model": "plannerQuestLink",
+      "operation": "createMany"
+    },
+    {
+      "path": "lib/planner/server/materialize.ts",
+      "line": 187,
+      "model": "goal",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/materialize.ts",
+      "line": 216,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/materialize.ts",
+      "line": 217,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/mutation-guards.ts",
+      "line": 24,
+      "model": "quest",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/planner/server/mutation-guards.ts",
+      "line": 25,
+      "model": "goal",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/planner/server/mutation-guards.ts",
+      "line": 38,
+      "model": "goal",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/mutation-guards.ts",
+      "line": 72,
+      "model": "quest",
+      "operation": "delete"
+    },
+    {
+      "path": "lib/planner/server/mutation-guards.ts",
+      "line": 76,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 45,
+      "model": "plannerRevision",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 75,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 76,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 90,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 106,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 200,
+      "model": "plannerRevision",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 246,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/operations.ts",
+      "line": 250,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/preferences.ts",
+      "line": 158,
+      "model": "plannerPreference",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/preferences.ts",
+      "line": 162,
+      "model": "plannerPreference",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/preferences.ts",
+      "line": 193,
+      "model": "plannerPreference",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/preferences.ts",
+      "line": 197,
+      "model": "plannerPreference",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/preferences.ts",
+      "line": 229,
+      "model": "plannerPreference",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/preferences.ts",
+      "line": 250,
+      "model": "plannerPreference",
+      "operation": "deleteMany"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 358,
+      "model": "plannerRevision",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 851,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 866,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 1114,
+      "model": "plannerQuestLink",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 1127,
+      "model": "quest",
+      "operation": "delete"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 1199,
+      "model": "plannerQuestLink",
+      "operation": "updateMany"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 1218,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/rebalance.ts",
+      "line": 1228,
+      "model": "plannerRevision",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/reoffer.ts",
+      "line": 240,
+      "model": "quest",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/reoffer.ts",
+      "line": 241,
+      "model": "plannerQuestLink",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/reoffer.ts",
+      "line": 258,
+      "model": "plannerQuestLink",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/reoffer.ts",
+      "line": 262,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/reoffer.ts",
+      "line": 308,
+      "model": "plannerQuestLink",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/revisions.ts",
+      "line": 32,
+      "model": "plannerPlan",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/revisions.ts",
+      "line": 83,
+      "model": "plannerRevision",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/revisions.ts",
+      "line": 88,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/revisions.ts",
+      "line": 498,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/planner/server/stretch.ts",
+      "line": 143,
+      "model": "quest",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/stretch.ts",
+      "line": 144,
+      "model": "plannerQuestLink",
+      "operation": "create"
+    },
+    {
+      "path": "lib/planner/server/stretch.ts",
+      "line": 177,
+      "model": "plannerPlan",
+      "operation": "update"
+    },
+    {
+      "path": "lib/study-schedule-service.ts",
+      "line": 174,
+      "model": "quest",
+      "operation": "update"
+    },
+    {
+      "path": "prisma/seed.ts",
+      "line": 64,
+      "model": "goal",
+      "operation": "create"
+    },
+    {
+      "path": "prisma/seed.ts",
+      "line": 77,
+      "model": "quest",
+      "operation": "create"
+    },
+    {
+      "path": "prisma/seed.ts",
+      "line": 101,
+      "model": "studySession",
+      "operation": "create"
+    }
+  ],
+  "effective_sql_functions": [
+    {
+      "signature": "public.claim_achievement_reward_atomic(text,text,integer,integer,text)",
+      "path": "prisma/migrations/20260827050000_sp_stipend_level_rank_ups/migration.sql",
+      "line": 800,
+      "mutated_tables": [
+        "SylphLedger",
+        "User",
+        "UserAchievement",
+        "UserStats",
+        "XpLedger"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 2,
+      "advisory_lock": false,
+      "body_sha256": "7d351d49431e891e48b30e26ce98c07ea97cfd46682b5a8f107dcda43faefaf3",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.claim_quest_reward(integer,integer,text)",
+      "path": "prisma/migrations/20260827050000_sp_stipend_level_rank_ups/migration.sql",
+      "line": 533,
+      "mutated_tables": [
+        "HpLedger",
+        "Quest",
+        "SylphLedger",
+        "SystemMessage",
+        "User",
+        "UserStats",
+        "XpLedger"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 2,
+      "advisory_lock": false,
+      "body_sha256": "bd94f3f91d72161ead846e93237cc2dee64feae0b6f7b045ad9ac66b9f0aef61",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.commit_focus_progression(integer,integer,integer,integer,integer,integer,integer)",
+      "path": "prisma/migrations/20260821000000_add_user_stats_and_progression_rpc/migration.sql",
+      "line": 37,
+      "mutated_tables": [
+        "UserStats"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "422d7ec34a6948a55923e12b603794f58cd41851f986b75a349129424861e385",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.commit_forge_progress(text,integer,integer)",
+      "path": "prisma/migrations/20260821030000_add_concept_forge_rpc/migration.sql",
+      "line": 4,
+      "mutated_tables": [
+        "SylphLedger",
+        "UserForgeCoreMastery",
+        "UserForgeProgress",
+        "UserStats"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "6c4ee79b48f3d543ed5350d6453d1552645255fe978dcd094e833fa1ca8e520b",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.complete_study_session(integer,integer,integer,integer,integer,integer,integer,integer,boolean)",
+      "path": "prisma/migrations/20260827000000_s2_security_hardening/migration.sql",
+      "line": 692,
+      "mutated_tables": [
+        "Quest",
+        "StudySession",
+        "SylphLedger",
+        "SystemMessage",
+        "User",
+        "UserStats",
+        "XpLedger"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 2,
+      "advisory_lock": false,
+      "body_sha256": "5ab56588a1d244bda3298594203a9165bd58a36441c49c5e7927a53cebdc35c1",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.create_focus_party(integer,text)",
+      "path": "prisma/migrations/20260907030000_focus_party_single_active_membership/migration.sql",
+      "line": 60,
+      "mutated_tables": [
+        "FocusParty",
+        "FocusPartyMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "66405bd7cbc8510319d8ba0cb2e06d2a8f235298c0b2128c861ccf42e1dc87b9",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.enter_focus_session(integer,integer)",
+      "path": "prisma/migrations/20260907010000_focus_party_security_hardening/migration.sql",
+      "line": 420,
+      "mutated_tables": [
+        "FocusSession",
+        "FocusSessionMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 3,
+      "advisory_lock": false,
+      "body_sha256": "47143fb37459b6b17f08402845d8bd862907d287fb2673a6bc0a2377cee0f86b",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.forge_apex_node_atomic(text,text,text)",
+      "path": "prisma/migrations/20260827040000_fix_apex_synthesis_threshold/migration.sql",
+      "line": 6,
+      "mutated_tables": [
+        "SubjectNode",
+        "SylphLedger",
+        "User",
+        "UserStats",
+        "XpLedger"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 3,
+      "advisory_lock": false,
+      "body_sha256": "08e26740fc4016c09149d7584a06da3d18d141d19222ce94f960e39f7eab6685",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.join_focus_party(integer,integer)",
+      "path": "prisma/migrations/20260907030000_focus_party_single_active_membership/migration.sql",
+      "line": 116,
+      "mutated_tables": [
+        "FocusPartyMember",
+        "SessionInvite"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 2,
+      "advisory_lock": false,
+      "body_sha256": "21e22c9f181f33cded1647f34d06e3212be4d5653ae017df866529c75fb59a1a",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.leave_focus_party(integer,integer)",
+      "path": "prisma/migrations/20260907030000_focus_party_single_active_membership/migration.sql",
+      "line": 203,
+      "mutated_tables": [
+        "FocusParty",
+        "FocusPartyMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 2,
+      "advisory_lock": false,
+      "body_sha256": "10e7cc279d522f2771695d2c452b6d45d6d52bb1227fa7f4b3e6ab6f7ab166b6",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.leave_focus_session(integer,integer)",
+      "path": "prisma/migrations/20260907010000_focus_party_security_hardening/migration.sql",
+      "line": 740,
+      "mutated_tables": [
+        "FocusSession",
+        "FocusSessionMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "cf290a5f819dcc84c6b836875822232ad4883c54a085a181176bae6032052962",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.pause_focus_timer(integer,integer)",
+      "path": "prisma/migrations/20260907010000_focus_party_security_hardening/migration.sql",
+      "line": 591,
+      "mutated_tables": [
+        "FocusSessionMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "b33e8b367ad682a9de0c1c0ce41f7a96990c1a36b71b64b3d83d7b4a14149ef1",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.planner_quest_guard()",
+      "path": "prisma/migrations/20260924010000_planner_foundation/migration.sql",
+      "line": 217,
+      "mutated_tables": [
+        "PlannerQuestLink"
+      ],
+      "security_definer": false,
+      "explicit_row_locks": 0,
+      "advisory_lock": false,
+      "body_sha256": "ba0e19da9f8c4fc3022eea390c22f825b1b7acceff4cead23fe2d089469cf5a6",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.purchase_shop_item(integer)",
+      "path": "prisma/migrations/20260821010000_add_economy_and_inventory_rpcs/migration.sql",
+      "line": 4,
+      "mutated_tables": [
+        "SylphLedger",
+        "User",
+        "UserInventory",
+        "UserStats"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "4557ed48c3b56b501f45e200fd0ac8c952b732e0a61cd27580996dabae67d85a",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.remove_focus_party_member(integer,integer,integer)",
+      "path": "prisma/migrations/20260907030000_focus_party_single_active_membership/migration.sql",
+      "line": 295,
+      "mutated_tables": [
+        "FocusPartyMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 2,
+      "advisory_lock": false,
+      "body_sha256": "f1fab35604031a906f35a0182939d0fa1c5f19c5cf75c99c97b7fb0001cd1841",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.resume_focus_timer(integer,integer)",
+      "path": "prisma/migrations/20260907010000_focus_party_security_hardening/migration.sql",
+      "line": 669,
+      "mutated_tables": [
+        "FocusSessionMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "e2fc0dcb45148157d35ca27d50a5211b301e793c22d7e201f6e25c3e0bf14883",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.settle_study_session_atomic(integer,integer,integer,integer,integer,integer,boolean,boolean,text)",
+      "path": "prisma/migrations/20260827050000_sp_stipend_level_rank_ups/migration.sql",
+      "line": 13,
+      "mutated_tables": [
+        "HpLedger",
+        "Quest",
+        "StudySession",
+        "SubjectNode",
+        "SylphLedger",
+        "SystemMessage",
+        "User",
+        "UserStats",
+        "XpLedger"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 5,
+      "advisory_lock": false,
+      "body_sha256": "534775af6ce26e2fec80b46ebc1cc4f498ccea2f1520162de88c53d1a1d20fca",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.start_focus_timer(integer,integer)",
+      "path": "prisma/migrations/20260907010000_focus_party_security_hardening/migration.sql",
+      "line": 520,
+      "mutated_tables": [
+        "FocusSessionMember"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "bd5420e4a50162a4ac581cfd1623974d94fc41de07d7c57dc367c1fb4aac3250",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.start_study_session(integer,integer,integer,integer)",
+      "path": "prisma/migrations/20260827000000_s2_security_hardening/migration.sql",
+      "line": 57,
+      "mutated_tables": [
+        "Quest",
+        "StudySession"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 0,
+      "advisory_lock": false,
+      "body_sha256": "37f891f98bb2d77a3f3d4ae5a027ad13ba983d2472f5afa458998c6969683178",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.unlock_skill_node(integer)",
+      "path": "prisma/migrations/20260821020000_add_skill_tree_rpc/migration.sql",
+      "line": 4,
+      "mutated_tables": [
+        "UserSkill",
+        "UserStats"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "e8de39b6b7e48ae0e426bd0eba38a75ced320b9fcd21e8994741cfeb8648bef2",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    },
+    {
+      "signature": "public.unlock_skill_node_atomic(text,text,integer,text[])",
+      "path": "prisma/migrations/20260827000000_s2_security_hardening/migration.sql",
+      "line": 1549,
+      "mutated_tables": [
+        "UserSkillNode",
+        "UserStats"
+      ],
+      "security_definer": true,
+      "explicit_row_locks": 1,
+      "advisory_lock": false,
+      "body_sha256": "b8f8146044ae50518b6bb918d923182deccf767e0bcba79747042faac5f07723",
+      "effective_under": "ordered repository migrations; hosted deployment not inspected"
+    }
+  ],
+  "sql_drop_events": [
+    {
+      "kind": "drop",
+      "signature": "public.claim_quest_reward(integer,integer,text)",
+      "path": "prisma/migrations/20260822000000_atomic_apex_forge_and_skill_unlock_rpcs/migration.sql",
+      "line": 415
+    },
+    {
+      "kind": "drop",
+      "signature": "public.complete_study_session(integer,integer,integer,integer,integer,integer,integer)",
+      "path": "prisma/migrations/20260822010000_atomic_session_and_achievement_rpcs/migration.sql",
+      "line": 396
+    },
+    {
+      "kind": "drop",
+      "signature": "public.complete_study_session(integer,integer,integer,integer,integer,integer,integer)",
+      "path": "prisma/migrations/20260823020000_fix_session_duration_inflation/migration.sql",
+      "line": 33
+    },
+    {
+      "kind": "drop",
+      "signature": "public.complete_study_session(integer,integer,integer,integer,integer,integer,integer,boolean)",
+      "path": "prisma/migrations/20260825000000_add_session_break_seconds/migration.sql",
+      "line": 23
+    },
+    {
+      "kind": "drop",
+      "signature": "public.start_study_session(integer,integer,integer)",
+      "path": "prisma/migrations/20260826050000_drop_legacy_start_study_session_overload/migration.sql",
+      "line": 13
+    },
+    {
+      "kind": "drop",
+      "signature": "public.claim_session_reward_atomic(text,text,integer,integer,text,numeric)",
+      "path": "prisma/migrations/20260827000000_s2_security_hardening/migration.sql",
+      "line": 51
+    }
+  ],
+  "routes": [
+    {
+      "path": "app/api/achievements/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 18
+        },
+        {
+          "method": "POST",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "path": "app/api/ai-planner/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "app/api/calendar/month/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "app/api/cognitive-stats/invest/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 24
+        },
+        {
+          "method": "POST",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/[id]/invite/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/[id]/join/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/[id]/members/[memberId]/route.ts",
+      "methods": [
+        {
+          "method": "DELETE",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/[id]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 14
+        },
+        {
+          "method": "DELETE",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/[id]/session/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 14
+        },
+        {
+          "method": "POST",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/[id]/session/timer/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/invites/[id]/route.ts",
+      "methods": [
+        {
+          "method": "PATCH",
+          "line": 59
+        },
+        {
+          "method": "POST",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "path": "app/api/focus-party/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 15
+        },
+        {
+          "method": "POST",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "path": "app/api/friends/requests/[id]/route.ts",
+      "methods": [
+        {
+          "method": "PATCH",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "path": "app/api/friends/requests/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 10
+        },
+        {
+          "method": "POST",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "path": "app/api/goals/[id]/adjust/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "path": "app/api/goals/[id]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 29
+        },
+        {
+          "method": "PATCH",
+          "line": 63
+        },
+        {
+          "method": "DELETE",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "path": "app/api/goals/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 26
+        },
+        {
+          "method": "POST",
+          "line": 61
+        },
+        {
+          "method": "DELETE",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/archive/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/check-result/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/commit/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 3
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/friction/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/milestones/[itemKey]/expand/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/operations/[key]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 7
+        },
+        {
+          "method": "POST",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/preferences/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 18
+        },
+        {
+          "method": "POST",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/rebalance/confirm/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/rebalance/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/reoffer/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 15
+        },
+        {
+          "method": "POST",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/revisions/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 4
+        },
+        {
+          "method": "POST",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/[id]/stretch/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/capabilities/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/generate/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/intake/[id]/action/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/intake/[id]/copilot/apply/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/intake/[id]/copilot/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/intake/[id]/designer/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/intake/[id]/import/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/intake/[id]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 8
+        },
+        {
+          "method": "PATCH",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/intake/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/recover/[key]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 6
+        },
+        {
+          "method": "POST",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "path": "app/api/planner/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "path": "app/api/quests/[id]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 27
+        },
+        {
+          "method": "PATCH",
+          "line": 62
+        },
+        {
+          "method": "DELETE",
+          "line": 283
+        }
+      ]
+    },
+    {
+      "path": "app/api/quests/check-deadlines/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "path": "app/api/quests/evaluate-scope/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "path": "app/api/quests/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 37
+        },
+        {
+          "method": "POST",
+          "line": 146
+        },
+        {
+          "method": "DELETE",
+          "line": 390
+        }
+      ]
+    },
+    {
+      "path": "app/api/quests/weekly/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "path": "app/api/sessions/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 64
+        },
+        {
+          "method": "PATCH",
+          "line": 120
+        }
+      ]
+    },
+    {
+      "path": "app/api/shop/purchase/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "path": "app/api/skills/unlock/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "app/api/subjects/[id]/compile/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "path": "app/api/subjects/[id]/forge-apex/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "app/api/subjects/[id]/nodes/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "app/api/subjects/[id]/restore/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "path": "app/api/subjects/[id]/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 31
+        },
+        {
+          "method": "PATCH",
+          "line": 70
+        },
+        {
+          "method": "DELETE",
+          "line": 192
+        }
+      ]
+    },
+    {
+      "path": "app/api/subjects/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 17
+        },
+        {
+          "method": "POST",
+          "line": 96
+        }
+      ]
+    },
+    {
+      "path": "app/api/system-messages/chat/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/account/delete/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/account/route.ts",
+      "methods": [
+        {
+          "method": "PATCH",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/heartbeat/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/onboarding/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/reset-progress/route.ts",
+      "methods": [
+        {
+          "method": "POST",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/sessions/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 7
+        },
+        {
+          "method": "DELETE",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/stats/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/study-schedule/floating-rest-day/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 24
+        },
+        {
+          "method": "POST",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "path": "app/api/user/study-schedule/route.ts",
+      "methods": [
+        {
+          "method": "GET",
+          "line": 18
+        },
+        {
+          "method": "PATCH",
+          "line": 57
+        }
+      ]
+    }
+  ],
+  "source_sha256": {
+    "app/admin/background-studio/page.tsx": "af9a0363c77d29f8235e72cc76bf0c44091bd6b0472f089107c2f42cc78e3e98",
+    "app/api/achievements/route.ts": "8c99a95756c76b3ed7008e449cef04dc30b41c9eeca454d13af5cbca74ec5b9b",
+    "app/api/acoustics/route.ts": "3f06009afed35607669fc6bd8352404e939999004caf316cb228c311767b196f",
+    "app/api/admin/focus-background-categories/[id]/route.ts": "214d16c65cc7f1bde0be17252983f52d85b18dff572fc28c384bafd57a400ec6",
+    "app/api/admin/focus-background-categories/route.ts": "8ad7056e11677a0c62be582f3534e064de8739675a7b3c7d84d95577bb29f025",
+    "app/api/admin/focus-backgrounds/[id]/replace/route.ts": "e83996bc815bc66703d8ec9c1c0fdb78d9eabf042a69c6f069dff71059066a46",
+    "app/api/admin/focus-backgrounds/[id]/route.ts": "24bdb8e2be8e19a9ac0d2e2e44ae0777599e6b6df2cfaf6e65a4113cecebd90a",
+    "app/api/admin/focus-backgrounds/reorder/route.ts": "53f85e3a73d053d07619d5c5da00fe3b7fa7a6fdec0d48ae7d9626caa669a4ce",
+    "app/api/admin/focus-backgrounds/route.ts": "3618142ca8d477b57a32a588c5ad41b4313ff5e4773cea7991a2b6c29fdddf75",
+    "app/api/admin/focus-backgrounds/upload/route.ts": "87a773a5a95e742bf1bdb093af318594f397f1c030eecea73a0069bddf50a9bd",
+    "app/api/ai-costs/route.ts": "3031f6100974df72527259db5b5600ea1bd8324eb8fa477ea3d92e55f308eef4",
+    "app/api/ai-planner/route.ts": "31b39ad7be45982ab4a89486b69e80923e2ea91fbd5ceb74e1de020c5cc60b3e",
+    "app/api/ai-usage/route.ts": "eea54fd3cb22116738427590f51261b2b5c71cf421874201c1bc25e972bd53a2",
+    "app/api/auth/callback/[provider]/route.ts": "e95b338c9a28c967cca6a43d606725cdc8367a78b380255cb98d4b0b329649db",
+    "app/api/auth/check-username/route.ts": "03180550e3ab466fe0393bd9c27bae9ce48889af671a53faf1c83fa3aa68efd3",
+    "app/api/auth/login/route.ts": "a8dcdc3ea764649f45328493a683c838560115e59c395bd850cc19d46b147239",
+    "app/api/auth/logout/route.ts": "3d0c5285da0e71e6ee39dd1dbf26d72e3d9015753b916e483b30f2d82e9d018c",
+    "app/api/auth/logout-all/route.ts": "7d4691c034aebcd090e90ecbf9c18d91865151a905aae5970348a7c0b8d35f25",
+    "app/api/auth/oauth/[provider]/route.ts": "3e7d5b73711bfc4080f6b668f43b9acdcc8ed47b551600e7ade0ee6b5bbecc54",
+    "app/api/auth/register/route.ts": "a25ec8381c86a747e978e36013765bd725ae2108fbeba7b0040a15b0a67dc36b",
+    "app/api/auth/verify-email/confirm/route.ts": "32cc556c3edaa75d75ac0c5fd1884962a651247bceef5ed22d8d0e1e4ea775e9",
+    "app/api/auth/verify-email/send/route.ts": "1f9b0bb058b8758afb845ea978d39f6197686f1f14367a4c13dbd6b1c7127c7e",
+    "app/api/calendar/month/route.ts": "6f37e5b5b8c8537e25e78eb44111dc639409c77b3f9ee69f8628886f3eb07a33",
+    "app/api/chats/[id]/route.ts": "a0f27207fa3ab535641aa268ded892e3b89b899d57ad02e544469dc5d4fe3563",
+    "app/api/chats/route.ts": "8f3a7e6d40efe07306cde7352481dba6d0c97ea74b764502fc27455800f70b00",
+    "app/api/cognitive-stats/invest/route.ts": "3571a3ffdee0e09e68cf95c88b9f21ae68932f72dcd0264aae1658ac91e87fc9",
+    "app/api/conversations/[id]/messages/[messageId]/route.ts": "9f3607e2f69d7402a6146b0f32833982f29638e16c9b3fcc8432e75915c6206f",
+    "app/api/conversations/[id]/messages/route.ts": "60ad89313b402723cb697444021ba33d2f68a0c6709dcde8d8bc95b034044ed4",
+    "app/api/conversations/[id]/route.ts": "407abc5a739ec02bbe2b8d42407a9a33807914b42dd5c38f16ec43aac3ae1846",
+    "app/api/conversations/route.ts": "b354c8dea53ec2db48ba90555e62addb15943175dadea2ef191f16fd2a120a3d",
+    "app/api/cosmetics/route.ts": "f786ed9e5177f5ae8eef8e3b3318c32724769e633dceb5b773f641e49c639ac3",
+    "app/api/cron/daily-briefing/route.ts": "83aad8dada955fe55007f8b2e5bd3876f1efb8d90492ae05a8eaf235ac6fcafd",
+    "app/api/currency/stats/route.ts": "cc7bb83f0295f03596d4f4d03e9d62ab654123e76a31535e385160f0cdd7030a",
+    "app/api/focus-backgrounds/preference/refresh-signed-url/route.ts": "cb3268bd6d95032a91e9ed4426fb2eb7c35e08e59a0ee16c53f41618890b5a65",
+    "app/api/focus-backgrounds/preference/route.ts": "fc84c0107dcbe282ae9c810ec0ebae39a0ef1582a84dd4acad091e26983815fb",
+    "app/api/focus-backgrounds/route.ts": "32f7665b17b0c679873cacc5a14efa840065862d2d962df7e60ee18f8097ff82",
+    "app/api/focus-party/[id]/invite/route.ts": "d4112bbf5286920d57b91cba182ff30d8eeaf1d598a1a0566c15f70a882bf2ce",
+    "app/api/focus-party/[id]/join/route.ts": "de5480d24917c59b9d70bf7337367b48ce5ed90f24ac6db729e20e467d3bb9d5",
+    "app/api/focus-party/[id]/members/[memberId]/route.ts": "31558727b4a16fcd6ae9c154fddd673009546030c89825a7bdbc542e7e416958",
+    "app/api/focus-party/[id]/route.ts": "027b2cb27aa4ae46f0a627e2923b3b517d61860043666a803398d34b45fa014a",
+    "app/api/focus-party/[id]/session/route.ts": "17de9d2367ffed2e3323b3df712828eb600057bacfb6fddd57bf980e349a1e39",
+    "app/api/focus-party/[id]/session/timer/route.ts": "574b3b008c6c25b60ba08bd227fe66f8608000fc5c94dc97801a5e64dd41ddb2",
+    "app/api/focus-party/invites/[id]/route.ts": "9ba67706510a40c996daa0c267fb781c0b7a76558466b6ee6072e61a877b12ad",
+    "app/api/focus-party/route.ts": "dc5586a597f92d96fb64afdc75ccc7944d7a33b0661bd54f7f25bbf585ac95d0",
+    "app/api/friends/[id]/route.ts": "d0807258dbc3f09af53a88440b86e100a24948833e1b43d64cea5b2396a1162b",
+    "app/api/friends/block/route.ts": "7da1293d349ef28e095483c4c75a1610b81b1b626241d56c770f8605ee73a325",
+    "app/api/friends/remove/route.ts": "9708f23169eaf9a4c0999123a7e3594939b3f10fac9aa0581ba34a7491b2abda",
+    "app/api/friends/requests/[id]/route.ts": "5ee9b7fb1ab02b5fa6f2e89bd6806b75e67c0069965b34f210d9593ec7dc3d29",
+    "app/api/friends/requests/route.ts": "3af8d557b23bc50b83bf17d8cc915d7febb43a8d01ce01d76c1c71a70f69b536",
+    "app/api/friends/route.ts": "574a3a3b6ae10e3d0945592ae145bf6a2320c7aeafdc9259f246fc526e1d1453",
+    "app/api/friends/unblock/route.ts": "57526744f3193840ac11654d1d253e6a561523ee15a67d3464882477023a9154",
+    "app/api/goals/[id]/adjust/route.ts": "dbf6e229816d6b0f64217aaac3b2327f82980233e1bcf34dea117dfd9282ec66",
+    "app/api/goals/[id]/route.ts": "215c729212bbfa74e246b9486f02ccd4faae4b07e75c98314d30be0770093588",
+    "app/api/goals/route.ts": "0a66f9fac0ec20bdda9fa0f491c62165fa9411193b53ae4eebe517202d9ba9e1",
+    "app/api/insights/route.ts": "5cae40c82c19ce81c2792be53d5b66f02b94578c0b5e655f670968c26e85120e",
+    "app/api/inventory/equip/route.ts": "b15b57c0f00abbbffa7b1a9f5f895a4ca5cf4309c87ab1e22ad81dae1dfa4713",
+    "app/api/inventory/route.ts": "092ba9f00e311922710012b18d620ffd7dbd406863b0541f35bd8058fd4645c3",
+    "app/api/invites/[id]/route.ts": "334c9e0b7644533f2a6671eed78f43ec6df3f22881a2c140c58b41c77a9a7b1b",
+    "app/api/invites/route.ts": "74e05bd57e02a5ed849fee5f710715d85b1bf364efe9c88dc810bd378af8cc29",
+    "app/api/notifications/preferences/route.ts": "e1c21547d60278d7ab5222038e96d3dccf279f1fd2e2d9c799a2b1f7957a72e9",
+    "app/api/notifications/route.ts": "d5c35881ae110da676d139fa7d2a47a9eba5428bc7f073d420edf77b603532cd",
+    "app/api/planner/[id]/archive/route.ts": "2c81cb9cec21aae8fe43db8467c075d872de643e591888f5aaa9e0f42e246a88",
+    "app/api/planner/[id]/check-result/route.ts": "6b840af9df7591214f3845abf3e45a0492aa1438d0ea4050643120f5ccf08464",
+    "app/api/planner/[id]/commit/route.ts": "3b5e5f4a7f87d24f63dc183b6042f367d3bac204f28279c143535bb48e034989",
+    "app/api/planner/[id]/friction/route.ts": "dab44520af9ff8215aff2d47ed8d78caabc42b085973dd02d9a6e9a13858478d",
+    "app/api/planner/[id]/milestones/[itemKey]/expand/route.ts": "a55f650f450d7831c8f65ff070e7fae3fde9f026b58908b94cb2f898a8dee992",
+    "app/api/planner/[id]/operations/[key]/route.ts": "982849805682f3d33c84beef2667dc1e5b437b793cd7372d2ce26d461934c71d",
+    "app/api/planner/[id]/preferences/route.ts": "8d6a52fe3827b7285f8c3f13724067ac737a8a5029656d2c8362f7618f4c7331",
+    "app/api/planner/[id]/rebalance/confirm/route.ts": "d1cc8ddebdc7627c05e29d43ef650404cb592d57945f7262b60fab8f94df2f0c",
+    "app/api/planner/[id]/rebalance/route.ts": "23b1350f8f61c7f1bfcbf5e198216b84700d4a228e8aa1d834b0b65ac8f3d803",
+    "app/api/planner/[id]/reoffer/route.ts": "d3037a9f0877f5dba2f4f924406969f08c25cf70178273b104bdbd518e57fac9",
+    "app/api/planner/[id]/revisions/route.ts": "03d3de46cfe9eee00a5241940dffc6e1e273ec3b8e840f5d9ee68d1b537800e3",
+    "app/api/planner/[id]/route.ts": "3a2a708499a7f1b910cccb89e3672dfd3cd5fda807aa6b49e29dc847dcb8ac5e",
+    "app/api/planner/[id]/stretch/route.ts": "dac0b2019965208909beb32a1d62ff4ed8957aa0b0694e311c1b35a2b4103aa6",
+    "app/api/planner/capabilities/route.ts": "29a89324a073cd60805765214416203d8abf0644d5fcf566853f4a6e4b2b399d",
+    "app/api/planner/generate/route.ts": "21e84cf0a064076f0f54363a855a0fbec46443e94a051d18be2a0feba23a4659",
+    "app/api/planner/intake/[id]/action/route.ts": "e04e646d1a003b932b063a13fb205f1f20df3f1cdd0f57edd57fec8523bc164b",
+    "app/api/planner/intake/[id]/copilot/apply/route.ts": "285d551fa33d8ca6f0a600c9950840702379725f0ce586974e6f47c9ec1c4e02",
+    "app/api/planner/intake/[id]/copilot/route.ts": "e9700691209244cec39765b2f78f457dfec6cd634ec38f40ffa531b0649aa337",
+    "app/api/planner/intake/[id]/designer/route.ts": "f4dc4ea8d83036290e8bc2ef2c45d60a83f8beaf8379a72f90429ddeed097587",
+    "app/api/planner/intake/[id]/import/route.ts": "5285798dc4472e86ef80578c7dc2f5cf89022027f37f027e5a92db33efdf1116",
+    "app/api/planner/intake/[id]/route.ts": "8f3f38720daffb48c3a5a7d7a96eae003c5b24cb81959cd4b7038a74bea389cd",
+    "app/api/planner/intake/route.ts": "4f3542b352daeac652f35827606966b3eb39b78943702a77df85846d5a2d567a",
+    "app/api/planner/recover/[key]/route.ts": "55ad17528d53b4710f616bcfd9026e6ce6169ec03b16c747c416341e116af977",
+    "app/api/planner/route.ts": "b46e08366224a45587bd8b29f5690d4689432d5bcdf03e408a03e6f2e78cc874",
+    "app/api/profile/[username]/route.ts": "7854ce1d2ab88a81090a47d45dd143e530e3d1e9023675128429971b17f1a5fc",
+    "app/api/profile/customization/route.ts": "034bfdce2d7c6af467a4e460feca6a2d275c5e4f832fcf5839a4f63fd948ce1c",
+    "app/api/profile/stats/route.ts": "0a48d7132e914fb2c625110cc73313a61d78c856d941dc43dd523c9e5f29bf8c",
+    "app/api/quests/[id]/route.ts": "6339105ba63df4beb6d567cba6b7837c0e3ad08327d6003a4ae7886038df7511",
+    "app/api/quests/check-deadlines/route.ts": "f1390c95e5e58b2ebd6c02d58c5ffa322f8c9e4b114462819ba92fc35e53a946",
+    "app/api/quests/evaluate-scope/route.ts": "6897099a23e4bd6c5e5d05924fc0206d8c73fab54b28a4095c5110f0ace71abd",
+    "app/api/quests/route.ts": "68222dcfdb0394f9b801ff823702d7e283e6ae30abda97e0d7e6fe23801dc90e",
+    "app/api/quests/weekly/route.ts": "8ff3167801db21f16d275da97e82032442dc25243c3240fea55bdd6a614acb72",
+    "app/api/realtime/token/route.ts": "688b269344d82c42c373f29e9579f3a1d2487462b752c63952c730bac14c5a0a",
+    "app/api/sessions/route.ts": "1d5cc76ac313f07864435d68134de97cf1beeeabe79e28956236796e3f8cd8f7",
+    "app/api/shop/purchase/route.ts": "0cec8e1d1851af619a66c81a96eef9b07932bb478fe248b5bc87a8e7cb9f39c5",
+    "app/api/shop/route.ts": "78e2313a6b85fdc10165c6691d7d2d8bf15febcaa3c274dc2a84286e8d7dd566",
+    "app/api/skills/route.ts": "887c12cba64c87fe2cd64cb8362af7aaa8a2723e830751a85d77cc92a71fe0b6",
+    "app/api/skills/unlock/route.ts": "534a62f782314bc44ee512eb6f3d93dcdad283326813e97d4925bfb43281a5fe",
+    "app/api/subjects/[id]/compile/route.ts": "9ce6ce3108b855805c98b630e2440e2d1de014af76e1f22f799538df2b678bd5",
+    "app/api/subjects/[id]/forge-apex/route.ts": "1c9ac939603a3809843d2dd3696dd810714bbf3432629a382dacf19c591d4bbf",
+    "app/api/subjects/[id]/nodes/route.ts": "07ea82de35cad14d3d8d1a606dce4bfc2d1434a329fcb73e7c53a37905e57454",
+    "app/api/subjects/[id]/restore/route.ts": "0a3e679b88a21ff7253e720fdf4abe83c60de1fcfa24322eed53b281cf13c489",
+    "app/api/subjects/[id]/route.ts": "ecf241d54e42503a67d7d33f152fbb6346fa472d854b03790b0abe85b3ed72b1",
+    "app/api/subjects/route.ts": "9f64f74aaa9b4898dd0e365a29af36450edc0ae02357b4cae9b7e129fca26daa",
+    "app/api/system-messages/chat/route.ts": "3ec1c050d7e31bb34e568e953459e70f56c5ae8dd6a6c7dc99b1a11653420dbe",
+    "app/api/system-messages/route.ts": "25bde85108f5de606e7a47b1f3cc48895f756c55b642d182d16947220c3f2d34",
+    "app/api/user/[username]/route.ts": "e2d4bf654f694e8050bc1fe6528006be4b0a06238f5cd8933dae63f2639b8dba",
+    "app/api/user/account/delete/route.ts": "d7bc70bd40b99824593e90f5c8f3ffcd8da697a69b6f2047277bc58c5a6ac707",
+    "app/api/user/account/route.ts": "621a91ed81b60adaf90eb0a2bcfc6930b625a78ac15f99ce66db27c85af75d3f",
+    "app/api/user/connections/[provider]/link/route.ts": "04d266a9f15d954ab94aaee980b964882be6ae20810343e5ebb1d8aedff673cf",
+    "app/api/user/connections/[provider]/route.ts": "ff865b28fe73ed2c6da9bf830a161ba61070452e982dac63073d5897910f9645",
+    "app/api/user/connections/route.ts": "cae3dc07edde945612177c68eb9b66bf289551482e6a4d4714ae18a6e60cad4d",
+    "app/api/user/detailed-stats/route.ts": "acd9a7a36864bcae2c63ca06088263e65c57c6f4ddc5ab1327b4ad1699ca7b8c",
+    "app/api/user/focus-backgrounds/[id]/route.ts": "5111cf33a2d56a1b0737394fce3da2f0a05600e52390a0e2d72b402c56c7df18",
+    "app/api/user/focus-backgrounds/route.ts": "20cd314abad83ca1525ec9d9bb325ff0338bfd972ba429779b1868c4c99b8776",
+    "app/api/user/heartbeat/route.ts": "7a0b03d5af4e9cd45bdd5232ad211fe319a6029feb649c2f8cd49380433fd4e8",
+    "app/api/user/onboarding/route.ts": "0c25de14118a92633a5c038ad7d0ca4098470a668d268613ab8c0c6c1ce1067c",
+    "app/api/user/privacy/route.ts": "4db7a5531649f684815ea57b973fd47fdaa8ae3403392f26da68482e0625fe24",
+    "app/api/user/rankings/route.ts": "0d5bb64c522478ce6da192bba7884a41819ca0f3d6b3c5c42a516757a16538df",
+    "app/api/user/reset-progress/route.ts": "1fdf9d63f631e278dc372e285bc16bd459d0d7df11b503bc3d38ed45d1016073",
+    "app/api/user/security/route.ts": "f3afb5a2f9747c32c29182340fc44221a8d872e45cfaf9a7c0c0e0572ee71d5f",
+    "app/api/user/security/send-code/route.ts": "f3e67f12897437924d79b8dd34916c4a4730e187c01d207209c4f84bcc77e862",
+    "app/api/user/sessions/route.ts": "2f1b7a850f7ae49d66fcbdc78763ead2cd36b1181355add0f34e1cf238dc8e03",
+    "app/api/user/stats/route.ts": "75f1227cc4406c005eac6ebfee16190c14e1c8f08902680ed5307fe851ce510f",
+    "app/api/user/study-schedule/floating-rest-day/route.ts": "b776da708fb0524f9f24f42e920385b7163fcb263e752e375b31f1a22c1f5ce8",
+    "app/api/user/study-schedule/route.ts": "f7b9ef718864dcdec8b52d96a09e6c3efc7b331f126a9a9648244487656e728e",
+    "app/api/users/search/route.ts": "660f5b2554504b6ae3dc76da539088bf2cf11003e86ba5878bf8497bfe3c07e9",
+    "app/api/waitlist/route.ts": "abfddcbf2652025e0531bfd600173e2bad34407012330c071d9b7ffd7eba2eea",
+    "app/calendar/components/CalendarScreen.tsx": "d000ceebbca3659957fae681012f2ba25eef12672992750ccf88733be7e10b34",
+    "app/calendar/components/DayInspectionPanel.tsx": "050f9357462624611dc3df0f99c814c6bd0c3904978abc8f5aa45959be9ba588",
+    "app/calendar/components/StudyScheduleModal.tsx": "0b5fe12815b16adb8b8dcb586d999c2a6dbe5953882d03ec4bba858a0fc1555b",
+    "app/calendar/loading.tsx": "58d15a33b7bbcaa48c0d9ebe236b6e046b3570a1e9f52b0bdcd337a454e68321",
+    "app/calendar/page.tsx": "9e237c028cb72754cb8faabdb8a979e27438e12a57b3ca9c6f0eaabf0b112e10",
+    "app/companion-prototype/page.tsx": "2c209915fd228bfe800ee0e4c23556854f0240e75d99df69a57b343d1be360d4",
+    "app/components/AcousticsContext.tsx": "768fefe7ad76f9714fe4fcad1381d5e078ad6ea92d4584674e74b3dc1f4faad9",
+    "app/components/AcousticsDynamicIsland.tsx": "bec7983819df3aaaa617078af982808d377685ab10ac1ed8f0ec490fe8e5d7fb",
+    "app/components/AddFriendModal.tsx": "6d5a94d90bdcabb068aa294f5a9ac7d651208488513c60d66078091e20ee242b",
+    "app/components/AiPlannerModal.tsx": "71af9a7af126eff82bc0e424b7dcc8af594075f4bf2dd43df32c425148cd318a",
+    "app/components/AiPlannerPanel.tsx": "40c36fd9d7f9ab5e34c846f3bdbee6a729e9079f901308f046b736e95afe2db3",
+    "app/components/AuthProvider.tsx": "a08efab265f365df1d924dec59fb505c925cbe86f964fadf41d18644efe94aea",
+    "app/components/BackToSettings.tsx": "fd6c1326e5acb3d32dc45dd54aa2b30c43ec5386ce0b0de9a6b189628ad43306",
+    "app/components/Calendar/StudyCalendar.tsx": "f3caef102b4e446d31f770fdc0e7fc3cce277d0a789693a9cd2345ca4c75f6ed",
+    "app/components/ConfirmationModal.tsx": "1f021b8966283dabca0f587f5278d05fccd41f3191127a23ecfa7756f93d7407",
+    "app/components/CustomAudioContext.tsx": "ab91606e9c11b6c9c4b0d2495ab05003bec5c73fd1e1ba7c9ec9bc7f8322ca96",
+    "app/components/CustomDatePicker.tsx": "acdae3db8052e4600b6827fb398d9068c399c8f55016b8014f01e361f892ab39",
+    "app/components/FriendRequestsModal.tsx": "da6fe7d74ac20cb65116ef5db161ab8743e3a99bd0e0a8bd428e543e68ada4bb",
+    "app/components/GlobalSystemWrapper.tsx": "77e84ac6c598c85420f5ad57496190793572034bc069b9fe105f8d167d278c5a",
+    "app/components/LevelUpOverlay.tsx": "12c1d3b647f5bd7abd976a993fb0fb33edad4466f410aef097cc1e9801cfebac",
+    "app/components/MarkdownRenderer.tsx": "4795aa624716c8ac9f7ccf4eb225c5127eafd990b9c9f2c4afbc86687009f869",
+    "app/components/OAuthButtons.tsx": "61c0ed350a60697ce4ee0643aab7daa21efc0a26af22031bcf7d50194143d8fa",
+    "app/components/PasswordStrengthMeter.tsx": "a849abb32afeaf7e50de1328ce932e9c334849ceca66e97f725f2c61e9552102",
+    "app/components/ProfileModalContext.tsx": "d6653e8fee64c9da50124e27ee339b7f273a38d3a18517623222ce191f836d45",
+    "app/components/PublicProfileModal.tsx": "bf48943dd5a2209425b1803516947aa6774c773349d83987c6c7c31bdd5573eb",
+    "app/components/RouteLoading.tsx": "86ec1be93b2bd4b89b33945660fdee37c244e5cf030b4260e8c6976f812e730d",
+    "app/components/SessionEndToast.tsx": "e64bb9bfed6a4285eac2f3dbd0f22cfae1780f84ded6d5268b562092583a92b8",
+    "app/components/SessionInviteToast.tsx": "00ee67a4dc04f0f6ae1e188abaa9ede997891fd6a04fc233f2f2cdb952b8005f",
+    "app/components/SettingsContext.tsx": "14a802c85051441470781a37f12db0252d87b18fb7deac29d02451b9b6ba64d9",
+    "app/components/SettingsPanel.tsx": "3bac9d97606daa81fa80d23213cf3f5b3b5b851816abbf1f4ee93c11c27b6655",
+    "app/components/SettingsRow.tsx": "cc268d6a6d2e15d710c50226fa01c29b36c95d78744e5c06e64267ad477a9ce8",
+    "app/components/SettingsRowGroup.tsx": "5356e4af01623f0caba7cd84796c461cacff67b4871da92624f14633111b7576",
+    "app/components/SettingsSectionCard.tsx": "6c5abf60e1bfaec368e227401c169567a637e95cf0b616c4ccdd614ccb240971",
+    "app/components/Sidebar.tsx": "bd193392429ccf4b12b7d6475280a33dea9e634be299aae003f1daa2c08ad8e2",
+    "app/components/SidebarWrapper.tsx": "f27342756607f28d30e4fd6ae580f30aa4d940175f75c297f23247bcbb6d080c",
+    "app/components/SylfAppShell.tsx": "175bab5394fc91b9dcb50035393cb8e9bef0558739e8598decbec73d505d2660",
+    "app/components/ThemeProvider.tsx": "5e2728eb6e7a4f17214b1f6ab201bffab5de4b8de1e6af77892e4fbc2faaccdf",
+    "app/components/ToggleSwitch.tsx": "9422eea775ef6b6de8a2895066b56b907e8f4aaac5ab1d774774a0aba6220a31",
+    "app/components/TopRightBar.tsx": "4e7df7e85c037606fb126d11504ca3331eace385998bee08fa1dad826b4fea44",
+    "app/components/UserAvatar.tsx": "3aac2edee0b9867feb4771e88d97604636c4bcb4299c65927bfa224672cfb2b9",
+    "app/components/auth/AuthGlowingStars.tsx": "90d421406566fa490b2b6f278cf1261eaa43928cbf3be46ac58a467a13e28e73",
+    "app/components/auth/AuthHeader.tsx": "394d6de3eebd0efcc41ec89dd8b7e1716a09e501a81c37e5752492d7d61f1592",
+    "app/components/auth/AuthSplitLayout.tsx": "23f164deb9c23d455496920b402ffd06f0a5e422ed20a4e23a2cdadbff86ce45",
+    "app/components/auth/BackgroundStars.tsx": "b302143288fc481084d844555aeac60a51917cc2392faf996077dc22dcbefaa0",
+    "app/components/auth/BotanicalDivider.tsx": "5e2154798997e9de768bbcf63174f38ce8d8f39fbef625b772a21683281c9c34",
+    "app/components/auth/CelestialBackdrop.tsx": "99f4390c568a904e7affca4277d4f8e2852ca324cd324d3aac33e55d48e2da11",
+    "app/components/auth/CelestialStudyArtwork.tsx": "bd60457149d7a065417e8729ab4c59d9c7fc13ce9c2e1100d60b70b16acb4571",
+    "app/components/auth/CenterDividerGeometry.tsx": "ff3eab44423cfc8fda416facb7093b60a3d1e7c90a434435b957f6b2f91043c2",
+    "app/components/auth/SceneScaffolding.tsx": "f13764c6a565cc236cd6f80e35f25b45489de1fc9bd393079a3e3afb79379aaa",
+    "app/components/auth/SideVines.tsx": "c56b07e62e7cbf0e4ca3574c0763f0085b23d18de74403cd2f223d7ca9f40367",
+    "app/components/auth/StudyIslandScene.tsx": "0d9ac37c08849e24273f319be68580e53b5acc701545e8415f25c0908504c9ec",
+    "app/components/auth/StudyTimerHUD.tsx": "427d3acc57b9109588c6aab1d981b071d3745773225648393a5671f532b99010",
+    "app/components/character/CharacterRenderer.tsx": "1110ad6028665dc38fa481a8752276dc8fcc01c8183ea5e057a254deb049785f",
+    "app/components/icons/SystemIcons.tsx": "b6655ab7fc29b77dda2e731b01a68d13c5df650376ffb5e4ed9f08c5ea3bbbcb",
+    "app/components/icons/index.ts": "1f8812176e78050a2f9984166e30c988b130e96ff9a98df5abd5289f9c902a80",
+    "app/components/landing/CoreFeatures.tsx": "b6050adb3147398258aeafb7e57270ae773617e9ed9012e235eca0300c2401d4",
+    "app/components/landing/FaqSection.tsx": "4b851917c65105ffaa6142add1606d04750fff38cc95263ca312b7f8ea923a61",
+    "app/components/landing/HeroSection.tsx": "db56c1078667081b7c420ece11e57cb7716500ffd9f07b03dfbf699e55bd844c",
+    "app/components/landing/HowItWorks.tsx": "0a1feacd9090492b62ddc8e56c62ac929984536e680fe51583baef6d725c5090",
+    "app/components/landing/LandingFooter.tsx": "2e6a616fa45e38ae703af752a30369a0f1beef5634aef020c4297ccccd323cf4",
+    "app/components/landing/LandingNavbar.tsx": "4dc3a10cb0a56042a358853d111949a6405b9be8d754cce64199843b725019bd",
+    "app/components/landing/PricingSection.tsx": "bf2e5f9e160ced69aec519a1eba7ff68f5203512e019a6d547d2115742bd9a07",
+    "app/components/landing/ProductProof.tsx": "0cf4806a9d4ba8fb57fdcfacde1882a0e5401561fee68b2596b909196f8c3ae6",
+    "app/components/landing/ProductScreenshot.tsx": "93a1ebb1c3fc15de75e842150c26e77d4bac912ba6d4b69bd382bab867dc8dc5",
+    "app/components/landing/ProductShowcase.tsx": "b25d0ee1d680805eced7a3d7ac4bcd03f1457b416cbb73bb7af5eb88cd24b2b3",
+    "app/components/landing/ProgressionCore.tsx": "7326cfa97e1cca684e17e6f16e22d6e563af96f5c780f302533838473fec5856",
+    "app/components/landing/ProgressionSection.tsx": "d6b7ce5a034c388e13269b3bfbd093947bc1db082374a0ef0f23dae257eb3b56",
+    "app/components/landing/SkillTreeCore.tsx": "9a2d191b6e479471fdd37d98fa51cec53693db00125d754ae4449803d374fc78",
+    "app/components/landing/WaitlistSection.tsx": "fd3649ae4b7b8b71ebf55ddbf71f58c3ee0558b98f0ed1607e9585f6fbd2acd2",
+    "app/components/landing/WhatIsSylf.tsx": "5d96e8b6bfcdd2ea419728cdd748f0ba372814f8d1a231fcc1339edb0507ae51",
+    "app/components/landing/WhoItsFor.tsx": "7ced0ae7a9ba5369169cb4d67fd49e24e775e4f1069ed3669ce5baaf69b9796d",
+    "app/components/landing/companion/Companion.tsx": "3d57e57c59e2af50e7a07a166c4a528452a8b5af98da1a0135812bdfb9c4400f",
+    "app/components/landing/companion/CompanionReview.tsx": "532ffd0503cbd02cd86d65733ad1565d07674a29e68a1c0ce4ea2069600b7eb8",
+    "app/components/landing/companion/JourneyCompanion.tsx": "09e25f83c11c85742578fc39487f12ed9a39dc5bbab724e7c05c173f6d9f5c5c",
+    "app/components/landing/companion/MagicalEyes.tsx": "10e81070f775b17fa3af75463fd6d0e9168a74c731d0b442d8432209fb437675",
+    "app/components/landing/companion/PixelCompanion.tsx": "e98a19bf7f31be5d03499365db7f7d5fe45ea5b6a53d9bbfd988d22fc46b682c",
+    "app/components/landing/companion/artwork.tsx": "b71d952f445eb3d17324bb2408ed261f9a968c2cce0f23e685291e32f2561bd1",
+    "app/components/landing/companion/journey-motion.ts": "589fab9eff227e512387dc9c6bdf36db836bd2fceb83eadc1a8d9afbc2fd6836",
+    "app/components/landing/companion/model.ts": "e1a9dabd8cdce8c532313e1e6e5064f62a6d0211d47f71d2c8a16598ec77b3c0",
+    "app/components/landing/companion/pixel-preview.ts": "0ae9ccad1d4864f1dd8c75d6818108013034c1de9a920145765f84d4bf0d33b5",
+    "app/components/landing/companion/secondary-motion.ts": "70b1a8125f684f191734d0d04d2e6b85ac62061098ebe6776f40a603a9ad7386",
+    "app/components/landing/companion/useCompanionState.ts": "03a55b0d4e31d7058dd82841f3b5f93520612cd243b10d938ef9a1f9d50bf475",
+    "app/components/landing/journey/CelestialDecor.tsx": "ca69804ab647e5f5910e3b1a22eb8fdac690f2835a60cd6473af8c8cdb7af2b7",
+    "app/components/landing/journey/CelestialMotifs.tsx": "609af8090a69f4e2df28a1cc1f9d114e4a8b76d927da8a1692baba2d7c5c827d",
+    "app/components/landing/journey/HeroJourneyAnchor.tsx": "e98e4b44f9830183da2639ae45f4f10ab65579b69ea5d09074300225aa37840c",
+    "app/components/landing/journey/JourneyLanding.tsx": "dac24821fd6401bbb2ac689eb64cf18e6ad2be1a19595c3dc1a0e5a7f7ab7ed0",
+    "app/components/landing/journey/JourneyPath.tsx": "02f9e357f63297aa5cc8528ad118f68a363e7dfef4fb20aa9ebf13a22b5f862a",
+    "app/components/landing/journey/RealProductScreenshot.tsx": "4a0ae1b68a089c8c050b92e1f03a38975a86a363fb93a0316ec4779339d9e8c1",
+    "app/components/landing/journey/WaitlistSignup.tsx": "bfa8125024fcdb7bc0ae0974d91ed533fc1aabb0203869e4aa58f8540122695b",
+    "app/components/landing/journey/journey-geometry.ts": "3d65a337a9c034ea2fb9dc22310cce720589bab1f3069eb6ebdcf47840e32c55",
+    "app/components/planner/CoverageMapPanel.tsx": "c659b3503fd50e4a329e027ede78d531f285571d6d456fe4e3fcce175c1bae04",
+    "app/components/planner/DraftEditWarnings.tsx": "f3404620365d3832ed734cb4d1eab3d106fc84dc04c4319bcb19b58ca9ca249b",
+    "app/components/planner/ExamPlanner.tsx": "28c6fd4f93e8a67338cc0fcd2b84eef89c45b7c092c30db37342d283774e0adf",
+    "app/components/planner/ExamPlannerQuickModal.tsx": "6c61003b5943785684f0e12e0514322df2e6379e529c41b1ab39b9d338be6c84",
+    "app/components/planner/FrictionFeedback.tsx": "e2e731398df592fd8912b7bcda1b2d9625804b54ff62376786a5739a9ee684e2",
+    "app/components/planner/IntensityNote.tsx": "40b1dd3eb8be9b4688e41bba4a46e6c8ccd5acd824a67938a9591cb041487bbb",
+    "app/components/planner/MasteryPlanner.tsx": "81b07cedcfd94fd42779ee74473a47601a85a6ee7c12a6698e11fb3765fc4407",
+    "app/components/planner/PlanItemEditor.tsx": "21352fdd27a95b9f4426986bce73eba8688542e8508b39858e1384e223378f50",
+    "app/components/planner/PlannerModesChooser.tsx": "98554ad8e8045d5d0eb0de9387d0a07c6240c1a3a3d968fcdeb3a035e245b4ad",
+    "app/components/planner/PlannerWorkspace.tsx": "b305d5371259cf9f1f9f5c5764ce03f676991db7d11cd8928c6eb37750e14c24",
+    "app/components/planner/PreferencePanel.tsx": "c3ef93790ceded88766cf4c80917735629db4303e33997d933bba720e5635622",
+    "app/components/planner/RebalancePanel.tsx": "00f753e238d26d2aded027f06a89797cca1845e2f2bb0c4a4f1f9810c6dfa328",
+    "app/components/planner/RoadmapPlanner.tsx": "5ef1d6dfdc83be3e5bdaa70b60141548df53c26f55d6961e9cb3b176f8bef190",
+    "app/components/planner/StretchPromotion.tsx": "781200f9a1ee6ce75e7770bfe2acb28143aa5316dcea57fa2e6722386894e078",
+    "app/components/planner/copilot/PlannerCopilot.tsx": "1a57c6b66493145be474a5b67eb2f8b3ff5ff03dc65c8a813307859be3256306",
+    "app/components/planner/quick-plan/AvailabilityControl.tsx": "cc3567c98d6937fa9bccce518d3665569057edda4b7cc02f2193822a7af453bd",
+    "app/components/planner/quick-plan/BackgroundCurriculumControl.tsx": "2b96a6d26e84311141343730233aa0ea6d590fca3c74bb75a71b053ce2d70d6f",
+    "app/components/planner/quick-plan/GenerationPanel.tsx": "d9206d0ba4c54ee31776ab79310a8ba97ffdb66b0cedb5263a7035301b544f77",
+    "app/components/planner/quick-plan/OverlapReview.tsx": "75505daa5f53986c4b2665469479c7636e047bf05176349d210c13812c8aa522",
+    "app/components/planner/quick-plan/PlanBriefPanel.tsx": "8a1425d3cce4c0eb922689bbbc405ee1bec9aedb02e35ec199d665d19788391b",
+    "app/components/planner/quick-plan/PreparednessMatrix.tsx": "d8625645db4d982b2dd68a71899cedcc462a8193633cbbcf0bd63c977ae56623",
+    "app/components/planner/quick-plan/QuickPlan.tsx": "913a11151e9bf052153b128957a2a1399f7aee8e1665c8b93264332c75326b03",
+    "app/components/planner/quick-plan/ResearchStatusPanel.tsx": "c68de42038cec7edba4af8fde5d90c58693d46f2373b40988668f9ba4e1b0117",
+    "app/components/planner/quick-plan/ScopeEditor.tsx": "d62b889b0d58138ae54cee2785108d08142a1bbf5803618ef80ca75b05a8e906",
+    "app/components/planner/quick-plan/ScopeReview.tsx": "2c29bf327c0c8295591b9a3cf087dca7adaf2fce2991a5b7bf6b133f77ac7844",
+    "app/components/planner/quick-plan/SourcePanel.tsx": "28161708d771ea4df5d6303d9a7db2ef7fe0bcf5b89c70b56b1bd8d193ae77ab",
+    "app/components/planner/quick-plan/WeeklyBudgetControl.tsx": "902ff40423446ba89df7644c5dd793a2e36d8ccf6f73e4f56eb5dc41f46e85ec",
+    "app/components/planner/quick-plan/useIntake.ts": "74b351e242cce2411cc55445b15c25eb7e5adacd303c1f6bd5f74951b1ee5930",
+    "app/components/planner/useExamCapabilities.ts": "b7905449f77a33e311426b65966b2687dc1d7c3d2df313893af4ac3cbef30ef4",
+    "app/components/system/PresenceIconBadge.tsx": "859c8a8bbba71df36a54cbd046d62b67e85781dd5fd767b1c0b0d66dfc3edd96",
+    "app/components/system/SystemAIProvider.tsx": "4d40d37b3e53e1efae7ae45e698e852a0832655ead0954d774e68168c33ec3c0",
+    "app/components/system/SystemFab.tsx": "7c9161aad53ee36e5266b5dbe3579b16ccdffc7ce2c82555a025a140fab47edd",
+    "app/components/system/SystemOverlay.tsx": "7c252c427fc9d4036150150441151efeee789f309b02b4ce841a4411d399780b",
+    "app/components/system/page-presence.ts": "77ae5ce4b30fe9682b3ddbeaadaf85b1e1dbbaaaee2eab303fd895384dbedd49",
+    "app/dashboard/components/DashboardIcons.tsx": "3af0d0f92fbd86d7843f971617d1860b05326d433e4f19ae9842a204d6eb6899",
+    "app/dashboard/components/DashboardScreen.tsx": "31014d0c547d47bfdb5a2d81841f628ca487aa1cbf2651e94858b03d06af4b74",
+    "app/dashboard/loading.tsx": "98dbf2f968f20797ff689f02958a51701992b4a302739f01bbfaf4816fb3be49",
+    "app/dashboard/page.tsx": "7dbb012a226b4e3e10a2e4da567408e319569fd5dcbc55a3d929f43c30848755",
+    "app/dashboard-design/components/DashboardDesignScreen.tsx": "245e42b8a6b5b2ccaef40f38dc96bdc939e821ba5e99a2a908ab46244f1af6cc",
+    "app/dashboard-design/components/DashboardIcons.tsx": "3af0d0f92fbd86d7843f971617d1860b05326d433e4f19ae9842a204d6eb6899",
+    "app/dashboard-design/components/DesignLabBar.tsx": "2641e162acf530d321f61cf7538674b5705def721ed90633f28c057dde4a74b6",
+    "app/dashboard-design/page.tsx": "1607c8156b9919463b2380fa1887f06b2cc1d99ab9fca51c3b73c48cc1d81e9e",
+    "app/focus/components/FocusBackgroundPicker.tsx": "a9ef14a01bf0904505295ccab99f5c944737f5d61ad3960bdbf5f02c976ac6db",
+    "app/focus/components/FocusBackgroundRenderer.tsx": "8351dd6693ba8d11cda14f5f2ee336c5daae06203ef0e9cb1b92ff3d42dc2b87",
+    "app/focus/components/FocusScreen.tsx": "ec6b673dbcde5905250fb9220058a2f20053314b152fbf5e14b33382b9865707",
+    "app/focus/components/FocusTimerLayoutPreview.tsx": "9a5363224d55dc9d52a9c3ef64b62ac8bddbe289d0249afa091c01a965dfb6be",
+    "app/focus/components/FocusTimerLayoutProps.ts": "720e1cf2aede9c873e02fe8bfd7a55962a143d62d1ed0f5ae95100efb4f7d3f0",
+    "app/focus/components/FocusTimerLayoutRouter.tsx": "fbb3abf30fcf716018f19c1d90d9068490a31d0b4c72fb1673cef45f9772de77",
+    "app/focus/components/FocusToolWindow.tsx": "c42b7e52370acc192bc69e5f1b432cc4d6f76726920b2ef648b0f847c0c452f3",
+    "app/focus/components/FocusToolsContext.tsx": "19d9207eef21711fc314b8b10b5ab6180bd2b16c9d23648d54872c773005938b",
+    "app/focus/components/FocusToolsDock.tsx": "43ecf761077b05cbdb15b02a52542c9f77f5e2f4552dda10d4cd996e4a7ef085",
+    "app/focus/components/layouts/AnimeTimerLayout.tsx": "90173e75cc4401fa9cafdeb80881d3dac5ab5b8d516fc190f4abb131df27cc2c",
+    "app/focus/components/layouts/ClassicTimerLayout.tsx": "57ee8fafbf9bc6639ee4d698efbc4f65dd42cc01a3edcbf21004af62073a97bf",
+    "app/focus/components/layouts/FantasyTimerLayout.tsx": "24c0ce644aaee6877ec0646805c8aca7a37ca230eb6281a5c9a942a2aab2d3b0",
+    "app/focus/components/layouts/FocusTimerDockProps.ts": "709a09deea04938f0446dc17da61521ca09a4e8502df03ff4bd65aa05b20ac2f",
+    "app/focus/components/layouts/LandscapeTimerLayout.tsx": "ee2804e293d962e80e51ebc9f8b87cfa44fa9ab6d50dcdf159cd56651bdbe362",
+    "app/focus/components/tools/AiAssistantTool.tsx": "7436ce26e06c13672db7271aba80c12f6bdf0885e4f9589030eff784741a79ea",
+    "app/focus/components/tools/AudioMixerTool.tsx": "0fb1b4e2c25c52c99276b43a8131ab11bd85a07d775a4f6506b8c88fc301c01f",
+    "app/focus/components/tools/CalculatorTool.tsx": "7afcbc9fc988f24b6347e4123b934bd777cad0ab2f907cad8a0bd83d456963ee",
+    "app/focus/components/tools/FormulasTool.tsx": "0d929e4a69c69c2f75a75deb064c649b0cfb81690fd3c363c5582549254cdcca",
+    "app/focus/components/tools/ScratchpadTool.tsx": "bfd84a8cdadacc4edbd18f9837ac0b501deb3e74159403ada2d504b1adda0a30",
+    "app/focus/hooks/useFocusBackground.ts": "3bb55ecc3fbc6ab2f1007f61311f264021f9dd107b774c67fd3b5d0362da4b29",
+    "app/focus/hooks/useFocusEyeComfort.ts": "a0c560e3d024193e5d157ec8c7061d8fa4c43764e1f9b165de00a009f118e173",
+    "app/focus/hooks/useScreenWakeLock.ts": "82e3bbdedd2f675818eb433ebc7046c1ad862610044d23ace163340f55d73152",
+    "app/focus/hooks/useTimerLeadership.ts": "1631df10fd25c8e7d8e8e40f05fe05cdafa4f0cd2620aee10d52a11b3b611401",
+    "app/focus/hooks/useToolWindowManager.ts": "ec5d84b36f28783c2d2512d0ff065fb912d0eefa7c7179e122427deef67bd0ca",
+    "app/focus/page.tsx": "5ffa79a4fe2aa27798501fffaabce6707a9673271e48656b40d4b6417f41695e",
+    "app/focus-party/[id]/focus/page.tsx": "df736993bb408a1e6262c38e28f11ecc27bac49b1ef5750a1889ef1de9c3997a",
+    "app/focus-party/[id]/page.tsx": "953b967d0eff0259f2167af74f54dba71cdf3bcbec235160e808377abe699f78",
+    "app/goals/components/GoalsScreen.tsx": "f520cea12515c8c9fa9cdbe3a2b954b422e81918f0522cadf86cd83c17ec53ed",
+    "app/goals/components/GoalsTab.tsx": "2cfe1039921d4b3cd494ea1ed68d677bce8a51fa8cb08b819166e45b59b36572",
+    "app/goals/components/QuestsTab.tsx": "c468eb1e64ad95a8e8ebfc768f94401aed326b89c2fdab49ac0aa6762255bf01",
+    "app/goals/loading.tsx": "59a218616760125e4a328383c50b112d3579200b59512063a75669cafa060caf",
+    "app/goals/page.tsx": "e0646c9be0fa7fcf008c6f6d1d4838c3bbdc8ec091dde2908b1210c82315b52d",
+    "app/hooks/useDashboardData.ts": "f28b5e872012fd92d06f699f4231e119c36b9bcee6940060e6924540e6828b95",
+    "app/hooks/useFocusPartyRealtime.ts": "c1a8ce4f6c50646d17911c2e13816c0ebebc021bfb632a36940775ffd0de98a8",
+    "app/hooks/useHeartbeat.ts": "a69e6c3c0885d28d012fdff4575e196996a05d1c6e07dd4134a6e1513783de01",
+    "app/hooks/usePostgresChanges.ts": "f046565db3b360df5b09df70569b248abf90e69ff076a2514bc1c926706e1453",
+    "app/hooks/useRealtimePresence.ts": "f2f56d01d0fcc28a30168ecf749e487dc1c5c8195e8211cecafe7550c5fcc68f",
+    "app/inventory/page.tsx": "5d936239aacd186a02519cb9da2860dbb70d6e3348463d4a1b98ff5bc9bfda79",
+    "app/layout.tsx": "498353783f342fef0058b01e1705aaaf8c90d4828c4027ebfdb715e63e7c05a8",
+    "app/locker/components/AcousticsTab.tsx": "7fb764735fab060e92158a728c71f2f46719012559ed2df8d0ad7608a0eedd94",
+    "app/locker/components/CreateNodeQuestModal.tsx": "e476c4a00db378d84a1119f346b60d92af2ab23772374b8f3ba77b59535ce704",
+    "app/locker/components/CustomAudioTab.tsx": "79d696f0f812ffcd5573e2e9b72081e6e1d8d004fa6ecb193f8a9c228cd1d4a4",
+    "app/locker/components/IdentityTab.tsx": "a72f7ddfdb2cc3f69e53187f33bb28bcb5922ead6cdfc5e678c52289677af86b",
+    "app/locker/components/ItemsTab.tsx": "79a7d675d4ef874257cadbcc0628a82e141185b9c45ec5e8586ddbc63d8dc1ea",
+    "app/locker/components/LockerScreen.tsx": "6a2631f6515286ea889aeaee7f9690a01add85b217d5b6ea63fd45d55c9d8184",
+    "app/locker/components/SkillInspector.tsx": "cda9b324331102b37a26d29714e9bef0b1d5d89f2e28dfbe5b3b2e70ba7cc37c",
+    "app/locker/components/SkillNodeGraph.tsx": "72fc10d8b9096ddddc7130ae8a406f600a601aedad632c4e0a1aa1e7cfc6f1c6",
+    "app/locker/components/SkillTreeTab.tsx": "eabc853dd453a0524ae2eefa062e86a2b9e034e218eaafbcf9a59f3727331f71",
+    "app/locker/components/SubjectConstellationCanvas.tsx": "2482f58cb910092ca96f7e21df38c95a41a1d9eed375dc0cd0f35b30aba4673b",
+    "app/locker/components/identity/CharacterStudioView.tsx": "d79da915ca09f3baf1282bc8688e3649341b3390f0ccd0519203b552775d47e6",
+    "app/locker/components/identity/ImageCropModal.tsx": "91059e12a4458a8d16a0f7d9871501c7bacf98c1882e90c98d57ab2c5de419d1",
+    "app/locker/components/identity/ProfileStudioView.tsx": "7aa6e25b9a1b1bd4ddf84b8052db67559c88507a708c1bf1d750b5ad07fd4be8",
+    "app/locker/components/identity/StudioHubView.tsx": "2f8adc020fd91292dbe62aed6821725786c08e56a7320140973762f8626570a2",
+    "app/locker/page.tsx": "4d686a4c82b36f416c60465aad1332648150c187be817b5c2ad6f3cd806042a1",
+    "app/login/page.tsx": "6346bbf91eb57234eb167b7bf1cf71e4625389c801cc4c5b73ac3794fc6b56ea",
+    "app/onboarding/components/AppearanceStep.tsx": "1e83f3a8cdb25b99b5a43ff4ac4ea4d23fa2cb740100f51ece44df444087fd99",
+    "app/onboarding/components/CompletionStep.tsx": "8e559867e416bdcfa103538b829d3ebe288325e9b3e797e15f0f1dab007ef56b",
+    "app/onboarding/components/IdentityFields.tsx": "3cf127970f2f36d7003ebca83639f6f8e70943b4b716a3266a5ff129fee90079",
+    "app/onboarding/components/OnboardingProgress.tsx": "72c0c1f0a5cd399ee478bca10ebb539d456027a0ba4ed75972d03ea9acdd97a4",
+    "app/onboarding/components/SubjectsStep.tsx": "0169cb4f2425046b940123cac5067d4364175f71d33ed0ddb332d08dc465300e",
+    "app/onboarding/components/WelcomeStep.tsx": "3cbfb17a2eab9a01698039b16483a37403fb5b4d625fef92d0b705a82cabf1d6",
+    "app/onboarding/page.tsx": "98d12d6a0f770a7b90b96b389913051db9e99e73dc4d42e23870042ac36851ba",
+    "app/page.tsx": "97115903a21cd6312cc1b9c35c7b6896c091566bdb6e7941be5714cfc58e827a",
+    "app/profile/[username]/PublicProfileClient.tsx": "049e065b43eeea027eab045aa5041d26a74486f1731c4a1a2b94fef02ce54c0d",
+    "app/profile/[username]/page.tsx": "8e6a4de50ddb23dca66e13723a401bb06f2a8dd3c8a90caf13b46b9166365cc0",
+    "app/quests/components/QuestsScreen.tsx": "4143f91a2919a95a201208f8196607d44a040f2639ffb91d87af625c091fc9f5",
+    "app/quests/page.tsx": "45cbc16ec80cd56f2cbd9cf4997c83cd986ac654ce5f6d6042b10e14569e3dfa",
+    "app/register/page.tsx": "16f9d7bdff980bf15bfffdfce0ab4e9b8e2d7057b6e42a6c059c68170c823bb9",
+    "app/settings/account/AccountInformation.tsx": "eedf60514d9f7ce83d09e00437be35dd995a7e8e71dfe751783e11b8e80cb83f",
+    "app/settings/account/ConnectedAccounts.tsx": "43db886c8eb53b21573daa4d6c8ef8ca53edaadbbbacaba5dbb9bd48f06863f0",
+    "app/settings/account/DangerZone.tsx": "bb5e6efccedc9015633f5e6070d19aab15dca87652939a26a01b1e41611f2c75",
+    "app/settings/account/PrivacyInformation.tsx": "8a160c6dadd49f2f1ea0a1a163978820339c2e0d667394c548c6553453a5a108",
+    "app/settings/account/SecurityInformation.tsx": "09a855162e66162a634b385517829a879c1a1af3ceb86e94b432c88607d871be",
+    "app/settings/account/SessionsInformation.tsx": "627cf22c874aae1d79f5f74d4ed6771c2acd0a19cef402ca4061c223a32a11f6",
+    "app/settings/account/components/AccountSettingsScreen.tsx": "24faa0ab8950d6d9177f1d588b2b9b60210d8fb54d8e357eb0fc444908190276",
+    "app/settings/account/loading.tsx": "56da47178448ab33c213892bc5978a63b4a24d36c58c9d7ea64241a48feb92b2",
+    "app/settings/account/page.tsx": "ccdda9c20eb2e3f63ea3043c52fbacfc5b841a7b4bfef790f270a3a5ac283da5",
+    "app/settings/account/services/account-capability.ts": "99d5b8e3447acbacbee3a344c0b63e6ef2ab65a77c966ebf0af221a2323d3089",
+    "app/settings/achievements/components/AchievementsSettingsScreen.tsx": "ca0b2efb61dfe22e26c185fe0691d7ff130b0c9803f10fb6564e4a7e1ff08b90",
+    "app/settings/achievements/loading.tsx": "75a9887876700ea64024b824fd804883ab3d568e8b8dfe954ef584c5e04de9f5",
+    "app/settings/achievements/page.tsx": "8f3edf7e6f9df6210729b0072317e807b4c31b16cc36a8a81b7e4308e3541d0d",
+    "app/settings/appearance/components/AppearanceSettingsScreen.tsx": "5ec721988fcc9cccf456f29bd748e7b34cb3f9d2a8bcd4e12aa69335036d660f",
+    "app/settings/appearance/components/ColorPickerBoard.tsx": "8a694d4da60188f503869aa2a825b99b1afdb66cb875cb177bf1314aca0f56c7",
+    "app/settings/appearance/components/MiniDashboardPreview.tsx": "7d700266ab28137a1a9d139367e8bd29e85e106e198d1e8d6749e3fd4f34552f",
+    "app/settings/appearance/page.tsx": "f9d0864df2fccfb5bfa65defe697f6175b891fe0a5549150c82b5ef7ee048218",
+    "app/settings/archive/components/ArchiveSettingsScreen.tsx": "c263edc850449a7bd0d97a00c679da62ec36f73bf32c202199ba56ded956ab83",
+    "app/settings/archive/loading.tsx": "ddec0e464d77f2d2bebcf6bb6dc13f3a9d17023c7a812742a002e9f968589561",
+    "app/settings/archive/page.tsx": "9438fe49fe294e2c24acdfda79d50ca4fa58883775c19fc77b65d55397d5c552",
+    "app/settings/backgrounds/components/BackgroundsSettingsScreen.tsx": "4307e82d48066a93cf125abfa21d2c9d9aa5b0fc56c4a487d928ba0cbe72da1c",
+    "app/settings/backgrounds/loading.tsx": "000597b56b1ba8ed3374250a73c92bc71f37c7247b6ce41dc124fa6fbf185407",
+    "app/settings/backgrounds/page.tsx": "eb15444e113d438d947e331aa6f7d4ccdc57a5f2feacb2c8b66a4b80faccf801",
+    "app/settings/badges/components/BadgesRedirectController.tsx": "0d0be8cedb37767b2c34f69c6ec9da8e9d5b4eeb8341265eefda3f5c65468e08",
+    "app/settings/badges/loading.tsx": "676d0785d9d31d1ac7685b5475cce97486647c827e5106942045630b40c51e22",
+    "app/settings/badges/page.tsx": "9a3e811b39354ddd5dc66d25e1fe3747837367b743a44b8ce240d7b45932ae2e",
+    "app/settings/calendar/components/CalendarSettingsScreen.tsx": "07f494d351bad22811745bf3038bc5d339f5e496bed1b163159231b3fc2f9dc7",
+    "app/settings/calendar/loading.tsx": "0db298cd8529bf6e69195e95f3ec04a7e9fe8d2cb1c05d9d3bff1e9b76c1ba26",
+    "app/settings/calendar/page.tsx": "248aa66a0bf389c7cd487c392b5253dc1a08d31c683e996098cc79a5121ae6e5",
+    "app/settings/collection/components/CollectionSettingsScreen.tsx": "644663158026c8f4a78f71eec5f9a32b92c56c61618cc236d2cbc98c1a8312a5",
+    "app/settings/collection/loading.tsx": "25c0f34105425d8ebd39cb2fac95b59ac3cafede69fe4e9e4707eb81ee551ef8",
+    "app/settings/collection/page.tsx": "ed2555ad249ecc4ee77c35fddea9a615ac81ec612933881bc41679537b98bebe",
+    "app/settings/components/SettingsIndexController.tsx": "1cc103c7416a7fdcd27f6ca2401e16fd00d31e3ba84fdc31c6c7f27e0d854ece",
+    "app/settings/components/SystemLibrary.tsx": "27890e621fc7508de9d9738deda4c3bf7da70df459a2e09637b468fc4450e17c",
+    "app/settings/components/useSystemAppearance.ts": "1f7a97192c2144947253646bc7c8c5a8ff57e4c3c928b7569aa2d8a89ddb5349",
+    "app/settings/focus-backgrounds/components/FocusBackgroundsSettingsScreen.tsx": "996721c6cacf02bc48d066df23233b931be67bfbfd011d5d1a710096581a0fb0",
+    "app/settings/focus-backgrounds/page.tsx": "a0f3e20ea739c8e985934b1c2e3ab5625a94d5f5d7cf92cf6ef64dc30a1b9a6f",
+    "app/settings/layout.tsx": "d23fbfaf3591e2e7f16b60e5f9157774fff1b3c678a0313e2325e05006b1937e",
+    "app/settings/loading.tsx": "67d083605d70c905e8cc02d7458f0205fec4944446ceb342961880740b420712",
+    "app/settings/logout/loading.tsx": "c6eed680f86fd5e52b1bfa7a23f6e91aae62d2658f4c3613bd26b379c8bf1063",
+    "app/settings/logout/page.tsx": "5769a06e260ed88d79a45f3ba4ad117283317f7e17e3f4c4a44385ec88886a41",
+    "app/settings/modes/components/ModesSettingsScreen.tsx": "068fa497614ce33c603006f19273963abe144da00704b0bb5224017544bec0f7",
+    "app/settings/modes/loading.tsx": "86f34283f80c8575348a1bb0e17d3df4b4a143c93e32fdc5989c3d09562b8467",
+    "app/settings/modes/page.tsx": "2a66f139e5dda2843a25a16790f503c26e148ea9d7b6949de55e795a1c09d69d",
+    "app/settings/notifications/components/NotificationsSettingsScreen.tsx": "c55312683be570217a875cf505feefa41eedcf747b0e4dc59f71dbbafd39b4ca",
+    "app/settings/notifications/loading.tsx": "bfe8cc79c92b7614d9bb8d9318e5445cf238ee0a86897ddeaffd6a9476a9dfcd",
+    "app/settings/notifications/page.tsx": "54bee4d6dc40049207d5926a20d4cc38b10ade3c1a71bdf4d479f3845c06bf18",
+    "app/settings/page.tsx": "11cd0517027a26e1988e75e1026d96de4d5df5bea44f0bcae557c0fab2dcbdb1",
+    "app/settings/profile/components/ProfileRedirectController.tsx": "b4c713e9e97fd05277ae37a8fdea04c5d6570ef267f378595d7ceda18f29375d",
+    "app/settings/profile/loading.tsx": "08ddc0d611900eee8163abfcdf1061ff270b9236c1cff356bb21cf2a2f755d8a",
+    "app/settings/profile/page.tsx": "b243648714d5c0e5e24bc7e94b5ee0a13dc6d285ddcda639fec077188d4f3e66",
+    "app/settings/rankings/components/RankingsSettingsScreen.tsx": "a37c06c1e1d7e940f2056342c82ebe65438584a31a3f4c08b9307c4a0cf1e6f0",
+    "app/settings/rankings/loading.tsx": "49701a6ccd54b412431cd3125052fa96cc90fd8a1f8627f41c74133e76481492",
+    "app/settings/rankings/page.tsx": "404b01e776bc2308aa37384b0eefba71b809cd337c20c11ef8915a224bc58960",
+    "app/settings/stats/components/StatsSettingsScreen.tsx": "f8221d87f5da26e8ae714c35968ff4a805841693d235d3f2c6fd7169ded38e75",
+    "app/settings/stats/loading.tsx": "ae5520d330c9f8100213a6bae8b9a206df7782816b69ebf38050f454634cb426",
+    "app/settings/stats/page.tsx": "076ce82ce4291d8c9d49ac460087eaa71786ed52c35f5adecb6e0cc6ffe3eebf",
+    "app/settings/sync/components/SyncRedirectController.tsx": "90886c76aeaee940912bb39ca36acec2ec6a79d255f09751c212632ef2b61423",
+    "app/settings/sync/loading.tsx": "bf44df8d9fa4e30913f3690d93c4a2c5764a2da65f61961ca1dfec22a8300f02",
+    "app/settings/sync/page.tsx": "dab4609ba9e87ad80123176eccc47218fdd3d1c100878f20dd7bb288aa6af2ab",
+    "app/settings/themes/components/ThemesSettingsScreen.tsx": "81d5f0c6f355b3b6b26aee18c769ec4191f311e4fb0f0e7e855098f3e269d926",
+    "app/settings/themes/loading.tsx": "4c8a66ba9ab851106299fda74dcd2482b569f88230f284f77f6488c517ea569f",
+    "app/settings/themes/page.tsx": "411e09f8327cffdd57534cd3051f12c5f3e155ce5bdc403feba031030c386845",
+    "app/shop/components/ShopScreen.tsx": "3c74cbae449ec363b06a2956448d59f739a91ce7d29a5c18e903e39ddefd9644",
+    "app/shop/loading.tsx": "67858a364e9b77f67f21054b6742999dad5bb48e12940e1fef93522b3669c6af",
+    "app/shop/page.tsx": "357168a1a0b0431832e85307ede692d3421fea814d774fab6e39c5f49c62797a",
+    "app/social/chat/[conversationId]/loading.tsx": "6ada9f0a531b29cf1727057855d0516f1a5773ac9ed1671b3dd54c097115d048",
+    "app/social/chat/[conversationId]/page.tsx": "d1017d5959d258db78c37ea8e76a6ecb2133e39555d329fe2f5aabe06f893ec3",
+    "app/social/components/ChatDetailsDrawer.tsx": "28a1e8454f711ad850ec42e9651437e267aaa9e2efb741ede5f153fdc379f277",
+    "app/social/components/ChatEmptyState.tsx": "3160dc85afbbf5184284f4d8e9dc2619933e60d1bea5759f182ee31170b1d097",
+    "app/social/components/ChatHeader.tsx": "0d8843790d7f35e5a055377ed78f3879b43fc3efcff68e643773d169def65f03",
+    "app/social/components/ChatInputBar.tsx": "bac09292b7a22534ec026ecde332f70702445af98e5edb4fc770c0b9b0f95510",
+    "app/social/components/MessageItem.tsx": "b8682584b868224fd99e8e10245bfad7d8464e4b2b00ecc1ce54f3254629dd60",
+    "app/social/components/SocialScreen.tsx": "21487297b59df234461fcf3d91c8fc265be27cc75d54cc0894e11ac347e2e026",
+    "app/social/components/focus-party/FocusPartyContext.tsx": "1843a6b72071b259cfdf1e1baf8850966b6eef09fa60e64424c36aa4c3e25c8c",
+    "app/social/components/focus-party/FocusPartyEmptyState.tsx": "cdac1788cb167b2048659a9733e44158dbf309a90a7553dc395e000926d0480e",
+    "app/social/components/focus-party/FocusPartyInviteModal.tsx": "2534ae0e5ff06cb334938ba11027542a0f795c1ec21c1a81b2530919e51eca6d",
+    "app/social/components/focus-party/FocusPartyLobby.tsx": "13c9e93d41f4cf66f5eb2f9c0081f753602f4e6a524c2d8a0e328fecaab04a54",
+    "app/social/components/focus-party/FocusPartyMemberStage.tsx": "a576aaa0d18b33edc437283e004ef4d204175eb5990860be4b6f14087ec05333",
+    "app/social/components/focus-party/FocusPartyRoom.tsx": "68bffc15f16af42a4ddba3fff25f6687e07ab1672a0c53747c41e2564c6a1cfe",
+    "app/social/components/focus-party/FocusPartySection.tsx": "4e859d73cb7d650cef5d1bb1f7a2f723a074dfde4658c0b666e69da5dfb778c4",
+    "app/social/components/focus-party/FocusPartyTimerLayoutRouter.tsx": "6c027895683e047cabcb79859c9133a122aebf08d94d057d891398025b9be838",
+    "app/social/components/focus-party/focus-party-utils.ts": "266d37ef1ce160e452c2ab3041cae92086657fa3f2d8965b9a0ca512f5a34fe4",
+    "app/social/components/focus-party/index.ts": "710e5437880b8a2962c77238fd8ff3137e227f2076b5fdc13e35bf15fdb1cf9d",
+    "app/social/loading.tsx": "c7d43c5d3041cc8d88a523018294e8e80d35a118b9cab6abb49f015f06f81fb1",
+    "app/social/page.tsx": "1643a6d2593fc757511162941a92092dbb5eed8f7aef999150fffcdcb9bdc38b",
+    "app/studio/backgrounds/page.tsx": "b173d7581187d6e8dcc8378f3f5af20c4ac37b3174b4fd019747133ac398642d",
+    "app/sylv-preview/page.tsx": "e0e946b532979c948df629852536527be3b5fc0581c75950e4020bc1f39217d0",
+    "app/system/components/ConversationPanel.tsx": "926aea42afda55a466916a697f5facb86347188db33fd6f1e534ba1a58ef4322",
+    "app/system/components/PlannerTab.tsx": "725acab11a35d60c7b749034ead970c8995f55809c3b2ea807098b54bd909779",
+    "app/system/components/SessionSidebar.tsx": "1e90721e3ff4945ce9a679d92079dc8d84f4bf5564a0f84e97ef74c154c9efd6",
+    "app/system/components/SystemScreen.tsx": "7e724ff0269cfcc21a1fff09d2e6cf1a5d416c8b03bdb441be9a259575f92995",
+    "app/system/loading.tsx": "e8f0afa3ac78978cb8e8891bf1f01105c2e09853c11fd37f82d523574714a9f6",
+    "app/system/page.tsx": "79612d7b2807d354c6deb83315ff3f12859cb05185a5c8dcbd5f4a2a893a73f5",
+    "app/timer/components/DeleteSubjectModal.tsx": "f1e1850b96c71df9bd4780163df978895cc322fe8bc5c29b08acbfcee349e2d4",
+    "app/timer/components/SubjectModal.tsx": "30973e620f15b7ddbad71fdccecf83b218f0b6169839724fcd7655d19b646205",
+    "app/timer/components/TimerScreen.tsx": "7f2b303869414b2ec2df11ea8b4183c31eb0c5e2cb4f29e686db42ffd0b31860",
+    "app/timer/page.tsx": "c0514af0de45d487548e54484258cf707dbd6bcdbe8a6e439aa40b8787052d1f",
+    "lib/achievement-facts.ts": "f2c7cd40578fc7c76bdf282e7f6e2aa2aff563b4745fe6885aa662f048dd8fb9",
+    "lib/achievement-progress.ts": "ea4cc3dc3ca6714efae4d0bba09af056b340e3a25857648e8a904039dd94b058",
+    "lib/achievements-catalog.ts": "86c2ea74a66e4d83cfd832d177ba0a302774694827988eddf1cb663cfa39bc82",
+    "lib/acoustics/audio-engine.ts": "7b4020a9a649fbb17e63c35edfd145082ad44f4d1909a220f2f737a9577e82b8",
+    "lib/acoustics/custom-audio-store.ts": "dce1898696a7731f1d0a2a520aaceb7419407b23cdacd082a25dd4d9c0566472",
+    "lib/ai/agent-router.ts": "a822adb4e47f5b898ddeaf9c0bce36c24759a360df20bc2c59cf66ab9d4bf842",
+    "lib/ai/chat-tool-executor.ts": "d7788404014651313949e448d191af3decdb3e3895a4b2f2c4612c5118b0267a",
+    "lib/ai/chat-tools.ts": "ebb6246cbe449e937d6272d19fe53adc206839e25bdb88e1bd8b5b3fa1f409eb",
+    "lib/ai/cheap-answers/calculators.ts": "e8fe0671398f8a4e6d088ac319795678b86bdf5656bf4dcd81ef03042d5b547a",
+    "lib/ai/cheap-answers/datetime.ts": "7fbd6614f1eb8c4725bae7b9186ad8d3e82580b5da1bab15cf1c352efb2b99e4",
+    "lib/ai/cheap-answers/facts.ts": "1f26e80853352a0628ebc33ed64dc4239d9982f9c84fbbd56590ac08183c99e7",
+    "lib/ai/cheap-answers/index.ts": "853aaee87bf2a5c49f8ec4c3f48b4ee7928bcc57354ac45421594c2627423953",
+    "lib/ai/cheap-answers/math.ts": "bf9050e7dbfd4d1ccb8ad1a4bc7c2e6096bb4be5a5396f548eec1510c1d242c3",
+    "lib/ai/cheap-answers/units.ts": "704af245e646aac7ddfb84e3ae5ec9085606e8386b45430c96c5fec713af03d9",
+    "lib/ai/config.ts": "9dc6ea97553436d2d14302199a28eb7a5448352f5b01b961d918001319b5bddc",
+    "lib/ai/context-engine.ts": "af4a1f10ffd3b8095d366ba7e66652a8053ad656dfecf2d25abfc7570d465dc1",
+    "lib/ai/daily-briefing-service.ts": "7f2886c693d3099e57d153c2023f0579b7ff48ac9463ad01cb86df9b374406d2",
+    "lib/ai/deterministic-responder.ts": "81d4a17a1846c4946acdd6d7572e467c7d84ccef7c55c48e78aac53c4d0d46db",
+    "lib/ai/entitlements.ts": "1ec643001a72c6b090cb8e98068f4910e24c7696bbf28289687306cffe724f35",
+    "lib/ai/intents/continuation.ts": "c4e952549249570fee167fcc0db724e71dfaa9fff3832ae93cf70d5acea8b84a",
+    "lib/ai/intents/executors.ts": "fbc4375ba87976eeb3b623cad543b679cf3cade24bffab602da156b4ead2ab6a",
+    "lib/ai/intents/matcher.ts": "8d73efef7d9bff9aa81b1fb27031f08171f19f1206541ba0d4a6d9c9bf29c355",
+    "lib/ai/intents/registry.ts": "1872586dde32918d7851340ad78fad346b667a92fdd148b0a598527105cdaebc",
+    "lib/ai/intents/signals.ts": "781b0064c8c578b635e606d721602bd884ff92ce3a1cdafe845842352880fb7e",
+    "lib/ai/intents/vocabulary.ts": "b259a096093ac6528dbc7ba9517a9c6e07b08eed8c23c8ada02def4e1f77b88e",
+    "lib/ai/json-extractor.ts": "9d97a8c43ebd351dfd3a4d401ea1bc9f2758bcc166b223f02a78d553e7122528",
+    "lib/ai/message-intent.ts": "0d40792104a614e13f0f693987cc8065ccbf8487333629e0f463454d1637bc7f",
+    "lib/ai/orchestrator.ts": "b17dfdf9d9e6f861c1731c013354baeca72f9c15ca7aa7f281d7e0069b36062e",
+    "lib/ai/planner/context.ts": "dad2bcb5daadfdd7c27ddd5638495bceb170db235e7cc41ee958f8a23ce791c0",
+    "lib/ai/planner/critic.ts": "f6ef83b17f5f96276cf975eafcb5949f9a1e47a41b7a95b0e346d3bc59c3908b",
+    "lib/ai/planner/exam.ts": "160093ce830f97f1bad33ed3eeed215b27d6a86669f3bd98fd8a3c45b3b27b43",
+    "lib/ai/planner/expansion.ts": "23fe9ccbc7da4b5155dd5f48ed2f5ef60c5d4a065859e9bbc4fffcfd2ca453fb",
+    "lib/ai/planner/mastery.ts": "7609be0383edab4b1640dc84e2502a8c0155305d4bc766798b130e49a9db9259",
+    "lib/ai/planner/pipeline.ts": "035fc52378815a149d4ec37daf3a88c67b5f1e523bb06456504c9b0ff200541d",
+    "lib/ai/planner/rebalance.ts": "65ff82165bae2bd165a61b47aa320740948aad79bb33a1261852fe0e1652e4ce",
+    "lib/ai/planner/repair.ts": "b6a99b6cadd41825709ca53c53d80faa90ad1ee4a651b9800126e2d45069fdb4",
+    "lib/ai/planner/roadmap.ts": "add1def9c8b28a4dccf7c5c414b76c031f4338707de5573bcd4bf9167eab04d9",
+    "lib/ai/planner/validation-hints.ts": "34423698299a34f1fa0054611a318f13f2a78c513efe8c536458a9e10e994573",
+    "lib/ai/planning-engine.ts": "cbd73cc7180a1b031e08e1ee1eae29e873b010029126b7d9b69d9c674fc72977",
+    "lib/ai/prompts.ts": "88cd94f7545c5d1e629568230f7b7fb8af4b2ae6409ea93e9133effd57e347d7",
+    "lib/ai/providers/deepseek.ts": "8a281b8db5860403723d3404a50bf6afc4ef35aa453f06f05025374e327cfbf8",
+    "lib/ai/providers/factory.ts": "8c55b9e0ff53bcf45a115b5707be757100aaee7640e05a87c0242383cee06c9a",
+    "lib/ai/providers/gemini.ts": "1e1d0785d0d0a07c45765a97b7e54360f4928efdc06fe2d5b4aaa73ee7330e86",
+    "lib/ai/providers/groq.ts": "8538e0b005ff907ad114608948a7f6e6151540dc6428ffb876933e511bcf0ac9",
+    "lib/ai/providers/types.ts": "4b0aed5a0c9dcbf0865b67e5d2ef4ae5275d2191c8ec16784f322a398490289c",
+    "lib/ai/scope-evaluator.ts": "3aea02914a406a23dbfdda246685090c113992df46035878eabf371c52f25c5a",
+    "lib/ai/syllabus-compiler.ts": "b46ce623576a43a759e9027f3fdd8bf0e53f954247fe101c6f87dcb442d002a3",
+    "lib/ai/tool-confirmation.ts": "e252ed334f4eba31cf34934147a15cce23d29d7edf654ac11a426e6b2aa40f73",
+    "lib/ai/usage-limiter.ts": "30fdfa37d5cb4df0a3577dc27e934f019f5d8008e2f2cf3a554d814f0ed9bfdf",
+    "lib/ai/usage-logger.ts": "b7c225d188a56d1fb04bc149e12a0a8e2b2bb35426a2db04c3ac20f202b25b26",
+    "lib/api-transport.ts": "af9786b2cb9d830762406820e2b616eaf7a5cc1c62b5e55feb0af5049d7e1043",
+    "lib/archive-catalog.ts": "6635ceda9950fce438348e9bf40de7366ce7b012b6b7f9cdeca27fc10275fd5b",
+    "lib/asset-manifest.ts": "ffa0906f33ba55500930758ebaf06c521009dbaf45822ed59820543dc40b42b4",
+    "lib/auth-admin.ts": "69dd876b5bb4e425fca25d09c31dd0c2a983bf366f1e9e3e9d0ba47984a6cdc8",
+    "lib/auth-server.ts": "f38b580620c248211462f165f651283ae7dc3fc8031c33907b53ca1ae00e800f",
+    "lib/auth-service.ts": "97a3115de69fbede4ece3bb81165f6929f4b4abf41def95aecfc759ec9106807",
+    "lib/auth.ts": "6bbfcdb626c7bc60d875ade85d46f35b780b70e954045aecbec39fd2d5a04dfd",
+    "lib/block-service.ts": "388ac0f6f24bca7b62031d24c7d52548ca068b697ad8f91d0d227e9501b1e627",
+    "lib/cache-service.ts": "4055e8557f0069d0da4045cafab809fa27ba35d7e4cda3c0ed725bc4b74e14c7",
+    "lib/calculator/math-engine.ts": "4a6f74436dee4c720d0d8cd2b08c06318c00dd9f6c8d306824aeed209dbd818f",
+    "lib/character-traits.ts": "01d1cd4bd59635d754d18312c5816fef0ea9ef6b28ee1f93bbe66b859c5ef1e6",
+    "lib/client-data-cache.ts": "d1f0f79d5f71c4e8e3179350f00b8fd286406a26a14711e8dbb1f004f4d536b6",
+    "lib/cognitive-stats.ts": "0d06b8cfe7c2b9d81bfa66e103d151eed62788f36b482eb30f7eee6a3ab75265",
+    "lib/color-utils.ts": "7ba92ac192ac2cb97bc3ed48a292fd1b47205001be401ed21da0cc4a625c1e9f",
+    "lib/concept-forge.ts": "15fbbd7df5705d956092c6ccd5aa27552154b6ae8bce0867cf0478e9e559181f",
+    "lib/cosmetics-catalog.ts": "684ce934e65d974262be30431989accf02c25cd30ad3052c1d96d34b9656e627",
+    "lib/db-notification-preferences.ts": "bbe785c1f7785a30a61df2e33f176e5a32823bb92d093095e2ab6b970b66c89d",
+    "lib/difficulty-engine.ts": "9cd8e6c9a275f83eeb12c977becaa3a10687801ea058d3f17016a92db4f2f5c9",
+    "lib/email.ts": "6e27d52b77c7d1ff0d01cf6754344d3f1a1b3d97ec64bc101eda2b5f411c43d9",
+    "lib/focus-background-client.ts": "f56eeadce4c829a8f6450ac04dca72136f2560dd244eab6e1d588bcb91fe49e1",
+    "lib/focus-background-preference.ts": "a18041f33e24b37ad13f8148e4d4b9d71e0e4abdd927e72d64c646878f8b3601",
+    "lib/focus-background-types.ts": "288412161d9427b1bcb2b34b616ada123f862c7c6471ad61c25447ba9256312b",
+    "lib/focus-party-service.ts": "7da430ab402a53b41459f0190dd060341cb4b69869e5ee7fedf167cd11800bee",
+    "lib/focus-party-types.ts": "1f0c63c8124aa95fc2e134ef30e8adc0c56abeb2e19379959443172e9aa9e354",
+    "lib/game-engine.ts": "e48da06a0d4e54f6245c08724b6fcb2c04d300ca0e91bbf3906403ad15477f4c",
+    "lib/goal-theme.ts": "83844182b190768abfe5641d1343e1bb62c21c0870e04cb4c9929c7020a67434",
+    "lib/hp-penalty-service.ts": "5f0597c9f3d6a089010351bafee701ac2ee496ffe75f3d1c8584628e33eabd6f",
+    "lib/image-dimensions.ts": "48b4cf645458458119a17c89ebcba106f14ee91e534f6b8bda814737c0e93bed",
+    "lib/motion.ts": "9ddcf6a38f65286ca5f98cebe7700ee2b89d48fdc2c8e3dcb21b83c90a89ea9f",
+    "lib/notification-preferences.ts": "f661397eecbde0657d44c5f764b0cbd24e9209ed86ef178cef85dd439dc15485",
+    "lib/oauth.ts": "ada2bc7bad72b4afe132277e9a2b8c507ea181e1301b031d2f0c03fc74070915",
+    "lib/planner/capacity.ts": "4150d18d27c8174e76048e7b8018ef3a91250b9f3cc11f0a686f0fb7d62afc69",
+    "lib/planner/client.ts": "1d284ddf618524514559f6a22dab72f6b4f09b042041e762cd3c695e198e8fba",
+    "lib/planner/comparison/contracts.ts": "6f6dd16de065d45a2dd2e2fe5bc7e72d683ce76aa3d43cc49d49bf7dc1728a2b",
+    "lib/planner/comparison/units.ts": "b2d704a9a72044779440b25667a8d82c548ec0f3351f1f9a9ea37efe9899e91c",
+    "lib/planner/constraints.ts": "41e3f3a38b434448878b39474c7ca36c11d6f5272084a61265e6529df8ceb38b",
+    "lib/planner/contracts.ts": "da4d6d2dbe020fef33448a09d5313d050bcf69be2321d7e5b7aab24d3545ffe2",
+    "lib/planner/copilot/client.ts": "da6cc75f71c174c3912d7b7a82fc3e5581d126dbf81528d1583c0c1914be000b",
+    "lib/planner/copilot/context.ts": "fde2fdb9fea99ab284b52eb623d583b17a1fc4b302929173a68ec910a00487da",
+    "lib/planner/copilot/contracts.ts": "9b7f1f9a0eccf316f8f5eae7877f0040b6b4729cc7345103426eebd46dc4c3af",
+    "lib/planner/copilot/explain.ts": "5afa5e4204c9c196a9ab0c43fae35d73a3b17ce4d8e542bdf434117dbdf59757",
+    "lib/planner/copilot/map.ts": "59993dd8d0ed029a0eb6e89666181f808eaa1a1de7881bdc40451c4d87ec5160",
+    "lib/planner/copilot/model.ts": "09d48845ce1e5489259862187a41e84fdb138b0871179c4244c5d48ac65d64ee",
+    "lib/planner/copilot/outcomes.ts": "7d74362ccbd13751c58316460b3436c5f866eab0d65f4c2e0aa1374ff0442e0b",
+    "lib/planner/copilot/proposal.ts": "9e8b2256deb4cf00c5835fa770d54fa41d7a309c4c2ad4b1db3cb9dc8455b197",
+    "lib/planner/copilot/release.ts": "d359cae448e7ee077e7b5fe648837e3cc648c6345f06c0038fe3c02a924fd37b",
+    "lib/planner/copilot/run.ts": "491c5888533f658acee17dd5bf491e7e74afe030a442f0e41da2b277a3565981",
+    "lib/planner/coverage-client.ts": "4731f98445702c5497808d36cd9ca6c1e17789db2dc5e85f6e3f7f13028f8951",
+    "lib/planner/coverage.ts": "cda58404a0d016b4489b1249a9bd8a83cc0f110d04c64e34069376f6f43f6e4d",
+    "lib/planner/dates.ts": "031da0e2139fe91f24ec0477e85ad13b89a5b9b029293f7ab50f426f24435a54",
+    "lib/planner/designer/client.ts": "c6c277737dba45d0952a75e6c83bd4373ca1220891261fe5ec92c148edd7d826",
+    "lib/planner/designer/contracts.ts": "66a714c03c34246f45a60841fbd43de8b87cc3d8ea2435a080407bdf49ef8444",
+    "lib/planner/designer/model.ts": "30df9d3436a24ab795458df6034b6f8cb3142909a87ecf2606e43b14cda521b8",
+    "lib/planner/designer/project.ts": "a4a6a9d8c9bbec68b3286f714f1fa3f7daffeefb69f929d70696976581b6829f",
+    "lib/planner/designer/run.ts": "dd0c8bfe19c49ffabc9d9355bcd01918de68f8b62487710700727329c510a8b8",
+    "lib/planner/done.ts": "1c82f670873da6908608dceff2d74870d5af725a610c1f95699567915c1a0198",
+    "lib/planner/draft-rules.ts": "3ad20c2a7c514a36789e2eced0bd5b56ef5902639525f9e3f5b4cf30bb2f0406",
+    "lib/planner/edit-client.ts": "6ed13a074f30c61a3f24a6612d0e9a83bb7104c449c743305677c4ecbe1d0141",
+    "lib/planner/errors.ts": "4b858ad7668dabff57897824cd787d307fb5e5791ff0ebb00db66961d34e4d59",
+    "lib/planner/exam-client.ts": "e7b38e402f51890228b0472f25fd41ff056d529e27b74f5283d40d80dddc66f8",
+    "lib/planner/exam-fields.ts": "3d795be8e1f36df9a162825c401174404764fe120329b5d183cb8a3063c1f341",
+    "lib/planner/exam-policy.ts": "de0c645089ab4057e2c2c0ce2a4cf70e92948efa99ba2c28b070460784079da6",
+    "lib/planner/expansion-fields.ts": "20e85f34d2728f475a9042f5d2a1abd32cf06e17d9e7fed4f9603acccfda4c7b",
+    "lib/planner/expansion-policy.ts": "d95def5fe7087dc46684f58d3f086261420baa09a5ef3d2dccae1780a29b64fe",
+    "lib/planner/friction-client.ts": "eacb347f3b75e440480791cd62d964411538af626d5351b8a7cf4fb7393a153f",
+    "lib/planner/friction-fields.ts": "4efbf30ef744e1de0dfa0275d1c546581fd1017de9e9db8bf6a5f44b6ef6340f",
+    "lib/planner/import/outline.ts": "0a43b697bcf2da76eaa72e4200516ca7d4423d0fe2264bc4b0b7bf71d336922c",
+    "lib/planner/import/pdf.ts": "bed98225c987a910441b7571b3719d963ea1a20e1997a7eb2948c256ff54086b",
+    "lib/planner/import/service.ts": "7c8dc4faddd810199ac2d8b8542f3a5986699d5eed24820c885daa2c53c9bcf4",
+    "lib/planner/import/storage.ts": "f264e7df50bc0c80a0da82cbd7f8c10e8c2511bc559f18ee5436332e96c9e7b8",
+    "lib/planner/import/validate.ts": "4b54ae3a33aac978952fb87d9cb7a3d53f9929977fdb28b74837ebb132df6bb5",
+    "lib/planner/import/vision.ts": "265ace4aa37078b13b79e1ff8cb1829f64c870eb66815844a3eb48dad5085345",
+    "lib/planner/intake/actions.ts": "b3d6373e4123d74fcc8b8467944f1e875007c6a54610a53cb33f0568a0575bad",
+    "lib/planner/intake/brief.ts": "f6968a62785ab4a08205345fcfeaea148a60e200372c3f8b51cf4d62958998df",
+    "lib/planner/intake/client.ts": "d5848988b6556d980c10cbc9c3d7688b129ae86707081ce4e07355c8eb227b56",
+    "lib/planner/intake/distribution.ts": "94535ae908060f39c943cb76e2df7d644b7bbc709135ecb292a46901965b10f5",
+    "lib/planner/intake/findings.ts": "773d4eb2fd8a7decd92c6ea3e67e7cc6739d51359d67b6a083ca1dc6c128558d",
+    "lib/planner/intake/readiness.ts": "5dc004a7b54f66e335238388cbbd540ea103e2463f0fb9613e4cc12810d75d11",
+    "lib/planner/intake/scope-node.ts": "2d854b5a026aac96fe6abb40bbe66320b722ddad1b3b0cb9594f3ec954757eb4",
+    "lib/planner/intake/scope-sync.ts": "75f665ce7b9a834b0e8c4e55013df8bd5cdac692e2ac547926359f56511e23ff",
+    "lib/planner/intake/to-input.ts": "dc8168853ec126c510eb45134e8d4c034ec3932f64ae93c0d9068125f2e46721",
+    "lib/planner/intake-telemetry.ts": "5e8119abdf647318d693e38967cd6c3078da62ac109672c79fff1dc7a87717c5",
+    "lib/planner/load.ts": "8c7a6f333ee6efaffbafd01f0b902ad92bb6e2ba92698742783c1d909b18bf49",
+    "lib/planner/mastery-client.ts": "e01ec1a02a90e7fe21528d57e3e0c0549a9bc0760fb663986c2ebf5f6ff36cc0",
+    "lib/planner/mastery-fields.ts": "b91d51bfa38045bd7362792dc7e1d9c27dd21d5ea3c71b739f396ce52bea0a33",
+    "lib/planner/mastery-policy.ts": "9f161b3cd11f9f6e8be96d564a84ed284b0996057e5c8adc58fd06a25e760504",
+    "lib/planner/mastery-progress.ts": "1e89d51f58ba2ea6d4ad85987bd72b946b5225b664a52a53fb0dbe608124a2b2",
+    "lib/planner/planner-role.ts": "ed413ba50629d1d8584cbfa34b380a87f1fc7e7cc86529337da6a777bbf3bcb5",
+    "lib/planner/preference-fields.ts": "ae54ef0fdec850519d91b3be2e1ab7576358028c32ba1ca845ca4eb461d5c8eb",
+    "lib/planner/preferences-client.ts": "8308f0c30c1342fd1e8072daea85a49788053741da0867fc42b3e1173066bfbb",
+    "lib/planner/preparedness-matrix.ts": "233280f49537ab101bc3a72b65a4f9e1ffaf54afe5ef3fce53af5096cf83d39a",
+    "lib/planner/preparedness.ts": "275e2a6e969c060882c2f2a3df796b31bbd219f5e98fdb29d328c2133a36d639",
+    "lib/planner/priority.ts": "b538bcd283e4f810f6c8d4fa812cd8cbd1d74f3027edeef6cd6047be2dbd2adc",
+    "lib/planner/quality/corpus.ts": "ec20885b2c0115b6735d48c89d022ca8650116881661f13ab79a45b06f7f9cc5",
+    "lib/planner/quality/evaluate.ts": "4fc0d54e0ccec56a79dee1440539e55af7b2c67319304e67cabde5e57a7e1601",
+    "lib/planner/quality/metrics.ts": "5901e04ed8ab72de712260a733433dc6cfc0f35c67c4e3d1b68f482df4928d5a",
+    "lib/planner/rebalance-client.ts": "f504f0cfb258dee098bc2bd75ea67522d2f9d47bc19d77dee7b581d6abae2ace",
+    "lib/planner/rebalance-fields.ts": "9135638c2a712e18fdcb7b4065d66c5b68cdbbf891a32a0e518f42e91aeafcd4",
+    "lib/planner/rebalance-mode-rules.ts": "e61473bcd039410e5513a19a2011f1a68b4c3921b27141f3a8d743fab75f6bca",
+    "lib/planner/rebalance-policy.ts": "e94eba0e39b0684ceed2c7299f15f836cd1592e3418cef4db3a610cc55d03242",
+    "lib/planner/rebalance-scope.ts": "5d0deb4b695cb90fcf06ee8868fa53958ac628465062b22ffa5ce4bf3d092654",
+    "lib/planner/reoffer-client.ts": "51b1c77f184648f574236512ec689768f5f2619ffcf2ba41c52ece4e543234f6",
+    "lib/planner/reoffer.ts": "0a39eaa49e88d757a71cb70870b9137060e5a2e50820a6753290e9456940f4db",
+    "lib/planner/research/agent.ts": "dde84c726390ba5be527dd442fbf92efeaf4b6cee8f402f07206e7d84c1051c3",
+    "lib/planner/research/authority.ts": "5b0ab1d6cc3ed9e7e47d8a0be16d2999fd0e28ebb2673efef939a13515fd0c7e",
+    "lib/planner/research/comparison.ts": "fced8412a2f7610e467acdae0ca36bfbf5c924c84b135ca345b78f35249981a1",
+    "lib/planner/research/contracts.ts": "b8d90835f75eace36daa03e82055135afd41bdb6f9447992e2793f3361138d32",
+    "lib/planner/research/coverage.ts": "4ecfb120a9b4cae45cfd6dbf46147fe9f4436cf0f3a5ef99ca3626292746a219",
+    "lib/planner/research/deepseek.ts": "8d4f2c4bcd7c01b99e2b78021e8d6adcbe7f7784ddea187777f907ad05599704",
+    "lib/planner/research/evidence.ts": "4049bfa079ffb888a05a596f36ff5e0eafebf3094dceeeb9918a412e2688d8fb",
+    "lib/planner/research/import-scope.ts": "833a43a6b2eeb0f1db18b5a82447244b18cc6f6a82a123b832e02aaa71f4e4e5",
+    "lib/planner/research/plan-quality.ts": "36803ee4c0c0cd12b562d1c908b41f4541ab146a3311ce8b24c7e048146d8063",
+    "lib/planner/research/redact.ts": "548565abdc15d83ecb73ad5a642b4a7507f3224fd8d3193686ab4097e0a760e9",
+    "lib/planner/research/search/contracts.ts": "b1424cfdec40b3d71ae3a687d87228d5580440d4be394fbb997d90efe84aff1a",
+    "lib/planner/research/search/fetch.ts": "456898370df869d674257142d6dec667b072c02df5e01ca4542c2cf556a9e24f",
+    "lib/planner/research/search/pool.ts": "6b00c960a6feb834b09d38efde31b55a292c3308e216a8351595d6521f9f2caf",
+    "lib/planner/research/search/provider.ts": "d276a9e1b0af85d007a69660c53dc442e28abfbb1189d30a71c3ecef4d30b9fa",
+    "lib/planner/research/search/url.ts": "3c1a9a9ddf42eed7b53ba41057bf565fa03e8109cc4981816caa789998ffdbf3",
+    "lib/planner/research/selection.ts": "e796a93e43ccfd3219fa453f14ff0699a8ede50a65a380d8960cd0b3c37860cd",
+    "lib/planner/research/service.ts": "b1b35834a10a9019d3e18db7b0f221d96839de84167b9814e3e271e993fee586",
+    "lib/planner/research/sources.ts": "0884ba8bfd85b510e52117c160993403451f46b0a83b7e074023be97706b032a",
+    "lib/planner/retrieval-client.ts": "e619592d400979a97e4fa4f156c5d3a71f8a6847b2d703ca2f76a829ce750c17",
+    "lib/planner/retrieval.ts": "5540d877f228dcf1269be93c5e1d532874b0897ce05c792acdf02f3029465852",
+    "lib/planner/roadmap-client.ts": "3dd909746681940f7f0561c835f49929ab14cad38e6f63fb5f00bb0510f61d9a",
+    "lib/planner/roadmap-fields.ts": "aae020fef2267fd1bb67e8b6b38c477c233b1419dae0f810c294649c3bac7183",
+    "lib/planner/roadmap-policy.ts": "0388fb0d0345486454260d609f7afc9f062d170a7d1ead210273ea7cf004b366",
+    "lib/planner/roadmap-progress.ts": "1c1bd279d9392687b761aa088886c058a1c1bc7adf93aa9b87b4f7fde61dbd73",
+    "lib/planner/scope-topic.ts": "6ef2a8d6736459abb781e0e855a1ae31e53d6d67b8a4262651c926ae002f171c",
+    "lib/planner/semantic.ts": "1fe40d67071b18130d1d48741545ba0c62c8d9adc151f83a9742ae5f941a4716",
+    "lib/planner/server/check-result.ts": "502b307d090376297e2bf263342aaddf285b17a5a812a503311a9bb2a456786f",
+    "lib/planner/server/core.ts": "f7eef762152842f2b324371e3252dc67bd10bdadee4e43aa2fcbbe51815f3c0a",
+    "lib/planner/server/expansion.ts": "d7bd08aa1c6f5aa320452bdf5334225b65c0fe93ee2cf24d86a0eafcae9078ff",
+    "lib/planner/server/flexibility.ts": "d996ee175ca027bc7a11022550caa46b1d21a4b81117e94860bfc67c4ed3c37d",
+    "lib/planner/server/friction.ts": "1f7f2614224d331c444bb7e30393151e49a835d224b1f746e00bddeaf547f42f",
+    "lib/planner/server/generation.ts": "28cf20f6b1f4ef72c1e3c27e5d5baf1196c31592be1bbc9fafcfe630961e6067",
+    "lib/planner/server/http.ts": "f7b4eb3294522f0171d25bb76fef94d554fdf451525ebfbdeed3819411b82e9d",
+    "lib/planner/server/intake-session.ts": "55f664f951786b8e74e66fb839867ab2c1d79c802180826b744d4cd687103ef0",
+    "lib/planner/server/intake.ts": "c56bc01712446ea771b3c3969b14f2f5dd5a18248ffdcaa20bf27ab881605a99",
+    "lib/planner/server/materialize.ts": "21c57af76444d955b97d8aebf4b47cff9448545acb778285ae88fff09e6a97e3",
+    "lib/planner/server/mutation-guards.ts": "ae762d536c8f13ba043d0358458ba522b37975eba489d989077b7b16bf16f5d4",
+    "lib/planner/server/operations.ts": "d973e6091e797db64177cb6d58f9ae34ac8270a376f66dae8ef1a42f7cc8bd4e",
+    "lib/planner/server/preferences.ts": "994250258dada53d097f386f46c623a934e1f1a64ada336f6a0fbee0c91d9ab7",
+    "lib/planner/server/rebalance-run.ts": "538b7f243e06451f99e241a749335a1c768fdb236112d0b84b39b535e5ab1e14",
+    "lib/planner/server/rebalance.ts": "6f0d87b86c0afbdbd87249a517a563faf37182b65f4f31cd52f4fdb46317e1c9",
+    "lib/planner/server/reoffer.ts": "79e478e559ceef70fac9aae70bd62cd676e762a51736db48e042ce758031d4cd",
+    "lib/planner/server/revisions.ts": "3f1cc2e34e8d796adf933658a55d06259eeff2d15f9c070009cc42c308145e9a",
+    "lib/planner/server/running.ts": "7602ac8316df7e0d1669be9a9a0ae6133cf760515645df6c91a74a8a06ec2c69",
+    "lib/planner/server/stretch.ts": "2b9be2ebfc67119aa5341d90260c2f43feb84ec31b3a9ea13345323b0c8c4405",
+    "lib/planner/smart-setup.ts": "0eb9a4b07700d2616af7bbf0c76e7da0439d9c2ce20bd6f3fd0ff68b3ef5b096",
+    "lib/planner/stretch-client.ts": "6f9ea406af99ad11f2b9abd5750f26af304ca76d46711454135d320ec5954474",
+    "lib/planner/telemetry.ts": "f0792d2ed2f91bc3b15a356830b2efdee793f635ef58e3b8e0fc5f6feeee18cd",
+    "lib/planner/transport.ts": "b8badfddb62cef849d2f2752fe5f1cc04475b4905e557fa77198df33dbed2506",
+    "lib/prelaunch.ts": "3b146a9e5f4d8449ed18ec0e1d2f3e002680ad4293680542d74449a3a98be5b5",
+    "lib/prisma.ts": "2f9d45a8974a7f7687e5f43bf887f50a0b125605eff91c2937594b7c43572d9b",
+    "lib/privacy-types.ts": "4d4c99dfa64b705e04ea75d31ff01bcb38691424ae537bd350185a9aa3464ee0",
+    "lib/privacy.ts": "c2ca5814612a7ec49d9de9c40a982748a3ea2970e20cfe1ab0ba045b3e14348f",
+    "lib/profile-service.ts": "7da11a836f8ef1fb43210bfd14b940a8e48d6b26f337095d4a531a98c2625e93",
+    "lib/provider-types.ts": "861778497e8d412136a83f3495bca86cafe5998b7c87fc45e48bf0cb8f6f45b5",
+    "lib/rate-limit.ts": "3058b288edbd032272afffcb7c81f61b831a79034c48112f71caec796762c3f2",
+    "lib/realtime-status.ts": "3e491c8992c81043f55b6b50603d773e6e1b1d8323ee4aed91df7229306049c8",
+    "lib/redis.ts": "aabcc47fb0fc5ce8755a14479ca0d016c999df31bf6f808e0ccd92beb1e3856d",
+    "lib/scholar-id.ts": "9ac187e0bee4cfc784086a62f2e8c2c787420fa0e8b15344a1055c19d5d26d39",
+    "lib/scroll-lock.ts": "4da7938379fe8c92de6bc8902ccf97610f2f69ec2cb8d425bc4c6db91912cc25",
+    "lib/session-math.ts": "772bdbab4a915f8c0eac4a8de99f292bed34c2d4fb84d272d4ea222c1c3a734c",
+    "lib/session-service.ts": "5dbeaff1de673296ce8271b7f69dd6e489923f29b61b898601af0b08a17e813f",
+    "lib/shop-items.ts": "70d5219ca72f6cfd7d8b58fe04ac88c157a9c2a8f37d2a292d22fde9b0e36ee1",
+    "lib/skill-tree-skeleton.ts": "337b336282be24c56cbe292975f9dd3c2c176fc713bfcdcee9cbc6cb9018b9bf",
+    "lib/skill-tree-theme.ts": "8ff5b884796cecc493c5aa0f52300abdd1e1f93d6fd1638fc13454710d729473",
+    "lib/skill-tree.ts": "60e1a4840eda47d03e60e7a4e1a07d88e5efc8a690b5a94becc52409b9173ebd",
+    "lib/study-schedule-service.ts": "c9b009d47ea310007096279bd23f5e25d7d197d253ae8fc58dbefabf763bf59b",
+    "lib/study-schedule-types.ts": "2402e787590d3a4ae60a90f0b62124ab176415020ac39f3506548a59fa727ddf",
+    "lib/study-systems.ts": "b0d4cf582a4e6251d9f2a124225b291232499b3c0b905b4524f58e5f4422cc3f",
+    "lib/subject-service.ts": "b3ce7361e4c5f045d96fd1082739a779bdf0c3c81b9f3605befd9300b778720c",
+    "lib/supabase-browser.ts": "a5cdbaf60b1369c60ddba045ccae5873ae416dea6cc274a4217b6ab32b3145d2",
+    "lib/supabase-storage.ts": "4ff4bd0225a3d497d0a87f28c00fa40d8ef57a219b5fb58ab570c3dc85f2e6d7",
+    "lib/sylvs/anchors.ts": "9785a7ea9ec530f178e491b2a30ab40b2406d36c31bef02c6288ba94269f4525",
+    "lib/sylvs/colors.ts": "b19faee6c1ac7686eefa498508697b4284d1e01572c7b25598a6dc734ef7d4d1",
+    "lib/sylvs/index.ts": "bd9103719dd912931cb80fbb24430fbc6236adf610fc088d11b70e24029260eb",
+    "lib/sylvs/registry.ts": "27f0a42acf41bd21de09610c25f22c4db957ba6ac6afb33b6c29f6ded7598727",
+    "lib/sylvs/renderer/AnchorOverlay.tsx": "938b8b6bbf928d5d0db62dedec7eed82526e43f4b9a6e6bd779ce96c7684849a",
+    "lib/sylvs/renderer/FemaleBase.tsx": "d7869521c38fd77248ce82e4e1a02f4ab0f61a2d1407ebb3eaa974110e908b2c",
+    "lib/sylvs/renderer/MaleBase.tsx": "217490903cb85af64e8ec6629ebb1464c8bf02cfe8a3001fc78ccce9b5f48143",
+    "lib/sylvs/renderer/SylvRenderer.tsx": "3d99e5d0252b1a4d494cb9cf67208edd65153319c85c8042ac9264ef5f443798",
+    "lib/sylvs/types.ts": "6113144257500038f97dee5b0380e17bd517cf42d24fddfebc761169ba2f9883",
+    "lib/system-collection.ts": "2adc28cc70b152a7d0587109fdfce5573220b29607af912bea8a6c703171f2fc",
+    "lib/timer-engine.ts": "c3c9e365cbd197c7613bd3aa2fc9591c73f057962a3b177f15b513a8a1ac7b3e",
+    "lib/timer-leader.ts": "5b30672eeee660a8b8fd9c6f92689f33d7aa06730505168fb16aea811393fbf9",
+    "lib/timezone-server.ts": "f78065f698cea200b84381d96f84256b0ace5d78b2f09747e95560f5557cfee2",
+    "lib/timezone-service.ts": "d3dda7b14e39957068c10a1ffc76adf43c9cf0f0be37e629e1bd967e582eeca3",
+    "lib/upload-security.ts": "f7895f48d97a7651aae9940dca5aae3db458796187049330a45706d7c6f63f08",
+    "mobile/src/MobileApp.tsx": "66340ac41f59c6a4771b40d89f319f0133530af32b91053771c272bc083aa1c1",
+    "mobile/src/adapters/account/mobile-account-capability.ts": "7846a11085795675f85d022ada410d2487c4b17b0d9bce01bd64d3a2c151029a",
+    "mobile/src/adapters/api/mock-api.ts": "82808119c8b70a92887f5bc8bffe61bcb250751b2387d14833a3ba8179f3a7d2",
+    "mobile/src/adapters/navigation/NavigationContext.tsx": "db4d73679bf43355f4f4ee973e06a1923c39032508ecc4b3d42fd50ed9d54bdc",
+    "mobile/src/adapters/navigation/next-image.tsx": "e552f1aaf7a6b96365cdcf153c495eac2586bd31390b60d92aeaf69bade4b62d",
+    "mobile/src/adapters/navigation/next-link.tsx": "fc811fb5977a31e79b44049609a58bf586aedc78dae2d6c6beea36f6223bae3c",
+    "mobile/src/adapters/navigation/next-navigation.tsx": "3a7f5429bd115db091d27be736d0d352a69a7052240825318bf678baf00afa1e",
+    "mobile/src/components/MobileRouteOutlet.tsx": "d948fa4855760fa4a527e25c2ac90ab50f2702a70bb4481598c5dca82ecdc920",
+    "mobile/src/components/Phase1ATimerProof.tsx": "ce3416754ae3fa5e51069ca70d03633897909853f858082207fde6ab8011f102",
+    "mobile/src/main.tsx": "5d4f068193df17c2947513a0ef76484cb23e6ff6679e1dfd3bd3f1fb8f0f5e21",
+    "scripts/apply-migration.mjs": "5593f48933ef5d2fe9a26e3efdf7db526d89d8d971f12bb0af17e43c2655b8fb",
+    "scripts/audit-pixel-companion-grid.mjs": "ed20ad25ae20842f8dbc7d9e4b9deb642517cbe8752e8290f36d3041ddd31049",
+    "scripts/check-model-migration.mjs": "c46b0283715e2b10b33c8ec927ad885c71aaea0970fe37333a50d200860b3144",
+    "scripts/confirm-invites-and-rejoin.mjs": "65eed19fbd65e95d8ffb65a7e5dc0a0484489613b405bf60d7a3c813162f3072",
+    "scripts/download_and_normalize_canary.mjs": "c683c3e649c99668062ccf4cae395d0b51797ec283c237c1d2c7e0d760addd8f",
+    "scripts/fetch_equipment_sprites.mjs": "787347951e30dea588ad963478cc5c61cc1d8a7b51a2f3c8ee9e1989f5218200",
+    "scripts/fetch_overlay_sprites.mjs": "e26497e124e9e18e013e083a7249a3d28a9ac5bc218cd58f9f88a8df8e96da85",
+    "scripts/normalize_base_canary.mjs": "2cb4b6681028e37d0711d1ed1238c9eb1125af42495a4d7cdc4e7aec3c5e110e",
+    "scripts/optimize-sylv-svgs.mjs": "a9dbfc1b05e26b0fc4ab41df6513973c2bf9c79227b37f056167f8e6d3d05c91",
+    "scripts/pipeline-vectorize-sylvs.mjs": "6f37338417637c367ae5859a97a7888923dd4365d7042ebc6fce062ec9446cd8",
+    "scripts/prepare-pixel-companion-base.mjs": "0e6651444f2d67dc4bd955236b0a7aeb61fe721b79f93a9c549f986824d8a587",
+    "scripts/prepare-pixel-companion-eyes.mjs": "271b617815eaf94fcc140e385ab62716f3bb5e4c1b65f8bb632c483d03060fbd",
+    "scripts/qa-planner-session.mjs": "81dcff0e88aead585ef811d39a450cd7022b07b62cda4422a1c8986a5faafb23",
+    "scripts/render-comparison.mjs": "4c3c5fdbd71f242399592b2e8815cadf8ad0a0c3ca7730b4be0e153f590af2cd",
+    "scripts/scan-secrets.mjs": "aa738e06161941f123346d388fed5e73e5652fbd0ec60e7a86f2771aa8e3c85a",
+    "scripts/supabase-realtime-setup.sql": "132ede74f5e261ea88718646c7d117895e3d705e3e8ed47c3d9fde854cd1cf02",
+    "scripts/test-planner-postgres.mjs": "d9835383a63ed827c10c01863179a1878139185581498d4f7990c3281ff5c9d8",
+    "scripts/verify-app-sanity.mjs": "7a26372fa5695ca35a6ee0f49d2000a5b44559895caa9bc98925f9e58318265c",
+    "scripts/verify-catalog-rls-penetration.mjs": "1013fc6e7d897281079391889d8e3db7ecd011e6bebf6eb379feea694cc65d03",
+    "scripts/verify-celestial-world.mjs": "65bca102bc730b59bd3e50384fcacce493667589104e1c6d20f4e5ff1f39ed3f",
+    "scripts/verify-companion-state-polish.mjs": "d498311b4346d80c1e77d87526e811f7e75c45d7a04198b66732f9050d4d55d7",
+    "scripts/verify-focus-backgrounds.mjs": "beec51d858fe9945dc5ac52b7983e3bdae35fe09291d1b07b75ba810bfb7a358",
+    "scripts/verify-focus-party.mjs": "f68aec4074ef4bf89bb57b6cf8f26b371991f46a54172d82f3d34ab7a657eaa5",
+    "scripts/verify-landing-companion.mjs": "5daaa7d4da0d4978752391d6080016ddc47be342f1cece133524a957bb285648",
+    "scripts/verify-magical-eyes.mjs": "9b381d629e6e5c0b809a8990a5460deea757d5ebe205bda595b9465a46506479",
+    "scripts/verify-mobile-bundle.mjs": "7fb5dbe10fa0e9296e90e21b2da31e211714c9579a120cb2a12335898b7e6724",
+    "scripts/verify-phase2-service.mjs": "7d198761f64092897d49f4a3ec75db835f4408672a5240623cf4dd75dc94c4fc",
+    "scripts/verify-pixel-companion-phase1.mjs": "e67e39e07067b38e407b2f69095692a333b93ea0184f330fa5dd4add683cb844",
+    "scripts/verify-pixel-companion-phase2.mjs": "f3aedc3a76a7c83d7dc80ffcee245b15199d927ef7f05a44409597df688b4ffd",
+    "scripts/verify-planner-browser.mjs": "760f2499c125a8b22b13f537dc9958aad4568708dcec11671688a2568d0a6592",
+    "scripts/verify-realtime-security.mjs": "04b4c78cd79ebe0bad053e16d40b38b2971281bb8f71e61931203c6962bda2ba",
+    "scripts/verify-single-active-party.mjs": "3dadab2ea042c5f753241ed6bc2398b1a24e64d94d676c9aad09933ef559aaa9",
+    "scripts/verify-storage-penetration.mjs": "e4c76eb1151625c6351f55277ec9c9971dd80ac107730261a0885696b3d2b01b",
+    "scripts/verify-svg-companion-sequence.mjs": "29fdd93f24b9cdfb1b80e88d794c52ed650fc9be708bab5cb9bd98104c8c1f98",
+    "prisma/seed.ts": "59e6505853a2c5c90b1b6d641186e9b295222f7b64ed2e4d57237eeaa22318f3",
+    "prisma/migrations/20260808000000_init/migration.sql": "5f28a80ffaccad12a9b66e5e7d7d2d2ca1920146991a36af82e1feb0185d6c83",
+    "prisma/migrations/20260808010000_add_ai_models/migration.sql": "10c260802053ef51d3c8e89debad807a5178bf2c6783c490a38f3a799307bede",
+    "prisma/migrations/20260808083947_update_effort_level/migration.sql": "7b2b4bc5784a2c2e0ae67d168765fc38eb62a35cb806459efe2701e91beee5f6",
+    "prisma/migrations/20260808084000_add_daily_briefing/migration.sql": "5a90e3afcf215abf728a7a9cdb71073ff9795babbc17a6e565f82ef8a2cb7204",
+    "prisma/migrations/20260820000000_add_achievement_ledger_source/migration.sql": "e20fe6dccc28a1377a4116deed3aa8663100c1523f8e4c1a1e54a99334f8ac88",
+    "prisma/migrations/20260821000000_add_user_stats_and_progression_rpc/migration.sql": "4a9c854e2b969fc2081e9e9de5c568b81c0ecd3534f43619fecb2a18e1c18b6f",
+    "prisma/migrations/20260821010000_add_economy_and_inventory_rpcs/migration.sql": "b86481e7e44a862643c9398661f300ec600d866a49447c634666c2386eda5541",
+    "prisma/migrations/20260821020000_add_skill_tree_rpc/migration.sql": "65bb1ee03c970614a25bdc491e2d77bb2be7cc7f24cddb6f53ab198795030af2",
+    "prisma/migrations/20260821030000_add_concept_forge_rpc/migration.sql": "db42757a23580d1a59da96fa6aa78d47611a0dd4dc4dff1a637d50830445b7dd",
+    "prisma/migrations/20260822000000_atomic_apex_forge_and_skill_unlock_rpcs/migration.sql": "c2217daf94ef2353bb0a6cfbffee992c29cca8e40cd0539d44934ad8ab7f70ea",
+    "prisma/migrations/20260822010000_atomic_session_and_achievement_rpcs/migration.sql": "f6a71c3ff0370ebd30bf4d911cb5268576f0dab0eb3eddcc5053bb687bf2fc0d",
+    "prisma/migrations/20260822020000_usage_quota_table/migration.sql": "defed486f6bac578ebeabf68a1a58a5052f643b4680cf1c815726a66bc03bb20",
+    "prisma/migrations/20260822030000_subject_compilation_cooldown/migration.sql": "ab1ec3777e87696ed380323fb70494706c848b1b7e1928e66f9d77c3ccb71a6d",
+    "prisma/migrations/20260823000000_add_goal_color_and_quest_linking/migration.sql": "f77b871b1b8e02a12da603315a0405f1bbec47e90dd24a3ab067d9155ef4acf3",
+    "prisma/migrations/20260823000000_irregular_rest_days_and_quest_cascade/migration.sql": "d4a121cf1d82da420924b87655e2b53fdf4d485d916572463ef3e60e70845e8c",
+    "prisma/migrations/20260823020000_fix_session_duration_inflation/migration.sql": "4d02de13302fe46a5566b64df0ebb65eafd54e527c18a2ae4e42a811b520cfec",
+    "prisma/migrations/20260824000000_ai_usage_telemetry/migration.sql": "c3b54caeee037e5fbbd3918cbb70a70a5a8eec072bc91c58a2ff43655b80416d",
+    "prisma/migrations/20260824010000_ai_usage_cache_hit_tokens/migration.sql": "16f8ddd89ea3ccceca3b5673267d002bc14f77b591aa8be77b8d81263d1f07dd",
+    "prisma/migrations/20260824020000_system_message_model_used/migration.sql": "be9592b0569881b3eab28658c9b8554c428b574ab396abb923ed9b7d96ae2a67",
+    "prisma/migrations/20260824120000_add_subject_syllabus_note/migration.sql": "dea23c70cd42b07868aa8dcf501d6d4d1b740cbc3f4e66f259beec5c18759516",
+    "prisma/migrations/20260825000000_add_session_break_seconds/migration.sql": "52963e5184d5ddd0ff33d60c6cf5bf3d99764fad44d78eea0694720f5e124613",
+    "prisma/migrations/20260826000000_fix_level1_xp_bucket/migration.sql": "38f478f363c3bc6d8f137229b08856f5505c950e2af199921552d1a9718d1cb8",
+    "prisma/migrations/20260826010000_add_waitlist_entry/migration.sql": "c32a5e39000e6f7ded54ef2d5f6d01294e7202268845f46cd3dadb89099498b9",
+    "prisma/migrations/20260826030000_reconcile_levels_from_lifetime_xp/migration.sql": "868b664ecb26d53e908707f1abc120bb70c50c9f06bfcbde40acd29c7c38cdc7",
+    "prisma/migrations/20260826040000_cognitive_stats_invest/migration.sql": "e477c167a0ca0f2fb4cb0e0a4732a37433d376f134e2748a7085fb03b938cc68",
+    "prisma/migrations/20260826040000_timer_settlement_and_lifecycle/migration.sql": "bd8a07adc2d79c6a3938f010a628133b20613fe716fe8e23ab00f2a6f1b622f6",
+    "prisma/migrations/20260826050000_drop_legacy_start_study_session_overload/migration.sql": "b6b0c5e4d95537c326758eb7cf5433768fba1cdf42e9a2ef6faa4f08a0ac4901",
+    "prisma/migrations/20260826060000_fix_settle_record_guards/migration.sql": "48f01d38cf45f03b6b828ac1fb3be4b15a6856abd5c0ef9d2e378aebfb1e78e6",
+    "prisma/migrations/20260826070000_fix_settle_nested_quest_guard/migration.sql": "cdf2e6ad4c6bf702a1db8e06ae78948f2d495c085f09b05335e0f55786830cc8",
+    "prisma/migrations/20260826080000_start_session_zero_duration/migration.sql": "3c58135091c03f8212f9a495b8b394378703f4e163c81841b7669b14ed311082",
+    "prisma/migrations/20260826090000_timer_trust_boundaries/migration.sql": "e5968db34baadfb70fbfc8916a35d67535af3ade3cba9220f1f193c04c554476",
+    "prisma/migrations/20260826100000_t3_trust_hardening/migration.sql": "1f5c7d56f201831266eb594fa75c913c66f848aef236541a452f2821ffd8cab4",
+    "prisma/migrations/20260826110000_t3_settle_insert_wall_clamp/migration.sql": "3975946805708e20ea1ba993c478550222132f255d458e9c9ef9183003e736d1",
+    "prisma/migrations/20260827000000_s2_security_hardening/migration.sql": "f2da293979c30bb64242481b675b928160bea7c434bd166b29b359d030ef9ce6",
+    "prisma/migrations/20260827010000_s2_policy_jwt_semantics/migration.sql": "55cec2bb379f206a897705ef138a62de38d0a34056721713f05ff01ed84e5c24",
+    "prisma/migrations/20260827020000_s2_policy_recursion_fix/migration.sql": "3be28fcf215acb8114bf2e48ef81d7e699d6571c9a7da9f89a7b6596f59a7730",
+    "prisma/migrations/20260827030000_cognitive_stats_effects/migration.sql": "0bbb91e1936abe2428d3f0741f6ad53feecb7168b309e30b5c9bf8e00e5ae463",
+    "prisma/migrations/20260827040000_fix_apex_synthesis_threshold/migration.sql": "368c43a22baef6e81811c19518f59d3791c40e2a646389372c26e96ae8caada5",
+    "prisma/migrations/20260827050000_sp_stipend_level_rank_ups/migration.sql": "a4c9971fcff9cc57c1ce47be3235eb21b72201373a6838fd723e871bd181f455",
+    "prisma/migrations/20260907000000_focus_party_foundation/migration.sql": "1bd5ae3326a07bbfef305031ad0fa5e6017ecabeb91aaabab26ad6551c2f5dd6",
+    "prisma/migrations/20260907010000_focus_party_security_hardening/migration.sql": "038aa914ea2dbc39fd365006c44b47995eb1577966908b9e8558d6d9f8f5420f",
+    "prisma/migrations/20260907020000_focus_party_realtime_security/migration.sql": "52d866c71fdb83f4d053f477eea1b3fbaf0e7e3444b9df626998526ada581a50",
+    "prisma/migrations/20260907030000_focus_party_single_active_membership/migration.sql": "95542aa4b38fa4aec39fd5425cb363b730dc1fc17ede1008e2423f72f156df04",
+    "prisma/migrations/20260909000000_focus_background_catalog/migration.sql": "c226c654bbe558e99351d859a316a0c682d5d61cf71dc282c64bfde17e3e5937",
+    "prisma/migrations/20260909010000_focus_background_rls/migration.sql": "4ae38361d6bc178bfa0383151b1a9d732f8ee77086ad62c6e1b3a85346469d62",
+    "prisma/migrations/20260909020000_focus_background_timer_position/migration.sql": "6858de6cabd5438bd17aaff175de7c5d464ff618588e1b38116e6cd6a8f2d785",
+    "prisma/migrations/20260909030000_focus_background_user_preference/migration.sql": "2146cff15f823c1dec414482aaac382b73addcb66adf927e79780d06131ced75",
+    "prisma/migrations/20260909040000_user_focus_background/migration.sql": "5d52d7c820e3b094590e6680cd2436d226e86f3f56a49238139bc1cf6fbf30ad",
+    "prisma/migrations/20260909040001_storage_restrictive_isolation/migration.sql": "154c93f0a09bc286f4d921f083124be15d53eb7f5ea80cbb2176117989fbd0a1",
+    "prisma/migrations/20260909050000_focus_background_preference_source/migration.sql": "9c26ebce3150026870900e64d3ecd1b8faf2a2f15a7626ea197ef038ad434bbf",
+    "prisma/migrations/20260909060000_user_focus_background_layout_key/migration.sql": "9f1ba283a0a08548c0bc08481f062818e68f90ab7c44f7c0c46e4eeeea5c58e5",
+    "prisma/migrations/20260924010000_planner_foundation/migration.sql": "808f2d27d5395ab3aec95d7ee980c088d9274f52a051c8fe75b266b951b8a7e2",
+    "prisma/migrations/20260925152657_planner_check_result/migration.sql": "021be3a218ee4eb0fc3b1bfebfa70f266b9fe0b8efe292b19cd0f26dadc6f717",
+    "prisma/migrations/20260926010000_planner_preference_friction/migration.sql": "253727d0f3683a3dbb73bae29fcea39eb777ea4b303ac4bfd986b5252f2522fc",
+    "prisma/migrations/20260926020000_planner_intake_session/migration.sql": "529f47786c7b5fe4664d7a6eef9bd60349f57cd13643196d999214c04a59c4f2",
+    "prisma/migrations/20260926030000_subject_archived_at/migration.sql": "f936519df158f4beac595472818ae34d33f3b1ff03572dcf3fc3b2d24a2dfe81",
+    "prisma/migrations/20260927090000_planner_user_released_disposition/migration.sql": "f26f63bbfe29801c197c2b29efdd272a90057094b77b8bda7648383c2992a324",
+    "prisma/migrations/20260927100000_planner_reoffer_state/migration.sql": "3915a9ce650cd8fbef1d8460558831c9d99f04b2d41cd7b40201c7950590bff6",
+    "prisma/schema.prisma": "2a5e1eb96c1de742e5f1853cc71b153b36d628579f995ffb3d548aecf4472444"
+  },
+  "limits": [
+    "Mechanical scanning is not a proof against dynamically constructed identifiers or untracked external writers.",
+    "Effective SQL assumes ordered migrations applied; inspect deployed catalog/grants before cutover.",
+    "No app/DB mutation, provider calls or production credentials were used.",
+    "New Phase 0 V2 contract scaffolding and PostgreSQL harness are owned by parallel agents; they are not counted as currently deployed execution writers."
+  ],
+  "runtime_sql_calls": [
+    {
+      "path": "app/api/achievements/route.ts",
+      "line": 111,
+      "function": "claim_achievement_reward_atomic",
+      "operator_script": false
+    },
+    {
+      "path": "app/api/quests/[id]/route.ts",
+      "line": 163,
+      "function": "claim_quest_reward",
+      "operator_script": false
+    },
+    {
+      "path": "app/api/sessions/route.ts",
+      "line": 88,
+      "function": "start_study_session",
+      "operator_script": false
+    },
+    {
+      "path": "app/api/sessions/route.ts",
+      "line": 183,
+      "function": "settle_study_session_atomic",
+      "operator_script": false
+    },
+    {
+      "path": "app/api/shop/purchase/route.ts",
+      "line": 44,
+      "function": "purchase_shop_item",
+      "operator_script": false
+    },
+    {
+      "path": "app/api/skills/unlock/route.ts",
+      "line": 78,
+      "function": "unlock_skill_node_atomic",
+      "operator_script": false
+    },
+    {
+      "path": "app/api/subjects/[id]/forge-apex/route.ts",
+      "line": 100,
+      "function": "forge_apex_node_atomic",
+      "operator_script": false
+    },
+    {
+      "path": "lib/ai/chat-tool-executor.ts",
+      "line": 760,
+      "function": "claim_quest_reward",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 220,
+      "function": "create_focus_party",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 233,
+      "function": "join_focus_party",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 259,
+      "function": "leave_focus_party",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 273,
+      "function": "remove_focus_party_member",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 306,
+      "function": "enter_focus_session",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 336,
+      "function": "start_focus_timer",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 366,
+      "function": "pause_focus_timer",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 396,
+      "function": "resume_focus_timer",
+      "operator_script": false
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "line": 426,
+      "function": "leave_focus_session",
+      "operator_script": false
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 65,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 77,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 132,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 138,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 157,
+      "function": "start_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 163,
+      "function": "leave_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 186,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 209,
+      "function": "resume_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 214,
+      "function": "leave_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 223,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 67,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 87,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 100,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 101,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 102,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 115,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 149,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 174,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 175,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 197,
+      "function": "pause_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 206,
+      "function": "resume_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 213,
+      "function": "start_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 220,
+      "function": "start_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 227,
+      "function": "pause_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 238,
+      "function": "start_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 247,
+      "function": "resume_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 258,
+      "function": "leave_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 276,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 296,
+      "function": "start_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 325,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 349,
+      "function": "remove_focus_party_member",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 361,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 373,
+      "function": "leave_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 376,
+      "function": "leave_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 408,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 425,
+      "function": "leave_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 430,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 431,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 432,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 444,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 454,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 466,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 473,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 474,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 517,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 99,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 168,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 191,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 220,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 236,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 252,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 267,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 290,
+      "function": "start_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 305,
+      "function": "pause_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 320,
+      "function": "resume_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 335,
+      "function": "leave_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 349,
+      "function": "remove_focus_party_member",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 363,
+      "function": "remove_focus_party_member",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 376,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 389,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 401,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 87,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 98,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 104,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 109,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 113,
+      "function": "start_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 119,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 130,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 135,
+      "function": "enter_focus_session",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 325,
+      "function": "pause_focus_timer",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 372,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 61,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 79,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 93,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 105,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 156,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 157,
+      "function": "join_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 158,
+      "function": "create_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 193,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 196,
+      "function": "leave_focus_party",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 219,
+      "function": "create_focus_party",
+      "operator_script": true
+    }
+  ],
+  "direct_raw_sql_sites": [
+    {
+      "path": "lib/db-notification-preferences.ts",
+      "line": 38,
+      "operation": "UPDATE",
+      "table": "User",
+      "operator_script": false
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 47,
+      "operation": "INSERT INTO",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 245,
+      "operation": "DELETE FROM",
+      "table": "FocusParty",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/confirm-invites-and-rejoin.mjs",
+      "line": 248,
+      "operation": "DELETE FROM",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/qa-planner-session.mjs",
+      "line": 26,
+      "operation": "INSERT INTO",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 51,
+      "operation": "INSERT INTO",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 125,
+      "operation": "INSERT INTO",
+      "table": "FocusPartyMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 138,
+      "operation": "INSERT INTO",
+      "table": "FocusPartyMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 164,
+      "operation": "INSERT INTO",
+      "table": "FocusSession",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 311,
+      "operation": "UPDATE",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 335,
+      "operation": "INSERT INTO",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 386,
+      "operation": "UPDATE",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 398,
+      "operation": "DELETE FROM",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 545,
+      "operation": "DELETE FROM",
+      "table": "FocusParty",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-focus-party.mjs",
+      "line": 548,
+      "operation": "DELETE FROM",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 75,
+      "operation": "INSERT INTO",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 420,
+      "operation": "UPDATE",
+      "table": "FocusSession",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 421,
+      "operation": "DELETE FROM",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 422,
+      "operation": "DELETE FROM",
+      "table": "FocusSession",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 424,
+      "operation": "DELETE FROM",
+      "table": "FocusPartyMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 425,
+      "operation": "DELETE FROM",
+      "table": "FocusParty",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-phase2-service.mjs",
+      "line": 429,
+      "operation": "DELETE FROM",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 67,
+      "operation": "INSERT INTO",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 305,
+      "operation": "UPDATE",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 392,
+      "operation": "UPDATE",
+      "table": "FocusSession",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 393,
+      "operation": "DELETE FROM",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 394,
+      "operation": "DELETE FROM",
+      "table": "FocusSession",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 396,
+      "operation": "DELETE FROM",
+      "table": "FocusPartyMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 397,
+      "operation": "DELETE FROM",
+      "table": "FocusParty",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 402,
+      "operation": "UPDATE",
+      "table": "FocusSession",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 403,
+      "operation": "DELETE FROM",
+      "table": "FocusSessionMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 404,
+      "operation": "DELETE FROM",
+      "table": "FocusSession",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 406,
+      "operation": "DELETE FROM",
+      "table": "FocusPartyMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 407,
+      "operation": "DELETE FROM",
+      "table": "FocusParty",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-realtime-security.mjs",
+      "line": 411,
+      "operation": "DELETE FROM",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 47,
+      "operation": "INSERT INTO",
+      "table": "User",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 121,
+      "operation": "INSERT INTO",
+      "table": "FocusPartyMember",
+      "operator_script": true
+    },
+    {
+      "path": "scripts/verify-single-active-party.mjs",
+      "line": 213,
+      "operation": "INSERT INTO",
+      "table": "FocusPartyMember",
+      "operator_script": true
+    }
+  ]
+}

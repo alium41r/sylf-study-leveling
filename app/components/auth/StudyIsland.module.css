@@ -1,0 +1,240 @@
+/* ============================================================
+   STUDY ISLAND SCENE STYLES
+   Low-poly floating island, companion integration, and timer HUD
+   ============================================================ */
+
+.sceneContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 580px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  user-select: none;
+}
+
+/* Floating assembly holding the island, props, and companion */
+.islandAssembly {
+  position: relative;
+  width: 100%;
+  max-width: 660px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: islandDrift 8s ease-in-out infinite;
+}
+
+/* Floating Study Timer HUD Widget (Locked to Island in Celestial SVG) */
+.timerCard {
+  width: max-content;
+  background: rgba(11, 17, 33, 0.82);
+  border: 1px solid rgba(129, 140, 248, 0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 0.85rem;
+  padding: 0.85rem 1.15rem;
+  transform: rotate(-2.5deg);
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.65), 0 0 24px rgba(99, 102, 241, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  animation: hudHover 7s ease-in-out infinite;
+}
+
+.timerHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #38bdf8;
+  text-transform: uppercase;
+  font-family: "Rajdhani", sans-serif;
+}
+
+.timerSparkle {
+  color: #38bdf8;
+  font-size: 0.75rem;
+}
+
+.timerClock {
+  font-family: "Rajdhani", monospace, sans-serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  margin: 0.2rem 0 0.45rem;
+  line-height: 1;
+}
+
+.focusModePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(25, 34, 60, 0.65);
+  border: 1px solid rgba(80, 110, 170, 0.3);
+  color: #c7d2fe;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: "Rajdhani", sans-serif;
+}
+
+.focusCompass {
+  color: #38bdf8;
+}
+
+/* Companion slot positioned over the island plateau */
+.companionLayer {
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-40%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Top Right Crescent Moon */
+.crescentMoon {
+  position: absolute;
+  top: 8%;
+  right: 14%;
+  z-index: 5;
+  filter: drop-shadow(0 0 16px rgba(186, 215, 255, 0.4));
+  pointer-events: none;
+}
+
+/* Top Hanging Lantern / Vine Ornament */
+.hangingOrnament {
+  position: absolute;
+  top: 0;
+  right: 6%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Bottom Right Motto */
+.mottoContainer {
+  position: absolute;
+  bottom: 5%;
+  right: 6%;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #64748b;
+  font-family: "Rajdhani", sans-serif;
+  pointer-events: none;
+}
+
+.mottoStar {
+  color: #38bdf8;
+  margin-left: 0.25rem;
+  display: inline-block;
+}
+
+/* Animations */
+@keyframes islandDrift {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes hudHover {
+  0%, 100% {
+    transform: rotate(-2.5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(-3px);
+  }
+}
+
+@keyframes crystalFloat1 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes crystalFloat2 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes steamRise {
+  0% {
+    transform: translateY(0) scaleY(0.9);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateY(-4px) scaleY(1.05);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-9px) scaleY(1);
+    opacity: 0;
+  }
+}
+
+@keyframes lanternPulse {
+  0%, 100% {
+    opacity: 0.82;
+    filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.6));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 9px rgba(56, 189, 248, 0.9));
+  }
+}
+
+.crystal1 {
+  animation: crystalFloat1 5s ease-in-out infinite;
+}
+
+.crystal2 {
+  animation: crystalFloat2 6s ease-in-out infinite;
+}
+
+.steamLine1 {
+  animation: steamRise 3.6s ease-in-out infinite;
+}
+
+.steamLine2 {
+  animation: steamRise 3.6s ease-in-out infinite 1.8s;
+}
+
+.flameGlow {
+  animation: lanternPulse 3.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .islandAssembly,
+  .timerCard,
+  .crystal1,
+  .crystal2,
+  .steamLine1,
+  .steamLine2,
+  .flameGlow {
+    animation: none;
+    transform: none;
+  }
+}

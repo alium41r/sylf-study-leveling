@@ -2,6 +2,8 @@
 @import "katex/dist/katex.min.css";
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *, .dark, .dark *));
+
 /* ============================================================
    THE SYSTEM — Solo Leveling Design System
    ============================================================
@@ -11,12 +13,13 @@
 
 /* ─── CSS Custom Properties (Design Tokens) ─────────────────── */
 :root {
+  color-scheme: dark;
   /* Core backgrounds */
-  --bg-void: #090d16;        /* Deepest canvas — page background (uniform) */
-  --bg-abyss: #0d1117;      /* Card backgrounds */
-  --bg-shadow: #0f0f2a;     /* Elevated surfaces */
-  --bg-panel: #141432;       /* Panel/sidebar background */
-  --bg-overlay: rgba(5, 5, 15, 0.92); /* Modal overlays */
+  --bg-void: #000000;        /* Deepest canvas — page background (uniform solid black default) */
+  --bg-abyss: #070707;      /* Card backgrounds */
+  --bg-shadow: #0e0e0e;     /* Elevated surfaces */
+  --bg-panel: #0a0a0a;       /* Panel/sidebar background */
+  --bg-overlay: rgba(0, 0, 0, 0.92); /* Modal overlays */
 
   /* ─── Unified Theme Accent ─────────────────────────────
      All UI chrome derives from these. Override these to re-theme
@@ -44,6 +47,24 @@
   --text-muted: #475569;     /* Very subtle text */
   --text-system: var(--accent-primary-light); /* System message text */
   --accent-text-light: var(--accent-primary-light); /* Accent text (glows in dark, sharp in light) */
+  --accent-text: var(--accent-primary-light);
+
+  /* Canonical Semantic Application Tokens */
+  --app-canvas: var(--bg-void);
+  --surface-1: var(--bg-abyss);
+  --surface-2: var(--bg-shadow);
+  --surface-raised: var(--bg-panel);
+  --border-strong: var(--border-active);
+  --accent: var(--accent-primary);
+  --accent-hover: var(--accent-primary-light);
+  --accent-muted: var(--accent-primary-dim);
+  --accent-foreground: #ffffff;
+  --accent-contrast: #ffffff;
+  --focus-ring: 0 0 0 2px var(--accent-primary-mid);
+  --sidebar-bg: var(--glass-liquid-bg);
+  --sidebar-fg: var(--text-primary);
+  --sidebar-border: var(--border-subtle);
+  --overlay-bg: var(--bg-overlay);
 
   /* Glow Effects — derived from accent-primary */
   --glow-purple: 0 0 20px var(--accent-primary-dim), 0 0 60px var(--accent-primary-dim);
@@ -62,7 +83,13 @@
 
   /* Spacing */
   --sidebar-width: 280px;
-  --sidebar-collapsed-width: 72px;
+  --sidebar-collapsed-width: 58px;
+
+  /* Liquid Glass Tokens (UI/UX Pro Max Architecture) */
+  --glass-liquid-bg: rgba(13, 17, 28, 0.68);
+  --glass-liquid-border: rgba(255, 255, 255, 0.12);
+  --glass-liquid-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 1px 2px 0 rgba(255, 255, 255, 0.18) inset, 0 0 35px -5px var(--accent-primary-dim);
+  --glass-liquid-specular: rgba(255, 255, 255, 0.15);
 
   /* Motion & Easing Tokens */
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
@@ -72,12 +99,13 @@
   --duration-slow: 400ms;
 
   /* Tailwind overrides */
-  --background: var(--bg-void);
+  --background: var(--app-canvas, var(--bg-void));
   --foreground: var(--text-primary);
 }
 
 /* ─── Light Mode Theme ──────────────────────────────────────── */
 html[data-mode="light"] {
+  color-scheme: light;
   --bg-void: #f8fafc;
   --bg-abyss: #ffffff;
   --bg-shadow: #f1f5f9;
@@ -89,8 +117,26 @@ html[data-mode="light"] {
   --text-muted: #64748b;
   --text-system: var(--accent-primary);
   --accent-text-light: var(--accent-primary-dark);
+  --accent-text: var(--accent-primary-dark);
 
-  --border-subtle: rgba(15, 23, 42, 0.12);
+  /* Canonical Semantic Application Tokens */
+  --app-canvas: var(--bg-void);
+  --surface-1: var(--bg-abyss);
+  --surface-2: var(--bg-shadow);
+  --surface-raised: var(--bg-panel);
+  --border-strong: rgba(15, 23, 42, 0.28);
+  --accent: var(--accent-primary);
+  --accent-hover: var(--accent-primary-dark);
+  --accent-muted: var(--accent-primary-dim);
+  --accent-foreground: #ffffff;
+  --accent-contrast: #ffffff;
+  --focus-ring: 0 0 0 2px var(--accent-primary-mid);
+  --sidebar-bg: rgba(255, 255, 255, 0.88);
+  --sidebar-fg: var(--text-primary);
+  --sidebar-border: rgba(15, 23, 42, 0.16);
+  --overlay-bg: rgba(255, 255, 255, 0.88);
+
+  --border-subtle: rgba(15, 23, 42, 0.16);
   --border-active: var(--accent-primary-mid);
 
   --text-glow: none;
@@ -101,37 +147,194 @@ html[data-mode="light"] {
   --glow-gold: 0 4px 20px rgba(245, 158, 11, 0.2), 0 0 10px rgba(0,0,0,0.05);
   --glow-red: 0 4px 20px rgba(239, 68, 68, 0.2);
   --glow-green: 0 4px 15px rgba(34, 197, 94, 0.2);
+
+  /* Liquid Glass Tokens (Light Mode Parity) */
+  --glass-liquid-bg: rgba(255, 255, 255, 0.88);
+  --glass-liquid-border: rgba(15, 23, 42, 0.16);
+  --glass-liquid-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.08) inset, 0 1px 2px 0 rgba(255, 255, 255, 1) inset, 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --glass-liquid-specular: rgba(255, 255, 255, 0.6);
+}
+
+/* ─── Liquid Glass Material (Apple/VisionOS Platform Guidance) ─── */
+.liquid-glass-sidebar {
+  background: var(--sidebar-bg, var(--glass-liquid-bg));
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border-color: var(--sidebar-border, var(--border-subtle));
+  color: var(--sidebar-fg, var(--text-primary));
+}
+
+html[data-mode="light"] .liquid-glass-sidebar {
+  border-right: 1px solid var(--border-subtle);
+  box-shadow: 1px 0 0 0 var(--border-subtle), 4px 0 20px rgba(15, 23, 42, 0.03);
+}
+
+.liquid-glass-floating {
+  background: var(--glass-liquid-bg);
+  border: 1px solid var(--glass-liquid-border);
+  box-shadow: var(--glass-liquid-shadow);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+}
+
+.liquid-glass-dock {
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.45),
+              0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+              0 1px 1px 0 rgba(255, 255, 255, 0.15) inset;
+}
+
+.liquid-glass-dock-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-dock-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--text-primary);
+}
+
+html[data-mode="light"] .liquid-glass-dock {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.12),
+              0 0 0 1px rgba(255, 255, 255, 0.95) inset,
+              0 1px 1px 0 rgba(255, 255, 255, 1) inset;
+}
+
+html[data-mode="light"] .liquid-glass-dock-btn {
+  background: rgba(0, 0, 0, 0.035);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  color: var(--text-secondary);
+}
+
+html[data-mode="light"] .liquid-glass-dock-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: var(--text-primary);
 }
 
 html[data-mode="light"] body {
-  background-color: var(--bg-void);
+  background-color: transparent;
   color: var(--text-primary);
 }
+
+/* ─── Simple Background Scoped Semantic Tokens ────────────────── */
+html[data-mode="light"][data-app-background="simple"] {
+  --bg-void: #ffffff;
+  --bg-abyss: #ffffff;
+  --bg-shadow: #f8fafc;
+  --bg-panel: #ffffff;
+  --border-subtle: rgba(15, 23, 42, 0.18);
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+}
+
+html[data-mode="dark"][data-app-background="simple"] {
+  --bg-void: #000000;
+  --bg-abyss: #070707;
+  --bg-shadow: #0e0e0e;
+  --bg-panel: #0a0a0a;
+  --border-subtle: rgba(255, 255, 255, 0.10);
+  --border-active: var(--accent-primary-mid);
+}
+
+/* Ensure pure canvas without conflicting legacy ambient starfield glow */
+[class*="topGlow"] {
+  display: none !important;
+}
+
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-app-canvas: var(--app-canvas);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-raised: var(--surface-raised);
   --color-bg-void: var(--bg-void);
   --color-bg-abyss: var(--bg-abyss);
   --color-bg-shadow: var(--bg-shadow);
   --color-bg-panel: var(--bg-panel);
   --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
   --color-border-active: var(--border-active);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-text-system: var(--text-system);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-text: var(--accent-text);
   --color-accent-text-light: var(--accent-text-light);
   --color-accent-primary: var(--accent-primary);
   --color-accent-primary-light: var(--accent-primary-light);
   --color-accent-primary-dim: var(--accent-primary-dim);
   --color-accent-primary-mid: var(--accent-primary-mid);
   --color-accent-primary-dark: var(--accent-primary-dark);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-overlay-bg: var(--overlay-bg);
   --font-sans: var(--font-rajdhani), var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --shadow-card: var(--card-shadow);
   /* Extra-small breakpoint for 360-430px viewport typography clamping */
   --breakpoint-xs: 30rem;
+}
+
+/* ─── Global Scrollbar Removal (Chrome, Safari, Opera, Firefox, Edge) ─── */
+html,
+body,
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* ─── Static Viewport Page Lock (Focus Timer, System AI Chat, Social Chat) ─── */
+html.static-viewport,
+body.static-viewport {
+  height: 100% !important;
+  height: 100dvh !important;
+  max-height: 100% !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+}
+
+@media (max-width: 768px) {
+  html.static-viewport,
+  body.static-viewport {
+    position: fixed !important;
+    width: 100% !important;
+    inset: 0 !important;
+  }
+}
+
+html.static-viewport #root,
+body.static-viewport #root,
+html.static-viewport #app-bg-layer,
+body.static-viewport #app-bg-layer {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
 }
 
 /* ═══ Global Mobile-First Viewport Hardening (Task 3.1) ═══════ */
@@ -140,6 +343,7 @@ html[data-mode="light"] body {
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
+    overscroll-behavior-y: none;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -242,7 +446,7 @@ body {
   width: 100%;
   overflow-x: hidden;
   overflow-x: clip;
-  background-color: var(--background);
+  background-color: transparent;
   color: var(--foreground);
   font-family: 'Inter', system-ui, sans-serif;
   overscroll-behavior-y: none;
@@ -550,12 +754,54 @@ input[type="search"]::-webkit-search-results-decoration {
   animation: edge-flow 20s linear infinite;
 }
 
+/* ─── Fantasy Chronometer Breathing Glow ─────────────────────────── */
+@keyframes fantasyGlowBreathe {
+  0%, 100% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 10px var(--accent-primary-dim));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 22px var(--accent-primary-mid));
+  }
+}
+
+.fantasy-glow-breathe {
+  animation: fantasyGlowBreathe 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fantasy-glow-breathe {
+    animation: none !important;
+  }
+}
+
+/* ─── Classic Sylf Orbiting Liquid Glass Glow Bar (60s Revolution) ─── */
+@keyframes classicOrbit {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+.classic-orbiting-bar {
+  animation: classicOrbit 60s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .classic-orbiting-bar {
+    animation: none !important;
+  }
+}
+
 /* ─── Settings Panel ─────────────────────────────────────────── */
 .settings-overlay {
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: var(--bg-overlay);
+  background: var(--overlay-bg, rgba(5, 5, 15, 0.90));
   backdrop-filter: blur(12px);
   overflow-y: auto;
   opacity: 0;
@@ -578,25 +824,33 @@ input[type="search"]::-webkit-search-results-decoration {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-panel);
-  border: 1px solid var(--accent-primary-mid);
+  background: var(--surface-1, var(--bg-panel));
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  color: var(--accent-primary-light);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
 .settings-close-btn:hover {
-  background: var(--accent-primary-dim);
-  box-shadow: 0 0 20px var(--accent-primary-mid);
+  background: var(--surface-raised, var(--accent-primary-dim));
+  border-color: var(--accent-primary-mid);
+  color: var(--accent-text, var(--accent-primary-light));
+  box-shadow: 0 0 20px var(--accent-primary-dim);
 }
 
 .settings-category-card {
-  background: var(--bg-abyss);
-  border: 1px solid var(--accent-primary-dim);
-  border-radius: 8px;
+  background: var(--surface-1, var(--bg-abyss));
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
   padding: 20px;
   position: relative;
+}
+
+html[data-mode="light"] .settings-category-card {
+  background: var(--surface-1, var(--bg-panel));
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
 }
 
 .settings-category-card::before {
@@ -615,7 +869,7 @@ input[type="search"]::-webkit-search-results-decoration {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--accent-text-light);
+  color: var(--accent-text, var(--accent-text-light));
   margin-bottom: 16px;
 }
 
@@ -626,9 +880,9 @@ input[type="search"]::-webkit-search-results-decoration {
   justify-content: center;
   gap: 10px;
   padding: 20px 12px;
-  background: var(--bg-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 6px;
+  background: var(--surface-2, var(--bg-shadow));
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.25s ease;
   text-decoration: none;
@@ -638,11 +892,23 @@ input[type="search"]::-webkit-search-results-decoration {
   animation: settings-tile-in 0.4s ease forwards;
 }
 
+html[data-mode="light"] .settings-tile {
+  background: var(--surface-2, var(--bg-shadow));
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
 .settings-tile:hover {
-  background: var(--bg-panel);
+  background: var(--surface-raised, var(--bg-panel));
   border-color: var(--accent-primary-mid);
   box-shadow: 0 0 20px var(--accent-primary-dim), inset 0 0 20px rgba(0, 0, 0, 0.03);
   transform: translateY(-2px);
+}
+
+html[data-mode="light"] .settings-tile:hover {
+  background: var(--surface-raised, var(--bg-panel));
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 14px var(--accent-primary-dim);
 }
 
 .settings-tile-icon {
@@ -651,7 +917,7 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .settings-tile:hover .settings-tile-icon {
-  color: var(--accent-cyan);
+  color: var(--accent-text, var(--accent-cyan));
 }
 
 .settings-tile-label {
@@ -749,9 +1015,9 @@ input[type="search"]::-webkit-search-results-decoration {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--border-subtle);
-  background: rgba(20, 20, 50, 0.5);
+  background: var(--surface-1);
   color: var(--text-secondary);
   font-family: 'Rajdhani', sans-serif;
   font-weight: 600;
@@ -765,10 +1031,15 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 .settings-page-back:hover {
-  color: var(--accent-primary-light);
+  color: var(--accent-text, var(--accent-primary-light));
   border-color: var(--accent-primary-mid);
-  background: var(--accent-primary-dim);
+  background: var(--surface-raised, var(--accent-primary-dim));
 }
+
+html[data-mode="light"] .settings-page-back {
+  background: var(--surface-1);
+}
+
 
 .settings-page-header {
   font-family: 'Rajdhani', sans-serif;
@@ -839,27 +1110,32 @@ input[type="search"]::-webkit-search-results-decoration {
 /* ─── Custom Scrollbar for Chat ──────────────────────────────── */
 .chat-scroll {
   overflow-y: scroll; /* Forces a permanent scrollbar */
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent-primary-mid) rgba(255, 255, 255, 0.02);
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--accent-primary-mid) rgba(255, 255, 255, 0.02) !important;
+  overscroll-behavior: contain !important;
+  overscroll-behavior-y: contain !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 .chat-scroll::-webkit-scrollbar {
-  width: 10px;
+  display: block !important;
+  width: 10px !important;
 }
 
 .chat-scroll::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.02) !important;
   border-radius: 8px;
 }
 
 .chat-scroll::-webkit-scrollbar-thumb {
-  background: var(--accent-primary-mid);
+  display: block !important;
+  background: var(--accent-primary-mid) !important;
   border-radius: 8px;
   border: 2px solid var(--bg-abyss);
 }
 
 .chat-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
+  background: var(--accent-primary) !important;
 }
 
 @keyframes fade-in-down {
@@ -889,18 +1165,50 @@ input[type="search"]::-webkit-search-results-decoration {
 }
 
 /* Custom Scrollbar for Notifications Dropdown */
+.custom-scrollbar {
+  scrollbar-width: thin !important;
+  overscroll-behavior: contain !important;
+  overscroll-behavior-y: contain !important;
+  -webkit-overflow-scrolling: touch;
+}
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  display: block !important;
+  width: 6px !important;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.1) !important;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  display: block !important;
+  background: rgba(255, 255, 255, 0.1) !important;
   border-radius: 3px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Ultra-thin scrollbar for floating sidebar navigation */
+.sidebar-scroll {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent !important;
+  overscroll-behavior: contain !important;
+  overscroll-behavior-y: contain !important;
+  -webkit-overflow-scrolling: touch;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 3px !important;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  display: block !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 9999px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
 }
 
 @keyframes exp-glow {

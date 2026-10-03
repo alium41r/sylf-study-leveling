@@ -1,0 +1,443 @@
+{
+  "source": "sylf pixel companion without eyes no bg.png",
+  "sourceSha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a",
+  "sourceDimensions": {
+    "width": 1254,
+    "height": 1254
+  },
+  "visiblePaletteRgbColors": 89391,
+  "alpha": {
+    "transparentPixels": 1098595,
+    "partialAlphaPixels": 0,
+    "opaquePixels": 473921
+  },
+  "exactColorRunAudit": {
+    "horizontal": {
+      "opaqueAdjacencies": 472039,
+      "changedOpaqueAdjacencies": 401240,
+      "changedOpaqueAdjacencyFraction": 0.8500145115128199,
+      "exactRgbaRunCount": 403122,
+      "medianExactRgbaRunLength": 1,
+      "onePixelRunFraction": 0.866913738272781,
+      "mostFrequentExactRgbaRunLengths": [
+        {
+          "length": 1,
+          "count": 349472
+        },
+        {
+          "length": 2,
+          "count": 41971
+        },
+        {
+          "length": 3,
+          "count": 8158
+        },
+        {
+          "length": 4,
+          "count": 2339
+        },
+        {
+          "length": 5,
+          "count": 732
+        },
+        {
+          "length": 6,
+          "count": 272
+        },
+        {
+          "length": 7,
+          "count": 98
+        },
+        {
+          "length": 8,
+          "count": 44
+        },
+        {
+          "length": 9,
+          "count": 22
+        },
+        {
+          "length": 10,
+          "count": 8
+        },
+        {
+          "length": 11,
+          "count": 3
+        },
+        {
+          "length": 12,
+          "count": 3
+        }
+      ],
+      "strongestEdgeProfileCorrelations": [
+        {
+          "sourcePixelShift": 14,
+          "correlation": 0.690146207098719
+        },
+        {
+          "sourcePixelShift": 13,
+          "correlation": 0.639740463151324
+        },
+        {
+          "sourcePixelShift": 27,
+          "correlation": 0.5608311019804548
+        },
+        {
+          "sourcePixelShift": 28,
+          "correlation": 0.49472337535580924
+        },
+        {
+          "sourcePixelShift": 26,
+          "correlation": 0.41459911188859727
+        },
+        {
+          "sourcePixelShift": 15,
+          "correlation": 0.40834643436518975
+        },
+        {
+          "sourcePixelShift": 12,
+          "correlation": 0.36117268048242557
+        },
+        {
+          "sourcePixelShift": 29,
+          "correlation": 0.3571054868406135
+        }
+      ]
+    },
+    "vertical": {
+      "opaqueAdjacencies": 471431,
+      "changedOpaqueAdjacencies": 394512,
+      "changedOpaqueAdjacencyFraction": 0.8368393253731723,
+      "exactRgbaRunCount": 397002,
+      "medianExactRgbaRunLength": 1,
+      "onePixelRunFraction": 0.8563256608279052,
+      "mostFrequentExactRgbaRunLengths": [
+        {
+          "length": 1,
+          "count": 339963
+        },
+        {
+          "length": 2,
+          "count": 43781
+        },
+        {
+          "length": 3,
+          "count": 9076
+        },
+        {
+          "length": 4,
+          "count": 2699
+        },
+        {
+          "length": 5,
+          "count": 923
+        },
+        {
+          "length": 6,
+          "count": 345
+        },
+        {
+          "length": 7,
+          "count": 113
+        },
+        {
+          "length": 8,
+          "count": 62
+        },
+        {
+          "length": 9,
+          "count": 19
+        },
+        {
+          "length": 10,
+          "count": 11
+        },
+        {
+          "length": 11,
+          "count": 5
+        },
+        {
+          "length": 12,
+          "count": 2
+        }
+      ],
+      "strongestEdgeProfileCorrelations": [
+        {
+          "sourcePixelShift": 14,
+          "correlation": 0.5470181946692741
+        },
+        {
+          "sourcePixelShift": 15,
+          "correlation": 0.4529272341802634
+        },
+        {
+          "sourcePixelShift": 13,
+          "correlation": 0.39773526646178897
+        },
+        {
+          "sourcePixelShift": 28,
+          "correlation": 0.37591689576072534
+        },
+        {
+          "sourcePixelShift": 29,
+          "correlation": 0.3544579495531196
+        },
+        {
+          "sourcePixelShift": 27,
+          "correlation": 0.2940128096453975
+        },
+        {
+          "sourcePixelShift": 30,
+          "correlation": 0.2563731312833393
+        },
+        {
+          "sourcePixelShift": 16,
+          "correlation": 0.24451212543584358
+        }
+      ]
+    }
+  },
+  "candidateBlockAudit": [
+    {
+      "blockSize": 2,
+      "phaseSelection": "Best strong-edge projection phase per axis, not an inferred authoring origin",
+      "xPhase": {
+        "origin": 1,
+        "strongEdgesOnBoundaryFraction": 0.5031346175766557
+      },
+      "yPhase": {
+        "origin": 0,
+        "strongEdgesOnBoundaryFraction": 0.5065999863917806
+      },
+      "fullyOpaqueBlocks": 117449,
+      "fullyOpaqueNonuniformColorBlocks": 115112,
+      "fullyOpaqueNonuniformColorFraction": 0.9801020017198955,
+      "medianDistinctRgbColorsPerFullyOpaqueBlock": 4,
+      "mixedAlphaBlocks": 2080
+    },
+    {
+      "blockSize": 3,
+      "phaseSelection": "Best strong-edge projection phase per axis, not an inferred authoring origin",
+      "xPhase": {
+        "origin": 2,
+        "strongEdgesOnBoundaryFraction": 0.35400281165697783
+      },
+      "yPhase": {
+        "origin": 1,
+        "strongEdgesOnBoundaryFraction": 0.3446961965026876
+      },
+      "fullyOpaqueBlocks": 51711,
+      "fullyOpaqueNonuniformColorBlocks": 51701,
+      "fullyOpaqueNonuniformColorFraction": 0.9998066175475238,
+      "medianDistinctRgbColorsPerFullyOpaqueBlock": 7,
+      "mixedAlphaBlocks": 1904
+    },
+    {
+      "blockSize": 6,
+      "phaseSelection": "Best strong-edge projection phase per axis, not an inferred authoring origin",
+      "xPhase": {
+        "origin": 5,
+        "strongEdgesOnBoundaryFraction": 0.17873019491622022
+      },
+      "yPhase": {
+        "origin": 2,
+        "strongEdgesOnBoundaryFraction": 0.17847179696536708
+      },
+      "fullyOpaqueBlocks": 12590,
+      "fullyOpaqueNonuniformColorBlocks": 12590,
+      "fullyOpaqueNonuniformColorFraction": 1,
+      "medianDistinctRgbColorsPerFullyOpaqueBlock": 21,
+      "mixedAlphaBlocks": 1162
+    },
+    {
+      "blockSize": 11,
+      "phaseSelection": "Best strong-edge projection phase per axis, not an inferred authoring origin",
+      "xPhase": {
+        "origin": 8,
+        "strongEdgesOnBoundaryFraction": 0.11128842281241688
+      },
+      "yPhase": {
+        "origin": 1,
+        "strongEdgesOnBoundaryFraction": 0.10787915901204327
+      },
+      "fullyOpaqueBlocks": 3579,
+      "fullyOpaqueNonuniformColorBlocks": 3579,
+      "fullyOpaqueNonuniformColorFraction": 1,
+      "medianDistinctRgbColorsPerFullyOpaqueBlock": 61,
+      "mixedAlphaBlocks": 707
+    },
+    {
+      "blockSize": 12,
+      "phaseSelection": "Best strong-edge projection phase per axis, not an inferred authoring origin",
+      "xPhase": {
+        "origin": 3,
+        "strongEdgesOnBoundaryFraction": 0.09411451802880048
+      },
+      "yPhase": {
+        "origin": 8,
+        "strongEdgesOnBoundaryFraction": 0.09226372729128393
+      },
+      "fullyOpaqueBlocks": 2969,
+      "fullyOpaqueNonuniformColorBlocks": 2969,
+      "fullyOpaqueNonuniformColorFraction": 1,
+      "medianDistinctRgbColorsPerFullyOpaqueBlock": 70,
+      "mixedAlphaBlocks": 647
+    },
+    {
+      "blockSize": 13,
+      "phaseSelection": "Best strong-edge projection phase per axis, not an inferred authoring origin",
+      "xPhase": {
+        "origin": 6,
+        "strongEdgesOnBoundaryFraction": 0.12952619780386793
+      },
+      "yPhase": {
+        "origin": 12,
+        "strongEdgesOnBoundaryFraction": 0.10332040552493706
+      },
+      "fullyOpaqueBlocks": 2519,
+      "fullyOpaqueNonuniformColorBlocks": 2519,
+      "fullyOpaqueNonuniformColorFraction": 1,
+      "medianDistinctRgbColorsPerFullyOpaqueBlock": 80,
+      "mixedAlphaBlocks": 591
+    },
+    {
+      "blockSize": 14,
+      "phaseSelection": "Best strong-edge projection phase per axis, not an inferred authoring origin",
+      "xPhase": {
+        "origin": 13,
+        "strongEdgesOnBoundaryFraction": 0.1004217485466773
+      },
+      "yPhase": {
+        "origin": 4,
+        "strongEdgesOnBoundaryFraction": 0.1084915288834456
+      },
+      "fullyOpaqueBlocks": 2149,
+      "fullyOpaqueNonuniformColorBlocks": 2149,
+      "fullyOpaqueNonuniformColorFraction": 1,
+      "medianDistinctRgbColorsPerFullyOpaqueBlock": 89,
+      "mixedAlphaBlocks": 571
+    }
+  ],
+  "candidateNativeRoundTrips": [
+    {
+      "nativeSize": 94,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 28487,
+      "changedVisibleRgbPixels": 466936,
+      "changedAppearancePixels": 466937,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 96,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 27765,
+      "changedVisibleRgbPixels": 466097,
+      "changedAppearancePixels": 466097,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 100,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 26661,
+      "changedVisibleRgbPixels": 467880,
+      "changedAppearancePixels": 467880,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 104,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 29535,
+      "changedVisibleRgbPixels": 469429,
+      "changedAppearancePixels": 469429,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 106,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 35875,
+      "changedVisibleRgbPixels": 472816,
+      "changedAppearancePixels": 472816,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 114,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 32842,
+      "changedVisibleRgbPixels": 470371,
+      "changedAppearancePixels": 470371,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 128,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 27202,
+      "changedVisibleRgbPixels": 463029,
+      "changedAppearancePixels": 463029,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 192,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 15783,
+      "changedVisibleRgbPixels": 444096,
+      "changedAppearancePixels": 444096,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 209,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 10057,
+      "changedVisibleRgbPixels": 434000,
+      "changedAppearancePixels": 434001,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 256,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 11248,
+      "changedVisibleRgbPixels": 428225,
+      "changedAppearancePixels": 428225,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 418,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 5023,
+      "changedVisibleRgbPixels": 371574,
+      "changedAppearancePixels": 371574,
+      "appearanceExact": false
+    },
+    {
+      "nativeSize": 627,
+      "reductionKernel": "nearest",
+      "restorationKernel": "nearest",
+      "changedAlphaPixels": 4023,
+      "changedVisibleRgbPixels": 309654,
+      "changedAppearancePixels": 309654,
+      "appearanceExact": false
+    }
+  ],
+  "comparisonRule": "Appearance changes if alpha differs or visible RGB differs; hidden RGB under two zero-alpha pixels is ignored. No tolerance is applied.",
+  "conclusion": "No safe, consistent lower native grid was recovered. Apparent large art cells have color variation and inconsistent edge alignment; every tested nearest-neighbor reduction changes visible pixels. Keep the supplied 1254x1254 RGBA canvas as canonical.",
+  "canonicalCanvas": {
+    "width": 1254,
+    "height": 1254,
+    "origin": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "normalizedDerivativeCreated": false,
+  "sourceUnchanged": true
+}

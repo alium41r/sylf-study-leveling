@@ -16,7 +16,7 @@
 // ============================================================
 
 import { prisma } from "@/lib/prisma";
-import { AI_COST_USD_PER_1M } from "./config";
+import { AI_COST_USD_PER_1M, HISTORICAL_MODEL_COST_USD_PER_1M } from "./config";
 
 export interface AiUsageEntry {
   userId: number;
@@ -36,7 +36,9 @@ export function estimateCostUsd(
   completionTokens: number,
   cacheHitTokens = 0
 ): number {
-  const rate = AI_COST_USD_PER_1M[model];
+  // Active rates first; the historical table only prices usage recorded before
+  // the V4.1 Flash migration, so old rows still report what they cost.
+  const rate = AI_COST_USD_PER_1M[model] ?? HISTORICAL_MODEL_COST_USD_PER_1M[model];
   if (!rate) return 0;
 
   const totalInput = Math.max(0, promptTokens);
@@ -51,7 +53,7 @@ export function estimateCostUsd(
   return Math.round(cost * 1_000_000) / 1_000_000; // 6 decimal places
 }
 
-export async function logAiUsage(entry: AiUsageEntry): Promise<void> {
+export async function logAiUsage(entry: AiUsageEntry, quiet = false): Promise<void> {
   try {
     // Guard: if the AiUsageLog table isn't available (older DB, test mocks),
     // skip silently — telemetry must never affect the chat flow.
@@ -77,6 +79,6 @@ export async function logAiUsage(entry: AiUsageEntry): Promise<void> {
     });
   } catch (e) {
     // Telemetry must never break the conversation.
-    console.error("[AI Usage Logger] Failed to record usage:", e);
+    if (!quiet) console.error("[AI Usage Logger] Failed to record usage:", e);
   }
 }

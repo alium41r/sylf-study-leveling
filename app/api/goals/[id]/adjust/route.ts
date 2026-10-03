@@ -1,6 +1,7 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
+import { assertNoPlannerGoals, isPlannerConflict } from "@/lib/planner/server/mutation-guards";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { previewEffortAdjustment, EFFORT_CONFIG, type EffortLevel } from "@/lib/game-engine";
 
@@ -40,7 +41,8 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     }
 
     // Get the existing goal
-    const goal = await prisma.goal.findFirst({
+    return await executionTransaction(session.userId, async tx => {
+    const goal = await tx.goal.findFirst({
       where: { id: parseInt(id), userId: session.userId },
       include: { quests: true },
     });
@@ -50,6 +52,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     }
 
     const { targetWeeks: newWeeks } = validation.data;
+    await assertNoPlannerGoals(session.userId, [goal.id], tx);
 
     // Estimate total study hours based on current effort level and timeline
     const currentConfig = EFFORT_CONFIG[goal.effortLevel as EffortLevel] || EFFORT_CONFIG.NORMAL;
@@ -62,15 +65,11 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       newWeeks
     );
 
-    // FETCH MEMORY: Get past 7 days of StudySessions
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    
     // We update the timeline, but we let the chat system handle quest regeneration.
     const newEffortLevelStr = preview.suggestedEffortLevel; 
 
     // Update the goal timeline and effort in DB
-    await prisma.goal.update({
+    await tx.goal.update({
       where: { id: goal.id },
       data: {
         targetWeeks: newWeeks,
@@ -80,12 +79,12 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     // Replace old pending quests with new ones
     // Delete existing pending quests
-    await prisma.quest.deleteMany({
-      where: { goalId: goal.id, status: "PENDING" },
+    await tx.quest.deleteMany({
+      where: { userId: session.userId, goalId: goal.id, status: "PENDING", elapsedSeconds: 0, sessions: { none: {} } },
     });
 
     // Add system message
-    await prisma.systemMessage.create({
+    await tx.systemMessage.create({
       data: {
         userId: session.userId,
         content: `[TIMELINE COMPRESSED]\n\nGoal: "${goal.title}"\nNew Timeline: ${newWeeks} weeks\nNew Effort Level: ${newEffortLevelStr}\n\nThe System has re-evaluated your timeline. Please talk to The System in the chat to regenerate your quests.`,
@@ -103,7 +102,9 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       },
       { status: 200 }
     );
+    });
   } catch (error) {
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

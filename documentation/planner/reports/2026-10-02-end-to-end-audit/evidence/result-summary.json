@@ -1,0 +1,459 @@
+{
+  "counts": {
+    "Goal": 2,
+    "Quest": 47,
+    "PlannerPlan": 4,
+    "PlannerIntakeSession": 3,
+    "ChatSession": 1,
+    "AiUsageLog": 18,
+    "PlannerRevision": 6,
+    "PlannerQuestLink": 33,
+    "StudySession": 1
+  },
+  "generations": [
+    {
+      "id": 175,
+      "startedAt": "2026-10-02T05:50:50.958Z",
+      "path": "/api/ai-planner",
+      "durationMs": 97483,
+      "status": 401
+    },
+    {
+      "id": 560,
+      "startedAt": "2026-10-02T06:00:37.446Z",
+      "path": "/api/ai-planner",
+      "durationMs": 51651,
+      "status": 200
+    },
+    {
+      "id": 780,
+      "startedAt": "2026-10-02T06:04:59.724Z",
+      "path": "/api/ai-planner",
+      "durationMs": 71840,
+      "status": 200
+    },
+    {
+      "id": 818,
+      "startedAt": "2026-10-02T06:10:09.728Z",
+      "path": "/api/planner/generate",
+      "durationMs": 45608,
+      "status": 200
+    },
+    {
+      "id": 915,
+      "startedAt": "2026-10-02T06:15:04.765Z",
+      "path": "/api/planner/generate",
+      "durationMs": 42507,
+      "status": 200
+    },
+    {
+      "id": 1011,
+      "startedAt": "2026-10-02T06:17:21.102Z",
+      "path": "/api/planner/generate",
+      "durationMs": 17876,
+      "status": 200
+    },
+    {
+      "id": 1026,
+      "startedAt": "2026-10-02T06:17:57.422Z",
+      "path": "/api/planner/faebbe22-0d26-4b5c-855d-22997650489f/commit",
+      "durationMs": 5775,
+      "status": 200
+    },
+    {
+      "id": 1075,
+      "startedAt": "2026-10-02T06:20:40.165Z",
+      "path": "/api/planner/generate",
+      "durationMs": 20221,
+      "status": 200
+    },
+    {
+      "id": 1085,
+      "startedAt": "2026-10-02T06:21:08.773Z",
+      "path": "/api/planner/faebbe22-0d26-4b5c-855d-22997650489f/rebalance",
+      "durationMs": 9265,
+      "status": 400
+    },
+    {
+      "id": 1097,
+      "startedAt": "2026-10-02T06:21:46.852Z",
+      "path": "/api/planner/c8035ff6-036f-47db-a653-03dfef73ad91/commit",
+      "durationMs": 2386,
+      "status": 409
+    },
+    {
+      "id": 1239,
+      "startedAt": "2026-10-02T06:30:57.398Z",
+      "path": "/api/planner/a53b65df-36a3-4e3a-9e7a-82526be57897/commit",
+      "durationMs": 3618,
+      "status": 200
+    },
+    {
+      "id": 1247,
+      "startedAt": "2026-10-02T06:31:19.309Z",
+      "path": "/api/planner/faebbe22-0d26-4b5c-855d-22997650489f/rebalance",
+      "durationMs": 26865,
+      "status": 200
+    },
+    {
+      "id": 1307,
+      "startedAt": "2026-10-02T06:32:10.812Z",
+      "path": "/api/planner/faebbe22-0d26-4b5c-855d-22997650489f/rebalance/confirm",
+      "durationMs": 7612,
+      "status": 200
+    },
+    {
+      "id": 1372,
+      "startedAt": "2026-10-02T06:35:43.100Z",
+      "path": "/api/planner/c8035ff6-036f-47db-a653-03dfef73ad91/commit",
+      "durationMs": 2330,
+      "status": 409
+    },
+    {
+      "id": 1373,
+      "startedAt": "2026-10-02T06:35:44.632Z",
+      "path": "/api/planner/generate",
+      "durationMs": 3458,
+      "status": 200
+    },
+    {
+      "id": 1434,
+      "startedAt": "2026-10-02T06:38:56.001Z",
+      "path": "/api/planner/generate",
+      "durationMs": 772,
+      "status": 409
+    },
+    {
+      "id": 1456,
+      "startedAt": "2026-10-02T06:39:49.541Z",
+      "path": "/api/planner/generate",
+      "durationMs": 1270,
+      "status": 409
+    },
+    {
+      "id": 1478,
+      "startedAt": "2026-10-02T06:40:40.461Z",
+      "path": "/api/planner/a53b65df-36a3-4e3a-9e7a-82526be57897/commit",
+      "durationMs": 1318,
+      "status": 409
+    },
+    {
+      "id": 1545,
+      "startedAt": "2026-10-02T06:43:54.583Z",
+      "path": "/api/planner/c8035ff6-036f-47db-a653-03dfef73ad91/milestones/9af9c926-2559-4525-a676-ab1c1767855f/expand",
+      "durationMs": 8846,
+      "status": 409
+    }
+  ],
+  "plans": [
+    {
+      "id": "0576867d-1e67-4e7a-89f2-1f759657a335",
+      "mode": "EXAM",
+      "version": 0,
+      "title": "Biology Exam",
+      "activeRevisionId": null,
+      "revisions": [
+        {
+          "id": "1ce9957f-5b40-4f0c-946b-92c13b570d15",
+          "source": "GENERATE",
+          "state": "FAILED",
+          "items": 0,
+          "minutes": 0,
+          "milestones": 0,
+          "semanticReview": null
+        }
+      ]
+    },
+    {
+      "id": "faebbe22-0d26-4b5c-855d-22997650489f",
+      "mode": "EXAM",
+      "version": 5,
+      "title": "Enzymes quiz",
+      "activeRevisionId": "80493dd5-1d5e-4dc2-8a2c-7ecd4cdc53d4",
+      "revisions": [
+        {
+          "id": "44a1ab75-0d71-4e81-8b51-284d4bd1d0d3",
+          "source": "GENERATE",
+          "state": "SEALED",
+          "items": 20,
+          "minutes": 900,
+          "milestones": 0,
+          "semanticReview": {
+            "critic": "UNREPAIRED",
+            "issues": 7,
+            "repaired": 0,
+            "schemaVersion": 1,
+            "softViolations": 0,
+            "deterministicIssues": 1
+          }
+        },
+        {
+          "id": "0d4bdef2-34f5-4be4-ac85-2aa7b2f0180b",
+          "source": "EDIT",
+          "state": "SEALED",
+          "items": 20,
+          "minutes": 885,
+          "milestones": 0,
+          "semanticReview": {
+            "critic": "NOT_RERUN",
+            "issues": 7,
+            "repaired": 0,
+            "schemaVersion": 1,
+            "softViolations": 0,
+            "deterministicIssues": 1
+          }
+        },
+        {
+          "id": "80493dd5-1d5e-4dc2-8a2c-7ecd4cdc53d4",
+          "source": "REBALANCE",
+          "state": "SEALED",
+          "items": 20,
+          "minutes": 885,
+          "milestones": 0,
+          "semanticReview": {
+            "critic": "UNREPAIRED",
+            "issues": 1,
+            "repaired": 0,
+            "schemaVersion": 1,
+            "softViolations": 0,
+            "deterministicIssues": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "c8035ff6-036f-47db-a653-03dfef73ad91",
+      "mode": "ROADMAP",
+      "version": 1,
+      "title": "Complete introductory Python course",
+      "activeRevisionId": null,
+      "revisions": [
+        {
+          "id": "256296b6-33dd-491a-b7cd-c8f276820ff2",
+          "source": "GENERATE",
+          "state": "SEALED",
+          "items": 0,
+          "minutes": 0,
+          "milestones": 7,
+          "semanticReview": {
+            "critic": "ISSUES_REPAIRED",
+            "issues": 1,
+            "repaired": 7,
+            "schemaVersion": 1,
+            "softViolations": 0,
+            "deterministicIssues": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "a53b65df-36a3-4e3a-9e7a-82526be57897",
+      "mode": "MASTERY",
+      "version": 2,
+      "title": "Master the chain rule",
+      "activeRevisionId": "b677f133-9d82-4af0-bc18-f57e582dc6c9",
+      "revisions": [
+        {
+          "id": "b677f133-9d82-4af0-bc18-f57e582dc6c9",
+          "source": "GENERATE",
+          "state": "SEALED",
+          "items": 13,
+          "minutes": 537,
+          "milestones": 0,
+          "semanticReview": {
+            "critic": "ISSUES_REPAIRED",
+            "issues": 0,
+            "repaired": 1,
+            "schemaVersion": 1,
+            "softViolations": 0,
+            "deterministicIssues": 0
+          }
+        }
+      ]
+    }
+  ],
+  "reconciliation": [
+    {
+      "itemKey": "ea1f8086-19c5-41fa-aff6-2f4d8ce5bb89",
+      "questId": 2572,
+      "revisionCriteria": "Active site structure and specificity explained from memory with no notes, then checked against notes.",
+      "revisionDescription": "Without notes, write out the structure of the active site and explain how it relates to enzyme specificity.",
+      "questDescription": "Write from memory the roles of active site, substrate and enzyme-substrate complex, then check against notes.\n\nDone when: Produce a labelled recall sheet with at least five correct statements about active site and specificity.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "db88c5ec-4141-4bb1-9858-3927102ac136",
+      "questId": 2573,
+      "revisionCriteria": "All questions attempted and marked, with corrections noted for any errors.",
+      "revisionDescription": "Work through questions on temperature, pH, substrate and enzyme concentration effects on rate.",
+      "questDescription": "Answer short questions on temperature, pH and substrate concentration effects, then mark and correct errors.\n\nDone when: Complete at least six short-answer questions and write one correction for each error.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "a0843054-28af-41e3-8369-1cf4d692e73f",
+      "questId": 2574,
+      "revisionCriteria": "Can annotate a rate graph and write a full denaturation explanation without prompts.",
+      "revisionDescription": "Review how to read and sketch rate graphs and explain denaturation in terms of active site shape.",
+      "questDescription": "Review graph shapes for enzyme rate and explain denaturation in terms of active site shape.\n\nDone when: Annotate two rate graphs and write a two-sentence explanation of denaturation.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "6e8b2c1e-8b99-4c88-ba20-7c3591b0d493",
+      "questId": 2575,
+      "revisionCriteria": "Full set completed within the time limit and marked, with errors logged.",
+      "revisionDescription": "Complete a timed set of short-answer enzyme questions under exam timing.",
+      "questDescription": "Complete a timed set of mixed enzyme short-answer questions and note any gaps.\n\nDone when: Finish the timed set within 35 minutes and list two topics needing further review.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "8cb4d4ab-84ae-46a4-983b-b396ae5664e7",
+      "questId": 2576,
+      "revisionCriteria": "All definitions written from memory and checked, with gaps corrected.",
+      "revisionDescription": "From memory, list and define competitive and non-competitive inhibition and the role of cofactors and coenzymes.",
+      "questDescription": "Write definitions and examples of competitive and non-competitive inhibition, plus cofactor roles.\n\nDone when: Produce a comparison table with correct definitions for both inhibitor types and one cofactor example.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "6a0c0c3b-a1a5-4c63-8189-8b0050a8dfd0",
+      "questId": 2577,
+      "revisionCriteria": "Questions completed and marked, with a correction for each mistake.",
+      "revisionDescription": "Answer applied questions distinguishing inhibition types and explaining cofactor roles.",
+      "questDescription": "Answer applied questions comparing competitive and non-competitive inhibition and cofactor effects.\n\nDone when: Complete at least five applied questions and correct any wrong comparisons.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "5f83c0d2-81ea-4c08-b911-388abbb8c740",
+      "questId": 2578,
+      "revisionCriteria": "Review your notes, then list the points you could not recall.",
+      "revisionDescription": "Review the design, variables and improvements for enzyme practical investigations.",
+      "questDescription": "Review variables, controls and reliability in enzyme practical investigations.\n\nDone when: Write a variable table for one enzyme investigation with independent, dependent and two control variables.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "e2d1cc72-35a0-41fb-92cd-ebaad2b2a5a5",
+      "questId": 2579,
+      "revisionCriteria": "Set completed within the time limit and marked, with errors logged.",
+      "revisionDescription": "Complete timed practical and data-handling enzyme questions.",
+      "questDescription": "Complete timed questions on enzyme practicals, data interpretation and error identification.\n\nDone when: Finish the timed set and write one correction for each data-interpretation error.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "9f7da5c0-7eec-4fac-8368-f12f3db247bf",
+      "questId": 2580,
+      "revisionCriteria": "Complete summary written from memory and checked, with weak points listed.",
+      "revisionDescription": "Write a full topic summary from memory covering structure, mechanism, factors, inhibition and practicals.",
+      "questDescription": "Write a one-page summary of enzymes from memory, covering structure, rate factors, inhibition and practicals.\n\nDone when: Recall the core points from memory, then check and correct the gaps.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "5e46dd4f-0f09-4bbb-97c7-dc8f6d38c14d",
+      "questId": 2581,
+      "revisionCriteria": "All questions attempted and marked, with corrections recorded.",
+      "revisionDescription": "Work through a mixed set of exam-style enzyme questions.",
+      "questDescription": "Answer a mixed set of enzyme exam-style questions and correct all errors.\n\nDone when: Complete at least eight mixed questions and write corrections for every error.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "ca696a0b-5854-49e6-9c90-8381fd5c8495",
+      "questId": 2582,
+      "revisionCriteria": "Full set completed within the time limit and marked, with errors logged.",
+      "revisionDescription": "Complete a full-topic timed set covering all enzyme content.",
+      "questDescription": "Complete a timed full-topic enzyme question set and record time and accuracy.\n\nDone when: Finish the timed set within 40 minutes and record two areas for final review.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "3ff88af1-aa64-4a3c-815a-92ad96517b19",
+      "questId": 2583,
+      "revisionCriteria": "Every logged error reworked and a corrected answer written for each.",
+      "revisionDescription": "Review the error log from timed practice and rework the questions that went wrong.",
+      "questDescription": "Review the error log from timed practice and rewrite corrected answers for recurring mistakes.\n\nDone when: Rewrite corrected answers for at least three recurring errors from the error log.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "e1482457-e42a-467c-bda0-7a604ea70108",
+      "questId": 2584,
+      "revisionCriteria": "All questions completed and marked, with corrections for any errors.",
+      "revisionDescription": "Work through graph interpretation and calculation questions on enzyme rates.",
+      "questDescription": "Answer graph-reading and simple rate-calculation questions on enzymes.\n\nDone when: Complete at least five graph or calculation questions and correct any errors.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "beaa4544-bc24-49c1-81fc-f74f61b5b8d3",
+      "questId": 2585,
+      "revisionCriteria": "All definitions and equations written from memory and checked, with gaps corrected.",
+      "revisionDescription": "Recall key enzyme definitions and any rate equations from memory.",
+      "questDescription": "Write key enzyme definitions and any rate equations from memory, then check accuracy.\n\nDone when: Produce a definitions list with at least six correct terms and one correct rate equation.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "0cf288f9-5293-46e4-8990-a4fa5bb25804",
+      "questId": 2586,
+      "revisionCriteria": "Set completed within the time limit and marked, with errors logged.",
+      "revisionDescription": "Complete a further timed mixed question set under exam conditions.",
+      "questDescription": "Complete a timed mixed enzyme question set covering all subtopics.\n\nDone when: Finish the timed set within 40 minutes and list two remaining weak areas.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "6d3b0302-4c73-4035-a14b-3b3a5748f851",
+      "questId": 2587,
+      "revisionCriteria": "Weak areas listed and each one reworked with corrected answers.",
+      "revisionDescription": "Identify and rework the weakest areas highlighted by recent timed practice.",
+      "questDescription": "Review the two weak areas identified in timed practice and write targeted summary notes.\n\nDone when: Write targeted summary notes for both weak areas with at least three correct points each.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "834bf744-9f41-4845-83bb-eb35f5adcd4c",
+      "questId": 2588,
+      "revisionCriteria": "Extended answers written under exam conditions and marked against the expected points.",
+      "revisionDescription": "Write full extended answers to exam-style enzyme questions.",
+      "questDescription": "Write extended answers to enzyme questions, focusing on structure, rate factors and inhibition.\n\nDone when: Write at least three extended answers and self-check each against key points.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "fb8a49a0-74a4-4b08-979f-e08684a52800",
+      "questId": 2589,
+      "revisionCriteria": "Set completed within the time limit and marked, with errors logged.",
+      "revisionDescription": "Complete a final timed mixed set covering the whole topic.",
+      "questDescription": "Complete a final timed mixed enzyme question set and record accuracy and timing.\n\nDone when: Finish the timed set within 40 minutes and record accuracy and two final review points.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "d44ad1fd-a3b6-4dea-9698-fb9ab62aad94",
+      "questId": 2590,
+      "revisionCriteria": "All remaining logged errors reworked and the error log cleared.",
+      "revisionDescription": "Rework any remaining errors from the final timed set and close out the error log.",
+      "questDescription": "Review the final timed set errors and rewrite corrected answers for any recurring mistakes.\n\nDone when: Rewrite corrected answers for at least two errors from the final timed set.",
+      "criteriaPresentInQuest": false
+    },
+    {
+      "itemKey": "97da62d6-1ad1-4125-94c8-bc13db773e2b",
+      "questId": 2591,
+      "revisionCriteria": "Key points and definitions recapped and any last uncertainties resolved.",
+      "revisionDescription": "Final pass over key points, definitions and high-frequency exam content for enzymes.",
+      "questDescription": "Review the one-page summary, definitions and error log for a final consolidated check.\n\nDone when: Read the summary, definitions and error log, and write three points to remember in the exam.",
+      "criteriaPresentInQuest": false
+    }
+  ],
+  "providerUsage": {
+    "callsLogged": 18,
+    "promptTokens": 38761,
+    "completionTokens": 40287,
+    "loggedEstimatedCostUsd": 0
+  },
+  "capturedAt": "2026-10-02T06:45:01.621Z",
+  "studySessions": [
+    {
+      "id": 863,
+      "userId": 1133,
+      "endedAt": "2026-10-02T06:44:29.621",
+      "questId": 2572,
+      "focusRate": 100,
+      "startedAt": "2026-10-02T06:43:59.323",
+      "subjectId": null,
+      "breakSeconds": 0,
+      "rewardsClaimed": true,
+      "durationMinutes": 0,
+      "durationSeconds": 15
+    }
+  ]
+}

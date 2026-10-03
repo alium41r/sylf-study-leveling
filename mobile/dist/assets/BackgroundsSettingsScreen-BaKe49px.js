@@ -1,0 +1,1 @@
+import{a as e}from"./vendor-motion-DkukPa_c.js";import{AppearanceSettingsScreen as t}from"./AppearanceSettingsScreen-Ko92ZCLW.js";var n=e();function r(){return(0,n.jsx)(t,{})}export{r as BackgroundsSettingsScreen,r as default};

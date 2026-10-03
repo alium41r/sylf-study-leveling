@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { TimezoneService } from "@/lib/timezone-service";
+import { getAccountCapability } from "./services/account-capability";
+import styles from "@/app/settings/components/SystemHubPage.module.css";
+import { Check, Copy, Clock, ShieldCheck, AlertCircle, RefreshCw, Send } from "lucide-react";
 
 export default function AccountInformation() {
   const { user, isLoading, mutateUser, refreshStats, login } = useAuth();
@@ -132,17 +135,12 @@ export default function AccountInformation() {
     
 
     try {
-      const res = await fetch("/api/auth/verify-email/send", {
-        method: "POST",
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setVerificationFeedback(data.message || "Verification link sent to your email.");
-        
-        setVerificationCooldown(30); // 60 seconds cooldown
+      const result = await getAccountCapability().sendEmailVerification();
+      if (result.ok) {
+        setVerificationFeedback(result.message || "Verification link sent to your email.");
+        setVerificationCooldown(30);
       } else {
-        setVerificationFeedback(data.error || "Failed to send verification link.");
+        setVerificationFeedback(result.error || "Failed to send verification link.");
       }
     } catch {
       setVerificationFeedback("Network error. Could not send verification link.");
@@ -210,28 +208,20 @@ export default function AccountInformation() {
     });
 
     try {
-      const res = await fetch("/api/user/account", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          name: formData.name,
-          email: formData.email,
-          timezone: formData.timezone,
-        }),
+      const result = await getAccountCapability().updateAccount({
+        username: formData.username,
+        name: formData.name,
+        email: formData.email,
+        timezone: formData.timezone,
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        if (data.user) {
-          login(data.user);
+      if (result.ok) {
+        if (result.data?.user) {
+          login(result.data.user);
         }
         setStatus({
           type: "success",
-          message: data.message || "Account preferences updated successfully.",
+          message: result.message || "Account preferences updated successfully.",
         });
         await refreshStats();
       } else {
@@ -239,7 +229,7 @@ export default function AccountInformation() {
         mutateUser(user);
         setStatus({
           type: "error",
-          message: data.error || "Failed to update account information.",
+          message: result.error || "Failed to update account information.",
         });
       }
     } catch (err) {
@@ -256,15 +246,15 @@ export default function AccountInformation() {
 
   if (isLoading || !user) {
     return (
-      <div className="animate-pulse space-y-6 pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-14 rounded" style={{ background: "var(--bg-shadow)" }}></div>
-          <div className="h-14 rounded" style={{ background: "var(--bg-shadow)" }}></div>
-          <div className="h-14 rounded" style={{ background: "var(--bg-shadow)" }}></div>
+      <div className="animate-pulse space-y-6 pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="h-16 rounded-xl bg-[var(--sub-surface)]"></div>
+          <div className="h-16 rounded-xl bg-[var(--sub-surface)]"></div>
+          <div className="h-16 rounded-xl bg-[var(--sub-surface)] md:col-span-2"></div>
         </div>
-        <div className="border-t pt-6 grid grid-cols-1 md:grid-cols-2 gap-6" style={{ borderColor: "var(--border-subtle)" }}>
-          <div className="h-14 rounded" style={{ background: "var(--bg-shadow)" }}></div>
-          <div className="h-14 rounded" style={{ background: "var(--bg-shadow)" }}></div>
+        <div className="border-t border-[var(--subtle-line)] pt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="h-20 rounded-xl bg-[var(--sub-surface)]"></div>
+          <div className="h-20 rounded-xl bg-[var(--sub-surface)]"></div>
         </div>
       </div>
     );
@@ -282,36 +272,28 @@ export default function AccountInformation() {
   const isVerified = user.verificationStatus === "VERIFIED";
 
   return (
-    <form onSubmit={handleSave} className="space-y-8 pt-2">
+    <form onSubmit={handleSave} className="space-y-7 pt-1">
       {status.message && (
         <div
-          className={`p-4 rounded border text-xs flex items-center gap-2 font-['Rajdhani'] ${
+          className={`p-3.5 rounded-xl border text-xs flex items-center gap-2.5 font-['Rajdhani'] font-bold ${
             status.type === "success"
-              ? "bg-green-950/20 border-green-800/40 text-accent-green"
-              : "bg-red-950/20 border-red-900/50 text-accent-red"
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+              : "bg-rose-500/10 border-rose-500/30 text-rose-500"
           }`}
-          style={{
-            color: status.type === "success" ? "var(--accent-green)" : "var(--accent-red)",
-            borderColor: status.type === "success" ? "rgba(34, 197, 94, 0.3)" : "rgba(239, 68, 68, 0.3)",
-          }}
         >
           {status.type === "success" ? (
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <Check className="w-4 h-4 shrink-0 text-emerald-500" />
           ) : (
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
           )}
           <span>{status.message}</span>
         </div>
       )}
 
       {/* Editable Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
         <div>
-          <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-2">
+          <label className={styles.configLabel}>
             Scholar Username
           </label>
           <input
@@ -319,18 +301,18 @@ export default function AccountInformation() {
             name="username"
             value={formData.username}
             onChange={handleChange}
-            className="input-field"
+            className={styles.configInput}
             placeholder="unique_username"
             disabled={isSaving}
             maxLength={20}
           />
-          <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+          <p className={styles.configHelper}>
             3-20 characters: lowercase letters, numbers, and underscores only.
           </p>
         </div>
 
         <div>
-          <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-2">
+          <label className={styles.configLabel}>
             Display Name
           </label>
           <input
@@ -338,18 +320,18 @@ export default function AccountInformation() {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="input-field"
+            className={styles.configInput}
             placeholder="Enter display name"
             disabled={isSaving}
             maxLength={30}
           />
-          <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+          <p className={styles.configHelper}>
             Appears on your hunter badge and ranking leaderboards.
           </p>
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-2">
+          <label className={styles.configLabel}>
             Email Address
           </label>
           <input
@@ -357,27 +339,24 @@ export default function AccountInformation() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="input-field"
+            className={styles.configInput}
             placeholder="scholar@example.com"
             disabled={isSaving}
           />
-          <p className="text-[0.65rem] mt-1" style={{ color: "var(--text-muted)" }}>
+          <p className={styles.configHelper}>
             Changing your email address will reset your status to Unverified and require re-verification.
           </p>
         </div>
       </div>
 
       {/* Timezone & Regional Schedule Settings */}
-      <div className="border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
-        <div className="flex items-center justify-between mb-4">
+      <div className="border-t border-[var(--subtle-line)] pt-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
-            <h3
-              className="text-sm font-['Rajdhani'] uppercase tracking-widest font-bold"
-              style={{ color: "var(--accent-primary-light)" }}
-            >
+            <h3 className="text-sm font-['Rajdhani'] uppercase tracking-widest font-bold text-[var(--ink)]">
               Timezone & Schedule Alignment
             </h3>
-            <p className="text-[0.7rem] text-muted mt-0.5">
+            <p className="text-xs text-[var(--muted)] mt-0.5">
               Controls daily AI quota resets, weekly quest deadlines (Sunday midnight), and calendar timestamps.
             </p>
           </div>
@@ -385,23 +364,17 @@ export default function AccountInformation() {
             type="button"
             onClick={handleAutoDetectTimezone}
             disabled={isSaving}
-            className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest px-3 py-1.5 rounded border transition-all flex items-center gap-1.5 hover:border-accent-primary"
-            style={{
-              background: "var(--bg-abyss)",
-              borderColor: "var(--border-active)",
-              color: "var(--accent-primary-light)",
-            }}
+            className={styles.btnSecondary}
+            style={{ padding: "6px 14px", fontSize: "0.75rem" }}
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Auto-Detect
+            <Clock className="w-3.5 h-3.5" />
+            <span>Auto-Detect</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
           <div>
-            <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-2">
+            <label className={styles.configLabel}>
               Configured Timezone
             </label>
             <select
@@ -409,18 +382,14 @@ export default function AccountInformation() {
               value={formData.timezone}
               onChange={handleChange}
               disabled={isSaving}
-              className="input-field w-full cursor-pointer"
-              style={{
-                background: "var(--bg-abyss)",
-                color: "var(--text-primary)",
-              }}
+              className={styles.configSelect}
             >
               {Array.from(new Set(timezoneOptions.map((t) => t.region))).map((region) => (
-                <optgroup key={region} label={region} style={{ background: "#0a0d14", color: "#60a5fa" }}>
+                <optgroup key={region} label={region}>
                   {timezoneOptions
                     .filter((t) => t.region === region)
                     .map((tz) => (
-                      <option key={tz.value} value={tz.value} style={{ background: "#06090e", color: "#e2e8f0" }}>
+                      <option key={tz.value} value={tz.value}>
                         {tz.label} ({tz.offset})
                       </option>
                     ))}
@@ -429,29 +398,17 @@ export default function AccountInformation() {
             </select>
           </div>
 
-          <div
-            className="p-3.5 rounded border flex flex-col justify-center"
-            style={{
-              background: "rgba(255, 255, 255, 0.02)",
-              borderColor: "var(--border-subtle)",
-            }}
-          >
+          <div className="p-4 rounded-xl border border-[var(--sub-border)] bg-[var(--sub-surface)] flex flex-col justify-center">
             <div className="flex items-center justify-between">
-              <span className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest text-muted">
+              <span className={styles.configLabel} style={{ marginBottom: 0 }}>
                 Current Local Time
               </span>
-              <span
-                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
-                style={{ background: "var(--accent-primary)" }}
-              />
+              <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
             </div>
-            <div
-              className="font-mono text-base font-bold mt-1"
-              style={{ color: "var(--accent-primary-light)" }}
-            >
+            <div className="font-mono text-xl font-bold text-[var(--accent)] mt-1 tracking-wider">
               {liveTime || "Calculating..."}
             </div>
-            <span className="text-[0.6rem] text-muted mt-0.5">
+            <span className="text-[0.68rem] text-[var(--quiet)] mt-0.5">
               Active: {formData.timezone}
             </span>
           </div>
@@ -459,174 +416,108 @@ export default function AccountInformation() {
       </div>
 
       {/* Read-Only System Identity Info */}
-      <div className="border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
-        <h3
-          className="text-sm font-['Rajdhani'] uppercase tracking-widest mb-6 font-bold"
-          style={{ color: "var(--accent-primary-light)" }}
-        >
-          System Identity
+      <div className="border-t border-[var(--subtle-line)] pt-6">
+        <h3 className="text-sm font-['Rajdhani'] uppercase tracking-widest mb-4 font-bold text-[var(--ink)]">
+          System Identity Ledger
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
-          <div>
-            <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-1">
-              Scholar ID
-            </label>
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="p-4 rounded-xl border border-[var(--sub-border)] bg-[var(--sub-surface)]">
+            <span className={styles.configLabel}>Scholar ID</span>
+            <div className="flex items-center justify-between mt-1 gap-2">
+              <span className="font-mono text-base font-bold text-[var(--ink)] truncate">
                 {scholarId}
               </span>
               <button
                 type="button"
                 onClick={handleCopyId}
-                className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest px-3 py-1 rounded border transition-colors flex items-center gap-1 min-w-[70px] justify-center"
-                style={{
-                  background: "var(--bg-abyss)",
-                  borderColor: "var(--border-subtle)",
-                  color: copied ? "var(--accent-green)" : "var(--text-muted)",
-                }}
+                className={styles.btnSecondary}
+                style={{ padding: "4px 10px", fontSize: "0.7rem", flexShrink: 0 }}
+                title="Copy Scholar ID"
               >
                 {copied ? (
-                  <span className="flex items-center gap-1" style={{ color: "var(--accent-green)" }}>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Copied
-                  </span>
+                  <Check className="w-3 h-3 text-emerald-500" />
                 ) : (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Copy
-                  </>
+                  <Copy className="w-3 h-3" />
                 )}
+                <span>{copied ? "Copied" : "Copy"}</span>
               </button>
             </div>
           </div>
 
-          <div>
-            <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-1">
-              Joined System
-            </label>
-            <span
-              className="font-['Rajdhani'] font-semibold text-lg"
-              style={{ color: "var(--text-primary)" }}
-            >
+          <div className="p-4 rounded-xl border border-[var(--sub-border)] bg-[var(--sub-surface)]">
+            <span className={styles.configLabel}>Joined System</span>
+            <span className="font-['Rajdhani'] font-bold text-base text-[var(--ink)] block mt-1 truncate">
               {joinDate}
             </span>
           </div>
 
-          <div>
-            <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-1">
-              Account Status
-            </label>
-            <div className="flex items-center gap-2">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{
-                  background: "var(--accent-green)",
-                  boxShadow: "0 0 10px rgba(34, 197, 94, 0.5)",
-                }}
-              />
-              <span
-                className="font-['Rajdhani'] font-semibold text-lg"
-                style={{ color: "var(--text-primary)" }}
-              >
+          <div className="p-4 rounded-xl border border-[var(--sub-border)] bg-[var(--sub-surface)]">
+            <span className={styles.configLabel}>Account Standing</span>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="font-['Rajdhani'] font-bold text-base text-emerald-500">
                 Active
               </span>
             </div>
           </div>
 
-          <div>
-            <label className="block text-[0.7rem] font-['Rajdhani'] uppercase tracking-widest text-muted mb-1">
-              Verification Status
-            </label>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                {isVerified ? (
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{
-                        background: "var(--accent-green)",
-                        boxShadow: "0 0 10px rgba(34, 197, 94, 0.5)",
-                      }}
-                    />
-                    <span
-                      className="font-['Rajdhani'] font-semibold text-lg"
-                      style={{ color: "var(--accent-green)" }}
-                    >
-                      Verified
-                    </span>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{
-                          background: "var(--accent-red)",
-                          boxShadow: "0 0 8px rgba(239, 68, 68, 0.5)",
-                        }}
-                      />
-                      <span
-                        className="font-['Rajdhani'] font-semibold text-lg"
-                        style={{ color: "var(--accent-red)" }}
-                      >
-                        Unverified
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleSendVerification}
-                      disabled={isSendingVerification || verificationCooldown > 0}
-                      className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest px-3 py-1 rounded border transition-all flex items-center gap-1.5"
-                      style={{
-                        background: verificationCooldown > 0 ? "rgba(255,255,255,0.03)" : "var(--accent-primary-dim)",
-                        borderColor: "var(--border-active)",
-                        color: "var(--accent-primary-light)",
-                        opacity: isSendingVerification || verificationCooldown > 0 ? 0.6 : 1,
-                        cursor: isSendingVerification || verificationCooldown > 0 ? "not-allowed" : "pointer",
-                      }}
-                    >
-                      {isSendingVerification ? (
-                        <>
-                          <div className="w-3 h-3 border border-t-transparent rounded-full animate-spin" style={{ borderColor: "var(--accent-primary-light)", borderTopColor: "transparent" }} />
-                          <span>Sending...</span>
-                        </>
-                      ) : verificationCooldown > 0 ? (
-                        <span>Resend in {verificationCooldown}s</span>
-                      ) : (
-                        <span>Send Link</span>
-                      )}
-                    </button>
-                  </>
-                )}
+          <div className="p-4 rounded-xl border border-[var(--sub-border)] bg-[var(--sub-surface)]">
+            <span className={styles.configLabel}>Verification</span>
+            <div className="flex items-center justify-between mt-1 gap-2">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isVerified
+                      ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                      : "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                  }`}
+                />
+                <span
+                  className={`font-['Rajdhani'] font-bold text-base ${
+                    isVerified ? "text-emerald-500" : "text-amber-500"
+                  }`}
+                >
+                  {isVerified ? "Verified" : "Unverified"}
+                </span>
               </div>
-
-              {verificationFeedback && (
-                <div className="space-y-1 mt-1">
-                  <p
-                    className="text-[0.7rem] font-['Rajdhani']"
-                    style={{
-                      color: verificationFeedback.includes("sent") ? "var(--accent-green)" : "var(--accent-red)",
-                    }}
-                  >
-                    {verificationFeedback}
-                  </p>
-                </div>
+              {!isVerified && (
+                <button
+                  type="button"
+                  onClick={handleSendVerification}
+                  disabled={isSendingVerification || verificationCooldown > 0}
+                  className={styles.btnSecondary}
+                  style={{ padding: "4px 10px", fontSize: "0.7rem", flexShrink: 0 }}
+                >
+                  {isSendingVerification ? (
+                    "Sending..."
+                  ) : verificationCooldown > 0 ? (
+                    `${verificationCooldown}s`
+                  ) : (
+                    "Verify"
+                  )}
+                </button>
               )}
             </div>
+            {verificationFeedback && (
+              <p
+                className={`text-[0.7rem] font-['Rajdhani'] mt-1.5 ${
+                  verificationFeedback.includes("sent")
+                    ? "text-emerald-500"
+                    : "text-rose-500"
+                }`}
+              >
+                {verificationFeedback}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="border-t pt-6 flex justify-end" style={{ borderColor: "var(--border-subtle)" }}>
+      <div className="border-t border-[var(--subtle-line)] pt-5 flex justify-end">
         <button
           type="submit"
-          className="btn-primary flex items-center gap-2"
+          className={`${styles.btnPrimary} w-full sm:w-auto`}
           disabled={!isDirty || isSaving}
-          style={{ opacity: !isDirty || isSaving ? 0.5 : 1, cursor: !isDirty || isSaving ? "not-allowed" : "pointer" }}
         >
           {isSaving ? (
             <>
@@ -641,3 +532,4 @@ export default function AccountInformation() {
     </form>
   );
 }
+

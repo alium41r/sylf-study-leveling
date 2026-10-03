@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { FocusToolsProvider, useFocusTools } from "@/app/focus/components/FocusToolsContext";
 import FocusToolsDock from "@/app/focus/components/FocusToolsDock";
 import FocusToolWindow from "@/app/focus/components/FocusToolWindow";
@@ -10,6 +10,7 @@ import FormulasTool from "@/app/focus/components/tools/FormulasTool";
 import ScratchpadTool from "@/app/focus/components/tools/ScratchpadTool";
 import AiAssistantTool from "@/app/focus/components/tools/AiAssistantTool";
 import AudioMixerTool from "@/app/focus/components/tools/AudioMixerTool";
+import { CustomAudioContext, CustomAudioContextType } from "@/app/components/CustomAudioContext";
 
 // Mock AcousticsContext
 vi.mock("@/app/components/AcousticsContext", () => ({
@@ -45,15 +46,31 @@ vi.mock("@/app/components/AuthProvider", () => ({
 
 // Helper test component to inspect context
 function TestConsumer() {
-  const { activeTool, openTool, closeTool, windowMode, setWindowMode, dockAnchor, setDockAnchor } = useFocusTools();
+  const {
+    activeTool,
+    openTools,
+    isMultiToolMode,
+    toggleMultiToolMode,
+    openTool,
+    closeTool,
+    windowMode,
+    setWindowMode,
+    dockAnchor,
+    setDockAnchor,
+  } = useFocusTools();
   return (
     <div>
       <span data-testid="active-tool">{activeTool || "none"}</span>
+      <span data-testid="open-tools">{openTools.join(",") || "empty"}</span>
+      <span data-testid="multi-mode">{String(isMultiToolMode)}</span>
       <span data-testid="window-mode">{windowMode}</span>
       <span data-testid="dock-anchor">{dockAnchor}</span>
       <button onClick={() => openTool("calculator")}>Open Calc</button>
       <button onClick={() => openTool("ai")}>Open AI</button>
-      <button onClick={closeTool}>Close Tool</button>
+      <button onClick={() => openTool("notes")}>Open Notes</button>
+      <button onClick={() => closeTool("calculator")}>Close Calc</button>
+      <button onClick={() => closeTool()}>Close Tool</button>
+      <button onClick={toggleMultiToolMode}>Toggle Multi</button>
       <button onClick={() => setWindowMode("minimized")}>Minimize</button>
       <button onClick={() => setDockAnchor("bottom-left")}>Snap Left</button>
     </div>
@@ -175,23 +192,65 @@ describe("Focus Tools Dock & Expandable Window System", () => {
 
       expect(screen.getByTestId("active-tool").textContent).toBe("none");
     });
+
+    it("handles multi-tool mode, multiple open tools, and closing individual tools", () => {
+      render(
+        <FocusToolsProvider>
+          <TestConsumer />
+        </FocusToolsProvider>
+      );
+
+      expect(screen.getByTestId("multi-mode").textContent).toBe("false");
+      expect(screen.getByTestId("open-tools").textContent).toBe("empty");
+
+      // Enable multi mode
+      fireEvent.click(screen.getByText("Toggle Multi"));
+      expect(screen.getByTestId("multi-mode").textContent).toBe("true");
+
+      // Open Calc and Notes
+      fireEvent.click(screen.getByText("Open Calc"));
+      fireEvent.click(screen.getByText("Open Notes"));
+      expect(screen.getByTestId("open-tools").textContent).toBe("calculator,notes");
+      expect(screen.getByTestId("active-tool").textContent).toBe("notes");
+
+      // Close Calc
+      fireEvent.click(screen.getByText("Close Calc"));
+      expect(screen.getByTestId("open-tools").textContent).toBe("notes");
+      expect(screen.getByTestId("active-tool").textContent).toBe("notes");
+
+      // Open Calc again
+      fireEvent.click(screen.getByText("Open Calc"));
+      expect(screen.getByTestId("open-tools").textContent).toBe("notes,calculator");
+      expect(screen.getByTestId("active-tool").textContent).toBe("calculator");
+
+      // Turn off multi mode -> only active tool (calculator) remains
+      fireEvent.click(screen.getByText("Toggle Multi"));
+      expect(screen.getByTestId("multi-mode").textContent).toBe("false");
+      expect(screen.getByTestId("open-tools").textContent).toBe("calculator");
+    });
   });
 
   describe("FocusToolsDock Component", () => {
-    it("renders the trigger pill and expands on click", () => {
+    it("renders the compact collapsed trigger pill and expands directly into the tools grid on first click", () => {
       render(
         <FocusToolsProvider>
           <FocusToolsDock />
         </FocusToolsProvider>
       );
 
+      // Collapsed state: trigger pill is rendered
       const dockButton = screen.getByTitle(/Toggle Study Utilities Dock/i);
       expect(dockButton).toBeDefined();
+      expect(dockButton.getAttribute("aria-expanded")).toBe("false");
 
-      // Click to expand dock
+      // In collapsed state, tools grid is not in the DOM
+      expect(screen.queryByLabelText("Calculator")).toBeNull();
+
+      // First click immediately reveals the tools grid
       fireEvent.click(dockButton);
+      expect(dockButton.getAttribute("aria-expanded")).toBe("true");
 
-      // Verify all tool launcher icons appear
+      // Verify all tool launcher tiles appear immediately on first click
       expect(screen.getByLabelText("Calculator")).toBeDefined();
       expect(screen.getByLabelText("AI Assistant")).toBeDefined();
       expect(screen.getByLabelText("Audio Mixer")).toBeDefined();
@@ -207,7 +266,7 @@ describe("Focus Tools Dock & Expandable Window System", () => {
         </FocusToolsProvider>
       );
 
-      // Expand dock
+      // Expand dock on first click
       fireEvent.click(screen.getByTitle(/Toggle Study Utilities Dock/i));
 
       // Click Calculator icon
@@ -215,6 +274,356 @@ describe("Focus Tools Dock & Expandable Window System", () => {
 
       // Verify Calculator window appears
       expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
+    });
+
+    it("allows hiding session controls via the hide button and restores it via unhide trigger", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+        </FocusToolsProvider>
+      );
+
+      // Initially session controls are visible with Hide Toolbar button
+      const hideButton = screen.getByTitle(/Hide Toolbar \(Alt\+H\)/i);
+      expect(hideButton).toBeDefined();
+      expect(screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i })).toBeDefined();
+
+      // Click hide
+      fireEvent.click(hideButton);
+
+      // Multi-Tool button in session controls is now hidden
+      expect(screen.queryByRole("button", { name: /Toggle Multi-Tool Mode/i })).toBeNull();
+
+      // Tools grid is STILL visible!
+      expect(screen.getByLabelText("Calculator")).toBeDefined();
+
+      // Reveal button appears
+      const showButton = screen.getByTitle(/Show Study Tools Toolbar/i);
+      expect(showButton).toBeDefined();
+
+      // Click reveal button to restore session controls
+      fireEvent.click(showButton);
+
+      // Session controls row is back
+      expect(screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i })).toBeDefined();
+      expect(screen.getByTitle(/Hide Toolbar \(Alt\+H\)/i)).toBeDefined();
+    });
+
+    it("toggles session controls visibility via Alt+H shortcut", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+        </FocusToolsProvider>
+      );
+
+      // Full session controls row is visible
+      expect(screen.getByTitle(/Hide Toolbar \(Alt\+H\)/i)).toBeDefined();
+
+      // Press Alt+H
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "h", altKey: true }));
+      });
+
+      // Now session controls are hidden and show trigger is visible
+      expect(screen.getByTitle(/Show Study Tools Toolbar/i)).toBeDefined();
+      expect(screen.queryByTitle(/Hide Toolbar \(Alt\+H\)/i)).toBeNull();
+
+      // Press Alt+H again to restore
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "h", altKey: true }));
+      });
+
+      // Full session controls row is back
+      expect(screen.getByTitle(/Hide Toolbar \(Alt\+H\)/i)).toBeDefined();
+    });
+
+    it("restores saved hidden preference from localStorage on mount", () => {
+      localStorage.setItem("focus_toolbar_hidden", "true");
+
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+        </FocusToolsProvider>
+      );
+
+      // Minimal mode: show trigger is immediately shown because session controls were saved as hidden
+      expect(screen.getByTitle(/Show Study Tools Toolbar/i)).toBeDefined();
+      expect(screen.queryByTitle(/Hide Toolbar \(Alt\+H\)/i)).toBeNull();
+      // Tools grid remains available
+      expect(screen.getByLabelText("Calculator")).toBeDefined();
+    });
+
+    it("closes the Tool Island panel when Escape key is pressed", async () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock />
+        </FocusToolsProvider>
+      );
+
+      const dockButton = screen.getByTitle(/Toggle Study Utilities Dock/i);
+      fireEvent.click(dockButton);
+      expect(screen.getByLabelText("Calculator")).toBeDefined();
+      expect(dockButton.getAttribute("aria-expanded")).toBe("true");
+
+      // Press Escape
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+      });
+
+      expect(dockButton.getAttribute("aria-expanded")).toBe("false");
+      await waitFor(() => {
+        expect(screen.queryByLabelText("Calculator")).toBeNull();
+      });
+    });
+
+    it("closes the Tool Island when clicking outside the panel", async () => {
+      render(
+        <div>
+          <div data-testid="outside-area">Outside Area</div>
+          <FocusToolsProvider>
+            <FocusToolsDock />
+          </FocusToolsProvider>
+        </div>
+      );
+
+      const dockButton = screen.getByTitle(/Toggle Study Utilities Dock/i);
+      fireEvent.click(dockButton);
+      expect(screen.getByLabelText("Calculator")).toBeDefined();
+      expect(dockButton.getAttribute("aria-expanded")).toBe("true");
+
+      // Click outside
+      act(() => {
+        fireEvent.mouseDown(screen.getByTestId("outside-area"));
+      });
+
+      expect(dockButton.getAttribute("aria-expanded")).toBe("false");
+      await waitFor(() => {
+        expect(screen.queryByLabelText("Calculator")).toBeNull();
+      });
+    });
+  });
+
+  describe("Multi-Tool Mode & Concurrent Containers", () => {
+    it("toggles multi-tool mode via dock button and hotkey Alt+U", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+        </FocusToolsProvider>
+      );
+
+      // Desktop Multi-Tool button initially shows MULTI: OFF
+      const multiButton = screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i });
+      expect(multiButton.textContent).toContain("MULTI: OFF");
+
+      // Click to toggle
+      fireEvent.click(multiButton);
+      expect(multiButton.textContent).toContain("MULTI: ON");
+
+      // Press Alt+U to toggle back to OFF
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "u", altKey: true }));
+      });
+      expect(multiButton.textContent).toContain("MULTI: OFF");
+
+      // Press Alt+U again to toggle ON
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "u", altKey: true }));
+      });
+      expect(multiButton.textContent).toContain("MULTI: ON");
+    });
+
+    it("opens multiple tool windows simultaneously when multi-tool mode is enabled", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+          <FocusToolWindow />
+        </FocusToolsProvider>
+      );
+
+      // Turn on multi-tool mode
+      const multiButton = screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i });
+      fireEvent.click(multiButton);
+
+      // Open Calculator
+      fireEvent.click(screen.getByLabelText("Calculator"));
+      expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
+
+      // Open Scratchpad (notes)
+      fireEvent.click(screen.getByLabelText("Scratchpad"));
+
+      // Both windows should be mounted simultaneously!
+      expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
+      expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
+    });
+
+    it("closes individual tool window leaving the other open", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+          <FocusToolWindow />
+        </FocusToolsProvider>
+      );
+
+      // Enable multi-tool mode
+      fireEvent.click(screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i }));
+
+      // Open Calculator + Scratchpad
+      fireEvent.click(screen.getByLabelText("Calculator"));
+      fireEvent.click(screen.getByLabelText("Scratchpad"));
+
+      expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
+      expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
+
+      // Click close button on Calculator window
+      const closeCalcButton = screen.getByTitle("Close SYSTEM CALCULATOR Window");
+      act(() => {
+        fireEvent.click(closeCalcButton);
+      });
+
+      // Calculator should be closed, Scratchpad remains open
+      expect(screen.queryByText("SYSTEM CALCULATOR")).toBeNull();
+      expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
+    });
+
+    it("minimizes and restores individual tool window independently", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+          <FocusToolWindow />
+        </FocusToolsProvider>
+      );
+
+      // Enable multi-tool mode
+      fireEvent.click(screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i }));
+
+      // Open Calculator and Scratchpad
+      fireEvent.click(screen.getByLabelText("Calculator"));
+      fireEvent.click(screen.getByLabelText("Scratchpad"));
+
+      // Find minimize buttons
+      const minimizeButtons = screen.getAllByTitle("Minimize Window");
+      expect(minimizeButtons.length).toBe(2);
+
+      // Minimize the first window
+      fireEvent.click(minimizeButtons[0]);
+
+      // Should now have 1 restore button and 1 minimize button
+      expect(screen.getByTitle("Restore Window")).toBeDefined();
+      expect(screen.getAllByTitle("Minimize Window").length).toBe(1);
+
+      // Restore it back
+      fireEvent.click(screen.getByTitle("Restore Window"));
+      expect(screen.getAllByTitle("Minimize Window").length).toBe(2);
+    });
+
+    it("retains only the active tool when multi-tool mode is turned off", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+          <FocusToolWindow />
+        </FocusToolsProvider>
+      );
+
+      // Turn on multi mode
+      const multiButton = screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i });
+      fireEvent.click(multiButton);
+
+      // Open Calculator then Scratchpad (Scratchpad is active)
+      fireEvent.click(screen.getByLabelText("Calculator"));
+      fireEvent.click(screen.getByLabelText("Scratchpad"));
+
+      expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
+      expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
+
+      // Turn off multi-tool mode
+      act(() => {
+        fireEvent.click(multiButton);
+      });
+
+      // Only the active tool (Scratchpad) should remain
+      expect(screen.queryByText("SYSTEM CALCULATOR")).toBeNull();
+      expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
+    });
+
+    it("limits concurrent open tool containers to 2 and replaces oldest inactive tool when a third is opened", () => {
+      // Simulate standard laptop viewport (1024px)
+      window.innerWidth = 1024;
+      window.dispatchEvent(new Event("resize"));
+
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+          <FocusToolWindow />
+        </FocusToolsProvider>
+      );
+
+      // Turn on multi mode
+      const multiButton = screen.getByRole("button", { name: /Toggle Multi-Tool Mode/i });
+      fireEvent.click(multiButton);
+
+      // Open Tool 1: Calculator
+      fireEvent.click(screen.getByLabelText("Calculator"));
+      expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
+
+      // Open Tool 2: Scratchpad (now 2 tools open)
+      fireEvent.click(screen.getByLabelText("Scratchpad"));
+      expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
+      expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
+
+      // Open Tool 3: AI Assistant (exceeds limit 2 -> oldest inactive tool Calculator should be replaced)
+      act(() => {
+        fireEvent.click(screen.getByLabelText("AI Assistant"));
+      });
+
+      // Max 2 containers: Calculator closed, Scratchpad and AI Assistant open!
+      expect(screen.queryByText("SYSTEM CALCULATOR")).toBeNull();
+      expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
+      expect(screen.getByText("AI STUDY ASSISTANT")).toBeDefined();
+    });
+
+    it("ensures there is only 1 multi-tool mode button rendered without duplicates in window headers", () => {
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock defaultExpanded={true} />
+          <FocusToolWindow />
+        </FocusToolsProvider>
+      );
+
+      // Enable multi mode and open two tools
+      const multiButtonsBefore = screen.getAllByRole("button", { name: /Toggle Multi-Tool Mode/i });
+      expect(multiButtonsBefore.length).toBe(1);
+
+      fireEvent.click(multiButtonsBefore[0]);
+      fireEvent.click(screen.getByLabelText("Calculator"));
+      fireEvent.click(screen.getByLabelText("Scratchpad"));
+
+      // With 2 windows open, there should STILL be only 1 multi-tool toggle button on the screen!
+      const multiButtonsAfter = screen.getAllByRole("button", { name: /Toggle Multi-Tool Mode/i });
+      expect(multiButtonsAfter.length).toBe(1);
+    });
+
+    it("renders and toggles multi-tool mode in mobile drawer sheet", () => {
+      // Simulate mobile viewport
+      window.innerWidth = 400;
+      window.dispatchEvent(new Event("resize"));
+
+      render(
+        <FocusToolsProvider>
+          <FocusToolsDock />
+        </FocusToolsProvider>
+      );
+
+      // Open mobile sheet
+      fireEvent.click(screen.getByTitle(/Toggle Study Utilities Dock/i));
+
+      // Verify Multi-Tool Windows label and button exist
+      expect(screen.getByText("Multi-Tool Windows")).toBeDefined();
+      const mobileMultiBtn = screen.getByRole("button", { name: /MULTI: OFF/i });
+      expect(mobileMultiBtn).toBeDefined();
+
+      // Toggle multi-tool mode in mobile drawer
+      fireEvent.click(mobileMultiBtn);
+      expect(screen.getByRole("button", { name: /MULTI: ON/i })).toBeDefined();
     });
   });
 
@@ -559,5 +968,114 @@ describe("Focus Tools Dock & Expandable Window System", () => {
       expect(screen.getByText(/Deep Brown Noise/i)).toBeDefined();
       expect(screen.getByText(/White Noise/i)).toBeDefined();
     });
+
+    it("renders Custom Audio tab, switches view, and shows empty state with import button", () => {
+      render(
+        <FocusToolsProvider>
+          <AudioMixerTool />
+        </FocusToolsProvider>
+      );
+
+      // Verify Custom Audio tab exists
+      const customTab = screen.getByRole("button", { name: /^Custom Audio/i });
+      expect(customTab).toBeDefined();
+
+      // Switch to Custom Audio tab
+      fireEvent.click(customTab);
+
+      // Verify empty state and import button
+      expect(screen.getByText(/No Local Audio Added Yet/i)).toBeDefined();
+      expect(screen.getByText(/Local Audio Files \(0\)/i)).toBeDefined();
+      expect(screen.getAllByRole("button", { name: /Import Audio/i }).length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("switches to Custom Audio view when clicking CUSTOM category filter under soundscapes", () => {
+      render(
+        <FocusToolsProvider>
+          <AudioMixerTool />
+        </FocusToolsProvider>
+      );
+
+      // Find and click CUSTOM filter button
+      const customPill = screen.getByRole("button", { name: /Category filter: CUSTOM/i });
+      expect(customPill).toBeDefined();
+      fireEvent.click(customPill);
+
+      // View should have switched to Custom Audio view
+      expect(screen.getByText(/No Local Audio Added Yet/i)).toBeDefined();
+      expect(screen.getByText(/Local Audio Files \(0\)/i)).toBeDefined();
+    });
+
+    it("renders imported custom audio tracks, format badge, and active state when library is populated", () => {
+      const mockCustomContext: CustomAudioContextType = {
+        library: [
+          {
+            id: "study-lofi-1",
+            title: "Lofi Rain Beats",
+            originalFilename: "lofi-rain.mp3",
+            mimeType: "audio/mpeg",
+            sizeBytes: 3145728, // ~3 MB
+            duration: 180, // 3 mins
+            dateAdded: "2026-09-24T00:00:00.000Z",
+          },
+        ],
+        activeTrackId: "study-lofi-1",
+        activeEntry: {
+          id: "study-lofi-1",
+          title: "Lofi Rain Beats",
+          originalFilename: "lofi-rain.mp3",
+          mimeType: "audio/mpeg",
+          sizeBytes: 3145728,
+          duration: 180,
+          dateAdded: "2026-09-24T00:00:00.000Z",
+        },
+        isPlaying: true,
+        duration: 180,
+        volume: 75,
+        loop: false,
+        isLoading: false,
+        error: null,
+        importFile: vi.fn(),
+        playTrack: vi.fn(),
+        pause: vi.fn(),
+        resume: vi.fn(),
+        togglePlay: vi.fn(),
+        setActiveTrackId: vi.fn(),
+        playNextTrack: vi.fn(),
+        playPreviousTrack: vi.fn(),
+        seek: vi.fn(),
+        restart: vi.fn(),
+        setVolume: vi.fn(),
+        toggleMute: vi.fn(),
+        toggleLoop: vi.fn(),
+        renameTrack: vi.fn(),
+        removeTrack: vi.fn(),
+        refreshLibrary: vi.fn(),
+        subscribeToTime: () => () => {},
+        getCurrentTime: () => 45,
+      };
+
+      render(
+        <CustomAudioContext.Provider value={mockCustomContext}>
+          <FocusToolsProvider>
+            <AudioMixerTool />
+          </FocusToolsProvider>
+        </CustomAudioContext.Provider>
+      );
+
+      // Active custom track should be displayed in the top Now Playing deck
+      expect(screen.getByText("Lofi Rain Beats")).toBeDefined();
+      expect(screen.getByText(/MP3/i)).toBeDefined();
+      expect(screen.getByTitle("Pause Custom Audio")).toBeDefined();
+
+      // Switch to Custom Audio view
+      const customTab = screen.getByRole("button", { name: /^Custom Audio/i });
+      fireEvent.click(customTab);
+
+      // Track item should be listed in the library
+      expect(screen.getByText("Local Audio Files (1)")).toBeDefined();
+      expect(screen.getAllByText("Lofi Rain Beats").length).toBeGreaterThanOrEqual(1);
+    });
   });
 });
+

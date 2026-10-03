@@ -1,0 +1,6 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run __tests__/planner-v2/intelligence --reporter=json --outputFile=documentation/planner/reports/2026-10-03-phase-2/evidence/step1-supporting-units.json
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+JSON report written to /Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-03-phase-2/evidence/step1-supporting-units.json

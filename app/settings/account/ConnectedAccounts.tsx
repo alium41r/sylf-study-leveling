@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { getAccountCapability } from "./services/account-capability";
+import styles from "../components/SystemHubPage.module.css";
+import { Check, AlertCircle } from "lucide-react";
 
 interface ProviderConfig {
   id: string;
@@ -27,7 +30,7 @@ const PROVIDERS: ProviderConfig[] = [
     id: "github",
     name: "GitHub",
     icon: (
-      <svg className="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
+      <svg className="w-5 h-5 fill-current text-[var(--ink)]" viewBox="0 0 24 24">
         <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.304 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
       </svg>
     ),
@@ -62,7 +65,7 @@ interface ConnectedAccountInfo {
 
 export default function ConnectedAccounts() {
   const [connections, setConnections] = useState<Record<string, ConnectedAccountInfo>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -76,7 +79,6 @@ export default function ConnectedAccounts() {
 
   const fetchConnections = useCallback(async () => {
     try {
-      // Stale-while-revalidate: reopening account paints instantly.
       const data = await fetchCachedJSON<{ connections?: ConnectedAccountInfo[] }>(
         "/api/user/connections",
         { credentials: "include" },
@@ -96,7 +98,6 @@ export default function ConnectedAccounts() {
     }
   }, []);
 
-  // Check URL params for OAuth status (e.g. ?connected=github or ?error=...)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
@@ -138,15 +139,12 @@ export default function ConnectedAccounts() {
     setModalState({ isOpen: false, providerId: null });
 
     try {
-      const res = await fetch(`/api/user/connections/${providerId}`, {
-        method: "DELETE",
-      });
+      const result = await getAccountCapability().disconnectProvider(providerId);
 
-      const data = await res.json();
-      if (res.ok) {
+      if (result.ok) {
         await fetchConnections();
       } else {
-        setErrorMessage(data.error || "Could not disconnect account.");
+        setErrorMessage(result.error || "Could not disconnect account.");
       }
     } catch {
       setErrorMessage("Network error while disconnecting provider.");
@@ -156,32 +154,22 @@ export default function ConnectedAccounts() {
   const selectedProvider = PROVIDERS.find((p) => p.id === modalState.providerId);
 
   return (
-    <div className="pt-2 space-y-4">
+    <div className="pt-1 space-y-4">
       {successMessage && (
-        <div
-          className="p-4 rounded border text-xs flex items-center gap-2 font-['Rajdhani'] bg-emerald-950/20 border-emerald-900/50"
-          style={{ color: "var(--accent-green)" }}
-        >
-          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
+        <div className="p-3.5 rounded-xl border text-xs flex items-center gap-2 font-['Rajdhani'] font-bold bg-emerald-500/10 border-emerald-500/30 text-emerald-500">
+          <Check className="w-4 h-4 shrink-0 text-emerald-500" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div
-          className="p-4 rounded border text-xs flex items-center gap-2 font-['Rajdhani'] bg-red-950/20 border-red-900/50"
-          style={{ color: "var(--accent-red)" }}
-        >
-          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
+        <div className="p-3.5 rounded-xl border text-xs flex items-center gap-2 font-['Rajdhani'] font-bold bg-rose-500/10 border-rose-500/30 text-rose-500">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         {PROVIDERS.map((provider) => {
           const conn = connections[provider.id];
           const isConnected = conn?.isLinked;
@@ -193,61 +181,53 @@ export default function ConnectedAccounts() {
           return (
             <div
               key={provider.id}
-              className="p-4 border rounded flex items-center justify-between transition-colors"
-              style={{
-                background: "var(--bg-abyss)",
-                borderColor: "var(--border-subtle)",
-              }}
+              className="p-4 rounded-xl border border-[var(--sub-border)] bg-[var(--sub-surface)] flex items-center justify-between gap-3 transition-colors hover:border-[var(--line)]"
             >
-              <div className="flex items-center gap-4">
-                <div
-                  className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border"
-                  style={{
-                    background: isConnected ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.4)",
-                    borderColor: isConnected ? "var(--border-active)" : "var(--border-subtle)",
-                  }}
-                >
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-[var(--sub-border)] bg-[var(--chip-bg)]">
                   {provider.icon}
                 </div>
-                <div>
-                  <h4 className="font-['Rajdhani'] font-bold text-primary">{provider.name}</h4>
-                  {isConnected ? (
-                    <p
-                      className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest mt-0.5"
-                      style={{ color: "var(--accent-green)" }}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-['Rajdhani'] font-bold text-sm text-[var(--ink)]">
+                      {provider.name}
+                    </h4>
+                    <span
+                      className={`text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${
+                        isConnected
+                          ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-500"
+                          : "bg-[var(--chip-bg)] border-[var(--sub-border)] text-[var(--muted)]"
+                      }`}
                     >
-                      {displayHandle}
-                    </p>
-                  ) : (
-                    <p
-                      className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest mt-0.5"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      Not Connected
-                    </p>
-                  )}
+                      {isConnected ? "Linked" : "Disconnected"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--muted)] truncate mt-0.5 font-['Rajdhani']">
+                    {isConnected ? displayHandle : "Not connected to system"}
+                  </p>
                 </div>
               </div>
 
-              {isConnected ? (
-                <button
-                  type="button"
-                  onClick={() => handleDisconnectClick(provider.id)}
-                  className="btn-secondary !border-red-900/50 hover:!bg-red-900/20 text-danger"
-                  style={{ padding: "6px 14px", fontSize: "0.75rem" }}
-                >
-                  Disconnect
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleConnect(provider.id)}
-                  className="btn-primary"
-                  style={{ padding: "6px 14px", fontSize: "0.75rem" }}
-                >
-                  Connect
-                </button>
-              )}
+              <div className="shrink-0">
+                {isConnected ? (
+                  <button
+                    type="button"
+                    onClick={() => handleDisconnectClick(provider.id)}
+                    className="px-3 py-1.5 rounded-xl font-['Rajdhani'] font-bold text-xs uppercase tracking-wider transition-all border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white"
+                  >
+                    Disconnect
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleConnect(provider.id)}
+                    className={styles.btnPrimary}
+                    style={{ padding: "6px 14px", fontSize: "0.75rem" }}
+                  >
+                    Connect
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
@@ -262,11 +242,11 @@ export default function ConnectedAccounts() {
         confirmText="Confirm Disconnect"
         message={
           <div className="space-y-3">
-            <p className="text-gray-300 text-sm">
+            <p className="text-[var(--ink)] text-sm">
               Are you sure you want to disconnect your {selectedProvider?.name} account?
             </p>
-            <p className="text-xs text-muted">
-              If this is your only authentication method, you will need a password configured to access your system profile.
+            <p className="text-xs text-[var(--muted)]">
+              If this is your only authentication method, ensure you have a password configured to access your system profile.
             </p>
           </div>
         }

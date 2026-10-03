@@ -1,0 +1,43 @@
+{
+  "base": "http://127.0.0.1:3100",
+  "checks": [
+    {
+      "name": "the public landing page renders",
+      "ok": true,
+      "detail": "/ text=3085 links=4 settled=true"
+    },
+    {
+      "name": "the Planner surface renders",
+      "ok": true,
+      "detail": "/system text=252 links=8 settled=true"
+    },
+    {
+      "name": "an ordinary authenticated page renders",
+      "ok": true,
+      "detail": "/goals?tab=quests text=388 links=8 settled=true"
+    },
+    {
+      "name": "a second authenticated page renders",
+      "ok": true,
+      "detail": "/calendar text=197 links=8 settled=true"
+    },
+    {
+      "name": "the page's own session call succeeds",
+      "ok": true,
+      "detail": "GET /api/user/stats → 200"
+    },
+    {
+      "name": "internal navigation works",
+      "ok": true,
+      "detail": "/system → clicked \"Calendar\" → /calendar text=268"
+    },
+    {
+      "name": "the shell still renders after navigating away and back",
+      "ok": true,
+      "detail": "/system text=252 links=8"
+    }
+  ],
+  "console": [
+    "log/warning: The resource http://127.0.0.1:3100/_next/static/chunks/37gz70utbwm2a.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value "
+  ]
+}

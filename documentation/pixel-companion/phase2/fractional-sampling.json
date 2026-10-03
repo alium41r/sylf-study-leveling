@@ -1,0 +1,104 @@
+{
+  "method": "Force unsnapped device-pixel translation phases on the actual 56x70 landing traveler. Native screenshot crops; bright mean RGB >=75 excludes dark background/edges. Compare exact RGB to opaque current body+neutral-eye runtime palette. No screenshot resampling.",
+  "sourceColors": 100122,
+  "stats": [
+    {
+      "dpr": 1,
+      "phaseDevicePixels": 0,
+      "brightPixels": 684,
+      "sourcePalettePixels": 684,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 553
+    },
+    {
+      "dpr": 1,
+      "phaseDevicePixels": 0.25,
+      "brightPixels": 692,
+      "sourcePalettePixels": 692,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 549
+    },
+    {
+      "dpr": 1,
+      "phaseDevicePixels": 0.5,
+      "brightPixels": 694,
+      "sourcePalettePixels": 694,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 533
+    },
+    {
+      "dpr": 1,
+      "phaseDevicePixels": 0.75,
+      "brightPixels": 703,
+      "sourcePalettePixels": 703,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 551
+    },
+    {
+      "dpr": 2,
+      "phaseDevicePixels": 0,
+      "brightPixels": 2793,
+      "sourcePalettePixels": 2793,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 1877
+    },
+    {
+      "dpr": 2,
+      "phaseDevicePixels": 0.25,
+      "brightPixels": 2809,
+      "sourcePalettePixels": 2809,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 1894
+    },
+    {
+      "dpr": 2,
+      "phaseDevicePixels": 0.5,
+      "brightPixels": 2763,
+      "sourcePalettePixels": 2763,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 1839
+    },
+    {
+      "dpr": 2,
+      "phaseDevicePixels": 0.75,
+      "brightPixels": 2792,
+      "sourcePalettePixels": 2792,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 1843
+    },
+    {
+      "dpr": 3,
+      "phaseDevicePixels": 0,
+      "brightPixels": 6228,
+      "sourcePalettePixels": 6228,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 3640
+    },
+    {
+      "dpr": 3,
+      "phaseDevicePixels": 0.25,
+      "brightPixels": 6297,
+      "sourcePalettePixels": 6297,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 3670
+    },
+    {
+      "dpr": 3,
+      "phaseDevicePixels": 0.5,
+      "brightPixels": 6275,
+      "sourcePalettePixels": 6275,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 3695
+    },
+    {
+      "dpr": 3,
+      "phaseDevicePixels": 0.75,
+      "brightPixels": 6286,
+      "sourcePalettePixels": 6286,
+      "unknownBrightPixels": 0,
+      "uniqueBrightColors": 3694
+    }
+  ],
+  "observed": "Forced fractional positions change the sampled edge pattern, most visibly at DPR1. Bright source-palette comparison measures interpolation colors independently of the normal application's device-pixel snapping.",
+  "limitation": "Installed headless Chrome only; dark edge colors, other compositors and physical hardware are not covered."
+}

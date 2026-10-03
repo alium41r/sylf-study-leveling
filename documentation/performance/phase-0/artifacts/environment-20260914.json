@@ -1,0 +1,11 @@
+{
+  "at": "2026-09-14T13:47:31.789Z",
+  "node": "v26.7.0",
+  "platform": "darwin",
+  "release": "25.5.0",
+  "arch": "arm64",
+  "cpu": "Apple M1",
+  "logicalCpus": 8,
+  "memoryGiB": 8,
+  "buildId": "kIH7mNXA892mZ3ArJmyNR"
+}

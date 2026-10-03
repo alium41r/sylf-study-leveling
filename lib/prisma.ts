@@ -18,7 +18,16 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Increment this version whenever schema fields are modified
-const SCHEMA_BUILD_VERSION = 10;
+const SCHEMA_BUILD_VERSION = 26;
+let applicationPool: Pool | undefined;
+
+/** Raw durable-core transactions reuse the web pool already owned by Prisma. */
+export function getApplicationPool(): Pool {
+  getPrismaClient();
+  const pool = applicationPool ?? globalForPrisma.pool;
+  if (!pool) throw new Error("Application database pool is unavailable");
+  return pool;
+}
 
 export function getPrismaClient(): PrismaClient {
   if (globalForPrisma.prisma && globalForPrisma.prismaVersion === SCHEMA_BUILD_VERSION) {
@@ -31,6 +40,28 @@ export function getPrismaClient(): PrismaClient {
       globalForPrisma.prisma.$disconnect();
     } catch {}
     globalForPrisma.prisma = undefined;
+  }
+
+  // In development, purge require.cache so regenerated Prisma Client DMMF schema
+  // is loaded fresh from disk without requiring a full server process restart.
+  let PrismaConstructor = PrismaClient;
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      if (typeof require !== "undefined" && require.cache) {
+        Object.keys(require.cache).forEach((key) => {
+          if (key.includes(".prisma") || key.includes("@prisma")) {
+            delete require.cache[key];
+          }
+        });
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const freshModule = require("@prisma/client");
+        if (freshModule?.PrismaClient) {
+          PrismaConstructor = freshModule.PrismaClient;
+        }
+      }
+    } catch (e) {
+      console.warn("[prisma] require cache bust failed, falling back to static import:", e);
+    }
   }
 
   const connectionString = process.env.DATABASE_POOL_URL || process.env.DATABASE_URL;
@@ -56,7 +87,8 @@ export function getPrismaClient(): PrismaClient {
   }
 
   const adapter = new PrismaPg(pool);
-  const client = new PrismaClient({ adapter });
+  applicationPool = pool;
+  const client = new PrismaConstructor({ adapter });
 
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.prisma = client;
@@ -67,4 +99,3 @@ export function getPrismaClient(): PrismaClient {
 }
 
 export const prisma = getPrismaClient();
-

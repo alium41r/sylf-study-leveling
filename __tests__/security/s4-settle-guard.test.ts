@@ -5,6 +5,19 @@ import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
+// Route tests exercise transport only. Durable settlement and weekly atomicity
+// run against real PostgreSQL in the required Phase 1 suite.
+vi.mock("@/lib/planner/v2/server/web", () => ({
+  durablePlanner: () => ({ sessions: {
+    settleLegacy: async (ownerId: number, request: { id: number; focus: number; breaks: number; questId?: number; complete: boolean; final: boolean }) => {
+      const result = await prisma.$queryRaw<Array<{ settle_study_session_atomic: Record<string, unknown> }>>`
+        SELECT public.settle_study_session_atomic(${ownerId},${request.id},${request.focus},${request.breaks},${request.questId ?? null},${null},${request.complete},${request.final},${new Date().toISOString().slice(0, 10)}) AS settle_study_session_atomic
+      `;
+      return { ...result[0].settle_study_session_atomic, weeklyAwarded: false };
+    },
+  } }),
+}));
+
 describe("S4: study-session settle flood guard", () => {
   beforeEach(() => {
     vi.restoreAllMocks();

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { backdropVariants, modalDialogVariants, topToastVariants } from "@/lib/motion";
 import { useAuth } from "./AuthProvider";
 import { useProfileModal } from "./ProfileModalContext";
 import { getClassInfo, COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
@@ -27,7 +28,6 @@ import {
   ShieldCheck,
   ChevronDown,
   MoreVertical,
-  Flame,
   Award,
   Sparkles,
   ExternalLink,
@@ -37,6 +37,7 @@ import {
   Code2,
   Lock,
 } from "lucide-react";
+import { StreakFlameIcon, QuestEmblemIcon, SystemApertureIcon } from "@/app/components/icons";
 
 interface ProfileDossier {
   id: number;
@@ -538,34 +539,42 @@ export function PublicProfileModal() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <motion.div
+          key="public-profile-modal-root"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.16 } }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+        >
           {/* Backdrop Overlay */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            variants={backdropVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
             onClick={closeProfile}
             className="fixed inset-0 bg-black/80 backdrop-blur-md"
           />
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            transition={{ type: "spring", duration: 0.4, bounce: 0.15 }}
+            variants={modalDialogVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
             className="relative w-full max-w-4xl bg-bg-panel border border-border-subtle rounded-2xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]"
           >
             {/* ─── Toast Feedback Overlay ───────────────────────── */}
             <AnimatePresence>
               {toastMsg && (
                 <motion.div
-                  initial={{ opacity: 0, y: -20, x: "-50%" }}
-                  animate={{ opacity: 1, y: 0, x: "-50%" }}
-                  exit={{ opacity: 0, y: -20, x: "-50%" }}
+                  variants={topToastVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
                   className="absolute top-4 left-1/2 z-50 px-4 py-2 rounded-xl bg-bg-abyss/95 border border-accent-primary/50 text-text-primary text-xs font-['Rajdhani'] font-bold uppercase tracking-wider shadow-2xl flex items-center gap-2 backdrop-blur-md pointer-events-none"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-accent-primary animate-spin" />
+                  <SystemApertureIcon size={14} className="text-accent-primary animate-spin" />
                   <span>{toastMsg}</span>
                 </motion.div>
               )}
@@ -1144,7 +1153,8 @@ export function PublicProfileModal() {
                               </span>
                             </div>
                             <div className="system-card p-4 rounded-xl bg-bg-panel/80 border border-border-subtle flex flex-col">
-                              <span className="text-[10px] text-text-muted font-['Rajdhani'] uppercase">
+                              <span className="text-[10px] text-text-muted font-['Rajdhani'] uppercase flex items-center gap-1.5">
+                                <QuestEmblemIcon size={12} className="text-accent-primary" />
                                 Quests Cleared
                               </span>
                               <span className="text-sm font-bold font-['Rajdhani'] text-text-primary mt-0.5">
@@ -1221,7 +1231,7 @@ export function PublicProfileModal() {
                                     className="px-4 py-1 rounded-full border border-amber-400/40 text-amber-300 text-[11px] font-bold font-['Rajdhani'] uppercase tracking-[0.2em] bg-amber-400/5 flex items-center gap-1.5 shadow-[0_0_12px_rgba(251,191,36,0.08)]"
                                     title={`Weekly Streak: ${dossier.streakDays} consecutive week${dossier.streakDays === 1 ? "" : "s"}`}
                                   >
-                                    <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20" />
+                                    <StreakFlameIcon size={14} className="text-amber-400" />
                                     <span>{dossier.streakDays} {dossier.streakDays === 1 ? "Week" : "Weeks"} Streak</span>
                                   </span>
                                 )}
@@ -1293,8 +1303,8 @@ export function PublicProfileModal() {
                                       <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted font-['Rajdhani'] font-bold">
                                         Weekly Streak
                                       </span>
-                                      <span className="text-xs font-bold font-['Rajdhani'] text-amber-400 flex items-center gap-1">
-                                        <Flame className="w-3.5 h-3.5 text-amber-400" />
+                                      <span className="text-xs font-bold font-['Rajdhani'] text-amber-400 flex items-center gap-1.5">
+                                        <StreakFlameIcon size={14} className="text-amber-400" />
                                         <span>{dossier.streakDays ?? 0} {(dossier.streakDays ?? 0) === 1 ? "Week" : "Weeks"}</span>
                                       </span>
                                     </div>
@@ -1516,7 +1526,7 @@ export function PublicProfileModal() {
                                           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                                           style={{
                                             background: `${colors.glow}`,
-                                            border: `1px solid ${colors.main}40`,
+                                            border: `1px solid color-mix(in srgb, ${colors.main} 25%, transparent)`,
                                           }}
                                         >
                                           <Award className="w-5 h-5" style={{ color: colors.main }} />
@@ -1531,7 +1541,7 @@ export function PublicProfileModal() {
                                               style={{
                                                 color: colors.main,
                                                 background: colors.glow,
-                                                border: `1px solid ${colors.main}30`,
+                                                border: `1px solid color-mix(in srgb, ${colors.main} 19%, transparent)`,
                                               }}
                                             >
                                               {rarity}
@@ -1570,7 +1580,7 @@ export function PublicProfileModal() {
               confirmText={confirmModal.confirmText}
             />
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

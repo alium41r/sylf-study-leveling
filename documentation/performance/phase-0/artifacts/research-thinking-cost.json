@@ -1,0 +1,31 @@
+{
+  "target": "CAIE A Level Mathematics 9709",
+  "pages": [
+    "https://www.cambridgeinternational.org/Images/697427-2026-2027-syllabus.pdf",
+    "https://www.scribd.com/document/569980748/AL-CIE-%E6%95%B0%E5%AD%A6-%E8%80%83%E5%8D%B7%E9%A2%98%E5%9E%8B",
+    "https://syllabus.papacambridge.com/syllabus/caie/cambridge-advancedcambridge-asa-level-mathematics-9709",
+    "https://www.iitianacademy.com/a-level/cie-as-a-level-maths-revision-resources-exam-style-questions-and-notes/cambridge-international-as-a-level-maths-9709-study-notes/"
+  ],
+  "disabled": {
+    "thinking": "disabled",
+    "outputTokens": 3199,
+    "inputTokens": 9033,
+    "elapsedMs": 9508,
+    "scopeNodes": 44,
+    "proposedClaims": 10,
+    "acceptedClaims": 6,
+    "rejectedClaims": 4,
+    "objectivesClaimed": 2
+  },
+  "enabled": {
+    "thinking": "enabled",
+    "outputTokens": 14836,
+    "inputTokens": 9058,
+    "elapsedMs": 54681,
+    "scopeNodes": 44,
+    "proposedClaims": 10,
+    "acceptedClaims": 8,
+    "rejectedClaims": 2,
+    "objectivesClaimed": 2
+  }
+}

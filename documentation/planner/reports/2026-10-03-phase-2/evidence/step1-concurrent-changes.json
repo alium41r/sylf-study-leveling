@@ -1,0 +1,71 @@
+{
+  "recordedAt": "2026-10-03T16:17:56.074Z",
+  "classification": "Unrelated concurrent appearance/cosmetics changes observed after the starting baseline; Step 1 has edited no pre-existing file.",
+  "files": [
+    {
+      "path": "__tests__/color-utils.test.ts",
+      "baselineSha256": "8b46e92ab49122d5c1ca93106d5d170a68a95b100851763017e9f4be9d76a6a5",
+      "observedSha256": "0bcfbfb04a7524873067271823b1ff88eb2abae8e96090fe2d49d48cb1383197"
+    },
+    {
+      "path": "__tests__/settings/app-backgrounds.test.tsx",
+      "baselineSha256": "f568d922a1aa89c9e849ef6a34c9425b5a4cb537895ef49cd24337a0c7399039",
+      "observedSha256": "c48901ddd93afd757bfd43530e6a35bd6cbcea27039182112861e254e135cc4f"
+    },
+    {
+      "path": "app/api/cosmetics/route.ts",
+      "baselineSha256": "f786ed9e5177f5ae8eef8e3b3318c32724769e633dceb5b773f641e49c639ac3",
+      "observedSha256": "7a760827a67a2b081650169dd2a3d1df89ee74572faef8a1bbf90add9568a924"
+    },
+    {
+      "path": "app/api/user/onboarding/route.ts",
+      "baselineSha256": "b763bebb071acd8f0e0f0babb3c35b57b759046d640b18de3b1e6f5a5c0aca00",
+      "observedSha256": "927e0efcea88a2a9f399470a54d363e6edd88ff4d6c4bcea53c01f89f665330b"
+    },
+    {
+      "path": "app/components/GlobalSystemWrapper.tsx",
+      "baselineSha256": "5aaa11f68f0045257ced04471183c1407c7fee9a69fd6eb6ba4b2ad3025ccc0c",
+      "observedSha256": "ed60228e5c697abfc99d6ea759113375750a74b970d42e7c47a3926056e30e16"
+    },
+    {
+      "path": "app/globals.css",
+      "baselineSha256": "6a94dfc131b407f5c2ee8fcd64e0816c106684fd2dc10a552a3b3d68cd963cb4",
+      "observedSha256": "f74439f94a76f3836fac853348370f16508c098fdede332aacf5e9e4f3d2c4f5"
+    },
+    {
+      "path": "app/layout.tsx",
+      "baselineSha256": "498353783f342fef0058b01e1705aaaf8c90d4828c4027ebfdb715e63e7c05a8",
+      "observedSha256": "61409adfedfab3e5e66c7adcf453fc82621222f94c8ac37d7a63fbb5f53606ac"
+    },
+    {
+      "path": "app/onboarding/components/AppearanceStep.tsx",
+      "baselineSha256": "1e83f3a8cdb25b99b5a43ff4ac4ea4d23fa2cb740100f51ece44df444087fd99",
+      "observedSha256": "98454bd982811245ec57875ecf99273b12bde1c078494e9ad7c293beafcaf6b7"
+    },
+    {
+      "path": "app/onboarding/page.tsx",
+      "baselineSha256": "98d12d6a0f770a7b90b96b389913051db9e99e73dc4d42e23870042ac36851ba",
+      "observedSha256": "c4b337f3d3ef5e1e238c17cdbfa4fe06047317dae46aab3fccfb25d777edceb1"
+    },
+    {
+      "path": "app/settings/appearance/components/AppearanceSettingsScreen.tsx",
+      "baselineSha256": "5ec721988fcc9cccf456f29bd748e7b34cb3f9d2a8bcd4e12aa69335036d660f",
+      "observedSha256": "ea92a000abf4fded11b047fbd4ff2e72c8f976ee383acf0d9888cef0a8a9b2ea"
+    },
+    {
+      "path": "app/settings/components/SystemHubPage.module.css",
+      "baselineSha256": "5db5a8e757fbc738ec056b052edba6942d7d4d1a159bfe89d7a7455285fef92a",
+      "observedSha256": "789920e7987e998128d1a0699fedf1f42dd34899503ec74ccf4293867b9e2a53"
+    },
+    {
+      "path": "lib/color-utils.ts",
+      "baselineSha256": "7ba92ac192ac2cb97bc3ed48a292fd1b47205001be401ed21da0cc4a625c1e9f",
+      "observedSha256": "6c2ed5a08f248abc576ead462403b9c9c8f76b0258434da540d5b4d81750f529"
+    },
+    {
+      "path": "lib/cosmetics-catalog.ts",
+      "baselineSha256": "684ce934e65d974262be30431989accf02c25cd30ad3052c1d96d34b9656e627",
+      "observedSha256": "63bb62dd22cb8f22fcdf00c2d97b60e306b933f44d744d24249c3e7be55aaeb4"
+    }
+  ]
+}

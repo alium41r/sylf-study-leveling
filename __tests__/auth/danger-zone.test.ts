@@ -28,6 +28,7 @@ vi.mock("@/lib/prisma", () => ({
       deleteMany: vi.fn(),
     },
     studySession: {
+      findFirst: vi.fn().mockResolvedValue(null),
       deleteMany: vi.fn(),
     },
     sylphLedger: {
@@ -36,6 +37,13 @@ vi.mock("@/lib/prisma", () => ({
     hpLedger: {
       deleteMany: vi.fn(),
     },
+    // The reset path now always consults the Planner guards before deleting goals
+    // and Quests; this account has no planner data.
+    plannerPlan: { findFirst: vi.fn().mockResolvedValue(null) },
+    plannerQuestLink: { findFirst: vi.fn().mockResolvedValue(null) },
+    userStats: { updateMany: vi.fn() },
+    xpLedger: { deleteMany: vi.fn() },
+    $queryRaw: vi.fn().mockResolvedValue([]),
     $transaction: vi.fn(),
   },
 }));
@@ -48,6 +56,8 @@ vi.mock("@/lib/email", () => ({
 describe("Danger Zone Security & Verification Architecture", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(prisma.verificationToken.deleteMany).mockResolvedValue({ count: 1 });
+    vi.mocked(prisma.$transaction).mockImplementation(async callback => callback(prisma));
   });
 
   describe("1. Log Out (This Device)", () => {
@@ -228,12 +238,8 @@ describe("Danger Zone Security & Verification Architecture", () => {
       };
 
       (prisma.$transaction as any).mockImplementation(async (callback: any) => {
-        return callback({
-          user: { update: vi.fn().mockResolvedValue(mockResetUser) },
-          quest: { deleteMany: vi.fn().mockResolvedValue({}) },
-          studySession: { deleteMany: vi.fn().mockResolvedValue({}) },
-          sylphLedger: { deleteMany: vi.fn().mockResolvedValue({}) },
-          hpLedger: { deleteMany: vi.fn().mockResolvedValue({}) },
+        return callback({ ...prisma,
+          user: { ...prisma.user, update: vi.fn().mockResolvedValue(mockResetUser) },
         });
       });
 
@@ -286,12 +292,8 @@ describe("Danger Zone Security & Verification Architecture", () => {
       };
 
       (prisma.$transaction as any).mockImplementation(async (callback: any) => {
-        return callback({
-          user: { update: vi.fn().mockResolvedValue(mockResetUser) },
-          quest: { deleteMany: vi.fn().mockResolvedValue({}) },
-          studySession: { deleteMany: vi.fn().mockResolvedValue({}) },
-          sylphLedger: { deleteMany: vi.fn().mockResolvedValue({}) },
-          hpLedger: { deleteMany: vi.fn().mockResolvedValue({}) },
+        return callback({ ...prisma,
+          user: { ...prisma.user, update: vi.fn().mockResolvedValue(mockResetUser) },
         });
       });
 

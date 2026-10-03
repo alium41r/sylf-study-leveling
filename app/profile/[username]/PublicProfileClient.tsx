@@ -18,9 +18,8 @@ import {
   ShieldCheck,
   ChevronDown,
   MoreVertical,
-  Flame,
-  Sparkles,
 } from "lucide-react";
+import { StreakFlameIcon, QuestEmblemIcon, SystemApertureIcon } from "@/app/components/icons";
 
 export interface ProfileData {
   id: number;
@@ -355,7 +354,7 @@ export function PublicProfileClient({
             exit={{ opacity: 0, y: -20, x: "-50%" }}
             className="fixed top-6 left-1/2 z-50 px-4 py-2 rounded-xl bg-bg-abyss/95 border border-accent-primary/50 text-text-primary text-xs font-['Rajdhani'] font-bold uppercase tracking-wider shadow-2xl flex items-center gap-2 backdrop-blur-md pointer-events-none"
           >
-            <Sparkles className="w-3.5 h-3.5 text-accent-primary animate-spin" />
+            <SystemApertureIcon size={14} className="text-accent-primary animate-spin" />
             <span>{toastMsg}</span>
           </motion.div>
         )}
@@ -752,13 +751,16 @@ export function PublicProfileClient({
                 </div>
                 <div className="p-4 rounded-xl bg-bg-abyss/50 border border-border-subtle flex justify-between items-center">
                   <span className="text-xs text-text-muted font-['Rajdhani'] uppercase">Current Streak</span>
-                  <span className="text-sm font-bold font-['Rajdhani'] text-amber-400 flex items-center gap-1">
-                    <Flame className="w-3.5 h-3.5" />
+                  <span className="text-sm font-bold font-['Rajdhani'] text-amber-400 flex items-center gap-1.5">
+                    <StreakFlameIcon size={14} className="text-amber-400" />
                     <span>{profile.streakDays || 0} {profile.streakDays === 1 ? "Week" : "Weeks"}</span>
                   </span>
                 </div>
                 <div className="p-4 rounded-xl bg-bg-abyss/50 border border-border-subtle flex justify-between items-center">
-                  <span className="text-xs text-text-muted font-['Rajdhani'] uppercase">Quests Completed</span>
+                  <span className="text-xs text-text-muted font-['Rajdhani'] uppercase flex items-center gap-1.5">
+                    <QuestEmblemIcon size={12} className="text-accent-primary" />
+                    Quests Completed
+                  </span>
                   <span className="text-sm font-bold font-['Rajdhani'] text-text-primary">
                     {profile.completedQuestsCount || 0}
                   </span>

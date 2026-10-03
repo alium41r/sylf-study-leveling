@@ -5,6 +5,7 @@ import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getCognitiveEffects } from "@/lib/cognitive-stats";
+import { isEmailInAdminBootstrap } from "@/lib/auth-admin";
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,6 +54,7 @@ export async function GET(req: NextRequest) {
         sylph: true,
         timezone: true,
         hasCompletedOnboarding: true,
+        isAdmin: true,
         stats: {
           select: { endurance: true },
         },
@@ -69,6 +71,15 @@ export async function GET(req: NextRequest) {
       });
       return res;
     }
+    
+    // Controlled admin bootstrap fallback
+    if (!user.isAdmin && isEmailInAdminBootstrap(user.email)) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { isAdmin: true },
+      });
+      user.isAdmin = true;
+    }
 
     const timezone = user.timezone || "UTC";
     const todayStart = TimezoneService.getStartOfDayUTC(timezone);
@@ -77,13 +88,15 @@ export async function GET(req: NextRequest) {
     const todaySessions = await prisma.studySession.findMany({
       where: {
         userId: user.id,
-        startedAt: { gte: todayStart },
+        OR: [{ executionState: null, startedAt: { gte: todayStart } },
+          { executionState: { not: null }, executionContext: { path: ["actualCivilDate"], equals: TimezoneService.getUserLocalDate(timezone) } }],
       },
       select: {
         durationMinutes: true,
         durationSeconds: true,
         startedAt: true,
         endedAt: true,
+        executionState: true,
       },
     }).catch(() => []);
 
@@ -93,6 +106,12 @@ export async function GET(req: NextRequest) {
     const now = new Date();
 
     for (const s of todaySessions) {
+      if (s.executionState != null) {
+        todayStudySeconds += s.durationSeconds;
+        if (s.executionState === "ENDED") completedTodaySeconds += s.durationSeconds;
+        if (s.executionState === "RUNNING" && !activeSessionStartedAt) activeSessionStartedAt = s.startedAt.toISOString();
+        continue;
+      }
       if (!s.endedAt) {
         // Active (unended) session: count its already-flushed stored seconds.
         // A session is "live" when it is freshly started (pre-first-flush,

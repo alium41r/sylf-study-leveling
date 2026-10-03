@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "eslint": {
+    "command": "npx eslint scripts/test-planner-v2-phase0-postgres.mjs vitest.planner-v2-postgres.config.ts __tests__/planner-v2/postgres",
+    "exitCode": 0,
+    "diagnostics": []
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit --pretty false",
+    "exitCode": 2,
+    "phase0FileDiagnostics": [],
+    "unrelatedGeneratedRouteDiagnostics": [
+      {
+        "file": ".next/dev/types/app/api/acoustics/route.ts",
+        "code": "TS2344",
+        "export": "CURATED_SOUNDSCAPES"
+      },
+      {
+        "file": ".next/dev/types/app/api/quests/route.ts",
+        "code": "TS2344",
+        "export": "calculateScopeWeight"
+      }
+    ],
+    "note": "These route exports were not changed by this work. No unrelated fix was attempted."
+  },
+  "phase1GuaranteesImplemented": false,
+  "discovery": {
+    "command": "npx vitest list __tests__/planner-v2 --filesOnly",
+    "exitCode": 0,
+    "requiredPostgresFilesFoundByDefault": 0,
+    "requiredSuffix": ".postgres.ts",
+    "dedicatedConfig": "vitest.planner-v2-postgres.config.ts"
+  }
+}

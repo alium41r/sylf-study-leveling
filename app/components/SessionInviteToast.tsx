@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { cornerToastVariants } from "@/lib/motion";
 import { useAuth } from "./AuthProvider";
 
 interface Invite {
@@ -78,10 +79,10 @@ export function SessionInviteToast() {
           <motion.div
             key={invite.id}
             layout
-            initial={{ opacity: 0, x: 60, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 60, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 350 }}
+            variants={cornerToastVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             className="system-card p-4 shadow-2xl flex flex-col gap-3 w-80 border-l-4 pointer-events-auto"
             style={{ borderLeftColor: "var(--accent-primary-light)" }}
           >

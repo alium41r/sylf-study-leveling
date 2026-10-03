@@ -1,0 +1,74 @@
+{
+  "createdAt": "2026-10-02T02:00:21.530082+00:00",
+  "tests": {
+    "status": "passed",
+    "tests": 153,
+    "files": 18,
+    "log": "tests.log"
+  },
+  "eslint": {
+    "status": "passed",
+    "errors": 0,
+    "warnings": 0,
+    "log": "lint.log"
+  },
+  "typecheck": {
+    "status": "pre-existing errors",
+    "errorCount": 12,
+    "identicalToFrozenPhase2": true,
+    "changedFileErrors": 0,
+    "log": "typecheck.log"
+  },
+  "productionBuild": {
+    "status": "not rerun",
+    "knownPhase2Result": "Webpack compiled, then rejected the existing CURATED_SOUNDSCAPES route export; full production build success is not claimed"
+  },
+  "svgBrowser": {
+    "status": "passed",
+    "checks": 79,
+    "sizeViewportCases": 9,
+    "sizesPx": [
+      48,
+      96,
+      180
+    ],
+    "viewports": [
+      [
+        1440,
+        1000,
+        1
+      ],
+      [
+        820,
+        1180,
+        2
+      ],
+      [
+        390,
+        844,
+        3
+      ]
+    ],
+    "scrollFrameSamples": 750,
+    "runtimeExceptions": 0,
+    "evidence": "svg-browser-results.json"
+  },
+  "pixelBrowser": {
+    "status": "passed",
+    "checks": 317,
+    "expressionCases": 150,
+    "runtimeExceptions": 0,
+    "evidence": "pixel-regression/results.json"
+  },
+  "pixelFreeze": {
+    "status": "unchanged",
+    "files": 76,
+    "sharedCodeFragments": 4,
+    "evidence": "frozen-integrity-after.json"
+  },
+  "productionDevIsolation": {
+    "status": "passed in unit tests",
+    "details": "Sequence controls/cues and pixel URL switches do not activate with NODE_ENV=production"
+  },
+  "scope": "One development-only SVG capability sequence and SVG landing section persistence; pixel Phase 3 not implemented"
+}

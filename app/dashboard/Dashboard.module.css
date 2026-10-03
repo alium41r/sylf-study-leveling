@@ -1,0 +1,1385 @@
+/* ============================================================
+   SCHOLAR DASHBOARD (CSS MODULE)
+   Production implementation promoted from Dashboard Design Lab.
+   ============================================================ */
+
+.dashboardContainer {
+  --page: var(--app-canvas, #080d17);
+  --surface: var(--surface-1, #0e1522);
+  --elevated: var(--surface-2, #121c2b);
+  --ink: var(--text-primary, #eef1f8);
+  --muted: var(--text-secondary, #a1adc1);
+  --quiet: var(--text-muted, #8291aa);
+  --accent: var(--accent-text, var(--accent-primary-light, #b7cbf7));
+  --accent-strong: var(--accent-primary, #86aaf4);
+  --accent-dim: var(--accent-primary-dim, rgba(183, 203, 247, 0.12));
+  --accent-mid: var(--accent-primary-mid, rgba(134, 170, 244, 0.32));
+  --stage-glow: var(--accent-primary-dim, rgba(134, 170, 244, 0.14));
+  --stage-rim: var(--accent-primary-mid, rgba(134, 170, 244, 0.28));
+  --line: var(--border-strong, #263247);
+  --subtle-line: var(--border-subtle, #1a2435);
+  --gold: #d9b67b;
+  --gold-dim: rgba(217, 182, 123, 0.12);
+  --gold-border: rgba(217, 182, 123, 0.32);
+  --green: #a4d5bb;
+  --green-dim: rgba(164, 213, 187, 0.12);
+  --green-border: rgba(164, 213, 187, 0.32);
+  --red: #e07a7a;
+  --red-dim: rgba(224, 122, 122, 0.12);
+  --red-border: rgba(224, 122, 122, 0.32);
+  --warning: #fbbf24;
+  --warning-dim: rgba(251, 191, 36, 0.12);
+  --warning-border: rgba(251, 191, 36, 0.28);
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+
+:global(html[data-mode="light"]) .dashboardContainer {
+  --page: var(--app-canvas, #f1f4fa);
+  --surface: var(--surface-1, #ffffff);
+  --elevated: var(--surface-2, #e5ebf5);
+  --ink: var(--text-primary, #18283e);
+  --muted: var(--text-secondary, #475c77);
+  --quiet: var(--text-muted, #52657f);
+  --accent: var(--accent-text, var(--accent-primary-dark, #395d9f));
+  --accent-strong: var(--accent-primary, #2b4982);
+  --accent-dim: var(--accent-primary-dim, rgba(57, 93, 159, 0.1));
+  --accent-mid: var(--accent-primary-mid, rgba(57, 93, 159, 0.28));
+  --stage-glow: var(--accent-primary-dim, rgba(57, 93, 159, 0.08));
+  --stage-rim: var(--accent-primary-mid, rgba(57, 93, 159, 0.24));
+  --line: var(--border-strong, #bdcbe0);
+  --subtle-line: var(--border-subtle, #d6dfed);
+  --gold: #8a642f;
+  --gold-dim: rgba(138, 100, 47, 0.1);
+  --gold-border: rgba(138, 100, 47, 0.28);
+  --green: #2d6a4f;
+  --green-dim: rgba(45, 106, 79, 0.1);
+  --green-border: rgba(45, 106, 79, 0.28);
+  --red: #b91c1c;
+  --red-dim: rgba(185, 28, 28, 0.1);
+  --red-border: rgba(185, 28, 28, 0.28);
+  --warning: #b45309;
+  --warning-dim: rgba(180, 83, 9, 0.1);
+  --warning-border: rgba(180, 83, 9, 0.28);
+  color-scheme: light;
+}
+
+/* ─── Ambient Celestial Background ─────────────────────────── */
+.topGlow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 520px;
+  background:
+    radial-gradient(ellipse 60% 35% at 50% -5%, rgba(34, 51, 80, 0.2), transparent 70%),
+    radial-gradient(ellipse 40% 25% at 85% 10%, rgba(24, 39, 59, 0.12), transparent 70%);
+  overflow: hidden;
+}
+
+.topGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px),
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px);
+  background-size: 277px 213px, 367px 301px;
+  background-position: 31px 37px, 147px 73px;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
+}
+
+:global(html[data-mode="light"]) .topGlow {
+  background:
+    radial-gradient(ellipse 60% 35% at 50% -5%, rgba(180, 200, 235, 0.15), transparent 70%),
+    radial-gradient(ellipse 40% 25% at 85% 10%, rgba(195, 215, 245, 0.1), transparent 70%);
+}
+
+:global(html[data-mode="light"]) .topGlow::before {
+  opacity: 0.08;
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+@media (min-width: 640px) {
+  .contentWrapper {
+    padding: 2rem 1.5rem 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .contentWrapper {
+    padding: 2.25rem 2rem 5rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .contentWrapper {
+    max-width: 1360px;
+    padding: 2.75rem 2.5rem 5rem;
+  }
+}
+
+/* ─── Header & Editorial Titles ────────────────────────────── */
+.headerArea {
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.eyebrowEmblem {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--subtle-line);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 10px;
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-strong);
+}
+
+.title {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  margin: 0 0 0.5rem 0;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 1.75rem 0;
+  line-height: 1.5;
+}
+
+/* ─── Cards & Surfaces (De-noised, Clean Ambient Elevation) ── */
+.card,
+.characterCard,
+.statCard,
+.briefingCard,
+.insightsContainer,
+.questsCard,
+.streakCard,
+.friendsCard {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+  position: relative;
+}
+
+:global(html[data-mode="light"]) .card,
+:global(html[data-mode="light"]) .characterCard,
+:global(html[data-mode="light"]) .statCard,
+:global(html[data-mode="light"]) .briefingCard,
+:global(html[data-mode="light"]) .insightsContainer,
+:global(html[data-mode="light"]) .questsCard,
+:global(html[data-mode="light"]) .streakCard,
+:global(html[data-mode="light"]) .friendsCard {
+  border-color: var(--subtle-line);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.02);
+}
+
+/* ─── Scholar Identity & Stacked Telemetry Bars (Hybrid Refinement) ─── */
+.characterRow {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .characterRow {
+    flex-direction: row;
+    align-items: center;
+    gap: 2.5rem;
+  }
+}
+
+/* Standalone Character Card (Left Side) */
+.characterCard {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.35rem 1.65rem;
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: fit-content;
+  max-width: 100%;
+  user-select: none;
+  border-radius: 16px;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.characterCard:hover {
+  border-color: var(--border-active, var(--accent-mid, var(--line)));
+  box-shadow: 0 4px 20px -2px var(--accent-dim), 0 2px 8px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.avatarFrame {
+  --character-size: 110px;
+  position: relative;
+  width: 126px;
+  height: 126px;
+  border-radius: 16px;
+  background: var(--page);
+  border: 1px solid var(--subtle-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+:global(html[data-mode="light"]) .avatarFrame {
+  box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+
+.characterCard:hover .avatarFrame {
+  border-color: var(--accent);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 12px var(--accent-dim);
+}
+
+.avatarInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.avatarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 2px;
+}
+
+.avatarTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.avatarTagDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-strong);
+}
+
+.quietCustomizeLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--quiet);
+  text-decoration: none;
+  transition: color 150ms ease, transform 150ms ease;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.quietCustomizeLink:hover {
+  color: var(--accent);
+  transform: translate(1px, -1px);
+}
+
+.identityDetailsRow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.scholarName {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  letter-spacing: -0.01em;
+}
+
+.rankBadges {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rankPill {
+  display: inline-block;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+  line-height: 1.2;
+}
+
+.levelBadge {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+/* Rank seal variations */
+.rankE { background: rgba(148, 163, 184, 0.1); border-color: rgba(148, 163, 184, 0.3); color: #94a3b8; }
+.rankD { background: rgba(52, 211, 153, 0.1); border-color: rgba(52, 211, 153, 0.35); color: #34d399; }
+.rankC { background: rgba(96, 165, 250, 0.1); border-color: rgba(96, 165, 250, 0.35); color: #60a5fa; }
+.rankB { background: rgba(192, 132, 252, 0.1); border-color: rgba(192, 132, 252, 0.35); color: #c084fc; }
+.rankA { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.35); color: #fbbf24; }
+.rankS { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.4); color: #f87171; box-shadow: 0 0 12px rgba(248, 113, 113, 0.2); }
+
+/* ─── Stacked Telemetry Bars (Outside Character Card, Right Side) ─── */
+.barsContainer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.35rem;
+  padding: 0.25rem 0;
+}
+
+.trackGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.trackHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+}
+
+.trackLabel {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.trackValues {
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.trackValues span:first-child {
+  color: var(--ink);
+}
+
+.percentChip {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+}
+
+.progressWell {
+  width: 100%;
+  height: 7px;
+  background: var(--page);
+  border: 1px solid var(--subtle-line);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+:global(html[data-mode="light"]) .progressWell {
+  background: #e2e8f0;
+}
+
+.expFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--accent-strong, #3b82f6);
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hpFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--green, #10b981);
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hpFillLow {
+  background: var(--red, #ef4444);
+}
+
+/* ─── Responsive Behavior ─── */
+@media (max-width: 767px) {
+  .characterRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .characterCard {
+    width: 100%;
+    padding: 1.15rem 1.35rem;
+    gap: 1.15rem;
+    border-radius: 14px;
+  }
+
+  .avatarFrame {
+    --character-size: 94px;
+    width: 106px;
+    height: 106px;
+  }
+
+  .scholarName {
+    font-size: 1.25rem;
+  }
+
+  .barsContainer {
+    width: 100%;
+    gap: 1.15rem;
+    padding: 0;
+  }
+}
+
+/* ─── Metric Tiles Grid (Numbers Dominate) ─────────── */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .metricsGrid {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.statCard {
+  padding: 0.65rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.15rem;
+  cursor: default;
+  border-radius: 10px;
+}
+
+@media (min-width: 640px) {
+  .statCard {
+    padding: 1rem 1.15rem;
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.2rem;
+    border-radius: 14px;
+  }
+}
+
+.statIconBadge {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .statIconBadge {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    margin-bottom: 0.35rem;
+  }
+}
+
+.statLabel {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .statLabel {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}
+
+.statValue {
+  font-size: clamp(1.05rem, 3.8vw, 1.8rem);
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.statValueDivider {
+  color: var(--quiet);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.statSubtitle {
+  font-size: 11px;
+  color: var(--quiet);
+  margin: 0;
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .statSubtitle {
+    display: block;
+  }
+}
+
+/* ─── Daily Briefing Notification ──────────────────── */
+.briefingCard {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+}
+
+.briefingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.briefingTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.briefingTitle {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.briefingCloseBtn {
+  background: transparent;
+  border: none;
+  color: var(--quiet);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.briefingCloseBtn:hover {
+  color: var(--ink);
+  background: var(--surface);
+}
+
+/* ─── System Insights (Lightweight De-nested Stream) ────────── */
+.insightsContainer {
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .insightsContainer {
+    padding: 1.25rem 1.35rem;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.sectionTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionIcon {
+  color: var(--accent);
+}
+
+.sectionTitle {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.sectionSubtitle {
+  font-size: 12px;
+  color: var(--quiet);
+  margin: 0;
+}
+
+.insightsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+@media (max-width: 639px) {
+  .insightsGridCollapsed .insightCard:nth-child(n+2) {
+    display: none;
+  }
+}
+
+.insightsToggleBtn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--subtle-line);
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  margin-top: 0.65rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 150ms ease;
+}
+
+.insightsToggleBtn:hover {
+  background: var(--elevated);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+@media (max-width: 639px) {
+  .insightsToggleBtn {
+    display: inline-flex;
+  }
+}
+
+.insightCard {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--subtle-line);
+  border-radius: 0;
+  padding: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: border-color 150ms ease;
+}
+
+.insightCard:first-child {
+  padding-top: 0.2rem;
+}
+
+.insightCard:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.insightBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  margin-bottom: 0.4rem;
+}
+
+.badgeWarning {
+  background: var(--warning-dim);
+  border: 1px solid var(--warning-border);
+  color: var(--warning);
+}
+
+.badgeCoaching {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+}
+
+.badgeTrend {
+  background: var(--green-dim);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+}
+
+.insightDate {
+  font-size: 11px;
+  color: var(--quiet);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Two-Column Primary Layout ────────────────────────────── */
+.splitLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .splitLayout {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .splitLayout {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  }
+}
+
+.columnGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/* ─── Today's Quests & Quests Card ─────────────────────────── */
+.questsCard {
+  padding: 1.25rem 1.35rem;
+}
+
+.cardHeaderLink {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cardHeaderLink:hover {
+  color: var(--ink);
+}
+
+.questsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.questItem {
+  background: var(--page);
+  border: 1px solid var(--subtle-line);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+@media (min-width: 540px) {
+  .questItem {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.questItem:hover {
+  border-color: var(--line);
+  background: var(--elevated);
+}
+
+.questInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.questTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.questTitle {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.difficultyChip {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.diffEasy { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+.diffNormal { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid); }
+.diffHard { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+.diffExpert { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+
+.questMeta {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.questActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.statusPill {
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 5px;
+  text-transform: capitalize;
+}
+
+.statusCompleted { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+.statusInProgress { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid); }
+.statusPending { background: var(--elevated); color: var(--muted); border: 1px solid var(--subtle-line); }
+.statusFailed { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+
+.btnStart {
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btnStart:hover {
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+  background: var(--accent-dim);
+}
+
+.btnPrimary {
+  padding: 6px 15px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 7px;
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  color: #080d17;
+  cursor: pointer;
+  transition: background 150ms ease, opacity 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+:global(html[data-mode="light"]) .btnPrimary {
+  color: #ffffff;
+}
+
+.btnPrimary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btnPrimary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.questItemActive {
+  border-color: var(--accent-mid);
+  background: var(--elevated);
+}
+
+.activeFocusBanner {
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  border-left: 3px solid var(--accent-strong);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: border-color 150ms ease;
+}
+
+@media (max-width: 559px) {
+  .activeFocusBanner {
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+  }
+  .activeFocusBanner .btnPrimary {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 8px;
+  }
+}
+
+@media (min-width: 560px) {
+  .activeFocusBanner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.activeFocusBanner:hover {
+  border-color: var(--line);
+  border-left-color: var(--accent-strong);
+}
+
+.activeFocusInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.activeFocusEyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.activeFocusTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activeFocusMeta {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.activeBadgePulse {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-strong);
+}
+
+/* ─── Empty States (Refined & Minimal Copy) ─────────────────── */
+.emptyContainer {
+  padding: 1.5rem 1.25rem;
+  border: 1px dashed var(--subtle-line);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.45rem;
+}
+
+.emptyIconCircle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  display: grid;
+  place-items: center;
+  color: var(--quiet);
+  margin-bottom: 0.2rem;
+}
+
+.emptyText {
+  font-size: 12.5px;
+  color: var(--muted);
+  max-width: 260px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.emptyActionsRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0.35rem;
+}
+
+.emptyActionBtn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  text-decoration: none;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.emptyActionBtn:hover {
+  background: var(--accent);
+  color: var(--page);
+  border-color: var(--accent);
+}
+
+.emptySecondaryBtn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.emptySecondaryBtn:hover {
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+  background: var(--accent-dim);
+}
+
+/* ─── Compact Streak Quest Card ────────────────────────────── */
+.streakCard {
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-left: 3px solid var(--accent);
+  border-radius: 12px;
+}
+
+.streakHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 0.65rem;
+}
+
+.streakTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.streakTag {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+}
+
+.streakTitle {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.streakRewards {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+}
+
+.streakProgressGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.streakMetaRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.streakWell {
+  width: 100%;
+  height: 5px;
+  background: var(--page);
+  border: 1px solid var(--subtle-line);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.streakFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+  box-shadow: 0 0 8px var(--accent-dim);
+  transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Friends / Study Circle Card (De-nested Presence List) ── */
+.friendsCard {
+  padding: 1.25rem 1.35rem;
+}
+
+.presenceGroupTitle {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--quiet);
+  margin: 0.65rem 0 0.35rem 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.presenceOnlineTitle {
+  color: var(--green);
+}
+
+.friendsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.friendRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.friendRow:hover {
+  background: var(--elevated);
+  border-color: var(--subtle-line);
+}
+
+.friendRowOffline {
+  opacity: 0.6;
+}
+
+@media (max-width: 639px) {
+  .friendRowOffline:nth-of-type(n+3) {
+    display: none;
+  }
+}
+
+.friendMain {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.friendAvatarWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.friendAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  display: grid;
+  place-items: center;
+}
+
+.friendAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.friendAvatarInitial {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.presenceDot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 1.5px solid var(--surface);
+}
+
+.presenceDotOffline {
+  background: var(--quiet);
+}
+
+.friendDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.friendName {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 150ms ease;
+}
+
+.friendName:hover {
+  color: var(--accent);
+}
+
+.friendMeta {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}

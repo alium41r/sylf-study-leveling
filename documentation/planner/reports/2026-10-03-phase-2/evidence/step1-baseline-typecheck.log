@@ -1,0 +1,8 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'tsc' --noEmit --incremental false
+.next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import("/Users/aliumair/Desktop/sylf/app/api/acoustics/route"), "GET" | "PATCH" | "POST" | "HEAD" | "DELETE" | "revalidate" | "PUT" | "config" | "generateStaticParams" | ... 8 more ... | "OPTIONS", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'CURATED_SOUNDSCAPES' is incompatible with index signature.
+    Type '{ id: number; title: string; category: string; frequency: string; audioUrl: string; duration: number; defaultVolume: number; description: string; tags: string[]; isPreset: boolean; orderIndex: number; }[]' is not assignable to type 'never'.
+.next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import("/Users/aliumair/Desktop/sylf/app/api/quests/route"), "GET" | "PATCH" | "POST" | "HEAD" | "DELETE" | "revalidate" | "PUT" | "config" | "generateStaticParams" | "unstable_instant" | ... 7 more ... | "OPTIONS", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'calculateScopeWeight' is incompatible with index signature.
+    Type '(node: { title: string; description: string; tier: number; }, quest: { title: string; description?: string | null | undefined; targetMinutes: number; }) => number' is not assignable to type 'never'.

@@ -2,20 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import {
-  calculateWeeklyStreak,
-  getWeeklyBounds,
-  calculateWeeklyQuestReward,
-} from "@/lib/game-engine";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 import { revalidateTag } from "next/cache";
-import { TimezoneService } from "@/lib/timezone-service";
-import { getCognitiveEffects } from "@/lib/cognitive-stats";
+import { durablePlanner } from "@/lib/planner/v2/server/web";
+import { DurablePlannerError } from "@/lib/planner/v2/server/database";
+import { StudySessionTransitionV2Schema } from "@/lib/planner/v2/contracts";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
   subjectId: z.number().int().optional(),
   initialSeconds: z.number().int().min(0).optional(),
+  executionProtocol: z.literal(2).optional(),
 });
 
 const endSessionSchema = z.object({
@@ -28,30 +25,17 @@ const endSessionSchema = z.object({
   final: z.boolean().optional(),
 });
 
-interface SettleResult {
-  success: boolean;
-  sessionId: number;
-  isFinal: boolean;
-  alreadyClaimed: boolean;
-  durationSeconds: number;
-  breakSeconds: number;
-  deltaSeconds: number;
-  awarded: boolean;
-  xpGained: number;
-  sylphGained: number;
-  totalSylphEarned: number;
-  questCompleted: boolean;
-  questXp: number;
-  questSylph: number;
-  hpHealed: number;
-  level: number;
-  currentXP: number;
-  xpToNextLevel: number;
-  hunterRank: string;
-  levelsGained: number;
-  didRankUp: boolean;
-  nodeProgress: number | null;
-  masteryGranted: boolean;
+/** Restore an owned authoritative timer after refresh/client takeover. */
+export async function GET(req: NextRequest) {
+  const session = await getSession(req);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const id = Number(req.nextUrl.searchParams.get("id"));
+  if (!Number.isSafeInteger(id) || id <= 0) return NextResponse.json({ error: "Invalid session" }, { status: 400 });
+  try { return NextResponse.json({ execution: await durablePlanner().sessions.read(session.userId, id) }); }
+  catch (error) {
+    if (error instanceof DurablePlannerError) return NextResponse.json({ error: error.detail.code, detail: error.detail }, { status: 404 });
+    return NextResponse.json({ error: "SAVE_FAILED" }, { status: 503 });
+  }
 }
 
 /**
@@ -79,7 +63,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { questId, subjectId, initialSeconds } = validation.data;
+    const { questId, subjectId, initialSeconds, executionProtocol } = validation.data;
+    if (questId) {
+      const linked = await prisma.quest.findFirst({ where: { id: questId, userId }, select: { plannedMinutes: true } });
+      if (linked?.plannedMinutes !== null && linked?.plannedMinutes !== undefined) {
+        if (executionProtocol !== 2) return NextResponse.json({ error: "PLANNER_EXECUTION_PROTOCOL_REQUIRED", message: "Update this client before starting this plan's work." }, { status: 409 });
+        const execution = await durablePlanner().sessions.start(userId, questId);
+        return NextResponse.json({ id: execution.sessionId, userId, questId, subjectId: subjectId ?? null,
+          durationMinutes: Math.floor(execution.acceptedFocusSeconds / 60), durationSeconds: execution.acceptedFocusSeconds,
+          startedAt: execution.startedAt, execution }, { status: 201 });
+      }
+    }
 
     // Execute atomic PostgreSQL start_study_session RPC
     const rows = await prisma.$queryRaw<
@@ -96,6 +90,7 @@ export async function POST(req: NextRequest) {
     const session = rows[0]?.start_study_session;
     return NextResponse.json(session, { status: 201 });
   } catch (error: any) {
+    if (error instanceof DurablePlannerError) return NextResponse.json({ error: error.detail.code, detail: error.detail }, { status: 409 });
     console.error("POST /api/sessions error:", error);
     // S5: map RPC ownership rejections to clean 4xx (cross-user quest/subject).
     const msg = String(error?.message || "");
@@ -125,6 +120,14 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
+    if (body?.executionTransition) {
+      const transition = StudySessionTransitionV2Schema.safeParse(body.executionTransition);
+      if (!transition.success) return NextResponse.json({ error: "INVALID_OUTPUT", message: "Invalid versioned timer transition." }, { status: 400 });
+      const result = await durablePlanner().sessions.transition(session.userId, transition.data);
+      invalidateRankingsCache();
+      return NextResponse.json({ ...result.settlement, execution: result.execution, durationSeconds: result.execution.acceptedFocusSeconds,
+        breakSeconds: result.execution.acceptedBreakSeconds }, { status: 200 });
+    }
     const validation = endSessionSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
@@ -156,131 +159,12 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    const userRow = await prisma.user.findUnique({
-      where: { id: session.userId },
-      select: {
-        id: true,
-        username: true,
-        timezone: true,
-        lastActiveDate: true,
-        streakDays: true,
-        level: true,
-        stats: { select: { tenacity: true } },
-      },
-    }).catch(() => null);
-
-    const userLocalDate = userRow
-      ? TimezoneService.getUserLocalDate(userRow.timezone || "UTC")
-      : null;
-
-    // ─── SINGLE ATOMIC SETTLEMENT ──────────────────────────────
-    // Session upsert, wall-clock clamp, exact delta accounting, quest
-    // completion, node progress, progression, ledgers, and messages all
-    // commit or roll back together inside this one RPC call.
-    let rpcResult: SettleResult;
-    try {
-      const rows = await prisma.$queryRaw<[{ settle_study_session_atomic: SettleResult }]>`
-        SELECT public.settle_study_session_atomic(
-          ${session.userId},
-          ${id},
-          ${claimedSeconds},
-          ${breakSeconds ?? 0},
-          ${questId ?? null},
-          ${null},
-          ${completeQuest === true},
-          ${final === true},
-          ${userLocalDate}
-        ) AS settle_study_session_atomic
-      `;
-      rpcResult = rows[0]?.settle_study_session_atomic;
-    } catch (err: any) {
-      const msg = err?.message || "";
-      if (/Session not found/.test(msg)) {
-        return NextResponse.json({ error: "Session not found" }, { status: 404 });
-      }
-      throw err;
-    }
-
-    if (!rpcResult) {
-      return NextResponse.json({ error: "Settlement failed" }, { status: 500 });
-    }
-
-    // ─── WEEKLY STREAK (idempotent conditional update) ─────────
-    let weeklyAwarded = false;
-    if (userRow) {
-      const bounds = getWeeklyBounds(new Date(), userRow.timezone || "UTC");
-      if (userRow.lastActiveDate !== bounds.weekKey) {
-        const weekSessions = await prisma.studySession.aggregate({
-          _sum: { durationMinutes: true },
-          where: {
-            userId: userRow.id,
-            startedAt: {
-              gte: bounds.weekStart,
-              lte: bounds.weekEnd,
-            },
-          },
-        });
-
-        const weekMinutes = weekSessions._sum.durationMinutes || 0;
-        // Tenacity (Iron Will): each ability tier drops the 3-hour weekly
-        // milestone requirement by 5% (max −30% → 126 minutes).
-        const weeklyTargetMinutes = getCognitiveEffects({
-          tenacity: userRow.stats?.tenacity ?? undefined,
-        }).weeklyTargetMinutes;
-        if (weekMinutes >= weeklyTargetMinutes) {
-          const freezeItem = await prisma.inventoryItem.findFirst({
-            where: { userId: userRow.id, itemKey: "STREAK_FREEZE", quantity: { gt: 0 } },
-          });
-
-          const streakResult = calculateWeeklyStreak(
-            userRow.lastActiveDate,
-            bounds.weekKey,
-            userRow.streakDays,
-            !!freezeItem
-          );
-
-          const weeklyReward = calculateWeeklyQuestReward(userRow.level);
-
-          // Conditional update: exactly ONE concurrent request wins the
-          // streak write for this week (rowCount === 1). Losers skip cleanly
-          // instead of double-awarding sylph/messages.
-          const updated = await prisma.user.updateMany({
-            where: { id: userRow.id, lastActiveDate: { not: bounds.weekKey } },
-            data: {
-              streakDays: streakResult.newStreak,
-              lastActiveDate: bounds.weekKey,
-              sylph: { increment: weeklyReward.sylphReward },
-            },
-          });
-
-          if (updated.count > 0) {
-            weeklyAwarded = true;
-
-            if (streakResult.freezeUsed && freezeItem) {
-              await prisma.inventoryItem.updateMany({
-                where: { id: freezeItem.id, quantity: { gt: 0 } },
-                data: { quantity: { decrement: 1 } },
-              });
-              await prisma.systemMessage.create({
-                data: {
-                  userId: userRow.id,
-                  content: `**Weekly Streak Freeze Consumed**\n\nYour Streak Freeze protected your weekly streak after a missed cycle. Streak continues at **${streakResult.newStreak} weeks**!`,
-                  type: "STREAK",
-                },
-              });
-            }
-
-            await prisma.systemMessage.create({
-              data: {
-                userId: userRow.id,
-                content: `**Weekly Mission Complete: ${Math.round(weeklyTargetMinutes / 60 * 10) / 10} Hours of Focus!**\n\nYou completed the weekly ${weeklyTargetMinutes}-minute study target (Tenacity reduces it below the standard 3h). Weekly streak is now **${streakResult.newStreak} week${streakResult.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${weeklyReward.xpReward} XP, +${weeklyReward.sylphReward} Sylph.`,
-                type: "STREAK",
-              },
-            });
-          }
-        }
-      }
-    }
+    const rpcResult = await durablePlanner().sessions.settleLegacy(session.userId, {
+      id, focus: claimedSeconds, breaks: breakSeconds ?? 0, questId,
+      complete: completeQuest === true, final: final === true,
+    });
+    // Cache invalidation is not an economic decision.
+    const userRow = await prisma.user.findUnique({ where: { id: session.userId }, select: { username: true } });
 
     invalidateRankingsCache();
 
@@ -297,11 +181,16 @@ export async function PATCH(req: NextRequest) {
       {
         ...rpcResult,
         questCompletedNow: rpcResult.questCompleted,
-        weeklyAwarded,
+        weeklyAwarded: rpcResult.weeklyAwarded,
       },
       { status: 200 }
     );
   } catch (error) {
+    if (error instanceof Error && /Too many session settlements/.test(error.message)) return NextResponse.json({ error: error.message }, { status: 429, headers: { "Retry-After": "30" } });
+    if (error instanceof Error && /Session not found/.test(error.message)) return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    if (error instanceof DurablePlannerError) return NextResponse.json({ error: error.detail.code, detail: error.detail }, { status: 409 });
+    if (error instanceof Error && /PLANNER_(EXECUTION_PROTOCOL_REQUIRED|EXPLICIT_STOP_REQUIRED)/.test(error.message))
+      return NextResponse.json({ error: "PLANNER_EXECUTION_PROTOCOL_REQUIRED", message: "Reload or update this client to continue this plan's timer." }, { status: 409 });
     console.error("PATCH /api/sessions error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

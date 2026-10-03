@@ -1,0 +1,15 @@
+# Sylf pixel asset contract
+
+**Master canvas: 1254 × 1254 RGBA; origin `(0, 0)` at the top left.** This is the supplied artwork's coordinate canvas, not a recovered low-resolution pixel grid. [The grid audit](/Users/aliumair/Desktop/sylf/documentation/pixel-companion/phase2/grid-audit.json) found color variation within apparent cells and visible changes in every tested nearest-neighbor reduction. Keep the body at source resolution.
+
+- Every composable Sylf layer has exactly this full canvas, transparent outside its artwork. Never export tightly cropped runtime eye layers.
+- Stack body and eyes at `(0, 0)` with identical dimensions and one common display scale. Bake registration into the PNG; no per-expression CSS offsets, transforms, or scale corrections.
+- Store runtime assets under `public/companions/pixel/sylf/base/body.png` and `public/companions/pixel/sylf/eyes/{neutral,happy,thinking,focused,sleepy,blink}.png`. Keep source artwork untouched at the repository root. The Phase 1 full reference remains `/companions/sylf-pixel-companion.png`.
+- Copy the supplied transparent body byte-for-byte. Preserve source alpha, palette, coordinates, edges, and shadow; no cleanup, filtering, recoloring, smoothing, or reconstruction. Stop and report if an opaque source cannot be separated safely.
+- Prefer future eye artwork exported directly on the master canvas. A design-sheet import must record its source hash, crop, sampling rule, destination coordinates, and output checks. Use explicit nearest sampling only; never interpolate or generate pixels.
+- Phase 2 eyes use an audited 600 × 300 intermediate eye pair, sampled once to 300 × 150 with source `(2x + 1, 2y + 1)`, then placed at master coordinate `(475, 480)`. The final PNG is still 1254 × 1254. This discards unsampled pixels and **is not lossless native-grid recovery**; each retained RGBA value comes directly from the source. See [the eye audit](/Users/aliumair/Desktop/sylf/documentation/pixel-companion/phase2/eye-asset-audit.json).
+- Render with preserved aspect ratio, `image-rendering: pixelated`, and unoptimized image delivery. Scale both layers together; avoid blur, filters, rotation, perspective, or independently rounded layer geometry. Practical display sizes take priority over an integer scale that would require a 1254-pixel-wide UI slot.
+- Discrete expression/blink frames replace the eye layer without repositioning it. For movement, snap the shared sprite position to device pixels where fractional movement causes shimmer. Future animations must keep the same canvas and origin in every frame.
+- Future accessories, equipment, and effects must follow the same registered-canvas rule; those layers, atlases, customization, and additional companions are outside Phase 2.
+
+Validate dimensions/origin, alpha, source integrity, deterministic output, retained source colors, expression registration, and small/medium/large browser rendering before adding artwork. Run `node scripts/prepare-pixel-companion-base.mjs`, `node scripts/prepare-pixel-companion-eyes.mjs --check`, and `node scripts/audit-pixel-companion-grid.mjs` to reproduce the current asset evidence.

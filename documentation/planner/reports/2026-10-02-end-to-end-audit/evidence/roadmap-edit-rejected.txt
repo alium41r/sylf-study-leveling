@@ -1,0 +1,238 @@
+Browser tab: 3, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/system".
+0 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system
+	34 container
+		35 container
+			36 button Collapse sidebar
+			37 button Description: Open System Hub, Help: System Hub
+				38 image
+			39 button Notifications
+				40 image
+			41 button View Profile Card
+				42 text P
+				43 text Scholar
+				44 container
+					45 text E -Rank • Lv.  1
+		46 container Main Navigation
+			47 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			48 link Description: Timer, Value: 127.0.0.1:3101/timer
+			49 link Description: Social, Value: 127.0.0.1:3101/social
+			50 link Description: The System AI, Value: 127.0.0.1:3101/system
+			51 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			52 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			53 link Description: Locker, Value: 127.0.0.1:3101/locker
+			54 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		55 button Logout
+			56 image
+			57 text Logout
+		58 container
+			59 container
+				60 button CONVERSATION
+				62 button PLANNER ∞
+					63 text PLANNER
+					64 text ∞
+				65 text THE SYSTEM
+				66 text INTELLIGENCE LAYER
+				67 heading System Workspace, Value: 1
+					68 text System 
+					69 text Workspace
+				70 button (collapsed) Description: Open Archives, Secondary Actions: Expand
+					71 text ARCHIVES
+					72 text 1
+			150 container
+				151 container Planner setup
+					152 button Choose a different plan
+					153 text COURSE / SYLLABUS ROADMAP
+					154 button Back to Quick Plan
+					155 button Advanced setup
+					156 button Classic Planner
+				157 container Course Roadmap
+					158 heading Complete introductory Python course, Value: 2
+						159 text Complete introductory Python course
+					336 text These edits break the roadmap’s period, coverage, capacity, priority or outcome requirements. Restore the affected work.
+					160 container
+						161 text Target  2027-03-31  · MONTH periods ·  6  periods ·  7  milestones · 10.5  h estimated
+					162 text Coverage, progress and time on task do not establish academic mastery.
+					163 button (collapsed) Coverage map · 6 units · 0 not planned yet, Secondary Actions: Expand
+						164 text Coverage map
+						165 text · 
+						166 text 6
+						167 text  unit
+						168 text s
+						169 text  ·
+						170 text 0
+						171 text  not planned yet
+					172 button (collapsed) Planning preferences, Secondary Actions: Expand
+						173 text Planning preferences
+					174 text Nothing is created until you confirm. A confirmed roadmap creates no Quests — you expand one period when you want to start studying.
+					175 container
+						176 heading Periods, Value: 3
+							177 text Periods
+						178 button (expanded) Secondary Actions: Collapse, October 2026 Variables and data types foundations 2026-10-02 → 2026-10-31 · 105 min planned · not expanded
+							179 text October 2026
+							180 text Variables and data types foundations
+							181 text 2026-10-02
+							182 text  → 
+							183 text 2026-10-31
+							184 text  ·
+							185 text 105
+							186 text min planned
+							187 text  · not expanded
+						188 container
+							189 text Milestone
+							190 text field (settable) Milestone, Value: Variables and data types foundations
+							191 text Outcome (what finishing looks like)
+							192 text field (settable) Outcome (what finishing looks like), Value: Write and run a small Python program that uses numeric and string variables, then explain each value.
+							193 text Planned minutes
+							194 stepper (settable, integer) Planned minutes, Value: 105
+							195 text Covers: Variables and data types
+							196 checkbox (settable, integer) Description: Lock this milestone, Value: 0
+							197 checkbox (settable, integer) Description: Remove this milestone, Value: 0
+							198 button (disabled) Move earlier
+							199 button Move later
+						200 button (disabled) PLAN OCTOBER 2026
+						201 button (expanded) November 2026 Conditionals and branching 2026-11-01 → 2026-11-30 · 105 min planned · not expanded, Secondary Actions: Collapse
+							202 text November 2026
+							203 text Conditionals and branching
+							204 text 2026-11-01
+							205 text  → 
+							206 text 2026-11-30
+							207 text  ·
+							208 text 105
+							209 text min planned
+							210 text  · not expanded
+						211 container
+							212 text Milestone
+							213 text field (settable) Milestone, Value: Conditionals and branching
+							214 text Outcome (what finishing looks like)
+							215 text field (settable) Outcome (what finishing looks like), Value: Write if, elif, and else branches to control program flow.
+							216 text Planned minutes
+							217 stepper (settable, integer) Planned minutes, Value: 105
+							218 text Covers: Conditionals
+							219 checkbox (settable, integer) Description: Lock this milestone, Value: 0
+							220 checkbox (settable, integer) Description: Remove this milestone, Value: 0
+							221 button Move earlier
+							222 button Move later
+						223 button (disabled) PLAN NOVEMBER 2026
+						224 button (expanded) December 2026 Loops and repetition 2026-12-01 → 2026-12-31 · 105 min planned · not expanded, Secondary Actions: Collapse
+							225 text December 2026
+							226 text Loops and repetition
+							227 text 2026-12-01
+							228 text  → 
+							229 text 2026-12-31
+							230 text  ·
+							231 text 105
+							232 text min planned
+							233 text  · not expanded
+						234 container
+							235 text Milestone
+							236 text field (settable) Milestone, Value: Loops and repetition
+							237 text Outcome (what finishing looks like)
+							238 text field (settable) Outcome (what finishing looks like), Value: Complete the planned topics for this period and note what remains.
+							239 text Planned minutes
+							240 stepper (settable, integer) Planned minutes, Value: 105
+							241 text Covers: Loops
+							242 checkbox (settable, integer) Description: Lock this milestone, Value: 0
+							243 checkbox (settable, integer) Description: Remove this milestone, Value: 0
+							244 button Move earlier
+							245 button Move later
+						246 button (disabled) PLAN DECEMBER 2026
+						247 button (expanded) January 2027 Functions and reuse 2027-01-01 → 2027-01-31 · 105 min planned · not expanded, Secondary Actions: Collapse
+							248 text January 2027
+							249 text Functions and reuse
+							250 text 2027-01-01
+							251 text  → 
+							252 text 2027-01-31
+							253 text  ·
+							254 text 105
+							255 text min planned
+							256 text  · not expanded
+						257 container
+							258 text Milestone
+							259 text field (settable) Milestone, Value: Functions and reuse
+							260 text Outcome (what finishing looks like)
+							261 text field (settable) Outcome (what finishing looks like), Value: Define and call functions with parameters and return values.
+							262 text Planned minutes
+							263 stepper (settable, integer) Planned minutes, Value: 105
+							264 text Covers: Functions
+							265 checkbox (settable, integer) Description: Lock this milestone, Value: 0
+							266 checkbox (settable, integer) Description: Remove this milestone, Value: 0
+							267 button Move earlier
+							268 button Move later
+						269 button (disabled) PLAN JANUARY 2027
+						270 button (expanded) February 2027 Lists and dictionaries 2027-02-01 → 2027-02-28 · 105 min planned · not expanded, Secondary Actions: Collapse
+							271 text February 2027
+							272 text Lists and dictionaries
+							273 text 2027-02-01
+							274 text  → 
+							275 text 2027-02-28
+							276 text  ·
+							277 text 105
+							278 text min planned
+							279 text  · not expanded
+						280 container
+							281 text Milestone
+							282 text field (settable) Milestone, Value: Lists and dictionaries
+							283 text Outcome (what finishing looks like)
+							284 text field (settable) Outcome (what finishing looks like), Value: Store, retrieve, and update data using lists and dictionaries.
+							285 text Planned minutes
+							286 stepper (settable, integer) Planned minutes, Value: 105
+							287 text Covers: Lists and dictionaries
+							288 checkbox (settable, integer) Description: Lock this milestone, Value: 0
+							289 checkbox (settable, integer) Description: Remove this milestone, Value: 0
+							290 button Move earlier
+							291 button Move later
+						292 button (disabled) PLAN FEBRUARY 2027
+						293 button (expanded) Secondary Actions: Collapse, March 2027 Files and exceptions · Integrated Python practice 2027-03-01 → 2027-03-31 · 210 min planned · not expanded
+							294 text March 2027
+							295 text Files and exceptions · Integrated Python practice
+							296 text 2027-03-01
+							297 text  → 
+							298 text 2027-03-31
+							299 text  ·
+							300 text 210
+							301 text min planned
+							302 text  · not expanded
+						303 container
+							304 text Milestone
+							305 text field (settable) Milestone, Value: Files and exceptions
+							306 text Outcome (what finishing looks like)
+							307 text field (settable) Outcome (what finishing looks like), Value: Complete the planned topics for this period and note what remains.
+							308 text Planned minutes
+							309 stepper (settable, integer) Planned minutes, Value: 105
+							310 text Covers: Files and exceptions
+							311 checkbox (settable, integer) Description: Lock this milestone, Value: 0
+							312 checkbox (settable, integer) Description: Remove this milestone, Value: 0
+							313 button Move earlier
+							314 button Move later
+						315 button (disabled) PLAN MARCH 2027
+						316 container
+							317 text Milestone
+							318 text field (settable) Milestone, Value: Integrated Python practice
+							319 text Outcome (what finishing looks like)
+							320 text field (settable) Outcome (what finishing looks like), Value: Complete the planned topics for this period and note what remains.
+							321 text Planned minutes
+							322 stepper (settable, integer) Planned minutes, Value: 105
+							323 text Covers: Variables and data types, Conditionals, Loops, Functions, Lists and dictionaries, Files and exceptions
+							324 checkbox (settable, integer) Description: Lock this milestone, Value: 0
+							325 checkbox (settable, integer) Description: Remove this milestone, Value: 0
+							326 button Move earlier
+							327 button (disabled) Move later
+						328 button (disabled) PLAN MARCH 2027
+						329 button Save roadmap changes
+						330 button (disabled) CONFIRM ROADMAP · 0 QUESTS
+						331 button Reload saved roadmap
+						332 text Save your changes before confirming. Periods, coverage, capacity and priority are checked again.
+			140 container
+				141 text ARCHIVES 1
+				142 button NEW, Help: New Chat Session
+				143 button Close Archives
+				144 text field (settable)
+				145 button SELECT, Help: Select multiple chats
+				146 text TODAY 1
+				147 text Study Plan: GCSE algebra review
+				148 button Description: Rename Study Plan: GCSE algebra review, Help: Rename chat
+				149 button Description: Delete Study Plan: GCSE algebra review, Help: Delete chat
+	334 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		335 image
+
+The focused UI element is 0 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system

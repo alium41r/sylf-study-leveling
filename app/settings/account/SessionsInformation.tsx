@@ -7,6 +7,8 @@ import { SettingsRow } from "../../components/SettingsRow";
 import { useAuth } from "../../components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { getAccountCapability } from "./services/account-capability";
+import { Laptop, Smartphone, Globe, Monitor, AlertCircle } from "lucide-react";
 
 interface SessionItem {
   id: string;
@@ -17,6 +19,20 @@ interface SessionItem {
   isCurrent: boolean;
   icon: string;
   createdAt: string;
+}
+
+function getDeviceIcon(device: string, platform: string) {
+  const d = (device + " " + platform).toLowerCase();
+  if (d.includes("iphone") || d.includes("android") || d.includes("mobile")) {
+    return <Smartphone className="w-5 h-5 text-[var(--accent)]" />;
+  }
+  if (d.includes("mac") || d.includes("windows") || d.includes("linux") || d.includes("laptop")) {
+    return <Laptop className="w-5 h-5 text-[var(--accent)]" />;
+  }
+  if (d.includes("desktop") || d.includes("pc")) {
+    return <Monitor className="w-5 h-5 text-[var(--accent)]" />;
+  }
+  return <Globe className="w-5 h-5 text-[var(--accent)]" />;
 }
 
 export default function SessionsInformation() {
@@ -38,7 +54,6 @@ export default function SessionsInformation() {
       setIsLoading(true);
       setError(null);
 
-      // Stale-while-revalidate: reopening account paints instantly.
       const data = await fetchCachedJSON<{ sessions?: SessionItem[]; error?: string }>(
         "/api/user/sessions",
         { credentials: "include" },
@@ -69,28 +84,18 @@ export default function SessionsInformation() {
     if (!modalState.sessionId) return;
     setIsRevoking(true);
     try {
-      const res = await fetch("/api/user/sessions", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ sessionId: modalState.sessionId }),
-      });
+      const result = await getAccountCapability().revokeSession(modalState.sessionId);
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.isCurrent) {
+      if (result.ok) {
+        if (result.data?.isCurrent) {
           await logout();
           router.push("/login");
           return;
         }
-        // Remove revoked session from list
         setSessions((prev) => prev.filter((s) => s.id !== modalState.sessionId));
         setModalState({ isOpen: false, sessionId: null });
       } else {
-        const data = await res.json().catch(() => ({}));
-        alert(data.error || "Failed to revoke session");
+        alert(result.error || "Failed to revoke session");
       }
     } catch (err) {
       console.error("Failed to revoke session:", err);
@@ -102,17 +107,18 @@ export default function SessionsInformation() {
 
   if (isLoading && sessions.length === 0) {
     return (
-      <div className="py-8 text-center text-xs font-['Rajdhani'] font-bold text-text-muted uppercase tracking-wider animate-pulse">
+      <div className="py-8 text-center text-xs font-['Rajdhani'] font-bold text-[var(--muted)] uppercase tracking-wider animate-pulse">
         Loading active sessions...
       </div>
     );
   }
 
   return (
-    <div className="pt-2 space-y-4">
+    <div className="pt-1 space-y-4">
       {error && (
-        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-['Rajdhani']">
-          {error}
+        <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-['Rajdhani'] font-bold flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
@@ -121,38 +127,41 @@ export default function SessionsInformation() {
           <SettingsRow
             key={session.id}
             icon={
-              <div className="w-12 h-12 rounded bg-black/40 border border-white/5 flex items-center justify-center text-2xl">
-                {session.icon}
+              <div className="w-10 h-10 rounded-xl bg-[var(--chip-bg)] border border-[var(--sub-border)] flex items-center justify-center shrink-0">
+                {getDeviceIcon(session.device, session.platform)}
               </div>
             }
             label={
-              <>
-                {session.device}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-['Rajdhani'] font-bold text-sm text-[var(--ink)]">
+                  {session.device}
+                </span>
                 {session.isCurrent && (
-                  <span className="text-[0.6rem] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 uppercase tracking-widest border border-emerald-500/30 shrink-0 font-mono font-bold">
-                    Current
+                  <span className="text-[9px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 uppercase tracking-widest border border-emerald-500/30 font-mono font-bold">
+                    Current Device
                   </span>
                 )}
-              </>
+              </div>
             }
             description={
-              <>
-                <p className="truncate text-text-secondary">{session.platform} • {session.location}</p>
-                <p className="text-[0.65rem] font-['Rajdhani'] uppercase tracking-widest mt-1 truncate">
+              <div className="space-y-0.5">
+                <p className="truncate text-xs text-[var(--muted)]">
+                  {session.platform} • {session.location}
+                </p>
+                <p className="text-[11px] font-['Rajdhani'] uppercase tracking-wider text-[var(--quiet)] truncate">
                   Last Active:{" "}
-                  <span className={session.isCurrent ? "text-emerald-400 font-bold" : "text-text-primary"}>
+                  <span className={session.isCurrent ? "text-emerald-500 font-bold" : "text-[var(--ink)]"}>
                     {session.lastActive}
                   </span>
                 </p>
-              </>
+              </div>
             }
           >
             {!session.isCurrent && (
               <button
                 type="button"
                 onClick={() => handleRevoke(session.id)}
-                className="btn-secondary !border-rose-900/50 hover:!bg-rose-900/20 hover:!border-rose-500/50 text-rose-400 text-xs px-3.5 py-1.5 rounded-lg transition-all"
-                style={{ fontSize: "0.75rem" }}
+                className="px-3.5 py-1.5 rounded-xl font-['Rajdhani'] font-bold text-xs uppercase tracking-wider transition-all border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white"
               >
                 Revoke
               </button>
@@ -161,7 +170,7 @@ export default function SessionsInformation() {
         ))}
 
         {sessions.length === 0 && !isLoading && (
-          <div className="py-6 text-center text-text-muted text-xs font-['Rajdhani']">
+          <div className="py-6 text-center text-[var(--muted)] text-xs font-['Rajdhani']">
             No active sessions found.
           </div>
         )}
@@ -175,8 +184,8 @@ export default function SessionsInformation() {
         danger={true}
         confirmText={isRevoking ? "Revoking..." : "Revoke"}
         message={
-          <div className="space-y-4">
-            <p className="text-gray-300 text-sm">
+          <div className="space-y-3">
+            <p className="text-[var(--ink)] text-sm">
               Are you sure you want to sign out of this device? It will be disconnected immediately and require logging in again.
             </p>
           </div>

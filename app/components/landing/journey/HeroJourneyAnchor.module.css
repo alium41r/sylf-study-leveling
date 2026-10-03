@@ -1,0 +1,29 @@
+.origin {
+  position: relative;
+  height: 0;
+  pointer-events: none;
+}
+
+.anchor {
+  position: absolute;
+  top: -24px;
+  left: calc(50% + 38vw);
+  width: 1px;
+  height: 1px;
+}
+
+/* The narrower hero has no room beside its headline; stay below it. */
+@media (min-width: 701px) and (max-width: 900px) {
+  .anchor {
+    top: -20px;
+    left: calc(50% + 43vw);
+  }
+}
+
+/* Use the quiet gap above the product window, clear of both CTAs and the note. */
+@media (max-width: 700px) {
+  .anchor {
+    top: 45px;
+    left: calc(50% + 40vw);
+  }
+}

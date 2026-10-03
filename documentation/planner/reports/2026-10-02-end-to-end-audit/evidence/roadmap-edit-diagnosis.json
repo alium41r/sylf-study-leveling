@@ -1,0 +1,509 @@
+[
+  {
+    "httpId": 1313,
+    "result": {
+      "ok": true,
+      "findings": [],
+      "warnings": [],
+      "blockers": [],
+      "accepted": [],
+      "draft": {
+        "schemaVersion": 1,
+        "assumptions": [
+          "The supplied units are the full scope; no additional Python topics are introduced.",
+          "Each period has enough capacity to cover its assigned milestone effort within the supplied ceiling.",
+          "Reinforcement milestones may repeat a unit when a period has no new unit left.",
+          "Priority is NEUTRAL for all units, so no unit is forced into the first half by priority rules.",
+          "Effort is estimated from the supplied minimumMinutes and kept within each period's capacityMinutes.",
+          "No official exam, grade, or question-count requirements are assumed."
+        ],
+        "warnings": [
+          "The total scope minimum is 630 minutes, while usable minutes are 3775; the plan uses reinforcement and practice to fill periods without adding new syllabus content.",
+          "All topics have UNKNOWN preparedness and confidence, so sequencing is based on conceptual prerequisite order only.",
+          "No HARD weekly limit was supplied, so period capacityMinutes is treated as the ceiling.",
+          "Milestone effort is strategic and may be adjusted if actual pace differs.",
+          "The final period includes reinforcement because all six units are introduced earlier.",
+          "Dates are fixed to the supplied period end dates."
+        ],
+        "semanticReview": {
+          "schemaVersion": 1,
+          "critic": "ISSUES_REPAIRED",
+          "issues": 1,
+          "repaired": 7,
+          "deterministicIssues": 1,
+          "softViolations": 0
+        },
+        "topics": [
+          {
+            "key": "1428b2d3-c990-4850-b83c-43db7283a3f7",
+            "title": "Variables and data types",
+            "parentKey": null,
+            "scopeRef": "t1"
+          },
+          {
+            "key": "97a0a9c1-8dd3-4ace-b86b-dd1324daeec5",
+            "title": "Conditionals",
+            "parentKey": null,
+            "scopeRef": "t2"
+          },
+          {
+            "key": "39a1b8a8-c79d-4836-928d-6eb17d38abf7",
+            "title": "Loops",
+            "parentKey": null,
+            "scopeRef": "t3"
+          },
+          {
+            "key": "e1a0725a-9fd5-4e4f-a757-4a14c962d825",
+            "title": "Functions",
+            "parentKey": null,
+            "scopeRef": "t4"
+          },
+          {
+            "key": "1548d065-3286-4b5b-9df3-2704e0b3f83e",
+            "title": "Lists and dictionaries",
+            "parentKey": null,
+            "scopeRef": "t5"
+          },
+          {
+            "key": "8e5e5bd9-7a5d-475e-95ac-cfea53b77d08",
+            "title": "Files and exceptions",
+            "parentKey": null,
+            "scopeRef": "t6"
+          }
+        ],
+        "milestones": [
+          {
+            "key": "9af9c926-2559-4525-a676-ab1c1767855f",
+            "title": "Variables and data types foundations",
+            "date": "2026-10-31",
+            "periodKey": "d2a3efcc-4071-4d11-9b10-88466799e418",
+            "outcome": "Write and run a small Python program that uses numeric and string variables, then explain each value.",
+            "topicKeys": [
+              "1428b2d3-c990-4850-b83c-43db7283a3f7"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Write and run a short script using variables and at least two data types.",
+            "dependsOn": []
+          },
+          {
+            "key": "7e22d9dd-be9b-4fd1-910f-a6fe207e8cd2",
+            "title": "Conditionals and branching",
+            "date": "2026-11-30",
+            "periodKey": "a97497ae-11cb-4ed0-81e5-c65204447e9d",
+            "outcome": "Write if, elif, and else branches to control program flow.",
+            "topicKeys": [
+              "97a0a9c1-8dd3-4ace-b86b-dd1324daeec5"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Create a program that chooses between at least three outcomes.",
+            "dependsOn": [
+              "9af9c926-2559-4525-a676-ab1c1767855f"
+            ]
+          },
+          {
+            "key": "83d062b4-db7c-4db7-8be2-23a9a28356b2",
+            "title": "Loops and repetition",
+            "date": "2026-12-31",
+            "periodKey": "0210d2e4-3ebd-409e-a0a7-3cb796954729",
+            "outcome": "Complete the planned topics for this period and note what remains.",
+            "topicKeys": [
+              "39a1b8a8-c79d-4836-928d-6eb17d38abf7"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Write a loop that repeats an action and stops under a stated condition.",
+            "dependsOn": [
+              "7e22d9dd-be9b-4fd1-910f-a6fe207e8cd2"
+            ]
+          },
+          {
+            "key": "c840deec-2efa-4c85-a537-4317e38f9de7",
+            "title": "Functions and reuse",
+            "date": "2027-01-31",
+            "periodKey": "a8dfc18b-e3cd-4e30-b7ca-c1960b59bb40",
+            "outcome": "Define and call functions with parameters and return values.",
+            "topicKeys": [
+              "e1a0725a-9fd5-4e4f-a757-4a14c962d825"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Refactor a short script into at least two reusable functions.",
+            "dependsOn": [
+              "83d062b4-db7c-4db7-8be2-23a9a28356b2"
+            ]
+          },
+          {
+            "key": "07210f89-9bb4-4b0c-9080-8fc20fb326bf",
+            "title": "Lists and dictionaries",
+            "date": "2027-02-28",
+            "periodKey": "751ec854-58d0-4bdb-8f56-0ca92103c789",
+            "outcome": "Store, retrieve, and update data using lists and dictionaries.",
+            "topicKeys": [
+              "1548d065-3286-4b5b-9df3-2704e0b3f83e"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Build a small program that stores records in a list of dictionaries.",
+            "dependsOn": [
+              "c840deec-2efa-4c85-a537-4317e38f9de7"
+            ]
+          },
+          {
+            "key": "e0161581-119e-41e4-b538-0eb0b0b19765",
+            "title": "Files and exceptions",
+            "date": "2027-03-31",
+            "periodKey": "95a99a92-05e8-4d95-9a14-d09e8c0c05cc",
+            "outcome": "Complete the planned topics for this period and note what remains.",
+            "topicKeys": [
+              "8e5e5bd9-7a5d-475e-95ac-cfea53b77d08"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Write a program that reads a file and handles a missing-file error.",
+            "dependsOn": [
+              "07210f89-9bb4-4b0c-9080-8fc20fb326bf"
+            ]
+          },
+          {
+            "key": "77a2e4c0-85c4-4051-8ccb-ecf83713ccb1",
+            "title": "Integrated Python practice",
+            "date": "2027-03-31",
+            "periodKey": "95a99a92-05e8-4d95-9a14-d09e8c0c05cc",
+            "outcome": "Complete the planned topics for this period and note what remains.",
+            "topicKeys": [
+              "1428b2d3-c990-4850-b83c-43db7283a3f7",
+              "97a0a9c1-8dd3-4ace-b86b-dd1324daeec5",
+              "39a1b8a8-c79d-4836-928d-6eb17d38abf7",
+              "e1a0725a-9fd5-4e4f-a757-4a14c962d825",
+              "1548d065-3286-4b5b-9df3-2704e0b3f83e",
+              "8e5e5bd9-7a5d-475e-95ac-cfea53b77d08"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Run a small integrated program that uses all six units.",
+            "dependsOn": [
+              "e0161581-119e-41e4-b538-0eb0b0b19765"
+            ]
+          }
+        ],
+        "items": [],
+        "mode": "ROADMAP",
+        "outcome": "Complete introductory Python course",
+        "periods": [
+          {
+            "key": "d2a3efcc-4071-4d11-9b10-88466799e418",
+            "title": "October 2026",
+            "granularity": "MONTH",
+            "startDate": "2026-10-02",
+            "endDate": "2026-10-31",
+            "order": 0
+          },
+          {
+            "key": "a97497ae-11cb-4ed0-81e5-c65204447e9d",
+            "title": "November 2026",
+            "granularity": "MONTH",
+            "startDate": "2026-11-01",
+            "endDate": "2026-11-30",
+            "order": 1
+          },
+          {
+            "key": "0210d2e4-3ebd-409e-a0a7-3cb796954729",
+            "title": "December 2026",
+            "granularity": "MONTH",
+            "startDate": "2026-12-01",
+            "endDate": "2026-12-31",
+            "order": 2
+          },
+          {
+            "key": "a8dfc18b-e3cd-4e30-b7ca-c1960b59bb40",
+            "title": "January 2027",
+            "granularity": "MONTH",
+            "startDate": "2027-01-01",
+            "endDate": "2027-01-31",
+            "order": 3
+          },
+          {
+            "key": "751ec854-58d0-4bdb-8f56-0ca92103c789",
+            "title": "February 2027",
+            "granularity": "MONTH",
+            "startDate": "2027-02-01",
+            "endDate": "2027-02-28",
+            "order": 4
+          },
+          {
+            "key": "95a99a92-05e8-4d95-9a14-d09e8c0c05cc",
+            "title": "March 2027",
+            "granularity": "MONTH",
+            "startDate": "2027-03-01",
+            "endDate": "2027-03-31",
+            "order": 5
+          }
+        ]
+      }
+    }
+  },
+  {
+    "httpId": 1329,
+    "result": {
+      "ok": false,
+      "findings": [
+        {
+          "code": "INVALID_MILESTONE_OUTCOME",
+          "severity": "BLOCKER",
+          "scope": {
+            "kind": "DRAFT"
+          },
+          "consequence": "This change cannot be saved as it stands. Undo it, or adjust it so the plan stays valid.",
+          "acknowledgementCode": "BLOCK:INVALID_MILESTONE_OUTCOME"
+        }
+      ],
+      "warnings": [],
+      "blockers": [
+        {
+          "code": "INVALID_MILESTONE_OUTCOME",
+          "severity": "BLOCKER",
+          "scope": {
+            "kind": "DRAFT"
+          },
+          "consequence": "This change cannot be saved as it stands. Undo it, or adjust it so the plan stays valid.",
+          "acknowledgementCode": "BLOCK:INVALID_MILESTONE_OUTCOME"
+        }
+      ],
+      "accepted": [],
+      "draft": null
+    }
+  },
+  {
+    "httpId": 1399,
+    "result": {
+      "ok": true,
+      "findings": [],
+      "warnings": [],
+      "blockers": [],
+      "accepted": [],
+      "draft": {
+        "schemaVersion": 1,
+        "assumptions": [
+          "The supplied units are the full scope; no additional Python topics are introduced.",
+          "Each period has enough capacity to cover its assigned milestone effort within the supplied ceiling.",
+          "Reinforcement milestones may repeat a unit when a period has no new unit left.",
+          "Priority is NEUTRAL for all units, so no unit is forced into the first half by priority rules.",
+          "Effort is estimated from the supplied minimumMinutes and kept within each period's capacityMinutes.",
+          "No official exam, grade, or question-count requirements are assumed."
+        ],
+        "warnings": [
+          "The total scope minimum is 630 minutes, while usable minutes are 3775; the plan uses reinforcement and practice to fill periods without adding new syllabus content.",
+          "All topics have UNKNOWN preparedness and confidence, so sequencing is based on conceptual prerequisite order only.",
+          "No HARD weekly limit was supplied, so period capacityMinutes is treated as the ceiling.",
+          "Milestone effort is strategic and may be adjusted if actual pace differs.",
+          "The final period includes reinforcement because all six units are introduced earlier.",
+          "Dates are fixed to the supplied period end dates."
+        ],
+        "semanticReview": {
+          "schemaVersion": 1,
+          "critic": "ISSUES_REPAIRED",
+          "issues": 1,
+          "repaired": 7,
+          "deterministicIssues": 1,
+          "softViolations": 0
+        },
+        "topics": [
+          {
+            "key": "1428b2d3-c990-4850-b83c-43db7283a3f7",
+            "title": "Variables and data types",
+            "parentKey": null,
+            "scopeRef": "t1"
+          },
+          {
+            "key": "97a0a9c1-8dd3-4ace-b86b-dd1324daeec5",
+            "title": "Conditionals",
+            "parentKey": null,
+            "scopeRef": "t2"
+          },
+          {
+            "key": "39a1b8a8-c79d-4836-928d-6eb17d38abf7",
+            "title": "Loops",
+            "parentKey": null,
+            "scopeRef": "t3"
+          },
+          {
+            "key": "e1a0725a-9fd5-4e4f-a757-4a14c962d825",
+            "title": "Functions",
+            "parentKey": null,
+            "scopeRef": "t4"
+          },
+          {
+            "key": "1548d065-3286-4b5b-9df3-2704e0b3f83e",
+            "title": "Lists and dictionaries",
+            "parentKey": null,
+            "scopeRef": "t5"
+          },
+          {
+            "key": "8e5e5bd9-7a5d-475e-95ac-cfea53b77d08",
+            "title": "Files and exceptions",
+            "parentKey": null,
+            "scopeRef": "t6"
+          }
+        ],
+        "milestones": [
+          {
+            "key": "9af9c926-2559-4525-a676-ab1c1767855f",
+            "title": "Variables and data types foundations",
+            "date": "2026-10-31",
+            "periodKey": "d2a3efcc-4071-4d11-9b10-88466799e418",
+            "outcome": "Complete a short Python script with numeric and string variables, and explain its output.",
+            "topicKeys": [
+              "1428b2d3-c990-4850-b83c-43db7283a3f7"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Write and run a short script using variables and at least two data types.",
+            "dependsOn": []
+          },
+          {
+            "key": "7e22d9dd-be9b-4fd1-910f-a6fe207e8cd2",
+            "title": "Conditionals and branching",
+            "date": "2026-11-30",
+            "periodKey": "a97497ae-11cb-4ed0-81e5-c65204447e9d",
+            "outcome": "Write if, elif, and else branches to control program flow.",
+            "topicKeys": [
+              "97a0a9c1-8dd3-4ace-b86b-dd1324daeec5"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Create a program that chooses between at least three outcomes.",
+            "dependsOn": [
+              "9af9c926-2559-4525-a676-ab1c1767855f"
+            ]
+          },
+          {
+            "key": "83d062b4-db7c-4db7-8be2-23a9a28356b2",
+            "title": "Loops and repetition",
+            "date": "2026-12-31",
+            "periodKey": "0210d2e4-3ebd-409e-a0a7-3cb796954729",
+            "outcome": "Complete the planned topics for this period and note what remains.",
+            "topicKeys": [
+              "39a1b8a8-c79d-4836-928d-6eb17d38abf7"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Write a loop that repeats an action and stops under a stated condition.",
+            "dependsOn": [
+              "7e22d9dd-be9b-4fd1-910f-a6fe207e8cd2"
+            ]
+          },
+          {
+            "key": "c840deec-2efa-4c85-a537-4317e38f9de7",
+            "title": "Functions and reuse",
+            "date": "2027-01-31",
+            "periodKey": "a8dfc18b-e3cd-4e30-b7ca-c1960b59bb40",
+            "outcome": "Define and call functions with parameters and return values.",
+            "topicKeys": [
+              "e1a0725a-9fd5-4e4f-a757-4a14c962d825"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Refactor a short script into at least two reusable functions.",
+            "dependsOn": [
+              "83d062b4-db7c-4db7-8be2-23a9a28356b2"
+            ]
+          },
+          {
+            "key": "07210f89-9bb4-4b0c-9080-8fc20fb326bf",
+            "title": "Lists and dictionaries",
+            "date": "2027-02-28",
+            "periodKey": "751ec854-58d0-4bdb-8f56-0ca92103c789",
+            "outcome": "Store, retrieve, and update data using lists and dictionaries.",
+            "topicKeys": [
+              "1548d065-3286-4b5b-9df3-2704e0b3f83e"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Build a small program that stores records in a list of dictionaries.",
+            "dependsOn": [
+              "c840deec-2efa-4c85-a537-4317e38f9de7"
+            ]
+          },
+          {
+            "key": "e0161581-119e-41e4-b538-0eb0b0b19765",
+            "title": "Files and exceptions",
+            "date": "2027-03-31",
+            "periodKey": "95a99a92-05e8-4d95-9a14-d09e8c0c05cc",
+            "outcome": "Complete the planned topics for this period and note what remains.",
+            "topicKeys": [
+              "8e5e5bd9-7a5d-475e-95ac-cfea53b77d08"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Write a program that reads a file and handles a missing-file error.",
+            "dependsOn": [
+              "07210f89-9bb4-4b0c-9080-8fc20fb326bf"
+            ]
+          },
+          {
+            "key": "77a2e4c0-85c4-4051-8ccb-ecf83713ccb1",
+            "title": "Integrated Python practice",
+            "date": "2027-03-31",
+            "periodKey": "95a99a92-05e8-4d95-9a14-d09e8c0c05cc",
+            "outcome": "Complete the planned topics for this period and note what remains.",
+            "topicKeys": [
+              "1428b2d3-c990-4850-b83c-43db7283a3f7",
+              "97a0a9c1-8dd3-4ace-b86b-dd1324daeec5",
+              "39a1b8a8-c79d-4836-928d-6eb17d38abf7",
+              "e1a0725a-9fd5-4e4f-a757-4a14c962d825",
+              "1548d065-3286-4b5b-9df3-2704e0b3f83e",
+              "8e5e5bd9-7a5d-475e-95ac-cfea53b77d08"
+            ],
+            "effortMinutes": 105,
+            "checkpoint": "Run a small integrated program that uses all six units.",
+            "dependsOn": [
+              "e0161581-119e-41e4-b538-0eb0b0b19765"
+            ]
+          }
+        ],
+        "items": [],
+        "mode": "ROADMAP",
+        "outcome": "Complete introductory Python course",
+        "periods": [
+          {
+            "key": "d2a3efcc-4071-4d11-9b10-88466799e418",
+            "title": "October 2026",
+            "granularity": "MONTH",
+            "startDate": "2026-10-02",
+            "endDate": "2026-10-31",
+            "order": 0
+          },
+          {
+            "key": "a97497ae-11cb-4ed0-81e5-c65204447e9d",
+            "title": "November 2026",
+            "granularity": "MONTH",
+            "startDate": "2026-11-01",
+            "endDate": "2026-11-30",
+            "order": 1
+          },
+          {
+            "key": "0210d2e4-3ebd-409e-a0a7-3cb796954729",
+            "title": "December 2026",
+            "granularity": "MONTH",
+            "startDate": "2026-12-01",
+            "endDate": "2026-12-31",
+            "order": 2
+          },
+          {
+            "key": "a8dfc18b-e3cd-4e30-b7ca-c1960b59bb40",
+            "title": "January 2027",
+            "granularity": "MONTH",
+            "startDate": "2027-01-01",
+            "endDate": "2027-01-31",
+            "order": 3
+          },
+          {
+            "key": "751ec854-58d0-4bdb-8f56-0ca92103c789",
+            "title": "February 2027",
+            "granularity": "MONTH",
+            "startDate": "2027-02-01",
+            "endDate": "2027-02-28",
+            "order": 4
+          },
+          {
+            "key": "95a99a92-05e8-4d95-9a14-d09e8c0c05cc",
+            "title": "March 2027",
+            "granularity": "MONTH",
+            "startDate": "2027-03-01",
+            "endDate": "2027-03-31",
+            "order": 5
+          }
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,144 @@
+{
+  "phase": 2,
+  "request": "Revised Phase 2: master-grid analysis, shared full-canvas layers and pixel-only device-position snapping",
+  "tests": {
+    "command": "npx vitest run __tests__/landing __tests__/components/onboarding-redesign.test.tsx",
+    "passed": 140,
+    "files": 17,
+    "exitCode": 0
+  },
+  "lint": {
+    "scope": "All Phase 2 app/test/script files",
+    "errors": 0,
+    "warnings": 0,
+    "exitCode": 0
+  },
+  "assetValidation": {
+    "sharedCanvas": {
+      "width": 1254,
+      "height": 1254,
+      "origin": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "runtime": [
+      {
+        "file": "public/companions/pixel/sylf/base/body.png",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "file": "public/companions/pixel/sylf/eyes/neutral.png",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "file": "public/companions/pixel/sylf/eyes/happy.png",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "file": "public/companions/pixel/sylf/eyes/thinking.png",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "file": "public/companions/pixel/sylf/eyes/focused.png",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "file": "public/companions/pixel/sylf/eyes/sleepy.png",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "file": "public/companions/pixel/sylf/eyes/blink.png",
+        "width": 1254,
+        "height": 1254,
+        "hasAlpha": true,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    ],
+    "eyeCheck": "node scripts/prepare-pixel-companion-eyes.mjs --check passed; exact crops and deterministic nearest samples checked; zero generated visible RGBA colors",
+    "sourcesUnchanged": 9,
+    "bodyAndFullReferenceByteIdentical": true
+  },
+  "browser": {
+    "command": "node scripts/verify-pixel-companion-phase2.mjs",
+    "checks": 317,
+    "expressionCases": 150,
+    "failures": 0,
+    "runtimeExceptions": 0,
+    "context": "Installed headless Chrome with emulated DPR/viewports; no physical-device hardware benchmark",
+    "movement": [
+      {
+        "name": "Device-pixel snapped scroll travel DPR1",
+        "samples": 44,
+        "maxDevicePixelFraction": 0
+      },
+      {
+        "name": "Device-pixel snapped scroll travel DPR2",
+        "samples": 42,
+        "maxDevicePixelFraction": 0
+      },
+      {
+        "name": "Device-pixel snapped scroll travel DPR3",
+        "samples": 44,
+        "maxDevicePixelFraction": 0.00006103515625
+      }
+    ],
+    "brightPaletteSamples": 39016,
+    "unknownBrightPaletteColors": 0
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit --incremental false",
+    "exitCode": 2,
+    "errorCount": 12,
+    "identicalPhase1Diagnostics": true,
+    "phase2Errors": 0,
+    "limitation": "Existing generated Next route/page contract errors prevent a full passing check"
+  },
+  "build": {
+    "command": "npm run build -- --webpack",
+    "compiled": true,
+    "compilationSeconds": 21.2,
+    "exitCode": 1,
+    "blocker": "Existing invalid CURATED_SOUNDSCAPES export in app/api/acoustics/route.ts; unrelated route validation left unchanged"
+  },
+  "phase3Implemented": false
+}

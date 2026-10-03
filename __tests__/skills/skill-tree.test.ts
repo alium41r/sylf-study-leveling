@@ -192,6 +192,9 @@ describe("Gamification Engine Phase 3 — 8-Class Cognitive Skill Tree Infrastru
   describe("HP Penalty Service Psychologist Integration", () => {
     beforeEach(() => {
       vi.clearAllMocks();
+    vi.spyOn(prisma, "$queryRaw").mockResolvedValue([]);
+    vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(prisma));
+    vi.spyOn(prisma.floatingRestDay, "findMany").mockResolvedValue([]);
     });
 
     it("mitigates penalty with psychologist-mental-shield (25% damage reduction)", async () => {
@@ -218,6 +221,9 @@ describe("Gamification Engine Phase 3 — 8-Class Cognitive Skill Tree Infrastru
 
       vi.spyOn(prisma, "$transaction").mockImplementation(async (callback: any) => {
         return callback({
+          $queryRaw: vi.fn().mockResolvedValue([]),
+          studySession: prisma.studySession,
+          floatingRestDay: prisma.floatingRestDay,
           userInventory: {
             findFirst: vi.fn().mockResolvedValue(null),
           },
@@ -231,6 +237,7 @@ describe("Gamification Engine Phase 3 — 8-Class Cognitive Skill Tree Infrastru
             create: vi.fn(),
           },
           user: {
+            findUnique: prisma.user.findUnique,
             update: mockUserUpdate,
           },
         });
@@ -267,6 +274,9 @@ describe("Gamification Engine Phase 3 — 8-Class Cognitive Skill Tree Infrastru
 
       vi.spyOn(prisma, "$transaction").mockImplementation(async (callback: any) => {
         return callback({
+          $queryRaw: vi.fn().mockResolvedValue([]),
+          studySession: prisma.studySession,
+          floatingRestDay: prisma.floatingRestDay,
           userInventory: {
             findFirst: vi.fn().mockResolvedValue(null),
           },
@@ -280,6 +290,7 @@ describe("Gamification Engine Phase 3 — 8-Class Cognitive Skill Tree Infrastru
             create: vi.fn(),
           },
           user: {
+            findUnique: prisma.user.findUnique,
             update: mockUserUpdate,
           },
         });

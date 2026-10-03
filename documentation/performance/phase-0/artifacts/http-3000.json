@@ -1,0 +1,231 @@
+{
+  "at": "2026-09-11T03:30:34.030Z",
+  "base": "http://localhost:3000",
+  "authentication": "none; redirects are not authenticated-page timings",
+  "samples": [
+    {
+      "path": "/",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 223.83270799999997,
+      "totalMs": 230.599,
+      "decodedBytes": 70094
+    },
+    {
+      "path": "/",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 92.93504199999995,
+      "totalMs": 95.90104199999996,
+      "decodedBytes": 70094
+    },
+    {
+      "path": "/",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 81.15445899999997,
+      "totalMs": 84.98225000000002,
+      "decodedBytes": 70094
+    },
+    {
+      "path": "/",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 59.564666999999986,
+      "totalMs": 62.08566700000006,
+      "decodedBytes": 70094
+    },
+    {
+      "path": "/",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 67.41650000000004,
+      "totalMs": 69.69708400000002,
+      "decodedBytes": 70094
+    },
+    {
+      "path": "/",
+      "sample": 6,
+      "status": 200,
+      "headersMs": 56.71554100000003,
+      "totalMs": 61.21279100000004,
+      "decodedBytes": 70094
+    },
+    {
+      "path": "/",
+      "sample": 7,
+      "status": 200,
+      "headersMs": 118.61766599999999,
+      "totalMs": 137.02866600000004,
+      "decodedBytes": 70094
+    },
+    {
+      "path": "/dashboard",
+      "sample": 1,
+      "status": 307,
+      "headersMs": 11.965667000000053,
+      "totalMs": 12.349333999999999,
+      "decodedBytes": 6
+    },
+    {
+      "path": "/dashboard",
+      "sample": 2,
+      "status": 307,
+      "headersMs": 10.609249999999975,
+      "totalMs": 10.863708999999972,
+      "decodedBytes": 6
+    },
+    {
+      "path": "/dashboard",
+      "sample": 3,
+      "status": 307,
+      "headersMs": 12.74295799999993,
+      "totalMs": 12.975916999999981,
+      "decodedBytes": 6
+    },
+    {
+      "path": "/dashboard",
+      "sample": 4,
+      "status": 307,
+      "headersMs": 7.579458000000045,
+      "totalMs": 7.731999999999971,
+      "decodedBytes": 6
+    },
+    {
+      "path": "/dashboard",
+      "sample": 5,
+      "status": 307,
+      "headersMs": 8.255916999999954,
+      "totalMs": 8.449374999999918,
+      "decodedBytes": 6
+    },
+    {
+      "path": "/dashboard",
+      "sample": 6,
+      "status": 307,
+      "headersMs": 6.809582999999975,
+      "totalMs": 7.023124999999936,
+      "decodedBytes": 6
+    },
+    {
+      "path": "/dashboard",
+      "sample": 7,
+      "status": 307,
+      "headersMs": 8.391458000000057,
+      "totalMs": 8.614374999999995,
+      "decodedBytes": 6
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 1,
+      "status": 401,
+      "headersMs": 25.669457999999963,
+      "totalMs": 25.841790999999944,
+      "decodedBytes": 24
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 2,
+      "status": 401,
+      "headersMs": 25.835207999999966,
+      "totalMs": 26.084249999999997,
+      "decodedBytes": 24
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 3,
+      "status": 401,
+      "headersMs": 8.717583999999988,
+      "totalMs": 8.972708999999895,
+      "decodedBytes": 24
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 4,
+      "status": 401,
+      "headersMs": 10.271749999999997,
+      "totalMs": 10.639374999999973,
+      "decodedBytes": 24
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 5,
+      "status": 401,
+      "headersMs": 9.587292000000048,
+      "totalMs": 9.998958000000016,
+      "decodedBytes": 24
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 6,
+      "status": 401,
+      "headersMs": 10.126957999999945,
+      "totalMs": 10.428332999999952,
+      "decodedBytes": 24
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 7,
+      "status": 401,
+      "headersMs": 12.46383400000002,
+      "totalMs": 12.967624999999998,
+      "decodedBytes": 24
+    },
+    {
+      "path": "/api/acoustics",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 20.29508300000009,
+      "totalMs": 20.719708000000082,
+      "decodedBytes": 4590
+    },
+    {
+      "path": "/api/acoustics",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 18.085209000000077,
+      "totalMs": 18.52216700000008,
+      "decodedBytes": 4590
+    },
+    {
+      "path": "/api/acoustics",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 20.247708000000102,
+      "totalMs": 20.597917000000052,
+      "decodedBytes": 4590
+    },
+    {
+      "path": "/api/acoustics",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 16.340791999999965,
+      "totalMs": 16.888749999999845,
+      "decodedBytes": 4590
+    },
+    {
+      "path": "/api/acoustics",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 17.27520800000002,
+      "totalMs": 17.82508299999995,
+      "decodedBytes": 4590
+    },
+    {
+      "path": "/api/acoustics",
+      "sample": 6,
+      "status": 200,
+      "headersMs": 20.19554100000005,
+      "totalMs": 20.727750000000015,
+      "decodedBytes": 4590
+    },
+    {
+      "path": "/api/acoustics",
+      "sample": 7,
+      "status": 200,
+      "headersMs": 23.99066700000003,
+      "totalMs": 24.4826250000001,
+      "decodedBytes": 4590
+    }
+  ]
+}

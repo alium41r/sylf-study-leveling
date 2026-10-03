@@ -7,6 +7,9 @@ import { SettingsRow } from "../../components/SettingsRow";
 import { PrivacyLevel } from "@/lib/privacy-types";
 import { fetchCachedJSON, clearClientCache } from "@/lib/client-data-cache";
 
+import styles from "@/app/settings/components/SystemHubPage.module.css";
+import { Eye, Shield, Users, Lock, Check, AlertCircle } from "lucide-react";
+
 export default function PrivacyInformation() {
   const { user, isLoading } = useAuth();
   
@@ -110,9 +113,9 @@ export default function PrivacyInformation() {
 
   if (isLoading || isFetching) {
     return (
-      <div className="animate-pulse pt-2 space-y-8">
-        <div className="bg-white/5 border border-white/10 rounded h-[140px]"></div>
-        <div className="bg-white/5 border border-white/10 rounded h-[140px]"></div>
+      <div className="animate-pulse pt-2 space-y-6">
+        <div className="h-32 rounded-xl bg-[var(--sub-surface)]"></div>
+        <div className="h-32 rounded-xl bg-[var(--sub-surface)]"></div>
       </div>
     );
   }
@@ -123,8 +126,8 @@ export default function PrivacyInformation() {
       value={value}
       onChange={handleSelectChange}
       disabled={isSaving}
-      className="input-field text-sm shrink-0 bg-bg-void border-border-subtle focus:border-accent-cyan"
-      style={{ padding: "6px 12px", width: "auto", minWidth: "140px" }}
+      className={styles.configSelect}
+      style={{ width: "auto", minWidth: "150px", height: "38px", padding: "0 32px 0 12px", fontSize: "0.85rem" }}
     >
       <option value={PrivacyLevel.PUBLIC}>Public</option>
       <option value={PrivacyLevel.GROUPS}>Groups & Friends</option>
@@ -134,21 +137,30 @@ export default function PrivacyInformation() {
   );
 
   return (
-    <form onSubmit={handleSave} className="space-y-8 pt-2 relative">
+    <form onSubmit={handleSave} className="space-y-6 pt-1 relative">
       {status.message && (
-        <div className={`p-4 rounded border text-sm ${
-          status.type === 'success' 
-            ? 'bg-accent-green/10 border-accent-green/30 text-accent-green' 
-            : 'bg-red-950/20 border-red-900/50 text-accent-red'
-        }`}>
-          {status.message}
+        <div
+          className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 font-['Rajdhani'] font-bold ${
+            status.type === 'success'
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
+              : 'bg-rose-500/10 border-rose-500/30 text-rose-500'
+          }`}
+        >
+          {status.type === 'success' ? (
+            <Check className="w-4 h-4 shrink-0 text-emerald-500" />
+          ) : (
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+          )}
+          <span>{status.message}</span>
         </div>
       )}
 
+
       {/* Visibility & Status */}
       <div>
-        <h3 className="text-sm font-['Rajdhani'] font-bold uppercase tracking-widest text-accent-text-light mb-4">
-          Visibility & Status
+        <h3 className="text-xs font-['Rajdhani'] font-bold uppercase tracking-widest text-[var(--accent)] mb-3 flex items-center gap-2">
+          <Eye className="w-3.5 h-3.5" />
+          <span>Visibility & Online Telemetry</span>
         </h3>
         <SettingsRowGroup>
           <SettingsRow
@@ -176,8 +188,9 @@ export default function PrivacyInformation() {
 
       {/* Profile Data */}
       <div>
-        <h3 className="text-sm font-['Rajdhani'] font-bold uppercase tracking-widest text-accent-text-light mb-4">
-          Profile Data
+        <h3 className="text-xs font-['Rajdhani'] font-bold uppercase tracking-widest text-[var(--accent)] mb-3 flex items-center gap-2">
+          <Shield className="w-3.5 h-3.5" />
+          <span>Hunter Progress & Profile Data</span>
         </h3>
         <SettingsRowGroup>
           <SettingsRow
@@ -205,8 +218,9 @@ export default function PrivacyInformation() {
 
       {/* Social & Interactions */}
       <div>
-        <h3 className="text-sm font-['Rajdhani'] font-bold uppercase tracking-widest text-accent-text-light mb-4">
-          Social & Interactions
+        <h3 className="text-xs font-['Rajdhani'] font-bold uppercase tracking-widest text-[var(--accent)] mb-3 flex items-center gap-2">
+          <Users className="w-3.5 h-3.5" />
+          <span>Social Boundaries & Communications</span>
         </h3>
         <SettingsRowGroup>
           <SettingsRow
@@ -225,14 +239,10 @@ export default function PrivacyInformation() {
         </SettingsRowGroup>
       </div>
 
-      <div className="border-t border-border-subtle pt-6 flex justify-end">
+      <div className="border-t border-[var(--subtle-line)] pt-5 flex justify-end">
         <button 
           type="submit" 
-          className={`px-6 py-2.5 rounded-xl font-['Rajdhani'] font-bold tracking-wider uppercase text-white transition-all shadow-md ${
-            !isDirty || isSaving 
-              ? "bg-accent-primary-dim opacity-50 cursor-not-allowed border border-border-subtle" 
-              : "bg-accent-primary hover:bg-accent-primary-mid active:scale-95"
-          }`} 
+          className={`${styles.btnPrimary} w-full sm:w-auto`}
           disabled={!isDirty || isSaving}
         >
           {isSaving ? "Saving..." : "Save Preferences"}

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
 import { CharacterConfig } from "@/lib/character-traits";
+import styles from "../Locker.module.css";
 import {
   Package,
   Shield,
@@ -486,7 +487,10 @@ export function ItemsTab() {
       {/* ═════════════════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* ─── LEFT COLUMN: CHARACTER CARD STAGE (4 Cols) ────────── */}
-        <div className="lg:col-span-4 xl:col-span-4 rounded-2xl bg-bg-panel/90 border border-white/10 p-6 flex flex-col items-center text-center relative overflow-hidden shadow-2xl backdrop-blur-xl gap-5 lg:sticky lg:top-6">
+        <div className={`${styles.stageCard} lg:col-span-4 xl:col-span-4 p-6 flex flex-col items-center text-center relative overflow-hidden gap-5 lg:sticky lg:top-6`}>
+          {/* Top Specular Highlight */}
+          <div className={styles.topHighlight} aria-hidden="true" />
+
           {/* Ambient Glow Background Accent */}
           <div className="absolute -top-16 -left-16 w-48 h-48 bg-accent-primary/15 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -565,8 +569,11 @@ export function ItemsTab() {
         {/* ─── RIGHT COLUMN: LOADOUT MATRIX & INVENTORY VAULT (8 Cols) ── */}
         <div className="lg:col-span-8 xl:col-span-8 flex flex-col gap-6">
           {/* ─── 1. TOP LOADOUT BAR (5 TACTICAL DROP SLOTS) ────────────── */}
-          <div className="rounded-2xl bg-bg-panel/80 border border-white/10 p-5 sm:p-6 shadow-xl backdrop-blur-xl flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className={`${styles.card} p-5 sm:p-6 flex flex-col gap-4 relative overflow-hidden`}>
+            {/* Top Specular Highlight */}
+            <div className={styles.topHighlight} aria-hidden="true" />
+
+            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-accent-text-light" />
                 <h4 className="text-sm font-extrabold font-['Rajdhani'] uppercase tracking-widest text-text-primary">
@@ -658,9 +665,12 @@ export function ItemsTab() {
           </div>
 
           {/* ─── 2. BOTTOM INVENTORY VAULT GRID ──────────────────────── */}
-          <div className="rounded-2xl bg-bg-panel/80 border border-white/10 p-5 sm:p-6 shadow-xl backdrop-blur-xl flex flex-col gap-5">
+          <div className={`${styles.card} p-5 sm:p-6 flex flex-col gap-5 relative overflow-hidden`}>
+            {/* Top Specular Highlight */}
+            <div className={styles.topHighlight} aria-hidden="true" />
+
             {/* Category Filter Pills & Search */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-border-subtle pb-4">
               {/* Category Pills */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
                 {VAULT_TABS.map((cat) => {
@@ -673,8 +683,8 @@ export function ItemsTab() {
                       type="button"
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold font-['Rajdhani'] text-xs uppercase tracking-wider transition-all shrink-0 border ${
                         isActive
-                          ? "bg-accent-primary text-white border-accent-primary shadow-[0_0_14px_rgba(124,58,237,0.35)]"
-                          : "bg-bg-abyss/60 text-text-secondary hover:text-text-primary border-white/10 hover:border-white/20"
+                          ? "bg-accent-primary text-white border-accent-primary shadow-[0_0_14px_var(--accent-primary-dim)]"
+                          : "bg-surface border-border-subtle text-text-secondary hover:text-text-primary hover:border-accent-primary/40"
                       }`}
                     >
                       <Icon className="w-3.5 h-3.5" />
@@ -692,7 +702,7 @@ export function ItemsTab() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search vault..."
-                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-bg-abyss/80 border border-white/10 text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary/60"
+                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-surface border border-border-subtle text-xs font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary shadow-sm"
                 />
               </div>
             </div>

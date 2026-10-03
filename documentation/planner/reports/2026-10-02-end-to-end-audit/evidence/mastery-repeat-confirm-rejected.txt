@@ -1,0 +1,218 @@
+Browser tab: 4, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/system".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system
+	2 container
+		3 container
+			4 button Collapse sidebar
+			5 button Description: Open System Hub, Help: System Hub
+				6 image
+			7 button Notifications
+				8 image
+			9 button View Profile Card
+				10 text P
+				11 text Scholar
+				12 container
+					13 text E -Rank • Lv.  1
+		14 container Main Navigation
+			15 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			16 link Description: Timer, Value: 127.0.0.1:3101/timer
+			17 link Description: Social, Value: 127.0.0.1:3101/social
+			18 link Description: The System AI, Value: 127.0.0.1:3101/system
+			19 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			20 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			21 link Description: Locker, Value: 127.0.0.1:3101/locker
+			22 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		23 button Logout
+			24 image
+			25 text Logout
+		26 container
+			27 container
+				28 button CONVERSATION
+				30 button PLANNER ∞
+					31 text PLANNER
+					32 text ∞
+				33 text THE SYSTEM
+				34 text INTELLIGENCE LAYER
+				35 heading System Workspace, Value: 1
+					36 text System 
+					37 text Workspace
+				38 button (collapsed) Description: Open Archives, Secondary Actions: Expand
+					39 text ARCHIVES
+					40 text 1
+			148 container
+				149 container Planner setup
+					150 button Choose a different plan
+					151 text CHAPTER / UNIT MASTERY
+					152 button Quick Plan
+					153 button Advanced setup
+					154 button Classic Planner
+				155 container Quick Plan
+					156 heading WHAT DO YOU WANT TO MASTER?, Value: 2
+						157 text WHAT DO YOU WANT TO MASTER?
+					158 button (collapsed) Description: Ask Sylf Assistant, Secondary Actions: Expand
+					159 text 1
+					160 heading GOAL & TIMELINE, Value: 3
+						161 text GOAL & TIMELINE
+					162 text UNIT OR CHAPTER
+					163 text field (settable) UNIT OR CHAPTER, Value: Master the chain rule, ID: quick-plan-goal
+					164 text ONE chapter or topic — not a range. Put the chapters themselves in step 2 and Sylf will expand them.
+					165 container
+						166 text SUBJECT (optional)
+					167 text field (settable) SUBJECT (optional), ID: quick-plan-subject
+					168 text FINISH BY
+					169 date field (settable) FINISH BY, Value: 2026-11-20, ID: quick-plan-date
+						311 container
+							312 stepper
+							313 stepper
+							314 stepper
+						315 pop up button Show date picker Show date picker
+					175 container quick-plan-scope-step
+						176 text 2
+						177 heading WHAT SHOULD SYLF COVER?, Value: 3
+							178 text WHAT SHOULD SYLF COVER?
+						179 text Pick one way in. Nothing is searched, read or used until you confirm it.
+						180 text 1 · LOOK IT UP
+						181 text Sylf searches for the official syllabus, reads it, and shows you what it found — with its sources — before any of it is used.
+						182 button FIND SYLLABUS
+						183 text EXAM BOARD OR SYSTEM (OPTIONAL)
+						184 pop up button (collapsed, settable) EXAM BOARD OR SYSTEM (OPTIONAL), Value: Not sure / other, ID: quick-plan-board, Secondary Actions: Expand
+							185 menu
+								186 (selected) Not sure / other
+								187 CAIE — Cambridge International
+								188 Edexcel (Pearson)
+								189 Oxford AQA International
+								190 AQA (UK)
+								191 OCR (UK)
+								192 WJEC / Eduqas (Wales)
+								193 CCEA (Northern Ireland)
+								194 AP (College Board)
+								195 IB (International Baccalaureate)
+								196 FBISE — Federal Board (Pakistan)
+								197 BISE Punjab (Lahore)
+								198 BISE Sindh (Karachi)
+								199 BISE KPK (Peshawar)
+								200 BISE Balochistan (Quetta)
+								201 AKU-EB (Aga Khan University)
+								202 CBSE (India)
+								203 CISCE — ICSE / ISC (India)
+								204 NIOS (India — Open Schooling)
+								205 State Board (India)
+								206 University
+								207 Other
+						208 text ACADEMIC LEVEL
+						209 pop up button (collapsed, settable) ACADEMIC LEVEL, Value: Level not set, ID: quick-plan-level, Secondary Actions: Expand
+							210 menu
+								211 (selected) Level not set
+								212 A-Level
+								213 AS-Level
+								214 IGCSE
+								215 GCSE
+								216 O-Level
+								217 AP (Advanced Placement)
+								218 IB Higher Level (HL)
+								219 IB Standard Level (SL)
+								220 Middle School (Class 6-8)
+								221 Matriculation / SSC (Class 9-10)
+								222 Intermediate / HSSC (Class 11-12)
+								223 High School
+								224 Undergraduate
+								225 Other
+						226 text Both are optional and both are worth setting. This is how Sylf tells which sources are actually the exam board’s own rather than merely plausible ones — without it a search still runs, it just will not call anything official.
+						227 text Nothing is looked up until you press Find syllabus.
+						228 text 2 · UPLOAD IT
+						229 text Have the syllabus already? A PDF, or a photo of the contents page — Sylf reads it and lists the units.
+						230 text Upload a syllabus
+						231 text 3 · PASTE IT
+						232 text Copy a contents list from anywhere — a school website, a PDF, a teacher’s sheet — and paste it in. One unit per line.
+						233 button (collapsed) Paste an outline, Secondary Actions: Expand
+						234 text 4 · TYPE IT YOURSELF
+						235 text Don’t type ten chapter names from memory — type the range and Sylf will expand it into one unit per chapter.
+						236 text WHAT DO YOU NEED TO COVER?
+						237 text entry area (settable) WHAT DO YOU NEED TO COVER?, Value: Chain rule for composite functions, ID: quick-plan-scope
+						238 container quick-plan-scope-help
+							239 text One topic per line — or a range, and Sylf will expand it. Try
+							240 text Chapters 1-10
+							241 text  or 
+							242 text A-Level Physics P2 chapters 1-10
+							243 text . Leave it blank if you are not sure yet — you can add units later.
+						244 container
+							245 text 1  unit  will be planned .
+						246 button Use only what I give you
+						247 text Stops Sylf searching anything. Pick this if you would rather supply everything yourself.
+					248 text 3
+					249 heading HOW MUCH TIME DO YOU HAVE?, Value: 3
+						250 text HOW MUCH TIME DO YOU HAVE?
+					251 container Description: HOW MUCH TIME CAN YOU GIVE THIS EACH WEEK?, ID: quick-plan-budget
+						252 text HOW MUCH TIME CAN YOU GIVE THIS EACH WEEK?
+						253 container
+							254 text A realistic target, not a promise. Sylf spreads it around your rest days and whatever you have already planned. Open the days editor below if your week is unusual.
+						255 container Weekly study time
+							256 checkbox 3h, Value: 0
+							257 checkbox 5h, Value: 0
+							258 checkbox 8h, Value: 0
+							259 checkbox 10h, Value: 0
+							260 checkbox 15h, Value: 0
+							261 checkbox (collapsed) Custom, Value: 0, Secondary Actions: Expand
+						262 checkbox Use my normal Sylf schedule (12h a week), Value: 1
+						263 text 12h across 6 study days (about 2h each); Sunday left free; Sunday excluded by your settings.
+						264 content list How the weekly time is spread
+							265 container
+								266 text Sunday free
+							267 container
+								268 text Monday 2h 4m
+							269 container
+								270 text Tuesday 2h 13m
+							271 container
+								272 text Wednesday 2h 9m
+							273 container
+								274 text Thursday 2h 9m
+							275 container
+								276 text Friday 1h 44m
+							277 container
+								278 text Saturday 1h 41m
+					279 button (collapsed) Customize days, Secondary Actions: Expand
+						280 text Customize days
+					281 button (collapsed) MAKE IT SHARPER (OPTIONAL) — Background curriculum & prior knowledge, Secondary Actions: Expand
+						282 text MAKE IT SHARPER (OPTIONAL)
+						283 text — Background curriculum & prior knowledge
+					284 container Plan summary
+						285 container
+							286 heading YOUR PLAN, Value: 3
+								287 text YOUR PLAN
+							288 text This is everything Sylf will work from. Anything left unstated is decided conservatively. WHAT
+							289 button Edit Goal
+							290 text Master the chain rule WHEN
+							291 button Edit Date
+							292 text Nov 20, 2026 ·  7 weeks away WHAT IT COVERS
+							293 button Edit Scope
+							294 text 1  unit ·  entered topics HOW MUCH TIME
+							295 button Edit Weekly time
+							296 text 12h/week (normal schedule) →  Mon 2h 4m · Tue 2h 13m · Wed 2h 9m · Thu 2h 9m · Fri 1h 44m · Sat 1h 41m
+							297 button (collapsed) REVIEW DETAILS Your plan brief, Secondary Actions: Expand
+								298 text REVIEW DETAILS
+								299 text Your plan brief
+					300 container I HAVE ENOUGH TO MAKE A FIRST DRAFT.
+						301 heading I HAVE ENOUGH TO MAKE A FIRST DRAFT., Value: 3, ID: quick-plan-generate
+							302 text I HAVE ENOUGH TO MAKE A FIRST DRAFT.
+						303 text READY TO GENERATE
+						304 text Enough for a first draft, with 1 unit. Optional detail is available if you want it.
+						316 container
+							317 text The plan could not be confirmed. Nothing was created; the draft is saved.
+							318 button Change the brief
+					307 container
+						308 text Prefer the detailed setup?
+						309 button Open Advanced setup
+						310 text — it asks for everything, and nothing is created until you confirm a draft.
+			108 container
+				109 text ARCHIVES 1
+				110 button NEW, Help: New Chat Session
+				111 button Close Archives
+				112 text field (settable)
+				113 button SELECT, Help: Select multiple chats
+				114 text TODAY 1
+				115 text Study Plan: GCSE algebra review
+				116 button Description: Rename Study Plan: GCSE algebra review, Help: Rename chat
+				117 button Description: Delete Study Plan: GCSE algebra review, Help: Delete chat
+	319 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		320 image
+
+The focused UI element is 1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system

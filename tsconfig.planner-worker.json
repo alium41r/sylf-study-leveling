@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "rootDir": "lib",
+    "outDir": "dist/planner-worker",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "types": ["node"]
+  },
+  "include": ["lib/planner/v2/main.ts", "lib/planner/v2/server/**/*.ts", "lib/planner/v2/contracts/**/*.ts", "lib/planner/v2/intelligence/**/*.ts"],
+  "exclude": ["lib/planner/v2/server/web.ts"]
+}

@@ -9,6 +9,7 @@ import { NextRequest } from "next/server";
 
 vi.mock("@/lib/prisma", () => {
   const mockTx = {
+    $queryRaw: vi.fn().mockResolvedValue([]),
     user: {
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -17,6 +18,7 @@ vi.mock("@/lib/prisma", () => {
       upsert: vi.fn(),
     },
     subject: {
+      findMany: vi.fn().mockResolvedValue([]),
       upsert: vi.fn(),
       create: vi.fn(),
     },
@@ -50,6 +52,7 @@ vi.mock("@/lib/prisma", () => {
 describe("Subject-Syllabus Constellation & Focus Timer Auto-Sync (Phase 2)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    const tx = (prisma as any)._mockTx;
   });
 
   describe("1. 48-Node Constellation Topology & 115 SP Deterministic Ledger", () => {

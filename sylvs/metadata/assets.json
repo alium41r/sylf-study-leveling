@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "system": "sylv",
+  "assets": [
+    {
+      "id": "base-male",
+      "category": "base",
+      "name": "Canonical Male Base",
+      "gender": "male",
+      "rarity": "default",
+      "unlockType": "default",
+      "supportsPrimaryColor": true,
+      "supportsSecondaryColor": true,
+      "supportsGlow": true,
+      "path": "base/male/base-male.svg",
+      "zIndexLayer": 10,
+      "tags": ["base", "spirit", "floating", "male", "canonical"]
+    },
+    {
+      "id": "base-female",
+      "category": "base",
+      "name": "Canonical Female Base",
+      "gender": "female",
+      "rarity": "default",
+      "unlockType": "default",
+      "supportsPrimaryColor": true,
+      "supportsSecondaryColor": true,
+      "supportsGlow": true,
+      "path": "base/female/base-female.svg",
+      "zIndexLayer": 10,
+      "tags": ["base", "spirit", "floating", "female", "canonical"]
+    }
+  ]
+}

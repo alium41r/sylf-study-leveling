@@ -1,0 +1,178 @@
+[
+  {
+    "path": "app/components/landing/journey/WalkingCompanion.tsx",
+    "bytes": 9575
+  },
+  {
+    "path": "app/components/landing/journey/WalkingCompanion.module.css",
+    "bytes": 334
+  },
+  {
+    "path": "app/components/landing/journey/Companion.tsx",
+    "bytes": 720
+  },
+  {
+    "path": "app/components/landing/journey/companion-motion.ts",
+    "bytes": 1518
+  },
+  {
+    "path": "app/components/landing/journey/prototype/feet.ts",
+    "bytes": 2741
+  },
+  {
+    "path": "app/components/landing/journey/prototype/PrototypeCompanion.module.css",
+    "bytes": 625
+  },
+  {
+    "path": "app/components/landing/journey/prototype/locomotion.ts",
+    "bytes": 9590
+  },
+  {
+    "path": "app/components/landing/journey/prototype/frame-loop.ts",
+    "bytes": 934
+  },
+  {
+    "path": "app/components/landing/journey/prototype/movement.ts",
+    "bytes": 2767
+  },
+  {
+    "path": "app/components/landing/journey/prototype/types.ts",
+    "bytes": 905
+  },
+  {
+    "path": "app/components/landing/journey/prototype/rig.ts",
+    "bytes": 4363
+  },
+  {
+    "path": "app/components/landing/journey/prototype/diagnostics.ts",
+    "bytes": 6387
+  },
+  {
+    "path": "app/components/landing/journey/prototype/PrototypeCompanion.tsx",
+    "bytes": 3407
+  },
+  {
+    "path": "app/components/landing/journey/prototype/pixi-runtime.ts",
+    "bytes": 5667
+  },
+  {
+    "path": "app/components/landing/journey/prototype/personality.ts",
+    "bytes": 1748
+  },
+  {
+    "path": "__tests__/landing/companion-motion.test.ts",
+    "bytes": 3018
+  },
+  {
+    "path": "__tests__/landing/walking-companion.test.tsx",
+    "bytes": 8333
+  },
+  {
+    "path": "__tests__/landing/prototype-host.test.tsx",
+    "bytes": 3705
+  },
+  {
+    "path": "__tests__/landing/prototype-locomotion.test.ts",
+    "bytes": 11030
+  },
+  {
+    "path": "__tests__/landing/prototype-frame-loop.test.ts",
+    "bytes": 1878
+  },
+  {
+    "path": "__tests__/landing/prototype-diagnostics.test.ts",
+    "bytes": 1943
+  },
+  {
+    "path": "public/landing/chibi-idle-meditation.webm",
+    "bytes": 3627729
+  },
+  {
+    "path": "public/landing/chibi-idle-standing-provenance.json",
+    "bytes": 58464
+  },
+  {
+    "path": "public/landing/chibi-wave.webm",
+    "bytes": 2682734
+  },
+  {
+    "path": "public/landing/chibi-idle-standing-original.mp4",
+    "bytes": 3119557
+  },
+  {
+    "path": "public/landing/chibi-walk-original.mp4",
+    "bytes": 3112823
+  },
+  {
+    "path": "public/landing/chibi-wave-provenance.json",
+    "bytes": 58880
+  },
+  {
+    "path": "public/landing/chibi-walk-poster.png",
+    "bytes": 101759
+  },
+  {
+    "path": "public/landing/chibi-wave-original.mp4",
+    "bytes": 2482113
+  },
+  {
+    "path": "public/landing/chibi-idle-meditation-provenance.json",
+    "bytes": 57966
+  },
+  {
+    "path": "public/landing/chibi-walk.webm",
+    "bytes": 2665004
+  },
+  {
+    "path": "public/landing/chibi-wave-poster.png",
+    "bytes": 126594
+  },
+  {
+    "path": "public/landing/chibi-animation-registration.json",
+    "bytes": 2082
+  },
+  {
+    "path": "public/landing/chibi-idle-standing.webm",
+    "bytes": 3027936
+  },
+  {
+    "path": "public/landing/chibi-idle-meditation-original.mp4",
+    "bytes": 2771899
+  },
+  {
+    "path": "public/landing/chibi-idle-standing-poster.png",
+    "bytes": 173118
+  },
+  {
+    "path": "public/landing/chibi-idle-meditation-poster.png",
+    "bytes": 181730
+  },
+  {
+    "path": "public/landing/prototype/provenance.json",
+    "bytes": 600
+  },
+  {
+    "path": "public/landing/prototype/canonical.webp",
+    "bytes": 55296
+  },
+  {
+    "path": "public/landing/companions.png",
+    "bytes": 2345007
+  },
+  {
+    "path": "public/landing/companions.webp",
+    "bytes": 328548
+  },
+  {
+    "path": "public/landing/companion-poses.png",
+    "bytes": 2292586
+  },
+  {
+    "path": "public/landing/companion-poses.webp",
+    "bytes": 366320
+  },
+  {
+    "path": "public/landing/art-prompts.json",
+    "bytes": 3953
+  }
+]

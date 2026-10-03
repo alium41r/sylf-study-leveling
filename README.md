@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Repository documentation
+
+Start at the [documentation index](documentation/README.md) for current contracts, feature entry points, development reports, and evidence. Historical reports record their own task state; check the linked implementation before using them as current guidance. New reports belong under `documentation/<feature>/reports/<task-or-phase>/`, with evidence beside the report.
+
 ## Getting Started
 
 First, run the development server:

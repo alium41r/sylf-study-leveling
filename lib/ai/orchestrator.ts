@@ -202,11 +202,11 @@ TASK — produce the exact curriculum breakdown:
           { role: "user", content: synthesisPrompt },
         ];
 
-        onProgress?.(`[Researcher • DeepSeek v4 Pro] Synthesizing grounded findings into the official chapter list...`);
+        onProgress?.(`[Researcher • DeepSeek V4.1 Flash] Synthesizing grounded findings into the official chapter list...`);
         const res = await deepseek.generateResponse(messages, synthesisSystemInstruction, [], { signal });
 
         if (res.text && res.text.trim().length > 50) {
-          onProgress?.(`[Researcher • DeepSeek v4 Pro] Curriculum research finalized from live search findings.`);
+          onProgress?.(`[Researcher • DeepSeek V4.1 Flash] Curriculum research finalized from live search findings.`);
           return {
             data: res.text,
             model: `DeepSeek (${DEEPSEEK_MODELS.planner}) + ${searchSource}`,
@@ -351,7 +351,7 @@ TASK — produce the exact curriculum breakdown:
       try {
         const ai = new GoogleGenAI({ apiKey: geminiKey });
         const response = await ai.models.generateContent({
-          model: "gemini-3.7-flash",
+          model: GEMINI_MODELS.default,
           contents: prompt,
           config: {
             abortSignal: signal,
@@ -360,7 +360,7 @@ TASK — produce the exact curriculum breakdown:
         onProgress?.(`[Analyst • Gemini] Extracted ideal study durations and focus patterns.`);
         return {
           data: response.text || "Assume standard 45-minute sessions.",
-          model: "Gemini 3.7 Flash",
+          model: `Gemini (${GEMINI_MODELS.default})`,
           usage: this.geminiUsage(response),
         };
       } catch (e) {
@@ -377,7 +377,8 @@ TASK — produce the exact curriculum breakdown:
   /**
    * 3. Master Planner Agent
    * Synthesizes all information into a concrete list of Quests (tasks) to reach the goal.
-   * Primary: deepseek-v4-pro. Fallback: gemini-3.1-pro / 3.7-flash.
+   * Primary: the shared DeepSeek Flash model (DEEPSEEK_MODELS.planner).
+   * Fallback: gemini-3.1-pro / 3.7-flash.
    */
   private static async runMasterPlannerAgent(
     topic: string,
@@ -390,7 +391,7 @@ TASK — produce the exact curriculum breakdown:
     signal?: AbortSignal
   ): Promise<StudyPlanResult> {
     onProgress?.(
-      `[Master Planner • DeepSeek v4 Pro] Drafting ${Math.round(
+      `[Master Planner • DeepSeek V4.1 Flash] Drafting ${Math.round(
         totalTargetMinutes / 60
       )} hrs plan for "${topic}"...`
     );
@@ -463,7 +464,7 @@ Remember:
 
     const messages: NormalizedMessage[] = [{ role: "user", content: prompt }];
 
-    // Attempt 1: DeepSeek Primary Engine (deepseek-v4-pro)
+    // Attempt 1: DeepSeek Primary Engine (the shared Flash model)
     if (process.env.DEEPSEEK_API_KEY) {
       try {
         const deepseek = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.planner);
@@ -505,16 +506,16 @@ Remember:
         }
       } catch (geminiErr: any) {
         this.rethrowIfAborted(geminiErr, signal);
-        console.warn("[Master Planner Agent] Gemini research failed, trying 3.7-flash:", geminiErr.message);
+        console.warn("[Master Planner Agent] Gemini research failed, trying default flash:", geminiErr.message);
         try {
-          const geminiFlash = LLMFactory.getAdapter("gemini", "gemini-3.7-flash");
+          const geminiFlash = LLMFactory.getAdapter("gemini", GEMINI_MODELS.default);
           const res = await geminiFlash.generateResponse(messages, systemInstruction, [], {
             signal,
           });
 
           const parsed = this.parsePlanPayload(res.text || "", topic);
           if (parsed && parsed.quests.length > 0) {
-            parsed.modelUsed = "Gemini 3.7 Flash";
+            parsed.modelUsed = `Gemini (${GEMINI_MODELS.default})`;
             parsed.usage = this.sumUsage(res.usage);
             return parsed;
           }

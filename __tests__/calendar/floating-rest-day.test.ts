@@ -5,6 +5,7 @@ import { StudyScheduleService } from "../../lib/study-schedule-service";
 describe("Floating Rest Day Engine (Service)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(prisma.floatingRestDay, "findUnique").mockResolvedValue(null);
   });
 
   describe("isUserRestDay — unified rest day resolver", () => {
@@ -51,7 +52,7 @@ describe("Floating Rest Day Engine (Service)", () => {
       ).toBe(false);
     });
 
-    it("fails safe (false) when the floating lookup is unavailable", async () => {
+    it("fails closed when the floating lookup is unavailable", async () => {
       vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
         id: 1,
         restDays: [],
@@ -61,7 +62,7 @@ describe("Floating Rest Day Engine (Service)", () => {
       vi.spyOn(prisma.floatingRestDay, "findUnique").mockRejectedValue(
         new Error("table unavailable")
       );
-      expect(await StudyScheduleService.isUserRestDay(1, "2026-08-25")).toBe(false);
+      await expect(StudyScheduleService.isUserRestDay(1, "2026-08-25")).rejects.toThrow("table unavailable");
     });
   });
 
@@ -119,6 +120,7 @@ describe("Floating Rest Day Engine (Service)", () => {
   describe("cascadeQuestShifts — automatic quest shifting", () => {
     it("shifts uncompleted quests to the next available active date", async () => {
       const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([]),
         user: { findUnique: vi.fn().mockResolvedValue({ restDays: [0] }) },
         quest: {
           findMany: vi.fn().mockResolvedValue([
@@ -132,6 +134,9 @@ describe("Floating Rest Day Engine (Service)", () => {
         floatingRestDay: {
           findMany: vi.fn().mockResolvedValue([{ dateKey: "2026-08-26" }]),
         },
+        // The Planner's linked-Quest guard always runs now, so the transaction double
+        // must model the table it reads: nothing here is planner-linked.
+        plannerQuestLink: { findFirst: vi.fn().mockResolvedValue(null) },
       };
 
       // Designate 2026-08-25 (Tue) as a floating rest day; 26 (Wed) is also
@@ -150,12 +155,16 @@ describe("Floating Rest Day Engine (Service)", () => {
 
     it("ignores completed and failed quests", async () => {
       const tx = {
+        $queryRaw: vi.fn().mockResolvedValue([]),
         user: { findUnique: vi.fn().mockResolvedValue({ restDays: [] }) },
         quest: {
           findMany: vi.fn().mockResolvedValue([]),
           update: vi.fn(),
         },
         floatingRestDay: { findMany: vi.fn().mockResolvedValue([]) },
+        // The Planner's linked-Quest guard always runs now, so the transaction double
+        // must model the table it reads: nothing here is planner-linked.
+        plannerQuestLink: { findFirst: vi.fn().mockResolvedValue(null) },
       };
 
       const shifts = await StudyScheduleService.cascadeQuestShifts(1, "2026-08-25", { tx });

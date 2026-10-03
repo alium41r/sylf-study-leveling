@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 
+import { StreakFlameIcon } from "@/app/components/icons";
+
 export default function TopRightBar() {
   const { user } = useAuth();
   const [justExtendedStreak, setJustExtendedStreak] = useState(false);
@@ -60,13 +62,10 @@ export default function TopRightBar() {
           isAnimating ? "animate-streak-bounce border-yellow-400/80 shadow-yellow-500/50" : "border-border-subtle hover:border-yellow-400/50 hover:shadow-lg"
         }`}
       >
-        <svg 
-          className={`w-4 h-4 ${user.streakDays > 0 || isAnimating ? "text-yellow-400" : "text-text-muted"} ${isAnimating ? "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" : ""}`} 
-          fill="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
+        <StreakFlameIcon 
+          size={16}
+          className={`shrink-0 ${user.streakDays > 0 || isAnimating ? "text-yellow-400" : "text-text-muted"} ${isAnimating ? "drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" : ""}`} 
+        />
         <span className={`font-bold font-['Rajdhani'] tracking-wide text-sm ${user.streakDays > 0 ? "text-yellow-400" : "text-text-secondary"}`}>
           {user.streakDays} <span className="text-[10px] uppercase font-semibold text-text-muted">wks</span>
         </span>

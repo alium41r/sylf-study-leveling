@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { backdropVariants, modalDialogVariants } from "@/lib/motion";
 
 interface SearchResult {
   id: number;
@@ -70,23 +71,29 @@ export function AddFriendModal({ onClose }: AddFriendModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <motion.div
+      key="add-friend-modal-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+        variants={backdropVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
         className="absolute inset-0 bg-black/70 backdrop-blur-md"
         onClick={onClose}
       />
 
       {/* Modal */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.94, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.94, y: 10 }}
-        transition={{ type: "spring", damping: 28, stiffness: 380 }}
+        variants={modalDialogVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
         className="system-card relative w-full max-w-md p-6 z-10 flex flex-col max-h-[80vh] shadow-2xl"
       >
         <button
@@ -182,6 +189,6 @@ export function AddFriendModal({ onClose }: AddFriendModalProps) {
           )}
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

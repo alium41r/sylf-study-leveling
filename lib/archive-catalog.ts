@@ -1,4 +1,19 @@
-export type ArchiveCategory = 
+import {
+  ACHIEVEMENTS_CATALOG,
+  ACHIEVEMENT_CATEGORIES,
+  rankTitle,
+} from "./achievements-catalog";
+import { RANK_LADDER } from "./game-engine";
+import {
+  COGNITIVE_STAT_KEYS,
+  COGNITIVE_STATS,
+  ABILITY_TIERS,
+  INVEST_STEP,
+} from "./cognitive-stats";
+import { FULL_BODY_FORMS } from "./character-traits";
+import { FLOATING_REST_DAY_QUOTA } from "./study-schedule-types";
+
+export type ArchiveCategory =
   | "The System"
   | "Focus & Study"
   | "Quests & AI"
@@ -6,17 +21,14 @@ export type ArchiveCategory =
   | "Customization"
   | "Social & Network"
   | "Achievements";
-
-export type UnlockRequirement = 
+export type UnlockRequirement =
   | { type: "NONE" }
   | { type: "LEVEL"; value: number }
   | { type: "RANK"; value: string };
-
-export type ContentBlock = 
+export type ContentBlock =
   | { type: "p"; text: string }
   | { type: "h3"; text: string }
   | { type: "list"; items: string[] };
-
 export interface ArchiveEntry {
   id: string;
   categoryId: ArchiveCategory;
@@ -25,379 +37,574 @@ export interface ArchiveEntry {
   content: ContentBlock[];
   related: string[];
 }
+const p = (text: string): ContentBlock => ({ type: "p", text });
+const heading = (text: string): ContentBlock => ({ type: "h3", text });
+const list = (...items: string[]): ContentBlock => ({ type: "list", items });
+function entry(
+  id: string,
+  categoryId: ArchiveCategory,
+  title: string,
+  related: string[],
+  ...content: ContentBlock[]
+): ArchiveEntry {
+  return {
+    id,
+    categoryId,
+    title,
+    related,
+    content,
+    requirement: { type: "NONE" },
+  };
+}
 
+// A guide to the working app. Numerical ladders and catalog totals are derived
+// from their canonical registries; unpublished inventory is never promised here.
 export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
-  // ─── THE SYSTEM ───────────────────────────────────────────────
-  {
-    id: "sys_leveling",
-    categoryId: "The System",
-    title: "Levels & Experience",
-    requirement: { type: "NONE" },
-    related: ["sys_ranks", "eco_sylph", "sys_stats"],
-    content: [
-      { type: "p", text: "The System measures your growth through Experience Points (XP). You earn XP naturally by studying — finishing focus sessions on the Timer, completing Quests, and unlocking Achievements." },
-      { type: "p", text: "As your XP bar fills, you automatically Level Up. Each level-up raises your standing, unlocks new cosmetic rewards and shop items, and hands you a Sylph currency bonus as a gift." },
-      { type: "h3", text: "How it Feels" },
-      { type: "p", text: "Early levels come quickly so you feel the momentum of your new habit. Higher levels demand real consistency — the bar simply takes longer to fill the further you climb. There are no tricks: only study time and completed quests move it." },
-      { type: "h3", text: "Ways to Earn XP" },
-      { type: "list", items: [
-        "Focus sessions: the longer you focus, the more XP you earn.",
-        "Quests: every completed quest pays out its listed XP bounty.",
-        "Achievements: milestone rewards from the Achievements codex.",
-        "The weekly 3-hour milestone pays a large level-scaled XP reward."
-      ]}
-    ]
-  },
-  {
-    id: "sys_ranks",
-    categoryId: "The System",
-    title: "Hunter Ranks & Progression",
-    requirement: { type: "NONE" },
-    related: ["sys_leveling", "sys_classes"],
-    content: [
-      { type: "p", text: "While your Level measures raw progress, your Hunter Rank is your title — the badge everyone sees next to your name. Every scholar awakens as an E-Rank Hunter and climbs the ladder as their level rises." },
-      { type: "h3", text: "The Rank Ladder" },
-      { type: "list", items: [
-        "E-Rank — Level 1+ (The Awakening. Everyone starts here.)",
-        "D-Rank — Level 10+ (Habit is forming; the grind becomes routine.)",
-        "C-Rank — Level 25+ (A seasoned scholar with real standing.)",
-        "B-Rank — Level 50+ (Advanced discipline. High-tier status.)",
-        "A-Rank — Level 75+ (Elite. Prestigious titles and cosmetics unlock.)",
-        "S-Rank — Level 100+ (Master-level focus mastery.)",
-        "National Hunter — Level 125+ (Among the best in the country.)",
-        "Monarch — Level 150+ (The apex. The shadow monarch of scholars.)"
-      ]},
-      { type: "p", text: "Ranks aren't just for show — stronger shop gear, titles, and frames open up as you rise. Your rank badge appears on your profile, the leaderboards, and your friends' screens." }
-    ]
-  },
-  {
-    id: "sys_classes",
-    categoryId: "The System",
-    title: "Scholar Archetypes",
-    requirement: { type: "NONE" },
-    related: ["sys_ranks", "sys_skilltree", "sys_stats"],
-    content: [
-      { type: "p", text: "Every scholar has a study personality. The System models eight Archetypes — eight different ways of approaching learning — each with its own branch of the Skill Tree and its own bonuses." },
-      { type: "h3", text: "The Eight Archetypes" },
-      { type: "list", items: [
-        "Scholar — The reader. Bonuses to revision, review loops, and deep reading.",
-        "Analyst — The problem-solver. Earns extra Sylph on math and quantitative work.",
-        "Engineer — The organizer. Bonus rewards for staying on schedule and batch tasks.",
-        "Scientist — The rigor chaser. Extra XP for high-difficulty STEM work.",
-        "Researcher — The deep-diver. Bonuses for long, unbroken focus sessions.",
-        "Psychologist — The balanced one. Resists burnout and protects your mind.",
-        "Strategist — The planner. Bonus rewards for forecasting milestones.",
-        "Creative — The wildcard. Bonuses for cross-discipline and unusual study."
-      ]},
-      { type: "p", text: "You don't lock yourself in forever — the Skill Tree lets you invest points into any archetype you like, mixing perks to match your study style." }
-    ]
-  },
-  {
-    id: "sys_stats",
-    categoryId: "The System",
-    title: "Cognitive Attributes & Stats",
-    requirement: { type: "NONE" },
-    related: ["sys_leveling", "focus_timer"],
-    content: [
-      { type: "p", text: "The System tracks your growth across five core attributes, shown on your Scholar Profile:" },
-      { type: "list", items: [
-        "Endurance: Your ability to sustain long focus sessions without fatigue.",
-        "Tenacity: How consistently you hold streaks and push through hard tasks.",
-        "Velocity: How quickly you power through tasks and clear quests.",
-        "Synthesis: How well you retain concepts across subjects.",
-        "Discipline: How reliably you hit your daily targets and schedules."
-      ]},
-      { type: "p", text: "These attributes grow with real behaviour — long sessions build Endurance, consistent weeks build Tenacity. Think of them as your report card of habits, written by the System." }
-    ]
-  },
-
-  // ─── FOCUS & STUDY ────────────────────────────────────────────
-  {
-    id: "focus_timer",
-    categoryId: "Focus & Study",
-    title: "Study Timer & Focus Engine",
-    requirement: { type: "NONE" },
-    related: ["focus_subjects", "focus_streak", "eco_sylph"],
-    content: [
-      { type: "p", text: "The Focus Timer is where the work happens. Start a session from any subject or quest and it runs distraction-free — a big, clean timer with nothing else pulling your attention." },
-      { type: "h3", text: "Modes" },
-      { type: "list", items: [
-        "Free Flow: a simple stopwatch — study for as long as you want.",
-        "Pomodoro: classic focus/break cycles with session dots.",
-        "Deep Work: one long, protected block in fullscreen.",
-        "Sprint: short bursts with quick rests between them."
-      ]},
-      { type: "h3", text: "While You Study" },
-      { type: "p", text: "You can pull up the Tools dock for a calculator, scratchpad, formula sheet, ambient audio, or the in-session tutor — without ever leaving the timer. In Light Mode, a one-tap Eye-Comfort dimmer softens the screen for night studying." }
-    ]
-  },
-  {
-    id: "focus_subjects",
-    categoryId: "Focus & Study",
-    title: "Subjects & Objectives",
-    requirement: { type: "NONE" },
-    related: ["focus_timer", "qst_overview"],
-    content: [
-      { type: "p", text: "Organize your study by creating Subjects — Mathematics, Physics, Chemistry, Literature, whatever you're tackling. Each subject tracks its own total hours and daily progress." },
-      { type: "p", text: "The System can also compile a full 48-topic syllabus for a subject (mapped to your Skill Tree). Once it exists, every quest you finish on a topic pushes that topic toward mastery." }
-    ]
-  },
-  {
-    id: "focus_streak",
-    categoryId: "Focus & Study",
-    title: "Streaks & Weekly Milestones",
-    requirement: { type: "NONE" },
-    related: ["focus_timer", "qst_weekly", "inv_shop"],
-    content: [
-      { type: "p", text: "Consistency is the whole game. The System rewards it with a Weekly Streak: log 3 hours of focus between Monday and Sunday and your streak grows by one week." },
-      { type: "h3", text: "Streak Rewards" },
-      { type: "p", text: "Longer streaks mean richer payouts — every week your streak grows, your Sylph earnings are multiplied a little more, all the way up to a hefty 1.5× bonus." },
-      { type: "p", text: "Life happens. If a brutal week breaks your rhythm, a Streak Freeze item from the shop absorbs the hit and keeps your streak alive." }
-    ]
-  },
-  {
-    id: "focus_rest",
-    categoryId: "Focus & Study",
-    title: "Rest Days & Recovery",
-    requirement: { type: "NONE" },
-    related: ["focus_timer", "focus_streak", "qst_ai_planner"],
-    content: [
-      { type: "p", text: "Rest is part of the build. You can mark days of the week as permanent Rest Days in your calendar, and the System will never schedule quests on them or penalize you for taking them off." },
-      { type: "h3", text: "Floating Rest Days" },
-      { type: "p", text: "For unplanned days — a family dinner, a sickness, an emergency — you get one Floating Rest Day per week. Tap any date on the calendar and designate it. Any quests on that day automatically slide to the next available day, and the day is fully protected: no HP loss, no broken streak." },
-      { type: "p", text: "Rest days are walls the System refuses to cross — no quest, manual or automatic, will ever land on one." }
-    ]
-  },
-
-  // ─── QUESTS & AI ──────────────────────────────────────────────
-  {
-    id: "qst_overview",
-    categoryId: "Quests & AI",
-    title: "Quests & Bounties",
-    requirement: { type: "NONE" },
-    related: ["qst_weekly", "qst_ai_planner", "eco_sylph"],
-    content: [
-      { type: "p", text: "Quests are your study tasks, broken into bite-sized missions. Each one has a target time, a difficulty rating, and an XP + Sylph bounty. Finish it, claim the rewards, watch the bars move." },
-      { type: "h3", text: "Quest Types" },
-      { type: "list", items: [
-        "Scheduled Quests: planned tasks on specific dates with target durations.",
-        "AI-Planned Quests: study plans generated from your syllabus and deadlines.",
-        "Custom Quests: your own tasks — create one anytime from the Quest Log."
-      ]},
-      { type: "p", text: "Quests can be linked to a Goal (and inherit its color), to a subject topic for skill-tree progress, or stand alone. Difficulty (Easy → Expert) decides the bounty." }
-    ]
-  },
-  {
-    id: "qst_weekly",
-    categoryId: "Quests & AI",
-    title: "Weekly Focus Milestone",
-    requirement: { type: "NONE" },
-    related: ["focus_streak", "qst_overview"],
-    content: [
-      { type: "p", text: "Every week the System issues one big mission: 3 hours of focused study between Monday and Sunday midnight." },
-      { type: "p", text: "Hit it and the payout is serious — a level-scaled XP bomb plus a Sylph bonus — and your Weekly Streak ticks up one, supercharging future earnings." }
-    ]
-  },
-  {
-    id: "qst_ai_planner",
-    categoryId: "Quests & AI",
-    title: "The System's Study Assistant",
-    requirement: { type: "NONE" },
-    related: ["qst_overview", "focus_subjects", "focus_rest"],
-    content: [
-      { type: "p", text: "A quiet AI assistant works behind the scenes of The System. You don't need to know how it works — just what it does for you:" },
-      { type: "h3", text: "What It Does" },
-      { type: "list", items: [
-        "Plans your syllabus: give it an exam date and it splits the work into sensible daily quests.",
-        "Respects your life: it never schedules on your rest days and shrinks the workload if you're burning out.",
-        "Writes your morning briefing: each day starts with a short message summarizing yesterday and telling you what matters today.",
-        "Tutors you mid-session: stuck on a problem in the Focus Room? The assistant explains it step by step, with clean math formatting."
-      ]},
-      { type: "p", text: "You can also just talk to it from the chat — ask about your stats, move quests, set goals, or ask study advice. It can only do what the game allows; it can never cheat your XP or wipe your data without asking you first." }
-    ]
-  },
-
-  // ─── ECONOMY & SHOP ───────────────────────────────────────────
-  {
-    id: "eco_sylph",
-    categoryId: "Economy & Shop",
-    title: "Sylph Currency System",
-    requirement: { type: "NONE" },
-    related: ["inv_shop", "sys_leveling", "ach_system"],
-    content: [
-      { type: "p", text: "Sylph is the currency of The System — crystallized effort. You earn it from almost everything you do, and you spend it in the Shop on items, cosmetics, and protection." },
-      { type: "h3", text: "Earning Sylph" },
-      { type: "list", items: [
-        "Focus Timer: every studied minute pays Sylph.",
-        "Quests: each completed bounty includes a Sylph payout.",
-        "Level Ups: every level grants a bonus gift of Sylph.",
-        "Achievements: milestone rewards from the codex."
-      ]},
-      { type: "p", text: "Every single Sylph you earn or spend is written into your personal ledger — a full transaction history you can always check." }
-    ]
-  },
-  {
-    id: "inv_shop",
-    categoryId: "Economy & Shop",
-    title: "The Shop & Consumables",
-    requirement: { type: "NONE" },
-    related: ["eco_sylph", "inv_equipment"],
-    content: [
-      { type: "p", text: "The System Shop sells functional items with real in-game effects. Buy them with Sylph and activate them when you need them." },
-      { type: "h3", text: "Popular Items" },
-      { type: "list", items: [
-        "Streak Freeze: protects your weekly streak if a week goes sideways.",
-        "XP Boost (24h): multiplies all XP earned for a full day.",
-        "Sylph Boost (24h): multiplies Sylph earnings for a full day.",
-        "HP Potions: restore lost Health after missed goals.",
-        "Kamish's Ward: a shield that absorbs quest-failure damage.",
-        "Gate Key: doubles a quest's risk — and its reward.",
-        "Elixir of Insight: instantly refreshes your focus state."
-      ]},
-      { type: "p", text: "Some items trigger automatically (like the Streak Freeze); others you activate from your inventory before a session." }
-    ]
-  },
-  {
-    id: "inv_equipment",
-    categoryId: "Economy & Shop",
-    title: "Armour & Equipment",
-    requirement: { type: "NONE" },
-    related: ["inv_character", "sys_ranks", "eco_sylph"],
-    content: [
-      { type: "p", text: "Beyond consumables, the Shop sells real equipment your character wears into battle — visually and mechanically." },
-      { type: "h3", text: "Equipment Slots" },
-      { type: "list", items: [
-        "Helmet: headgear from scholar caps to hunter visors.",
-        "Chestplate: the main armour piece that defines your silhouette.",
-        "Pants: lower-body gear completing the set.",
-        "Boots: footwear, from sneakers to shadow boots.",
-        "Weapon: your tool of focus — grimoires, staves, blades.",
-        "Relic: a powerful accessory slot for rare artifacts."
-      ]},
-      { type: "h3", text: "Rarity & Requirements" },
-      { type: "p", text: "Gear comes in rarities — Common, Rare, Epic, Legendary, and Mythic — and stronger gear demands a higher Hunter Rank. Everything you equip appears live on your character in the Locker, on your profile, and in your friends' social cards." }
-    ]
-  },
-
-  // ─── CUSTOMIZATION ────────────────────────────────────────────
-  {
-    id: "inv_cosmetics",
-    categoryId: "Customization",
-    title: "Themes, Auras & Cosmetics",
-    requirement: { type: "NONE" },
-    related: ["inv_character", "sys_ranks"],
-    content: [
-      { type: "p", text: "Make the System yours. Cosmetic unlocks personalize your whole experience without affecting gameplay balance:" },
-      { type: "list", items: [
-        "Interface Themes: recolor the entire app (Cyberpunk, Emerald, Sakura, Crimson, and more).",
-        "Awakened Auras: animated glows that surround your scholar card.",
-        "Avatar Frames: decorative borders for your profile picture.",
-        "Titles: badges of honour shown next to your name (Novice → Shadow Monarch).",
-        "Name Colors: customize the hue of your scholar ID."
-      ]}
-    ]
-  },
-  {
-    id: "inv_character",
-    categoryId: "Customization",
-    title: "The Character Studio",
-    requirement: { type: "NONE" },
-    related: ["inv_equipment", "inv_cosmetics", "sys_classes"],
-    content: [
-      { type: "p", text: "The Character Studio is where your scholar avatar comes to life. Build your look piece by piece on a live stage, and it follows you everywhere — profile, social cards, leaderboards, friends' screens." },
-      { type: "h3", text: "What You Can Customize" },
-      { type: "list", items: [
-        "Appearance: skin tones, hair styles and colors, eyewear and accessories.",
-        "Attire & Armour: robes, techwear, stealth gear — plus every equipment slot you own.",
-        "Auras: animated energy glows in different colors and shapes.",
-        "Pedestals: the platform your character stands on.",
-        "Everything updates live as you equip — including your Shop armour."
-      ]}
-    ]
-  },
-  {
-    id: "sys_skilltree",
-    categoryId: "Customization",
-    title: "The Skill Tree",
-    requirement: { type: "NONE" },
-    related: ["sys_classes", "focus_subjects", "sys_stats"],
-    content: [
-      { type: "p", text: "The Skill Tree is your permanent power-up map. It's a constellation of 24 skills across the eight archetypes, drawn as a glowing node graph." },
-      { type: "h3", text: "How Unlocking Works" },
-      { type: "list", items: [
-        "Master syllabus topics: finish a subject's compiled topics to earn Subject Points (SP).",
-        "SP unlocks Skill Nodes — one at a time, in any branch you choose.",
-        "Every unlocked node grants a real bonus: extra XP, extra Sylph, damage shields, and more.",
-        "Three tiers per archetype — deeper nodes mean stronger perks."
-      ]},
-      { type: "h3", text: "The Apex Keystone" },
-      { type: "p", text: "At the top of the constellation sits a final, unique node — the Apex Keystone. Forge it after mastering enough of your syllabus (115 SP), and the System crowns the achievement with a massive XP and Sylph reward." }
-    ]
-  },
-
-  // ─── SOCIAL & NETWORK ─────────────────────────────────────────
-  {
-    id: "soc_friends",
-    categoryId: "Social & Network",
-    title: "Friends & Scholar Network",
-    requirement: { type: "NONE" },
-    related: ["soc_presence", "soc_privacy"],
-    content: [
-      { type: "p", text: "Study is better together. Add friends by username or Scholar ID, see their levels and study time, and keep each other accountable." },
-      { type: "h3", text: "What Friends See" },
-      { type: "list", items: [
-        "Live study status: a glowing card with a ticking timer while they focus.",
-        "Today's study time, total hours, streak, and rank.",
-        "Their fully customized character — armour, aura, and all."
-      ]}
-    ]
-  },
-  {
-    id: "soc_presence",
-    categoryId: "Social & Network",
-    title: "Live Study Presence",
-    requirement: { type: "NONE" },
-    related: ["soc_friends", "focus_timer"],
-    content: [
-      { type: "p", text: "When you're in a focus session, the network knows. Your card lights up cyan with a pulsing study badge and a live timer, so friends can join the grind." },
-      { type: "p", text: "You can also invite friends into shared Study Rooms for synchronized focus sessions with shared ambient audio." }
-    ]
-  },
-  {
-    id: "soc_privacy",
-    categoryId: "Social & Network",
-    title: "Privacy & Visibility Controls",
-    requirement: { type: "NONE" },
-    related: ["soc_friends"],
-    content: [
-      { type: "p", text: "You control your exposure. Under Settings → Privacy you can tune:" },
-      { type: "list", items: [
-        "Profile visibility: Public, Friends Only, or Private.",
-        "Stats visibility: hide your study hours and attributes if you prefer.",
-        "Presence: turn off your live studying status.",
-        "Messages & Requests: restrict who can message or invite you."
-      ]}
-    ]
-  },
-
-  // ─── ACHIEVEMENTS ─────────────────────────────────────────────
-  {
-    id: "ach_system",
-    categoryId: "Achievements",
-    title: "Achievements & Milestones",
-    requirement: { type: "NONE" },
-    related: ["sys_leveling", "eco_sylph"],
-    content: [
-      { type: "p", text: "The Achievements codex is your trophy shelf — 24 milestones across six categories: Study, Streaks, Rank, Social, Quests, and Exploration." },
-      { type: "h3", text: "Rarity Tiers" },
-      { type: "list", items: [
-        "Common (Green): early wins — small Sylph/XP gifts.",
-        "Rare (Blue): intermediate milestones with meaningful payouts.",
-        "Epic (Purple): serious challenges with rare rewards.",
-        "Legendary (Orange): elite feats that grant special items.",
-        "Mythic (Gold): master-level achievements awarding ultimate artifacts."
-      ]},
-      { type: "p", text: "Claim them from the codex whenever you qualify — the reward lands instantly in your balance or inventory." }
-    ]
-  }
+  entry(
+    "sys_leveling",
+    "The System",
+    "Levels & Experience",
+    ["sys_ranks", "sys_stats", "eco_sylph"],
+    p(
+      "Your progress begins with focused study. Recorded sessions, completed quests, and claimed achievement rewards contribute Experience Points (XP). The dashboard shows your level and progress toward the next one."
+    ),
+    p(
+      "When your XP reaches the next threshold, your level rises automatically. Higher levels take more XP, and your Hunter Rank follows the level ladder. Level-up rewards are recorded in your Sylph ledger."
+    ),
+    heading("Ways to Grow"),
+    list(
+      "Study: finish a focus session to receive its recorded rewards. Break time is tracked separately and earns no focus rewards.",
+      "Quests: complete a task to receive its listed bounty. Studying and completing a quest are related but distinct records.",
+      "Weekly milestone: reach your weekly focus target for the displayed XP and Sylph payout.",
+      "Achievements: claim qualified milestones in System Hub → Achievements."
+    ),
+    p(
+      "Use the actual reward shown in the app. Session length, streaks, and cognitive abilities can affect payouts; progress does not rely on a fixed reward per click."
+    )
+  ),
+  entry(
+    "sys_ranks",
+    "The System",
+    "Hunter Ranks & Progression",
+    ["sys_leveling", "inv_character"],
+    p(
+      "Hunter Rank reflects your level. You begin at E-Rank and progress through eight tiers. Your current rank appears on your dashboard and profile."
+    ),
+    heading("The Rank Ladder"),
+    list(
+      ...[...RANK_LADDER]
+        .reverse()
+        .map((rank) => `${rankTitle(rank.display)} — Level ${rank.level}+`)
+    ),
+    p(
+      "Rank requirements can apply to a listed item or character style. Check the current listing; a higher rank does not imply an unpublished reward or a guaranteed shop catalog."
+    )
+  ),
+  entry(
+    "sys_stats",
+    "The System",
+    "Cognitive Attributes & Investment",
+    ["sys_leveling", "focus_streak", "eco_sylph"],
+    p(
+      "Five cognitive attributes represent your study abilities: Endurance, Tenacity, Velocity, Discipline, and Synthesis. The profile’s attribute controls let you invest Skill Points (SP) or Sylph in these abilities."
+    ),
+    p(
+      `Each investment adds ${INVEST_STEP} points. The cost grows with the attribute’s current band, and your level limits how high you can invest. The controls show the current cost and cap before you spend.`
+    ),
+    heading("Ability Effects"),
+    list(
+      ...COGNITIVE_STAT_KEYS.map(
+        (key) =>
+          `${COGNITIVE_STATS[key].label}: ${COGNITIVE_STATS[key].perkLadder}`
+      )
+    ),
+    p(
+      `Ability tiers activate at ${ABILITY_TIERS.join(", ")}. These are investments with defined effects, not automatic personality scores or a character class.`
+    )
+  ),
+  entry(
+    "focus_timer",
+    "Focus & Study",
+    "Study Timer & Focus Engine",
+    ["focus_modes", "focus_tools", "focus_subjects"],
+    p(
+      "Open Timer to choose a subject and begin studying. A quest can also open a linked focus session. The Focus screen records active study, pauses, and breaks separately."
+    ),
+    p(
+      "Use the session controls to pause, take a break, or finish. Finishing records the session and its rewards; live updates keep study totals current without awarding the same time twice."
+    ),
+    heading("A Space for Focus"),
+    list(
+      "Your chosen study protocol controls timed blocks and breaks.",
+      "The Tools dock keeps study aids within the Focus screen.",
+      "Backgrounds and timer layouts personalize the study environment.",
+      "Study history and statistics are available from System Hub."
+    )
+  ),
+  entry(
+    "focus_modes",
+    "Focus & Study",
+    "Study Protocols & Modes",
+    ["focus_timer", "focus_rest"],
+    p(
+      "Configure a study protocol in System Hub → Study Modes. Your selected protocol is used when you start an ordinary focus session; a linked quest carries its own target time."
+    ),
+    heading("Seven Study Rhythms"),
+    list(
+      "Free Flow: an open stopwatch with on-demand breaks.",
+      "Pomodoro: focus rounds with short breaks and longer recovery breaks.",
+      "52/17 Rhythm: longer work blocks separated by recovery breaks.",
+      "Animedoro: a focus marathon followed by a reward break.",
+      "Deep Work: a protected block with optional automatic fullscreen.",
+      "Sprint Mode: repeated short sprints and micro-rests.",
+      "Flowtime: an open focus rhythm with check-in reminders and proportional breaks."
+    ),
+    p(
+      "Durations, automatic transitions, and completion chimes depend on the settings for that protocol. A break is recovery time, not additional study time."
+    )
+  ),
+  entry(
+    "focus_tools",
+    "Focus & Study",
+    "The Focus Tools Dock",
+    ["focus_timer", "inv_audio", "qst_ai_planner"],
+    p(
+      "The Tools dock brings useful study aids into your session. Tool windows can be moved, minimized, and reopened while the timer continues."
+    ),
+    heading("At Your Desk"),
+    list(
+      "Calculator: scientific and STEM calculations.",
+      "AI Assistant: ask study questions and receive formatted explanations.",
+      "Audio Mixer: manage soundscapes, ambient layers, and your imported tracks.",
+      "Scratchpad: keep notes during focus.",
+      "Formulas: reference study sheets without leaving the session."
+    ),
+    p(
+      "Dock controls also offer Eye Comfort in light mode and Keep Awake on supported devices. These affect the display, not recorded study time. Tool availability and AI quotas follow the current account and device."
+    )
+  ),
+  entry(
+    "focus_subjects",
+    "Focus & Study",
+    "Subjects & Study History",
+    ["focus_timer", "qst_quick_plan"],
+    p(
+      "Subjects organize what you study. Create one in Timer with a name, syllabus code, exam board, level, color, and optional syllabus notes. Focus sessions linked to it contribute to its recorded study time."
+    ),
+    p(
+      "You can edit subject details. Removing a subject archives it safely rather than erasing its study history. Linked quests and plans follow the app’s subject handling, so review affected work when you change a subject."
+    ),
+    heading("Subjects and Planning"),
+    list(
+      "Subject study time measures recorded focus, not exam readiness.",
+      "A Planner scope can use subject details and supplied syllabus material.",
+      "Preparedness and mastery checks belong to the relevant Planner workflow; they are separate from lifetime hours."
+    )
+  ),
+  entry(
+    "focus_streak",
+    "Focus & Study",
+    "Weekly Streaks & Milestones",
+    ["qst_weekly", "sys_stats", "focus_rest"],
+    p(
+      "Sylf’s streak is weekly. Reach the focus milestone between Monday and Sunday in your configured timezone to extend your run of consecutive weeks. The WKS indicator shows this weekly count."
+    ),
+    p(
+      "The baseline target is three hours. Tenacity ability tiers can reduce that target, so follow the requirement displayed in the dashboard’s Streak Quest."
+    ),
+    heading("Consistency Rewards"),
+    list(
+      "The current weekly quest shows its target, progress, time remaining, and reward.",
+      "Weekly streak bonuses increase Sylph earnings at 1, 2, 4, and 8 weeks, up to 1.5×.",
+      "Streak achievements measure consecutive weeks, not consecutive study days."
+    ),
+    p(
+      "Scheduled rest days protect the daily schedule. They do not complete the weekly focus requirement for you."
+    )
+  ),
+  entry(
+    "focus_rest",
+    "Focus & Study",
+    "Calendar, Rest Days & Recovery",
+    ["qst_overview", "qst_planner_modes", "focus_streak"],
+    p(
+      "The Calendar brings scheduled quests, objective deadlines, and your study records together. Inspect a date to review the day’s work and adjust the schedule."
+    ),
+    p(
+      "Fixed rest days repeat on your chosen weekdays. The schedule respects them when placing study work, and protected rest days avoid daily-goal penalties."
+    ),
+    heading("Floating Rest Days"),
+    p(
+      `You have ${FLOATING_REST_DAY_QUOTA} floating rest day per ISO week for unplanned recovery. Mark an eligible date in the Calendar. Affected quests move to available study days, and the quota is shown before you confirm.`
+    ),
+    p(
+      "Use the calendar’s current availability and validation messages when rescheduling. A rest day changes the schedule, not your completed study record or the weekly streak target."
+    )
+  ),
+  entry(
+    "qst_overview",
+    "Quests & AI",
+    "Objectives, Quests & Bounties",
+    ["qst_planner_modes", "qst_weekly", "eco_sylph"],
+    p(
+      "Objectives hold your longer-term goals. Their quests turn that direction into individual study tasks, with a date, subject or topic when applicable, target duration, and displayed rewards."
+    ),
+    p(
+      "Open Objectives for goals and quests. The dedicated Quest route opens the quest view. You can create tasks manually or confirm a Planner proposal to create scheduled quests."
+    ),
+    heading("Follow the Current Task"),
+    list(
+      "Read the target and listed bounty before starting.",
+      "Start linked focus from the quest, or manage the task from the quest view.",
+      "Only completed quests count toward completion milestones.",
+      "Completed work stays part of your history when a plan is revised."
+    ),
+    p(
+      "Creating or generating a draft does not award XP. Rewards belong to recorded focus and completed tasks."
+    )
+  ),
+  entry(
+    "qst_weekly",
+    "Quests & AI",
+    "The Weekly Focus Quest",
+    ["focus_streak", "focus_timer", "sys_stats"],
+    p(
+      "The dashboard’s Streak Quest is a cumulative weekly focus milestone. You can make progress through multiple sessions; it does not require one uninterrupted three-hour block."
+    ),
+    heading("A Weekly Rhythm"),
+    list(
+      "The week runs Monday through Sunday in your timezone.",
+      "The displayed target accounts for applicable Tenacity effects.",
+      "Completing the target grants the current level-scaled XP and Sylph reward.",
+      "A completed week extends the weekly streak; the next week has a new target window."
+    )
+  ),
+  entry(
+    "qst_ai_planner",
+    "Quests & AI",
+    "The System AI & Classic Planner",
+    ["qst_planner_modes", "qst_quick_plan", "focus_tools"],
+    p(
+      "The System is Sylf’s AI workspace. Its chat can explain progress, help with study questions, and act on supported goals, quests, and calendar tasks. Quick access also appears in relevant dashboard, objectives, quest, and calendar contexts."
+    ),
+    p(
+      "The Planner tab opens the Classic Planner by default. Planner Modes is a separate choice in the same workspace, so you can use the familiar planner or a more focused Exam, Roadmap, or Mastery workflow."
+    ),
+    heading("Keep Control of Your Plan"),
+    list(
+      "Review proposed work and workload before committing it.",
+      "AI generation and messages follow the quota displayed for your account.",
+      "The in-session AI Assistant helps with study questions while you focus.",
+      "A proposal is planning advice; it does not certify knowledge or earn study rewards on its own."
+    )
+  ),
+  entry(
+    "qst_planner_modes",
+    "Quests & AI",
+    "Exam, Roadmap & Mastery Planning",
+    ["qst_quick_plan", "qst_overview", "focus_rest"],
+    p(
+      "Planner Modes offers three workflows for different kinds of study. Open The System → Planner → Planner Modes and choose the purpose that matches your work."
+    ),
+    heading("Choose Your Direction"),
+    list(
+      "Exam Planner: deadline-driven preparation for one exam, arranged day by day.",
+      "Course / Syllabus Roadmap: a longer course broken into periods and milestones. Expand a milestone into detailed study work when needed.",
+      "Chapter / Unit Mastery: take one unit through understanding, recall, practice, review, and a check."
+    ),
+    heading("From Draft to Real Work"),
+    p(
+      "Review and edit the draft, then confirm it to create quests. Availability, deadlines, constraints, and workload shape the proposal. Rebalancing adapts remaining work while respecting completed tasks and the plan’s existing commitments."
+    ),
+    p(
+      "Mastery check results and the Exam preparedness view describe the evidence you have recorded. They are distinct from a timer total or a character rank."
+    )
+  ),
+  entry(
+    "qst_quick_plan",
+    "Quests & AI",
+    "Quick Plan, Scope & Copilot",
+    ["qst_planner_modes", "focus_subjects"],
+    p(
+      "Quick Plan is the default creation flow inside Planner Modes. Build a brief around what you need to study, your deadline, and the time available across the week."
+    ),
+    p(
+      "Use subject details, uploaded material, or supported curriculum research to assemble the scope. Review the sources, topic coverage, and overlaps before generating your plan; imported or researched material is evidence to inspect, not automatic mastery."
+    ),
+    heading("Refine Your Direction"),
+    list(
+      "Review and edit the scope before creating work.",
+      "Use the plan’s coverage and preparedness views to inspect what is included.",
+      "The Plan Designer offers more direct control over plan structure.",
+      "Planner Copilot explains the current plan and proposes supported changes for review.",
+      "Core tasks and optional stretch work have distinct roles; accept changes deliberately."
+    ),
+    p(
+      "Confirmation creates actual quests. A draft, comparison, research result, or Copilot suggestion stays a proposal until its supported confirmation step is completed."
+    )
+  ),
+  entry(
+    "eco_sylph",
+    "Economy & Shop",
+    "Sylph Currency & Your Ledger",
+    ["sys_stats", "inv_shop", "ach_system"],
+    p(
+      "Sylph is the System’s currency: crystallized effort earned through focus, completed quests, weekly milestones, level-up rewards, and qualifying achievement claims."
+    ),
+    p(
+      "Your current balance is shown in the app. Collection’s Currency Ledger separates that spendable balance from total recorded earnings and spending."
+    ),
+    heading("Where Sylph Goes"),
+    list(
+      "Buy a currently listed item in the Shop when available.",
+      "Invest in cognitive attributes through the profile’s investment controls.",
+      "Review total spending in Collection; it includes all recorded negative ledger entries, not only shop purchases."
+    ),
+    p(
+      "App appearance colors, light/dark mode, and the basic appearance presets are free settings. Changing your interface color does not purchase a collectible."
+    )
+  ),
+  entry(
+    "inv_shop",
+    "Economy & Shop",
+    "The Current Shop",
+    ["inv_equipment", "eco_sylph", "inv_character"],
+    p(
+      "The Shop uses the current published catalog. It can be empty while new assets are being prepared. Only a live listing establishes an item’s name, price, rarity, requirements, and effects."
+    ),
+    p(
+      "New listings may appear as the catalog grows. Follow the current Shop rather than assuming that every item in a saved inventory is available to purchase again."
+    ),
+    heading("Before a Purchase"),
+    list(
+      "Check the listing’s actual Sylph price and Hunter Rank requirement.",
+      "Review the item description and any supported effect.",
+      "An acquired item belongs to your Locker inventory; a free character style remains a Studio choice."
+    )
+  ),
+  entry(
+    "inv_equipment",
+    "Economy & Shop",
+    "Locker Items & Equipment",
+    ["inv_collection", "inv_shop", "inv_character"],
+    p(
+      "Locker → Items shows your actual inventory and equipped loadout. An inventory record includes the item’s current name, description, rarity, quantity, and equipped state."
+    ),
+    p(
+      "Collection → Items & equipment presents the same ownership data as a ledger. It includes items you still own even when they are no longer offered in the current Shop."
+    ),
+    heading("Manage Your Loadout"),
+    list(
+      "Use the Locker to equip or unequip a supported item.",
+      "The current loadout groups armour, weapon, relic, and quickslot entries.",
+      "Compatibility follows the item’s actual category and slot.",
+      "A stored item is not automatically a usable consumable or a guaranteed visual overlay; follow the supported controls and listing."
+    )
+  ),
+  entry(
+    "inv_collection",
+    "Economy & Shop",
+    "Reading Your Collection",
+    ["inv_equipment", "inv_character", "inv_focus_backgrounds", "inv_audio"],
+    p(
+      "System Hub → Collection gathers inventory, character styles, personal focus backgrounds, imported audio, profile keepsakes, and currency totals."
+    ),
+    heading("What the Counts Mean"),
+    list(
+      "Owned items: total positive inventory quantities. The item shelf also shows distinct entries and equipped entries.",
+      "Available styles: Character Studio options you currently meet the requirements for, separate from purchases.",
+      "Personal images: backgrounds saved to your account’s personal gallery.",
+      "Local tracks: imported audio present on this device.",
+      "Recorded profile keepsakes: saved frame, title, and name-color acquisitions, excluding baseline defaults."
+    ),
+    p(
+      "The official focus gallery is shared availability, not a set of owned collectibles. Free appearance preferences are separate from acquisition counts."
+    )
+  ),
+  entry(
+    "inv_cosmetics",
+    "Customization",
+    "App Appearance & Colors",
+    ["inv_focus_backgrounds", "inv_character"],
+    p(
+      "System Hub → Appearance controls your app’s accent color, canvas color, and light/dark mode. Presets and custom colors are free preferences, not items to buy or level-gated theme unlocks."
+    ),
+    p(
+      "Use Save & Apply to commit the appearance you choose. The app’s surfaces, readable text, accent controls, and System pages adapt to these settings."
+    ),
+    heading("Two Kinds of Background"),
+    list(
+      "App canvas: the background color used across the interface.",
+      "Focus background: an official image or personal artwork used in a study session, with a suitable timer layout."
+    ),
+    p(
+      "Your appearance choice does not change study rewards, Hunter Rank, or inventory ownership."
+    )
+  ),
+  entry(
+    "inv_character",
+    "Customization",
+    "The Character Studio",
+    ["inv_profile", "inv_equipment", "sys_ranks"],
+    p(
+      "Open Locker → Identity to enter Character Studio or Profile Studio. Character Studio selects the visual form, pedestal, and available aura for your study identity."
+    ),
+    p(
+      `The current baseline Character Studio contains ${FULL_BODY_FORMS.length} full-body forms and its available pedestal. The form catalog is shared with Collection, so names and access requirements stay aligned.`
+    ),
+    heading("Make a Selection"),
+    list(
+      "Choose a listed form, pedestal, or aura you meet the requirements for.",
+      "Preview the result and save through the Studio’s controls.",
+      "Collection shows which style is selected and which styles are available.",
+      "No Aura and unequipped defaults are settings, not additional acquisitions."
+    ),
+    p(
+      "Your character style is a visual choice. Its access requirements and selected state are shown in Character Studio and Collection."
+    )
+  ),
+  entry(
+    "inv_profile",
+    "Customization",
+    "Profile Studio & Identity",
+    ["inv_character", "soc_privacy"],
+    p(
+      "Profile Studio manages your profile picture, banner, biography, and supported account links. You can choose an image, adjust its framing, preview the profile, and save your changes."
+    ),
+    heading("A Profile of Your Own"),
+    list(
+      "Profile images and a biography are personal settings, not purchased equipment.",
+      "Collection summarizes your saved identity and recorded profile cosmetic acquisitions.",
+      "Baseline frame, title, and name-color defaults do not inflate the acquired keepsake count.",
+      "Profile visibility and shared data follow your privacy controls."
+    )
+  ),
+  entry(
+    "inv_focus_backgrounds",
+    "Customization",
+    "Focus Backgrounds & Personal Gallery",
+    ["focus_timer", "inv_audio", "inv_cosmetics"],
+    p(
+      "Focus Backgrounds offers the official gallery, Classic Sylf, and your personal images. Your selected environment is used by the Focus screen, independently of your interface accent and canvas color."
+    ),
+    p(
+      "Upload an image to your personal gallery and choose its presentation. The gallery shows your storage quota and supports managing your saved images. Personal images belong to your account; official images are shared choices."
+    ),
+    heading("Layouts for Your Artwork"),
+    list(
+      "Classic Sylf: the original focus presentation.",
+      "Anime Framing: a layout suited to artwork with space beside its subject.",
+      "Cinematic Landscape: a restrained presentation for wide scenes.",
+      "Fantasy & Sanctum: a presentation for atmospheric environments."
+    ),
+    p(
+      "Use supported layout and timer positioning controls to keep your artwork and timer legible. Changing a background preserves the study session’s timer and recorded progress."
+    )
+  ),
+  entry(
+    "inv_audio",
+    "Customization",
+    "Acoustics & Imported Audio",
+    ["focus_tools", "inv_focus_backgrounds"],
+    p(
+      "Locker → Acoustics brings soundscapes, ambient layers, and your own audio into your study environment. The Focus Audio Mixer gives you access during a session."
+    ),
+    p(
+      "You can import supported audio files, rename them, play or pause, seek, loop, and adjust volume. Collection lists the imported tracks present on this device."
+    ),
+    heading("A Local Listening Library"),
+    list(
+      "Imported audio is stored locally on the device, not uploaded or synchronized to your account.",
+      "Built-in soundscapes are shared listening choices and do not count as acquired tracks.",
+      "Rain, café, keyboard, and white-noise layers can be mixed separately.",
+      "Keep copies of your source files if you plan to move to another device or clear local storage."
+    )
+  ),
+  entry(
+    "soc_friends",
+    "Social & Network",
+    "Friends & Your Study Circle",
+    ["soc_presence", "soc_parties", "soc_privacy"],
+    p(
+      "Social gathers your study circle and conversations. Add friends with the supported username or Scholar ID search, respond to requests, and open their profiles."
+    ),
+    heading("Stay Connected"),
+    list(
+      "See shared rank, level, study progress, and presence where privacy permits.",
+      "Send direct messages in the Social chat interface.",
+      "Invite friends to shared focus using the supported study-session invitations.",
+      "Friend milestones count distinct accepted friends, not pending requests or duplicate friendship rows."
+    )
+  ),
+  entry(
+    "soc_presence",
+    "Social & Network",
+    "Live Study Presence",
+    ["soc_friends", "soc_parties", "soc_privacy"],
+    p(
+      "When you study, supported social surfaces can show your current focus status and a live timer. Presence is separate from your saved session history and respects your privacy settings."
+    ),
+    heading("Share Your Rhythm"),
+    list(
+      "Friends can see the study status you choose to share.",
+      "Session invitations connect you to shared focus.",
+      "Your own session controls remain responsible for recording your focus time."
+    )
+  ),
+  entry(
+    "soc_parties",
+    "Social & Network",
+    "Focus Parties",
+    ["soc_friends", "focus_timer", "inv_audio"],
+    p(
+      "Focus Parties are shared study spaces reached through Social and supported session invitations. Join a party to see its members and participate in a shared focus session."
+    ),
+    p(
+      "Each member has a personal timer state and accumulated focus time. Joining a room alone is not completed study; your own recorded effort contributes to your progress."
+    ),
+    heading("Together, with Your Own Pace"),
+    list(
+      "Use the party’s supported invitations and membership controls.",
+      "Start, pause, and finish your personal focus through the shared session controls.",
+      "Leaving a session ends your participation; room membership and recorded study are distinct.",
+      "The Focus Party achievement requires a finished participation with at least one minute of personal focus."
+    )
+  ),
+  entry(
+    "soc_privacy",
+    "Social & Network",
+    "Privacy & Visibility",
+    ["soc_friends", "inv_profile"],
+    p(
+      "Privacy controls live under System Hub → Account. Set who can see your profile, online status, current session, study hours, rank, and achievements."
+    ),
+    heading("Choose What You Share"),
+    list(
+      "Profile and data visibility can be public, friends-only, or private according to the current control.",
+      "Friend-request and direct-message permissions control who may contact you.",
+      "Visible social information follows both the feature and your saved privacy settings."
+    )
+  ),
+  entry(
+    "ach_system",
+    "Achievements",
+    "Achievements & Milestones",
+    ["sys_leveling", "focus_streak", "inv_collection"],
+    p(
+      `The current register contains ${ACHIEVEMENTS_CATALOG.length} milestones across ${ACHIEVEMENT_CATEGORIES.length} categories: ${ACHIEVEMENT_CATEGORIES.join(", ")}. Open it from System Hub → Achievements.`
+    ),
+    p(
+      "Study records, weekly streaks, Hunter Rank, distinct friends, completed quests, subjects, confirmed plans, Focus Party participation, personal backgrounds, inventory, and recorded spending provide the actual progress."
+    ),
+    heading("Rarity Tiers"),
+    list(
+      "Common, Rare, Epic, Legendary, and Mythic describe milestone tiers.",
+      "Each milestone displays its exact XP or Sylph reward.",
+      "Ready milestones have a Claim reward control. A reward is redeemed once.",
+      "Claimed honors stay claimed when their description or reward is refreshed."
+    ),
+    p(
+      "Earlier claim history is retained when the register is updated. Earned rewards stay yours, and an existing claimed milestone cannot be claimed again."
+    )
+  ),
 ];

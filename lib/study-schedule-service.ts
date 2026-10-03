@@ -1,97 +1,20 @@
 import { prisma } from "@/lib/prisma";
+import { executionTransaction, coordinateExecution } from "@/lib/execution-coordination";
+import { assertNoLinkedQuests } from "@/lib/planner/server/mutation-guards";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getWeeklyBounds } from "@/lib/game-engine";
+import type { Prisma } from "@prisma/client";
 
-/** An objective deadline rendered as a milestone banner on the calendar. */
-export interface GoalMilestone {
-  id: number;
-  title: string;
-  color: string; // Goal.color token: EMERALD | CYAN | BLUE | VIOLET | ROSE | AMBER
-  targetDate: string; // ISO UTC instant
-  date: string; // YYYY-MM-DD local calendar date the milestone lands on
-}
+import {
+  GoalMilestone,
+  QuestShift,
+  FloatingRestDayStatus,
+  FLOATING_REST_DAY_QUOTA,
+  DayStudySummary,
+  MonthCalendarData,
+} from "./study-schedule-types";
 
-/** A quest relocated by the automatic floating-rest-day cascade. */
-export interface QuestShift {
-  questId: number;
-  title: string;
-  oldDate: string;
-  newDate: string;
-}
-
-/** Live toggle status for a single calendar date. */
-export interface FloatingRestDayStatus {
-  dateKey: string;
-  isFloatingRest: boolean;
-  isFixedRest: boolean;
-  weekKey: string; // "YYYY-Www"
-  weekUsage: number;
-  weekQuota: number;
-  canAdd: boolean;
-}
-
-/** Hard quota of floating rest days per ISO week. */
-export const FLOATING_REST_DAY_QUOTA = 1;
-
-export interface DayStudySummary {
-  date: string; // YYYY-MM-DD
-  dayOfWeek: number; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  isRestDay: boolean;
-  dailyGoalMinutes: number;
-  totalMinutes: number;
-  totalSeconds: number;
-  completionPercentage: number;
-  goalMet: boolean;
-  sessionsCount: number;
-  questsCount: number;
-  questsCompleted: number;
-  xpGained: number;
-  subjectBreakdown: Array<{
-    subjectId: number | null;
-    subjectName: string;
-    subjectColor: string;
-    minutes: number;
-    seconds: number;
-    percentage: number;
-  }>;
-  quests: Array<{
-    id: number;
-    title: string;
-    description: string | null;
-    status: string;
-    difficulty: string;
-    requiredMinutes: number;
-    elapsedSeconds: number;
-    xpReward: number;
-    sylphReward: number;
-    goal: { id: number; title: string; color: string } | null;
-  }>;
-}
-
-export interface MonthCalendarData {
-  year: number;
-  month: number; // 0-indexed (0 = Jan, 11 = Dec)
-  monthName: string;
-  dailyGoalMinutes: number;
-  restDays: number[];
-  enableHpPenalty: boolean;
-  days: DayStudySummary[];
-  /** Objective deadlines landing inside the displayed month. */
-  milestones: GoalMilestone[];
-  /** Floating rest day dateKeys (YYYY-MM-DD) inside the displayed month. */
-  floatingRestDays: string[];
-  monthStats: {
-    totalMinutes: number;
-    totalSeconds: number;
-    totalSessions: number;
-    activeDays: number;
-    totalDays: number;
-    goalsMetDays: number;
-    restDaysCount: number;
-    totalXpEarned: number;
-    totalQuestsCompleted: number;
-  };
-}
+export * from "./study-schedule-types";
 
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -126,12 +49,12 @@ export class StudyScheduleService {
    * Used by every ingestion vector (manual API, AI planner, chat tools,
    * calendar toggle, HP penalty engine) as the single source of truth.
    */
-  static async isUserRestDay(userId: number, targetDate: Date | string): Promise<boolean> {
+  static async isUserRestDay(userId: number, targetDate: Date | string, client: Prisma.TransactionClient = prisma): Promise<boolean> {
     let dateKey: string;
     let restDays: number[] = [];
 
     try {
-      const user = await prisma.user.findUnique({
+      const user = await client.user.findUnique({
         where: { id: userId },
         select: { restDays: true, timezone: true },
       });
@@ -140,27 +63,18 @@ export class StudyScheduleService {
         typeof targetDate === "string"
           ? targetDate
           : TimezoneService.getUserLocalDate(user?.timezone || "UTC", targetDate);
-    } catch {
-      dateKey =
-        typeof targetDate === "string"
-          ? targetDate
-          : targetDate.toISOString().split("T")[0];
-    }
+    } catch (error) { throw error; }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return false;
     if (this.isRestDay(dateKey, restDays)) return true;
 
     try {
-      const floating = await prisma.floatingRestDay.findUnique({
+      const floating = await client.floatingRestDay.findUnique({
         where: { userId_dateKey: { userId, dateKey } },
         select: { id: true },
       });
       return !!floating;
-    } catch {
-      // Schema/query availability must never break allocation flows —
-      // fail safe to "not a rest day" only when the lookup is impossible.
-      return false;
-    }
+    } catch (error) { throw error; }
   }
 
   /**
@@ -208,33 +122,32 @@ export class StudyScheduleService {
     opts?: { tx?: any }
   ): Promise<QuestShift[]> {
     const runner = async (client: any) => {
-      let restDays: number[] = [];
-      try {
-        const user = await client.user.findUnique({
+      const user = await client.user.findUnique({
           where: { id: userId },
           select: { restDays: true },
         });
-        restDays = user?.restDays || [];
-      } catch {}
+      const restDays: number[] = user?.restDays || [];
 
       const quests = await client.quest.findMany({
         where: {
           userId,
           scheduledFor: dateKey,
-          status: { notIn: ["COMPLETED", "FAILED"] },
+          status: "PENDING",
+          elapsedSeconds: 0,
+          plannedMinutes: null,
+          sessions: { none: {} },
         },
         select: { id: true, title: true, scheduledFor: true },
       });
 
       if (quests.length === 0) return [];
+      await assertNoLinkedQuests(userId, { id: { in: quests.map((q: { id: number }) => q.id) } }, client);
 
       // Preload floating rest days across the lookahead window so the scan
       // is O(1) per candidate day.
       const end = new Date(`${dateKey}T00:00:00Z`);
       end.setUTCDate(end.getUTCDate() + 31);
-      let floating: Array<{ dateKey: string }> = [];
-      try {
-        floating = await client.floatingRestDay.findMany({
+      const floating: Array<{ dateKey: string }> = await client.floatingRestDay.findMany({
           where: {
             userId,
             NOT: { dateKey },
@@ -242,7 +155,6 @@ export class StudyScheduleService {
           },
           select: { dateKey: true },
         });
-      } catch {}
       const floatingSet = new Set(floating.map((f) => f.dateKey));
 
       const shifts: QuestShift[] = [];
@@ -264,8 +176,8 @@ export class StudyScheduleService {
       return shifts;
     };
 
-    if (opts?.tx) return runner(opts.tx);
-    return prisma.$transaction(runner);
+    if (opts?.tx) { await coordinateExecution(opts.tx, userId); return runner(opts.tx); }
+    return executionTransaction(userId, runner);
   }
 
   /**
@@ -273,7 +185,8 @@ export class StudyScheduleService {
    */
   static async getFloatingRestDayStatus(
     userId: number,
-    dateKey: string
+    dateKey: string,
+    client: Prisma.TransactionClient = prisma,
   ): Promise<FloatingRestDayStatus> {
     const weekKey = this.getIsoWeekKey(dateKey);
 
@@ -283,12 +196,12 @@ export class StudyScheduleService {
 
     try {
       const [user, floating, weekRecords] = await Promise.all([
-        prisma.user.findUnique({ where: { id: userId }, select: { restDays: true } }),
-        prisma.floatingRestDay.findUnique({
+        client.user.findUnique({ where: { id: userId }, select: { restDays: true } }),
+        client.floatingRestDay.findUnique({
           where: { userId_dateKey: { userId, dateKey } },
           select: { id: true },
         }),
-        prisma.floatingRestDay.findMany({
+        client.floatingRestDay.findMany({
           where: { userId, weekKey },
           select: { dateKey: true },
         }),
@@ -297,7 +210,7 @@ export class StudyScheduleService {
       isFloatingRest = !!floating;
       isFixedRest = this.isRestDay(dateKey, user?.restDays || []);
       weekUsage = weekRecords.length;
-    } catch {}
+    } catch (error) { throw error; }
 
     return {
       dateKey,
@@ -419,6 +332,7 @@ export class StudyScheduleService {
             title: true,
             color: true,
             targetDate: true,
+            plannerPlans: { select: { id: true }, take: 1 },
           },
           orderBy: { targetDate: "asc" },
         })
@@ -449,7 +363,9 @@ export class StudyScheduleService {
     const milestones: GoalMilestone[] = (goals || [])
       .map((g) => {
         if (!g.targetDate) return null;
-        const localDate = TimezoneService.getUserLocalDate(timezone, g.targetDate);
+        const localDate = g.plannerPlans?.length
+          ? g.targetDate.toISOString().slice(0, 10)
+          : TimezoneService.getUserLocalDate(timezone, g.targetDate);
         if (!milestoneDateSet.has(localDate)) return null;
         return {
           id: g.id,

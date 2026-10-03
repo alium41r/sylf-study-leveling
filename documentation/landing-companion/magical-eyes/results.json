@@ -1,0 +1,323 @@
+{
+  "checks": [
+    {
+      "name": "NEUTRAL: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "HAPPY: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "CHEERFUL: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "EXCITED: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "FOCUSED: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "CURIOUS: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "SLEEPY: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "SAD: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "SURPRISED: eye change preserves body/hood and settles",
+      "passed": true
+    },
+    {
+      "name": "Blink replaces intact detailed eyes with a drawn lid",
+      "passed": true
+    },
+    {
+      "name": "character-sheet: no page overflow",
+      "passed": true
+    },
+    {
+      "name": "normal-96: no page overflow",
+      "passed": true
+    },
+    {
+      "name": "landing-desktop: no page overflow",
+      "passed": true
+    },
+    {
+      "name": "landing-mobile: no page overflow",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion disables eye and companion animations",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion retains a single visible new expression",
+      "passed": true
+    },
+    {
+      "name": "No companion resource or runtime errors",
+      "passed": true
+    }
+  ],
+  "transitions": [
+    {
+      "expression": "NEUTRAL",
+      "early": {
+        "eye": "NEUTRAL",
+        "outgoing": 0,
+        "currentOpacity": "1"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "HAPPY",
+      "early": {
+        "eye": "HAPPY",
+        "outgoing": 1,
+        "currentOpacity": "0.53494"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "CHEERFUL",
+      "early": {
+        "eye": "CHEERFUL",
+        "outgoing": 1,
+        "currentOpacity": "0.53435"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "EXCITED",
+      "early": {
+        "eye": "EXCITED",
+        "outgoing": 1,
+        "currentOpacity": "0.535173"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "FOCUSED",
+      "early": {
+        "eye": "FOCUSED",
+        "outgoing": 1,
+        "currentOpacity": "0.534817"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "CURIOUS",
+      "early": {
+        "eye": "CURIOUS",
+        "outgoing": 1,
+        "currentOpacity": "0.415621"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "SLEEPY",
+      "early": {
+        "eye": "SLEEPY",
+        "outgoing": 1,
+        "currentOpacity": "0.415725"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "SAD",
+      "early": {
+        "eye": "SAD",
+        "outgoing": 1,
+        "currentOpacity": "0.534926"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    },
+    {
+      "expression": "SURPRISED",
+      "early": {
+        "eye": "SURPRISED",
+        "outgoing": 1,
+        "currentOpacity": "0.535063"
+      },
+      "final": {
+        "sameSvg": true,
+        "sameHood": true,
+        "fixed": true,
+        "outgoing": 0
+      }
+    }
+  ],
+  "errors": [],
+  "blink": {
+    "count": 2,
+    "values": [
+      [
+        {
+          "name": "MagicalEyes-module__IbahNq__eye-open-phase",
+          "opacity": "1",
+          "transform": "none"
+        },
+        {
+          "name": "MagicalEyes-module__IbahNq__eye-closed-phase",
+          "opacity": "0",
+          "transform": "none"
+        }
+      ],
+      [
+        {
+          "name": "MagicalEyes-module__IbahNq__eye-open-phase",
+          "opacity": "0",
+          "transform": "none"
+        },
+        {
+          "name": "MagicalEyes-module__IbahNq__eye-closed-phase",
+          "opacity": "1",
+          "transform": "none"
+        }
+      ]
+    ]
+  },
+  "signedOutStats": [
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790614285889.419,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "14275.341"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790614292001.301,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "14275.683"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790614293067.058,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "14275.1024"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790614294175.567,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "14275.1365"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790614295468.485,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "14275.1706"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790614297518.106,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "14275.2047"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790614299357.235,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "14275.2389"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+Browser tab: 2, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/system".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system
+	2 container
+		3 container
+			4 button Collapse sidebar
+			5 button Description: Open System Hub, Help: System Hub
+				6 image
+			7 button Notifications
+				8 image
+			9 button View Profile Card
+				10 text P
+				11 text Scholar
+				12 container
+					13 text E -Rank • Lv.  1
+		14 container Main Navigation
+			15 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			16 link Description: Timer, Value: 127.0.0.1:3101/timer
+			17 link Description: Social, Value: 127.0.0.1:3101/social
+			18 link Description: The System AI, Value: 127.0.0.1:3101/system
+			19 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			20 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			21 link Description: Locker, Value: 127.0.0.1:3101/locker
+			22 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		23 button Logout
+			24 image
+			25 text Logout
+		26 container
+			27 container
+				28 button CONVERSATION
+					29 text CONVERSATION
+				30 button PLANNER ∞
+					31 text PLANNER
+					32 text ∞
+				33 text THE SYSTEM
+				34 text INTELLIGENCE LAYER
+				35 heading System Workspace, Value: 1
+					36 text System 
+					37 text Workspace
+				38 button (collapsed) Description: Open Archives, Secondary Actions: Expand
+					39 text ARCHIVES
+					40 text 1
+			41 container
+				42 text YOU 11:01
+				43 container
+					44 text Generate an adaptive AI Study Plan for  "GCSE algebra review"
+				45 container
+					46 text Syllabus:  Only these three topics: quadratic equations, simultaneous equations, and rearranging formulae. Quadratics are difficult; rearranging formulae is easy.  Target Effort:  2 hrs/week
+				47 text THE SYSTEM
+				48 button Copy response
+				49 text 11:01
+				50 heading 🎓 Study Plan Generated: Algebra Awakening: Quadratic, Simultaneous & Rearranging Mastery, Value: 3
+					51 text 🎓 Study Plan Generated: 
+					52 text Algebra Awakening: Quadratic, Simultaneous & Rearranging Mastery
+				53 content list
+					54 container
+						55 text Workload : 4 quests · ~2 hours total
+					56 container
+						57 text Effort : RELAXED (2 hrs/week)
+				58 heading Scheduled Quest Preview:, Value: 4
+					59 text Scheduled Quest Preview:
+				60 content list
+					61 container
+						62 text Ch 1: Quadratic Equations - Core Factorising & Solving  (30m)
+					63 container
+						64 text Ch 1: Quadratic Equations - Completing Square, Formula & Graphs  (30m)
+					65 container
+						66 text Ch 2: Simultaneous Equations  (35m)
+					67 container
+						68 text Ch 3: Rearranging Formulae  (25m)
+				69 text Quests are live on your calendar — ask me to modify, reschedule, or split any of them.
+				70 text entry area (settable)
+				71 button Attach File, Help: Attach syllabus, notes, or image
+				72 container Unlimited AI messages
+					73 image
+					74 text ∞
+				75 button (disabled) SEND
+			76 container
+				77 text ARCHIVES 1
+				78 button NEW, Help: New Chat Session
+				79 button Close Archives
+				80 text field (settable)
+				81 button SELECT, Help: Select multiple chats
+				82 text TODAY 1
+				83 text Study Plan: GCSE algebra review
+				84 button Description: Rename Study Plan: GCSE algebra review, Help: Rename chat
+				85 button Description: Delete Study Plan: GCSE algebra review, Help: Delete chat
+	86 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		87 image
+
+The focused UI element is 1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system

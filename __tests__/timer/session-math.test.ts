@@ -13,6 +13,19 @@ import {
   SESSION_GRACE_SECONDS,
 } from "@/lib/session-math";
 
+// Route tests exercise transport only. Durable settlement and weekly atomicity
+// run against real PostgreSQL in the required Phase 1 suite.
+vi.mock("@/lib/planner/v2/server/web", () => ({
+  durablePlanner: () => ({ sessions: {
+    settleLegacy: async (ownerId: number, request: { id: number; focus: number; breaks: number; questId?: number; complete: boolean; final: boolean }) => {
+      const result = await prisma.$queryRaw<Array<{ settle_study_session_atomic: Record<string, unknown> }>>`
+        SELECT public.settle_study_session_atomic(${ownerId},${request.id},${request.focus},${request.breaks},${request.questId ?? null},${null},${request.complete},${request.final},${new Date().toISOString().slice(0, 10)}) AS settle_study_session_atomic
+      `;
+      return { ...result[0].settle_study_session_atomic, weeklyAwarded: false };
+    },
+  } }),
+}));
+
 vi.mock("@/lib/auth", () => ({
   getSession: vi.fn(),
   verifyToken: vi.fn(),

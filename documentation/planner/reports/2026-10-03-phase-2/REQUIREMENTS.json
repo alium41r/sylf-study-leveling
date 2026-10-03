@@ -1,0 +1,1084 @@
+{
+  "schemaVersion": 2,
+  "scope": "Phase 2 intelligence/compiler only; SCHEMA_ONLY never claims runtime implementation.",
+  "governingSources": [
+    "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+    "documentation/planner/reports/2026-10-02-final-architecture-review/REVIEW.md",
+    "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+    "documentation/planner/reports/2026-10-02-phase-0/README.md",
+    "documentation/planner/reports/2026-10-02-phase-1/README.md"
+  ],
+  "approvedOrder": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "requirements": [
+    {
+      "id": "P2-01",
+      "requirement": "Frozen contract, source and concurrent-change baseline",
+      "step": 1,
+      "workstream": "A",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "3. Canonical model and sources of truth"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A12",
+            "A34"
+          ]
+        }
+      ],
+      "systems": [
+        "lib/planner/v2/contracts",
+        "Phase 0/1 evidence"
+      ],
+      "completionGate": "Frozen source pins and every pre-existing file remain identical.",
+      "status": "STEP_1_COMPLETE",
+      "evidence": {
+        "requiredTests": [
+          "supporting artifact schema rejection/correspondence tests",
+          "maximum-count serialization and combined UTF-8 byte overflow",
+          "frozen contracts, audit fixtures and durable digests",
+          "source preservation, source/isolated typecheck, ESLint and normal Node import"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Pure schema/correspondence scope only; actual lifecycle integration required at Steps 5/6."
+      }
+    },
+    {
+      "id": "P2-02",
+      "requirement": "Bounded assistant output and server action authorization",
+      "step": 3,
+      "workstream": "D",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "5. Advice, clarification, research and action"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A33"
+          ]
+        }
+      ],
+      "systems": [
+        "lib/planner/v2/intelligence",
+        "server/intents.ts",
+        "server/attempts.ts"
+      ],
+      "completionGate": "Advice and suggestions cannot enqueue, adopt, apply or create execution; authorized proposal targets exactly match the selected plans.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "advice/action authorization and owned target aliases",
+          "research applicability/authority/excerpt/partial PDF/OCR/private ownership",
+          "PostgreSQL atomic adoption, conversation CAS and zero-target advice"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-03",
+      "requirement": "Relevant context without loss of consequential execution/history",
+      "step": 2,
+      "workstream": "B",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "6. Interview, evidence and personalization"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A05",
+            "A24"
+          ]
+        }
+      ],
+      "systems": [
+        "server/context.ts",
+        "shared study/timezone/subject services"
+      ],
+      "completionGate": "Scope-filter evidence; preserve pins, actual and remaining time, closed/started content, capacity and consequential dependencies; fail explicit overflow.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "scope-relevant context, evidence contradictions and protected-history overflow",
+          "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-04",
+      "requirement": "Readiness, reliability, contradictory evidence and optional notes",
+      "step": 2,
+      "workstream": "B",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "6. Interview, evidence and personalization"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A15",
+            "A24"
+          ]
+        }
+      ],
+      "systems": [
+        "contracts/evidence.ts",
+        "PlannerCheckResult",
+        "execution context"
+      ],
+      "completionGate": "Completion and minutes are observations, not proof of mastery; provenance, dates and contradictions reach the model and reviewer.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "scope-relevant context, evidence contradictions and protected-history overflow",
+          "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-05",
+      "requirement": "Shared metered provider dispatch and fallback accounting",
+      "step": 2,
+      "workstream": "C",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "18. Runtime, exact call paths and performance budgets"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A23",
+            "A29",
+            "A32"
+          ]
+        }
+      ],
+      "systems": [
+        "lib/ai",
+        "server/accounting.ts",
+        "server/attempts.ts"
+      ],
+      "completionGate": "Reserve before each singleAttempt dispatch, count fallback, normalize finish/truncation, retain usage/cost uncertainty, transfer foreground receipts once.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "scope-relevant context, evidence contradictions and protected-history overflow",
+          "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-06",
+      "requirement": "One root deadline and mandatory review reservation",
+      "step": 2,
+      "workstream": "C",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "18. Runtime, exact call paths and performance budgets"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A10",
+            "A30",
+            "A32"
+          ]
+        }
+      ],
+      "systems": [
+        "contracts/envelope.ts",
+        "worker.ts",
+        "provider boundary"
+      ],
+      "completionGate": "All interpretation/research/OCR/fallback/adaptation/repair consume the frozen root budget; takeover never renews it; reserve review and repair plus verification before dispatch.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "scope-relevant context, evidence contradictions and protected-history overflow",
+          "reserve-before-dispatch, fallback, abort/deadline, finish/truncation and usage/accounting failures"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-07",
+      "requirement": "Assessment applicability, issuer authority and excerpt support",
+      "step": 3,
+      "workstream": "E",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "7. Assessment-aware research and import"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A14"
+          ]
+        }
+      ],
+      "systems": [
+        "lib/planner/research",
+        "evidence contracts",
+        "server/adoption.ts"
+      ],
+      "completionGate": "Issuer authority and applicable component/cycle/subset are independently verified; no synthetic official curriculum; only supported applicable claims adopted.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "advice/action authorization and owned target aliases",
+          "research applicability/authority/excerpt/partial PDF/OCR/private ownership",
+          "PostgreSQL atomic adoption, conversation CAS and zero-target advice"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-08",
+      "requirement": "Targeted extraction, bounded OCR and owned document access",
+      "step": 3,
+      "workstream": "E",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "7. Assessment-aware research and import"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A14",
+            "A32"
+          ]
+        }
+      ],
+      "systems": [
+        "research search/fetch/URL/storage primitives",
+        "existing owned-document repository"
+      ],
+      "completionGate": "Index/select relevant pages before extraction; aggregate limits across sources; require owned-document proof before replacing Phase 1 rejection.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "advice/action authorization and owned target aliases",
+          "research applicability/authority/excerpt/partial PDF/OCR/private ownership",
+          "PostgreSQL atomic adoption, conversation CAS and zero-target advice"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-09",
+      "requirement": "Atomic research adoption and zero-target read-only research",
+      "step": 3,
+      "workstream": "E",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "4. One lifecycle and truthful recovery"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A03",
+            "A14",
+            "A20"
+          ]
+        }
+      ],
+      "systems": [
+        "server/attempts.ts",
+        "server/adoption.ts",
+        "server/revisions.ts"
+      ],
+      "completionGate": "Requested/resolved intent correspondence and existing protected constraints survive CAS adoption; research advice creates no Plan/revision/Quest.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "advice/action authorization and owned target aliases",
+          "research applicability/authority/excerpt/partial PDF/OCR/private ownership",
+          "PostgreSQL atomic adoption, conversation CAS and zero-target advice"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-10",
+      "requirement": "Small consequential interview and bounded Plan conversation",
+      "step": 3,
+      "workstream": "D",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "5. Advice, clarification, research and action"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A19",
+            "A33"
+          ]
+        }
+      ],
+      "systems": [
+        "PlannerPlan.conversationVersion",
+        "headless assistant service/API"
+      ],
+      "completionGate": "Zero to three contextualized consequential questions; canonical intent can change only through authorized server operations; no Phase 3 UI.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "advice/action authorization and owned target aliases",
+          "research applicability/authority/excerpt/partial PDF/OCR/private ownership",
+          "PostgreSQL atomic adoption, conversation CAS and zero-target advice"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-11",
+      "requirement": "One LearningBlueprint generator, local aliases and scope dispositions",
+      "step": 4,
+      "workstream": "F",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "8. AI boundary and LearningBlueprint"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A11",
+            "A21",
+            "A22"
+          ]
+        }
+      ],
+      "systems": [
+        "frozen blueprint/reference validators",
+        "intelligence compiler"
+      ],
+      "completionGate": "Specific instructions/criteria survive; every supplied scope has a disposition; no lexical substitutions, ritual phase counts, duration floors or durable/model mutation IDs.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-12",
+      "requirement": "EXAM, ROADMAP, MASTERY and GENERAL educational policies",
+      "step": 4,
+      "workstream": "F",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "11. Planning policies"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A15",
+            "A17",
+            "A21"
+          ]
+        }
+      ],
+      "systems": [
+        "compact compiler policy inputs"
+      ],
+      "completionGate": "Tiny/secure topics can finish early; unknown scope, triage, large scope and no-deadline learning produce meaningful distinct strategies without filling capacity.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-13",
+      "requirement": "Committed versus contingent/optional work and detailed segments",
+      "step": 4,
+      "workstream": "F",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "8. AI boundary and LearningBlueprint"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A11",
+            "A27"
+          ]
+        }
+      ],
+      "systems": [
+        "blueprint contracts",
+        "compiler segment generation"
+      ],
+      "completionGate": "Only committed work is booked; contingent triggers remain recommendations. Normal detail about 14 days, suitable detail about 28; full strategic scope/forecast retained; no fabricated deadline.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-14",
+      "requirement": "Shared authoritative capacity and reserve semantics",
+      "step": 4,
+      "workstream": "G",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "10. Workload and scheduling"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A05",
+            "A06",
+            "A07",
+            "A24",
+            "A30"
+          ]
+        }
+      ],
+      "systems": [
+        "server/context.ts",
+        "execution-validation.ts",
+        "schedule/timezone owners"
+      ],
+      "completionGate": "Use daily, weekly, global and per-goal limits, rest/exclusions/deadlines, actual plus remaining work and pins; apply the soft reserve once.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-15",
+      "requirement": "Deterministic ordering, placement and meaningful declared splits",
+      "step": 4,
+      "workstream": "G",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "10. Workload and scheduling"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A06",
+            "A07",
+            "A11"
+          ]
+        }
+      ],
+      "systems": [
+        "allocator",
+        "frozen execution specifications",
+        "server placement validation"
+      ],
+      "completionGate": "Stable topological placement/local improvement preserve hard windows and prerequisites; split only declared meaningful chunks with explicit reviewed criteria/DAG; otherwise request adaptation.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-16",
+      "requirement": "Proven shortfall versus unresolved search and educational feedback",
+      "step": 4,
+      "workstream": "G",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "10. Workload and scheduling"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A07",
+            "A15",
+            "A18"
+          ]
+        }
+      ],
+      "systems": [
+        "allocation report",
+        "deterministic allocator"
+      ],
+      "completionGate": "Mathematical bounds prove shortfall; heuristic failure remains ALLOCATION_UNRESOLVED; report density, switching, finish, estimate risk and compromises.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-17",
+      "requirement": "One targeted adaptation and rescheduling",
+      "step": 4,
+      "workstream": "G",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "9. Generation and quality pipeline"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A07",
+            "A10"
+          ]
+        }
+      ],
+      "systems": [
+        "compiler allocation/adaptation stages"
+      ],
+      "completionGate": "At most one adaptation for shortfall or consequential poor placement; unresolved trade-offs lead to a decision or recoverable failure.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-18",
+      "requirement": "Joint blueprint and shared prerequisite ownership",
+      "step": 4,
+      "workstream": "F/G",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "14. Bounded multi-goal planning"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A07",
+            "A08"
+          ]
+        }
+      ],
+      "systems": [
+        "JointLearningBlueprintV2Schema",
+        "PlanChangeSet",
+        "shared apply owner"
+      ],
+      "completionGate": "Two selected plans share one request, capacity envelope, DAG, prerequisite owner and change set; no duplicate shared work or partial publication/apply.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
+          "seeded and small exhaustive-oracle allocation tests",
+          "hard prerequisite/window, declared split and reserve/capacity invariants",
+          "joint scope ownership/shared dependency and one adaptation"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-19",
+      "requirement": "Independent grounded review of actual allocated education",
+      "step": 5,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "17. Quality control and recovery"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A10",
+            "A22"
+          ]
+        }
+      ],
+      "systems": [
+        "fresh reviewer inputs",
+        "QualityReportV2"
+      ],
+      "completionGate": "Reviewer sees original goal, raw evidence/research, constraints and actual schedule; identified findings have evidence and consequence; vague more-practice preferences do not block.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "fresh review grounding and exact repair verification",
+          "review outage/budget exhaustion remains unconfirmable",
+          "actual compiled worker and PostgreSQL takeover/fence/cancel/publish/recovery"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-20",
+      "requirement": "One named repair, verified resolution and honest unavailable review",
+      "step": 5,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "17. Quality control and recovery"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A10",
+            "A18",
+            "A28"
+          ]
+        }
+      ],
+      "systems": [
+        "review/repair/verification handlers",
+        "quality report"
+      ],
+      "completionGate": "At most one repair; rerun deterministic allocation and verify exact issue IDs; no outage/budget/blocker becomes confirmable; preserve resumable artifact.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "fresh review grounding and exact repair verification",
+          "review outage/budget exhaustion remains unconfirmable",
+          "actual compiled worker and PostgreSQL takeover/fence/cancel/publish/recovery"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-21",
+      "requirement": "Checkpoint integrity and exact durable correspondence",
+      "step": 5,
+      "workstream": "A/H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "4. One lifecycle and truthful recovery"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A03",
+            "A04",
+            "A12",
+            "A20"
+          ]
+        }
+      ],
+      "systems": [
+        "intelligence/checkpoints.ts",
+        "AttemptService.checkpoint",
+        "repositories"
+      ],
+      "completionGate": "Match request, owner, root, authorization, targets/intents/bases/versions/context, sources, envelope, blueprint, allocation and quality digests before reuse; lifecycle fences remain Phase 1 authority.",
+      "status": "SCHEMA_ONLY",
+      "evidence": {
+        "requiredTests": [
+          "fresh review grounding and exact repair verification",
+          "review outage/budget exhaustion remains unconfirmable",
+          "actual compiled worker and PostgreSQL takeover/fence/cancel/publish/recovery"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-22",
+      "requirement": "Serialized bounds across checkpoint, seal, read and apply",
+      "step": 1,
+      "workstream": "A",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "3. Canonical model and sources of truth"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A11",
+            "A12"
+          ]
+        }
+      ],
+      "systems": [
+        "frozen envelopes",
+        "supporting schemas",
+        "serialization fixture"
+      ],
+      "completionGate": "Maximum stored-count joint witness round-trips within the common envelope; combined overflow is explicit and never silently trims protected context. PostgreSQL path verification remains Step 5/6.",
+      "status": "STEP_1_COMPLETE_INTEGRATION_PENDING",
+      "evidence": {
+        "requiredTests": [
+          "supporting artifact schema rejection/correspondence tests",
+          "maximum-count serialization and combined UTF-8 byte overflow",
+          "frozen contracts, audit fixtures and durable digests",
+          "source preservation, source/isolated typecheck, ESLint and normal Node import"
+        ],
+        "step1Suites": [
+          "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
+          "__tests__/planner-v2/intelligence/serialization.test.ts"
+        ],
+        "runtimeEvidence": "Pure schema/correspondence scope only; actual lifecycle integration required at Steps 5/6."
+      }
+    },
+    {
+      "id": "P2-23",
+      "requirement": "Actual compiled worker handlers and fenced recovery",
+      "step": 5,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "18. Runtime, exact call paths and performance budgets"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A03",
+            "A32"
+          ]
+        }
+      ],
+      "systems": [
+        "lib/planner/v2/main.ts",
+        "server/worker.ts",
+        "tsconfig.planner-worker.json"
+      ],
+      "completionGate": "Normal Node worker imports runtime-safe primitives, never Next-only/alias modules; actual handlers recover/cancel/fence/check deadlines and atomically publish.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "fresh review grounding and exact repair verification",
+          "review outage/budget exhaustion remains unconfirmable",
+          "actual compiled worker and PostgreSQL takeover/fence/cancel/publish/recovery"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-24",
+      "requirement": "Headless generation integration and composable final-intent enqueue",
+      "step": 6,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "9. Generation and quality pipeline"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A03",
+            "A08",
+            "A20"
+          ]
+        }
+      ],
+      "systems": [
+        "app/api/planner/generate/route.ts",
+        "web service",
+        "intent/attempt repositories"
+      ],
+      "completionGate": "V2 opt-in path persists exact intent and enqueues atomically; ownership/auth/idempotency/server-client boundaries hold; worker unavailability is truthful.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
+          "actual worker-to-candidate-to-atomic-apply PostgreSQL journey",
+          "development corpus plus actual provider outputs, measured latency and honest limitations",
+          "relevant existing regressions and Phase 2 completion report"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-25",
+      "requirement": "Candidate publication and atomic apply remain Phase 1 owned",
+      "step": 6,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "15. Apply transaction and coordination"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A02",
+            "A08",
+            "A26"
+          ]
+        }
+      ],
+      "systems": [
+        "server/revisions.ts",
+        "server/apply.ts",
+        "mutation guards"
+      ],
+      "completionGate": "Compile and seal the reviewed content exactly; successful candidate never auto-applies; Phase 1 all-or-none execution/link/pointer/receipt guarantees and started history remain unchanged.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
+          "actual worker-to-candidate-to-atomic-apply PostgreSQL journey",
+          "development corpus plus actual provider outputs, measured latency and honest limitations",
+          "relevant existing regressions and Phase 2 completion report"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-26",
+      "requirement": "Safe observability, measurable latency and privacy",
+      "step": 6,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "19. Observability and privacy"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A18",
+            "A29",
+            "A32"
+          ]
+        }
+      ],
+      "systems": [
+        "attempt stage receipts",
+        "provider usage and development evidence"
+      ],
+      "completionGate": "Record bounded stage timings/calls/tokens/finish reasons/recovery codes; no private reasoning, source document content or credentials in operational logs; distinguish measured targets from promises.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
+          "actual worker-to-candidate-to-atomic-apply PostgreSQL journey",
+          "development corpus plus actual provider outputs, measured latency and honest limitations",
+          "relevant existing regressions and Phase 2 completion report"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-27",
+      "requirement": "Development corpus, live generation evidence and completion report",
+      "step": 6,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "22. Automated verification"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A10",
+            "A11",
+            "A14",
+            "A15",
+            "A22"
+          ]
+        }
+      ],
+      "systems": [
+        "new intelligence corpus",
+        "PostgreSQL harness",
+        "phase report"
+      ],
+      "completionGate": "All four policies plus tiny/secure/triage/large/open deadline/joint cases, oracle/seeded allocator, actual provider output versus fixture expectations, worker/apply integration and no required skipped gates. Phase 5 held-out/human benchmark is separate.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
+          "actual worker-to-candidate-to-atomic-apply PostgreSQL journey",
+          "development corpus plus actual provider outputs, measured latency and honest limitations",
+          "relevant existing regressions and Phase 2 completion report"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    },
+    {
+      "id": "P2-28",
+      "requirement": "Preserve phase boundaries and protected educational reuse",
+      "step": 6,
+      "workstream": "H",
+      "sources": [
+        {
+          "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+          "section": "21. Migration and staged implementation"
+        },
+        {
+          "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+          "section": "5. Finding register: severity and user impact",
+          "findings": [
+            "A01",
+            "A02",
+            "A34"
+          ]
+        }
+      ],
+      "systems": [
+        "existing V2 lifecycle and feature flags"
+      ],
+      "completionGate": "No Phase 3 UI, Phase 4 selective adaptation/continuation journey or Phase 5 release benchmark; preserve existing calendar-only education and all Phase 0/1 guarantees rather than reimplementing them.",
+      "status": "PENDING",
+      "evidence": {
+        "requiredTests": [
+          "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
+          "actual worker-to-candidate-to-atomic-apply PostgreSQL journey",
+          "development corpus plus actual provider outputs, measured latency and honest limitations",
+          "relevant existing regressions and Phase 2 completion report"
+        ],
+        "step1Suites": [],
+        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+      }
+    }
+  ]
+}

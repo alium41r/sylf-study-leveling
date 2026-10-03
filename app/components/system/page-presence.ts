@@ -31,14 +31,13 @@ const PRESENCE: Record<string, PagePresence> = {
   command: {
     id: "command",
     label: "Command Center",
-    eyebrow: "PROGRESS & BRIEFING ASSIST",
-    greeting:
-      "Greetings, Scholar. I can see the full picture of your progress — ask me for today's briefing, what to focus on next, or anything about your rank, quests and weekly target.",
+    eyebrow: "OVERVIEW",
+    greeting: "Ready, Scholar. What's on your agenda today?",
     suggestions: [
-      "Give me today's briefing",
-      "What should I focus on next?",
-      "How is my weekly quest going?",
-      "Where am I struggling lately?",
+      "Today's briefing",
+      "Next priority",
+      "Weekly progress",
+      "Bottlenecks",
     ],
     plannerHint: "Generate a study plan from your progress",
     icon: "command",
@@ -46,14 +45,13 @@ const PRESENCE: Record<string, PagePresence> = {
   calendar: {
     id: "calendar",
     label: "Calendar",
-    eyebrow: "SCHEDULING ASSIST",
-    greeting:
-      "I have your schedule in view. Ask me about your week, overloaded days, or where a new study block could fit — or have me help you plan ahead.",
+    eyebrow: "SCHEDULE",
+    greeting: "Schedule loaded. Need a check-in or planning help?",
     suggestions: [
-      "What does my week look like?",
-      "Am I overloaded this week?",
-      "Help me reschedule my overdue quests",
-      "Where can I fit a 90-minute study block?",
+      "Weekly overview",
+      "Overloaded days",
+      "Find study block",
+      "Reschedule overdue",
     ],
     plannerHint: "Build a study plan around your calendar",
     icon: "calendar",
@@ -61,14 +59,13 @@ const PRESENCE: Record<string, PagePresence> = {
   objectives: {
     id: "objectives",
     label: "Objectives",
-    eyebrow: "GOALS & PLANNING ASSIST",
-    greeting:
-      "I can see your goals and their progress. Ask me for a progress summary, to create a new goal, or which objective needs your attention first.",
+    eyebrow: "GOALS",
+    greeting: "Objectives loaded. Where shall we direct focus?",
     suggestions: [
-      "Summarize my goal progress",
-      "Create a new study goal for Calculus",
-      "Which goal needs attention?",
-      "What quests do I have today?",
+      "Goal progress",
+      "Create new goal",
+      "Top priority",
+      "Today's quests",
     ],
     plannerHint: "Turn a subject into a full study plan",
     icon: "target",
@@ -76,14 +73,13 @@ const PRESENCE: Record<string, PagePresence> = {
   quests: {
     id: "quests",
     label: "Quests",
-    eyebrow: "QUEST & TASK ASSIST",
-    greeting:
-      "I have your quest log in view. Ask me what's due, to create a quest for you, or which tasks you're falling behind on.",
+    eyebrow: "QUESTS",
+    greeting: "Quest log ready. What are we completing today?",
     suggestions: [
-      "What quests are due today?",
-      "Create a quest to review flashcards tomorrow",
-      "Which quests am I behind on?",
-      "Reschedule my overdue quests",
+      "Due today",
+      "Create quest",
+      "Overdue tasks",
+      "Weekly target",
     ],
     plannerHint: "Generate quests from a study plan",
     icon: "scroll",
@@ -107,7 +103,6 @@ export function resolvePresence(pathname: string, search: string): PagePresence 
       const params = new URLSearchParams(search);
       const tab = params.get("tab");
       if (tab === "quests") return PRESENCE.quests;
-      if (tab === "skill-tree") return null; // visual page — stay focused
       return PRESENCE.objectives;
     }
     case "/quests":

@@ -162,14 +162,17 @@ describe("Focus Eye-Comfort Dimming Engine", () => {
   });
 
   describe("Dock Dim Toggle Button", () => {
-    function renderDock(dimControl?: {
-      isDimActive: boolean;
-      isLightMode: boolean;
-      onToggleDim: () => void;
-    }) {
+    function renderDock(
+      dimControl?: {
+        isDimActive: boolean;
+        isLightMode: boolean;
+        onToggleDim: () => void;
+      },
+      defaultExpanded = true
+    ) {
       return render(
         <FocusToolsProvider>
-          <FocusToolsDock dimControl={dimControl} />
+          <FocusToolsDock dimControl={dimControl} defaultExpanded={defaultExpanded} />
         </FocusToolsProvider>
       );
     }

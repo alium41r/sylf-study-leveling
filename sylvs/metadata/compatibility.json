@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "system": "sylv",
+  "rules": {
+    "sharedCoordinates": true,
+    "canvas": {
+      "width": 400,
+      "height": 600,
+      "viewBox": "0 0 400 600"
+    },
+    "genderCompatibility": {
+      "unisexAssets": true,
+      "baseSwapPreservesAccessories": true,
+      "hairSharedAcrossGenders": true,
+      "headwearSharedAcrossGenders": true
+    },
+    "layerOrder": [
+      "effects_background",
+      "hair_back",
+      "appendages_back",
+      "clothing_back",
+      "tail",
+      "body",
+      "arms",
+      "head",
+      "ears",
+      "eyes",
+      "markings",
+      "clothing_front",
+      "armor",
+      "hair_front",
+      "accessories_head",
+      "accessories_neck",
+      "accessories_floating",
+      "effects_foreground"
+    ]
+  }
+}

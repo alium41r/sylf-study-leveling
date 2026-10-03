@@ -1,0 +1,62 @@
+Browser tab: 2, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/system".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system
+	2 container
+		3 container
+			4 button Collapse sidebar
+			5 button Description: Open System Hub, Help: System Hub
+				6 image
+			7 button Notifications
+				8 image
+			9 button View Profile Card
+				10 text P
+				11 text Scholar
+				12 container
+					13 text E -Rank • Lv.  1
+		14 container Main Navigation
+			15 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			16 link Description: Timer, Value: 127.0.0.1:3101/timer
+			17 link Description: Social, Value: 127.0.0.1:3101/social
+			18 link Description: The System AI, Value: 127.0.0.1:3101/system
+			19 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			20 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			21 link Description: Locker, Value: 127.0.0.1:3101/locker
+			22 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		23 button Logout
+			24 image
+			25 text Logout
+		26 container
+			27 container
+				28 button CONVERSATION
+				30 button PLANNER ∞
+					31 text PLANNER
+					32 text ∞
+				33 text THE SYSTEM
+				34 text INTELLIGENCE LAYER
+				35 heading System Workspace, Value: 1
+					36 text System 
+					37 text Workspace
+				38 button (collapsed) Description: Open Archives, Secondary Actions: Expand
+					39 text ARCHIVES
+					40 text 1
+			67 container
+				68 heading AI Study Planner, Value: 2
+					69 text AI Study Planner
+				70 text Adaptive syllabus & quest generator
+				71 text UNLIMITED PLANS
+				72 button Planner modes
+				73 text > Initializing Multi-Agent Intelligence Engine... > [System] Fetching your past study sessions... > [Researcher] Running grounded Google Search for "GCSE algebra review (Scope: Only these three topics: quadratic equations, simultaneous equations, and rearranging formulae. Quadratics are difficult; rearranging formulae is easy.)"... > [Analyst • DeepSeek & Gemini] Reviewing 0 past study sessions... > [Analyst] No past history. Recommending standard 45-min Pomodoro sessions. > [Researcher] Live findings received (Academic Curriculum Knowledge Engine). Synthesizing official chapter breakdown... > [Researcher • DeepSeek V4.1 Flash] Synthesizing grounded findings into the official chapter list... Researching syllabus & structuring quests...
+			54 container
+				55 text ARCHIVES 1
+				56 button NEW, Help: New Chat Session
+				57 button Close Archives
+				58 text field (settable)
+				59 button SELECT, Help: Select multiple chats
+				60 text TODAY 1
+				61 text Study Plan: GCSE algebra review
+				62 button Description: Rename Study Plan: GCSE algebra review, Help: Rename chat
+				63 button Description: Delete Study Plan: GCSE algebra review, Help: Delete chat
+	74 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		75 image
+	66 text Sylf — Study Leveling
+
+The focused UI element is 1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system

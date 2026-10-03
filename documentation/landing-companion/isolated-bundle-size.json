@@ -1,0 +1,17 @@
+{
+  "description": "Isolated Vite library build of JourneyCompanion with React external, minify enabled. Incremental component footprint, not Next route transfer size.",
+  "createdAt": "2026-09-28T01:12:13.350Z",
+  "files": [
+    {
+      "name": "companion.css",
+      "rawBytes": 7924,
+      "gzipBytes": 1943
+    },
+    {
+      "name": "companion.mjs",
+      "rawBytes": 23072,
+      "gzipBytes": 6456
+    }
+  ],
+  "characterAssetBytes": 160722
+}

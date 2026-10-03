@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Atomic Transactional Wrapper: execute set_config and purchase_shop_item on same connection
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await executionTransaction(userId, async (tx) => {
       await tx.$executeRawUnsafe(
         `SELECT set_config('request.jwt.claim.userId', $1, true)`,
         String(userId)

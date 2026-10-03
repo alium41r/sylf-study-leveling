@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Check, Lock, Zap, Sparkles, AlertTriangle, Shield, GitBranch } from "lucide-react";
+import { Check, Lock, Zap, AlertTriangle, Shield, GitBranch } from "lucide-react";
+import { SystemInsightsIcon } from "@/app/components/icons";
 import type { SkeletonNode } from "@/lib/skill-tree-skeleton";
 import { getPrerequisites, TIER_SHAPE_LABELS } from "@/lib/skill-tree-skeleton";
 import type { NodeStatus } from "./SkillNodeGraph";
@@ -57,7 +58,7 @@ export function SkillInspector({
     return (
       <div className="rounded-2xl bg-bg-panel/70 border border-white/10 p-6 flex flex-col items-center justify-center text-center gap-4 min-h-[380px] backdrop-blur-xl">
         <div className="w-16 h-16 rounded-2xl bg-bg-abyss/80 border border-white/10 flex items-center justify-center">
-          <Sparkles className="w-7 h-7 text-text-muted opacity-40" />
+          <SystemInsightsIcon size={28} className="text-text-muted opacity-40" />
         </div>
         <div className="space-y-1.5">
           <h4 className="text-sm font-bold font-['Rajdhani'] text-text-primary uppercase tracking-wide">
@@ -86,16 +87,16 @@ export function SkillInspector({
 
   if (isClassLocked) {
     actionButton = (
-      <div className="w-full py-3 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-500 text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2">
+      <div className="w-full py-3 rounded-xl bg-slate-900/5 dark:bg-zinc-900/80 border border-border-subtle dark:border-zinc-800 text-text-muted text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2">
         <Lock className="w-4 h-4" />
         <span>Locked — Requires Class Mastery</span>
       </div>
     );
   } else if (status === "UNLOCKED") {
     actionButton = (
-      <div className="w-full py-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2">
+      <div className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2">
         <Check className="w-4 h-4" />
-        <span>✓ Acquired</span>
+        <span>Acquired</span>
       </div>
     );
   } else if (status === "AVAILABLE" && hasEnoughSP) {
@@ -126,14 +127,14 @@ export function SkillInspector({
     );
   } else if (status === "AVAILABLE" && !hasEnoughSP) {
     actionButton = (
-      <div className="w-full py-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-amber-400 text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2 opacity-80">
+      <div className="w-full py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2 opacity-90">
         <AlertTriangle className="w-4 h-4" />
         <span>Need {cost - skillPoints} More SP</span>
       </div>
     );
   } else {
     actionButton = (
-      <div className="w-full py-3 rounded-xl bg-zinc-900/60 border border-zinc-800 text-zinc-500 text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2">
+      <div className="w-full py-3 rounded-xl bg-slate-900/5 dark:bg-zinc-900/60 border border-border-subtle dark:border-zinc-800 text-text-muted text-sm font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2">
         <Lock className="w-4 h-4" />
         <span>Locked (Prerequisites Required)</span>
       </div>
@@ -141,7 +142,7 @@ export function SkillInspector({
   }
 
   return (
-    <div className="rounded-2xl bg-bg-panel/70 border border-white/10 backdrop-blur-xl overflow-hidden flex flex-col shadow-2xl">
+    <div className="rounded-2xl bg-bg-panel/70 border border-border-subtle backdrop-blur-xl overflow-hidden flex flex-col shadow-2xl">
       {/* ─── Header Accent Bar ─────────────────────────────── */}
       <div
         className="h-1"
@@ -188,15 +189,15 @@ export function SkillInspector({
             Structural Telemetry
           </span>
           <div className="grid grid-cols-2 gap-2">
-            <div className="px-3 py-2 rounded-xl bg-bg-abyss/60 border border-white/5 flex flex-col">
+            <div className="px-3 py-2 rounded-xl bg-bg-abyss/60 border border-border-subtle flex flex-col">
               <span className="text-[10px] font-['Rajdhani'] text-text-muted uppercase">Geometry</span>
               <span className="text-xs font-bold font-mono uppercase text-text-primary">
                 {node.shape.replace("_", " ")}
               </span>
             </div>
-            <div className="px-3 py-2 rounded-xl bg-bg-abyss/60 border border-white/5 flex flex-col">
+            <div className="px-3 py-2 rounded-xl bg-bg-abyss/60 border border-border-subtle flex flex-col">
               <span className="text-[10px] font-['Rajdhani'] text-text-muted uppercase">SP Cost</span>
-              <span className="text-xs font-bold font-mono text-amber-400">
+              <span className="text-xs font-bold font-mono text-amber-600 dark:text-amber-400">
                 {node.costSP} SP
               </span>
             </div>
@@ -213,8 +214,8 @@ export function SkillInspector({
             <div
               className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border text-xs font-['Rajdhani'] ${
                 hasEnoughSP || status === "UNLOCKED"
-                  ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-300"
-                  : "bg-rose-950/30 border-rose-500/30 text-rose-300"
+                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                  : "bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300"
               }`}
             >
               {hasEnoughSP || status === "UNLOCKED" ? (
@@ -232,8 +233,8 @@ export function SkillInspector({
               <div
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border text-xs font-['Rajdhani'] ${
                   prereqMet
-                    ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-300"
-                    : "bg-rose-950/30 border-rose-500/30 text-rose-300"
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                    : "bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300"
                 }`}
               >
                 {prereqMet ? (
@@ -246,7 +247,7 @@ export function SkillInspector({
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border bg-emerald-950/30 border-emerald-500/30 text-emerald-300 text-xs font-['Rajdhani']">
+              <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-['Rajdhani']">
                 <Shield className="w-3.5 h-3.5 shrink-0" />
                 <span>Tier 1 Root Foundation — no parent prerequisites</span>
               </div>

@@ -1,0 +1,666 @@
+{
+  "at": "2026-09-11T03:32:54.138Z",
+  "connection": {
+    "pooledVariable": false,
+    "port": "6543",
+    "maxConnectionsUsed": 1
+  },
+  "queries": [
+    {
+      "name": "network_roundtrip",
+      "samplesMs": [
+        124.55704200000037,
+        122.70141699999931,
+        128.12895800000024,
+        126.14979200000016,
+        125.40612499999952,
+        125.2358750000003,
+        122.01958299999933
+      ],
+      "planningMs": 0.018,
+      "executionMs": 0.02,
+      "plan": {
+        "node": "Result",
+        "planRows": 1,
+        "actualRows": 1,
+        "actualTotalMs": 0.002,
+        "sharedHitBlocks": 0,
+        "sharedReadBlocks": 0,
+        "children": []
+      }
+    },
+    {
+      "name": "auth_revocation",
+      "samplesMs": [
+        126.58787500000017,
+        125.75987500000065,
+        126.03729199999998,
+        139.91454200000044,
+        127.58612499999981,
+        131.24324999999953,
+        123.07066699999996
+      ],
+      "planningMs": 0.089,
+      "executionMs": 0.035,
+      "plan": {
+        "node": "Index Scan",
+        "relation": "User",
+        "index": "User_pkey",
+        "planRows": 1,
+        "actualRows": 1,
+        "actualTotalMs": 0.01,
+        "sharedHitBlocks": 2,
+        "sharedReadBlocks": 0,
+        "children": []
+      }
+    },
+    {
+      "name": "today_sessions",
+      "samplesMs": [
+        126.5873330000004,
+        132.47300000000178,
+        124.81616700000086,
+        123.73795799999971,
+        123.06387499999983,
+        123.71337499999936,
+        125.5555000000004
+      ],
+      "planningMs": 0.103,
+      "executionMs": 0.026,
+      "plan": {
+        "node": "Index Scan",
+        "relation": "StudySession",
+        "index": "StudySession_userId_startedAt_idx",
+        "planRows": 1,
+        "actualRows": 0,
+        "actualTotalMs": 0.008,
+        "sharedHitBlocks": 2,
+        "sharedReadBlocks": 0,
+        "children": []
+      }
+    },
+    {
+      "name": "recent_messages",
+      "samplesMs": [
+        123.44525000000067,
+        127.04075000000012,
+        124.85758300000089,
+        122.62616600000001,
+        123.36466599999949,
+        122.21720800000003,
+        124.28762500000084
+      ],
+      "planningMs": 0.1,
+      "executionMs": 0.039,
+      "plan": {
+        "node": "Limit",
+        "planRows": 1,
+        "actualRows": 0,
+        "actualTotalMs": 0.021,
+        "sharedHitBlocks": 1,
+        "sharedReadBlocks": 0,
+        "children": [
+          {
+            "node": "Sort",
+            "planRows": 1,
+            "actualRows": 0,
+            "actualTotalMs": 0.02,
+            "sharedHitBlocks": 1,
+            "sharedReadBlocks": 0,
+            "children": [
+              {
+                "node": "Seq Scan",
+                "relation": "Message",
+                "planRows": 1,
+                "actualRows": 0,
+                "actualTotalMs": 0.016,
+                "sharedHitBlocks": 1,
+                "sharedReadBlocks": 0,
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "incremental_messages",
+      "samplesMs": [
+        123.54337499999929,
+        123.0604170000006,
+        124.08558399999856,
+        125.31220799999937,
+        124.4107499999991,
+        123.1396249999998,
+        124.84679200000028
+      ],
+      "planningMs": 0.094,
+      "executionMs": 0.039,
+      "plan": {
+        "node": "Sort",
+        "planRows": 1,
+        "actualRows": 0,
+        "actualTotalMs": 0.021,
+        "sharedHitBlocks": 1,
+        "sharedReadBlocks": 0,
+        "children": [
+          {
+            "node": "Seq Scan",
+            "relation": "Message",
+            "planRows": 1,
+            "actualRows": 0,
+            "actualTotalMs": 0.017,
+            "sharedHitBlocks": 1,
+            "sharedReadBlocks": 0,
+            "children": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "notification_window",
+      "samplesMs": [
+        139.85375000000022,
+        128.90312500000073,
+        123.59437500000058,
+        125.0036250000012,
+        124.98241699999926,
+        124.47870799999873,
+        122.84162499999911
+      ],
+      "planningMs": 0.09,
+      "executionMs": 0.054,
+      "plan": {
+        "node": "Limit",
+        "planRows": 50,
+        "actualRows": 0,
+        "actualTotalMs": 0.033,
+        "sharedHitBlocks": 10,
+        "sharedReadBlocks": 0,
+        "children": [
+          {
+            "node": "Sort",
+            "planRows": 60,
+            "actualRows": 0,
+            "actualTotalMs": 0.031,
+            "sharedHitBlocks": 10,
+            "sharedReadBlocks": 0,
+            "children": [
+              {
+                "node": "Bitmap Heap Scan",
+                "relation": "SystemMessage",
+                "planRows": 60,
+                "actualRows": 0,
+                "actualTotalMs": 0.028,
+                "sharedHitBlocks": 10,
+                "sharedReadBlocks": 0,
+                "children": [
+                  {
+                    "node": "Bitmap Index Scan",
+                    "index": "SystemMessage_userId_sessionId_idx",
+                    "planRows": 60,
+                    "actualRows": 28,
+                    "actualTotalMs": 0.012,
+                    "sharedHitBlocks": 2,
+                    "sharedReadBlocks": 0,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "block_lookup",
+      "samplesMs": [
+        122.75562499999978,
+        123.43858399999954,
+        122.81241699999919,
+        121.38637500000004,
+        122.79491699999926,
+        123.27087499999834,
+        123.17433299999902
+      ],
+      "planningMs": 0.066,
+      "executionMs": 0.031,
+      "plan": {
+        "node": "Bitmap Heap Scan",
+        "relation": "BlockedUser",
+        "planRows": 17,
+        "actualRows": 0,
+        "actualTotalMs": 0.006,
+        "sharedHitBlocks": 3,
+        "sharedReadBlocks": 0,
+        "children": [
+          {
+            "node": "BitmapOr",
+            "planRows": 17,
+            "actualRows": 0,
+            "actualTotalMs": 0.003,
+            "sharedHitBlocks": 3,
+            "sharedReadBlocks": 0,
+            "children": [
+              {
+                "node": "Bitmap Index Scan",
+                "index": "BlockedUser_userId_blockedId_key",
+                "planRows": 8,
+                "actualRows": 0,
+                "actualTotalMs": 0.002,
+                "sharedHitBlocks": 2,
+                "sharedReadBlocks": 0,
+                "children": []
+              },
+              {
+                "node": "Bitmap Index Scan",
+                "index": "BlockedUser_userId_blockedId_key",
+                "planRows": 8,
+                "actualRows": 0,
+                "actualTotalMs": 0.001,
+                "sharedHitBlocks": 1,
+                "sharedReadBlocks": 0,
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "connectMs": 710.7117499999999,
+  "startupDefaults": {
+    "readOnly": "off",
+    "statementTimeout": "2min"
+  },
+  "readOnly": "on",
+  "version": "17.6",
+  "tables": [
+    {
+      "relname": "AcousticTrack",
+      "n_live_tup": "14",
+      "seq_scan": "622",
+      "idx_scan": "1"
+    },
+    {
+      "relname": "AiInsight",
+      "n_live_tup": "1",
+      "seq_scan": "1031",
+      "idx_scan": "1754"
+    },
+    {
+      "relname": "AiMemory",
+      "n_live_tup": "2",
+      "seq_scan": "4",
+      "idx_scan": "621"
+    },
+    {
+      "relname": "AiUsageLog",
+      "n_live_tup": "80",
+      "seq_scan": "10",
+      "idx_scan": "223"
+    },
+    {
+      "relname": "AuthSession",
+      "n_live_tup": "22",
+      "seq_scan": "346",
+      "idx_scan": "71"
+    },
+    {
+      "relname": "BlockedUser",
+      "n_live_tup": "0",
+      "seq_scan": "3",
+      "idx_scan": "9401"
+    },
+    {
+      "relname": "ChatSession",
+      "n_live_tup": "114",
+      "seq_scan": "1451",
+      "idx_scan": "494"
+    },
+    {
+      "relname": "ConnectedAccount",
+      "n_live_tup": "11",
+      "seq_scan": "6",
+      "idx_scan": "1208"
+    },
+    {
+      "relname": "Conversation",
+      "n_live_tup": "17",
+      "seq_scan": "2128",
+      "idx_scan": "2252"
+    },
+    {
+      "relname": "ConversationParticipant",
+      "n_live_tup": "30",
+      "seq_scan": "10807",
+      "idx_scan": "875"
+    },
+    {
+      "relname": "DailyBriefingLog",
+      "n_live_tup": "0",
+      "seq_scan": "3",
+      "idx_scan": "416"
+    },
+    {
+      "relname": "FloatingRestDay",
+      "n_live_tup": "2",
+      "seq_scan": "4",
+      "idx_scan": "636"
+    },
+    {
+      "relname": "FocusBackground",
+      "n_live_tup": "2",
+      "seq_scan": "257",
+      "idx_scan": "173"
+    },
+    {
+      "relname": "FocusBackgroundCategory",
+      "n_live_tup": "4",
+      "seq_scan": "166",
+      "idx_scan": "204"
+    },
+    {
+      "relname": "FocusParty",
+      "n_live_tup": "19",
+      "seq_scan": "6581",
+      "idx_scan": "1419"
+    },
+    {
+      "relname": "FocusPartyMember",
+      "n_live_tup": "28",
+      "seq_scan": "17791",
+      "idx_scan": "1374"
+    },
+    {
+      "relname": "FocusSession",
+      "n_live_tup": "31",
+      "seq_scan": "11396",
+      "idx_scan": "538"
+    },
+    {
+      "relname": "FocusSessionMember",
+      "n_live_tup": "46",
+      "seq_scan": "8263",
+      "idx_scan": "208"
+    },
+    {
+      "relname": "FriendRequest",
+      "n_live_tup": "13",
+      "seq_scan": "2642",
+      "idx_scan": "1383"
+    },
+    {
+      "relname": "Friendship",
+      "n_live_tup": "50",
+      "seq_scan": "4684",
+      "idx_scan": "4528"
+    },
+    {
+      "relname": "Goal",
+      "n_live_tup": "15",
+      "seq_scan": "1440",
+      "idx_scan": "2768"
+    },
+    {
+      "relname": "HpLedger",
+      "n_live_tup": "74",
+      "seq_scan": "453",
+      "idx_scan": "0"
+    },
+    {
+      "relname": "InventoryItem",
+      "n_live_tup": "0",
+      "seq_scan": "921",
+      "idx_scan": "2383"
+    },
+    {
+      "relname": "Item",
+      "n_live_tup": "69",
+      "seq_scan": "177",
+      "idx_scan": "223"
+    },
+    {
+      "relname": "Message",
+      "n_live_tup": "96",
+      "seq_scan": "4891",
+      "idx_scan": "1274"
+    },
+    {
+      "relname": "Quest",
+      "n_live_tup": "164",
+      "seq_scan": "3419",
+      "idx_scan": "5862"
+    },
+    {
+      "relname": "SessionInvite",
+      "n_live_tup": "32",
+      "seq_scan": "16999",
+      "idx_scan": "32351"
+    },
+    {
+      "relname": "StatInvestLedger",
+      "n_live_tup": "10",
+      "seq_scan": "5",
+      "idx_scan": "136"
+    },
+    {
+      "relname": "StudySession",
+      "n_live_tup": "375",
+      "seq_scan": "5031",
+      "idx_scan": "23069"
+    },
+    {
+      "relname": "Subject",
+      "n_live_tup": "38",
+      "seq_scan": "5547",
+      "idx_scan": "128"
+    },
+    {
+      "relname": "SubjectNode",
+      "n_live_tup": "1200",
+      "seq_scan": "1338",
+      "idx_scan": "4613"
+    },
+    {
+      "relname": "SylphLedger",
+      "n_live_tup": "317",
+      "seq_scan": "156",
+      "idx_scan": "320"
+    },
+    {
+      "relname": "SystemMessage",
+      "n_live_tup": "620",
+      "seq_scan": "7034",
+      "idx_scan": "35068"
+    },
+    {
+      "relname": "User",
+      "n_live_tup": "119",
+      "seq_scan": "5774",
+      "idx_scan": "152588"
+    },
+    {
+      "relname": "UserAchievement",
+      "n_live_tup": "9",
+      "seq_scan": "855",
+      "idx_scan": "522"
+    },
+    {
+      "relname": "UserCosmetic",
+      "n_live_tup": "243",
+      "seq_scan": "1215",
+      "idx_scan": "1078"
+    },
+    {
+      "relname": "UserFocusBackground",
+      "n_live_tup": "2",
+      "seq_scan": "169",
+      "idx_scan": "468"
+    },
+    {
+      "relname": "UserInventory",
+      "n_live_tup": "0",
+      "seq_scan": "4",
+      "idx_scan": "747"
+    },
+    {
+      "relname": "UserPrivacy",
+      "n_live_tup": "92",
+      "seq_scan": "441",
+      "idx_scan": "337"
+    },
+    {
+      "relname": "UserQuota",
+      "n_live_tup": "39",
+      "seq_scan": "2121",
+      "idx_scan": "562"
+    },
+    {
+      "relname": "UserSkillNode",
+      "n_live_tup": "0",
+      "seq_scan": "4",
+      "idx_scan": "359"
+    },
+    {
+      "relname": "UserStats",
+      "n_live_tup": "26",
+      "seq_scan": "4361",
+      "idx_scan": "1435"
+    },
+    {
+      "relname": "VerificationToken",
+      "n_live_tup": "1",
+      "seq_scan": "3",
+      "idx_scan": "447"
+    },
+    {
+      "relname": "WaitlistEntry",
+      "n_live_tup": "7",
+      "seq_scan": "10",
+      "idx_scan": "59"
+    },
+    {
+      "relname": "XpLedger",
+      "n_live_tup": "156",
+      "seq_scan": "161",
+      "idx_scan": "145"
+    },
+    {
+      "relname": "_prisma_migrations",
+      "n_live_tup": "51",
+      "seq_scan": "99",
+      "idx_scan": "58"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "BlockedUser",
+      "indexname": "BlockedUser_pkey",
+      "indexdef": "CREATE UNIQUE INDEX \"BlockedUser_pkey\" ON public.\"BlockedUser\" USING btree (id)"
+    },
+    {
+      "tablename": "BlockedUser",
+      "indexname": "BlockedUser_userId_blockedId_key",
+      "indexdef": "CREATE UNIQUE INDEX \"BlockedUser_userId_blockedId_key\" ON public.\"BlockedUser\" USING btree (\"userId\", \"blockedId\")"
+    },
+    {
+      "tablename": "ConversationParticipant",
+      "indexname": "ConversationParticipant_conversationId_userId_idx",
+      "indexdef": "CREATE INDEX \"ConversationParticipant_conversationId_userId_idx\" ON public.\"ConversationParticipant\" USING btree (\"conversationId\", \"userId\")"
+    },
+    {
+      "tablename": "ConversationParticipant",
+      "indexname": "ConversationParticipant_pkey",
+      "indexdef": "CREATE UNIQUE INDEX \"ConversationParticipant_pkey\" ON public.\"ConversationParticipant\" USING btree (id)"
+    },
+    {
+      "tablename": "ConversationParticipant",
+      "indexname": "ConversationParticipant_userId_conversationId_key",
+      "indexdef": "CREATE UNIQUE INDEX \"ConversationParticipant_userId_conversationId_key\" ON public.\"ConversationParticipant\" USING btree (\"userId\", \"conversationId\")"
+    },
+    {
+      "tablename": "Message",
+      "indexname": "Message_conversationId_createdAt_idx",
+      "indexdef": "CREATE INDEX \"Message_conversationId_createdAt_idx\" ON public.\"Message\" USING btree (\"conversationId\", \"createdAt\")"
+    },
+    {
+      "tablename": "Message",
+      "indexname": "Message_pkey",
+      "indexdef": "CREATE UNIQUE INDEX \"Message_pkey\" ON public.\"Message\" USING btree (id)"
+    },
+    {
+      "tablename": "Message",
+      "indexname": "Message_senderId_idx",
+      "indexdef": "CREATE INDEX \"Message_senderId_idx\" ON public.\"Message\" USING btree (\"senderId\")"
+    },
+    {
+      "tablename": "StudySession",
+      "indexname": "StudySession_pkey",
+      "indexdef": "CREATE UNIQUE INDEX \"StudySession_pkey\" ON public.\"StudySession\" USING btree (id)"
+    },
+    {
+      "tablename": "StudySession",
+      "indexname": "StudySession_userId_questId_idx",
+      "indexdef": "CREATE INDEX \"StudySession_userId_questId_idx\" ON public.\"StudySession\" USING btree (\"userId\", \"questId\")"
+    },
+    {
+      "tablename": "StudySession",
+      "indexname": "StudySession_userId_startedAt_idx",
+      "indexdef": "CREATE INDEX \"StudySession_userId_startedAt_idx\" ON public.\"StudySession\" USING btree (\"userId\", \"startedAt\" DESC)"
+    },
+    {
+      "tablename": "StudySession",
+      "indexname": "StudySession_userId_subjectId_idx",
+      "indexdef": "CREATE INDEX \"StudySession_userId_subjectId_idx\" ON public.\"StudySession\" USING btree (\"userId\", \"subjectId\")"
+    },
+    {
+      "tablename": "SystemMessage",
+      "indexname": "SystemMessage_pkey",
+      "indexdef": "CREATE UNIQUE INDEX \"SystemMessage_pkey\" ON public.\"SystemMessage\" USING btree (id)"
+    },
+    {
+      "tablename": "SystemMessage",
+      "indexname": "SystemMessage_userId_read_createdAt_idx",
+      "indexdef": "CREATE INDEX \"SystemMessage_userId_read_createdAt_idx\" ON public.\"SystemMessage\" USING btree (\"userId\", read, \"createdAt\" DESC)"
+    },
+    {
+      "tablename": "SystemMessage",
+      "indexname": "SystemMessage_userId_sessionId_idx",
+      "indexdef": "CREATE INDEX \"SystemMessage_userId_sessionId_idx\" ON public.\"SystemMessage\" USING btree (\"userId\", \"sessionId\")"
+    }
+  ],
+  "connections": [
+    {
+      "state": null,
+      "count": 7
+    },
+    {
+      "state": "active",
+      "count": 1
+    },
+    {
+      "state": "idle",
+      "count": 9
+    }
+  ],
+  "maxConnections": "60",
+  "publication": [
+    {
+      "tablename": "FocusParty"
+    },
+    {
+      "tablename": "FocusPartyMember"
+    },
+    {
+      "tablename": "FocusSession"
+    },
+    {
+      "tablename": "FocusSessionMember"
+    },
+    {
+      "tablename": "StudySession"
+    }
+  ],
+  "statementsExtension": true
+}

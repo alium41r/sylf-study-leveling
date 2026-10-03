@@ -34,7 +34,7 @@ describe("LLM Provider Contract Tests", () => {
 
   const adapters = [
     { name: "Gemini", instance: new GeminiAdapter("dummy-key", "gemini-3.7-flash") },
-    { name: "Groq", instance: new GroqAdapter("dummy-key", "qwen/qwen3.6-27b") },
+    { name: "Groq", instance: new GroqAdapter("dummy-key", "openai/gpt-oss-120b") },
     { name: "DeepSeek", instance: new DeepSeekAdapter("dummy-key", "deepseek-v4-flash") },
   ];
 

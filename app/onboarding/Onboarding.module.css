@@ -1,0 +1,710 @@
+/* ============================================================
+   SYLF ONBOARDING SUITE (CSS MODULE)
+   Harmonized with Scholar Dashboard, System, Timer & Settings.
+   Full dark/light mode parity with responsive mobile layout.
+   ============================================================ */
+
+.onboardingContainer {
+  --page: var(--app-canvas, #080d17);
+  --surface: var(--surface-1, #0e1522);
+  --elevated: var(--surface-2, #121c2b);
+  --elevated-hover: var(--surface-raised, #162234);
+  --ink: var(--text-primary, #eef1f8);
+  --muted: var(--text-secondary, #a1adc1);
+  --quiet: var(--text-muted, #8291aa);
+  --accent: var(--accent-text, var(--accent-primary-light, #b7cbf7));
+  --accent-strong: var(--accent-primary, #7c3aed);
+  --accent-dim: var(--accent-primary-dim, rgba(124, 58, 237, 0.15));
+  --accent-mid: var(--accent-primary-mid, rgba(124, 58, 237, 0.4));
+  --line: var(--border-strong, #263247);
+  --subtle-line: var(--border-subtle, #1a2435);
+  --gold: #d9b67b;
+  --green: #a4d5bb;
+  --red: #e07a7a;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1.5rem 1rem 3rem;
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+:global(html[data-mode="light"]) .onboardingContainer {
+  --page: var(--app-canvas, #f1f4fa);
+  --surface: var(--surface-1, #ffffff);
+  --elevated: var(--surface-2, #e5ebf5);
+  --elevated-hover: var(--surface-raised, #f0f4fa);
+  --ink: var(--text-primary, #18283e);
+  --muted: var(--text-secondary, #475c77);
+  --quiet: var(--text-muted, #52657f);
+  --accent: var(--accent-text, var(--accent-primary-dark, #5b21b6));
+  --accent-strong: var(--accent-primary, #7c3aed);
+  --accent-dim: var(--accent-primary-dim, rgba(124, 58, 237, 0.1));
+  --accent-mid: var(--accent-primary-mid, rgba(124, 58, 237, 0.28));
+  --line: var(--border-strong, #bdcbe0);
+  --subtle-line: var(--border-subtle, #d6dfed);
+  color-scheme: light;
+}
+
+/* ─── Ambient Starlight Canvas Glow ────────────────────────── */
+.topGlow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 520px;
+  background:
+    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(124, 58, 237, 0.18), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 85% 10%, rgba(99, 102, 241, 0.12), transparent 70%);
+  overflow: hidden;
+}
+
+.topGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.25;
+  background-image:
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px),
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px);
+  background-size: 277px 213px, 367px 301px;
+  background-position: 31px 37px, 147px 73px;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
+}
+
+:global(html[data-mode="light"]) .topGlow {
+  background:
+    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(195, 180, 245, 0.25), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 85% 10%, rgba(210, 225, 255, 0.2), transparent 70%);
+}
+
+:global(html[data-mode="light"]) .topGlow::before {
+  opacity: 0.1;
+}
+
+/* ─── Shell Container ──────────────────────────────────────── */
+.shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 44rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ─── Step Card Surface ────────────────────────────────────── */
+.stepCard {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .stepCard {
+    padding: 2.25rem;
+  }
+}
+
+:global(html[data-mode="light"]) .stepCard {
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.08);
+}
+
+/* ─── Progress Stepper Bar ─────────────────────────────────── */
+.progressNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: fit-content;
+  margin: 0 auto 0.5rem;
+}
+
+.progressItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--quiet);
+  transition: color 0.2s ease;
+}
+
+.progressItemActive {
+  color: var(--accent);
+}
+
+.progressItemCompleted {
+  color: var(--green);
+}
+
+.progressDot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  background: var(--line);
+  transition: all 0.2s ease;
+}
+
+.progressDotActive {
+  background: var(--accent-strong);
+  box-shadow: 0 0 10px var(--accent-strong);
+  transform: scale(1.2);
+}
+
+.progressDotCompleted {
+  background: var(--green);
+}
+
+.progressDivider {
+  width: 1rem;
+  height: 1px;
+  background: var(--subtle-line);
+}
+
+/* ─── Typography & Headers ─────────────────────────────────── */
+.stepHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.stepEyebrow {
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.stepTitle {
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .stepTitle {
+    font-size: 2.25rem;
+  }
+}
+
+.stepSubtitle {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 32rem;
+  margin: 0;
+}
+
+/* ─── Core Product Loop Presentation (Welcome) ─────────────── */
+.loopGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .loopGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.loopCard {
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  border-radius: 1rem;
+  padding: 1.15rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.loopCard:hover {
+  border-color: var(--accent-mid);
+  background: var(--elevated-hover);
+}
+
+.loopIconBox {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.loopTitle {
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+
+.loopDesc {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ─── Buttons & Controls ───────────────────────────────────── */
+.actionsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--subtle-line);
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  min-height: 46px;
+  padding: 0 1.75rem;
+  border-radius: 0.875rem;
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--accent-strong) 0%, #6366f1 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 18px var(--accent-dim);
+  transition: opacity 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.94;
+  box-shadow: 0 6px 24px var(--accent-mid);
+}
+
+.btnPrimary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btnSecondary {
+  min-height: 46px;
+  padding: 0 1.35rem;
+  border-radius: 0.875rem;
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--elevated);
+  color: var(--muted);
+  border: 1px solid var(--subtle-line);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  touch-action: manipulation;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--line);
+  background: var(--elevated-hover);
+}
+
+.btnSecondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── Form Inputs & Fields ─────────────────────────────────── */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.label {
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.labelOptional {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  text-transform: none;
+  color: var(--quiet);
+}
+
+.input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  background: var(--page);
+  color: var(--ink);
+  border: 1px solid var(--subtle-line);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 0.65rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  background: var(--page);
+  color: var(--ink);
+  border: 1px solid var(--subtle-line);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.875rem;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  background: var(--page);
+  color: var(--ink);
+  border: 1px solid var(--subtle-line);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.select:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+/* ─── Quick-Add Subject Chips ──────────────────────────────── */
+.quickAddSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.quickAddLabel {
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.quickAddGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.quickAddChip {
+  min-height: 38px;
+  padding: 0.4rem 0.875rem;
+  border-radius: 9999px;
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.quickAddChip:hover:not(:disabled) {
+  border-color: var(--accent-mid);
+  background: var(--elevated-hover);
+  color: var(--accent);
+}
+
+.quickAddChipAdded {
+  background: var(--accent-dim);
+  border-color: var(--accent-strong);
+  color: var(--accent);
+}
+
+/* ─── Active Subjects List ─────────────────────────────────── */
+.subjectsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.subjectCard {
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  border-radius: 0.875rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.subjectCard:hover {
+  border-color: var(--line);
+}
+
+.subjectColorIndicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.subjectCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding-left: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.subjectCardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.subjectName {
+  font-family: var(--font-rajdhani, 'Rajdhani', sans-serif);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subjectCodeBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.35rem;
+  text-transform: uppercase;
+}
+
+.subjectMeta {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.subjectRemoveBtn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--subtle-line);
+  color: var(--quiet);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.subjectRemoveBtn:hover {
+  color: var(--red);
+  border-color: var(--red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ─── Appearance Selector Controls ─────────────────────────── */
+.modeCardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .modeCardGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.modeCard {
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  touch-action: manipulation;
+}
+
+.modeCard:hover {
+  border-color: var(--line);
+  background: var(--elevated-hover);
+}
+
+.modeCardSelected {
+  border-color: var(--accent-strong);
+  background: var(--accent-dim);
+  box-shadow: 0 0 16px var(--accent-dim);
+}
+
+.accentSwatchesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.swatchBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  color: #ffffff;
+}
+
+.swatchBtn:hover {
+  transform: scale(1.1);
+}
+
+.swatchBtnSelected {
+  border-color: var(--ink);
+  box-shadow: 0 0 12px var(--accent-strong);
+  transform: scale(1.12);
+}
+
+/* ─── Compact Live Preview ─────────────────────────────────── */
+.previewBox {
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ─── Accessibility & Reduced Motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .btnPrimary,
+  .btnSecondary,
+  .quickAddChip,
+  .swatchBtn,
+  .topGlow::before {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}

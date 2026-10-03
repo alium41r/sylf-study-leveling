@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 // ============================================================
 // Chat Tool Executor — Runs AI tool calls against the database
 // ============================================================
@@ -6,6 +7,7 @@
 // ============================================================
 
 import { prisma } from "@/lib/prisma";
+import { assertNoLinkedQuests, assertNoPlannerGoals, deleteUnlinkedGoals, isPlannerConflict } from "@/lib/planner/server/mutation-guards";
 import { calculateQuestRewards, calculateRecommendedDifficulty, QuestDifficulty } from "@/lib/difficulty-engine";
 import {
   calculateDailyCapacity,
@@ -19,6 +21,7 @@ import { EffortLevel } from "@/lib/game-engine";
 import { isGoalColorToken, targetDateToUtc } from "@/lib/goal-theme";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
 import { buildRelevantContext } from "@/lib/ai/context-engine";
+import { GEMINI_MODELS } from "@/lib/ai/config";
 import { SHOP_ITEMS } from "@/lib/shop-items";
 import { signConfirmationToken, verifyConfirmationToken } from "@/lib/ai/tool-confirmation";
 
@@ -127,6 +130,7 @@ export async function executeChatTool(
         return { error: `Unknown tool: ${toolName}` };
     }
   } catch (error: any) {
+    if (isPlannerConflict(error)) return { error: "PLANNER_REVIEW_REQUIRED", requiresPlannerReview: true };
     console.error(`Tool Execution Error [${toolName}]:`, error);
     return { error: `Internal tool error occurred while executing ${toolName}.`, details: error.message };
   }
@@ -218,7 +222,7 @@ async function executeCreateGoal(
     targetDate = targetDateToUtc(args.targetDate);
   }
 
-  const goal = await prisma.goal.create({
+  const goal = await executionTransaction(userId, tx => tx.goal.create({
     data: {
       userId,
       title,
@@ -229,7 +233,7 @@ async function executeCreateGoal(
       color,
       targetDate,
     },
-  });
+  }));
 
   return {
     success: true,
@@ -246,11 +250,12 @@ async function executeCreateGoal(
 }
 
 async function executeUpdateGoal(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   let existing;
   if (args.goalId) {
-    existing = await prisma.goal.findFirst({ where: { id: Number(args.goalId), userId } });
+    existing = await tx.goal.findFirst({ where: { id: Number(args.goalId), userId } });
   } else if (args.searchTitle) {
-    existing = await prisma.goal.findFirst({
+    existing = await tx.goal.findFirst({
       where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
     });
@@ -259,6 +264,7 @@ async function executeUpdateGoal(userId: number, args: Record<string, any>) {
   if (!existing) return { error: "Goal not found. Please verify the ID or title." };
 
   const goalId = existing.id;
+  await assertNoPlannerGoals(userId, [goalId], tx);
   const dataToUpdate: any = {};
   if (args.title !== undefined) dataToUpdate.title = args.title;
   if (args.description !== undefined) dataToUpdate.description = args.description;
@@ -277,14 +283,16 @@ async function executeUpdateGoal(userId: number, args: Record<string, any>) {
     dataToUpdate.targetDate = targetDateToUtc(args.targetDate);
   }
 
-  const updated = await prisma.goal.update({
+  const updated = await tx.goal.update({
     where: { id: goalId },
     data: dataToUpdate,
   });
   return { success: true, goal: updated };
+  });
 }
 
 async function executeDeleteGoal(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   const ACTION_ALL = "DELETE_ALL_GOALS";
   const ACTION_BATCH = "DELETE_GOALS_BATCH";
 
@@ -301,8 +309,8 @@ async function executeDeleteGoal(userId: number, args: Record<string, any>) {
     const action = isDeleteAll ? ACTION_ALL : ACTION_BATCH;
     if (!isConfirmed(args, action, userId)) {
       const targetCount = isDeleteAll
-        ? await prisma.goal.count({ where: { userId } })
-        : await prisma.goal.count({ where: { userId, title: { in: titles } } });
+        ? await tx.goal.count({ where: { userId } })
+        : await tx.goal.count({ where: { userId, title: { in: titles } } });
       return buildConfirmationRequest(
         action,
         targetCount,
@@ -314,20 +322,19 @@ async function executeDeleteGoal(userId: number, args: Record<string, any>) {
 
   if (isDeleteAll) {
     // Confirmed full wipe: goals + their associated quests.
-    await prisma.quest.deleteMany({ where: { userId } });
-    const deleted = await prisma.goal.deleteMany({ where: { userId } });
-    return { success: true, message: `Successfully deleted all ${deleted.count} goals and their associated quests.` };
+    const guarded = await deleteUnlinkedGoals(userId, undefined, true, tx);
+    return { success: true, message: `Successfully deleted all ${guarded.goals} goals and their associated quests.` };
   }
 
   const idsToDelete: number[] = [];
   
   if (args.goalId) {
-    const existing = await prisma.goal.findFirst({ where: { id: Number(args.goalId), userId } });
+    const existing = await tx.goal.findFirst({ where: { id: Number(args.goalId), userId } });
     if (existing) idsToDelete.push(existing.id);
   }
   
   if (args.searchTitle) {
-    const existing = await prisma.goal.findFirst({
+    const existing = await tx.goal.findFirst({
       where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
     });
@@ -335,7 +342,7 @@ async function executeDeleteGoal(userId: number, args: Record<string, any>) {
   }
 
   for (const title of titles) {
-    const existing = await prisma.goal.findFirst({
+    const existing = await tx.goal.findFirst({
       where: { userId, title: { contains: title, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
     });
@@ -347,23 +354,20 @@ async function executeDeleteGoal(userId: number, args: Record<string, any>) {
   }
   
   // Delete associated quests first since they are tied to these goals
-  await prisma.quest.deleteMany({ where: { goalId: { in: idsToDelete } } });
-  
-  const deleted = await prisma.goal.deleteMany({
-    where: { id: { in: idsToDelete } }
+  const guarded = await deleteUnlinkedGoals(userId, idsToDelete, false, tx);
+  return { success: true, message: `Successfully deleted ${guarded.goals} goal(s) and their associated quests.` };
   });
-  
-  return { success: true, message: `Successfully deleted ${deleted.count} goal(s) and their associated quests.` };
 }
 
 async function executeDeleteAllTasks(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   const ACTION = "DELETE_ALL_TASKS";
 
   // The full wipe is ALWAYS destructive — require a valid signed token.
   if (!isConfirmed(args, ACTION, userId)) {
     const [questCount, goalCount] = await Promise.all([
-      prisma.quest.count({ where: { userId } }),
-      prisma.goal.count({ where: { userId } }),
+      tx.quest.count({ where: { userId } }),
+      tx.goal.count({ where: { userId } }),
     ]);
     const targetCount = questCount + goalCount;
     return buildConfirmationRequest(
@@ -375,12 +379,9 @@ async function executeDeleteAllTasks(userId: number, args: Record<string, any>) 
   }
 
   // Confirmed full wipe.
-  const questDeleted = await prisma.quest.deleteMany({ where: { userId } });
-  const goalDeleted = await prisma.goal.deleteMany({ where: { userId } });
-  return { 
-    success: true, 
-    message: `Mass deletion complete. Removed ${questDeleted.count} quests and ${goalDeleted.count} goals.` 
-  };
+  const guarded = await deleteUnlinkedGoals(userId, undefined, true, tx);
+  return { success: true, message: `Mass deletion complete. Removed ${guarded.quests} quests and ${guarded.goals} goals.` };
+  });
 }
 
 async function executeGetQuests(
@@ -456,6 +457,7 @@ async function executeCreateQuest(
   userId: number,
   args: Record<string, any>
 ) {
+  return executionTransaction(userId, async tx => {
   const title = args.title || "New Quest";
   const description = args.description || null;
   // S4: reward-driving values are clamped server-side — the LLM (or a
@@ -465,14 +467,14 @@ async function executeCreateQuest(
   let requiredMinutes = Number(args.requiredMinutes);
   if (!Number.isFinite(requiredMinutes) || requiredMinutes <= 0) requiredMinutes = 30;
   requiredMinutes = Math.min(MAX_QUEST_MINUTES, Math.max(MIN_QUEST_MINUTES, Math.round(requiredMinutes)));
-  const tz = await getUserTimezone(userId);
+  const tz = await getUserTimezone(userId, tx);
   const scheduledFor =
     args.scheduledFor || TimezoneService.getUserLocalDate(tz);
   let goalId = args.goalId ? Number(args.goalId) : null;
 
   // ─── REST-DAY ALLOCATION GUARDRAIL ─────────────────────────
   // AI-created quests must never land on fixed or floating rest days.
-  if (await StudyScheduleService.isUserRestDay(userId, scheduledFor)) {
+  if (await StudyScheduleService.isUserRestDay(userId, scheduledFor, tx)) {
     return {
       error: `REST_DAY_BLOCKED: ${scheduledFor} is a designated rest day (fixed or floating) and cannot receive quests. Repath this quest to the next active study day.`,
     };
@@ -482,7 +484,7 @@ async function executeCreateQuest(
   const MAX_AI_QUESTS_PER_DAY = 3;
 
   // 1. Check for duplicates
-  const existingDuplicate = await prisma.quest.findFirst({
+  const existingDuplicate = await tx.quest.findFirst({
     where: { userId, title, scheduledFor }
   });
   if (existingDuplicate) {
@@ -493,7 +495,7 @@ async function executeCreateQuest(
   // Use timezone-correct start of day for accurate daily counting
   const startOfDayUtc = TimezoneService.getStartOfDayUTC(tz);
 
-  const aiQuestsToday = await prisma.quest.count({
+  const aiQuestsToday = await tx.quest.count({
     where: {
       userId,
       // @ts-ignore
@@ -508,24 +510,27 @@ async function executeCreateQuest(
   // ────────────────────────────────────────────────────────────
 
   if (goalId) {
-    const goalExists = await prisma.goal.findFirst({ where: { id: goalId, userId } });
+    const goalExists = await tx.goal.findFirst({ where: { id: goalId, userId } });
     if (!goalExists) goalId = null;
+    else await assertNoPlannerGoals(userId, [goalId], tx);
   }
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await tx.user.findUnique({ where: { id: userId } });
   const userLevel = user?.level || 1;
 
   // Calculate rewards using the game engine
   const diff = calculateRecommendedDifficulty(requiredMinutes);
   const rewards = calculateQuestRewards(requiredMinutes, diff, userLevel);
 
-  const quest = await prisma.quest.create({
+  const quest = await tx.quest.create({
     data: {
       userId,
       goalId,
       title,
       description,
       requiredMinutes,
+      targetMinutes: requiredMinutes,
+      difficulty: diff,
       xpReward: rewards.xp,
       sylphReward: rewards.sylph,
       scheduledFor,
@@ -547,6 +552,7 @@ async function executeCreateQuest(
       scheduledFor: quest.scheduledFor,
     },
   };
+  });
 }
 
 async function executeCreateMultipleQuests(userId: number, args: Record<string, any>) {
@@ -562,18 +568,19 @@ async function executeCreateMultipleQuests(userId: number, args: Record<string, 
 }
 
 async function executeUpdateQuest(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   let existing;
   if (args.questId) {
     const questId = Number(args.questId);
-    existing = await prisma.quest.findFirst({ where: { id: questId, userId } });
+    existing = await tx.quest.findFirst({ where: { id: questId, userId } });
   } else if (args.searchTitle) {
-    existing = await prisma.quest.findFirst({
+    existing = await tx.quest.findFirst({
       where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
     });
   } else if (args.title) {
     // If the model passed `title` to identify the quest rather than `searchTitle`
-    existing = await prisma.quest.findFirst({
+    existing = await tx.quest.findFirst({
       where: { userId, title: { contains: args.title, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
     });
@@ -582,7 +589,7 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
   // Fallback: If still not found and user has a pending quest created recently
   let usedFallback = false;
   if (!existing && (args.requiredMinutes !== undefined || args.scheduledFor !== undefined || args.description !== undefined)) {
-    existing = await prisma.quest.findFirst({
+    existing = await tx.quest.findFirst({
       where: { userId, status: "PENDING" },
       orderBy: { createdAt: "desc" },
     });
@@ -601,7 +608,8 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
     if (!Number.isFinite(reqMins) || reqMins <= 0) reqMins = 30;
     reqMins = Math.min(240, Math.max(15, Math.round(reqMins)));
     dataToUpdate.requiredMinutes = reqMins;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    dataToUpdate.targetMinutes = reqMins;
+    const user = await tx.user.findUnique({ where: { id: userId } });
     const userLevel = user?.level || 1;
     const diff = calculateRecommendedDifficulty(reqMins);
     const rewards = calculateQuestRewards(reqMins, diff, userLevel);
@@ -613,7 +621,7 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(args.scheduledFor))) {
       return { error: "Invalid scheduledFor format. Must be YYYY-MM-DD." };
     }
-    if (await StudyScheduleService.isUserRestDay(userId, String(args.scheduledFor))) {
+    if (await StudyScheduleService.isUserRestDay(userId, String(args.scheduledFor), tx)) {
       return {
         error: `REST_DAY_BLOCKED: ${args.scheduledFor} is a designated rest day (fixed or floating) and cannot receive quests. Repath this quest to the next active study day.`,
       };
@@ -621,7 +629,8 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
     dataToUpdate.scheduledFor = args.scheduledFor;
   }
 
-  const updated = await prisma.quest.update({
+  await assertNoLinkedQuests(userId, { id: questId }, tx);
+  const updated = await tx.quest.update({
     where: { id: questId },
     data: dataToUpdate,
   });
@@ -630,9 +639,11 @@ async function executeUpdateQuest(userId: number, args: Record<string, any>) {
     result.warning = `No exact match found. Updated the most recent pending quest: "${existing.title}" (ID: ${existing.id}). Confirm this was the intended quest.`;
   }
   return result;
+  });
 }
 
 async function executeDeleteQuest(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   const ACTION_ALL = "DELETE_ALL_QUESTS";
   const ACTION_BATCH = "DELETE_QUESTS_BATCH";
 
@@ -649,8 +660,8 @@ async function executeDeleteQuest(userId: number, args: Record<string, any>) {
     const action = isDeleteAll ? ACTION_ALL : ACTION_BATCH;
     if (!isConfirmed(args, action, userId)) {
       const targetCount = isDeleteAll
-        ? await prisma.quest.count({ where: { userId } })
-        : await prisma.quest.count({ where: { userId, title: { in: titles } } });
+        ? await tx.quest.count({ where: { userId } })
+        : await tx.quest.count({ where: { userId, title: { in: titles } } });
       return buildConfirmationRequest(
         action,
         targetCount,
@@ -662,19 +673,20 @@ async function executeDeleteQuest(userId: number, args: Record<string, any>) {
 
   if (isDeleteAll) {
     // Confirmed full wipe.
-    const deleted = await prisma.quest.deleteMany({ where: { userId } });
+    await assertNoLinkedQuests(userId, {}, tx);
+    const deleted = await tx.quest.deleteMany({ where: { userId } });
     return { success: true, message: `Successfully deleted all ${deleted.count} quests.` };
   }
 
   const idsToDelete: number[] = [];
   
   if (args.questId) {
-    const existing = await prisma.quest.findFirst({ where: { id: Number(args.questId), userId } });
+    const existing = await tx.quest.findFirst({ where: { id: Number(args.questId), userId } });
     if (existing) idsToDelete.push(existing.id);
   }
   
   if (args.searchTitle) {
-    const existing = await prisma.quest.findFirst({
+    const existing = await tx.quest.findFirst({
       where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
     });
@@ -682,7 +694,7 @@ async function executeDeleteQuest(userId: number, args: Record<string, any>) {
   }
 
   for (const title of titles) {
-    const existing = await prisma.quest.findFirst({
+    const existing = await tx.quest.findFirst({
       where: { userId, title: { contains: title, mode: "insensitive" } },
       orderBy: { createdAt: "desc" },
     });
@@ -693,11 +705,13 @@ async function executeDeleteQuest(userId: number, args: Record<string, any>) {
     return { error: "No matching quests found to delete. Please verify the IDs or titles." };
   }
   
-  const deleted = await prisma.quest.deleteMany({
+  await assertNoLinkedQuests(userId, { id: { in: idsToDelete } }, tx);
+  const deleted = await tx.quest.deleteMany({
     where: { id: { in: idsToDelete } }
   });
   
   return { success: true, message: `Successfully deleted ${deleted.count} quest(s).` };
+  });
 }
 
 async function executeCompleteQuest(
@@ -833,24 +847,25 @@ async function executeGetWeeklySummary(userId: number) {
 // --- Phase 3A: Calendar Tools ---
 
 async function executeMoveQuest(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   const questId = Number(args.questId);
   const targetDate = String(args.targetDate);
   if (!questId || !targetDate) return { error: "Missing questId or targetDate" };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) return { error: "Invalid targetDate format. Must be YYYY-MM-DD" };
 
-  const quest = await prisma.quest.findUnique({ where: { id: questId, userId } });
+  const quest = await tx.quest.findUnique({ where: { id: questId, userId } });
   if (!quest) return { error: "Quest not found or unauthorized." };
   if (quest.status !== "PENDING" && quest.status !== "IN_PROGRESS") return { error: "Only PENDING or IN_PROGRESS quests can be moved." };
 
   // ─── REST-DAY ALLOCATION GUARDRAIL ─────────────────────────
-  if (await StudyScheduleService.isUserRestDay(userId, targetDate)) {
+  if (await StudyScheduleService.isUserRestDay(userId, targetDate, tx)) {
     return {
       error: `REST_DAY_BLOCKED: ${targetDate} is a designated rest day (fixed or floating) and cannot receive quests. Repath this quest to the next active study day.`,
     };
   }
 
-  const effortLevel = await getHighestEffortLevel(userId);
-  const matrix = await calculateDailyCapacity(userId, effortLevel, targetDate, targetDate);
+  const effortLevel = await getHighestEffortLevel(userId, tx);
+  const matrix = await calculateDailyCapacity(userId, effortLevel, targetDate, targetDate, tx);
   
   if (matrix[targetDate] < quest.requiredMinutes) {
     return { 
@@ -860,22 +875,25 @@ async function executeMoveQuest(userId: number, args: Record<string, any>) {
     };
   }
 
-  await prisma.quest.update({
+  await assertNoLinkedQuests(userId, { id: questId }, tx);
+  await tx.quest.update({
     where: { id: questId },
     data: { scheduledFor: targetDate }
   });
 
   return { success: true, message: `Moved quest to ${targetDate}` };
+  });
 }
 
 async function executeSwapQuests(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   const questIdA = Number(args.questIdA);
   const questIdB = Number(args.questIdB);
   if (!questIdA || !questIdB) return { error: "Missing quest IDs" };
   if (questIdA === questIdB) return { error: "Cannot swap a quest with itself." };
 
-  const questA = await prisma.quest.findUnique({ where: { id: questIdA, userId } });
-  const questB = await prisma.quest.findUnique({ where: { id: questIdB, userId } });
+  const questA = await tx.quest.findUnique({ where: { id: questIdA, userId } });
+  const questB = await tx.quest.findUnique({ where: { id: questIdB, userId } });
 
   if (!questA || !questB) return { error: "One or both quests not found or unauthorized." };
   if (
@@ -893,18 +911,18 @@ async function executeSwapQuests(userId: number, args: Record<string, any>) {
   // ─── REST-DAY ALLOCATION GUARDRAIL ─────────────────────────
   // A swap moves each quest onto the other quest's date; neither endpoint
   // may be a designated rest day.
-  if (await StudyScheduleService.isUserRestDay(userId, dateA)) {
+  if (await StudyScheduleService.isUserRestDay(userId, dateA, tx)) {
     return { error: `REST_DAY_BLOCKED: ${dateA} is a designated rest day. Swap target must be an active study day.` };
   }
-  if (await StudyScheduleService.isUserRestDay(userId, dateB)) {
+  if (await StudyScheduleService.isUserRestDay(userId, dateB, tx)) {
     return { error: `REST_DAY_BLOCKED: ${dateB} is a designated rest day. Swap target must be an active study day.` };
   }
 
-  const effortLevel = await getHighestEffortLevel(userId);
+  const effortLevel = await getHighestEffortLevel(userId, tx);
   
   // Calculate capacity for both dates
-  const matrixA = await calculateDailyCapacity(userId, effortLevel, dateA, dateA);
-  const matrixB = await calculateDailyCapacity(userId, effortLevel, dateB, dateB);
+  const matrixA = await calculateDailyCapacity(userId, effortLevel, dateA, dateA, tx);
+  const matrixB = await calculateDailyCapacity(userId, effortLevel, dateB, dateB, tx);
 
   // When A moves to B's date, B's old date regains B's minutes, but loses A's minutes
   const newBudgetA = matrixA[dateA] + questA.requiredMinutes - questB.requiredMinutes;
@@ -913,19 +931,22 @@ async function executeSwapQuests(userId: number, args: Record<string, any>) {
   if (newBudgetA < 0) return { error: `Cannot swap: ${dateA} would be overloaded.` };
   if (newBudgetB < 0) return { error: `Cannot swap: ${dateB} would be overloaded.` };
 
-  await prisma.$transaction([
-    prisma.quest.update({ where: { id: questIdA }, data: { scheduledFor: dateB } }),
-    prisma.quest.update({ where: { id: questIdB }, data: { scheduledFor: dateA } })
+  await assertNoLinkedQuests(userId, { id: { in: [questIdA, questIdB] } }, tx);
+  await Promise.all([
+    tx.quest.update({ where: { id: questIdA }, data: { scheduledFor: dateB } }),
+    tx.quest.update({ where: { id: questIdB }, data: { scheduledFor: dateA } })
   ]);
 
   return { success: true, message: `Swapped dates between ${questA.title} and ${questB.title}` };
+  });
 }
 
 async function executeClearDay(userId: number, args: Record<string, any>) {
+  return executionTransaction(userId, async tx => {
   const dateStr = String(args.date);
   if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return { error: "Invalid date format. Must be YYYY-MM-DD" };
 
-  const pendingQuests = await prisma.quest.findMany({
+  const pendingQuests = await tx.quest.findMany({
     where: {
       userId,
       scheduledFor: dateStr,
@@ -945,10 +966,10 @@ async function executeClearDay(userId: number, args: Record<string, any>) {
   searchEnd.setUTCDate(searchEnd.getUTCDate() + 14);
   const searchEndStr = searchEnd.toISOString().split("T")[0];
 
-  const effortLevel = await getHighestEffortLevel(userId);
-  const matrix = await calculateDailyCapacity(userId, effortLevel, nextDayStr, searchEndStr);
+  const effortLevel = await getHighestEffortLevel(userId, tx);
+  const matrix = await calculateDailyCapacity(userId, effortLevel, nextDayStr, searchEndStr, tx);
 
-  const updates = [];
+  const updates: { id: number; newDate: string }[] = [];
   const unplaced = [];
   
   for (const q of pendingQuests) {
@@ -971,14 +992,14 @@ async function executeClearDay(userId: number, args: Record<string, any>) {
     };
   }
 
-  await prisma.$transaction(
-    updates.map(u => prisma.quest.update({ where: { id: u.id }, data: { scheduledFor: u.newDate } }))
-  );
+  await assertNoLinkedQuests(userId, { id: { in: updates.map(u => u.id) } }, tx);
+  await Promise.all(updates.map(u => tx.quest.update({ where: { id: u.id }, data: { scheduledFor: u.newDate } })));
 
   return { 
     success: true, 
     message: `Cleared ${dateStr}. Pushed ${updates.length} quests forward safely.` 
   };
+  });
 }
 
 // --- Phase 3B: Analytics Tools ---
@@ -1245,7 +1266,9 @@ export async function executeGoogleSearch(args: {
       const { GoogleGenAI } = await import("@google/genai");
       const ai = new GoogleGenAI({ apiKey: geminiKey });
       const response = await ai.models.generateContent({
-        model: "gemini-3.7-flash",
+        // Model comes from the shared registry so a rename here never desyncs
+        // from every other Gemini workload.
+        model: GEMINI_MODELS.research,
         contents: searchPrompt,
         config: {
           systemInstruction:
@@ -1276,4 +1299,3 @@ export async function executeGoogleSearch(args: {
     summary: `Curriculum and syllabus structure for "${query}": Found standard qualification chapter breakdown with sequential unit progression.`,
   };
 }
-

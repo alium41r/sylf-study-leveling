@@ -1,0 +1,22 @@
+{
+  "finishedAt": "2026-10-03T07:39:57.569Z",
+  "checks": [
+    {
+      "name": "worker-build",
+      "exitCode": 0
+    },
+    {
+      "name": "mobile-build",
+      "exitCode": 0
+    },
+    {
+      "name": "mobile-verify",
+      "exitCode": 0
+    },
+    {
+      "name": "web-build",
+      "exitCode": 1
+    }
+  ],
+  "environment": "Masked dotenv keys; no hosted/provider credentials; isolated Next build directory"
+}

@@ -20,6 +20,9 @@ vi.mock("../../lib/auth-server", () => ({
 describe("Study Schedule & Calendar Engine", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(prisma, "$queryRaw").mockResolvedValue([]);
+    vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(prisma));
+    vi.spyOn(prisma.floatingRestDay, "findMany").mockResolvedValue([]);
   });
 
   describe("API: /api/user/study-schedule", () => {
@@ -208,7 +211,10 @@ describe("Study Schedule & Calendar Engine", () => {
 
       vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => {
         return cb({
-          user: { update: updateSpy },
+          $queryRaw: vi.fn().mockResolvedValue([]),
+          studySession: prisma.studySession,
+          floatingRestDay: prisma.floatingRestDay,
+          user: { findUnique: prisma.user.findUnique, update: updateSpy },
           hpLedger: { create: ledgerSpy },
           systemMessage: { create: vi.fn() },
         });
@@ -304,7 +310,10 @@ describe("Study Schedule & Calendar Engine", () => {
 
       vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => {
         return cb({
-          user: { update: updateSpy },
+          $queryRaw: vi.fn().mockResolvedValue([]),
+          studySession: prisma.studySession,
+          floatingRestDay: prisma.floatingRestDay,
+          user: { findUnique: prisma.user.findUnique, update: updateSpy },
           hpLedger: { create: ledgerSpy },
           systemMessage: { create: messageSpy },
         });

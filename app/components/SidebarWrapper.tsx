@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { PanelLeft } from "lucide-react";
 import Sidebar from "./Sidebar";
 import UserAvatar from "./UserAvatar";
@@ -9,8 +10,9 @@ import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { useProfileModal } from "./ProfileModalContext";
 import { lockPageScroll } from "../../lib/scroll-lock";
+import { MOTION_SPRING } from "../../lib/motion";
 
-const PUBLIC_PATHS = ["/", "/login", "/register", "/focus", "/onboarding"];
+const PUBLIC_PATHS = ["/", "/companion-prototype", "/login", "/register", "/focus", "/onboarding"];
 
 /**
  * Conditionally renders the Sidebar only on authenticated (non-public) pages.
@@ -24,7 +26,10 @@ const PUBLIC_PATHS = ["/", "/login", "/register", "/focus", "/onboarding"];
  */
 export default function SidebarWrapper() {
   const pathname = usePathname();
-  const isPublicPage = PUBLIC_PATHS.includes(pathname) || pathname.startsWith("/settings");
+  const isPublicPage =
+    PUBLIC_PATHS.includes(pathname) ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/focus-party");
   const isChatPage = pathname.startsWith("/social/chat");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -58,7 +63,7 @@ export default function SidebarWrapper() {
       {/* ─── Desktop Sidebar (flex flow, md and above) ─────── */}
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
 
-      {/* Spacer div to push main content right of the fixed sidebar (desktop only) */}
+      {/* Spacer div to push main content right of the fixed wall-dock sidebar (desktop only) */}
       <div
         className="hidden md:block"
         style={{
@@ -78,34 +83,47 @@ export default function SidebarWrapper() {
         <MobileTopBar onOpenMenu={() => setIsMobileMenuOpen(true)} />
       )}
 
-      {/* ─── Mobile Off-Canvas Drawer ──────────────────────── */}
+      {/* ─── Mobile Off-Canvas Drawer (Floating Liquid Glass Sheet) ────── */}
       {!isChatPage && (
-        <>
-          <div
-            className={`fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out md:hidden shadow-2xl ${
-              isDrawerOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation menu"
-          >
-            <Sidebar
-              isCollapsed={false}
-              setIsCollapsed={() => {}}
-              mobile
-              onCloseMobile={() => setIsMobileMenuOpen(false)}
-            />
-          </div>
-
-          {/* ─── Mobile Backdrop (closes drawer on tap) ─────────── */}
+        <AnimatePresence>
           {isDrawerOpen && (
-            <div
-              className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
-              aria-hidden="true"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
+            <>
+              {/* ─── Mobile Backdrop (closes drawer on tap) ─────────── */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
+                aria-hidden="true"
+                onClick={() => setIsMobileMenuOpen(false)}
+              />
+
+              {/* ─── Drawer Sheet ─── */}
+              <motion.div
+                initial={{ x: "-100%", opacity: 0.7 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "-100%", opacity: 0.7 }}
+                transition={MOTION_SPRING.drawer}
+                className="fixed left-3 z-50 w-[calc(100vw-2.5rem)] max-w-xs md:hidden shadow-2xl rounded-[28px] overflow-hidden"
+                style={{
+                  top: "calc(0.75rem + env(safe-area-inset-top, 0px))",
+                  bottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))",
+                }}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Navigation menu"
+              >
+                <Sidebar
+                  isCollapsed={false}
+                  setIsCollapsed={() => {}}
+                  mobile
+                  onCloseMobile={() => setIsMobileMenuOpen(false)}
+                />
+              </motion.div>
+            </>
           )}
-        </>
+        </AnimatePresence>
       )}
     </>
   );
@@ -125,7 +143,13 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const streak = Number(user?.streakDays ?? 0);
 
   return (
-    <header className="h-14 w-full flex items-center justify-between gap-2 px-3 md:hidden border-b border-border-subtle bg-background/80 backdrop-blur-md sticky top-0 z-30 shrink-0">
+    <header
+      className="w-full flex items-center justify-between gap-2 px-3 md:hidden border-b border-border-subtle bg-background/80 backdrop-blur-md sticky top-0 z-30 shrink-0"
+      style={{
+        paddingTop: "env(safe-area-inset-top, 0px)",
+        height: "calc(3.5rem + env(safe-area-inset-top, 0px))",
+      }}
+    >
       {/* Left: hamburger + pfp + name */}
       <div className="flex items-center gap-2.5 min-w-0">
         <button

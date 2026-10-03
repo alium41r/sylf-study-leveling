@@ -1,0 +1,17 @@
+{
+  "method": "Same prescribed 120-model-unit/s forward-stop-reverse wrapper trajectory at 60 Hz. Ground movement of two fully bound sole vertices in consecutive stance frames, including reach-limited contacts; not an IK or visual-art-quality measurement.",
+  "before": {
+    "samples": 707,
+    "rmsModelUnits": 0.6944139172313848,
+    "p95ModelUnits": 0.5115313022849339,
+    "maxModelUnits": 11.95799461593089,
+    "limitedFrames": 0
+  },
+  "after": {
+    "samples": 1068,
+    "rmsModelUnits": 0.000007529963031722254,
+    "p95ModelUnits": 0.00001922552559108226,
+    "maxModelUnits": 0.00002793531734823773,
+    "limitedFrames": 0
+  }
+}

@@ -9,15 +9,12 @@ import {
 import type { SkeletonNode } from "@/lib/skill-tree-skeleton";
 import { SKELETON_NODES, getNodeDisplayCode } from "@/lib/skill-tree-skeleton";
 import {
-  Sparkles,
   Loader2,
   BookOpen,
   CheckCircle2,
   Lock,
   Award,
   Star,
-  Target,
-  Flame,
   ArrowRight,
   Crown,
   Search,
@@ -26,6 +23,13 @@ import {
   Check,
   ChevronDown,
 } from "lucide-react";
+import {
+  QuestEmblemIcon,
+  SystemInsightsIcon,
+  SystemApertureIcon,
+  StreakFlameIcon,
+  FocusClockIcon,
+} from "@/app/components/icons";
 import Link from "next/link";
 import { CreateNodeQuestModal } from "./CreateNodeQuestModal";
 
@@ -465,7 +469,7 @@ export function SkillTreeTab() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <SystemApertureIcon size={14} />
                     <span>Compile Syllabus (AI)</span>
                   </>
                 )}
@@ -772,7 +776,7 @@ export function SkillTreeTab() {
                   {selectedSkeleton.tier === 10 ? (
                     mintedSP >= 115 ? (
                       <div className="w-full py-2.5 px-3 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 text-xs font-rajdhani font-bold uppercase tracking-wider flex items-center justify-center gap-2">
-                        <Flame className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                        <StreakFlameIcon size={16} className="text-amber-500 dark:text-amber-400" />
                         <span>Apex Keystone Ready to Forge</span>
                       </div>
                     ) : (
@@ -788,7 +792,7 @@ export function SkillTreeTab() {
                     </div>
                   ) : (selectedLive?.progress || 0) > 0 ? (
                     <div className="w-full py-2.5 px-3 rounded-xl bg-cyan-500/10 border border-cyan-500/40 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300 text-xs font-rajdhani font-bold uppercase tracking-wider flex items-center justify-center gap-2">
-                      <Sparkles className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                      <FocusClockIcon size={16} className="text-cyan-600 dark:text-cyan-400" />
                       <span>In Progress ({Math.round(selectedLive?.progress || 0)}%)</span>
                     </div>
                   ) : (
@@ -837,7 +841,7 @@ export function SkillTreeTab() {
                       onClick={() => setIsQuestModalOpen(true)}
                       className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-rajdhani font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md group"
                     >
-                      <Target className="w-4 h-4 transition-transform group-hover:rotate-45" />
+                      <QuestEmblemIcon className="w-4 h-4 transition-transform group-hover:rotate-45" />
                       <span>
                         {(selectedLive?.progress || 0) >= 100
                           ? "Review Node in Focus Quest"
@@ -851,7 +855,7 @@ export function SkillTreeTab() {
               /* Empty Inspector Dock */
               <div className="p-6 rounded-2xl bg-bg-panel/70 border border-border-subtle text-center flex flex-col items-center justify-center gap-3 min-h-[320px]">
                 <div className="w-12 h-12 rounded-xl bg-bg-abyss border border-border-subtle flex items-center justify-center text-text-muted opacity-50">
-                  <Sparkles className="w-6 h-6" />
+                  <SystemInsightsIcon size={24} />
                 </div>
                 <div className="space-y-1">
                   <h4 className="text-sm font-bold font-rajdhani text-text-primary uppercase tracking-wide">

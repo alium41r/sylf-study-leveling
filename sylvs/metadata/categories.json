@@ -1,0 +1,133 @@
+{
+  "version": "1.0.0",
+  "system": "sylv",
+  "categories": [
+    {
+      "id": "effects_background",
+      "name": "Background Effects",
+      "zIndexLayer": 5,
+      "description": "Auras, spirit halos, and background energy trails"
+    },
+    {
+      "id": "hair_back",
+      "name": "Hair (Back)",
+      "zIndexLayer": 8,
+      "description": "Hair volume cascading behind shoulders"
+    },
+    {
+      "id": "appendages_back",
+      "name": "Back Appendages",
+      "zIndexLayer": 9,
+      "description": "Wings, dorsal fins, and back accessories"
+    },
+    {
+      "id": "clothing_back",
+      "name": "Clothing (Back)",
+      "zIndexLayer": 9,
+      "description": "Capes, cloaks, and robes draped behind"
+    },
+    {
+      "id": "base",
+      "name": "Base Body",
+      "zIndexLayer": 10,
+      "description": "Foundational spirit body and head form"
+    },
+    {
+      "id": "tail",
+      "name": "Tail Anatomy",
+      "zIndexLayer": 11,
+      "anchor": "TAIL_ROOT",
+      "description": "Spirit tails, waves, and wisps"
+    },
+    {
+      "id": "body",
+      "name": "Torso Anatomy",
+      "zIndexLayer": 12,
+      "anchor": "BODY",
+      "description": "Torso form and body silhouette variations"
+    },
+    {
+      "id": "arms",
+      "name": "Arms",
+      "zIndexLayer": 13,
+      "anchor": "LEFT_ARM",
+      "description": "Arm pose and spirit flipper variations"
+    },
+    {
+      "id": "head",
+      "name": "Head Shape",
+      "zIndexLayer": 14,
+      "anchor": "HEAD",
+      "description": "Cranial geometry and chin contours"
+    },
+    {
+      "id": "ears",
+      "name": "Ears",
+      "zIndexLayer": 15,
+      "anchor": "LEFT_EAR",
+      "description": "Spirit fins, elven tips, and ear ornaments"
+    },
+    {
+      "id": "eyes",
+      "name": "Eyes",
+      "zIndexLayer": 16,
+      "anchor": "FACE",
+      "description": "Eye shapes, pupils, and magical irises"
+    },
+    {
+      "id": "markings",
+      "name": "Markings & Runes",
+      "zIndexLayer": 17,
+      "anchor": "FACE",
+      "description": "Forehead glyphs, cheek markings, and body runes"
+    },
+    {
+      "id": "clothing_front",
+      "name": "Clothing (Front)",
+      "zIndexLayer": 18,
+      "anchor": "BODY",
+      "description": "Tunics, robes, vests, and scholar garbs"
+    },
+    {
+      "id": "armor",
+      "name": "Armor",
+      "zIndexLayer": 19,
+      "anchor": "BODY",
+      "description": "Pauldrons, breastplates, and ceremonial armor"
+    },
+    {
+      "id": "hair_front",
+      "name": "Hair (Front)",
+      "zIndexLayer": 20,
+      "anchor": "HEAD",
+      "description": "Bangs, wisps, and front locks"
+    },
+    {
+      "id": "accessories_head",
+      "name": "Head Accessories",
+      "zIndexLayer": 21,
+      "anchor": "HEAD_ACCESSORY",
+      "description": "Halos, crowns, tiaras, and circlets"
+    },
+    {
+      "id": "accessories_neck",
+      "name": "Neck Accessories",
+      "zIndexLayer": 22,
+      "anchor": "CHEST_ACCESSORY",
+      "description": "Amulets, pendants, ribbons, and collars"
+    },
+    {
+      "id": "accessories_floating",
+      "name": "Floating Accessories",
+      "zIndexLayer": 23,
+      "anchor": "FLOATING_ACCESSORY",
+      "description": "Orbiting grimoires, familiars, spirits, and relics"
+    },
+    {
+      "id": "effects_foreground",
+      "name": "Foreground Effects",
+      "zIndexLayer": 25,
+      "description": "Sparkles, starlight runes, and floating motes"
+    }
+  ]
+}

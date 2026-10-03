@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-02T16:40:50.889Z",
+  "status": "PASSED",
+  "database": "generated disposable loopback database",
+  "runtime": "native",
+  "requiredSkippedTests": 0,
+  "requiredResults": [
+    {
+      "label": "phase0",
+      "files": 2,
+      "passed": 14,
+      "failed": 0,
+      "requiredSkipped": 0,
+      "optionalProviderExcluded": 0,
+      "failures": []
+    },
+    {
+      "label": "current",
+      "files": 17,
+      "passed": 225,
+      "failed": 0,
+      "requiredSkipped": 0,
+      "optionalProviderExcluded": 1,
+      "failures": []
+    }
+  ],
+  "migrations": [
+    {
+      "name": "20260822000000_atomic_apex_forge_and_skill_unlock_rpcs",
+      "sha256": "c2217daf94ef2353bb0a6cfbffee992c29cca8e40cd0539d44934ad8ab7f70ea"
+    },
+    {
+      "name": "20260822010000_atomic_session_and_achievement_rpcs",
+      "sha256": "f6a71c3ff0370ebd30bf4d911cb5268576f0dab0eb3eddcc5053bb687bf2fc0d"
+    },
+    {
+      "name": "20260826110000_t3_settle_insert_wall_clamp",
+      "sha256": "3975946805708e20ea1ba993c478550222132f255d458e9c9ef9183003e736d1"
+    },
+    {
+      "name": "20260827000000_s2_security_hardening",
+      "sha256": "f2da293979c30bb64242481b675b928160bea7c434bd166b29b359d030ef9ce6"
+    },
+    {
+      "name": "20260827010000_s2_policy_jwt_semantics",
+      "sha256": "55cec2bb379f206a897705ef138a62de38d0a34056721713f05ff01ed84e5c24"
+    },
+    {
+      "name": "20260827020000_s2_policy_recursion_fix",
+      "sha256": "3be28fcf215acb8114bf2e48ef81d7e699d6571c9a7da9f89a7b6596f59a7730"
+    },
+    {
+      "name": "20260827030000_cognitive_stats_effects",
+      "sha256": "0bbb91e1936abe2428d3f0741f6ad53feecb7168b309e30b5c9bf8e00e5ae463"
+    },
+    {
+      "name": "20260827040000_fix_apex_synthesis_threshold",
+      "sha256": "368c43a22baef6e81811c19518f59d3791c40e2a646389372c26e96ae8caada5"
+    },
+    {
+      "name": "20260827050000_sp_stipend_level_rank_ups",
+      "sha256": "a4c9971fcff9cc57c1ce47be3235eb21b72201373a6838fd723e871bd181f455"
+    },
+    {
+      "name": "20260924010000_planner_foundation",
+      "sha256": "808f2d27d5395ab3aec95d7ee980c088d9274f52a051c8fe75b266b951b8a7e2"
+    },
+    {
+      "name": "20260925152657_planner_check_result",
+      "sha256": "021be3a218ee4eb0fc3b1bfebfa70f266b9fe0b8efe292b19cd0f26dadc6f717"
+    },
+    {
+      "name": "20260926010000_planner_preference_friction",
+      "sha256": "253727d0f3683a3dbb73bae29fcea39eb777ea4b303ac4bfd986b5252f2522fc"
+    },
+    {
+      "name": "20260926020000_planner_intake_session",
+      "sha256": "529f47786c7b5fe4664d7a6eef9bd60349f57cd13643196d999214c04a59c4f2"
+    },
+    {
+      "name": "20260926030000_subject_archived_at",
+      "sha256": "f936519df158f4beac595472818ae34d33f3b1ff03572dcf3fc3b2d24a2dfe81"
+    },
+    {
+      "name": "20260927090000_planner_user_released_disposition",
+      "sha256": "f26f63bbfe29801c197c2b29efdd272a90057094b77b8bda7648383c2992a324"
+    },
+    {
+      "name": "20260927100000_planner_reoffer_state",
+      "sha256": "3915a9ce650cd8fbef1d8460558831c9d99f04b2d41cd7b40201c7950590bff6"
+    }
+  ],
+  "limitations": [
+    "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+    "Current services/SQL and PostgreSQL concurrency prerequisites only; V2 worker/apply are not implemented."
+  ],
+  "schemaDigest": "2a5e1eb96c1de742e5f1853cc71b153b36d628579f995ffb3d548aecf4472444",
+  "runtimeIdentity": {
+    "databaseMatches": true,
+    "address": "127.0.0.1",
+    "version": 180004
+  },
+  "postgresVersion": 180004,
+  "cleanup": "Disposable server stopped; cluster/container removed.",
+  "finishedAt": "2026-10-02T16:41:17.031Z"
+}

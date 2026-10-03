@@ -29,6 +29,10 @@ const authedJson = (url: string, method: string, body: unknown) =>
 describe("Floating Rest Day Toggle API", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(prisma, "$queryRaw").mockResolvedValue([]);
+    vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(prisma));
+    vi.spyOn(prisma.quest, "findMany").mockResolvedValue([]);
+    vi.spyOn(prisma.floatingRestDay, "deleteMany").mockResolvedValue({ count: 1 });
     vi.mocked(authServer.getSession).mockResolvedValue({ userId: 1 } as any);
     vi.mocked(auth.verifyToken).mockResolvedValue({ userId: 1 } as any);
   });
@@ -74,7 +78,7 @@ describe("Floating Rest Day Toggle API", () => {
       { questId: 11, title: "Past Paper", oldDate: "2026-08-25", newDate: "2026-08-27" },
     ]);
 
-    const tx = { floatingRestDay: { create: vi.fn().mockResolvedValue({ id: 1 }) } };
+    const tx = { $queryRaw: vi.fn().mockResolvedValue([]), quest: { findMany: vi.fn().mockResolvedValue([]) }, floatingRestDay: { create: vi.fn().mockResolvedValue({ id: 1 }) } };
     vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(tx));
 
     const res = await toggleFloatingRest(
@@ -103,7 +107,7 @@ describe("Floating Rest Day Toggle API", () => {
       weekQuota: 1,
       canAdd: false,
     });
-    const deleteSpy = vi.spyOn(prisma.floatingRestDay, "delete").mockResolvedValue({ id: 1 } as any);
+    const deleteSpy = vi.spyOn(prisma.floatingRestDay, "deleteMany").mockResolvedValue({ count: 1 });
 
     const res = await toggleFloatingRest(
       authedJson("http://localhost/api/user/study-schedule/floating-rest-day", "POST", {
@@ -115,7 +119,7 @@ describe("Floating Rest Day Toggle API", () => {
     const data = await res.json();
     expect(data.action).toBe("removed");
     expect(deleteSpy).toHaveBeenCalledWith({
-      where: { userId_dateKey: { userId: 1, dateKey: "2026-08-25" } },
+      where: { userId: 1, dateKey: "2026-08-25" },
     });
   });
 
@@ -167,6 +171,10 @@ describe("Floating Rest Day Toggle API", () => {
 describe("Manual Quest Allocation Guardrails", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(prisma, "$queryRaw").mockResolvedValue([]);
+    vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(prisma));
+    vi.spyOn(prisma.quest, "findMany").mockResolvedValue([]);
+    vi.spyOn(prisma.floatingRestDay, "deleteMany").mockResolvedValue({ count: 1 });
     vi.mocked(auth.verifyToken).mockResolvedValue({ userId: 1 } as any);
   });
 
@@ -207,6 +215,9 @@ describe("Manual Quest Allocation Guardrails", () => {
       userId: 1,
       status: "PENDING",
     } as any);
+    // The Planner's linked-Quest guard always runs now: this Quest is not plan-linked,
+    // so the route continues to its own rest-day check.
+    vi.spyOn(prisma.plannerQuestLink, "findFirst").mockResolvedValue(null);
     vi.spyOn(StudyScheduleService, "isUserRestDay").mockResolvedValue(true);
 
     const res = await updateQuest(

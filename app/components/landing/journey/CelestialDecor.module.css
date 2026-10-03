@@ -1,0 +1,349 @@
+/* Only the landing imports this world. Ornaments stay behind the reading surface. */
+.world {
+  --decor-drift: 0px;
+  position: absolute;
+  z-index: -1;
+  top: -40px;
+  bottom: -40px;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+  color: #adb8ff;
+}
+.world[data-celestial-decor="hero"] {
+  top: -96px;
+  bottom: -20px;
+}
+.lane {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: clamp(100px, 13vw, 245px);
+}
+.lane[data-side="right"] {
+  left: auto;
+  right: 0;
+  transform: scaleX(-1);
+}
+.vines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--decor-vine, #797cdf);
+  opacity: var(--decor-vine-opacity, 0.44);
+  stroke-width: 0.65;
+  mask-image: linear-gradient(transparent, black 7%, black 88%, transparent);
+}
+.vines path {
+  vector-effect: non-scaling-stroke;
+}
+.ghostVine {
+  opacity: 0.23;
+}
+.world [data-depth="far"] {
+  translate: 0 calc(var(--decor-drift) * 0.12);
+}
+.world [data-depth="mid"] {
+  translate: 0 calc(var(--decor-drift) * 0.4);
+}
+.world [data-depth="near"] {
+  translate: 0 var(--decor-drift);
+}
+.leaf,
+.star,
+.dot,
+.string,
+.lantern {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+}
+.leaf {
+  width: var(--size);
+  opacity: calc(var(--opacity) * var(--decor-leaf-opacity, 1));
+  transform: translateY(-50%) rotate(var(--angle));
+  transform-origin: 0 50%;
+}
+.leaf svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.driftingLeaf {
+  animation: leafDrift 19s ease-in-out infinite;
+  animation-delay: var(--delay);
+  transform-origin: 0 50%;
+}
+.star {
+  width: var(--size);
+  opacity: var(--opacity);
+  transform: translate(-50%, -50%);
+}
+.star svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.dot {
+  width: 1.6px;
+  height: 1.6px;
+  border-radius: 50%;
+  background: var(--decor-dot, #a8bbf2);
+  opacity: var(--opacity);
+}
+.string {
+  width: 1px;
+  height: var(--length);
+  background: linear-gradient(
+    transparent,
+    var(--decor-thread-faint, #9993ec66) 25%,
+    var(--decor-thread-strong, #9993ec8a) 75%,
+    transparent
+  );
+}
+.string > i {
+  position: absolute;
+  top: 43%;
+  left: -2px;
+  width: 4px;
+  height: 6px;
+  background: var(--decor-thread-node, #a6a3f0);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  opacity: 0.8;
+}
+.stringStar {
+  position: absolute;
+  top: 78%;
+  left: -3px;
+  width: 7px;
+  height: 13px;
+  color: var(--decor-star, #c3cdfa);
+  opacity: 0.8;
+}
+.lantern {
+  width: var(--size);
+  transform: translateX(-50%);
+  opacity: var(--decor-lantern-opacity, 0.88);
+}
+.lantern::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 1px;
+  height: 140px;
+  background: linear-gradient(transparent, var(--decor-hanger, #9893d755));
+}
+.lantern > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform-origin: 50% 0;
+  animation: lanternDrift 23s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+.books {
+  position: absolute;
+  left: -17px;
+  top: 44%;
+  width: 145px;
+  height: auto;
+  opacity: var(--decor-books-opacity, 0.88);
+  rotate: -3deg;
+}
+.distantStars {
+  position: absolute;
+  inset: 0;
+}
+.distantStars > i {
+  position: absolute;
+  width: 1.5px;
+  height: 1.5px;
+  background: var(--decor-dot, #b6c5f5);
+  border-radius: 50%;
+  opacity: 0.32;
+}
+.distantStars > i:nth-child(1) {
+  left: 27%;
+  top: 13%;
+}
+.distantStars > i:nth-child(2) {
+  left: 38%;
+  top: 24%;
+}
+.distantStars > i:nth-child(3) {
+  left: 66%;
+  top: 14%;
+}
+.distantStars > i:nth-child(4) {
+  left: 72%;
+  top: 41%;
+}
+.distantStars > i:nth-child(5) {
+  left: 22%;
+  top: 47%;
+}
+.distantStars > i:nth-child(6) {
+  left: 81%;
+  top: 27%;
+}
+.world[data-active="false"] :is(.driftingLeaf, .lantern > svg) {
+  animation-play-state: paused;
+}
+:global([data-surface="light"]) .world {
+  /* Daylight materials, not a faded night painting. These aliases inherit
+     the landing's actual surface/accent rather than the app's outer mode. */
+  --decor-tint: color-mix(in srgb, var(--accent) 58%, #8d74bd);
+  --decor-star: color-mix(in srgb, var(--decor-tint) 78%, var(--ink));
+  --decor-dot: var(--decor-star);
+  --decor-vine: color-mix(in srgb, var(--decor-tint) 62%, var(--ink));
+  --decor-vine-opacity: 0.4;
+  --decor-mobile-vine-opacity: 0.34;
+  --decor-leaf-opacity: 0.84;
+  --decor-thread-faint: color-mix(in srgb, var(--decor-vine) 24%, transparent);
+  --decor-thread-strong: color-mix(in srgb, var(--decor-vine) 40%, transparent);
+  --decor-thread-node: var(--decor-star);
+  --decor-hanger: color-mix(in srgb, var(--decor-vine) 32%, transparent);
+  --decor-leaf-base: color-mix(in srgb, var(--decor-tint) 72%, var(--ink));
+  --decor-leaf-mid: color-mix(in srgb, var(--decor-tint) 76%, var(--surface));
+  --decor-leaf-tip: color-mix(in srgb, var(--decor-tint) 30%, var(--surface));
+  --decor-leaf-fold: color-mix(in srgb, var(--decor-tint) 90%, var(--ink));
+  --decor-leaf-light: color-mix(in srgb, var(--decor-tint) 40%, var(--surface));
+  --decor-leaf-plane: color-mix(in srgb, var(--decor-tint) 67%, var(--surface));
+  --decor-leaf-ridge: color-mix(in srgb, var(--decor-tint) 16%, var(--surface));
+  --decor-lantern-opacity: 0.96;
+  --decor-glass-top: color-mix(in srgb, var(--decor-tint) 14%, var(--surface));
+  --decor-glass-mid: color-mix(in srgb, var(--decor-tint) 28%, var(--surface));
+  --decor-glass-base: color-mix(in srgb, var(--decor-tint) 42%, var(--surface));
+  --decor-glass-top-opacity: 0.72;
+  --decor-glass-mid-opacity: 0.8;
+  --decor-glass-base-opacity: 0.92;
+  --decor-glass-edge: var(--decor-star);
+  --decor-glass-highlight: var(--surface);
+  --decor-lantern-core: var(--decor-star);
+  --decor-lantern-tip: var(--decor-leaf-mid);
+  --decor-bloom: var(--decor-tint);
+  --decor-bloom-opacity: 0.16;
+  --decor-metal: color-mix(in srgb, var(--gold) 72%, var(--surface));
+  --decor-metal-edge: color-mix(in srgb, var(--gold) 80%, var(--surface));
+  --decor-metal-cap: var(--gold);
+  --decor-books-opacity: 0.86;
+  --decor-book-top: color-mix(in srgb, var(--decor-tint) 60%, var(--surface));
+  --decor-book-spine: color-mix(in srgb, var(--decor-tint) 72%, var(--surface));
+  --decor-book-cover: color-mix(in srgb, var(--decor-tint) 80%, var(--surface));
+  --decor-pages-start: color-mix(in srgb, var(--gold) 16%, var(--surface));
+  --decor-pages-end: color-mix(in srgb, var(--gold) 8%, var(--surface));
+  --decor-page-rule: color-mix(in srgb, var(--gold) 50%, var(--ink));
+  --decor-page-rule-opacity: 0.4;
+  --decor-book-edge: var(--decor-star);
+  --decor-book-rune: var(--surface);
+  color: var(--decor-star);
+}
+@keyframes leafDrift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translateY(-2.5px) rotate(0.8deg);
+  }
+}
+@keyframes lanternDrift {
+  0%,
+  100% {
+    transform: rotate(-1.1deg);
+  }
+  50% {
+    transform: rotate(1.1deg);
+  }
+}
+
+/* Content reaches the edges on laptops; trim bright foreground motifs there. */
+@media (max-width: 1200px) {
+  .lane {
+    width: 62px;
+  }
+  .world:not([data-celestial-decor="hero"]):not([data-celestial-decor="finale"])
+    .lane {
+    mask-image: linear-gradient(to right, black, black 25px, transparent 62px);
+  }
+  .leaf {
+    width: calc(var(--size) * 0.7);
+  }
+  .lantern,
+  .books {
+    display: none;
+  }
+  .star {
+    width: calc(var(--size) * 0.8);
+  }
+}
+/* Tablet uses a different, much quieter edge composition. */
+@media (max-width: 900px) {
+  .lane {
+    width: 34px;
+    opacity: 0.7;
+    mask-image: linear-gradient(to right, black, black 10px, transparent 34px);
+  }
+  .world .leaf:not([data-keep]),
+  .world .star:not([data-keep]),
+  .world .string:not([data-keep]),
+  .dot:nth-of-type(even),
+  .ghostVine,
+  .distantStars {
+    display: none;
+  }
+  .leaf {
+    width: calc(var(--size) * 0.6);
+  }
+  .string {
+    height: calc(var(--length) * 0.55);
+  }
+  .world [data-depth] {
+    translate: none;
+  }
+}
+@media (max-width: 700px) {
+  .world {
+    top: -20px;
+    bottom: -20px;
+  }
+  .world[data-celestial-decor="hero"] {
+    top: -76px;
+  }
+  .lane {
+    width: 28px;
+    opacity: 0.65;
+    mask-image: linear-gradient(to right, black, black 7px, transparent 28px);
+  }
+  .world[data-celestial-decor="hero"] .lane {
+    width: 43px;
+    mask-image: linear-gradient(to right, black, black 10px, transparent 43px);
+  }
+  .leaf {
+    width: calc(var(--size) * 0.53);
+  }
+  .vines {
+    opacity: var(--decor-mobile-vine-opacity, 0.36);
+  }
+  .stringStar {
+    width: 5px;
+    left: -2px;
+  }
+  .dot {
+    opacity: 0.23;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world [data-depth] {
+    translate: none !important;
+  }
+  .driftingLeaf,
+  .lantern > svg {
+    animation: none;
+  }
+}

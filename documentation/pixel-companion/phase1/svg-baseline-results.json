@@ -1,0 +1,3181 @@
+{
+  "base": "http://127.0.0.1:3100",
+  "createdAt": "2026-10-01T18:11:49.784Z",
+  "svgOnly": true,
+  "asset": {
+    "width": 1254,
+    "height": 1254,
+    "hasAlpha": false,
+    "transparent": 0,
+    "opaque": 1572516,
+    "partial": 0
+  },
+  "results": [
+    {
+      "name": "Existing review has all SVG galleries",
+      "passed": true
+    },
+    {
+      "name": "review-svg",
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1
+      },
+      "mode": "original",
+      "state": "IDLE",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 236.5,
+          "y": 591.421875,
+          "width": 320,
+          "height": 320,
+          "right": 556.5,
+          "bottom": 911.421875
+        },
+        "width": "320px",
+        "height": "320px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "CompanionReview-module___9ueba__canvas",
+          "rect": {
+            "x": 73,
+            "y": 486.140625,
+            "width": 647,
+            "height": 530.5625,
+            "right": 720,
+            "bottom": 1016.703125
+          },
+          "width": "647px",
+          "height": "530.562px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "SECTION",
+          "class": "CompanionReview-module___9ueba__stage",
+          "rect": {
+            "x": 72,
+            "y": 485.140625,
+            "width": 1296,
+            "height": 532.5625,
+            "right": 1368,
+            "bottom": 1017.703125
+          },
+          "width": "1296px",
+          "height": "532.562px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "CompanionReview-module___9ueba__review",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 2309.578125,
+            "right": 1440,
+            "bottom": 2309.578125
+          },
+          "width": "1440px",
+          "height": "2309.58px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "MAIN",
+          "class": "flex-1 w-full min-w-0 flex flex-col",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 2309.578125,
+            "right": 1440,
+            "bottom": 2309.578125
+          },
+          "width": "1440px",
+          "height": "2309.58px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "min-h-screen w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-x-clip",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 2309.578125,
+            "right": 1440,
+            "bottom": 2309.578125
+          },
+          "width": "1440px",
+          "height": "2309.58px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 15,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "review-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Existing SVG reading action still works",
+      "passed": true
+    },
+    {
+      "name": "review-mobile-svg",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "IDLE",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 65,
+          "y": 602.203125,
+          "width": 260,
+          "height": 260,
+          "right": 325,
+          "bottom": 862.203125
+        },
+        "width": "260px",
+        "height": "260px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "CompanionReview-module___9ueba__canvas",
+          "rect": {
+            "x": 25,
+            "y": 577.203125,
+            "width": 340,
+            "height": 310,
+            "right": 365,
+            "bottom": 887.203125
+          },
+          "width": "340px",
+          "height": "310px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "SECTION",
+          "class": "CompanionReview-module___9ueba__stage",
+          "rect": {
+            "x": 24,
+            "y": 576.203125,
+            "width": 342,
+            "height": 786.359375,
+            "right": 366,
+            "bottom": 1362.5625
+          },
+          "width": "342px",
+          "height": "786.359px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "CompanionReview-module___9ueba__review",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 3632.15625,
+            "right": 390,
+            "bottom": 3632.15625
+          },
+          "width": "390px",
+          "height": "3632.16px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "MAIN",
+          "class": "flex-1 w-full min-w-0 flex flex-col",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 3632.15625,
+            "right": 390,
+            "bottom": 3632.15625
+          },
+          "width": "390px",
+          "height": "3632.16px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "min-h-screen w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-x-clip",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 3632.15625,
+            "right": 390,
+            "bottom": 3632.15625
+          },
+          "width": "390px",
+          "height": "3632.16px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 15,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "review-mobile-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "landing-1440-d1-svg",
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1
+      },
+      "mode": "original",
+      "state": "IDLE",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 1195.6875,
+          "y": 377.796875,
+          "width": 144,
+          "height": 180,
+          "right": 1339.6875,
+          "bottom": 557.796875
+        },
+        "width": "144px",
+        "height": "180px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 1195.6875,
+            "y": 377.796875,
+            "width": 144,
+            "height": 180,
+            "right": 1339.6875,
+            "bottom": 557.796875
+          },
+          "width": "144px",
+          "height": "180px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 1195.6875,
+            "y": 377.796875,
+            "width": 144,
+            "height": 180,
+            "right": 1339.6875,
+            "bottom": 557.796875
+          },
+          "width": "144px",
+          "height": "180px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 1267.6875,
+            "y": 557.796875,
+            "width": 0,
+            "height": 0,
+            "right": 1267.6875,
+            "bottom": 557.796875
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 1267.69, 557.797)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 6423.171875,
+            "right": 1440,
+            "bottom": 6423.171875
+          },
+          "width": "1440px",
+          "height": "6423.17px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 6423.171875,
+            "right": 1440,
+            "bottom": 6423.171875
+          },
+          "width": "1440px",
+          "height": "6423.17px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-1440-d1-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 1440 DPR 1 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-1440-d2-svg",
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "IDLE",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 1195.6875,
+          "y": 377.796875,
+          "width": 144,
+          "height": 180,
+          "right": 1339.6875,
+          "bottom": 557.796875
+        },
+        "width": "144px",
+        "height": "180px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 1195.6875,
+            "y": 377.796875,
+            "width": 144,
+            "height": 180,
+            "right": 1339.6875,
+            "bottom": 557.796875
+          },
+          "width": "144px",
+          "height": "180px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 1195.6875,
+            "y": 377.796875,
+            "width": 144,
+            "height": 180,
+            "right": 1339.6875,
+            "bottom": 557.796875
+          },
+          "width": "144px",
+          "height": "180px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 1267.6875,
+            "y": 557.796875,
+            "width": 0,
+            "height": 0,
+            "right": 1267.6875,
+            "bottom": 557.796875
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 1267.69, 557.797)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 6423.171875,
+            "right": 1440,
+            "bottom": 6423.171875
+          },
+          "width": "1440px",
+          "height": "6423.17px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 6423.171875,
+            "right": 1440,
+            "bottom": 6423.171875
+          },
+          "width": "1440px",
+          "height": "6423.17px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-1440-d2-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 1440 DPR 2 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-1440-d3-svg",
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 3
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 1195.6875,
+          "y": 377.796875,
+          "width": 144,
+          "height": 180,
+          "right": 1339.6875,
+          "bottom": 557.796875
+        },
+        "width": "144px",
+        "height": "180px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 1195.6875,
+            "y": 377.796875,
+            "width": 144,
+            "height": 180,
+            "right": 1339.6875,
+            "bottom": 557.796875
+          },
+          "width": "144px",
+          "height": "180px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 1195.6875,
+            "y": 377.796875,
+            "width": 144,
+            "height": 180,
+            "right": 1339.6875,
+            "bottom": 557.796875
+          },
+          "width": "144px",
+          "height": "180px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 1267.6875,
+            "y": 557.796875,
+            "width": 0,
+            "height": 0,
+            "right": 1267.6875,
+            "bottom": 557.796875
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 1267.69, 557.797)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 6423.171875,
+            "right": 1440,
+            "bottom": 6423.171875
+          },
+          "width": "1440px",
+          "height": "6423.17px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 6423.171875,
+            "right": 1440,
+            "bottom": 6423.171875
+          },
+          "width": "1440px",
+          "height": "6423.17px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-1440-d3-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 1440 DPR 3 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-1024-d1-svg",
+      "viewport": {
+        "width": 1024,
+        "height": 900,
+        "dpr": 1
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 841.609375,
+          "y": 351.890625,
+          "width": 120,
+          "height": 150,
+          "right": 961.609375,
+          "bottom": 501.890625
+        },
+        "width": "120px",
+        "height": "150px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 841.609375,
+            "y": 351.890625,
+            "width": 120,
+            "height": 150,
+            "right": 961.609375,
+            "bottom": 501.890625
+          },
+          "width": "120px",
+          "height": "150px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 841.609375,
+            "y": 351.890625,
+            "width": 120,
+            "height": 150,
+            "right": 961.609375,
+            "bottom": 501.890625
+          },
+          "width": "120px",
+          "height": "150px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 901.609375,
+            "y": 501.890625,
+            "width": 0,
+            "height": 0,
+            "right": 901.609375,
+            "bottom": 501.890625
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 901.609, 501.891)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1024,
+            "height": 6017.640625,
+            "right": 1024,
+            "bottom": 6017.640625
+          },
+          "width": "1024px",
+          "height": "6017.64px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1024,
+            "height": 6017.640625,
+            "right": 1024,
+            "bottom": 6017.640625
+          },
+          "width": "1024px",
+          "height": "6017.64px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-1024-d1-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 1024 DPR 1 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-1024-d2-svg",
+      "viewport": {
+        "width": 1024,
+        "height": 900,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 841.609375,
+          "y": 351.890625,
+          "width": 120,
+          "height": 150,
+          "right": 961.609375,
+          "bottom": 501.890625
+        },
+        "width": "120px",
+        "height": "150px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 841.609375,
+            "y": 351.890625,
+            "width": 120,
+            "height": 150,
+            "right": 961.609375,
+            "bottom": 501.890625
+          },
+          "width": "120px",
+          "height": "150px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 841.609375,
+            "y": 351.890625,
+            "width": 120,
+            "height": 150,
+            "right": 961.609375,
+            "bottom": 501.890625
+          },
+          "width": "120px",
+          "height": "150px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 901.609375,
+            "y": 501.890625,
+            "width": 0,
+            "height": 0,
+            "right": 901.609375,
+            "bottom": 501.890625
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 901.609, 501.891)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1024,
+            "height": 6017.640625,
+            "right": 1024,
+            "bottom": 6017.640625
+          },
+          "width": "1024px",
+          "height": "6017.64px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1024,
+            "height": 6017.640625,
+            "right": 1024,
+            "bottom": 6017.640625
+          },
+          "width": "1024px",
+          "height": "6017.64px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-1024-d2-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 1024 DPR 2 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-1024-d3-svg",
+      "viewport": {
+        "width": 1024,
+        "height": 900,
+        "dpr": 3
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 841.609375,
+          "y": 351.890625,
+          "width": 120,
+          "height": 150,
+          "right": 961.609375,
+          "bottom": 501.890625
+        },
+        "width": "120px",
+        "height": "150px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 841.609375,
+            "y": 351.890625,
+            "width": 120,
+            "height": 150,
+            "right": 961.609375,
+            "bottom": 501.890625
+          },
+          "width": "120px",
+          "height": "150px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 841.609375,
+            "y": 351.890625,
+            "width": 120,
+            "height": 150,
+            "right": 961.609375,
+            "bottom": 501.890625
+          },
+          "width": "120px",
+          "height": "150px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 901.609375,
+            "y": 501.890625,
+            "width": 0,
+            "height": 0,
+            "right": 901.609375,
+            "bottom": 501.890625
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 901.609, 501.891)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1024,
+            "height": 6017.640625,
+            "right": 1024,
+            "bottom": 6017.640625
+          },
+          "width": "1024px",
+          "height": "6017.64px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1024,
+            "height": 6017.640625,
+            "right": 1024,
+            "bottom": 6017.640625
+          },
+          "width": "1024px",
+          "height": "6017.64px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-1024-d3-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 1024 DPR 3 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-820-d1-svg",
+      "viewport": {
+        "width": 820,
+        "height": 1180,
+        "dpr": 1
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 715.09375,
+          "y": 372.078125,
+          "width": 96,
+          "height": 120,
+          "right": 811.09375,
+          "bottom": 492.078125
+        },
+        "width": "96px",
+        "height": "120px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 715.09375,
+            "y": 372.078125,
+            "width": 96,
+            "height": 120,
+            "right": 811.09375,
+            "bottom": 492.078125
+          },
+          "width": "96px",
+          "height": "120px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 715.09375,
+            "y": 372.078125,
+            "width": 96,
+            "height": 120,
+            "right": 811.09375,
+            "bottom": 492.078125
+          },
+          "width": "96px",
+          "height": "120px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 763.09375,
+            "y": 492.078125,
+            "width": 0,
+            "height": 0,
+            "right": 763.09375,
+            "bottom": 492.078125
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 763.094, 492.078)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 820,
+            "height": 5751.125,
+            "right": 820,
+            "bottom": 5751.125
+          },
+          "width": "820px",
+          "height": "5751.12px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 820,
+            "height": 5751.125,
+            "right": 820,
+            "bottom": 5751.125
+          },
+          "width": "820px",
+          "height": "5751.12px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-820-d1-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 820 DPR 1 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-820-d2-svg",
+      "viewport": {
+        "width": 820,
+        "height": 1180,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 715.09375,
+          "y": 372.078125,
+          "width": 96,
+          "height": 120,
+          "right": 811.09375,
+          "bottom": 492.078125
+        },
+        "width": "96px",
+        "height": "120px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 715.09375,
+            "y": 372.078125,
+            "width": 96,
+            "height": 120,
+            "right": 811.09375,
+            "bottom": 492.078125
+          },
+          "width": "96px",
+          "height": "120px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 715.09375,
+            "y": 372.078125,
+            "width": 96,
+            "height": 120,
+            "right": 811.09375,
+            "bottom": 492.078125
+          },
+          "width": "96px",
+          "height": "120px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 763.09375,
+            "y": 492.078125,
+            "width": 0,
+            "height": 0,
+            "right": 763.09375,
+            "bottom": 492.078125
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 763.094, 492.078)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 820,
+            "height": 5751.125,
+            "right": 820,
+            "bottom": 5751.125
+          },
+          "width": "820px",
+          "height": "5751.12px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 820,
+            "height": 5751.125,
+            "right": 820,
+            "bottom": 5751.125
+          },
+          "width": "820px",
+          "height": "5751.12px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-820-d2-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 820 DPR 2 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-820-d3-svg",
+      "viewport": {
+        "width": 820,
+        "height": 1180,
+        "dpr": 3
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 715.09375,
+          "y": 372.078125,
+          "width": 96,
+          "height": 120,
+          "right": 811.09375,
+          "bottom": 492.078125
+        },
+        "width": "96px",
+        "height": "120px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 715.09375,
+            "y": 372.078125,
+            "width": 96,
+            "height": 120,
+            "right": 811.09375,
+            "bottom": 492.078125
+          },
+          "width": "96px",
+          "height": "120px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 715.09375,
+            "y": 372.078125,
+            "width": 96,
+            "height": 120,
+            "right": 811.09375,
+            "bottom": 492.078125
+          },
+          "width": "96px",
+          "height": "120px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 763.09375,
+            "y": 492.078125,
+            "width": 0,
+            "height": 0,
+            "right": 763.09375,
+            "bottom": 492.078125
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 763.094, 492.078)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 820,
+            "height": 5751.125,
+            "right": 820,
+            "bottom": 5751.125
+          },
+          "width": "820px",
+          "height": "5751.12px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 820,
+            "height": 5751.125,
+            "right": 820,
+            "bottom": 5751.125
+          },
+          "width": "820px",
+          "height": "5751.12px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-820-d3-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 820 DPR 3 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-390-d1-svg",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 323.5,
+          "y": 454.890625,
+          "width": 56,
+          "height": 70,
+          "right": 379.5,
+          "bottom": 524.890625
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 351.5,
+            "y": 524.890625,
+            "width": 0,
+            "height": 0,
+            "right": 351.5,
+            "bottom": 524.890625
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 351.5, 524.891)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-390-d1-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 390 DPR 1 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-390-d2-svg",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 323.5,
+          "y": 454.890625,
+          "width": 56,
+          "height": 70,
+          "right": 379.5,
+          "bottom": 524.890625
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 351.5,
+            "y": 524.890625,
+            "width": 0,
+            "height": 0,
+            "right": 351.5,
+            "bottom": 524.890625
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 351.5, 524.891)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-390-d2-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 390 DPR 2 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-390-d3-svg",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 3
+      },
+      "mode": "original",
+      "state": "IDLE",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 323.5,
+          "y": 454.890625,
+          "width": 56,
+          "height": 70,
+          "right": 379.5,
+          "bottom": 524.890625
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 351.5,
+            "y": 524.890625,
+            "width": 0,
+            "height": 0,
+            "right": 351.5,
+            "bottom": 524.890625
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 351.5, 524.891)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-390-d3-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 390 DPR 3 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-320-d1-svg",
+      "viewport": {
+        "width": 320,
+        "height": 740,
+        "dpr": 1
+      },
+      "mode": "original",
+      "state": "IDLE",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 260.5,
+          "y": 511.859375,
+          "width": 56,
+          "height": 70,
+          "right": 316.5,
+          "bottom": 581.859375
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 260.5,
+            "y": 511.859375,
+            "width": 56,
+            "height": 70,
+            "right": 316.5,
+            "bottom": 581.859375
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 260.5,
+            "y": 511.859375,
+            "width": 56,
+            "height": 70,
+            "right": 316.5,
+            "bottom": 581.859375
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 288.5,
+            "y": 581.859375,
+            "width": 0,
+            "height": 0,
+            "right": 288.5,
+            "bottom": 581.859375
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 288.5, 581.859)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 320,
+            "height": 6698.859375,
+            "right": 320,
+            "bottom": 6698.859375
+          },
+          "width": "320px",
+          "height": "6698.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 320,
+            "height": 6698.859375,
+            "right": 320,
+            "bottom": 6698.859375
+          },
+          "width": "320px",
+          "height": "6698.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-320-d1-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 320 DPR 1 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-320-d2-svg",
+      "viewport": {
+        "width": 320,
+        "height": 740,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "IDLE",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 260.5,
+          "y": 511.859375,
+          "width": 56,
+          "height": 70,
+          "right": 316.5,
+          "bottom": 581.859375
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 260.5,
+            "y": 511.859375,
+            "width": 56,
+            "height": 70,
+            "right": 316.5,
+            "bottom": 581.859375
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 260.5,
+            "y": 511.859375,
+            "width": 56,
+            "height": 70,
+            "right": 316.5,
+            "bottom": 581.859375
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 288.5,
+            "y": 581.859375,
+            "width": 0,
+            "height": 0,
+            "right": 288.5,
+            "bottom": 581.859375
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 288.5, 581.859)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 320,
+            "height": 6698.859375,
+            "right": 320,
+            "bottom": 6698.859375
+          },
+          "width": "320px",
+          "height": "6698.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 320,
+            "height": 6698.859375,
+            "right": 320,
+            "bottom": 6698.859375
+          },
+          "width": "320px",
+          "height": "6698.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-320-d2-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 320 DPR 2 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "landing-320-d3-svg",
+      "viewport": {
+        "width": 320,
+        "height": 740,
+        "dpr": 3
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 260.5,
+          "y": 511.859375,
+          "width": 56,
+          "height": 70,
+          "right": 316.5,
+          "bottom": 581.859375
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -0.0025, 0, 0, 0, 1)",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 260.5,
+            "y": 511.859375,
+            "width": 56,
+            "height": 70,
+            "right": 316.5,
+            "bottom": 581.859375
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 260.5,
+            "y": 511.859375,
+            "width": 56,
+            "height": 70,
+            "right": 316.5,
+            "bottom": 581.859375
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 288.5,
+            "y": 581.859375,
+            "width": 0,
+            "height": 0,
+            "right": 288.5,
+            "bottom": 581.859375
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 288.5, 581.859)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 320,
+            "height": 6698.859375,
+            "right": 320,
+            "bottom": 6698.859375
+          },
+          "width": "320px",
+          "height": "6698.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 320,
+            "height": 6698.859375,
+            "right": 320,
+            "bottom": 6698.859375
+          },
+          "width": "320px",
+          "height": "6698.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "landing-320-d3-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 320 DPR 3 original: one visible traveler",
+      "passed": true
+    },
+    {
+      "name": "Onboarding auth fixture",
+      "method": "Synthetic user ID 0 JWT in isolated temporary Chrome profile; client stats response; non-read API requests blocked; no real user data or submissions"
+    },
+    {
+      "name": "onboarding-1440-d1-svg",
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 655,
+          "y": 129.375,
+          "width": 130,
+          "height": 130,
+          "right": 785,
+          "bottom": 259.375
+        },
+        "width": "130px",
+        "height": "130px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "flex items-center justify-center my-1",
+          "rect": {
+            "x": 655,
+            "y": 129.375,
+            "width": 130,
+            "height": 130,
+            "right": 785,
+            "bottom": 259.375
+          },
+          "width": "130px",
+          "height": "130px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepHeader",
+          "rect": {
+            "x": 405,
+            "y": 125.375,
+            "width": 630,
+            "height": 269.96875,
+            "right": 1035,
+            "bottom": 395.34375
+          },
+          "width": "630px",
+          "height": "269.969px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepCard",
+          "rect": {
+            "x": 368,
+            "y": 88.375,
+            "width": 704,
+            "height": 636.25,
+            "right": 1072,
+            "bottom": 724.625
+          },
+          "width": "704px",
+          "height": "636.25px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "MAIN",
+          "class": "Onboarding-module__yQpSqG__shell",
+          "rect": {
+            "x": 368,
+            "y": 24,
+            "width": 704,
+            "height": 700.625,
+            "right": 1072,
+            "bottom": 724.625
+          },
+          "width": "704px",
+          "height": "700.625px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__onboardingContainer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 1000,
+            "right": 1440,
+            "bottom": 1000
+          },
+          "width": "1440px",
+          "height": "1000px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "onboarding-1440-d1-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Onboarding 1440 original: existing 130px Welcome slot",
+      "passed": true
+    },
+    {
+      "name": "onboarding-1440-d2-svg",
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 655,
+          "y": 129.375,
+          "width": 130,
+          "height": 130,
+          "right": 785,
+          "bottom": 259.375
+        },
+        "width": "130px",
+        "height": "130px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "flex items-center justify-center my-1",
+          "rect": {
+            "x": 655,
+            "y": 129.375,
+            "width": 130,
+            "height": 130,
+            "right": 785,
+            "bottom": 259.375
+          },
+          "width": "130px",
+          "height": "130px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepHeader",
+          "rect": {
+            "x": 405,
+            "y": 125.375,
+            "width": 630,
+            "height": 269.96875,
+            "right": 1035,
+            "bottom": 395.34375
+          },
+          "width": "630px",
+          "height": "269.969px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepCard",
+          "rect": {
+            "x": 368,
+            "y": 88.375,
+            "width": 704,
+            "height": 636.25,
+            "right": 1072,
+            "bottom": 724.625
+          },
+          "width": "704px",
+          "height": "636.25px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "MAIN",
+          "class": "Onboarding-module__yQpSqG__shell",
+          "rect": {
+            "x": 368,
+            "y": 24,
+            "width": 704,
+            "height": 700.625,
+            "right": 1072,
+            "bottom": 724.625
+          },
+          "width": "704px",
+          "height": "700.625px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__onboardingContainer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 1000,
+            "right": 1440,
+            "bottom": 1000
+          },
+          "width": "1440px",
+          "height": "1000px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "onboarding-1440-d2-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Onboarding 1440 original: existing 130px Welcome slot",
+      "passed": true
+    },
+    {
+      "name": "onboarding-390-d2-svg",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 2
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 130,
+          "y": 117.375,
+          "width": 130,
+          "height": 130,
+          "right": 260,
+          "bottom": 247.375
+        },
+        "width": "130px",
+        "height": "130px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "flex items-center justify-center my-1",
+          "rect": {
+            "x": 130,
+            "y": 117.375,
+            "width": 130,
+            "height": 130,
+            "right": 260,
+            "bottom": 247.375
+          },
+          "width": "130px",
+          "height": "130px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepHeader",
+          "rect": {
+            "x": 41,
+            "y": 113.375,
+            "width": 308,
+            "height": 305.96875,
+            "right": 349,
+            "bottom": 419.34375
+          },
+          "width": "308px",
+          "height": "305.969px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepCard",
+          "rect": {
+            "x": 16,
+            "y": 88.375,
+            "width": 358,
+            "height": 965.09375,
+            "right": 374,
+            "bottom": 1053.46875
+          },
+          "width": "358px",
+          "height": "965.094px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "MAIN",
+          "class": "Onboarding-module__yQpSqG__shell",
+          "rect": {
+            "x": 16,
+            "y": 24,
+            "width": 358,
+            "height": 1029.46875,
+            "right": 374,
+            "bottom": 1053.46875
+          },
+          "width": "358px",
+          "height": "1029.47px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__onboardingContainer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 1101.46875,
+            "right": 390,
+            "bottom": 1101.46875
+          },
+          "width": "390px",
+          "height": "1101.47px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "onboarding-390-d2-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Onboarding 390 original: existing 130px Welcome slot",
+      "passed": true
+    },
+    {
+      "name": "onboarding-320-d3-svg",
+      "viewport": {
+        "width": 320,
+        "height": 740,
+        "dpr": 3
+      },
+      "mode": "original",
+      "state": "GREETING",
+      "motion": "full",
+      "host": {
+        "rect": {
+          "x": 95,
+          "y": 117.375,
+          "width": 130,
+          "height": 130,
+          "right": 225,
+          "bottom": 247.375
+        },
+        "width": "130px",
+        "height": "130px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": null,
+      "svg": true,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "flex items-center justify-center my-1",
+          "rect": {
+            "x": 95,
+            "y": 117.375,
+            "width": 130,
+            "height": 130,
+            "right": 225,
+            "bottom": 247.375
+          },
+          "width": "130px",
+          "height": "130px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepHeader",
+          "rect": {
+            "x": 41,
+            "y": 113.375,
+            "width": 238,
+            "height": 328.765625,
+            "right": 279,
+            "bottom": 442.140625
+          },
+          "width": "238px",
+          "height": "328.766px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepCard",
+          "rect": {
+            "x": 16,
+            "y": 88.375,
+            "width": 288,
+            "height": 989.484375,
+            "right": 304,
+            "bottom": 1077.859375
+          },
+          "width": "288px",
+          "height": "989.484px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "MAIN",
+          "class": "Onboarding-module__yQpSqG__shell",
+          "rect": {
+            "x": 16,
+            "y": 24,
+            "width": 288,
+            "height": 1053.859375,
+            "right": 304,
+            "bottom": 1077.859375
+          },
+          "width": "288px",
+          "height": "1053.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__onboardingContainer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 320,
+            "height": 1125.859375,
+            "right": 320,
+            "bottom": 1125.859375
+          },
+          "width": "320px",
+          "height": "1125.86px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "onboarding-320-d3-svg: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Onboarding 320 original: existing 130px Welcome slot",
+      "passed": true
+    },
+    {
+      "name": "Provisional opaque layout inspection only",
+      "hasAlpha": false,
+      "readiness": "Transparency validation pending; these snapshots cannot establish final pixel quality"
+    },
+    {
+      "name": "provisional-opaque-landing-390",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 2
+      },
+      "mode": "pixel",
+      "state": "GREETING",
+      "motion": "none",
+      "host": {
+        "rect": {
+          "x": 323.5,
+          "y": 454.890625,
+          "width": 56,
+          "height": 70,
+          "right": 379.5,
+          "bottom": 524.890625
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": {
+        "rect": {
+          "x": 323.5,
+          "y": 454.890625,
+          "width": 56,
+          "height": 70,
+          "right": 379.5,
+          "bottom": 524.890625
+        },
+        "width": "56px",
+        "height": "70px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "pixelated",
+        "objectFit": "contain",
+        "loaded": true,
+        "naturalWidth": 1254,
+        "naturalHeight": 1254,
+        "src": "http://127.0.0.1:3100/companions/sylf-pixel-companion.png",
+        "containedArtwork": {
+          "width": 56,
+          "height": 56,
+          "sourceScale": 0.044657097288676235
+        }
+      },
+      "svg": false,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "JourneyCompanion-module__Y65XXG__surface",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__travelerBody BotanicalTrail-module__6jOLma__characterBody",
+          "rect": {
+            "x": 323.5,
+            "y": 454.890625,
+            "width": 56,
+            "height": 70,
+            "right": 379.5,
+            "bottom": 524.890625
+          },
+          "width": "56px",
+          "height": "70px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__traveler BotanicalTrail-module__6jOLma__heroTraveler",
+          "rect": {
+            "x": 351.5,
+            "y": 524.890625,
+            "width": 0,
+            "height": 0,
+            "right": 351.5,
+            "bottom": 524.890625
+          },
+          "width": "0px",
+          "height": "0px",
+          "transform": "matrix(1, 0, 0, 1, 351.5, 524.891)",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__journeyLayer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Journey-module__OOIejG__landing",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 6435.4375,
+            "right": 390,
+            "bottom": 6435.4375
+          },
+          "width": "390px",
+          "height": "6435.44px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "provisional-opaque-landing-390: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "provisional-opaque-landing-390: loaded crisp contained raster",
+      "passed": true
+    },
+    {
+      "name": "provisional-opaque-landing-390: static unfiltered companion",
+      "passed": true
+    },
+    {
+      "name": "provisional-opaque-onboarding-390",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 2
+      },
+      "mode": "pixel",
+      "state": "GREETING",
+      "motion": "none",
+      "host": {
+        "rect": {
+          "x": 130,
+          "y": 117.375,
+          "width": 130,
+          "height": 130,
+          "right": 260,
+          "bottom": 247.375
+        },
+        "width": "130px",
+        "height": "130px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "auto",
+        "objectFit": "fill"
+      },
+      "image": {
+        "rect": {
+          "x": 130,
+          "y": 117.375,
+          "width": 130,
+          "height": 130,
+          "right": 260,
+          "bottom": 247.375
+        },
+        "width": "130px",
+        "height": "130px",
+        "transform": "none",
+        "filter": "none",
+        "imageRendering": "pixelated",
+        "objectFit": "contain",
+        "loaded": true,
+        "naturalWidth": 1254,
+        "naturalHeight": 1254,
+        "src": "http://127.0.0.1:3100/companions/sylf-pixel-companion.png",
+        "containedArtwork": {
+          "width": 130,
+          "height": 130,
+          "sourceScale": 0.10366826156299841
+        }
+      },
+      "svg": false,
+      "ancestors": [
+        {
+          "tag": "DIV",
+          "class": "flex items-center justify-center my-1",
+          "rect": {
+            "x": 130,
+            "y": 117.375,
+            "width": 130,
+            "height": 130,
+            "right": 260,
+            "bottom": 247.375
+          },
+          "width": "130px",
+          "height": "130px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepHeader",
+          "rect": {
+            "x": 41,
+            "y": 113.375,
+            "width": 308,
+            "height": 305.96875,
+            "right": 349,
+            "bottom": 419.34375
+          },
+          "width": "308px",
+          "height": "305.969px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__stepCard",
+          "rect": {
+            "x": 16,
+            "y": 88.375,
+            "width": 358,
+            "height": 965.09375,
+            "right": 374,
+            "bottom": 1053.46875
+          },
+          "width": "358px",
+          "height": "965.094px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "MAIN",
+          "class": "Onboarding-module__yQpSqG__shell",
+          "rect": {
+            "x": 16,
+            "y": 24,
+            "width": 358,
+            "height": 1029.46875,
+            "right": 374,
+            "bottom": 1053.46875
+          },
+          "width": "358px",
+          "height": "1029.47px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        },
+        {
+          "tag": "DIV",
+          "class": "Onboarding-module__yQpSqG__onboardingContainer",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 1101.46875,
+            "right": 390,
+            "bottom": 1101.46875
+          },
+          "width": "390px",
+          "height": "1101.47px",
+          "transform": "none",
+          "filter": "none",
+          "imageRendering": "auto",
+          "objectFit": "fill"
+        }
+      ],
+      "overflow": 0,
+      "gallery": {
+        "original": 0,
+        "pixel": 0
+      }
+    },
+    {
+      "name": "provisional-opaque-onboarding-390: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "provisional-opaque-onboarding-390: loaded crisp contained raster",
+      "passed": true
+    },
+    {
+      "name": "provisional-opaque-onboarding-390: static unfiltered companion",
+      "passed": true
+    },
+    {
+      "name": "Pixel runtime asset responses",
+      "responses": [
+        {
+          "url": "http://127.0.0.1:3100/companions/sylf-pixel-companion.png",
+          "status": 200,
+          "mimeType": "image/png"
+        },
+        {
+          "url": "http://127.0.0.1:3100/companions/sylf-pixel-companion.png",
+          "status": 304,
+          "mimeType": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "No browser runtime exceptions",
+      "passed": true
+    }
+  ]
+}

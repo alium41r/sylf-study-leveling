@@ -3,9 +3,10 @@
 // ============================================================================
 // Set PRELAUNCH_MODE=true (or "1") in the environment to lock the app down
 // while the landing page collects waitlist signups:
-//   - /login and /register redirect to the landing page
+//   - all other page routes redirect to the landing page, even with a session
 //   - account creation (email + OAuth) is blocked with a 403
-// The waitlist API itself is NOT affected — signups keep working.
+// APIs and public assets keep their existing behavior; waitlist signups work.
+// Leave this unset/false locally to retain app access on the dev server.
 // ============================================================================
 
 export function isPrelaunchMode(): boolean {

@@ -1,0 +1,844 @@
+{
+  "checks": [
+    {
+      "name": "Neutral to Happy: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Happy to Excited: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Neutral to Curious: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Neutral to Curious: head transform eases",
+      "passed": true
+    },
+    {
+      "name": "Neutral to Thinking: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Neutral to Thinking: head transform eases",
+      "passed": true
+    },
+    {
+      "name": "Neutral to Sleepy: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Neutral to Sleepy: head transform eases",
+      "passed": true
+    },
+    {
+      "name": "Floating to Hello: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Floating to Reading: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Floating to Tablet: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Floating to Timer: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Floating to Celebrating: same SVG, hood and host box",
+      "passed": true
+    },
+    {
+      "name": "Wave keeps sleeve, cuff and mitten synchronized",
+      "passed": true
+    },
+    {
+      "name": "Wave moves across sampled frames",
+      "passed": true
+    },
+    {
+      "name": "Both mittens overlap each held prop's bounds",
+      "passed": true
+    },
+    {
+      "name": "Mobile: twelve states, no page overflow, timer visible",
+      "passed": true
+    },
+    {
+      "name": "Reduced-motion gallery has no running animations",
+      "passed": true
+    },
+    {
+      "name": "Reduced-motion live timer has no animation or transition",
+      "passed": true
+    },
+    {
+      "name": "Reduced-motion still keeps timer progress and hands",
+      "passed": true
+    },
+    {
+      "name": "No companion resource or browser runtime errors",
+      "passed": true
+    }
+  ],
+  "transitions": [
+    {
+      "name": "Neutral to Happy",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "QUEST_COMPLETE",
+        "expression": "HAPPY",
+        "action": "FLOATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -0.0340787)",
+        "pose": "matrix(1, 0, 0, 1, 0, -0.408945)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "QUEST_COMPLETE",
+        "expression": "HAPPY",
+        "action": "FLOATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -0.575781)",
+        "pose": "matrix(1, 0, 0, 1, 0, -6.90937)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "QUEST_COMPLETE",
+        "expression": "HAPPY",
+        "action": "FLOATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -1)",
+        "pose": "matrix(1, 0, 0, 1, 0, -12)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Happy to Excited",
+      "before": {
+        "state": "QUEST_COMPLETE",
+        "expression": "HAPPY",
+        "action": "FLOATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -1)",
+        "pose": "matrix(1, 0, 0, 1, 0, -12)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "LEVEL_UP",
+        "expression": "EXCITED",
+        "action": "CELEBRATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -1.03413)",
+        "pose": "matrix(1, 0, 0, 1, 0, -12.8192)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -9.65869)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "LEVEL_UP",
+        "expression": "EXCITED",
+        "action": "CELEBRATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -1.57579)",
+        "pose": "matrix(1, 0, 0, 1, 0, -25.8189)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -4.24214)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "LEVEL_UP",
+        "expression": "EXCITED",
+        "action": "CELEBRATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -2)",
+        "pose": "matrix(1, 0, 0, 1, 0, -36)",
+        "actionPose": "none",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Neutral to Curious",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "DISCOVERING",
+        "expression": "CURIOUS",
+        "action": "FLOATING",
+        "hood": "matrix(0.999998, -0.00178742, 0.00178742, 0.999998, 0, 0)",
+        "pose": "matrix(1, 0.000476645, -0.000476645, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "DISCOVERING",
+        "expression": "CURIOUS",
+        "action": "FLOATING",
+        "hood": "matrix(0.999546, -0.0301395, 0.0301395, 0.999546, 0, 0)",
+        "pose": "matrix(0.999968, 0.00803834, -0.00803834, 0.999968, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "DISCOVERING",
+        "expression": "CURIOUS",
+        "action": "FLOATING",
+        "hood": "matrix(0.99863, -0.052336, 0.052336, 0.99863, 0, 0)",
+        "pose": "matrix(0.999903, 0.0139622, -0.0139622, 0.999903, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Neutral to Thinking",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "AI_THINKING",
+        "expression": "THINKING",
+        "action": "USING_TABLET",
+        "hood": "matrix(0.999999, -0.00119437, 0.00119437, 0.999999, 0, 0.0684324)",
+        "pose": "matrix(1, -0.000358311, 0.000358311, 1, 0, 0.171081)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -9.65784)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "AI_THINKING",
+        "expression": "THINKING",
+        "action": "USING_TABLET",
+        "hood": "matrix(0.999798, -0.0200999, 0.0200999, 0.999798, 0, 1.15172)",
+        "pose": "matrix(0.999982, -0.00603033, 0.00603033, 0.999982, 0, 2.87929)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -4.24142)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "AI_THINKING",
+        "expression": "THINKING",
+        "action": "USING_TABLET",
+        "hood": "matrix(0.999391, -0.0348995, 0.0348995, 0.999391, 0, 2)",
+        "pose": "matrix(0.999945, -0.0104718, 0.0104718, 0.999945, 0, 5)",
+        "actionPose": "none",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Neutral to Sleepy",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "REST",
+        "expression": "SLEEPY",
+        "action": "FLOATING",
+        "hood": "matrix(0.999998, 0.00178926, -0.00178926, 0.999998, 0, 0.102517)",
+        "pose": "matrix(1, 0.00029821, -0.00029821, 1, 0, 0.478412)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "REST",
+        "expression": "SLEEPY",
+        "action": "FLOATING",
+        "hood": "matrix(0.999545, 0.0301478, -0.0301478, 0.999545, 0, 1.72761)",
+        "pose": "matrix(0.999987, 0.00502538, -0.00502538, 0.999987, 0, 8.06216)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "REST",
+        "expression": "SLEEPY",
+        "action": "FLOATING",
+        "hood": "matrix(0.99863, 0.052336, -0.052336, 0.99863, 0, 3)",
+        "pose": "matrix(0.999962, 0.00872654, -0.00872654, 0.999962, 0, 14)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Floating to Hello",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "GREETING",
+        "expression": "NEUTRAL",
+        "action": "HELLO",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, 0)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "GREETING",
+        "expression": "NEUTRAL",
+        "action": "HELLO",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, 0)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "GREETING",
+        "expression": "NEUTRAL",
+        "action": "HELLO",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, 0)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Floating to Reading",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "READING",
+        "expression": "THINKING",
+        "action": "READING",
+        "hood": "matrix(1, 0.000597492, -0.000597492, 1, 0, 0.0684676)",
+        "pose": "matrix(1, -0.000358495, 0.000358495, 1, 0, 0.171169)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -9.65766)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "READING",
+        "expression": "THINKING",
+        "action": "READING",
+        "hood": "matrix(0.99995, 0.0100462, -0.0100462, 0.99995, 0, 1.15123)",
+        "pose": "matrix(0.999982, -0.0060278, 0.0060278, 0.999982, 0, 2.87808)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -4.24384)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "READING",
+        "expression": "THINKING",
+        "action": "READING",
+        "hood": "matrix(0.999848, 0.0174524, -0.0174524, 0.999848, 0, 2)",
+        "pose": "matrix(0.999945, -0.0104718, 0.0104718, 0.999945, 0, 5)",
+        "actionPose": "none",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Floating to Tablet",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "PLANNING",
+        "expression": "CURIOUS",
+        "action": "USING_TABLET",
+        "hood": "matrix(0.999999, -0.00119693, 0.00119693, 0.999999, 0, 0.0685789)",
+        "pose": "matrix(1, 0.000478771, -0.000478771, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -9.65711)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "PLANNING",
+        "expression": "CURIOUS",
+        "action": "USING_TABLET",
+        "hood": "matrix(0.999798, -0.0201047, 0.0201047, 0.999798, 0, 1.15199)",
+        "pose": "matrix(0.999968, 0.00804232, -0.00804232, 0.999968, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -4.24005)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "PLANNING",
+        "expression": "CURIOUS",
+        "action": "USING_TABLET",
+        "hood": "matrix(0.999391, -0.0348995, 0.0348995, 0.999391, 0, 2)",
+        "pose": "matrix(0.999903, 0.0139622, -0.0139622, 0.999903, 0, 0)",
+        "actionPose": "none",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Floating to Timer",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "FOCUSING",
+        "expression": "THINKING",
+        "action": "TIMER_MODE",
+        "hood": "matrix(0.999999, 0.00119202, -0.00119202, 0.999999, 0, 0.0341489)",
+        "pose": "matrix(1, -0.000357606, 0.000357606, 1, 0, 0.170744)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -9.79511)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "FOCUSING",
+        "expression": "THINKING",
+        "action": "TIMER_MODE",
+        "hood": "matrix(0.999798, 0.0200985, -0.0200985, 0.999798, 0, 0.575819)",
+        "pose": "matrix(0.999982, -0.00602993, 0.00602993, 0.999982, 0, 2.8791)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -6.54508)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "FOCUSING",
+        "expression": "THINKING",
+        "action": "TIMER_MODE",
+        "hood": "matrix(0.999391, 0.0348995, -0.0348995, 0.999391, 0, 1)",
+        "pose": "matrix(0.999945, -0.0104718, 0.0104718, 0.999945, 0, 5)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -4)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    },
+    {
+      "name": "Floating to Celebrating",
+      "before": {
+        "state": "IDLE",
+        "expression": "NEUTRAL",
+        "action": "FLOATING",
+        "hood": "none",
+        "pose": "matrix(1, 0, 0, 1, 0, 0)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -10)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "early": {
+        "state": "LEVEL_UP",
+        "expression": "EXCITED",
+        "action": "CELEBRATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -0.0683153)",
+        "pose": "matrix(1, 0, 0, 1, 0, -1.22968)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -9.65842)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "middle": {
+        "state": "LEVEL_UP",
+        "expression": "EXCITED",
+        "action": "CELEBRATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -1.15167)",
+        "pose": "matrix(1, 0, 0, 1, 0, -20.7301)",
+        "actionPose": "matrix(1, 0, 0, 1, 0, -4.24164)",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      },
+      "settled": {
+        "state": "LEVEL_UP",
+        "expression": "EXCITED",
+        "action": "CELEBRATING",
+        "hood": "matrix(1, 0, 0, 1, 0, -2)",
+        "pose": "matrix(1, 0, 0, 1, 0, -36)",
+        "actionPose": "none",
+        "stable": true,
+        "box": {
+          "x": 236.5,
+          "y": 321.859375,
+          "width": 320,
+          "height": 320
+        }
+      }
+    }
+  ],
+  "wave": [
+    [
+      "matrix(0.999859, -0.0167773, 0.0167773, 0.999859, 0, 0)",
+      "matrix(0.999859, -0.0167773, 0.0167773, 0.999859, 0, 0)",
+      "matrix(0.999859, -0.0167773, 0.0167773, 0.999859, 0, 0)"
+    ],
+    [
+      "matrix(0.999256, 0.0385664, -0.0385664, 0.999256, 0, 0)",
+      "matrix(0.999256, 0.0385664, -0.0385664, 0.999256, 0, 0)",
+      "matrix(0.999256, 0.0385664, -0.0385664, 0.999256, 0, 0)"
+    ],
+    [
+      "matrix(0.99888, 0.0473066, -0.0473066, 0.99888, 0, 0)",
+      "matrix(0.99888, 0.0473066, -0.0473066, 0.99888, 0, 0)",
+      "matrix(0.99888, 0.0473066, -0.0473066, 0.99888, 0, 0)"
+    ],
+    [
+      "matrix(0.984833, -0.173506, 0.173506, 0.984833, 0, 0)",
+      "matrix(0.984833, -0.173506, 0.173506, 0.984833, 0, 0)",
+      "matrix(0.984833, -0.173506, 0.173506, 0.984833, 0, 0)"
+    ]
+  ],
+  "errors": [],
+  "grips": [
+    {
+      "action": "READING",
+      "hands": [
+        true,
+        true
+      ]
+    },
+    {
+      "action": "USING_TABLET",
+      "hands": [
+        true,
+        true
+      ]
+    }
+  ],
+  "mobile": {
+    "count": 12,
+    "overflow": 0,
+    "timer": "inline"
+  },
+  "unauthenticatedStats": [
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790594857143.159,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "7137.308"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790594876637.177,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "7137.617"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790594880212.334,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "7137.925"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790594881748.518,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "7137.1233"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790594883166.891,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "7137.1541"
+        }
+      }
+    },
+    {
+      "method": "Log.entryAdded",
+      "params": {
+        "entry": {
+          "source": "network",
+          "level": "error",
+          "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "timestamp": 1790594884695.819,
+          "url": "http://localhost:3000/api/user/stats",
+          "networkRequestId": "7137.1849"
+        }
+      }
+    }
+  ]
+}

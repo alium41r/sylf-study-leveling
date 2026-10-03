@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -109,10 +110,10 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Apply updates and fetch updated user
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await executionTransaction(userId, tx => tx.user.update({
       where: { id: userId },
       data: updates,
-    });
+    }));
 
     const scholarId = updatedUser.scholarId || formatScholarId(updatedUser.id);
 

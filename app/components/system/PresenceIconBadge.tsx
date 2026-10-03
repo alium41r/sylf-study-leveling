@@ -1,13 +1,15 @@
 "use client";
 
-import { Command, CalendarDays, Target, ScrollText } from "lucide-react";
+import React from "react";
+import { Command, CalendarDays } from "lucide-react";
+import { ObjectiveTargetIcon, QuestEmblemIcon } from "@/app/components/icons";
 import type { PresenceIcon } from "./page-presence";
 
-const ICONS: Record<PresenceIcon, typeof Command> = {
+const ICONS: Record<PresenceIcon, React.ComponentType<{ className?: string }>> = {
   command: Command,
   calendar: CalendarDays,
-  target: Target,
-  scroll: ScrollText,
+  target: ObjectiveTargetIcon,
+  scroll: QuestEmblemIcon,
 };
 
 export function PresenceIconBadge({

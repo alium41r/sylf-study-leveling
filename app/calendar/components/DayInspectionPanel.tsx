@@ -1,8 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { DayStudySummary, GoalMilestone, FloatingRestDayStatus } from "@/lib/study-schedule-service";
+import { DayStudySummary, GoalMilestone, FloatingRestDayStatus } from "@/lib/study-schedule-types";
 import { resolveGoalColor, formatGoalDeadline } from "@/lib/goal-theme";
+import { QuestEmblemIcon } from "@/app/components/icons";
+import { X } from "lucide-react";
+import styles from "../Calendar.module.css";
 
 interface DayInspectionPanelProps {
   dayData: DayStudySummary | null;
@@ -55,7 +58,7 @@ export default function DayInspectionPanel({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 24, scale: 0.98 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="system-card p-4 sm:p-6 md:p-8 mt-6 relative overflow-y-auto border border-border-subtle shadow-xl z-50 fixed inset-x-0 bottom-0 max-h-[80vh] rounded-t-2xl pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:inset-x-auto md:bottom-auto md:max-h-none md:rounded-none md:overflow-hidden md:pb-8"
+      className={`${styles.card} p-4 sm:p-6 md:p-8 mt-6 relative overflow-y-auto border border-border-subtle shadow-2xl z-50 fixed inset-x-0 bottom-0 max-h-[80vh] rounded-t-2xl pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:inset-x-auto md:bottom-auto md:max-h-none md:rounded-2xl md:overflow-hidden md:pb-8`}
     >
       {/* Mobile grab handle */}
       <div className="md:hidden mx-auto mb-3 h-1 w-10 rounded-full bg-border-subtle shrink-0" />
@@ -126,11 +129,9 @@ export default function DayInspectionPanel({
 
         <button
           onClick={onClose}
-          className="self-start sm:self-center p-2 rounded-xl text-text-muted hover:text-text-primary hover:bg-bg-shadow border border-transparent hover:border-border-subtle transition-all"
+          className="self-start sm:self-center w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors cursor-pointer text-text-muted hover:text-text-primary"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X size={16} />
         </button>
       </div>
 
@@ -168,10 +169,9 @@ export default function DayInspectionPanel({
                   </div>
                 </div>
                 <span
-                  className="text-[0.65rem] font-mono font-bold px-2.5 py-1 rounded-full border shrink-0"
+                  className="text-[0.65rem] font-mono font-bold px-2.5 py-1 rounded-full border shrink-0 bg-slate-900/5 dark:bg-black/30"
                   style={{
-                    color: theme.light,
-                    background: "rgba(0,0,0,0.25)",
+                    color: theme.base,
                     borderColor: theme.mid,
                   }}
                 >
@@ -330,9 +330,7 @@ export default function DayInspectionPanel({
       {/* Completed Topics & Scheduled Quests List */}
       <div className="mt-6">
         <h4 className="text-sm font-bold uppercase tracking-wider text-text-primary font-['Rajdhani'] mb-3 flex items-center gap-2">
-          <svg className="w-4 h-4 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
+          <QuestEmblemIcon size={16} className="text-accent-primary-light" />
           Assigned Quests & Completed Topics
         </h4>
 
@@ -496,7 +494,6 @@ function FloatingRestDayControl({
   onToggle?: () => void;
   isToggling: boolean;
 }) {
-  const amber = resolveGoalColor("AMBER");
   const quotaLabel = `${status.weekUsage}/${status.weekQuota} floating rest days used this week`;
   const isQuotaExhausted = status.weekUsage >= status.weekQuota;
   const isActive = status.isFloatingRest;
@@ -523,23 +520,22 @@ function FloatingRestDayControl({
 
   return (
     <div
-      className="mt-6 p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-      style={{
-        background: isActive ? amber.dim : "rgba(5, 5, 15, 0.35)",
-        borderColor: isActive ? amber.mid : "var(--border-subtle)",
-      }}
+      className={`mt-6 p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
+        isActive
+          ? "bg-amber-500/10 border-amber-500/30 dark:border-amber-500/40"
+          : "bg-slate-900/[0.03] dark:bg-[rgba(5,5,15,0.35)] border-border-subtle"
+      }`}
     >
       <div className="flex items-center gap-3 min-w-0">
         <div
-          className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center"
-          style={{ background: amber.dim, border: `1px solid ${amber.mid}` }}
+          className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400"
         >
-          <svg className="w-4 h-4" style={{ color: amber.light }} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4-.95-4-2s1.79-2 4-2 4 .95 4 2-1.79 2-4 2zm0 0v6m0 0a4 4 0 11-8 0 4 4 0 018 0zm8-6a4 4 0 11-8 0 4 4 0 018 0z" opacity="0.9" />
           </svg>
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-bold font-['Rajdhani'] truncate" style={{ color: amber.light }}>
+          <p className="text-sm font-bold font-['Rajdhani'] truncate text-amber-700 dark:text-amber-300">
             {isActive ? "Floating Rest Day Active" : "Ad-hoc Rest Day Designation"}
           </p>
           <p className="text-xs text-text-muted">
@@ -559,19 +555,13 @@ function FloatingRestDayControl({
         onClick={onToggle}
         className={`px-4 py-2 rounded-lg text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shrink-0 ${
           isToggling ? "opacity-60 cursor-wait" : ""
-        }`}
-        style={
+        } ${
           tone === "cancel"
-            ? { background: amber.base, color: "#fff", border: `1px solid ${amber.light}` }
+            ? "bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white border border-amber-600 dark:border-amber-400 shadow-sm"
             : tone === "add"
-            ? { background: amber.dim, color: amber.light, border: `1px dashed ${amber.mid}` }
-            : {
-                background: "var(--bg-shadow)",
-                color: "var(--text-muted)",
-                border: "1px solid var(--border-subtle)",
-                cursor: "not-allowed",
-              }
-        }
+            ? "bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-dashed border-amber-500/40 hover:border-amber-500/70"
+            : "bg-bg-shadow text-text-muted border border-border-subtle cursor-not-allowed"
+        }`}
       >
         {isToggling ? "Updating..." : buttonLabel}
       </button>

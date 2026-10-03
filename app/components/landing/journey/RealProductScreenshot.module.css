@@ -1,0 +1,206 @@
+.frame {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.windowTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.imageButton {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--page);
+  color: var(--ink);
+  text-align: left;
+  cursor: zoom-in;
+}
+
+.imageButton:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: -3px !important;
+}
+
+.screenshot {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.expandHint {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+  pointer-events: none;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+.imageButton:hover .expandHint,
+.imageButton:focus-visible .expandHint {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: min(1240px, calc(100vw - 40px));
+  max-width: none;
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 100px rgb(0 0 0 / 40%);
+}
+
+.dialog::backdrop {
+  background: rgb(3 7 14 / 85%);
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 58px;
+  padding: 7px 12px 7px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dialog .dialogTitle {
+  margin: 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+.closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.closeButton:hover {
+  background: var(--elevated);
+  color: var(--ink);
+}
+
+.closeButton:focus-visible,
+.imageStage:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.imageStage {
+  max-height: calc(100dvh - 152px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--quiet) var(--page);
+  background: var(--page);
+}
+
+.expandedImage {
+  display: block;
+  width: 100%;
+  max-height: calc(100dvh - 152px);
+  height: auto;
+  object-fit: contain;
+}
+
+.dialog .dialogHint {
+  min-height: 32px;
+  margin: 0;
+  padding: 8px 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.mobileHint {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .expandHint {
+    right: 8px;
+    bottom: 8px;
+    gap: 5px;
+    padding: 5px 7px;
+    font-size: 9px;
+  }
+
+  .dialog {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 24px);
+    border-radius: 8px;
+  }
+
+  .dialogHeader {
+    gap: 12px;
+    padding-left: 14px;
+  }
+
+  .imageStage {
+    max-height: calc(100dvh - 132px);
+  }
+
+  .expandedImage {
+    width: 1175px;
+    max-width: none;
+    max-height: none;
+  }
+
+  .mobileHint {
+    display: inline;
+  }
+
+  .desktopHint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expandHint,
+  .closeButton {
+    transition: none;
+  }
+}

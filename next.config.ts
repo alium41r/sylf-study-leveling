@@ -56,11 +56,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    ignoreBuildErrors: true,
+  // Disposable browser qualification must not replace a concurrent dev build.
+  distDir: process.env.SYLF_TEST_DIST_DIR || ".next",
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
   async headers() {
     return [

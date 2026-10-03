@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 2,
+  "gate": "PLANNER_V2_PHASE_0",
+  "startedAt": "2026-10-02T16:40:41.372Z",
+  "status": "PASSED",
+  "evidenceBoundary": "Pure V2 contracts and current-system PostgreSQL prerequisites; no Phase 1 runtime guarantees or product cutover.",
+  "checks": [
+    {
+      "name": "authoritative references and Phase 0 documents",
+      "status": "PASSED"
+    },
+    {
+      "name": "writer inventory source correspondence",
+      "status": "PASSED"
+    },
+    {
+      "name": "required contract and audit regression suites",
+      "status": "PASSED"
+    },
+    {
+      "name": "isolated Phase 0 TypeScript",
+      "status": "PASSED"
+    },
+    {
+      "name": "Phase 0 ESLint",
+      "status": "PASSED"
+    },
+    {
+      "name": "script syntax",
+      "status": "PASSED"
+    },
+    {
+      "name": "genuine PostgreSQL integrity/concurrency and all current required suites",
+      "status": "PASSED"
+    }
+  ],
+  "references": [
+    {
+      "path": "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md",
+      "sha256": "899a31f164c481907a89286507a71c613e5a27813140b2eaf951e7ec718ca365"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-final-architecture-review/REVIEW.md",
+      "sha256": "872c1dc40b8fd41e8fabea29074373f7095c5bd7f5c24de8b4e87e9efee5df5a"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+      "sha256": "f4b260e35c71c9d4c9adf3a10285be5163a02a701c28eda4d78201c6cc8820ae"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-phase-0/README.md",
+      "sha256": "051efef789d0e4ef71d54941f1581559eff20342a6c39ffc4cec8344632e9df6"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-phase-0/CONTRACTS.md",
+      "sha256": "29ad4c1d44d4089372041f9c818700b06c6676b47fa692017eed6206da97d7f0"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-phase-0/EXECUTION_WRITERS.md",
+      "sha256": "51d94d5cdc003b779a44e512680444f656e5a379768bb91f3acdea0cd6cec75e"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-phase-0/MIGRATION_MAP.md",
+      "sha256": "a133ff59cf478722c3d4625615ee71c562dcb31e4f8dff0460e4fe79a4507b43"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-phase-0/WORKER_RUNTIME.md",
+      "sha256": "7e99d5c6e922d3e2b4fbe7c042ca5d045be52f2fa2e22ff0876799ddd928f0cd"
+    },
+    {
+      "path": "documentation/planner/reports/2026-10-02-phase-0/POSTGRES_HARNESS.md",
+      "sha256": "955a3d3f4830c15e1d0351dd2f242c069cdbdaff94ddefbefb5f87390cd3b544"
+    }
+  ],
+  "limitations": [
+    "The historical production migration chain needs rehearsal; the PostgreSQL harness uses the documented audited bootstrap.",
+    "Hosted grants/catalog, actual mobile builds, V2 worker/apply recovery, browser quality and model benchmark remain later phase gates.",
+    "Whole-repository generated Next route type errors are recorded separately; the isolated Phase 0 typecheck is required."
+  ],
+  "inventory": {
+    "behaviorGroups": 36,
+    "ormSites": 105,
+    "effectiveSqlSignatures": 21,
+    "routes": 65,
+    "runtimeSqlCalls": 98,
+    "rawSqlSites": 38,
+    "pinnedSourceFiles": 771
+  },
+  "unit": {
+    "suites": 7,
+    "passed": 54,
+    "failed": 0,
+    "skipped": 0
+  },
+  "postgres": {
+    "version": 180004,
+    "requiredSkipped": 0,
+    "results": [
+      {
+        "label": "phase0",
+        "files": 2,
+        "passed": 14,
+        "failed": 0,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": []
+      },
+      {
+        "label": "current",
+        "files": 17,
+        "passed": 225,
+        "failed": 0,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 1,
+        "failures": []
+      }
+    ],
+    "cleanup": "Disposable server stopped; cluster/container removed."
+  },
+  "audit": {
+    "findings": 34,
+    "normalizedScenarios": 12,
+    "sha256": "50e07301b7126ec75aee52ee09537301696a207556ed6cb8bd045fd69ffe03b5"
+  },
+  "contractSources": {
+    "lib/planner/v2/contracts/artifacts.ts": "2d28f60affbab80b0b674f1b35e975f63974bccbe45b5dcfd2a42015bba0fd75",
+    "lib/planner/v2/contracts/blueprint.ts": "409fbcaeaa15acb8dc9d1bee80e8612abb4553ecc7381d2e7965536ac649f4ab",
+    "lib/planner/v2/contracts/envelope.ts": "3d8bedf93e5d8bf29ad80841f1f11205c576d25f13e7bafe159f0fb3921e382b",
+    "lib/planner/v2/contracts/evidence.ts": "13aeaad8563bff0d5fcb7c5044ab0c5ca6227ee13664e0c2a02f215de8620f21",
+    "lib/planner/v2/contracts/execution.ts": "a45a6d90a8f58c11f1342d05542a7728e3fbe23fe8830bdfda6a32ae2d5fd3cc",
+    "lib/planner/v2/contracts/index.ts": "e89a831c07e54720a0c5251310bf3440d81366e5bbeabfcb0aaa8a9b0990172e",
+    "lib/planner/v2/contracts/intent.ts": "474d8847506ab5f3ee886e375ac3390a9b2e5a805c85343e559fe761dded9b51",
+    "lib/planner/v2/contracts/lineage.ts": "4f72e0cbdf879659cc5326e2006dee2827af790cee68faa2592328e3bac5719b",
+    "lib/planner/v2/contracts/operations.ts": "22579b5f3f3b3aeee0e5d8c2db5412d9e8b7e31e1c19d38a95a6ebc340e60e8c",
+    "lib/planner/v2/contracts/primitives.ts": "3d26fa7a94bca8299b0de5c1d787f3c95b67d14e6bf4bc91d84ade2890244f04",
+    "lib/planner/v2/contracts/session.ts": "14c2768a4c773fc33d14d4f681746f34c75952cc3363b85128084fa03b4bb4b8",
+    "lib/planner/v2/contracts/workspace.ts": "2abc74a5886e51dacb3f76da3ecdd820db9925e2580d2a4dbd1a8802c80c465c"
+  },
+  "finishedAt": "2026-10-02T16:41:17.194Z"
+}

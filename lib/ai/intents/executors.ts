@@ -298,7 +298,7 @@ const goals: Executor = async (userId) => {
 
 const subjects: Executor = async (userId) => {
   const list = await prisma.subject.findMany({
-    where: { userId },
+    where: { userId, archivedAt: null },
     select: { name: true, examBoard: true, level: true },
     orderBy: { createdAt: "asc" },
     take: 6,

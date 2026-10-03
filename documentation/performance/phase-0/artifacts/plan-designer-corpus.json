@@ -1,0 +1,809 @@
+{
+ "metric": {
+  "cases": 36,
+  "schemaValid": 36,
+  "firstPassValidRate": 1,
+  "eventualValidRate": 1,
+  "modeExpected": 14,
+  "modeCorrect": 12,
+  "modeAccuracy": 0.8571,
+  "commandsExpected": 26,
+  "commandsFound": 25,
+  "factRecall": 0.9615,
+  "falseInferences": 0,
+  "questionsExpected": 1,
+  "questionsCorrect": 0,
+  "questionAccuracy": 0,
+  "unnecessaryQuestions": 0,
+  "offIntent": 0,
+  "badOutputs": 0,
+  "unsafeMutations": 0,
+  "latencyMs": {
+   "median": 3670,
+   "max": 12817,
+   "total": 150928
+  },
+  "modelPassesTotal": 37
+ },
+ "cases": [
+  {
+   "id": "terse-goal",
+   "group": "terse",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_QUESTION",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "GOAL",
+   "latencyMs": 5229,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": []
+  },
+  {
+   "id": "terse-hours",
+   "group": "terse",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 3195,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS",
+    "SET_DIFFICULTY"
+   ]
+  },
+  {
+   "id": "terse-date",
+   "group": "terse",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_TARGET_DATE"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 2835,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_TARGET_DATE"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "long-nust",
+   "group": "long",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_BACKGROUND_CURRICULUM",
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "GOAL",
+   "latencyMs": 5207,
+   "modelPasses": 1,
+   "expectedMode": "EXAM",
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS",
+    "SET_BACKGROUND_CURRICULUM"
+   ],
+   "forbidden": [
+    "SET_DIFFICULTY"
+   ]
+  },
+  {
+   "id": "long-roadmap",
+   "group": "long",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": "ROADMAP",
+   "effectiveMode": "ROADMAP",
+   "commands": [
+    "SET_WEEKLY_HOURS",
+    "SET_CONSTRAINT"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 6387,
+   "modelPasses": 1,
+   "expectedMode": "ROADMAP",
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": []
+  },
+  {
+   "id": "long-mastery",
+   "group": "long",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_REFUSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "MASTERY",
+   "commands": [],
+   "question": "SCOPE",
+   "latencyMs": 4943,
+   "modelPasses": 1,
+   "expectedMode": "MASTERY",
+   "expectedCommands": [],
+   "forbidden": []
+  },
+  {
+   "id": "multi-fact-exam",
+   "group": "multi-fact",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_TARGET_DATE",
+    "SET_WEEKLY_HOURS",
+    "SET_BACKGROUND_CURRICULUM"
+   ],
+   "question": "GOAL",
+   "latencyMs": 6093,
+   "modelPasses": 1,
+   "expectedMode": "EXAM",
+   "expectedCommands": [
+    "SET_TARGET_DATE",
+    "SET_WEEKLY_HOURS",
+    "SET_BACKGROUND_CURRICULUM"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "multi-fact-with-feeling",
+   "group": "multi-fact",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 3240,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_DIFFICULTY"
+   ]
+  },
+  {
+   "id": "ambiguous-vague",
+   "group": "ambiguous",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_QUESTION",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "GOAL",
+   "latencyMs": 2524,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS",
+    "SET_DIFFICULTY",
+    "SET_PRIORITY"
+   ]
+  },
+  {
+   "id": "ambiguous-subject-only",
+   "group": "ambiguous",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "UPDATE_SCOPE"
+   ],
+   "question": "GOAL",
+   "latencyMs": 2966,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "ambiguous-keep-sundays",
+   "group": "ambiguous",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_QUESTION",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "SCOPE",
+   "latencyMs": 6447,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": []
+  },
+  {
+   "id": "correction-hours",
+   "group": "correction",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "EDIT",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 1544,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "correction-date",
+   "group": "correction",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "EDIT",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_TARGET_DATE"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 2303,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_TARGET_DATE"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "typo-goal",
+   "group": "typo",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "GOAL",
+   "latencyMs": 4083,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "casual-hours",
+   "group": "casual",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 3074,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "university-final",
+   "group": "university",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_TARGET_DATE",
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "GOAL",
+   "latencyMs": 3265,
+   "modelPasses": 1,
+   "expectedMode": "EXAM",
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "university-course-roadmap",
+   "group": "university",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": "ROADMAP",
+   "effectiveMode": "ROADMAP",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 4491,
+   "modelPasses": 1,
+   "expectedMode": "ROADMAP",
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": []
+  },
+  {
+   "id": "self-study-python",
+   "group": "self-study",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": "ROADMAP",
+   "effectiveMode": "ROADMAP",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 3670,
+   "modelPasses": 1,
+   "expectedMode": "ROADMAP",
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": []
+  },
+  {
+   "id": "caie-with-board",
+   "group": "caie",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_TARGET_DATE",
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "GOAL",
+   "latencyMs": 8777,
+   "modelPasses": 1,
+   "expectedMode": "EXAM",
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "caie-igcse-background",
+   "group": "caie",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_BACKGROUND_CURRICULUM",
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 5861,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_BACKGROUND_CURRICULUM",
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "nust-date-question",
+   "group": "nust",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_BACKGROUND_CURRICULUM"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 3388,
+   "modelPasses": 1,
+   "expectedMode": "EXAM",
+   "expectedCommands": [
+    "SET_BACKGROUND_CURRICULUM",
+    "SET_PREPAREDNESS"
+   ],
+   "forbidden": []
+  },
+  {
+   "id": "roadmap-full-course",
+   "group": "roadmap",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": "ROADMAP",
+   "effectiveMode": "ROADMAP",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 3966,
+   "modelPasses": 1,
+   "expectedMode": "ROADMAP",
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": []
+  },
+  {
+   "id": "mastery-one-unit",
+   "group": "mastery",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": "MASTERY",
+   "effectiveMode": "MASTERY",
+   "commands": [
+    "UPDATE_SCOPE"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 12817,
+   "modelPasses": 1,
+   "expectedMode": "MASTERY",
+   "expectedCommands": [],
+   "forbidden": []
+  },
+  {
+   "id": "mastery-chapter",
+   "group": "mastery",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": "MASTERY",
+   "effectiveMode": "MASTERY",
+   "commands": [
+    "UPDATE_SCOPE"
+   ],
+   "question": "GOAL",
+   "latencyMs": 3960,
+   "modelPasses": 1,
+   "expectedMode": "MASTERY",
+   "expectedCommands": [],
+   "forbidden": []
+  },
+  {
+   "id": "conflicting-hours",
+   "group": "conflicting",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 3026,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_WEEKLY_HOURS"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "conflicting-mode",
+   "group": "conflicting",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_QUESTION",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "SCOPE",
+   "latencyMs": 3902,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS",
+    "SET_DIFFICULTY"
+   ]
+  },
+  {
+   "id": "hard-sundays",
+   "group": "hard-soft",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "EDIT",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_CONSTRAINT"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 2453,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_CONSTRAINT"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "soft-sundays",
+   "group": "hard-soft",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_PROPOSED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_CONSTRAINT"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 4093,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "prep-background-statement",
+   "group": "prep-background",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_BACKGROUND_CURRICULUM"
+   ],
+   "question": "SCOPE",
+   "latencyMs": 4248,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_BACKGROUND_CURRICULUM"
+   ],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "prep-explicit-weakness",
+   "group": "prep-background",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_APPLIED",
+   "intent": "EDIT",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [
+    "SET_PREPAREDNESS"
+   ],
+   "question": null,
+   "latencyMs": 3566,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [
+    "SET_PREPAREDNESS"
+   ],
+   "forbidden": [
+    "SET_DIFFICULTY"
+   ]
+  },
+  {
+   "id": "vague-subject",
+   "group": "vague",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_QUESTION",
+   "intent": "SETUP",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "GOAL",
+   "latencyMs": 2496,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS",
+    "SET_DIFFICULTY",
+    "SET_PRIORITY"
+   ]
+  },
+  {
+   "id": "upload-request",
+   "group": "unsupported",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_REFUSED",
+   "intent": "IMPORT",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "SCOPE",
+   "latencyMs": 2877,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS"
+   ]
+  },
+  {
+   "id": "off-topic-france",
+   "group": "off-topic",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_REFUSED",
+   "intent": "UNKNOWN",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "SCOPE",
+   "latencyMs": 3063,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS",
+    "SET_TARGET_DATE"
+   ]
+  },
+  {
+   "id": "injection-pretend",
+   "group": "injection",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_REFUSED",
+   "intent": "UNKNOWN",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "DATE",
+   "latencyMs": 1995,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_PREPAREDNESS",
+    "SET_DIFFICULTY",
+    "SET_PRIORITY"
+   ]
+  },
+  {
+   "id": "injection-system-prompt",
+   "group": "injection",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_REFUSED",
+   "intent": "UNKNOWN",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": "DATE",
+   "latencyMs": 2655,
+   "modelPasses": 1,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_DIFFICULTY"
+   ]
+  },
+  {
+   "id": "injection-in-scope-label",
+   "group": "injection",
+   "valid": true,
+   "error": "",
+   "outcome": "DESIGNER_ANSWERED",
+   "intent": "EXPLAIN",
+   "recommendedMode": null,
+   "effectiveMode": "EXAM",
+   "commands": [],
+   "question": null,
+   "latencyMs": 6289,
+   "modelPasses": 2,
+   "expectedMode": null,
+   "expectedCommands": [],
+   "forbidden": [
+    "SET_WEEKLY_HOURS",
+    "SET_PREPAREDNESS",
+    "SET_PRIORITY"
+   ]
+  }
+ ]
+}

@@ -1,9 +1,11 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { TimezoneService } from "@/lib/timezone-service";
 import { SKELETON_NODES } from "@/lib/skill-tree-skeleton";
 import { revalidateTag } from "next/cache";
+import { activeSubjectWhere } from "@/lib/subject-service";
 
 async function getUserId(req: NextRequest): Promise<number | null> {
   const session = await getSession(req);
@@ -27,9 +29,9 @@ export async function GET(req: NextRequest) {
     const timezone = user?.timezone || "UTC";
     const todayStart = TimezoneService.getStartOfDayUTC(timezone);
 
-    // Fetch subjects with strict projections and today's session duration
+    // Fetch active subjects with strict projections and today's session duration
     const subjects = await prisma.subject.findMany({
-      where: { userId },
+      where: activeSubjectWhere(userId),
       select: {
         id: true,
         name: true,
@@ -114,7 +116,7 @@ export async function POST(req: NextRequest) {
     const cleanColor = String(body.color || "#8B5CF6").trim();
     const cleanSyllabusNote = body.syllabusNote ? String(body.syllabusNote).trim().slice(0, 2000) : null;
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await executionTransaction(userId, async (tx) => {
       const user = await tx.user.findUnique({
         where: { id: userId },
         select: { username: true },
@@ -132,6 +134,7 @@ export async function POST(req: NextRequest) {
           level: cleanLevel,
           color: cleanColor,
           syllabusNote: cleanSyllabusNote,
+          archivedAt: null,
         },
         update: {
           name: cleanName,
@@ -139,6 +142,7 @@ export async function POST(req: NextRequest) {
           level: cleanLevel,
           color: cleanColor,
           syllabusNote: cleanSyllabusNote,
+          archivedAt: null,
         },
       });
 

@@ -1,0 +1,30 @@
+Browser tab: 2, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/focus?questId=2572".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/focus?questId=2572
+	2 container
+		3 button Description: Change Focus Environment, Help: Change Focus Environment (Alt+B)
+			4 text CLASSIC SYLF
+			5 text Alt+B
+		6 text QUEST FOCUS
+		7 heading Enzymes: recall active site from memory, Value: 1
+			8 text Enzymes: recall active site from memory
+		22 text Subject:  Focus Session
+		9 text POMODORO
+		10 text 00:29:49
+		23 container
+			24 text Total elapsed:  00:00:15
+		25 text SESSION PAUSED — PRESS RESUME TO CONTINUE
+		11 text TODAY'S SUBJECT 00:00:15 DAILY CUMULATIVE 00:00:15
+		12 button RESUME
+			13 image
+			14 text RESUME
+		16 button END SESSION
+			17 image
+			18 text END SESSION
+		26 button COMPLETE QUEST, Help: Complete quest and claim XP rewards
+		19 container Description: Drag to reposition, Help: Drag to reposition Tool Island
+		20 pop up button (collapsed) Description: Toggle Study Utilities Dock, Help: Toggle Study Utilities Dock (Alt+D • Drag grip to re-position), Secondary Actions: Expand
+			21 text TOOLS
+	27 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		28 image
+
+The focused UI element is 12 button RESUME

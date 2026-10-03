@@ -1,0 +1,23 @@
+{
+  "root": ".",
+  "include": [],
+  "exclude": [
+    ".git",
+    ".next",
+    ".turbo",
+    ".vercel",
+    ".cg",
+    "node_modules",
+    "dist",
+    "build",
+    "out",
+    "coverage",
+    "mobile/dist",
+    "prisma/generated",
+    "*.generated.*"
+  ],
+  "max_file_kb": 512,
+  "incremental": true,
+  "engine": "auto",
+  "language_map": {}
+}

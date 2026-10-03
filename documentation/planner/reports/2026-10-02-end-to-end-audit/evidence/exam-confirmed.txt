@@ -1,0 +1,351 @@
+Browser tab: 2, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/system".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system
+	2 container
+		3 container
+			4 button Collapse sidebar
+			5 button Description: Open System Hub, Help: System Hub
+				6 image
+			7 button Notifications
+				8 image
+			9 button View Profile Card
+				10 text P
+				11 text Scholar
+				12 container
+					13 text E -Rank • Lv.  1
+		14 container Main Navigation
+			15 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			16 link Description: Timer, Value: 127.0.0.1:3101/timer
+			17 link Description: Social, Value: 127.0.0.1:3101/social
+			18 link Description: The System AI, Value: 127.0.0.1:3101/system
+			19 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			20 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			21 link Description: Locker, Value: 127.0.0.1:3101/locker
+			22 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		23 button Logout
+			24 image
+			25 text Logout
+		26 container
+			27 container
+				28 button CONVERSATION
+				30 button PLANNER ∞
+					31 text PLANNER
+					32 text ∞
+				33 text THE SYSTEM
+				34 text INTELLIGENCE LAYER
+				35 heading System Workspace, Value: 1
+					36 text System 
+					37 text Workspace
+				38 button (collapsed) Description: Open Archives, Secondary Actions: Expand
+					39 text ARCHIVES
+					40 text 1
+			99 container
+				100 container Planner setup
+					101 button Choose a different plan
+					102 text EXAM PLANNER
+					103 button Back to Quick Plan
+					104 button Advanced setup
+					105 button Classic Planner
+				106 container Exam Planner
+					107 heading Your Exam plan is ready, Value: 2
+						108 text Your Exam plan is ready
+					396 container
+						397 text 20  ordinary Quests created. They use your existing Focus, XP, rewards and completion flow.
+						398 link Description: START NEXT QUEST, Value: 127.0.0.1:3101/focus?questId=2572
+						399 link Description: View Quests, Value: 127.0.0.1:3101/quests
+						400 button View Plan
+					109 container
+						110 text Exam:  2026-10-30  · Asia/Karachi  · Standard preparation
+					111 text 20
+					112 text planned Quests
+					113 container
+						114 text 14.8  h
+					115 text planned work
+					116 text 20
+					117 text study days
+					118 text 20
+					119 text available days
+					120 container
+						121 text 15 %
+					122 text recovery reserve
+					123 container
+						124 text 216  min
+					125 text protected reserve
+					126 text Capacity reflects the saved schedule snapshot and is checked again at confirmation. Completion and study time do not establish academic mastery.
+					127 container
+						128 heading Scope & assumptions, Value: 3
+							129 text Scope & assumptions
+						130 content list
+							131 container
+								132 AXListMarker • 
+								133 text Enzymes  — 20 planned items
+						134 text Enzymes is already covered, so no LEARN item is required. Usable days provide 51 minutes each after reserve and exam-day exclusion. Preferred session length is 45 minutes, but 51-minute days allow one 45-minute session plus brief review. No mock duration was supplied, so no MOCK_EXAM item is scheduled. Confidence is 4, so MISTAKE_REVIEW is not required by the confidence rule. The topic is not marked difficult, so standard practice floors apply. Covered does not mean confident or mastered. This plan does not claim mastery or predict a grade. No official question counts, mark schemes or exam-board requirements are assumed. Only supplied usable days are used. The final review is scheduled within 3 days of the exam. Practice and recall are separated across dates where possible.
+					135 button (collapsed) Coverage map · 1 unit · 0 not planned yet, Secondary Actions: Expand
+						136 text Coverage map
+						137 text · 
+						138 text 1
+						139 text  unit
+						140 text  ·
+						141 text 0
+						142 text  not planned yet
+					143 button (collapsed) Planning preferences, Secondary Actions: Expand
+						144 text Planning preferences
+					145 container
+						146 heading Staged timeline, Value: 3
+							147 text Staged timeline
+						148 button (expanded) Secondary Actions: Collapse, CONSOLIDATION Enzymes: recall active site from memory 2026-10-06 · 30 min · RECALL Done when: Produce a labelled recall sheet with at least five correct statements about active site and specificity.
+							149 AXListMarker ▾ 
+							150 text CONSOLIDATION
+							151 text Enzymes: recall active site from memory
+							152 text 2026-10-06
+							153 text  · 
+							154 text 30
+							155 text  min · 
+							156 text RECALL
+							157 text Done when: 
+							158 text Produce a labelled recall sheet with at least five correct statements about active site and specificity.
+						374 text Enzymes
+						375 text Retrieval strengthens memory for core enzyme concepts before practice.
+						376 text Write from memory the roles of active site, substrate and enzyme-substrate complex, then check against notes.
+						377 container
+							378 text Quest title
+							379 text field (disabled) Quest title, Value: Enzymes: recall active site from memory
+							380 text Done when (completion condition)
+							381 text field (disabled) Done when (completion condition), Value: Produce a labelled recall sheet with at least five correct statements about active site and specificity.
+							382 text One observable action or output. Claiming mastery is not a completion condition. Date
+							383 date field (disabled, settable) Date, Value: 2026-10-06
+							389 text Minutes
+							390 stepper (disabled, settable, integer) Minutes, Value: 30
+							391 checkbox (disabled, settable, integer) Description: Lock this item, Value: 0
+							392 checkbox (disabled, settable, integer) Description: Remove from this draft, Value: 0
+							393 button (disabled) Move earlier
+							394 button (disabled) Move later
+						395 button (collapsed) Why does this need changing?, Secondary Actions: Expand
+						159 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes practice: factors affecting rate 2026-10-08 · 45 min · PRACTICE Done when: Complete at least six short-answer questions and write one correction for each error.
+							160 AXListMarker ▸ 
+							161 text PRACTICE
+							162 text Enzymes practice: factors affecting rate
+							163 text 2026-10-08
+							164 text  · 
+							165 text 45
+							166 text  min · 
+							167 text PRACTICE
+							168 text Done when: 
+							169 text Complete at least six short-answer questions and write one correction for each error.
+						170 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes review: rate graphs and denaturation 2026-10-09 · 45 min · REVIEW Done when: Annotate two rate graphs and write a two-sentence explanation of denaturation.
+							171 AXListMarker ▸ 
+							172 text CONSOLIDATION
+							173 text Enzymes review: rate graphs and denaturation
+							174 text 2026-10-09
+							175 text  · 
+							176 text 45
+							177 text  min · 
+							178 text REVIEW
+							179 text Done when: 
+							180 text Annotate two rate graphs and write a two-sentence explanation of denaturation.
+						181 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes timed practice: mixed short answers 2026-10-10 · 45 min · TIMED PRACTICE Done when: Finish the timed set within 35 minutes and list two topics needing further review.
+							182 AXListMarker ▸ 
+							183 text PRACTICE
+							184 text Enzymes timed practice: mixed short answers
+							185 text 2026-10-10
+							186 text  · 
+							187 text 45
+							188 text  min · 
+							189 text TIMED PRACTICE
+							190 text Done when: 
+							191 text Finish the timed set within 35 minutes and list two topics needing further review.
+						192 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes recall: inhibitors and cofactors 2026-10-12 · 45 min · RECALL Done when: Produce a comparison table with correct definitions for both inhibitor types and one cofactor example.
+							193 AXListMarker ▸ 
+							194 text CONSOLIDATION
+							195 text Enzymes recall: inhibitors and cofactors
+							196 text 2026-10-12
+							197 text  · 
+							198 text 45
+							199 text  min · 
+							200 text RECALL
+							201 text Done when: 
+							202 text Produce a comparison table with correct definitions for both inhibitor types and one cofactor example.
+						203 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes practice: inhibition and cofactors 2026-10-13 · 45 min · PRACTICE Done when: Complete at least five applied questions and correct any wrong comparisons.
+							204 AXListMarker ▸ 
+							205 text PRACTICE
+							206 text Enzymes practice: inhibition and cofactors
+							207 text 2026-10-13
+							208 text  · 
+							209 text 45
+							210 text  min · 
+							211 text PRACTICE
+							212 text Done when: 
+							213 text Complete at least five applied questions and correct any wrong comparisons.
+						214 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes review: practical investigations 2026-10-14 · 45 min · REVIEW Done when: Write a variable table for one enzyme investigation with independent, dependent and two control variables.
+							215 AXListMarker ▸ 
+							216 text CONSOLIDATION
+							217 text Enzymes review: practical investigations
+							218 text 2026-10-14
+							219 text  · 
+							220 text 45
+							221 text  min · 
+							222 text REVIEW
+							223 text Done when: 
+							224 text Write a variable table for one enzyme investigation with independent, dependent and two control variables.
+						225 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes timed practice: practical and data questions 2026-10-15 · 45 min · TIMED PRACTICE Done when: Finish the timed set and write one correction for each data-interpretation error.
+							226 AXListMarker ▸ 
+							227 text PRACTICE
+							228 text Enzymes timed practice: practical and data questions
+							229 text 2026-10-15
+							230 text  · 
+							231 text 45
+							232 text  min · 
+							233 text TIMED PRACTICE
+							234 text Done when: 
+							235 text Finish the timed set and write one correction for each data-interpretation error.
+						236 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes recall: full topic summary 2026-10-16 · 45 min · RECALL Done when: Recall the core points from memory, then check and correct the gaps.
+							237 AXListMarker ▸ 
+							238 text CONSOLIDATION
+							239 text Enzymes recall: full topic summary
+							240 text 2026-10-16
+							241 text  · 
+							242 text 45
+							243 text  min · 
+							244 text RECALL
+							245 text Done when: 
+							246 text Recall the core points from memory, then check and correct the gaps.
+						247 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes practice: mixed exam-style questions 2026-10-17 · 45 min · PRACTICE Done when: Complete at least eight mixed questions and write corrections for every error.
+							248 AXListMarker ▸ 
+							249 text PRACTICE
+							250 text Enzymes practice: mixed exam-style questions
+							251 text 2026-10-17
+							252 text  · 
+							253 text 45
+							254 text  min · 
+							255 text PRACTICE
+							256 text Done when: 
+							257 text Complete at least eight mixed questions and write corrections for every error.
+						258 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes timed practice: full-topic set 2026-10-19 · 45 min · TIMED PRACTICE Done when: Finish the timed set within 40 minutes and record two areas for final review.
+							259 AXListMarker ▸ 
+							260 text PRACTICE
+							261 text Enzymes timed practice: full-topic set
+							262 text 2026-10-19
+							263 text  · 
+							264 text 45
+							265 text  min · 
+							266 text TIMED PRACTICE
+							267 text Done when: 
+							268 text Finish the timed set within 40 minutes and record two areas for final review.
+						269 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes review: error log and corrections 2026-10-20 · 45 min · REVIEW Done when: Rewrite corrected answers for at least three recurring errors from the error log.
+							270 AXListMarker ▸ 
+							271 text CONSOLIDATION
+							272 text Enzymes review: error log and corrections
+							273 text 2026-10-20
+							274 text  · 
+							275 text 45
+							276 text  min · 
+							277 text REVIEW
+							278 text Done when: 
+							279 text Rewrite corrected answers for at least three recurring errors from the error log.
+						280 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes practice: graph and calculation questions 2026-10-21 · 45 min · PRACTICE Done when: Complete at least five graph or calculation questions and correct any errors.
+							281 AXListMarker ▸ 
+							282 text PRACTICE
+							283 text Enzymes practice: graph and calculation questions
+							284 text 2026-10-21
+							285 text  · 
+							286 text 45
+							287 text  min · 
+							288 text PRACTICE
+							289 text Done when: 
+							290 text Complete at least five graph or calculation questions and correct any errors.
+						291 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes recall: key definitions and equations 2026-10-22 · 45 min · RECALL Done when: Produce a definitions list with at least six correct terms and one correct rate equation.
+							292 AXListMarker ▸ 
+							293 text CONSOLIDATION
+							294 text Enzymes recall: key definitions and equations
+							295 text 2026-10-22
+							296 text  · 
+							297 text 45
+							298 text  min · 
+							299 text RECALL
+							300 text Done when: 
+							301 text Produce a definitions list with at least six correct terms and one correct rate equation.
+						302 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes timed practice: mixed question set 2026-10-23 · 45 min · TIMED PRACTICE Done when: Finish the timed set within 40 minutes and list two remaining weak areas.
+							303 AXListMarker ▸ 
+							304 text PRACTICE
+							305 text Enzymes timed practice: mixed question set
+							306 text 2026-10-23
+							307 text  · 
+							308 text 45
+							309 text  min · 
+							310 text TIMED PRACTICE
+							311 text Done when: 
+							312 text Finish the timed set within 40 minutes and list two remaining weak areas.
+						313 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes review: weak areas from timed practice 2026-10-24 · 45 min · REVIEW Done when: Write targeted summary notes for both weak areas with at least three correct points each.
+							314 AXListMarker ▸ 
+							315 text CONSOLIDATION
+							316 text Enzymes review: weak areas from timed practice
+							317 text 2026-10-24
+							318 text  · 
+							319 text 45
+							320 text  min · 
+							321 text REVIEW
+							322 text Done when: 
+							323 text Write targeted summary notes for both weak areas with at least three correct points each.
+						324 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes practice: exam-style extended answers 2026-10-26 · 45 min · PRACTICE Done when: Write at least three extended answers and self-check each against key points.
+							325 AXListMarker ▸ 
+							326 text PRACTICE
+							327 text Enzymes practice: exam-style extended answers
+							328 text 2026-10-26
+							329 text  · 
+							330 text 45
+							331 text  min · 
+							332 text PRACTICE
+							333 text Done when: 
+							334 text Write at least three extended answers and self-check each against key points.
+						335 button (collapsed) Secondary Actions: Expand, PRACTICE Enzymes timed practice: final mixed set 2026-10-27 · 45 min · TIMED PRACTICE Done when: Finish the timed set within 40 minutes and record accuracy and two final review points.
+							336 AXListMarker ▸ 
+							337 text PRACTICE
+							338 text Enzymes timed practice: final mixed set
+							339 text 2026-10-27
+							340 text  · 
+							341 text 45
+							342 text  min · 
+							343 text TIMED PRACTICE
+							344 text Done when: 
+							345 text Finish the timed set within 40 minutes and record accuracy and two final review points.
+						346 button (collapsed) Secondary Actions: Expand, CONSOLIDATION Enzymes review: final error correction 2026-10-28 · 45 min · REVIEW Done when: Rewrite corrected answers for at least two errors from the final timed set.
+							347 AXListMarker ▸ 
+							348 text CONSOLIDATION
+							349 text Enzymes review: final error correction
+							350 text 2026-10-28
+							351 text  · 
+							352 text 45
+							353 text  min · 
+							354 text REVIEW
+							355 text Done when: 
+							356 text Rewrite corrected answers for at least two errors from the final timed set.
+						357 button (collapsed) Secondary Actions: Expand, EXAM READINESS Enzymes final review: key points and definitions 2026-10-29 · 45 min · FINAL REVIEW Done when: Read the summary, definitions and error log, and write three points to remember in the exam.
+							358 AXListMarker ▸ 
+							359 text EXAM READINESS
+							360 text Enzymes final review: key points and definitions
+							361 text 2026-10-29
+							362 text  · 
+							363 text 45
+							364 text  min · 
+							365 text FINAL REVIEW
+							366 text Done when: 
+							367 text Read the summary, definitions and error log, and write three points to remember in the exam.
+					368 button (disabled) Save revised draft
+					369 button CREATE PLAN · 20 QUESTS
+						370 text CREATE PLAN · 
+						401 text 20
+						402 text  QUESTS
+					373 button Reload saved plan
+			76 container
+				77 text ARCHIVES 1
+				78 button NEW, Help: New Chat Session
+				79 button Close Archives
+				80 text field (settable)
+				81 button SELECT, Help: Select multiple chats
+				82 text TODAY 1
+				83 text Study Plan: GCSE algebra review
+				84 button Description: Rename Study Plan: GCSE algebra review, Help: Rename chat
+				85 button Description: Delete Study Plan: GCSE algebra review, Help: Delete chat
+	97 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		98 image
+
+The focused UI element is 107 heading Your Exam plan is ready, Value: 2

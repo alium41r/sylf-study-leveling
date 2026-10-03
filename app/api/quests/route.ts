@@ -1,4 +1,6 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
+import { assertNoLinkedQuests, assertNoPlannerGoals, isPlannerConflict } from "@/lib/planner/server/mutation-guards";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { TimezoneService } from "@/lib/timezone-service";
@@ -10,6 +12,7 @@ import { StudyScheduleService } from "@/lib/study-schedule-service";
 import { calculateSemanticScopeWeight, evaluateSyllabusScopeWithAI } from "@/lib/ai/scope-evaluator";
 import { reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
 import { calculateQuestRewards } from "@/lib/difficulty-engine";
+import { projectQuestDuration } from "@/lib/planner/v2/quest-read";
 
 /**
  * Calculates deterministic AI scope completion weight W_scope in [0.10, 1.00]
@@ -80,6 +83,11 @@ export async function GET(req: NextRequest) {
         targetMinutes: true,
         requiredMinutes: true,
         elapsedSeconds: true,
+        plannedMinutes: true,
+        remainingMinutesEstimate: true,
+        remainingEstimateBasisActualSeconds: true,
+        remainingDisposition: true,
+        executionVersion: true,
         scopeWeight: true,
         scheduledFor: true,
         isGateKeyApplied: true,
@@ -100,12 +108,14 @@ export async function GET(req: NextRequest) {
           },
         },
         sessions: {
-          where: { startedAt: { gte: todayStart } },
+          where: { OR: [{ executionState: null, startedAt: { gte: todayStart } },
+            { executionState: { not: null }, executionContext: { path: ["actualCivilDate"], equals: TimezoneService.getUserLocalDate(tz) } }] },
           select: {
             durationMinutes: true,
             durationSeconds: true,
             startedAt: true,
             endedAt: true,
+            executionState: true,
           },
         },
       },
@@ -115,6 +125,7 @@ export async function GET(req: NextRequest) {
     const now = new Date();
     const enriched = quests.map((q) => {
       const sessionSeconds = (q.sessions || []).reduce((acc: number, s: any) => {
+        if (s.executionState != null) return acc + (s.durationSeconds || 0);
         if (!s.endedAt) {
           const started = new Date(s.startedAt);
           const elapsed = Math.floor((now.getTime() - started.getTime()) / 1000);
@@ -126,7 +137,7 @@ export async function GET(req: NextRequest) {
       const todaySeconds = sessionSeconds;
       const { sessions: _, ...rest } = q;
       return {
-        ...rest,
+        ...projectQuestDuration(rest),
         todaySeconds,
       };
     });
@@ -220,6 +231,7 @@ export async function POST(req: NextRequest) {
     let subjectNodeId: number | undefined = undefined;
     let subjectId: number | undefined = rawSubjectId ? Number(rawSubjectId) : undefined;
     let scopeWeight = 0.25;
+    let evaluatedNodeSnapshot: string | null = null;
 
     // 1. Evaluate Subject Node Binding & Scope Weight
     if (rawSubjectNodeId) {
@@ -229,6 +241,7 @@ export async function POST(req: NextRequest) {
           id: parsedNodeId,
           subject: {
             userId,
+            archivedAt: null,
           },
         },
         select: {
@@ -250,9 +263,15 @@ export async function POST(req: NextRequest) {
 
       subjectNodeId = node.id;
       subjectId = node.subjectId;
+      evaluatedNodeSnapshot = JSON.stringify(node);
+
       // S4: scope evaluation is quota-reserved like the dedicated endpoint.
+      // A configured owner account bypasses the reservation (charged === false)
+      // but is still entitled to the real AI evaluation, so `unlimited` must
+      // open this branch too — otherwise it would silently fall back to the
+      // deterministic estimate.
       const scopeQuota = await reserveQuota(userId, "scope");
-      if (scopeQuota.charged) {
+      if (scopeQuota.charged || scopeQuota.unlimited) {
         try {
           const evalResult = await evaluateSyllabusScopeWithAI({
             nodeTitle: node.title,
@@ -282,6 +301,22 @@ export async function POST(req: NextRequest) {
           targetMinutes,
         }).scopeWeight;
       }
+    } else if (subjectId) {
+      const activeSub = await prisma.subject.findFirst({
+        where: {
+          id: subjectId,
+          userId,
+          archivedAt: null,
+        },
+        select: { id: true },
+      });
+
+      if (!activeSub) {
+        return NextResponse.json(
+          { error: "Subject not found or archived" },
+          { status: 400 }
+        );
+      }
     }
 
     // 2. Map difficulty and compute rewards (canonical unified standard)
@@ -295,7 +330,23 @@ export async function POST(req: NextRequest) {
     const sylphReward = rewards.sylph;
 
     // 3. Create Quest record
-    const quest = await prisma.quest.create({
+    const quest = await executionTransaction(session.userId, async tx => {
+      // Provider work is outside this unit. Every mutable admission fact is
+      // reread under coordination before any Quest is created.
+      const currentTimezone = await getUserTimezone(userId, tx);
+      const currentDate = typeof rawScheduledFor === "string" && rawScheduledFor.trim() ? scheduledFor : TimezoneService.getUserLocalDate(currentTimezone);
+      if (await StudyScheduleService.isUserRestDay(userId, currentDate, tx)) return NextResponse.json({ error: "REST_DAY_ALLOCATION_PROHIBITED" }, { status: 400 });
+      if (linkedGoalId) {
+        if (!await tx.goal.findFirst({ where: { id: linkedGoalId, userId }, select: { id: true } })) return NextResponse.json({ error: "Goal not found or unauthorized" }, { status: 404 });
+        await assertNoPlannerGoals(userId, [linkedGoalId], tx);
+      }
+      if (subjectId && !await tx.subject.findFirst({ where: { id: subjectId, userId, archivedAt: null }, select: { id: true } })) return NextResponse.json({ error: "Subject not found or unauthorized" }, { status: 404 });
+      if (subjectNodeId) {
+        const currentNode = await tx.subjectNode.findFirst({ where: { id: subjectNodeId, subject: { userId, archivedAt: null } },
+          select: { id: true, title: true, description: true, tier: true, difficulty: true, subjectId: true } });
+        if (!currentNode || JSON.stringify(currentNode) !== evaluatedNodeSnapshot) return NextResponse.json({ error: "SUBJECT_SCOPE_CHANGED", message: "The subject changed while this activity was being prepared. Retry with its current scope." }, { status: 409 });
+      }
+      return tx.quest.create({
       data: {
         userId,
         subjectId: subjectId ?? null,
@@ -308,7 +359,7 @@ export async function POST(req: NextRequest) {
         scopeWeight,
         status: "ACTIVE",
         difficulty,
-        scheduledFor,
+        scheduledFor: currentDate,
         xpReward,
         sylphReward,
       },
@@ -341,6 +392,8 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+    });
+    if (quest instanceof Response) return quest;
 
     // Invalidate user cache tags
     try {
@@ -378,15 +431,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "No IDs provided" }, { status: 400 });
     }
 
-    const result = await prisma.quest.deleteMany({
+    await assertNoLinkedQuests(session.userId, { id: { in: ids } });
+    const result = await executionTransaction(session.userId, tx => tx.quest.deleteMany({
       where: {
         userId: session.userId,
         id: { in: ids },
       },
-    });
+    }));
 
     return NextResponse.json({ success: true, count: result.count }, { status: 200 });
   } catch (error) {
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     console.error("Failed to bulk delete quests:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

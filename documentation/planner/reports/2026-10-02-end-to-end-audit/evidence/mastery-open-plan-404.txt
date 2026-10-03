@@ -1,0 +1,35 @@
+Browser tab: 4, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/planner".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/planner
+	2 container
+		3 container
+			4 button Collapse sidebar
+			5 button Description: Open System Hub, Help: System Hub
+				6 image
+			7 button Notifications
+				8 image
+			9 button View Profile Card
+				10 text P
+				11 text Scholar
+				12 container
+					13 text E -Rank • Lv.  1
+		14 container Main Navigation
+			15 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			16 link Description: Timer, Value: 127.0.0.1:3101/timer
+			17 link Description: Social, Value: 127.0.0.1:3101/social
+			18 link Description: The System AI, Value: 127.0.0.1:3101/system
+			19 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			20 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			21 link Description: Locker, Value: 127.0.0.1:3101/locker
+			22 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		23 button Logout
+			24 image
+			25 text Logout
+		26 container
+			27 heading 404, Value: 1
+				28 text 404
+			29 heading This page could not be found., Value: 2
+				30 text This page could not be found.
+	31 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		32 image
+
+The focused UI element is 1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/planner

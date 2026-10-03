@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-03T12:35:08.826Z",
+  "checks": [
+    {
+      "name": "paused reload preserves accepted actual time and PAUSED state",
+      "ok": true,
+      "detail": {
+        "state": "PAUSED"
+      }
+    },
+    {
+      "name": "dark desktop: paused controls remain usable and no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 1440,
+        "overflow": 0,
+        "mode": "dark",
+        "resume": true,
+        "text": "CLASSIC SYLF\nAlt+B\nQUEST FOCUS\nChoose circuit methods\nSubject: Focus Session\nPOMODORO\n00:30:00\n\nTotal elapsed: 00:00:05\n\nSESSION PAUSED — PRESS RESUME TO CONTINUE\n\nTODAY'S SUBJECT\n00:00:05\nDAILY CUMULATIVE\n00:00:05\nRESUME\nEND SESSION\nCOMPLETE QUEST\nTOOLS"
+      }
+    },
+    {
+      "name": "dark mobile: paused controls remain usable and no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 390,
+        "overflow": 0,
+        "mode": "dark",
+        "resume": true,
+        "text": "QUEST FOCUS\nChoose circuit methods\nSubject: Focus Session\nPOMODORO\n00:30:00\n\nTotal elapsed: 00:00:05\n\nSESSION PAUSED — PRESS RESUME TO CONTINUE\n\nTODAY'S SUBJECT\n00:00:05\nDAILY CUMULATIVE\n00:00:05\nRESUME\nEND SESSION\nCOMPLETE QUEST\nTOOLS"
+      }
+    },
+    {
+      "name": "light desktop: paused controls remain usable and no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 1440,
+        "overflow": 0,
+        "mode": "light",
+        "resume": true,
+        "text": "CLASSIC SYLF\nAlt+B\nQUEST FOCUS\nChoose circuit methods\nSubject: Focus Session\nPOMODORO\n00:30:00\n\nTotal elapsed: 00:00:05\n\nSESSION PAUSED — PRESS RESUME TO CONTINUE\n\nTODAY'S SUBJECT\n00:00:05\nDAILY CUMULATIVE\n00:00:05\nRESUME\nEND SESSION\nCOMPLETE QUEST\nTOOLS"
+      }
+    },
+    {
+      "name": "light mobile: paused controls remain usable and no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 390,
+        "overflow": 0,
+        "mode": "light",
+        "resume": true,
+        "text": "QUEST FOCUS\nChoose circuit methods\nSubject: Focus Session\nPOMODORO\n00:30:00\n\nTotal elapsed: 00:00:05\n\nSESSION PAUSED — PRESS RESUME TO CONTINUE\n\nTODAY'S SUBJECT\n00:00:05\nDAILY CUMULATIVE\n00:00:05\nRESUME\nEND SESSION\nCOMPLETE QUEST\nTOOLS"
+      }
+    },
+    {
+      "name": "custom desktop: paused controls remain usable and no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 1440,
+        "overflow": 0,
+        "mode": "light",
+        "resume": true,
+        "text": "CLASSIC SYLF\nAlt+B\nQUEST FOCUS\nChoose circuit methods\nSubject: Focus Session\nPOMODORO\n00:30:00\n\nTotal elapsed: 00:00:05\n\nSESSION PAUSED — PRESS RESUME TO CONTINUE\n\nTODAY'S SUBJECT\n00:00:05\nDAILY CUMULATIVE\n00:00:05\nRESUME\nEND SESSION\nCOMPLETE QUEST\nTOOLS"
+      }
+    },
+    {
+      "name": "custom mobile: paused controls remain usable and no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "width": 390,
+        "overflow": 0,
+        "mode": "light",
+        "resume": true,
+        "text": "QUEST FOCUS\nChoose circuit methods\nSubject: Focus Session\nPOMODORO\n00:30:00\n\nTotal elapsed: 00:00:05\n\nSESSION PAUSED — PRESS RESUME TO CONTINUE\n\nTODAY'S SUBJECT\n00:00:05\nDAILY CUMULATIVE\n00:00:05\nRESUME\nEND SESSION\nCOMPLETE QUEST\nTOOLS"
+      }
+    },
+    {
+      "name": "other-device END survives browser refresh without new accepted time",
+      "ok": true,
+      "detail": {
+        "state": "ENDED"
+      }
+    },
+    {
+      "name": "ending a timer does not complete study work",
+      "ok": true,
+      "detail": {
+        "status": "IN_PROGRESS"
+      }
+    }
+  ],
+  "screenshots": [
+    "dark-desktop.png",
+    "dark-mobile.png",
+    "light-desktop.png",
+    "light-mobile.png",
+    "custom-desktop.png",
+    "custom-mobile.png"
+  ],
+  "status": "PASSED",
+  "sessionId": 24,
+  "finalAcceptedFocusSeconds": 5,
+  "finishedAt": "2026-10-03T12:35:51.942Z"
+}

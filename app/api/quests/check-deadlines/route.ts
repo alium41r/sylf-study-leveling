@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
@@ -34,47 +35,40 @@ export async function GET(req: NextRequest) {
       return quest.scheduledFor < userLocalDate;
     });
 
-    for (const quest of overdueQuests) {
-      const user = quest.user;
-      
-      let penalty: number = DIFFICULTY_CONFIG[quest.difficulty as keyof typeof DIFFICULTY_CONFIG]?.hpPenalty || 10;
-      if (quest.isGateKeyApplied) penalty *= 3;
-      if (quest.isKamishWardActive) penalty = 0;
-
-      const newHp = Math.max(0, user.hp - penalty);
-
-      await prisma.$transaction(async (tx) => {
-        await tx.quest.update({
-          where: { id: quest.id },
-          data: { status: "FAILED" }
-        });
-
-        await tx.user.update({
-          where: { id: user.id },
-          data: { hp: newHp }
-        });
-
-        if (penalty > 0) {
-          await tx.hpLedger.create({
-            data: { userId: user.id, amount: -penalty, source: "QUEST_FAILED_LATE" },
-          });
+    let processed = 0;
+    for (const snapshot of overdueQuests) {
+      const changed = await executionTransaction(snapshot.userId, async tx => {
+        // Re-read execution and HP after the shared user lock; snapshots above
+        // select candidates, never determine a penalty or overwrite fresh HP.
+        await tx.$queryRaw`SELECT id FROM "StudySession" WHERE "userId"=${snapshot.userId} ORDER BY id FOR UPDATE`;
+        await tx.$queryRaw`SELECT id FROM "Quest" WHERE id=${snapshot.id} AND "userId"=${snapshot.userId} FOR UPDATE`;
+        const quest = await tx.quest.findFirst({ where: { id: snapshot.id, userId: snapshot.userId }, include: { user: true } });
+        if (!quest || !["PENDING", "IN_PROGRESS"].includes(quest.status) ||
+          quest.scheduledFor >= TimezoneService.getUserLocalDate(quest.user.timezone || "UTC")) return false;
+        if (quest.plannedMinutes !== null) {
+          const running = await tx.studySession.findFirst({ where: { questId: quest.id, endedAt: null,
+            OR: [{ executionState: "RUNNING" }, { executionState: null }] }, select: { id: true } });
+          if (running || quest.remainingDisposition !== "OPEN") return false;
+          await tx.$queryRaw`SELECT set_config('sylf.planner_v2_execution_quest',${String(quest.id)},true)`;
         }
-
-        const shieldText = quest.isKamishWardActive 
-          ? `\n\nKamish's Ward intercepted all damage.` 
-          : `\n\nPenalty: -${penalty} HP`;
-
-        await tx.systemMessage.create({
-          data: {
-            userId: user.id,
-            content: `**Quest Failed (Overdue)**\n\n"${quest.title}" was not completed by its deadline of ${quest.scheduledFor}.${shieldText}`,
-            type: "WARNING",
-          },
-        });
+        const user = quest.user;
+        let penalty: number = DIFFICULTY_CONFIG[quest.difficulty].hpPenalty;
+        if (quest.isGateKeyApplied) penalty *= 3;
+        if (quest.isKamishWardActive) penalty = 0;
+        const newHp = Math.max(0, user.hp - penalty);
+        await tx.quest.update({ where: { id: quest.id }, data: { status: "FAILED",
+          ...(quest.plannedMinutes !== null ? { executionVersion: { increment: 1 } } : {}) } });
+        await tx.user.update({ where: { id: user.id }, data: { hp: newHp } });
+        if (penalty > 0) await tx.hpLedger.create({ data: { userId: user.id, amount: -penalty, source: "QUEST_FAILED_LATE" } });
+        const shieldText = quest.isKamishWardActive ? `\n\nKamish's Ward intercepted all damage.` : `\n\nPenalty: -${penalty} HP`;
+        await tx.systemMessage.create({ data: { userId: user.id,
+          content: `**Quest Failed (Overdue)**\n\n"${quest.title}" was not completed by its deadline of ${quest.scheduledFor}.${shieldText}`, type: "WARNING" } });
+        return true;
       });
+      processed += Number(changed);
     }
 
-    return NextResponse.json({ processed: overdueQuests.length }, { status: 200 });
+    return NextResponse.json({ processed }, { status: 200 });
   } catch (error) {
     console.error("Cron check-deadlines error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

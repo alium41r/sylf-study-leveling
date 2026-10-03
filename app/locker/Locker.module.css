@@ -1,0 +1,404 @@
+/* ============================================================
+   SCHOLAR LOCKER & ARSENAL (CSS MODULE)
+   Harmonized with Scholar Dashboard, Timer, Goals, Social & Calendar.
+   Supports seamless Dark Mode and Light Mode switching.
+   ============================================================ */
+
+.lockerContainer {
+  --page: var(--app-canvas, #080d17);
+  --surface: var(--surface-1, #0e1522);
+  --surface-hover: var(--surface-raised, #121c2b);
+  --elevated: var(--surface-2, #121c2b);
+  --ink: var(--text-primary, #eef1f8);
+  --muted: var(--text-secondary, #a1adc1);
+  --quiet: var(--text-muted, #8291aa);
+  --accent: var(--accent-text, var(--accent-primary-light, #00f0ff));
+  --accent-strong: var(--accent-primary, #00c8e0);
+  --accent-dim: var(--accent-primary-dim, rgba(0, 240, 255, 0.12));
+  --accent-mid: var(--accent-primary-mid, rgba(0, 240, 255, 0.3));
+  --line: var(--border-strong, #263247);
+  --subtle-line: var(--border-subtle, #1a2435);
+  --card-shadow: 0 0 24px -4px var(--accent-dim), 0 4px 18px rgba(0, 0, 0, 0.35);
+  --card-shadow-hover: 0 0 32px -2px var(--accent-dim), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --top-highlight-opacity: 0.65;
+  --chip-bg: rgba(255, 255, 255, 0.03);
+  --chip-border: rgba(255, 255, 255, 0.08);
+  --btn-ghost-bg: rgba(255, 255, 255, 0.04);
+  --btn-ghost-border: rgba(255, 255, 255, 0.1);
+  --btn-ghost-hover: rgba(255, 255, 255, 0.08);
+  --tab-bar-bg: rgba(14, 21, 34, 0.85);
+  --tab-bar-border: rgba(38, 50, 71, 0.8);
+  --tab-bar-shadow: 0 0 24px rgba(0, 0, 0, 0.45), 0 0 16px -4px var(--accent-dim);
+  --track-bg: #080d17;
+  --track-border: rgba(255, 255, 255, 0.1);
+  --input-bg: #080d17;
+  --input-border: #1a2435;
+  --dialog-bg: #0e1522;
+  --dialog-border: #1a2435;
+  --dialog-backdrop: rgba(0, 0, 0, 0.75);
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100vh;
+  color: var(--ink);
+  color-scheme: dark;
+}
+
+:global(html[data-mode="light"]) .lockerContainer {
+  --page: var(--app-canvas, #f1f4fa);
+  --surface: var(--surface-1, #ffffff);
+  --surface-hover: var(--surface-raised, #f8fafc);
+  --elevated: var(--surface-2, #e5ebf5);
+  --ink: var(--text-primary, #18283e);
+  --muted: var(--text-secondary, #475c77);
+  --quiet: var(--text-muted, #52657f);
+  --accent: var(--accent-text, var(--accent-primary-dark, #0284c7));
+  --accent-strong: var(--accent-primary, #0369a1);
+  --accent-dim: var(--accent-primary-dim, rgba(2, 132, 199, 0.1));
+  --accent-mid: var(--accent-primary-mid, rgba(2, 132, 199, 0.28));
+  --line: var(--border-strong, #bdcbe0);
+  --subtle-line: var(--border-subtle, #d6dfed);
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --card-shadow-hover: 0 8px 24px -4px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+  --top-highlight-opacity: 0.35;
+  --chip-bg: rgba(15, 23, 42, 0.04);
+  --chip-border: rgba(15, 23, 42, 0.08);
+  --btn-ghost-bg: rgba(15, 23, 42, 0.04);
+  --btn-ghost-border: rgba(15, 23, 42, 0.12);
+  --btn-ghost-hover: rgba(15, 23, 42, 0.08);
+  --tab-bar-bg: rgba(255, 255, 255, 0.92);
+  --tab-bar-border: #cbd5e1;
+  --tab-bar-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  --track-bg: #e2e8f0;
+  --track-border: #cbd5e1;
+  --input-bg: #f8fafc;
+  --input-border: #cbd5e1;
+  --dialog-bg: #ffffff;
+  --dialog-border: #d6dfed;
+  --dialog-backdrop: rgba(15, 23, 42, 0.45);
+
+  color-scheme: light;
+}
+
+/* ─── Ambient Starlight Canvas Glow ────────────────────────── */
+.topGlow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 580px;
+  background:
+    radial-gradient(ellipse 65% 42% at 50% -5%, rgba(0, 240, 255, 0.18), transparent 70%),
+    radial-gradient(ellipse 45% 32% at 85% 10%, rgba(34, 51, 80, 0.22), transparent 70%);
+  overflow: hidden;
+}
+
+.topGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px),
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px);
+  background-size: 277px 213px, 367px 301px;
+  background-position: 31px 37px, 147px 73px;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
+}
+
+:global(html[data-mode="light"]) .topGlow {
+  background:
+    radial-gradient(ellipse 65% 42% at 50% -5%, rgba(180, 220, 245, 0.25), transparent 70%),
+    radial-gradient(ellipse 45% 32% at 85% 10%, rgba(195, 215, 245, 0.15), transparent 70%);
+}
+
+:global(html[data-mode="light"]) .topGlow::before {
+  opacity: 0.08;
+}
+
+/* ─── Typography & Eyebrow ─────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-strong);
+}
+
+.title {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ─── Cards & Surfaces ─────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, background-color 220ms ease;
+}
+
+.card:hover {
+  border-color: var(--line);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.stageCard {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.topHighlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary, #00f0ff), transparent);
+  opacity: var(--top-highlight-opacity);
+  pointer-events: none;
+}
+
+.topHighlightEmerald {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #10b981, transparent);
+  opacity: var(--top-highlight-opacity);
+  pointer-events: none;
+}
+
+/* ─── Top Switcher Tab Bar ─────────────────────────────────── */
+.tabSwitcher {
+  background: var(--tab-bar-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--tab-bar-border);
+  box-shadow: var(--tab-bar-shadow);
+  padding: 6px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ─── Navigation & Interactive Buttons ─────────────────────── */
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  color: var(--muted);
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.navBtn:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent-mid);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: var(--btn-ghost-bg);
+  border: 1px solid var(--btn-ghost-border);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: all 180ms ease;
+  cursor: pointer;
+}
+
+.ghostBtn:hover {
+  background: var(--btn-ghost-hover);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.activeGhostBtn {
+  background: var(--accent-dim);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-dim);
+}
+
+/* ─── Primary Action Gradient Buttons (Guaranteed Contrast) ── */
+.btnPrimaryAction {
+  background: linear-gradient(135deg, var(--accent-primary, #0284c7) 0%, var(--accent-primary-light, #00f0ff) 100%);
+  color: #ffffff !important;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px var(--accent-dim), 0 0 12px var(--accent-dim);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 9px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnPrimaryAction:hover {
+  box-shadow: 0 0 22px var(--accent-mid);
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.btnPrimaryAction:active {
+  transform: scale(0.98);
+}
+
+.btnPrimaryAction:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btnEmeraldAction {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff !important;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25), 0 0 12px rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 9px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnEmeraldAction:hover {
+  box-shadow: 0 0 22px rgba(16, 185, 129, 0.4);
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.btnEmeraldAction:active {
+  transform: scale(0.98);
+}
+
+.btnEmeraldAction:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ─── Input & Search Fields ────────────────────────────────── */
+.inputField {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.inputField:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+/* ─── Soundscape Card ──────────────────────────────────────── */
+.soundscapeCard {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 18px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.soundscapeCard:hover {
+  border-color: var(--line);
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.soundscapeCardActive {
+  background: var(--accent-dim);
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 24px -2px var(--accent-mid);
+  transform: translateY(-2px);
+}

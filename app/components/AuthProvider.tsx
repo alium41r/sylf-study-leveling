@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { clearClientCache } from "@/lib/client-data-cache";
+import { resolveApiUrl } from "@/lib/api-transport";
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -29,7 +30,9 @@ export interface UserStats {
   activeNameColor?: string;
   activeTheme?: string;
   activeBackground?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   characterConfig?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   socialLinks?: any;
   hunterRank: string;
   level: number;
@@ -47,6 +50,7 @@ export interface UserStats {
   activeSessionStartedAt?: string | null;
   sylph: number;
   hasCompletedOnboarding: boolean;
+  isAdmin?: boolean;
   hasPassword?: boolean;
   timezone?: string;
   createdAt: string;
@@ -65,9 +69,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // ─── Provider ────────────────────────────────────────────────
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({
+  children,
+  initialUser,
+}: {
+  children: ReactNode;
+  initialUser?: UserStats | null;
+}) {
+  const [user, setUser] = useState<UserStats | null>(initialUser ?? null);
+  const [isLoading, setIsLoading] = useState(initialUser === undefined);
 
   const mutateUser = useCallback((newUserData: UserStats | null) => {
     // S3: in-memory only — no user profile is persisted to localStorage.
@@ -78,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // in JS and no Bearer headers anywhere).
   const refreshStats = useCallback(async () => {
     try {
-      const res = await fetch("/api/user/stats", { credentials: "include" });
+      const res = await fetch(resolveApiUrl("/api/user/stats"), { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         setUser(data);
@@ -103,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      await fetch(resolveApiUrl("/api/auth/logout"), { method: "POST", credentials: "include" });
     } catch (e) {
       console.error("Logout API error:", e);
     }

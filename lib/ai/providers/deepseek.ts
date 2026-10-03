@@ -21,6 +21,8 @@ export interface DeepSeekAdapterOptions {
   thinking?: "enabled" | "disabled";
   /** Aborts the upstream HTTP request immediately when signalled. */
   signal?: AbortSignal;
+  /** Caller owns the bounded repair/fallback budget. */
+  singleAttempt?: boolean;
 }
 
 export class DeepSeekAdapter implements LLMAdapter {
@@ -46,7 +48,7 @@ export class DeepSeekAdapter implements LLMAdapter {
     return this.model;
   }
 
-  private resolveModelName(requested: string): string {
+  public resolveModelName(requested: string): string {
     if (process.env.DEEPSEEK_MODEL) return process.env.DEEPSEEK_MODEL;
     if (requested.includes("vision")) return "deepseek-v4-flash-vision-exp";
     if (requested.includes("reasoner")) return "deepseek-reasoner";
@@ -258,7 +260,7 @@ export class DeepSeekAdapter implements LLMAdapter {
         // If the deployed model doesn't accept the `thinking` param, retry
         // once without it instead of cascading to fallback providers.
         if (
-          options?.thinking &&
+          !options?.singleAttempt && options?.thinking &&
           err instanceof LLMProviderError &&
           (err as any).status === 400 &&
           typeof err.originalError === "string" &&
@@ -317,6 +319,8 @@ export class DeepSeekAdapter implements LLMAdapter {
       const text = rawText ? rawText.trim() : undefined;
 
       return {
+        finishReason: data.choices?.[0]?.finish_reason === "length" ? "MAX_TOKENS" :
+          ["stop", "tool_calls"].includes(data.choices?.[0]?.finish_reason) ? "STOP" : "OTHER",
         text,
         toolCalls:
           normalizedToolCalls.length > 0 ? normalizedToolCalls : undefined,

@@ -1,0 +1,879 @@
+/* ============================================================
+   SCHOLAR SOCIAL — NETWORK & FOCUS PARTIES (CSS MODULE)
+   Harmonized with Scholar Dashboard & Study Timer design tokens.
+   ============================================================ */
+
+.socialContainer {
+  --page: var(--app-canvas, #080d17);
+  --surface: var(--surface-1, #0e1522);
+  --elevated: var(--surface-2, #121c2b);
+  --ink: var(--text-primary, #eef1f8);
+  --muted: var(--text-secondary, #a1adc1);
+  --quiet: var(--text-muted, #8291aa);
+  --accent: var(--accent-text, var(--accent-primary-light, #b7cbf7));
+  --accent-strong: var(--accent-primary, #86aaf4);
+  --accent-dim: var(--accent-primary-dim, rgba(183, 203, 247, 0.12));
+  --accent-mid: var(--accent-primary-mid, rgba(134, 170, 244, 0.32));
+  --line: var(--border-strong, #263247);
+  --subtle-line: var(--border-subtle, #1a2435);
+  --gold: #d9b67b;
+  --gold-dim: rgba(217, 182, 123, 0.12);
+  --gold-border: rgba(217, 182, 123, 0.32);
+  --green: #a4d5bb;
+  --green-dim: rgba(164, 213, 187, 0.12);
+  --green-border: rgba(164, 213, 187, 0.32);
+  --red: #e07a7a;
+  --red-dim: rgba(224, 122, 122, 0.12);
+  --red-border: rgba(224, 122, 122, 0.32);
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100%;
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+
+:global(html[data-mode="light"]) .socialContainer {
+  --page: var(--app-canvas, #f1f4fa);
+  --surface: var(--surface-1, #ffffff);
+  --elevated: var(--surface-2, #e5ebf5);
+  --ink: var(--text-primary, #18283e);
+  --muted: var(--text-secondary, #475c77);
+  --quiet: var(--text-muted, #52657f);
+  --accent: var(--accent-text, var(--accent-primary-dark, #395d9f));
+  --accent-strong: var(--accent-primary, #2b4982);
+  --accent-dim: var(--accent-primary-dim, rgba(57, 93, 159, 0.1));
+  --accent-mid: var(--accent-primary-mid, rgba(57, 93, 159, 0.28));
+  --line: var(--border-strong, #bdcbe0);
+  --subtle-line: var(--border-subtle, #d6dfed);
+  --gold: #8a642f;
+  --gold-dim: rgba(138, 100, 47, 0.1);
+  --gold-border: rgba(138, 100, 47, 0.28);
+  --green: #2d6a4f;
+  --green-dim: rgba(45, 106, 79, 0.1);
+  --green-border: rgba(45, 106, 79, 0.28);
+  --red: #b91c1c;
+  --red-dim: rgba(185, 28, 28, 0.1);
+  --red-border: rgba(185, 28, 28, 0.28);
+  color-scheme: light;
+}
+
+/* ─── Ambient Starlight Canvas Glow ────────────────────────── */
+.topGlow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 520px;
+  background:
+    radial-gradient(ellipse 60% 35% at 50% -5%, rgba(34, 51, 80, 0.2), transparent 70%),
+    radial-gradient(ellipse 40% 25% at 85% 10%, rgba(24, 39, 59, 0.12), transparent 70%);
+  overflow: hidden;
+}
+
+.topGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px),
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px);
+  background-size: 277px 213px, 367px 301px;
+  background-position: 31px 37px, 147px 73px;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
+}
+
+:global(html[data-mode="light"]) .topGlow {
+  background:
+    radial-gradient(ellipse 60% 35% at 50% -5%, rgba(180, 200, 235, 0.15), transparent 70%),
+    radial-gradient(ellipse 40% 25% at 85% 10%, rgba(195, 215, 245, 0.1), transparent 70%);
+}
+
+:global(html[data-mode="light"]) .topGlow::before {
+  opacity: 0.08;
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3.5rem;
+}
+
+@media (min-width: 640px) {
+  .contentWrapper {
+    padding: 2rem 1.5rem 4.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .contentWrapper {
+    padding: 2.25rem 2rem 5rem;
+  }
+}
+
+/* ─── Header Typography ────────────────────────────────────── */
+.headerArea {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.headerTextGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-strong);
+}
+
+.title {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  margin: 0 0 0.35rem 0;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .headerActions {
+    margin-top: 0;
+    gap: 0.75rem;
+  }
+}
+
+.btnRequests {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btnRequests:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+}
+
+.btnRequestsBadge {
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: var(--red);
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.btnAddFriend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  color: #ffffff !important;
+  cursor: pointer;
+  box-shadow: 0 2px 10px var(--accent-dim);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnAddFriend:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-mid);
+}
+
+/* ─── Navigation Tabs ──────────────────────────────────────── */
+.tabsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--subtle-line);
+  padding-bottom: 2px;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabsContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.tabsList {
+  display: flex;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .tabsList {
+    gap: 1.75rem;
+  }
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  color: var(--ink);
+}
+
+.tabBtnActive {
+  color: var(--ink);
+  border-bottom-color: var(--accent-strong);
+}
+
+.tabBadge {
+  font-family: "Rajdhani", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+}
+
+.tabBadgeLive {
+  background: var(--green-dim);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+}
+
+/* ─── Search & Controls Filter Bar ─────────────────────────── */
+.controlsBar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .controlsBar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.15rem;
+  }
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .searchWrap {
+    max-width: 380px;
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--quiet);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 7px 12px 7px 34px;
+  border-radius: 8px;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.searchInput:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.filtersGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.chipGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--elevated);
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--subtle-line);
+}
+
+.filterChip {
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 140ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filterChip:hover {
+  color: var(--ink);
+}
+
+.filterChipActive {
+  background: var(--accent-strong);
+  color: #ffffff;
+  box-shadow: 0 1px 4px var(--accent-dim);
+}
+
+.filterChipStudyingActive {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.filterChipOnlineActive {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.sortSelectWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.sortSelect {
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.sortSelect option {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* ─── Cards & Surfaces (De-noised, Clean Ambient Elevation) ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--line);
+}
+
+:global(html[data-mode="light"]) .card {
+  border-color: var(--subtle-line);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.02);
+}
+
+/* ─── Friend Card ──────────────────────────────────────────── */
+.friendCard {
+  composes: card;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem 1.15rem;
+}
+
+@media (min-width: 640px) {
+  .friendCard {
+    padding: 1.25rem 1.35rem;
+  }
+}
+
+.friendCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.friendCardStudying {
+  border-color: var(--accent-mid);
+  box-shadow: 0 4px 20px -2px var(--accent-dim);
+}
+
+.friendCardStudying::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, var(--accent-dim), transparent 70%);
+  pointer-events: none;
+}
+
+.cardHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.statusStudying {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+}
+
+.statusOnline {
+  background: var(--green-dim);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+}
+
+.statusOffline {
+  color: var(--quiet);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.youBadge {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rankBadgesGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rankChip {
+  font-family: "Rajdhani", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  border: 1px solid var(--subtle-line);
+  background: var(--elevated);
+  color: var(--muted);
+}
+
+.levelText {
+  font-family: "Rajdhani", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--quiet);
+}
+
+/* Character Stage */
+.characterStage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 145px;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 220ms ease;
+}
+
+.characterStage:hover {
+  transform: scale(1.03);
+}
+
+.characterInfo {
+  text-align: center;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.characterName {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 150ms ease;
+}
+
+.characterStage:hover .characterName {
+  color: var(--accent);
+}
+
+.characterHandle {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--quiet);
+  margin: 1px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Study Timer Box */
+.studyTimerBox {
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: center;
+  margin-top: 0.5rem;
+  position: relative;
+  z-index: 2;
+  transition: all 180ms ease;
+}
+
+.studyTimerBoxStudying {
+  border-color: var(--accent-mid);
+  background: rgba(14, 21, 34, 0.95);
+  box-shadow: 0 0 16px -2px var(--accent-dim);
+}
+
+.studyTimerLabel {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+}
+
+.studyTimerClock {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  display: block;
+  margin-top: 1px;
+  user-select: none;
+}
+
+.studyTimerClockActive {
+  color: var(--accent);
+  text-shadow: 0 0 16px var(--accent-dim);
+}
+
+/* Card Action Buttons */
+.cardActionsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 0.6rem;
+  position: relative;
+  z-index: 2;
+}
+
+.btnActionSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 150ms ease;
+  text-decoration: none;
+}
+
+.btnActionSecondary:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+}
+
+.btnActionPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--accent-strong);
+  border: 1px solid var(--accent-strong);
+  color: #ffffff !important;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--accent-dim);
+  transition: all 150ms ease;
+  text-decoration: none;
+}
+
+.btnActionPrimary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.btnActionMessage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btnActionMessage:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff !important;
+}
+
+/* ─── Messages & Groups Panel ──────────────────────────────── */
+.panelCard {
+  composes: card;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .panelCard {
+    padding: 1.5rem 1.75rem;
+  }
+}
+
+.panelHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--subtle-line);
+  padding-bottom: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .panelHeader {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.panelTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panelIconBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.panelTitle {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.panelSubtitle {
+  font-size: 11px;
+  font-family: "Rajdhani", sans-serif;
+  color: var(--muted);
+  margin: 1px 0 0 0;
+}
+
+.conversationRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  transition: all 160ms ease;
+  text-decoration: none;
+}
+
+.conversationRow:hover {
+  border-color: var(--line);
+  transform: translateX(2px);
+  background: var(--surface);
+}
+
+.conversationRowUnread {
+  border-color: var(--accent-mid);
+  background: rgba(183, 203, 247, 0.06);
+  border-left: 3px solid var(--accent-strong);
+}

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, UserPlus, Inbox, Loader2 } from "lucide-react";
 import { CharacterRenderer } from "./character/CharacterRenderer";
+import { backdropVariants, modalDialogVariants } from "@/lib/motion";
 
 export interface FriendRequestItem {
   id: number;
@@ -52,23 +53,29 @@ export function FriendRequestsModal({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <motion.div
+      key="friend-requests-modal-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.15 } }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+        variants={backdropVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
         className="absolute inset-0 bg-black/75 backdrop-blur-md"
         onClick={onClose}
       />
 
       {/* Modal Card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.94, y: 12 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.94, y: 12 }}
-        transition={{ type: "spring", damping: 28, stiffness: 380 }}
+        variants={modalDialogVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
         className="system-card relative w-full max-w-xl p-5 sm:p-6 z-10 flex flex-col max-h-[85vh] shadow-2xl border border-border-subtle bg-bg-panel/95 backdrop-blur-xl rounded-2xl"
       >
         {/* Close Button */}
@@ -228,6 +235,6 @@ export function FriendRequestsModal({
           )}
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

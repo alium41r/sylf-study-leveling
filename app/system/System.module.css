@@ -1,0 +1,696 @@
+/* ============================================================
+   THE SYSTEM — AI WORKSPACE & INTELLIGENCE SUITE (CSS MODULE)
+   Harmonized with Scholar Dashboard, Social & Timer design tokens.
+   ============================================================ */
+
+.systemContainer {
+  --page: var(--app-canvas, #080d17);
+  --surface: var(--surface-1, #0e1522);
+  --elevated: var(--surface-2, #121c2b);
+  --ink: var(--text-primary, #eef1f8);
+  --muted: var(--text-secondary, #a1adc1);
+  --quiet: var(--text-muted, #8291aa);
+  --accent: var(--accent-text, var(--accent-primary-light, #b7cbf7));
+  --accent-strong: var(--accent-primary, #86aaf4);
+  --accent-dim: var(--accent-primary-dim, rgba(183, 203, 247, 0.12));
+  --accent-mid: var(--accent-primary-mid, rgba(134, 170, 244, 0.32));
+  --line: var(--border-strong, #263247);
+  --subtle-line: var(--border-subtle, #1a2435);
+  --gold: #d9b67b;
+  --gold-dim: rgba(217, 182, 123, 0.12);
+  --gold-border: rgba(217, 182, 123, 0.32);
+  --green: #a4d5bb;
+  --green-dim: rgba(164, 213, 187, 0.12);
+  --green-border: rgba(164, 213, 187, 0.32);
+  --red: #e07a7a;
+  --red-dim: rgba(224, 122, 122, 0.12);
+  --red-border: rgba(224, 122, 122, 0.32);
+  --tab-bar-bg: rgba(14, 21, 34, 0.88);
+  --tab-bar-border: var(--border-subtle, #1a2435);
+  --tab-bar-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  overscroll-behavior: none;
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+
+:global(html[data-mode="light"]) .systemContainer {
+  --page: var(--app-canvas, #f1f4fa);
+  --surface: var(--surface-1, #ffffff);
+  --elevated: var(--surface-2, #e5ebf5);
+  --ink: var(--text-primary, #18283e);
+  --muted: var(--text-secondary, #475c77);
+  --quiet: var(--text-muted, #52657f);
+  --accent: var(--accent-text, var(--accent-primary-dark, #395d9f));
+  --accent-strong: var(--accent-primary, #2b4982);
+  --accent-dim: var(--accent-primary-dim, rgba(57, 93, 159, 0.1));
+  --accent-mid: var(--accent-primary-mid, rgba(57, 93, 159, 0.28));
+  --line: var(--border-strong, #bdcbe0);
+  --subtle-line: var(--border-subtle, #d6dfed);
+  --gold: #8a642f;
+  --gold-dim: rgba(138, 100, 47, 0.1);
+  --gold-border: rgba(138, 100, 47, 0.28);
+  --green: #2d6a4f;
+  --green-dim: rgba(45, 106, 79, 0.1);
+  --green-border: rgba(45, 106, 79, 0.28);
+  --red: #b91c1c;
+  --red-dim: rgba(185, 28, 28, 0.1);
+  --red-border: rgba(185, 28, 28, 0.28);
+  --tab-bar-bg: rgba(255, 255, 255, 0.94);
+  --tab-bar-border: var(--border-subtle, #d6dfed);
+  --tab-bar-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  color-scheme: light;
+}
+
+/* ─── Ambient Starlight Canvas Glow ────────────────────────── */
+.topGlow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 520px;
+  background:
+    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(34, 51, 80, 0.22), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 85% 10%, rgba(24, 39, 59, 0.14), transparent 70%);
+  overflow: hidden;
+}
+
+.topGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px),
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px);
+  background-size: 277px 213px, 367px 301px;
+  background-position: 31px 37px, 147px 73px;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
+}
+
+:global(html[data-mode="light"]) .topGlow {
+  background:
+    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(180, 200, 235, 0.18), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 85% 10%, rgba(195, 215, 245, 0.12), transparent 70%);
+}
+
+:global(html[data-mode="light"]) .topGlow::before {
+  opacity: 0.08;
+}
+
+/* ─── Main Content Column ──────────────────────────────────── */
+.mainColumn {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0%;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── Workspace Header Area ────────────────────────────────── */
+.workspaceHeader {
+  flex-shrink: 0;
+  padding: 0.65rem 1rem 0.5rem;
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid var(--subtle-line);
+}
+
+@media (min-width: 640px) {
+  .workspaceHeader {
+    padding: 0.75rem 1.75rem 0.6rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .workspaceHeader {
+    padding: 0.85rem 2.25rem 0.65rem;
+  }
+}
+
+/* ─── Objectives-Style Centered Tab Switcher ───────────────── */
+.tabSwitcher {
+  background: var(--tab-bar-bg);
+  border: 1px solid var(--tab-bar-border);
+  box-shadow: var(--tab-bar-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.headerTopRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.eyebrowGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  cursor: pointer;
+  user-select: none;
+  transition: color 150ms ease;
+}
+
+.eyebrow:hover {
+  color: var(--accent-strong);
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-strong);
+}
+
+.intelligenceChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+:global(html[data-mode="light"]) .intelligenceChip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #059669;
+}
+
+.radarBeacon {
+  position: relative;
+  display: flex;
+  width: 6px;
+  height: 6px;
+}
+
+.radarPing {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: #34d399;
+  opacity: 0.75;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.radarDot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #10b981;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.title {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(1.35rem, 2.25vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.btnArchivesTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 12px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 180ms ease;
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btnArchivesTrigger:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-dim);
+}
+
+.btnArchivesTriggerActive {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 14px var(--accent-dim);
+}
+
+.triggerBadge {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--subtle-line);
+  color: var(--muted);
+}
+
+/* Legacy alias for any lingering references */
+.btnMobileHistory {
+  composes: btnArchivesTrigger;
+}
+
+/* ─── Workspace Tabs (Retained for backwards compatibility) ── */
+.tabsContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0.5rem;
+}
+
+.tabBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.tabBtn:hover {
+  color: var(--ink);
+}
+
+.tabBtnActive {
+  color: var(--accent);
+}
+
+.tabBadge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--subtle-line);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 2px;
+}
+
+.tabBadgeLocked {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+:global(html[data-mode="light"]) .tabBadgeLocked {
+  background: rgba(217, 119, 6, 0.15);
+  border-color: rgba(217, 119, 6, 0.4);
+  color: #b45309;
+}
+
+/* ─── Primary Action Gradient Button (Ensures High Contrast Text) ── */
+.btnPrimaryAction {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%);
+  color: #ffffff !important;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 14px var(--accent-dim);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnPrimaryAction:hover {
+  box-shadow: 0 0 20px var(--accent-mid);
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.btnPrimaryAction:active {
+  transform: scale(0.98);
+}
+
+.btnPrimaryAction:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ─── Session History Rail (Desktop & Mobile) ──────────────── */
+.sidebarContainer {
+  background: var(--surface);
+  border-left: 1px solid var(--subtle-line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+:global(html[data-mode="light"]) .sidebarContainer {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.sidebarHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--subtle-line);
+  background: var(--elevated);
+}
+
+:global(html[data-mode="light"]) .sidebarHeader {
+  background: rgba(241, 244, 250, 0.7);
+}
+
+.btnNewChatCompact {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 160ms ease;
+  user-select: none;
+}
+
+.btnNewChatCompact:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #ffffff;
+  box-shadow: 0 0 12px var(--accent-mid);
+  transform: translateY(-0.5px);
+}
+
+.btnNewChatCompact:active {
+  transform: scale(0.97);
+}
+
+.sidebarTitleGroup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+
+.sidebarHeading {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.countPill {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  color: var(--muted);
+}
+
+.btnSelectMode {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--subtle-line);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 140ms ease;
+  user-select: none;
+}
+
+.btnSelectMode:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+}
+
+.btnSelectModeActive {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchBoxInput {
+  width: 100%;
+  padding: 6px 26px 6px 28px;
+  border-radius: 8px;
+  background: var(--page);
+  border: 1px solid var(--subtle-line);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+  transition: all 150ms ease;
+}
+
+.searchBoxInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-dim);
+}
+
+.searchBoxInput::placeholder {
+  color: var(--quiet);
+}
+
+.sessionItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.sessionItem:hover {
+  background: var(--elevated);
+  border-color: var(--subtle-line);
+  color: var(--ink);
+}
+
+.sessionItemActive {
+  background: linear-gradient(90deg, var(--accent-dim) 0%, transparent 100%);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 0 12px var(--accent-dim);
+}
+
+.sessionActiveBar {
+  position: absolute;
+  left: 2px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 9999px;
+  background: var(--accent-strong);
+  box-shadow: 0 0 8px var(--accent-strong);
+}
+
+/* ─── Command Deck & Messages in ConversationPanel ─────────── */
+.deckWrapper {
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 12px 14px 10px;
+  transition: all 200ms ease;
+}
+
+:global(html[data-mode="light"]) .deckWrapper {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 25px rgba(24, 40, 62, 0.08);
+}
+
+.deckWrapper:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 24px var(--accent-dim), 0 10px 32px rgba(0, 0, 0, 0.35);
+}
+
+.starterCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.starterCard:hover {
+  background: var(--elevated);
+  border-color: var(--accent-mid);
+  color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px var(--accent-dim);
+}
+
+.messageBubbleUser {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(56, 189, 248, 0.05) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 18px;
+  border-top-right-radius: 6px;
+  color: var(--ink);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+:global(html[data-mode="light"]) .messageBubbleUser {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(56, 189, 248, 0.04) 100%);
+  border-color: rgba(2, 132, 199, 0.25);
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.06);
+}
+
+.messageBubbleSystem {
+  background: rgba(14, 21, 34, 0.75);
+  border: 1px solid var(--subtle-line);
+  border-radius: 20px;
+  border-top-left-radius: 6px;
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+:global(html[data-mode="light"]) .messageBubbleSystem {
+  background: #ffffff;
+  border-color: var(--subtle-line);
+  box-shadow: 0 4px 16px rgba(24, 40, 62, 0.06);
+}
+
+/* ─── Planner Tab Card ─────────────────────────────────────── */
+.plannerCard {
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+:global(html[data-mode="light"]) .plannerCard {
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(24, 40, 62, 0.07);
+}
+
+@media (min-width: 640px) {
+  .plannerCard {
+    padding: 2rem;
+  }
+}

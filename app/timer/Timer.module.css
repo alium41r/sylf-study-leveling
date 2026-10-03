@@ -1,0 +1,1408 @@
+/* ============================================================
+   STUDY TIMER — FOCUS SESSIONS (CSS MODULE)
+   Harmonized with Scholar Dashboard & Landing Page design tokens.
+   ============================================================ */
+
+.timerContainer,
+.modalOverlay {
+  --page: var(--app-canvas, #080d17);
+  --surface: var(--surface-1, #0e1522);
+  --elevated: var(--surface-2, #121c2b);
+  --ink: var(--text-primary, #eef1f8);
+  --muted: var(--text-secondary, #a1adc1);
+  --quiet: var(--text-muted, #8291aa);
+  --accent: var(--accent-text, var(--accent-primary-light, #b7cbf7));
+  --accent-strong: var(--accent-primary, #86aaf4);
+  --accent-dim: var(--accent-primary-dim, rgba(183, 203, 247, 0.12));
+  --accent-mid: var(--accent-primary-mid, rgba(134, 170, 244, 0.32));
+  --line: var(--border-strong, #263247);
+  --subtle-line: var(--border-subtle, #1a2435);
+  --gold: #d9b67b;
+  --gold-dim: rgba(217, 182, 123, 0.12);
+  --gold-border: rgba(217, 182, 123, 0.32);
+  --green: #a4d5bb;
+  --green-dim: rgba(164, 213, 187, 0.12);
+  --green-border: rgba(164, 213, 187, 0.32);
+  --red: #e07a7a;
+  --red-dim: rgba(224, 122, 122, 0.12);
+  --red-border: rgba(224, 122, 122, 0.32);
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+
+.timerContainer {
+  min-height: 100%;
+}
+
+:global(html[data-mode="light"]) .timerContainer,
+:global(html[data-mode="light"]) .modalOverlay {
+  --page: var(--app-canvas, #f1f4fa);
+  --surface: var(--surface-1, #ffffff);
+  --elevated: var(--surface-2, #e5ebf5);
+  --ink: var(--text-primary, #18283e);
+  --muted: var(--text-secondary, #475c77);
+  --quiet: var(--text-muted, #52657f);
+  --accent: var(--accent-text, var(--accent-primary-dark, #395d9f));
+  --accent-strong: var(--accent-primary, #2b4982);
+  --accent-dim: var(--accent-primary-dim, rgba(57, 93, 159, 0.1));
+  --accent-mid: var(--accent-primary-mid, rgba(57, 93, 159, 0.28));
+  --line: var(--border-strong, #bdcbe0);
+  --subtle-line: var(--border-subtle, #d6dfed);
+  --gold: #8a642f;
+  --gold-dim: rgba(138, 100, 47, 0.1);
+  --gold-border: rgba(138, 100, 47, 0.28);
+  --green: #2d6a4f;
+  --green-dim: rgba(45, 106, 79, 0.1);
+  --green-border: rgba(45, 106, 79, 0.28);
+  --red: #b91c1c;
+  --red-dim: rgba(185, 28, 28, 0.1);
+  --red-border: rgba(185, 28, 28, 0.28);
+  color-scheme: light;
+}
+
+/* ─── Ambient Starlight Canvas Glow ────────────────────────── */
+.topGlow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 520px;
+  background:
+    radial-gradient(ellipse 60% 35% at 50% -5%, rgba(34, 51, 80, 0.2), transparent 70%),
+    radial-gradient(ellipse 40% 25% at 85% 10%, rgba(24, 39, 59, 0.12), transparent 70%);
+  overflow: hidden;
+}
+
+.topGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px),
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px);
+  background-size: 277px 213px, 367px 301px;
+  background-position: 31px 37px, 147px 73px;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
+}
+
+:global(html[data-mode="light"]) .topGlow {
+  background:
+    radial-gradient(ellipse 60% 35% at 50% -5%, rgba(180, 200, 235, 0.15), transparent 70%),
+    radial-gradient(ellipse 40% 25% at 85% 10%, rgba(195, 215, 245, 0.1), transparent 70%);
+}
+
+:global(html[data-mode="light"]) .topGlow::before {
+  opacity: 0.08;
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3.5rem;
+  transition: filter 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 260ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contentWrapperBlurred {
+  filter: blur(10px);
+  opacity: 0.38;
+  pointer-events: none;
+  user-select: none;
+  transform: scale(0.995);
+}
+
+@media (min-width: 640px) {
+  .contentWrapper {
+    padding: 2rem 1.5rem 4.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .contentWrapper {
+    padding: 2.25rem 2rem 5rem;
+  }
+}
+
+/* ─── Header Typography ────────────────────────────────────── */
+.headerArea {
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-strong);
+}
+
+.title {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  margin: 0 0 0.5rem 0;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 1.75rem 0;
+  line-height: 1.5;
+}
+
+/* ─── Cards & Surfaces (De-noised, Clean Ambient Elevation) ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+  position: relative;
+}
+
+.card:hover {
+  border-color: var(--line);
+}
+
+:global(html[data-mode="light"]) .card {
+  border-color: var(--subtle-line);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.02);
+}
+
+/* ─── Hero Cumulative Focus Card ───────────────────────────── */
+.heroTimerCard {
+  composes: card;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  margin-bottom: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .heroTimerCard {
+    padding: 2.5rem 2.25rem;
+  }
+}
+
+.heroDateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  padding: 4px 14px;
+  border-radius: 9999px;
+}
+
+.heroClock {
+  font-size: clamp(2.75rem, 7vw, 5.25rem);
+  font-weight: 700;
+  font-family: "Rajdhani", "Inter", -apple-system, BlinkMacSystemFont, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  color: var(--ink);
+  text-shadow: 0 0 22px var(--accent-dim);
+  margin: 0.35rem 0;
+  user-select: none;
+}
+
+.heroCaption {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 420px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Two-Column Layout ────────────────────────────────────── */
+.splitLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .splitLayout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.columnArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionIcon {
+  color: var(--accent);
+}
+
+.sectionTitle {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.countChip {
+  font-family: "Rajdhani", -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--muted);
+}
+
+.btnAddSubject {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btnAddSubject:hover {
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+  background: var(--accent-dim);
+}
+
+/* ─── Item Cards (Quests & Subjects) ───────────────────────── */
+.itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.itemCard {
+  composes: card;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.itemCard:hover {
+  transform: translateX(2px);
+  border-color: var(--line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+.itemMain {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.playBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.playBtn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+  transform: scale(1.05);
+  box-shadow: 0 2px 10px var(--accent-dim);
+}
+
+.playIcon {
+  margin-left: 2px;
+}
+
+.itemContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.itemTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+  min-width: 0;
+}
+
+.itemTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.itemMeta {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.itemNote {
+  font-size: 11px;
+  color: var(--quiet);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.codeBadge {
+  font-size: 10.5px;
+  font-family: "Rajdhani", monospace;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1.5px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.diffChip {
+  font-size: 10.5px;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.diffEasy { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+.diffNormal { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-mid); }
+.diffHard { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+.diffExpert { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
+
+.timerReadout {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  flex-shrink: 0;
+  text-align: right;
+  letter-spacing: 0.02em;
+}
+
+.timerTargetMuted {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--quiet);
+}
+
+/* ─── Glassmorphism Tooltip for Quest Title ─────────────────── */
+.tooltipWrapper {
+  position: relative;
+  min-width: 0;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.tooltipPopup {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 6px;
+  display: none;
+  z-index: 60;
+  background: rgba(14, 21, 34, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--subtle-line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--ink);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  white-space: normal;
+  min-width: 180px;
+  max-width: 300px;
+  pointer-events: none;
+}
+
+.tooltipWrapper:hover .tooltipPopup {
+  display: block;
+}
+
+/* ─── Floating Liquid Glass Add Subject Modal ──────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 0.75rem) 0.75rem calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 640px) {
+  .modalOverlay {
+    padding: 1.5rem;
+  }
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 14, 0.9);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  cursor: pointer;
+}
+
+:global(html[data-mode="light"]) .modalBackdrop {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.floatingLiquidModal {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 520px;
+  margin: auto 0;
+  max-height: calc(100dvh - 1.5rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, rgba(13, 20, 34, 0.97) 0%, rgba(8, 13, 24, 0.99) 100%);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 1.25rem 1rem;
+  box-shadow:
+    0 28px 70px -10px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 1px 2px 0 rgba(255, 255, 255, 0.25) inset,
+    0 0 45px -8px var(--accent-dim);
+  overflow: hidden;
+  color: var(--ink);
+}
+
+@media (min-width: 640px) {
+  .floatingLiquidModal {
+    border-radius: 20px;
+    padding: 1.65rem;
+    max-height: calc(100dvh - 3rem);
+  }
+}
+
+:global(html[data-mode="light"]) .floatingLiquidModal {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(246, 249, 255, 0.99) 100%);
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  box-shadow:
+    0 24px 50px -10px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(15, 23, 42, 0.08) inset,
+    0 1px 2px 0 rgba(255, 255, 255, 1) inset,
+    0 8px 24px -4px rgba(0, 0, 0, 0.06);
+}
+
+.specularTopRim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 15%,
+    rgba(255, 255, 255, 0.7) 50%,
+    rgba(255, 255, 255, 0.15) 85%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+:global(html[data-mode="light"]) .specularTopRim {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 20%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.5) 80%,
+    transparent 100%
+  );
+}
+
+.ambientGlassOrb {
+  position: absolute;
+  top: -60px;
+  right: -50px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+  opacity: 0.6;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .modalHeader {
+    gap: 1rem;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.9rem;
+  }
+}
+
+:global(html[data-mode="light"]) .modalHeader {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.modalTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .modalTitleGroup {
+    gap: 12px;
+  }
+}
+
+.modalIconBadge {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent-mid);
+  box-shadow: 0 0 12px -2px var(--accent-dim);
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .modalIconBadge {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+}
+
+.modalTitle {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.modalSubtitle {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 2px 0 0 0;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .modalSubtitle {
+    font-size: 12px;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+}
+
+.modalCloseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 180ms ease;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .modalCloseBtn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.modalCloseBtn:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+:global(html[data-mode="light"]) .modalCloseBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global(html[data-mode="light"]) .modalCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.16);
+  color: var(--ink);
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 2px;
+}
+
+@media (min-width: 640px) {
+  .modalForm {
+    gap: 1.1rem;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 520px) {
+  .formGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (min-width: 640px) {
+  .fieldGroup {
+    gap: 5px;
+  }
+}
+
+.fieldLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .fieldLabel {
+    font-size: 11px;
+  }
+}
+
+.fieldLabelOptional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--quiet);
+}
+
+.textInput,
+.selectInput,
+.textareaInput {
+  width: 100%;
+  background: rgba(8, 13, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  padding: 8px 11px;
+  color: var(--ink);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+@media (min-width: 640px) {
+  .textInput,
+  .selectInput,
+  .textareaInput {
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 13.5px;
+  }
+}
+
+:global(html[data-mode="light"]) .textInput,
+:global(html[data-mode="light"]) .selectInput,
+:global(html[data-mode="light"]) .textareaInput {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  color: #0f172a;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.textInput:focus,
+.selectInput:focus,
+.textareaInput:focus {
+  border-color: var(--accent-strong);
+  background: rgba(12, 19, 33, 0.98);
+  box-shadow: 0 0 0 3px var(--accent-dim), 0 0 16px -2px var(--accent-dim);
+}
+
+:global(html[data-mode="light"]) .textInput:focus,
+:global(html[data-mode="light"]) .selectInput:focus,
+:global(html[data-mode="light"]) .textareaInput:focus {
+  background: #ffffff;
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px var(--accent-dim), 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.selectInput option {
+  background: #0e1522;
+  color: #eef1f8;
+}
+
+:global(html[data-mode="light"]) .selectInput option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.textareaInput {
+  resize: vertical;
+  min-height: 52px;
+  line-height: 1.4;
+}
+
+@media (min-width: 640px) {
+  .textareaInput {
+    min-height: 64px;
+    line-height: 1.45;
+  }
+}
+
+.helperText {
+  font-size: 10.5px;
+  color: var(--quiet);
+  line-height: 1.35;
+  margin: 1px 0 0 0;
+}
+
+@media (min-width: 640px) {
+  .helperText {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+}
+
+.colorPickerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .colorPickerRow {
+    gap: 12px;
+  }
+}
+
+.colorLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .colorLabel {
+    font-size: 11px;
+  }
+}
+
+.swatchGroup {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .swatchGroup {
+    gap: 8px;
+  }
+}
+
+.colorSwatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+  padding: 0;
+  opacity: 0.8;
+}
+
+@media (min-width: 640px) {
+  .colorSwatch {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.colorSwatch:hover {
+  opacity: 1;
+  transform: scale(1.16);
+}
+
+.colorSwatchActive {
+  opacity: 1;
+  transform: scale(1.24);
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.55);
+}
+
+:global(html[data-mode="light"]) .colorSwatchActive {
+  border-color: #0f172a;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .formActions {
+    gap: 10px;
+    padding-top: 1rem;
+  }
+}
+
+:global(html[data-mode="light"]) .formActions {
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.btnCancel {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition: all 180ms ease;
+}
+
+@media (min-width: 640px) {
+  .btnCancel {
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 9px;
+  }
+}
+
+.btnCancel:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+:global(html[data-mode="light"]) .btnCancel {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global(html[data-mode="light"]) .btnCancel:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.16);
+  color: var(--ink);
+}
+
+.btnSubmit {
+  background: var(--accent-strong, #86aaf4);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 7px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px -3px var(--accent-dim);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .btnSubmit {
+    font-size: 13px;
+    padding: 8px 20px;
+    border-radius: 9px;
+  }
+}
+
+.btnSubmit:hover:not(:disabled) {
+  background: var(--accent, #b7cbf7);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -2px var(--accent-mid);
+  filter: brightness(1.08);
+}
+
+:global(html[data-mode="light"]) .btnSubmit {
+  background: var(--accent-strong, #2b4982);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btnSubmit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Empty States ─────────────────────────────────────────── */
+.emptyState {
+  padding: 2.25rem 1.5rem;
+  border: 1px dashed var(--subtle-line);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.emptyIconCircle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  display: grid;
+  place-items: center;
+  color: var(--quiet);
+  margin-bottom: 0.2rem;
+}
+
+.emptyText {
+  font-size: 12.5px;
+  color: var(--muted);
+  max-width: 260px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.emptyLink {
+  margin-top: 0.35rem;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+
+.emptyLink:hover {
+  background: var(--accent);
+  color: var(--page);
+  border-color: var(--accent);
+}
+
+/* ─── Subject Management Affordance & Dropdown Menu ───────── */
+.itemRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.menuContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.btnMenuTrigger {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+.btnMenuTrigger:hover,
+.btnMenuTrigger:focus-visible {
+  color: var(--ink);
+  background: var(--elevated);
+  border-color: var(--subtle-line);
+}
+
+.dropdownMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 40;
+  min-width: 155px;
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: all 120ms ease;
+  font-family: inherit;
+}
+
+.menuItem:hover,
+.menuItem:focus-visible {
+  background: var(--elevated);
+  color: var(--ink);
+}
+
+.menuItemDanger {
+  color: #ef4444;
+}
+
+.menuItemDanger:hover,
+.menuItemDanger:focus-visible {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+/* ─── Delete Confirmation Modal ────────────────────────────── */
+.confirmModalCard {
+  composes: floatingLiquidModal;
+  max-width: 480px;
+}
+
+.warningIconBadge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: grid;
+  place-items: center;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.confirmBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.blockedAlert {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  font-size: 13px;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.activeWarning {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+  font-size: 12.5px;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keptSection {
+  background: var(--elevated);
+  border: 1px solid var(--subtle-line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.keptTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.keptList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.keptItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.keptCheck {
+  color: var(--green, #10b981);
+  flex-shrink: 0;
+}
+
+.btnDelete {
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: #dc2626;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnDelete:hover:not(:disabled) {
+  background: #b91c1c;
+  box-shadow: 0 0 16px rgba(220, 38, 38, 0.4);
+}
+
+.btnDelete:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── Undo Toast Notification ──────────────────────────────── */
+.undoToast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  color: var(--ink);
+  font-size: 13.5px;
+  animation: toastSlideIn 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btnUndo {
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: inherit;
+}
+
+.btnUndo:hover {
+  background: var(--accent-strong);
+  color: #ffffff;
+}
+
+.undoClose {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.undoClose:hover {
+  color: var(--ink);
+}
+

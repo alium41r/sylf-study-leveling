@@ -17,7 +17,7 @@ import { PagePresence, resolvePresence } from "./page-presence";
 import { QuotaInfo, AiPlannerModal } from "../AiPlannerModal";
 import SystemFab from "./SystemFab";
 import SystemOverlay from "./SystemOverlay";
-import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 
 // ============================================================
 // System AI Provider — the client-side intelligence layer.

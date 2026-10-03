@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "finishedAt": "2026-10-03T12:31:34.006Z",
+  "files": 46,
+  "passed": 494,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "missing": [],
+  "unexpected": [],
+  "failures": [],
+  "database": "No database/provider credentials; database suites run exclusively in the disposable PostgreSQL harness."
+}

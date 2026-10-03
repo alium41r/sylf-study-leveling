@@ -51,6 +51,8 @@ export interface LLMUsage {
 }
 
 export interface LLMResponse {
+  /** Bounded completion metadata for callers that own structured-output validation. */
+  finishReason?: "STOP" | "MAX_TOKENS" | "OTHER";
   text?: string;
   toolCalls?: NormalizedToolCall[];
   rawCandidateParts?: any[]; // Provider raw candidate parts for preserving reasoning chain
@@ -76,13 +78,16 @@ export interface LLMGenerateOptions {
   temperature?: number;
   maxTokens?: number;
   /**
-   * DeepSeek-only: control the reasoning/thinking mode for models that
+   * Control the reasoning/thinking mode for models that
    * support it. "disabled" skips generating (and billing) reasoning tokens
-   * — ideal for simple/fast tiers. Adapters that don't support it ignore it.
+   * — ideal for simple/fast tiers. The single-attempt Gemini 2.5 Flash path
+   * also supports disabled thinking; unsupported adapters/models ignore it.
    */
   thinking?: "enabled" | "disabled";
   /** Aborts the upstream HTTP request immediately when signalled. */
   signal?: AbortSignal;
+  /** Caller owns the bounded repair/fallback budget. */
+  singleAttempt?: boolean;
 }
 
 export interface LLMAdapter {

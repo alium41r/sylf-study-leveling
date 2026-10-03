@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function LandingFooter() {
+export default function LandingFooter({
+  showAppAccess,
+}: {
+  showAppAccess: boolean;
+}) {
   const [modalContent, setModalContent] = useState<"privacy" | "terms" | null>(null);
 
   useEffect(() => {
@@ -34,13 +38,17 @@ export default function LandingFooter() {
           >
             Terms of Access
           </button>
-          <span>•</span>
-          <Link
-            href="/login"
-            className="hover:text-text-primary transition-colors font-medium text-text-secondary"
-          >
-            Scholar Log In
-          </Link>
+          {showAppAccess && (
+            <>
+              <span>•</span>
+              <Link
+                href="/login"
+                className="hover:text-text-primary transition-colors font-medium text-text-secondary"
+              >
+                Scholar Log In
+              </Link>
+            </>
+          )}
         </div>
       </div>
 

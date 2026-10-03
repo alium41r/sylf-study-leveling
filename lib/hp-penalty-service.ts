@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { executionTransaction, coordinateExecution } from "@/lib/execution-coordination";
 import { TimezoneService } from "@/lib/timezone-service";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
 import { getActiveSkillModifiers } from "@/lib/skill-tree";
@@ -81,9 +81,10 @@ export class HpPenaltyService {
     };
 
     if (txParam) {
+      await coordinateExecution(txParam, userId);
       return runner(txParam);
     }
-    return prisma.$transaction(runner);
+    return executionTransaction(userId, runner);
   }
 
   /**
@@ -95,9 +96,8 @@ export class HpPenaltyService {
     userId: number,
     timezoneOverride?: string
   ): Promise<PenaltyReconciliationResult> {
-    let user: any = null;
-    try {
-      user = await prisma.user.findUnique({
+    return executionTransaction(userId, async tx => {
+    const user = await tx.user.findUnique({
         where: { id: userId },
         select: {
           id: true,
@@ -114,11 +114,6 @@ export class HpPenaltyService {
           },
         },
       });
-    } catch (userErr) {
-      console.warn("HpPenaltyService user query error:", userErr);
-      return { penaltiesApplied: 0, totalHpDeducted: 0, newHp: 100, evaluatedDays: [], restExemptDays: [] };
-    }
-
     if (!user) {
       return { penaltiesApplied: 0, totalHpDeducted: 0, newHp: 100, evaluatedDays: [], restExemptDays: [] };
     }
@@ -156,7 +151,7 @@ export class HpPenaltyService {
 
     // Guard against running ahead of yesterday or evaluating future dates
     if (evalStartDateStr > yesterdayStr) {
-      await prisma.user.update({
+      await tx.user.update({
         where: { id: userId },
         data: { lastDailyPenaltyEvaluatedDate: yesterdayStr },
       });
@@ -187,7 +182,7 @@ export class HpPenaltyService {
     }
 
     if (daysToEvaluate.length === 0) {
-      await prisma.user.update({
+      await tx.user.update({
         where: { id: userId },
         data: { lastDailyPenaltyEvaluatedDate: yesterdayStr },
       });
@@ -206,7 +201,7 @@ export class HpPenaltyService {
     const lastDayUtc = new Date(`${daysToEvaluate[daysToEvaluate.length - 1]}T23:59:59Z`);
     lastDayUtc.setUTCDate(lastDayUtc.getUTCDate() + 2);
 
-    const sessions = await prisma.studySession.findMany({
+    const sessions = await tx.studySession.findMany({
       where: {
         userId,
         startedAt: {
@@ -218,6 +213,7 @@ export class HpPenaltyService {
         durationMinutes: true,
         durationSeconds: true,
         startedAt: true,
+        executionContext: true,
       },
     });
 
@@ -228,7 +224,8 @@ export class HpPenaltyService {
     }
 
     for (const s of sessions) {
-      const localDate = TimezoneService.getUserLocalDate(timezone, s.startedAt);
+      const context = s.executionContext as { actualCivilDate?: string } | null;
+      const localDate = context?.actualCivilDate ?? TimezoneService.getUserLocalDate(timezone, s.startedAt);
       if (dailyMinutesMap[localDate] !== undefined) {
         const mins = s.durationMinutes > 0 ? s.durationMinutes : Math.floor(s.durationSeconds / 60);
         dailyMinutesMap[localDate] += mins;
@@ -254,14 +251,12 @@ export class HpPenaltyService {
     // exactly like fixed rest days — 0 HP, 0 streak impact.
     let floatingRestSet = new Set<string>();
     try {
-      const floating = await prisma.floatingRestDay.findMany({
+      const floating = await tx.floatingRestDay.findMany({
         where: { userId, dateKey: { in: daysToEvaluate } },
         select: { dateKey: true },
       });
       floatingRestSet = new Set(floating.map((f) => f.dateKey));
-    } catch {
-      // best-effort: unavailable schema never blocks reconciliation
-    }
+    } catch (error) { throw error; }
 
     const restExemptDays: string[] = [];
 
@@ -287,7 +282,7 @@ export class HpPenaltyService {
     }
 
     if (penaltyEvents.length === 0) {
-      await prisma.user.update({
+      await tx.user.update({
         where: { id: userId },
         data: { lastDailyPenaltyEvaluatedDate: yesterdayStr },
       });
@@ -303,7 +298,7 @@ export class HpPenaltyService {
     let itemMitigatedName: string | null = null;
 
     // Execute atomic update, consumable interception, & ledger entries
-    await prisma.$transaction(async (tx) => {
+    {
       // 1. Check for consumable HP protection items (Phoenix Tear, Greater Recovery Flask, etc.)
       const recoveryItem = tx.userInventory?.findFirst
         ? await tx.userInventory.findFirst({
@@ -439,7 +434,7 @@ export class HpPenaltyService {
           lastDailyPenaltyEvaluatedDate: yesterdayStr,
         },
       });
-    });
+    }
 
     return {
       penaltiesApplied: penaltiesCount,
@@ -449,5 +444,6 @@ export class HpPenaltyService {
       mitigatedByItem: itemMitigatedName,
       restExemptDays,
     };
+    });
   }
 }

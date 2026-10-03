@@ -1,0 +1,767 @@
+{
+  "phase": 2,
+  "method": "Copy user-supplied RGBA eye rectangles without changes into a registered 600×300 intermediate pair. Nearest-sample once at exactly 0.5 scale by copying source RGBA (2x+1,2y+1), then place the 300×150 pair at (475,480) inside a full 1254×1254 transparent canonical canvas. No interpolation, background removal, or color operations.",
+  "sourceArtworkModified": false,
+  "sources": [
+    {
+      "file": "eye batch 1 (1).png",
+      "sha256": "9a47ca26d91b37e7811a68987fcf20608f8d0df28a223f777ff010a9c5097550",
+      "width": 1774,
+      "height": 887,
+      "hasAlpha": true,
+      "channels": 4,
+      "alpha": {
+        "transparent": 1074046,
+        "partial": 0,
+        "opaque": 499492
+      }
+    },
+    {
+      "file": "eye batch 2 (1).png",
+      "sha256": "32a8a1c95337ef644c0c96b6db054e46d1f671261020d98db287daedcf054300",
+      "width": 1536,
+      "height": 1024,
+      "hasAlpha": true,
+      "channels": 4,
+      "alpha": {
+        "transparent": 1138240,
+        "partial": 0,
+        "opaque": 434624
+      }
+    },
+    {
+      "file": "eye batch 4 (1).png",
+      "sha256": "784e8107e54edd693a7a63b02dd5348b43c7802866582148488c17216ac30707",
+      "width": 1536,
+      "height": 1024,
+      "hasAlpha": true,
+      "channels": 4,
+      "alpha": {
+        "transparent": 1253897,
+        "partial": 0,
+        "opaque": 318967
+      }
+    }
+  ],
+  "processedSheetNumbers": [
+    1,
+    2,
+    4
+  ],
+  "processedStateCount": 6,
+  "canvas": {
+    "width": 1254,
+    "height": 1254
+  },
+  "alignment": {
+    "sourceSpace": "Eye-sheet pixels are preserved exactly during crop registration. Runtime layers receive one deterministic nearest-neighbor half-scale conversion to match the body-space eye size.",
+    "registeredPairCanvas": {
+      "width": 600,
+      "height": 300
+    },
+    "registeredPairAnchors": [
+      {
+        "x": 150,
+        "y": 150
+      },
+      {
+        "x": 450,
+        "y": 150
+      }
+    ],
+    "registrationRule": "Center each visible alpha bounding box on the shared anchor using the same integer floor convention.",
+    "canonicalCanvas": {
+      "width": 1254,
+      "height": 1254
+    },
+    "canonicalLayerOrigin": {
+      "x": 0,
+      "y": 0
+    },
+    "embeddedEyeRegion": {
+      "left": 475,
+      "top": 480,
+      "width": 300,
+      "height": 150
+    },
+    "sourceEyeScaleRelativeToBaseSource": 0.5,
+    "nativeBaseEyeAnchors": [
+      {
+        "x": 550,
+        "y": 555
+      },
+      {
+        "x": 700,
+        "y": 555
+      }
+    ],
+    "pixelRendering": "Every layer fills the same canvas at (0,0). The renderer applies identical pixelated display scaling to body and eye layers; there are no CSS offsets or per-expression scales."
+  },
+  "alphaModification": "No background removal or alpha-value interpolation. Each retained runtime alpha is copied from a selected source sample; surrounding padding is transparent. The source artwork already contains transparency.",
+  "nearestSampling": {
+    "sourceDimensions": {
+      "width": 600,
+      "height": 300
+    },
+    "destinationDimensions": {
+      "width": 300,
+      "height": 150
+    },
+    "formula": "sourceX = 2*destinationX+1; sourceY = 2*destinationY+1; copy the whole RGBA tuple",
+    "lossless": false,
+    "explanation": "Sampling discards source pixels rather than recovering a lossless logical grid. It preserves the selected artwork's palette and intended body-space scale, but must not be described as unresampled or pixel-for-pixel source preservation."
+  },
+  "rgbaChangedBytesWithinRegisteredSourceCrops": 0,
+  "generatedVisibleRgbaColors": 0,
+  "padding": "Full-canvas padding outside the embedded 300×150 eye region is transparent RGBA zero. Existing source transparency inside the sampled region is copied exactly.",
+  "assets": [
+    {
+      "state": "neutral",
+      "source": "eye batch 1 (1).png",
+      "sourceLabel": "Neutral / Idle",
+      "runtime": "public/companions/pixel/sylf/eyes/neutral.png",
+      "canvas": {
+        "width": 1254,
+        "height": 1254
+      },
+      "pngSha256": "9f402b022ee0ae6decd0bea9c25791f9c2959f423af5d9e36809ce037d27a409",
+      "rgbaSha256": "7e5cc9e1b3ff71f396b98a72041ce7dcf39ed7d361db842bee4eb9dec8ff1ec9",
+      "alpha": {
+        "transparent": 1553512,
+        "partial": 0,
+        "opaque": 19004
+      },
+      "registeredPairRgbaSha256": "a4fd0239dc6a77b39c98a6aa503d0760b4bf308ed270661dea866b1b1ecc90db",
+      "nearestSampledPairRgbaSha256": "62b158e1e0a9214d81c5f5aeb2a57500d3440ea3e855ad2c58d4e5d0bc718797",
+      "sourceVisibleRgbaPaletteSize": 33000,
+      "runtimeVisibleRgbaPaletteSize": 11658,
+      "generatedVisibleRgbaColors": 0,
+      "visibleBounds": {
+        "left": 498,
+        "top": 499,
+        "width": 253,
+        "height": 113
+      },
+      "layerOrigin": {
+        "x": 0,
+        "y": 0
+      },
+      "eyes": [
+        {
+          "side": "left",
+          "sourceCrop": {
+            "left": 40,
+            "top": 120,
+            "width": 250,
+            "height": 265
+          },
+          "visibleSourceBounds": {
+            "left": 64,
+            "top": 153,
+            "width": 207,
+            "height": 219
+          },
+          "sourceAnchor": {
+            "x": 167,
+            "y": 262
+          },
+          "registeredPairAnchor": {
+            "x": 150,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 23,
+            "top": 8,
+            "width": 250,
+            "height": 265
+          },
+          "cropRgbaSha256": "87183449d333329fa62fdff19e9dfa19a3fd17f7a18118d4f8bc98d38c379df0",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 28349,
+            "partial": 0,
+            "opaque": 37901
+          }
+        },
+        {
+          "side": "right",
+          "sourceCrop": {
+            "left": 330,
+            "top": 120,
+            "width": 260,
+            "height": 265
+          },
+          "visibleSourceBounds": {
+            "left": 355,
+            "top": 153,
+            "width": 205,
+            "height": 226
+          },
+          "sourceAnchor": {
+            "x": 457,
+            "y": 265
+          },
+          "registeredPairAnchor": {
+            "x": 450,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 323,
+            "top": 5,
+            "width": 260,
+            "height": 265
+          },
+          "cropRgbaSha256": "c8d89cfbbbdcb11389f9e1a49ba88497c567706e93fcf09433a23b23d3249a6c",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 30701,
+            "partial": 0,
+            "opaque": 38199
+          }
+        }
+      ]
+    },
+    {
+      "state": "happy",
+      "source": "eye batch 1 (1).png",
+      "sourceLabel": "Soft Happy",
+      "runtime": "public/companions/pixel/sylf/eyes/happy.png",
+      "canvas": {
+        "width": 1254,
+        "height": 1254
+      },
+      "pngSha256": "0f9ef074ea6750cb5ea54147ac252a26bb7a3961a337fe7fa3b3a3cc67fe9090",
+      "rgbaSha256": "8e9268478c044a5307cd943d11d1ad6034c5bce07ae0d75415debdb6c7ed0349",
+      "alpha": {
+        "transparent": 1553708,
+        "partial": 0,
+        "opaque": 18808
+      },
+      "registeredPairRgbaSha256": "7e70803f2da533d44da8eaf2b59f0c3a37bf736922e2d1adca4b027d290140aa",
+      "nearestSampledPairRgbaSha256": "c17fddb504084a129882d1180c6058079e20792e61fb9a27ac528aaf6fb2f4c3",
+      "sourceVisibleRgbaPaletteSize": 32047,
+      "runtimeVisibleRgbaPaletteSize": 11650,
+      "generatedVisibleRgbaColors": 0,
+      "visibleBounds": {
+        "left": 496,
+        "top": 501,
+        "width": 258,
+        "height": 109
+      },
+      "layerOrigin": {
+        "x": 0,
+        "y": 0
+      },
+      "eyes": [
+        {
+          "side": "left",
+          "sourceCrop": {
+            "left": 605,
+            "top": 120,
+            "width": 265,
+            "height": 265
+          },
+          "visibleSourceBounds": {
+            "left": 639,
+            "top": 154,
+            "width": 217,
+            "height": 218
+          },
+          "sourceAnchor": {
+            "x": 747,
+            "y": 262
+          },
+          "registeredPairAnchor": {
+            "x": 150,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 8,
+            "top": 8,
+            "width": 265,
+            "height": 265
+          },
+          "cropRgbaSha256": "ddd4236a0f425206275084095c6af7cc18e06aa757a8a0f78645f74f581f979a",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 32337,
+            "partial": 0,
+            "opaque": 37888
+          }
+        },
+        {
+          "side": "right",
+          "sourceCrop": {
+            "left": 895,
+            "top": 120,
+            "width": 260,
+            "height": 265
+          },
+          "visibleSourceBounds": {
+            "left": 914,
+            "top": 154,
+            "width": 214,
+            "height": 218
+          },
+          "sourceAnchor": {
+            "x": 1020,
+            "y": 262
+          },
+          "registeredPairAnchor": {
+            "x": 450,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 325,
+            "top": 8,
+            "width": 260,
+            "height": 265
+          },
+          "cropRgbaSha256": "0065da5b030701e71093e33a288ac0a9526220177e97af19c96feab25b50e2b3",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 31432,
+            "partial": 0,
+            "opaque": 37468
+          }
+        }
+      ]
+    },
+    {
+      "state": "thinking",
+      "source": "eye batch 2 (1).png",
+      "sourceLabel": "Thinking",
+      "runtime": "public/companions/pixel/sylf/eyes/thinking.png",
+      "canvas": {
+        "width": 1254,
+        "height": 1254
+      },
+      "pngSha256": "7b4a3de46930c2c9384ef39b92b23752dd16d478e1f6361e2ae3624deb442bb9",
+      "rgbaSha256": "2ed2c364b9b917e61650130da499507bf1c1526452fb29a14e46c78474c70aca",
+      "alpha": {
+        "transparent": 1559407,
+        "partial": 0,
+        "opaque": 13109
+      },
+      "registeredPairRgbaSha256": "424356daa3577e5f9ebc10d92cb28827ddf474836eda4fb648f8cb70a79e5e26",
+      "nearestSampledPairRgbaSha256": "13c0bed52dbd946d27daeb903e9f372037d3610efc43512c42f5b326a509cf57",
+      "sourceVisibleRgbaPaletteSize": 20060,
+      "runtimeVisibleRgbaPaletteSize": 7493,
+      "generatedVisibleRgbaColors": 0,
+      "visibleBounds": {
+        "left": 501,
+        "top": 508,
+        "width": 246,
+        "height": 95
+      },
+      "layerOrigin": {
+        "x": 0,
+        "y": 0
+      },
+      "eyes": [
+        {
+          "side": "left",
+          "sourceCrop": {
+            "left": 1020,
+            "top": 145,
+            "width": 260,
+            "height": 255
+          },
+          "visibleSourceBounds": {
+            "left": 1054,
+            "top": 180,
+            "width": 196,
+            "height": 190
+          },
+          "sourceAnchor": {
+            "x": 1151,
+            "y": 274
+          },
+          "registeredPairAnchor": {
+            "x": 150,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 19,
+            "top": 21,
+            "width": 260,
+            "height": 255
+          },
+          "cropRgbaSha256": "155d037ba7adf290d719a4484aa76e6891ead20cf596de19be552d833e7b2d01",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 37199,
+            "partial": 0,
+            "opaque": 29101
+          }
+        },
+        {
+          "side": "right",
+          "sourceCrop": {
+            "left": 1295,
+            "top": 195,
+            "width": 235,
+            "height": 205
+          },
+          "visibleSourceBounds": {
+            "left": 1320,
+            "top": 228,
+            "width": 188,
+            "height": 164
+          },
+          "sourceAnchor": {
+            "x": 1413,
+            "y": 309
+          },
+          "registeredPairAnchor": {
+            "x": 450,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 332,
+            "top": 36,
+            "width": 235,
+            "height": 205
+          },
+          "cropRgbaSha256": "0eb865c2d4567b57f7d9ddb1152a1d7dafbbbc725a6dbeb83fcb0c1018bfd9a6",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 24855,
+            "partial": 0,
+            "opaque": 23320
+          }
+        }
+      ]
+    },
+    {
+      "state": "focused",
+      "source": "eye batch 2 (1).png",
+      "sourceLabel": "Focused",
+      "runtime": "public/companions/pixel/sylf/eyes/focused.png",
+      "canvas": {
+        "width": 1254,
+        "height": 1254
+      },
+      "pngSha256": "618bbabcc9499ac226c047647cb9e40aa90f15b28677060c08e93e014478c719",
+      "rgbaSha256": "af6f731fd8dc73be388c5cf10a21d8f0559a933b641eb7a3a6b4ae298f7b4baa",
+      "alpha": {
+        "transparent": 1558119,
+        "partial": 0,
+        "opaque": 14397
+      },
+      "registeredPairRgbaSha256": "7de0fbfb84485373ebbef867bbe2008a5e886a66b56cb8a6f23da55e74e9741c",
+      "nearestSampledPairRgbaSha256": "a70f748706a901ab05e893169643c3428a96d9707489f4b9fe928aca859f49b3",
+      "sourceVisibleRgbaPaletteSize": 25404,
+      "runtimeVisibleRgbaPaletteSize": 8973,
+      "generatedVisibleRgbaColors": 0,
+      "visibleBounds": {
+        "left": 504,
+        "top": 505,
+        "width": 242,
+        "height": 100
+      },
+      "layerOrigin": {
+        "x": 0,
+        "y": 0
+      },
+      "eyes": [
+        {
+          "side": "left",
+          "sourceCrop": {
+            "left": 15,
+            "top": 150,
+            "width": 235,
+            "height": 250
+          },
+          "visibleSourceBounds": {
+            "left": 34,
+            "top": 191,
+            "width": 186,
+            "height": 199
+          },
+          "sourceAnchor": {
+            "x": 126,
+            "y": 290
+          },
+          "registeredPairAnchor": {
+            "x": 150,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 39,
+            "top": 10,
+            "width": 235,
+            "height": 250
+          },
+          "cropRgbaSha256": "d94fab062b0115692a315f37771f2dc796aa557b22a340cc30a96032c8e4ab9e",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 29718,
+            "partial": 0,
+            "opaque": 29032
+          }
+        },
+        {
+          "side": "right",
+          "sourceCrop": {
+            "left": 260,
+            "top": 150,
+            "width": 230,
+            "height": 250
+          },
+          "visibleSourceBounds": {
+            "left": 292,
+            "top": 191,
+            "width": 185,
+            "height": 200
+          },
+          "sourceAnchor": {
+            "x": 384,
+            "y": 290
+          },
+          "registeredPairAnchor": {
+            "x": 450,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 326,
+            "top": 10,
+            "width": 230,
+            "height": 250
+          },
+          "cropRgbaSha256": "9879f764541aac6084ca1337d4702cdd40cbf5dfec47e540334b5476b5cfadbb",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 28880,
+            "partial": 0,
+            "opaque": 28620
+          }
+        }
+      ]
+    },
+    {
+      "state": "sleepy",
+      "source": "eye batch 4 (1).png",
+      "sourceLabel": "Sleepy",
+      "runtime": "public/companions/pixel/sylf/eyes/sleepy.png",
+      "canvas": {
+        "width": 1254,
+        "height": 1254
+      },
+      "pngSha256": "54078754998a0a77145420e72e2d9f81a56180dcbc0033c824faf7c4db95896d",
+      "rgbaSha256": "6d37b2dcb2cbb6a1e20226d7a0509042a9e738081ca72f084ba2d87acdfa1d01",
+      "alpha": {
+        "transparent": 1562059,
+        "partial": 0,
+        "opaque": 10457
+      },
+      "registeredPairRgbaSha256": "5ab288ba9b4b78f722b93480971722a45ae833949dbf48a69f9b14dcc34ba1ec",
+      "nearestSampledPairRgbaSha256": "a1f6d09e1c79dd6fab0e9c27438cf94bca7c4752a0f4e3f315bbf1f8a058437c",
+      "sourceVisibleRgbaPaletteSize": 15333,
+      "runtimeVisibleRgbaPaletteSize": 5531,
+      "generatedVisibleRgbaColors": 0,
+      "visibleBounds": {
+        "left": 501,
+        "top": 519,
+        "width": 249,
+        "height": 72
+      },
+      "layerOrigin": {
+        "x": 0,
+        "y": 0
+      },
+      "eyes": [
+        {
+          "side": "left",
+          "sourceCrop": {
+            "left": 10,
+            "top": 195,
+            "width": 245,
+            "height": 200
+          },
+          "visibleSourceBounds": {
+            "left": 28,
+            "top": 242,
+            "width": 196,
+            "height": 143
+          },
+          "sourceAnchor": {
+            "x": 125,
+            "y": 313
+          },
+          "registeredPairAnchor": {
+            "x": 150,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 35,
+            "top": 32,
+            "width": 245,
+            "height": 200
+          },
+          "cropRgbaSha256": "538e513a6e4a18e2f2cf524e809ac16e5c2e6bc40cbc871c95306dc78f4e53a7",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 28501,
+            "partial": 0,
+            "opaque": 20499
+          }
+        },
+        {
+          "side": "right",
+          "sourceCrop": {
+            "left": 275,
+            "top": 195,
+            "width": 245,
+            "height": 200
+          },
+          "visibleSourceBounds": {
+            "left": 303,
+            "top": 242,
+            "width": 199,
+            "height": 143
+          },
+          "sourceAnchor": {
+            "x": 402,
+            "y": 313
+          },
+          "registeredPairAnchor": {
+            "x": 450,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 323,
+            "top": 32,
+            "width": 245,
+            "height": 200
+          },
+          "cropRgbaSha256": "955d1dd4b2ee5af3e4136ff39fb30befe26dc025f108dcd316323fe6ba9ab199",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 27679,
+            "partial": 0,
+            "opaque": 21321
+          }
+        }
+      ]
+    },
+    {
+      "state": "blink",
+      "source": "eye batch 4 (1).png",
+      "sourceLabel": "Resting / Closed eyes",
+      "runtime": "public/companions/pixel/sylf/eyes/blink.png",
+      "canvas": {
+        "width": 1254,
+        "height": 1254
+      },
+      "pngSha256": "6f174ae289b92985b4c76d508464d62761052751e29c8ada9940e58ffff26aa0",
+      "rgbaSha256": "50021030398992bbb37dcf67d1b808b0636a8d779696b35bcc97d1d62d502efc",
+      "alpha": {
+        "transparent": 1567555,
+        "partial": 0,
+        "opaque": 4961
+      },
+      "registeredPairRgbaSha256": "4064d4cca583a06dd06f223ac5c185d56a73a5707f1002b6182669aa131f4f29",
+      "nearestSampledPairRgbaSha256": "07cb374689105d281470900780aa73788d07f1d91df75ad5a4527d498f77c62c",
+      "sourceVisibleRgbaPaletteSize": 6512,
+      "runtimeVisibleRgbaPaletteSize": 2555,
+      "generatedVisibleRgbaColors": 0,
+      "visibleBounds": {
+        "left": 502,
+        "top": 531,
+        "width": 246,
+        "height": 49
+      },
+      "layerOrigin": {
+        "x": 0,
+        "y": 0
+      },
+      "eyes": [
+        {
+          "side": "left",
+          "sourceCrop": {
+            "left": 20,
+            "top": 600,
+            "width": 245,
+            "height": 165
+          },
+          "visibleSourceBounds": {
+            "left": 44,
+            "top": 651,
+            "width": 191,
+            "height": 98
+          },
+          "sourceAnchor": {
+            "x": 139,
+            "y": 699
+          },
+          "registeredPairAnchor": {
+            "x": 150,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 31,
+            "top": 51,
+            "width": 245,
+            "height": 165
+          },
+          "cropRgbaSha256": "a064c8cac9a5acdcc0eb6eb17064ccca10823ec0dac36350c91278c7f8bda7a8",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 30483,
+            "partial": 0,
+            "opaque": 9942
+          }
+        },
+        {
+          "side": "right",
+          "sourceCrop": {
+            "left": 280,
+            "top": 600,
+            "width": 240,
+            "height": 165
+          },
+          "visibleSourceBounds": {
+            "left": 298,
+            "top": 651,
+            "width": 191,
+            "height": 98
+          },
+          "sourceAnchor": {
+            "x": 393,
+            "y": 699
+          },
+          "registeredPairAnchor": {
+            "x": 450,
+            "y": 150
+          },
+          "registeredPairCrop": {
+            "left": 337,
+            "top": 51,
+            "width": 240,
+            "height": 165
+          },
+          "cropRgbaSha256": "5786270c5ed280b08fb2dd0906c919813ddab67bfc9fa43a02bf055f1da60616",
+          "sourceRgbaEqualsRegisteredPairCrop": true,
+          "rgbaChangedBytes": 0,
+          "alpha": {
+            "transparent": 29658,
+            "partial": 0,
+            "opaque": 9942
+          }
+        }
+      ]
+    }
+  ]
+}

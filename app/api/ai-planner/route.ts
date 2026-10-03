@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { executionTransaction } from "@/lib/execution-coordination";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { AiStudyOrchestrator, StudySessionData } from "@/lib/ai/orchestrator";
@@ -21,12 +22,18 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = session.userId;
+    if (await prisma.plannerPlan.findFirst({ where: { userId, contractVersion: 2 }, select: { id: true } })) {
+      return NextResponse.json({ error: "PLANNER_V2_REQUIRED", message: "Continue planning through your current Planner workspace." }, { status: 409 });
+    }
 
     // ── Quota enforcement ─────────────────────────────────
     // S4: RESERVE before the (expensive, multi-agent) generation begins;
     // failures/aborts refund the unit.
+    // A configured owner account is entitled to unlimited generations: the
+    // reservation is bypassed (charged === false) and `unlimited` carries the
+    // permission, so the gate must accept either signal.
     const quota = await reserveQuota(userId, "planner");
-    if (!quota.charged) {
+    if (!quota.charged && !quota.unlimited) {
       return NextResponse.json(
         { error: "quota_exceeded", feature: "planner", remaining: 0, limit: quota.limit, resetsAt: quota.resetsAt },
         { status: 429 }
@@ -142,7 +149,9 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          const goal = await prisma.goal.create({
+          const { goal, plannerModelName } = await executionTransaction(userId, async tx => {
+            if (await tx.plannerPlan.findFirst({ where: { userId, contractVersion: 2 }, select: { id: true } })) throw new Error("PLANNER_V2_REQUIRED");
+          const goal = await tx.goal.create({
             data: {
               userId,
               title: planResult.goalTitle,
@@ -159,11 +168,11 @@ export async function POST(req: NextRequest) {
           });
 
           // Create the Quests in user's timezone
-          const userWithSchedule = await prisma.user.findUnique({
+          const userWithSchedule = await tx.user.findUnique({
             where: { id: userId },
             select: { restDays: true, timezone: true },
           });
-          const tz = userWithSchedule?.timezone || (await getUserTimezone(userId));
+          const tz = userWithSchedule?.timezone || (await getUserTimezone(userId, tx));
           const restDays = userWithSchedule?.restDays || [0];
 
           const today = new Date();
@@ -178,15 +187,14 @@ export async function POST(req: NextRequest) {
           // Floating (ad-hoc) rest days are hard-blocked here too: no quest may
           // be generated on a date the user exempted from study.
           let floatingRestSet = new Set<string>();
-          try {
             const floatingStart = TimezoneService.getUserLocalDate(tz);
             const floatingEnd = TimezoneService.getUserLocalDateOffset(tz, daysToDeadline + 14);
-            const floating = await prisma.floatingRestDay.findMany({
+            const floating = await tx.floatingRestDay.findMany({
               where: { userId, dateKey: { gte: floatingStart, lte: floatingEnd } },
               select: { dateKey: true },
             });
             floatingRestSet = new Set(floating.map((f) => f.dateKey));
-          } catch {} // best-effort: schedule lookup must never abort generation
+
 
           const questsToCreate = planResult.quests.map((q, index) => {
             // Distribute quests across the timeline evenly
@@ -208,6 +216,8 @@ export async function POST(req: NextRequest) {
               }
             }
 
+            if (attempts >= 30) throw new Error("REST_DAY_ALLOCATION_PROHIBITED");
+
             // Canonical difficulty tier derived deterministically from duration;
             // rewards were already canonicalized by the orchestrator.
             const difficulty = calculateRecommendedDifficulty(q.requiredMinutes);
@@ -218,6 +228,7 @@ export async function POST(req: NextRequest) {
               title: q.title,
               description: q.description,
               requiredMinutes: q.requiredMinutes,
+              targetMinutes: q.requiredMinutes,
               xpReward: q.xpReward,
               sylphReward: q.sylphReward,
               difficulty,
@@ -227,7 +238,7 @@ export async function POST(req: NextRequest) {
             };
           });
 
-          await prisma.quest.createMany({
+          await tx.quest.createMany({
             data: questsToCreate
           });
 
@@ -236,7 +247,7 @@ export async function POST(req: NextRequest) {
           questsToCreate.forEach(q => actualTotalMinutes += q.requiredMinutes);
 
           // Create the User Prompt message in the chat session
-          await prisma.systemMessage.create({
+          await tx.systemMessage.create({
             data: {
               userId,
               sessionId: targetSessionId,
@@ -257,7 +268,7 @@ export async function POST(req: NextRequest) {
           const plannerModelName = planResult.modelUsed || "Gemini 3.7 Flash";
           const assistantContent = `### 🎓 Study Plan Generated: **${planResult.goalTitle}**\n\n- **Workload**: ${questsToCreate.length} quests · ~${Math.round(actualTotalMinutes / 60)} hours total\n- **Effort**: ${mappedEffortLevel} (${effortHours} hrs/week)${targetDate ? `\n- **Deadline**: ${targetDate}` : ""}\n\n#### Scheduled Quest Preview:\n${questsPreview}${moreQuestsNote}\n\nQuests are live on your calendar — ask me to modify, reschedule, or split any of them.`;
 
-          await prisma.systemMessage.create({
+          await tx.systemMessage.create({
             data: {
               userId,
               sessionId: targetSessionId,
@@ -268,8 +279,23 @@ export async function POST(req: NextRequest) {
             },
           });
 
-          // Final response with targetSessionId and modelUsed
-          sendEvent("result", { goal, sessionId: targetSessionId, modelUsed: plannerModelName });
+            return { goal, plannerModelName };
+          });
+
+          // Final response with targetSessionId, modelUsed, and current quota
+          sendEvent("result", {
+            goal,
+            sessionId: targetSessionId,
+            modelUsed: plannerModelName,
+            quota: {
+              allowed: quota.unlimited || quota.allowed,
+              used: quota.used,
+              limit: quota.limit,
+              remaining: quota.remaining,
+              resetsAt: quota.resetsAt,
+              unlimited: quota.unlimited,
+            },
+          });
 
           // Request-level cost telemetry (best-effort — never blocks the result).
           await logAiUsage({

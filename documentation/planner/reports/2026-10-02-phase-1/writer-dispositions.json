@@ -1,0 +1,532 @@
+{
+  "schemaVersion": 2,
+  "phase": 1,
+  "groups": [
+    {
+      "id": "P01",
+      "name": "Initial confirmation / Roadmap expansion confirmation",
+      "disposition": "CANONICAL_APPLY",
+      "originalSources": [
+        "app/api/planner/[id]/commit/route.ts",
+        "lib/planner/server/materialize.ts"
+      ],
+      "owners": [
+        "lib/planner/v2/server/apply.ts"
+      ],
+      "guarantee": "V2 commit uses one owned, current, sealed change-set transaction. Legacy materialization rejects adopted Plans.",
+      "qualification": "joint apply; duplicate receipt; five rollback boundaries"
+    },
+    {
+      "id": "P02",
+      "name": "Rebalance confirmation",
+      "disposition": "CANONICAL_APPLY",
+      "originalSources": [
+        "app/api/planner/[id]/rebalance/confirm/route.ts",
+        "lib/planner/server/rebalance.ts"
+      ],
+      "owners": [
+        "lib/planner/v2/server/apply.ts"
+      ],
+      "guarantee": "Semantic diff and protected execution validate before any write; paused remaining overlays and withdrawal retain accepted history. Legacy rebalance rejects adopted Plans.",
+      "qualification": "semantic identity; KEPT stability; withdrawal/continuation; Focus race"
+    },
+    {
+      "id": "P03",
+      "name": "Plan shells, generation/expansion attempts, revisions and archive",
+      "disposition": "DURABLE_CORE",
+      "originalSources": [
+        "lib/planner/server/operations.ts",
+        "lib/planner/server/revisions.ts"
+      ],
+      "owners": [
+        "lib/planner/v2/server/intents.ts",
+        "lib/planner/v2/server/attempts.ts",
+        "lib/planner/v2/server/revisions.ts"
+      ],
+      "guarantee": "Owned immutable intent/revision, durable request correspondence, fence/deadline/CAS and atomic publication. Archive supersedes work and preserves execution.",
+      "qualification": "intent/lease/cancellation/currentness; worker SIGKILL/SIGTERM; workspace"
+    },
+    {
+      "id": "P04",
+      "name": "Optional stretch promotion",
+      "disposition": "REVIEW_REQUIRED",
+      "originalSources": [
+        "app/api/planner/[id]/stretch/route.ts",
+        "lib/planner/server/stretch.ts"
+      ],
+      "owners": [
+        "lib/planner/server/stretch.ts",
+        "lib/planner/v2/server/apply.ts"
+      ],
+      "guarantee": "Adopted Plan promotion cannot use the legacy service; authorized change must become a sealed proposal and canonical apply. No Phase 2 promotion intelligence is introduced.",
+      "qualification": "legacy mutation guard and current SQL guards"
+    },
+    {
+      "id": "P05",
+      "name": "Copilot generated-item release",
+      "disposition": "REVIEW_REQUIRED",
+      "originalSources": [
+        "app/api/planner/intake/[id]/copilot/apply/route.ts",
+        "lib/planner/copilot/release.ts"
+      ],
+      "owners": [
+        "lib/planner/copilot/release.ts",
+        "lib/planner/v2/server/apply.ts"
+      ],
+      "guarantee": "Legacy Copilot cannot release adopted linked work. Canonical diff removes unstarted work or withdraws started work, retaining lineage.",
+      "qualification": "permanent tombstone; withdrawal/continuation"
+    },
+    {
+      "id": "P06",
+      "name": "Released-work reoffer accept/decline",
+      "disposition": "REVIEW_REQUIRED",
+      "originalSources": [
+        "app/api/planner/[id]/reoffer/route.ts",
+        "lib/planner/server/reoffer.ts"
+      ],
+      "owners": [
+        "lib/planner/server/reoffer.ts",
+        "lib/planner/v2/server/apply.ts"
+      ],
+      "guarantee": "Old reoffer cannot mutate adopted Plans. A new approved activity uses explicit lineage; removed identities cannot silently reattach.",
+      "qualification": "tombstone SQL and execution correspondence"
+    },
+    {
+      "id": "P07",
+      "name": "Manual linked Quest structural edit/delete escape hatch",
+      "disposition": "REVIEW_REQUIRED",
+      "originalSources": [
+        "app/api/quests/[id]/route.ts",
+        "lib/planner/server/mutation-guards.ts"
+      ],
+      "owners": [
+        "lib/planner/server/mutation-guards.ts",
+        "app/api/quests/[id]/route.ts"
+      ],
+      "guarantee": "Generic structural edits/deletes fail for adopted linked work; cosmetic Goal edits are separate. No manual-quest capability bypasses V2 SQL.",
+      "qualification": "actual old-client route rejection; SQL structural protection"
+    },
+    {
+      "id": "P08",
+      "name": "Manual linked Goal edit and guarded bulk Goal deletion",
+      "disposition": "REVIEW_REQUIRED",
+      "originalSources": [
+        "lib/planner/server/mutation-guards.ts"
+      ],
+      "owners": [
+        "lib/planner/server/mutation-guards.ts"
+      ],
+      "guarantee": "Linked outcome/deadline changes require canonical intent/review; delete rejects linked work. Canonical apply owns semantic Goal projection.",
+      "qualification": "Goal route units; owned Goal/deferred SQL; atomic apply"
+    },
+    {
+      "id": "Q01",
+      "name": "Ordinary/manual or SubjectNode Quest creation",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/quests/route.ts",
+        "app/locker/components/CreateNodeQuestModal.tsx"
+      ],
+      "owners": [
+        "app/api/quests/route.ts"
+      ],
+      "guarantee": "User coordination encloses final ownership/node/rest/timezone/reward reads and creation; adoption guards prevent introducing unversioned work into a V2 Goal.",
+      "qualification": "generic Quest vs apply capacity conflict; Quest creation units"
+    },
+    {
+      "id": "Q02",
+      "name": "Ordinary field/status update and explicit completion",
+      "disposition": "COORDINATED_EXECUTION",
+      "originalSources": [
+        "app/api/quests/[id]/route.ts"
+      ],
+      "owners": [
+        "app/api/quests/[id]/route.ts",
+        "lib/planner/v2/server/sessions.ts"
+      ],
+      "guarantee": "Linked explicit completion requires protocol/version and authoritative completion service. Client elapsed writes and withdrawn completion cannot bypass it.",
+      "qualification": "duplicate actual route completion; settlement/reward tests"
+    },
+    {
+      "id": "Q03",
+      "name": "Single/bulk Quest deletion",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/quests/[id]/route.ts",
+        "app/api/quests/route.ts"
+      ],
+      "owners": [
+        "app/api/quests/[id]/route.ts",
+        "app/api/quests/route.ts"
+      ],
+      "guarantee": "Standalone deletion remains supported with fresh checks. Linked structural deletion requires review; started history cannot be deleted.",
+      "qualification": "old-client delete rejection; zero-second SQL protection"
+    },
+    {
+      "id": "G01",
+      "name": "Goal CRUD routes",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/goals/[id]/route.ts",
+        "app/api/goals/route.ts"
+      ],
+      "owners": [
+        "app/api/goals/route.ts",
+        "app/api/goals/[id]/route.ts"
+      ],
+      "guarantee": "Goal CRUD uses user coordination and fresh linked guards; ordinary Goals remain supported.",
+      "qualification": "Goal route units; generic SQL ownership/Goal guard"
+    },
+    {
+      "id": "G02",
+      "name": "Timeline adjustment endpoint",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/goals/[id]/adjust/route.ts"
+      ],
+      "owners": [
+        "app/api/goals/[id]/adjust/route.ts"
+      ],
+      "guarantee": "Ordinary timeline read/write/message is one transaction; adopted linked adjustment fails rather than running a second allocator.",
+      "qualification": "calendar/Goal units; adopted structural SQL guard"
+    },
+    {
+      "id": "C01",
+      "name": "Generic chat Goal/Quest create/update",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "owners": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "guarantee": "Each mutation encloses consequential reads and writes in executionTransaction; providers remain outside. Linked commands require review.",
+      "qualification": "calendar-tools units; SQL source/Quest backstops"
+    },
+    {
+      "id": "C02",
+      "name": "Chat Goal/Quest destructive commands",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "owners": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "guarantee": "Owned destructive authorization is retained; linked Goals/Quests fail closed.",
+      "qualification": "calendar-tools and Goal deletion units; SQL backstop"
+    },
+    {
+      "id": "C03",
+      "name": "Chat completion",
+      "disposition": "REVIEW_OR_PROTOCOL_REQUIRED",
+      "originalSources": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "owners": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "guarantee": "Generic chat does not fabricate a V2 execution version. Linked completion requires the same canonical execution service/protocol as Focus.",
+      "qualification": "completion guards; withdrawal prohibition; calendar-tools units"
+    },
+    {
+      "id": "C04",
+      "name": "Move, swap, clear-day tools",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "owners": [
+        "lib/ai/chat-tool-executor.ts"
+      ],
+      "guarantee": "Move/swap/clear-day decisions and writes share user coordination. Linked structural requests require a reviewed change, never legacy date math.",
+      "qualification": "calendar-tools units; independent Quest/source SQL rejection"
+    },
+    {
+      "id": "S01",
+      "name": "Start and lazy recovery API",
+      "disposition": "CANONICAL_EXECUTION",
+      "originalSources": [
+        "app/api/sessions/route.ts",
+        "app/focus/components/FocusScreen.tsx"
+      ],
+      "owners": [
+        "app/api/sessions/route.ts",
+        "lib/planner/v2/server/sessions.ts",
+        "app/focus/components/FocusScreen.tsx"
+      ],
+      "guarantee": "Zero-second adopted starts and owned restore use RUNNING/PAUSED/ENDED and execution versions; user lock precedes Session/Quest.",
+      "qualification": "separate-connection start/apply; browser pause/reload; native fetch transport"
+    },
+    {
+      "id": "S02",
+      "name": "Heartbeat/finalize/complete API",
+      "disposition": "CANONICAL_EXECUTION",
+      "originalSources": [
+        "app/api/sessions/route.ts",
+        "app/focus/components/FocusScreen.tsx"
+      ],
+      "owners": [
+        "lib/planner/v2/server/sessions.ts",
+        "lib/planner/v2/session-client.ts"
+      ],
+      "guarantee": "Acknowledged transitions, cumulative clamp, durable receipt and server precedence retain epoch/leadership owners. End does not infer study completion.",
+      "qualification": "timing tolerance; response loss; stale device; browser END"
+    },
+    {
+      "id": "S03",
+      "name": "Weekly streak award after settlement",
+      "disposition": "COORDINATED_SETTLEMENT",
+      "originalSources": [
+        "app/api/sessions/route.ts"
+      ],
+      "owners": [
+        "lib/planner/v2/server/settlement.ts",
+        "app/api/sessions/route.ts"
+      ],
+      "guarantee": "Existing weekly mission/economic math settles inside the same coordinated transaction exactly once.",
+      "qualification": "competing protocol mission settlement and rollback"
+    },
+    {
+      "id": "S04",
+      "name": "Focus Party timer state",
+      "disposition": "INDEPENDENT_SOCIAL_AUTHORITY",
+      "originalSources": [
+        "app/api/focus-party/[id]/session/timer/route.ts",
+        "lib/focus-party-service.ts"
+      ],
+      "owners": [
+        "lib/focus-party-service.ts"
+      ],
+      "guarantee": "Party timer rows are not StudySession state and cannot pause/end/complete ordinary study. Shared Focus execution still uses S01/S02.",
+      "qualification": "Focus party shared-client units; account cascade PostgreSQL"
+    },
+    {
+      "id": "A01",
+      "name": "Weekly schedule settings",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/user/study-schedule/route.ts",
+        "app/calendar/components/StudyScheduleModal.tsx"
+      ],
+      "owners": [
+        "app/api/user/study-schedule/route.ts",
+        "lib/planner/v2/server/context.ts"
+      ],
+      "guarantee": "Schedule writes and acceptance share user coordination. Consequential values stale proposals; goals/preferences are not capacity.",
+      "qualification": "study-schedule units; context currentness; generic route conflict"
+    },
+    {
+      "id": "A02",
+      "name": "Floating rest-day toggle and automatic shifting",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/user/study-schedule/floating-rest-day/route.ts",
+        "lib/study-schedule-service.ts"
+      ],
+      "owners": [
+        "app/api/user/study-schedule/floating-rest-day/route.ts",
+        "lib/study-schedule-service.ts"
+      ],
+      "guarantee": "Desired state is idempotent; no old automatic shifter moves sealed work. Rest context changes remain visible and require linked replan.",
+      "qualification": "duplicate desired rest-day route; rest/calendar units"
+    },
+    {
+      "id": "A03",
+      "name": "Deadline sweep",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/quests/check-deadlines/route.ts"
+      ],
+      "owners": [
+        "app/api/quests/check-deadlines/route.ts"
+      ],
+      "guarantee": "Per-user fresh status/economics are coordinated; adopted work is not blindly failed by an incompatible legacy sweep.",
+      "qualification": "deadline/unit coverage; Quest execution SQL guard"
+    },
+    {
+      "id": "A04",
+      "name": "Lazy daily-study penalty",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/calendar/month/route.ts",
+        "app/api/user/heartbeat/route.ts",
+        "lib/hp-penalty-service.ts"
+      ],
+      "owners": [
+        "lib/hp-penalty-service.ts"
+      ],
+      "guarantee": "Fresh actual effort and HP/ledger update run under user-first coordination; accepted historical civil dates are retained.",
+      "qualification": "calendar/penalty units; economic/source SQL protection"
+    },
+    {
+      "id": "A05",
+      "name": "Timezone changes/onboarding",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/user/account/route.ts",
+        "app/api/user/onboarding/route.ts"
+      ],
+      "owners": [
+        "app/api/user/account/route.ts",
+        "app/api/user/onboarding/route.ts"
+      ],
+      "guarantee": "Timezone/availability writes are coordinated; accepted session executionContext retains original actual date.",
+      "qualification": "onboarding units; context staleness; accepted-date/session tests"
+    },
+    {
+      "id": "D01",
+      "name": "Subject creation/onboarding",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/subjects/route.ts",
+        "app/api/user/onboarding/route.ts"
+      ],
+      "owners": [
+        "app/api/subjects/route.ts",
+        "app/api/user/onboarding/route.ts"
+      ],
+      "guarantee": "Owned Subject creation and academic context updates use user coordination; weak progression is not verified mastery.",
+      "qualification": "Subject/onboarding units; source SQL guard"
+    },
+    {
+      "id": "D02",
+      "name": "Subject metadata edit/archive/restore",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/subjects/[id]/restore/route.ts",
+        "app/api/subjects/[id]/route.ts",
+        "lib/subject-service.ts"
+      ],
+      "owners": [
+        "lib/subject-service.ts",
+        "app/api/subjects/[id]/route.ts",
+        "app/api/subjects/[id]/restore/route.ts"
+      ],
+      "guarantee": "Metadata/archive/restore uses fresh owned state and execution checks; no active history cascade.",
+      "qualification": "Subject lifecycle/edit/delete units; context SQL guards"
+    },
+    {
+      "id": "D03",
+      "name": "AI syllabus compilation",
+      "disposition": "COORDINATED",
+      "originalSources": [
+        "app/api/subjects/[id]/compile/route.ts"
+      ],
+      "owners": [
+        "app/api/subjects/[id]/compile/route.ts"
+      ],
+      "guarantee": "Provider runs outside locks; final transaction verifies source currentness before replacing nodes. Accepted tasks remain immutable.",
+      "qualification": "Subject tests; direct node/source SQL protection"
+    },
+    {
+      "id": "D04",
+      "name": "Apex, skills, achievements, shop and stat investments",
+      "disposition": "COORDINATED_ECONOMY",
+      "originalSources": [
+        "app/api/achievements/route.ts",
+        "app/api/cognitive-stats/invest/route.ts",
+        "app/api/shop/purchase/route.ts",
+        "app/api/skills/unlock/route.ts",
+        "app/api/subjects/[id]/forge-apex/route.ts"
+      ],
+      "owners": [
+        "app/api/achievements/route.ts",
+        "lib/achievement-facts.ts",
+        "app/api/shop/purchase/route.ts",
+        "app/api/cognitive-stats/invest/route.ts"
+      ],
+      "guarantee": "Fresh achievement facts+claim+message and ORM economy use shared coordination. Effective shop/equip/skill/Apex RPCs acquire user coordination before economics; old unused reward bypass signatures are dropped.",
+      "qualification": "actual duplicate achievement route; direct SQL shop lock wait/math; reward/skill units; retired function catalog"
+    },
+    {
+      "id": "D05",
+      "name": "Reset progress",
+      "disposition": "COORDINATED_RESET",
+      "originalSources": [
+        "app/api/user/reset-progress/route.ts"
+      ],
+      "owners": [
+        "app/api/user/reset-progress/route.ts"
+      ],
+      "guarantee": "Reset blocks linked work/open timers rather than inventing replan erasure. Ordinary reset updates correlated mirrors/ledgers and OTP atomically.",
+      "qualification": "actual blocked OTP preservation and ordinary reset route"
+    },
+    {
+      "id": "D06",
+      "name": "Account deletion and FK cascades",
+      "disposition": "COORDINATED_ERASURE",
+      "originalSources": [
+        "app/api/user/account/delete/route.ts",
+        "prisma/migrations/20260924010000_planner_foundation/migration.sql",
+        "prisma/schema.prisma"
+      ],
+      "owners": [
+        "app/api/user/account/delete/route.ts"
+      ],
+      "guarantee": "Explicit erasure is one coordinated security/cascade transaction; deleted Attempt ownership fences workers. Historical party membership cascades are allowed only for erasure.",
+      "qualification": "actual account route and late worker rejection"
+    },
+    {
+      "id": "X01",
+      "name": "Development seed and QA script",
+      "disposition": "DISPOSABLE_OPERATOR_ONLY",
+      "originalSources": [
+        "prisma/seed.ts",
+        "scripts/qa-planner-session.mjs"
+      ],
+      "owners": [
+        "prisma/seed.ts",
+        "scripts/qa-planner-session.mjs"
+      ],
+      "guarantee": "Not a product execution pathway. Existing admin seed/QA tools were not run against hosted data; adopted SQL still rejects uncoordinated writes.",
+      "qualification": "source disposition, not hosted qualification"
+    },
+    {
+      "id": "P09",
+      "name": "Classic direct materializer",
+      "disposition": "BOUNDED_UNADOPTED_LEGACY",
+      "originalSources": [
+        "app/api/ai-planner/route.ts"
+      ],
+      "owners": [
+        "app/api/ai-planner/route.ts"
+      ],
+      "guarantee": "Classic rejects an adopted user before provider dispatch and again before its coordinated final write. It cannot materialize V2 work or act as a fallback; retirement remains Phase 5 supported-client cutover.",
+      "qualification": "Classic/current suites; SQL adopted Goal guard"
+    },
+    {
+      "id": "S05",
+      "name": "Focus Party membership and indirect timer termination",
+      "disposition": "INDEPENDENT_SOCIAL_AUTHORITY",
+      "originalSources": [
+        "lib/focus-party-service.ts",
+        "prisma/migrations/20260907030000_focus_party_single_active_membership/migration.sql"
+      ],
+      "owners": [
+        "lib/focus-party-service.ts"
+      ],
+      "guarantee": "Party membership/termination has no ordinary StudySession write; account erasure is the explicit exception. Never infer study completion from social presence.",
+      "qualification": "Focus party unit suites and actual historical-party erasure"
+    },
+    {
+      "id": "X02",
+      "name": "Existing PostgreSQL verification-script writers",
+      "disposition": "DISPOSABLE_OPERATOR_ONLY",
+      "originalSources": [
+        "scripts/confirm-invites-and-rejoin.mjs",
+        "scripts/verify-focus-party.mjs",
+        "scripts/verify-phase2-service.mjs",
+        "scripts/verify-realtime-security.mjs",
+        "scripts/verify-single-active-party.mjs"
+      ],
+      "owners": [
+        "scripts/test-planner-v2-phase1-postgres.mjs"
+      ],
+      "guarantee": "Old verification scripts are not release authority and were not executed against hosted data. Required V2 tests enforce random loopback DB name+identity marker and isolated credentials.",
+      "qualification": "harness identity/bootstrap/catalog/concurrency evidence"
+    }
+  ],
+  "scope": "Repository execution writers; no hosted catalog or external principal qualification.",
+  "coverageNote": "Actual-route PostgreSQL tests are distinguished from unit/source plus database-backstop evidence; not every route is claimed to have a dedicated PostgreSQL race."
+}

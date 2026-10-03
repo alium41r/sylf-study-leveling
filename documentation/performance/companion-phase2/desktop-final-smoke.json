@@ -1,0 +1,48 @@
+{
+  "status": "complete",
+  "viewport": "1440x1000",
+  "frames": 721,
+  "interval": {
+    "mean": 16.667,
+    "p95": 18.6,
+    "max": 18.8
+  },
+  "skin": {
+    "mean": 0.08,
+    "p95": 0.2,
+    "max": 0.9
+  },
+  "upload": {
+    "mean": 0.008,
+    "p95": 0.1,
+    "max": 0.1
+  },
+  "submit": {
+    "mean": 0.111,
+    "p95": 0.2,
+    "max": 0.4
+  },
+  "counts": {
+    "positionUploads": 721,
+    "renders": 721,
+    "scheduled": 721,
+    "traceCallbacks": 721
+  },
+  "states": {
+    "idle": 221,
+    "start": 64,
+    "walk": 301,
+    "stop": 110,
+    "turn": 25
+  },
+  "world": {
+    "frames": 444,
+    "measures": 0,
+    "frameMaxMs": 5.1,
+    "measureMaxMs": 43.6
+  },
+  "longTaskSupported": true,
+  "longTasks": 0,
+  "longestTask": 0,
+  "gaps": []
+}

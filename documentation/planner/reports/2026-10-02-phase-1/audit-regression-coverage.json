@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 2,
+  "findings": [
+    {
+      "auditId": "A01",
+      "boundary": "Canonical intent / typed change",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A02",
+      "boundary": "Execution specification / semantic diff",
+      "phase1Protection": "Full ExecutionTaskSpec semantic diff; changed instructions preserve unstarted identity; true KEPT rows stable.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A03",
+      "boundary": "Attempt identity / recovery",
+      "phase1Protection": "Immutable request/input hash; edit supersedes pinned Attempt; old result never retargets.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A04",
+      "boundary": "Workspace projection",
+      "phase1Protection": "Owned workspace current/stale projection and receipt recovery.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A05",
+      "boundary": "Effective context",
+      "phase1Protection": "Shared accepted availability/context pinned at publication and rechecked at apply.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A06",
+      "boundary": "Duration / migration",
+      "phase1Protection": "Reviewed duration alias adoption plus shared remaining/read adapters.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A07",
+      "boundary": "Scheduling envelope",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A08",
+      "boundary": "Apply transaction / receipt",
+      "phase1Protection": "Duplicate same/joint apply returns the exact stored receipt.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A09",
+      "boundary": "Review projection",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A10",
+      "boundary": "Quality report",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A11",
+      "boundary": "Shared technical envelope",
+      "phase1Protection": "Same frozen bounds across sealed proposal, graph verification and apply.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A12",
+      "boundary": "Shared serialized envelope",
+      "phase1Protection": "Same serialized envelope; long UTF-8 baseline proof and fail-closed payload bounds.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A13",
+      "boundary": "Workspace / navigation",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A14",
+      "boundary": "Research provenance",
+      "phase1Protection": "Public input cannot mint verified research; trusted fenced resolution adopts owned canonical scope.",
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A15",
+      "boundary": "Planning quality",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A16",
+      "boundary": "One canonical intent",
+      "phase1Protection": "One immutable canonical intent across policies; changing strategy supersedes candidate.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A17",
+      "boundary": "Optional deadline / errors",
+      "phase1Protection": "Frozen optional deadline parsing; no-deadline intent remains valid; typed domain errors.",
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A18",
+      "boundary": "Structured error / checkpoint",
+      "phase1Protection": "Durable checkpoint/lease recovery and stage/error identity.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A19",
+      "boundary": "Optimistic persistence",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A20",
+      "boundary": "Consequential currentness",
+      "phase1Protection": "Value/dependency context currentness; fresh owned sources/availability/evidence.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A21",
+      "boundary": "Useful outcomes / pacing",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A22",
+      "boundary": "Content preservation",
+      "phase1Protection": "Preserve specific approved content; no lexical rewrite or generic substitution in durable core.",
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A23",
+      "boundary": "Accounting / admission",
+      "phase1Protection": "Lazy first-dispatch quota; exactly-once reservation/settlement; zero-call calendar seam.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A24",
+      "boundary": "Remaining work / evidence",
+      "phase1Protection": "Remaining forecasts cannot infer completion/mastery; explicit execution completion.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A25",
+      "boundary": "Workspace / receipt",
+      "phase1Protection": "Active receipt/candidate/working intent projection stays distinct.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A26",
+      "boundary": "Owned execution context",
+      "phase1Protection": "Owned Goal/Subject/spec resources; missing Goal adopted transactionally.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A27",
+      "boundary": "Commitment category",
+      "phase1Protection": "Unselected workload pinned; selected replacement/KEPT counted once.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A28",
+      "boundary": "Recovery actions",
+      "phase1Protection": "Structured recovery actions and admission-disabled recovery routes.",
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A29",
+      "boundary": "Usage accounting",
+      "phase1Protection": "Unknown usage/pricing is explicit; cancellation/late reconciliation cannot fabricate zero cost.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A30",
+      "boundary": "Hard facts / runtime",
+      "phase1Protection": "Immutable hard facts and root processing/lease/deadline enforcement.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A31",
+      "boundary": "Roadmap expansion admission",
+      "phase1Protection": "Expansion uses the same durable admission/context/apply foundation; intelligence not shipped.",
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A32",
+      "boundary": "Root request budget",
+      "phase1Protection": "Transferred foreground receipts and bounded root budgets preserved across retry/takeover.",
+      "laterProductGate": false
+    },
+    {
+      "auditId": "A33",
+      "boundary": "Conversation interpretation",
+      "phase1Protection": null,
+      "laterProductGate": true
+    },
+    {
+      "auditId": "A34",
+      "boundary": "Evidence / verification",
+      "phase1Protection": "Frozen evidence hashes retained; required PG suite cannot skip; no claim of AI-quality qualification.",
+      "laterProductGate": true
+    }
+  ],
+  "note": "The 34 frozen findings remain regression evidence. Phase 1 establishes listed system invariants; interview, pedagogy, rendered Planner review/navigation and performance quality are later gates, not asserted fixed."
+}

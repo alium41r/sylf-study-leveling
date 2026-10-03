@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
         completionTokens: true,
         cacheHitTokens: true,
         estimatedCostUsd: true,
+        requestId: true,
         createdAt: true,
       },
       orderBy: { createdAt: "asc" },
@@ -50,6 +51,7 @@ export async function GET(req: NextRequest) {
           completionTokens: number;
           cacheHitTokens: number;
           costUsd: number;
+          unknownCostRequests: number;
         }
       > = {};
       const byFeature: Record<
@@ -60,6 +62,7 @@ export async function GET(req: NextRequest) {
           completionTokens: number;
           cacheHitTokens: number;
           costUsd: number;
+          unknownCostRequests: number;
         }
       > = {};
 
@@ -68,13 +71,18 @@ export async function GET(req: NextRequest) {
       let totalCompletion = 0;
       let totalCacheHit = 0;
       let totalCost = 0;
+      let unknownCostRequests = 0;
 
       for (const r of slice) {
+        // Old logs used zero for missing prices. Retain their stored value,
+        // but do not certify it as a priced durable-dispatch receipt.
+        const costUnknown = r.estimatedCostUsd === null || r.requestId === null && r.estimatedCostUsd === 0;
         totalRequests += 1;
         totalPrompt += r.promptTokens;
         totalCompletion += r.completionTokens;
         totalCacheHit += r.cacheHitTokens || 0;
-        totalCost += r.estimatedCostUsd;
+        totalCost += r.estimatedCostUsd ?? 0;
+        if (costUnknown) unknownCostRequests++;
 
         const m = (byModel[r.model] ??= {
           requests: 0,
@@ -82,12 +90,14 @@ export async function GET(req: NextRequest) {
           completionTokens: 0,
           cacheHitTokens: 0,
           costUsd: 0,
+          unknownCostRequests: 0,
         });
         m.requests += 1;
         m.promptTokens += r.promptTokens;
         m.completionTokens += r.completionTokens;
         m.cacheHitTokens += r.cacheHitTokens || 0;
-        m.costUsd += r.estimatedCostUsd;
+        m.costUsd += r.estimatedCostUsd ?? 0;
+        if (costUnknown) m.unknownCostRequests++;
 
         const f = (byFeature[r.feature] ??= {
           requests: 0,
@@ -95,12 +105,14 @@ export async function GET(req: NextRequest) {
           completionTokens: 0,
           cacheHitTokens: 0,
           costUsd: 0,
+          unknownCostRequests: 0,
         });
         f.requests += 1;
         f.promptTokens += r.promptTokens;
         f.completionTokens += r.completionTokens;
         f.cacheHitTokens += r.cacheHitTokens || 0;
-        f.costUsd += r.estimatedCostUsd;
+        f.costUsd += r.estimatedCostUsd ?? 0;
+        if (costUnknown) f.unknownCostRequests++;
       }
 
       const round = (n: number) => Math.round(n * 1_000_000) / 1_000_000;
@@ -110,6 +122,8 @@ export async function GET(req: NextRequest) {
         completionTokens: totalCompletion,
         cacheHitTokens: totalCacheHit,
         costUsd: round(totalCost),
+        unknownCostRequests,
+        costComplete: unknownCostRequests === 0,
         byModel: Object.entries(byModel)
           .map(([model, v]) => ({ model, ...v, costUsd: round(v.costUsd) }))
           .sort((a, b) => b.costUsd - a.costUsd),

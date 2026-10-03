@@ -1,0 +1,44 @@
+{
+  "at": "2026-09-11T03:31:46.684Z",
+  "results": [
+    {
+      "case": "two simultaneous reads",
+      "storageKey": null,
+      "networkRequests": 1
+    },
+    {
+      "case": "two simultaneous reads",
+      "storageKey": "social:friends:7",
+      "networkRequests": 2
+    },
+    {
+      "case": "stale revalidation does not notify existing caller",
+      "initial": {
+        "version": 1
+      },
+      "visibleAfterBackgroundCompletion": {
+        "version": 1
+      },
+      "nextRead": {
+        "version": 2
+      },
+      "networkRequests": 2
+    },
+    {
+      "case": "URL invalidation misses storage-key entry",
+      "data": {
+        "version": 1
+      },
+      "networkRequests": 1,
+      "storageEntries": 1
+    },
+    {
+      "case": "inflight completion after logout clear restores payload",
+      "storageEntries": 1
+    },
+    {
+      "case": "AI transcript storage key passes no-persist guard",
+      "storageEntries": 1
+    }
+  ]
+}

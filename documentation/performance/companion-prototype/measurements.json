@@ -1,0 +1,192 @@
+{
+  "baseline": {
+    "raw": 1360672,
+    "gzip": 394497,
+    "brotli": 337566
+  },
+  "initial": {
+    "entries": [
+      {
+        "file": "static/chunks/3o169g1xwq5yz.js",
+        "raw": 18268,
+        "gzip": 6970,
+        "brotli": 6221
+      },
+      {
+        "file": "static/chunks/1ntn7efqc-iiw.js",
+        "raw": 54763,
+        "gzip": 12926,
+        "brotli": 11280
+      },
+      {
+        "file": "static/chunks/0rmkc-mv_pjla.js",
+        "raw": 47229,
+        "gzip": 11729,
+        "brotli": 10339
+      },
+      {
+        "file": "static/chunks/26p7d39aas105.js",
+        "raw": 135907,
+        "gzip": 44445,
+        "brotli": 38864
+      },
+      {
+        "file": "static/chunks/01_vdy5a_qo4k.js",
+        "raw": 104483,
+        "gzip": 25642,
+        "brotli": 21624
+      },
+      {
+        "file": "static/chunks/07hvr40w77zns.js",
+        "raw": 423198,
+        "gzip": 124036,
+        "brotli": 103792
+      },
+      {
+        "file": "static/chunks/2efk5ase77c1r.js",
+        "raw": 57594,
+        "gzip": 17169,
+        "brotli": 14983
+      },
+      {
+        "file": "static/chunks/3qe_rpm3-13sd.js",
+        "raw": 4151,
+        "gzip": 1555,
+        "brotli": 1414
+      },
+      {
+        "file": "static/chunks/115d14p_rqdeh.js",
+        "raw": 64012,
+        "gzip": 20356,
+        "brotli": 17727
+      },
+      {
+        "file": "static/chunks/1dofafxrdsqhe.js",
+        "raw": 32793,
+        "gzip": 9380,
+        "brotli": 8278
+      },
+      {
+        "file": "static/chunks/3nc6x0_y5iwnk.js",
+        "raw": 44491,
+        "gzip": 9274,
+        "brotli": 7989
+      },
+      {
+        "file": "static/chunks/37n2y244i6xgf.js",
+        "raw": 141865,
+        "gzip": 38714,
+        "brotli": 33211
+      },
+      {
+        "file": "static/chunks/1wpi-_59dw0su.js",
+        "raw": 227425,
+        "gzip": 71049,
+        "brotli": 60686
+      },
+      {
+        "file": "static/chunks/turbopack-3yg6phq9m191r.js",
+        "raw": 10581,
+        "gzip": 4158,
+        "brotli": 3745
+      }
+    ],
+    "totals": {
+      "raw": 1366760,
+      "gzip": 397403,
+      "brotli": 340153
+    }
+  },
+  "deferred": {
+    "entries": [
+      {
+        "file": "static/chunks/370eo742vzz5t.js",
+        "raw": 352,
+        "gzip": 240,
+        "brotli": 200
+      },
+      {
+        "file": "static/chunks/06yo8r1dtth60.js",
+        "raw": 192917,
+        "gzip": 50689,
+        "brotli": 43706
+      },
+      {
+        "file": "static/chunks/2v8kev3tsae35.js",
+        "raw": 142917,
+        "gzip": 43609,
+        "brotli": 37479
+      },
+      {
+        "file": "static/chunks/0fiqumlr9098b.js",
+        "raw": 22176,
+        "gzip": 6732,
+        "brotli": 6071
+      },
+      {
+        "file": "static/chunks/04qaqiql_tpbt.js",
+        "raw": 43184,
+        "gzip": 11211,
+        "brotli": 9829
+      },
+      {
+        "file": "static/chunks/0pim5tbo67shx.js",
+        "raw": 22245,
+        "gzip": 6765,
+        "brotli": 6102
+      }
+    ],
+    "totals": {
+      "raw": 423791,
+      "gzip": 119246,
+      "brotli": 103387
+    }
+  },
+  "delta": {
+    "raw": 6088,
+    "gzip": 2906,
+    "brotli": 2587
+  },
+  "asset": 55296,
+  "observedDeferred": {
+    "entries": [
+      {
+        "file": "static/chunks/370eo742vzz5t.js",
+        "raw": 352,
+        "gzip": 240,
+        "brotli": 200
+      },
+      {
+        "file": "static/chunks/06yo8r1dtth60.js",
+        "raw": 192917,
+        "gzip": 50689,
+        "brotli": 43706
+      },
+      {
+        "file": "static/chunks/2v8kev3tsae35.js",
+        "raw": 142917,
+        "gzip": 43609,
+        "brotli": 37479
+      },
+      {
+        "file": "static/chunks/0fiqumlr9098b.js",
+        "raw": 22176,
+        "gzip": 6732,
+        "brotli": 6071
+      },
+      {
+        "file": "static/chunks/04qaqiql_tpbt.js",
+        "raw": 43184,
+        "gzip": 11211,
+        "brotli": 9829
+      }
+    ],
+    "totals": {
+      "raw": 401546,
+      "gzip": 112481,
+      "brotli": 97285
+    }
+  },
+  "method": "Production Next manifests plus the renderer import chunk graph. Observed deferred files verified in browser script tags. gzip/Brotli are local compression estimates, not measured network transfer. Baseline full build was blocked after compilation by an unrelated type error; final build passed. Working tree contains concurrent unrelated changes.",
+  "date": "2026-09-23"
+}

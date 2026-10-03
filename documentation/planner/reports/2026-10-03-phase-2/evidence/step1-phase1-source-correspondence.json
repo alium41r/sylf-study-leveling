@@ -1,0 +1,13 @@
+{
+  "historicalStatus": "PASSED",
+  "qualifiedFiles": 797,
+  "mismatches": [
+    "app/components/GlobalSystemWrapper.tsx",
+    "app/components/LevelUpOverlay.tsx",
+    "app/layout.tsx",
+    "app/timer/components/TimerScreen.tsx",
+    "lib/color-utils.ts",
+    "lib/cosmetics-catalog.ts"
+  ],
+  "boundary": "Hash correspondence to the completed Phase 1 report, not a new run of its integration suites."
+}

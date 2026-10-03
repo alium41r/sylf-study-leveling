@@ -2,15 +2,19 @@
 
 import { useAuth } from "../AuthProvider";
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import StudyScheduleModal from "../../calendar/components/StudyScheduleModal";
 import DayInspectionPanel from "../../calendar/components/DayInspectionPanel";
+import { backdropVariants } from "@/lib/motion";
 import {
   MonthCalendarData,
   DayStudySummary,
   GoalMilestone,
   FloatingRestDayStatus,
-} from "@/lib/study-schedule-service";
+} from "@/lib/study-schedule-types";
 import { resolveGoalColor } from "@/lib/goal-theme";
+import { ChevronLeft, ChevronRight, Sliders, BarChart3, RotateCcw } from "lucide-react";
+import styles from "../../calendar/Calendar.module.css";
 
 /* ─── Helpers ──────────────────────────────────────────────── */
 
@@ -89,39 +93,39 @@ function DayCell({
         alignItems: "center",
         justifyContent: "center",
         gap: "2px",
-        borderRadius: "6px",
+        borderRadius: "10px",
         overflow: "hidden",
         touchAction: "manipulation",
         background: isFloatingRest
-          ? "rgba(245, 158, 11, 0.05)"
+          ? "rgba(245, 158, 11, 0.08)"
           : isToday
-          ? "var(--accent-primary-dim)"
+          ? "var(--accent-primary)"
           : isRest && minutes === 0
           ? "rgba(34, 197, 94, 0.04)"
           : getIntensityColor(minutes),
         border: isFloatingRest
-          ? "1px dashed rgba(245, 158, 11, 0.45)"
+          ? "1px dashed rgba(245, 158, 11, 0.55)"
           : isToday
-          ? "1px solid var(--accent-primary-mid)"
+          ? "1px solid var(--accent-primary-light, #67e8f9)"
           : isRest
-          ? "1px dashed rgba(34, 197, 94, 0.35)"
+          ? "1px dashed rgba(34, 197, 94, 0.45)"
           : milestoneTheme
           ? `1px solid ${milestoneTheme.mid}`
           : `1px solid ${getIntensityBorder(minutes)}`,
         cursor: "pointer",
-        transition: "all 0.2s ease",
         position: "relative",
-        opacity: isCurrentMonth ? 1 : 0.3,
+        opacity: isCurrentMonth ? 1 : 0.28,
+        boxShadow: isToday ? "0 0 16px var(--accent-dim)" : undefined,
       }}
-      className="hover:scale-[1.02] hover:shadow-lg hover:z-10 min-h-[64px] sm:min-h-[112px]"
+      className={`${styles.dayCell} min-h-[64px] sm:min-h-[112px]`}
     >
       <span
         style={{
           fontFamily: "'Rajdhani', sans-serif",
-          fontWeight: isToday ? 700 : 500,
-          fontSize: "0.85rem",
+          fontWeight: isToday ? 700 : 600,
+          fontSize: "0.9rem",
           color: isToday
-            ? "var(--accent-text-light)"
+            ? "#080d17"
             : minutes > 0 || questsCount > 0 || isFloatingRest
             ? "var(--text-primary)"
             : "var(--text-muted)",
@@ -134,9 +138,9 @@ function DayCell({
         <span
           style={{
             fontFamily: "'Rajdhani', sans-serif",
-            fontSize: "0.55rem",
-            color: "var(--accent-text-light)",
-            fontWeight: 600,
+            fontSize: "0.6rem",
+            color: isToday ? "#080d17" : "var(--accent-text-light)",
+            fontWeight: 700,
           }}
         >
           {minutes < 60 ? `${minutes}m` : `${Math.floor(minutes / 60)}h`}
@@ -424,7 +428,7 @@ export default function StudyCalendar() {
       const res = await fetch("/api/user/study-schedule/floating-rest-day", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dateKey: selectedDay.date }),
+        body: JSON.stringify({ dateKey: selectedDay.date, enabled: !floatingRestStatus?.isFloatingRest }),
       });
       if (res.ok) {
         // Cascade may have shifted quests — refresh the whole month grid.
@@ -533,42 +537,24 @@ export default function StudyCalendar() {
   return (
     <div style={{ maxWidth: "min(980px, 100%)", margin: "0 auto" }}>
       {/* ─── Top Control Bar: Month Navigation & Goals Trigger ────── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-        }}
-      >
+      <div className="flex items-center justify-between mb-5">
         <button
           onClick={() => navigateMonth(-1)}
-          style={{
-            background: "var(--bg-panel)",
-            border: "1px solid var(--border-subtle)",
-            borderRadius: "6px",
-            padding: "8px 12px",
-            color: "var(--text-secondary)",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}
-          className="hover:bg-bg-panel hover:text-text-primary"
+          className={styles.navBtn}
           title="Previous Month"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft size={18} />
         </button>
 
-        <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+        <div className="text-center flex flex-col items-center">
+          <div className="flex items-center gap-3 flex-wrap justify-center">
             <h2
               style={{
                 fontFamily: "'Rajdhani', sans-serif",
                 fontWeight: 700,
-                fontSize: "1.5rem",
-                color: "var(--text-primary)",
-                letterSpacing: "0.05em",
+                fontSize: "1.7rem",
+                color: "var(--ink)",
+                letterSpacing: "0.04em",
               }}
             >
               {MONTH_NAMES[month]} {year}
@@ -577,162 +563,90 @@ export default function StudyCalendar() {
             {/* Toggle Month Stats Button */}
             <button
               onClick={() => setShowMonthStats(!showMonthStats)}
-              style={{
-                background: showMonthStats ? "var(--accent-dim)" : "var(--bg-panel)",
-                border: `1px solid ${showMonthStats ? "var(--accent-primary)" : "var(--border-subtle)"}`,
-                borderRadius: "6px",
-                padding: "4px 8px",
-                color: showMonthStats ? "var(--accent-text-light)" : "var(--text-muted)",
-                fontFamily: "'Rajdhani', sans-serif",
-                fontWeight: 600,
-                fontSize: "0.7rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "4px",
-              }}
-              className="hover:text-text-primary"
+              className={`${styles.ghostBtn} ${showMonthStats ? styles.activeGhostBtn : ""}`}
               title={showMonthStats ? "Hide Month Stats" : "Show Month Stats"}
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              {showMonthStats ? "Hide Stats" : "Show Month Stats"}
+              <BarChart3 size={14} />
+              <span>{showMonthStats ? "Hide Stats" : "Show Month Stats"}</span>
             </button>
           </div>
 
           {(month !== now.getMonth() || year !== now.getFullYear()) && (
             <button
               onClick={goToToday}
-              style={{
-                fontFamily: "'Rajdhani', sans-serif",
-                fontSize: "0.75rem",
-                color: "var(--accent-text-light)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                marginTop: "2px",
-              }}
-              className="hover:text-text-primary transition-colors"
+              className="mt-1 flex items-center gap-1.5 text-xs font-['Rajdhani'] font-bold text-accent-text-light hover:text-text-primary transition-colors cursor-pointer uppercase tracking-wider"
             >
-              ← Back to Today
+              <RotateCcw size={12} />
+              <span>Back to Today</span>
             </button>
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setIsScheduleModalOpen(true)}
-            style={{
-              background: "var(--bg-panel)",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: "6px",
-              padding: "8px 12px",
-              color: "var(--accent-text-light)",
-              fontFamily: "'Rajdhani', sans-serif",
-              fontWeight: 600,
-              fontSize: "0.75rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-            className="hover:bg-bg-panel hover:text-text-primary"
+            className={styles.ghostBtn}
             title="Configure Daily Target & Rest Days"
           >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <line x1="4" y1="21" x2="4" y2="14" />
-              <line x1="4" y1="10" x2="4" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="12" />
-              <line x1="12" y1="8" x2="12" y2="3" />
-              <line x1="20" y1="21" x2="20" y2="16" />
-              <line x1="20" y1="12" x2="20" y2="3" />
-              <line x1="1" y1="14" x2="7" y2="14" />
-              <line x1="9" y1="8" x2="15" y2="8" />
-              <line x1="17" y1="16" x2="23" y2="16" />
-            </svg>
-            Schedule
+            <Sliders size={14} />
+            <span>Schedule</span>
           </button>
 
           <button
             onClick={() => navigateMonth(1)}
-            style={{
-              background: "var(--bg-panel)",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: "6px",
-              padding: "8px 12px",
-              color: "var(--text-secondary)",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-            }}
-            className="hover:bg-bg-panel hover:text-text-primary"
+            className={styles.navBtn}
             title="Next Month"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight size={18} />
           </button>
         </div>
       </div>
 
       {/* ─── Month Stats Cards (Revealed when showMonthStats is true) ── */}
       {showMonthStats && calendarData && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
-          <div className="system-card" style={{ padding: "16px", textAlign: "center" }}>
-            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-text-light)" }}>
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
+        >
+          <div className={styles.statCard}>
+            <div className={styles.topHighlight} />
+            <p className={`${styles.statValue} ${styles.statValueHighlight}`}>
               {Math.floor(calendarData.monthStats.totalMinutes / 60)}h {calendarData.monthStats.totalMinutes % 60}m
             </p>
-            <p className="stat-label">Total Study</p>
+            <p className={styles.statLabel}>Total Study</p>
           </div>
-          <div className="system-card" style={{ padding: "16px", textAlign: "center" }}>
-            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-primary)" }}>
+          <div className={styles.statCard}>
+            <div className={styles.topHighlight} />
+            <p className={`${styles.statValue} ${styles.statValueHighlight}`}>
               {calendarData.monthStats.activeDays}
             </p>
-            <p className="stat-label">Active Days</p>
+            <p className={styles.statLabel}>Active Days</p>
           </div>
-          <div className="system-card" style={{ padding: "16px", textAlign: "center" }}>
-            <p style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "1.4rem", color: "var(--accent-primary)" }}>
+          <div className={styles.statCard}>
+            <div className={styles.topHighlight} />
+            <p className={`${styles.statValue} ${styles.statValueHighlight}`}>
               {calendarData.monthStats.totalDays > 0
                 ? Math.round((calendarData.monthStats.activeDays / calendarData.monthStats.totalDays) * 100)
                 : 0}%
             </p>
-            <p className="stat-label">Consistency</p>
+            <p className={styles.statLabel}>Consistency</p>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ─── Calendar Grid ───────────────────────────── */}
-      <div className="system-card" style={{ padding: "24px" }}>
+      <div className={`${styles.card} p-4 sm:p-6 md:p-7`}>
+        <div className={styles.topHighlight} />
         {/* Day labels */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(7, 1fr)",
-            gap: "6px",
-            marginBottom: "12px",
-          }}
-        >
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-3">
           {DAY_LABELS.map((label) => (
             <div
               key={label}
-              style={{
-                textAlign: "center",
-                fontFamily: "'Rajdhani', sans-serif",
-                fontWeight: 600,
-                fontSize: "0.75rem",
-                color: "var(--text-muted)",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                padding: "8px 0",
-              }}
+              className="text-center font-['Rajdhani'] font-bold text-xs uppercase tracking-wider py-1.5"
+              style={{ color: "var(--muted)" }}
             >
               {label}
             </div>
@@ -741,30 +655,24 @@ export default function StudyCalendar() {
 
         {/* Calendar cells */}
         {isLoading ? (
-          <div style={{ textAlign: "center", padding: "80px 0" }}>
+          <div className="text-center py-20">
             <div
               style={{
                 width: "40px",
                 height: "40px",
                 border: "3px solid var(--border-subtle)",
-                borderTopColor: "var(--accent-cyan)",
+                borderTopColor: "var(--accent-primary)",
                 borderRadius: "50%",
                 margin: "0 auto 16px",
                 animation: "spin 0.8s linear infinite",
               }}
             />
-            <p style={{ color: "var(--text-muted)", fontFamily: "'Rajdhani', sans-serif", fontSize: "0.9rem" }}>
+            <p className="font-['Rajdhani'] text-sm tracking-wider uppercase font-bold" style={{ color: "var(--muted)" }}>
               Loading calendar...
             </p>
           </div>
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(7, 1fr)",
-              gap: "6px",
-            }}
-          >
+          <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
             {gridCells.map((cell, i) => (
               <DayCell
                 key={i}
@@ -802,50 +710,56 @@ export default function StudyCalendar() {
       </div>
 
       {/* ─── Selected Day Detail Panel ────────────────── */}
-      {selectedDay && (
-        <>
-          {/* Mobile bottom-sheet backdrop (tap outside to close) */}
-          <div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
-            aria-hidden="true"
-            onClick={() => setSelectedDay(null)}
-          />
-          <DayInspectionPanel
-            dayData={selectedDay}
-            milestones={selectedDay.date ? milestonesByDate[selectedDay.date] || [] : []}
-            floatingRestStatus={floatingRestStatus}
-            onToggleFloatingRest={handleToggleFloatingRest}
-            isTogglingFloatingRest={isTogglingFloatingRest}
-            onClose={() => setSelectedDay(null)}
-          />
-        </>
-      )}
+      <AnimatePresence>
+        {selectedDay && (
+          <div key="selected-day-inspection-wrapper">
+            {/* Mobile bottom-sheet backdrop (tap outside to close) */}
+            <motion.div
+              variants={backdropVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+              aria-hidden="true"
+              onClick={() => setSelectedDay(null)}
+            />
+            <DayInspectionPanel
+              dayData={selectedDay}
+              milestones={selectedDay.date ? milestonesByDate[selectedDay.date] || [] : []}
+              floatingRestStatus={floatingRestStatus}
+              onToggleFloatingRest={handleToggleFloatingRest}
+              isTogglingFloatingRest={isTogglingFloatingRest}
+              onClose={() => setSelectedDay(null)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* ─── Intensity Legend ─────────────────────────── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "10px",
-          marginTop: "24px",
-        }}
-      >
-        <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Less</span>
-        {[0, 15, 30, 60, 120].map((mins) => (
-          <div
-            key={mins}
-            style={{
-              width: "16px",
-              height: "16px",
-              borderRadius: "4px",
-              background: getIntensityColor(mins),
-              border: `1px solid ${getIntensityBorder(mins)}`,
-            }}
-            title={`${mins}+ minutes`}
-          />
-        ))}
-        <span style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>More</span>
+      <div className="flex justify-center mt-6">
+        <div className={styles.legendCapsule}>
+          <span className="font-['Rajdhani'] font-bold text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+            Less
+          </span>
+          <div className="flex items-center gap-1.5">
+            {[0, 15, 30, 60, 120].map((mins) => (
+              <div
+                key={mins}
+                style={{
+                  width: "16px",
+                  height: "16px",
+                  borderRadius: "4px",
+                  background: getIntensityColor(mins),
+                  border: `1px solid ${getIntensityBorder(mins)}`,
+                }}
+                title={`${mins}+ minutes`}
+              />
+            ))}
+          </div>
+          <span className="font-['Rajdhani'] font-bold text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>
+            More
+          </span>
+        </div>
       </div>
 
       {/* ─── Schedule & Goals Configuration Modal ────── */}

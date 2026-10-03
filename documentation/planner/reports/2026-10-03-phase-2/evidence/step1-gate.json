@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 2,
+  "gate": "PLANNER_V2_PHASE_2_STEP_1",
+  "startedAt": "2026-10-03T16:23:11.657Z",
+  "status": "PASSED",
+  "boundary": "Baseline, requirement map, pure supporting artifacts, serialization and normal Node loading. No Phase 2 compiler/provider/database lifecycle completion is claimed.",
+  "checks": [
+    {
+      "name": "frozen Phase 0 contracts",
+      "status": "PASSED",
+      "evidence": {
+        "files": 12,
+        "historicalGateStatus": "PASSED"
+      }
+    },
+    {
+      "name": "governing source and requirement correspondence",
+      "status": "PASSED",
+      "evidence": {
+        "requirements": 28,
+        "steps": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "mapSha256": "8dd5940f6efc52ecff352aae01b3769cf90237e556e7df2e53d63c1103f38ae4"
+      }
+    },
+    {
+      "name": "required frozen/audit/digest/supporting suites",
+      "status": "PASSED",
+      "evidence": {
+        "files": 10,
+        "passed": 97,
+        "failed": 0,
+        "requiredSkipped": 0
+      }
+    },
+    {
+      "name": "isolated supporting artifact TypeScript",
+      "status": "PASSED",
+      "evidence": {
+        "config": "tsconfig.planner-v2-phase2.json"
+      }
+    },
+    {
+      "name": "whole source TypeScript excluding generated Next baseline",
+      "status": "PASSED",
+      "evidence": {
+        "generatedNextTypesExcluded": true
+      }
+    },
+    {
+      "name": "whole repository typecheck matches pre-change failures exactly",
+      "status": "PASSED",
+      "evidence": {
+        "status": "BASELINE_FAILURE_UNCHANGED",
+        "errors": [
+          ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'."
+        ]
+      }
+    },
+    {
+      "name": "Step 1 ESLint without warnings",
+      "status": "PASSED",
+      "evidence": {
+        "warnings": 0
+      }
+    },
+    {
+      "name": "compiled supporting artifacts load in normal Node",
+      "status": "PASSED",
+      "evidence": {
+        "node": "v26.7.0",
+        "module": "intelligence/checkpoints.js",
+        "nextRuntimeRequired": false,
+        "providerCalls": 0
+      }
+    },
+    {
+      "name": "documentation references and Step 1 whitespace",
+      "status": "PASSED",
+      "evidence": {
+        "documents": 3,
+        "step1SourceFiles": 14,
+        "step1WhitespaceFindings": 0,
+        "preExistingTrackedWhitespaceStatus": "PRE_EXISTING_OR_UNRELATED_CONCURRENT_FAILURE",
+        "preExistingFindings": [
+          "__tests__/focus/focus-tools.test.tsx:1081: new blank line at EOF.",
+          "app/api/user/stats/route.ts:74: trailing whitespace.",
+          "app/components/ConfirmationModal.tsx:106: new blank line at EOF.",
+          "app/components/SettingsRow.tsx:43: new blank line at EOF.",
+          "app/components/SettingsRowGroup.tsx:19: new blank line at EOF.",
+          "app/components/SettingsSectionCard.tsx:66: new blank line at EOF.",
+          "app/components/Sidebar.tsx:257: trailing whitespace.",
+          "app/components/Sidebar.tsx:294: trailing whitespace.",
+          "app/components/Sidebar.tsx:454: trailing whitespace.",
+          "app/components/Sidebar.tsx:462: trailing whitespace.",
+          "app/components/Sidebar.tsx:478: trailing whitespace.",
+          "app/components/Sidebar.tsx:488: trailing whitespace.",
+          "app/components/Sidebar.tsx:507: trailing whitespace.",
+          "app/components/Sidebar.tsx:517: trailing whitespace.",
+          "app/components/Sidebar.tsx:530: trailing whitespace.",
+          "app/components/Sidebar.tsx:571: trailing whitespace.",
+          "app/components/Sidebar.tsx:594: trailing whitespace.",
+          "app/components/Sidebar.tsx:609: trailing whitespace.",
+          "app/components/Sidebar.tsx:619: trailing whitespace.",
+          "app/components/Sidebar.tsx:620: trailing whitespace.",
+          "app/components/Sidebar.tsx:625: trailing whitespace.",
+          "app/components/Sidebar.tsx:626: trailing whitespace.",
+          "app/components/Sidebar.tsx:657: trailing whitespace.",
+          "app/components/Sidebar.tsx:699: trailing whitespace.",
+          "app/components/Sidebar.tsx:746: trailing whitespace.",
+          "app/components/Sidebar.tsx:841: trailing whitespace.",
+          "app/components/TopRightBar.tsx:65: trailing whitespace.",
+          "app/components/TopRightBar.tsx:67: trailing whitespace.",
+          "app/focus/components/tools/AudioMixerTool.tsx:982: new blank line at EOF.",
+          "app/goals/components/GoalsTab.tsx:314: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:315: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:334: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:370: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:371: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:372: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:373: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:376: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:377: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:378: trailing whitespace.",
+          "app/goals/components/GoalsTab.tsx:659: trailing whitespace.",
+          "app/goals/components/QuestsTab.tsx:290: trailing whitespace.",
+          "app/goals/components/QuestsTab.tsx:501: trailing whitespace.",
+          "app/goals/components/QuestsTab.tsx:502: trailing whitespace.",
+          "app/settings/account/AccountInformation.tsx:535: new blank line at EOF.",
+          "app/settings/account/SecurityInformation.tsx:185: trailing whitespace.",
+          "app/settings/account/SecurityInformation.tsx:197: trailing whitespace.",
+          "app/settings/account/SecurityInformation.tsx:210: trailing whitespace.",
+          "app/settings/account/SecurityInformation.tsx:261: new blank line at EOF.",
+          "lib/cosmetics-catalog.ts:184: new blank line at EOF."
+        ]
+      }
+    },
+    {
+      "name": "Planner baseline preservation and unrelated concurrent changes",
+      "status": "PASSED",
+      "evidence": {
+        "preExistingFiles": 3750,
+        "unexpectedChanges": [],
+        "unrelatedConcurrentChanges": [
+          {
+            "path": "__tests__/color-utils.test.ts",
+            "baselineSha256": "8b46e92ab49122d5c1ca93106d5d170a68a95b100851763017e9f4be9d76a6a5",
+            "observedSha256": "0bcfbfb04a7524873067271823b1ff88eb2abae8e96090fe2d49d48cb1383197"
+          },
+          {
+            "path": "__tests__/settings/app-backgrounds.test.tsx",
+            "baselineSha256": "f568d922a1aa89c9e849ef6a34c9425b5a4cb537895ef49cd24337a0c7399039",
+            "observedSha256": "c48901ddd93afd757bfd43530e6a35bd6cbcea27039182112861e254e135cc4f"
+          },
+          {
+            "path": "app/api/cosmetics/route.ts",
+            "baselineSha256": "f786ed9e5177f5ae8eef8e3b3318c32724769e633dceb5b773f641e49c639ac3",
+            "observedSha256": "7a760827a67a2b081650169dd2a3d1df89ee74572faef8a1bbf90add9568a924"
+          },
+          {
+            "path": "app/api/user/onboarding/route.ts",
+            "baselineSha256": "b763bebb071acd8f0e0f0babb3c35b57b759046d640b18de3b1e6f5a5c0aca00",
+            "observedSha256": "927e0efcea88a2a9f399470a54d363e6edd88ff4d6c4bcea53c01f89f665330b"
+          },
+          {
+            "path": "app/components/GlobalSystemWrapper.tsx",
+            "baselineSha256": "5aaa11f68f0045257ced04471183c1407c7fee9a69fd6eb6ba4b2ad3025ccc0c",
+            "observedSha256": "ed60228e5c697abfc99d6ea759113375750a74b970d42e7c47a3926056e30e16"
+          },
+          {
+            "path": "app/globals.css",
+            "baselineSha256": "6a94dfc131b407f5c2ee8fcd64e0816c106684fd2dc10a552a3b3d68cd963cb4",
+            "observedSha256": "f74439f94a76f3836fac853348370f16508c098fdede332aacf5e9e4f3d2c4f5"
+          },
+          {
+            "path": "app/layout.tsx",
+            "baselineSha256": "498353783f342fef0058b01e1705aaaf8c90d4828c4027ebfdb715e63e7c05a8",
+            "observedSha256": "61409adfedfab3e5e66c7adcf453fc82621222f94c8ac37d7a63fbb5f53606ac"
+          },
+          {
+            "path": "app/onboarding/components/AppearanceStep.tsx",
+            "baselineSha256": "1e83f3a8cdb25b99b5a43ff4ac4ea4d23fa2cb740100f51ece44df444087fd99",
+            "observedSha256": "98454bd982811245ec57875ecf99273b12bde1c078494e9ad7c293beafcaf6b7"
+          },
+          {
+            "path": "app/onboarding/page.tsx",
+            "baselineSha256": "98d12d6a0f770a7b90b96b389913051db9e99e73dc4d42e23870042ac36851ba",
+            "observedSha256": "c4b337f3d3ef5e1e238c17cdbfa4fe06047317dae46aab3fccfb25d777edceb1"
+          },
+          {
+            "path": "app/settings/appearance/components/AppearanceSettingsScreen.tsx",
+            "baselineSha256": "5ec721988fcc9cccf456f29bd748e7b34cb3f9d2a8bcd4e12aa69335036d660f",
+            "observedSha256": "ea92a000abf4fded11b047fbd4ff2e72c8f976ee383acf0d9888cef0a8a9b2ea"
+          },
+          {
+            "path": "app/settings/components/SystemHubPage.module.css",
+            "baselineSha256": "5db5a8e757fbc738ec056b052edba6942d7d4d1a159bfe89d7a7455285fef92a",
+            "observedSha256": "789920e7987e998128d1a0699fedf1f42dd34899503ec74ccf4293867b9e2a53"
+          },
+          {
+            "path": "lib/color-utils.ts",
+            "baselineSha256": "7ba92ac192ac2cb97bc3ed48a292fd1b47205001be401ed21da0cc4a625c1e9f",
+            "observedSha256": "6c2ed5a08f248abc576ead462403b9c9c8f76b0258434da540d5b4d81750f529"
+          },
+          {
+            "path": "lib/cosmetics-catalog.ts",
+            "baselineSha256": "684ce934e65d974262be30431989accf02c25cd30ad3052c1d96d34b9656e627",
+            "observedSha256": "63bb62dd22cb8f22fcdf00c2d97b60e306b933f44d744d24249c3e7be55aaeb4"
+          }
+        ],
+        "step1ChangesToExistingFiles": 0,
+        "addedFiles": 33,
+        "sourceFiles": 14
+      }
+    }
+  ],
+  "sourceSha256": {
+    "__tests__/planner-v2/intelligence/fixtures.ts": "63dbd36b42449b72a9cf14815315cd84c4ab8cf769dac99c408279863b17e04c",
+    "__tests__/planner-v2/intelligence/serialization.test.ts": "4b2d81ee4cb1a0471678d0668fa79c5856dda233b281c42584ec8868920b509b",
+    "__tests__/planner-v2/intelligence/supporting-schemas.test.ts": "8f0f33a9ff5300eed2f13e3e1cb96a732d199520cbbbbfd3abcd7a32c8b40412",
+    "documentation/planner/reports/2026-10-03-phase-2/IMPLEMENTATION_PLAN.md": "f03d2ac0fe430340900ca8321c9d39ef44729ed4c5ebd62b97405fe110178186",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md": "fa2fec4e9a308dbabac69e9ba62243d0295482bc2aafbc3d9ecde7a5a27d4f19",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json": "8dd5940f6efc52ecff352aae01b3769cf90237e556e7df2e53d63c1103f38ae4",
+    "documentation/planner/reports/2026-10-03-phase-2/SUPPORTING_ARTIFACTS.md": "4da561a1acf3a2d0126ffab60127038ae11a7bee5cf8f893ebb287026f8176f9",
+    "lib/planner/v2/intelligence/checkpoints.ts": "5a000cf3fb117540fec1ff2dcbfd1d0f036a30a58d651d1460a09044ffb3b6ed",
+    "lib/planner/v2/intelligence/schemas/assistant.ts": "118791339d5a92eb976c79c11b6457b2c355abc06cbe710b1c3a4976d8c2ab58",
+    "lib/planner/v2/intelligence/schemas/checkpoint.ts": "051f2a3f876dda72ed085b393a7022faea24615d35eee66741f99e8c98bc8edf",
+    "lib/planner/v2/intelligence/schemas/research.ts": "7dfa0c36541e7110fb2fb1eba2debfb92847c78dadc205bffee3a127d0bbcc41",
+    "lib/planner/v2/intelligence/schemas/scheduling.ts": "482f75e33ca156ddb01142257904c8a624596b784a486e43e791ce19d19768da",
+    "scripts/verify-planner-v2-phase2-step1.mjs": "e1fac09d4770fe2f776fa5fb0de1ad60bfb134b4da0e639c173a08ff9087961c",
+    "tsconfig.planner-v2-phase2.json": "46c861f233e76b8b044705ce4802aa1d05d7e7067f7a47922da8dfa4ee5cc2cd"
+  },
+  "serialization": {
+    "boundary": "Pure serialization and frozen correspondence; no database publish/read/apply transaction executed.",
+    "plans": 2,
+    "storedActivitiesPerPlan": 200,
+    "scopeNodesPerPlan": 500,
+    "phasesPerPlan": 100,
+    "newActivities": 60,
+    "researchClaims": 200,
+    "checkpointBytes": 2351701,
+    "attemptTransportBytes": 2998945,
+    "blueprintBytes": 834361,
+    "revisionBytes": [
+      1656459,
+      1656459
+    ],
+    "changeSetBytes": 297006,
+    "envelopeBytes": 4194304
+  },
+  "finishedAt": "2026-10-03T16:24:11.566Z"
+}

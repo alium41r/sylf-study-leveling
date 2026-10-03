@@ -13,19 +13,20 @@ export default function BackToSettings() {
   const { openSettings, originRoute } = useSettings();
 
   const handleClick = () => {
-    // Navigate to the origin route (the page the user was on before entering settings).
-    // This avoids polluting the browser history stack with a chain of /settings/* entries.
-    const target = originRoute || "/dashboard";
-    router.push(target);
-    // Re-open the settings panel after navigation completes
-    setTimeout(() => openSettings(), 200);
+    // 1. Immediately open the System Hub overlay so it renders with 0ms lag
+    // and covers the screen before any background navigation can be perceived.
+    openSettings();
+
+    // 2. Silently update the background route to origin route so the underlying
+    // page and browser history stay clean without showing any intermediate pages.
+    const target = originRoute && !originRoute.startsWith("/settings") ? originRoute : "/dashboard";
+    router.replace(target);
   };
 
   return (
     <button
       onClick={handleClick}
       className="settings-page-back"
-      style={{ cursor: "pointer", background: "none", border: "none" }}
     >
       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

@@ -1,0 +1,1077 @@
+{
+  "checks": [
+    {
+      "name": "1600: nine section compositions",
+      "passed": true
+    },
+    {
+      "name": "1600: single traveling Sylf",
+      "passed": true
+    },
+    {
+      "name": "1600: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1600: aria hidden and non-interactive",
+      "passed": true
+    },
+    {
+      "name": "1600: SVG world has no canvas, videos, images or filters",
+      "passed": true
+    },
+    {
+      "name": "1600: approved canonical character asset",
+      "passed": true
+    },
+    {
+      "name": "1600: companion visible at hero start",
+      "passed": true
+    },
+    {
+      "name": "1600: starts exactly at measured hero waypoint",
+      "passed": true
+    },
+    {
+      "name": "1600: offscreen decoration is paused",
+      "passed": true
+    },
+    {
+      "name": "1600: no teleport during normal hero scroll",
+      "passed": true
+    },
+    {
+      "name": "1600: hero scroll follows continuous path",
+      "passed": true
+    },
+    {
+      "name": "1440: nine section compositions",
+      "passed": true
+    },
+    {
+      "name": "1440: single traveling Sylf",
+      "passed": true
+    },
+    {
+      "name": "1440: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: aria hidden and non-interactive",
+      "passed": true
+    },
+    {
+      "name": "1440: SVG world has no canvas, videos, images or filters",
+      "passed": true
+    },
+    {
+      "name": "1440: approved canonical character asset",
+      "passed": true
+    },
+    {
+      "name": "1440: companion visible at hero start",
+      "passed": true
+    },
+    {
+      "name": "1440: starts exactly at measured hero waypoint",
+      "passed": true
+    },
+    {
+      "name": "1440: offscreen decoration is paused",
+      "passed": true
+    },
+    {
+      "name": "1440: no teleport during normal hero scroll",
+      "passed": true
+    },
+    {
+      "name": "1440: hero scroll follows continuous path",
+      "passed": true
+    },
+    {
+      "name": "1440: intro has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: intro activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1440: focus has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: focus activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1440: progression has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: progression activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1440: companion has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: companion activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1440: planning has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: planning activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1440: together has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: together activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1440: finale has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: finale activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1440: footer has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: footer activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1280: nine section compositions",
+      "passed": true
+    },
+    {
+      "name": "1280: single traveling Sylf",
+      "passed": true
+    },
+    {
+      "name": "1280: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1280: aria hidden and non-interactive",
+      "passed": true
+    },
+    {
+      "name": "1280: SVG world has no canvas, videos, images or filters",
+      "passed": true
+    },
+    {
+      "name": "1280: approved canonical character asset",
+      "passed": true
+    },
+    {
+      "name": "1280: companion visible at hero start",
+      "passed": true
+    },
+    {
+      "name": "1280: starts exactly at measured hero waypoint",
+      "passed": true
+    },
+    {
+      "name": "1280: offscreen decoration is paused",
+      "passed": true
+    },
+    {
+      "name": "1280: no teleport during normal hero scroll",
+      "passed": true
+    },
+    {
+      "name": "1280: hero scroll follows continuous path",
+      "passed": true
+    },
+    {
+      "name": "1024: nine section compositions",
+      "passed": true
+    },
+    {
+      "name": "1024: single traveling Sylf",
+      "passed": true
+    },
+    {
+      "name": "1024: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: aria hidden and non-interactive",
+      "passed": true
+    },
+    {
+      "name": "1024: SVG world has no canvas, videos, images or filters",
+      "passed": true
+    },
+    {
+      "name": "1024: approved canonical character asset",
+      "passed": true
+    },
+    {
+      "name": "1024: companion visible at hero start",
+      "passed": true
+    },
+    {
+      "name": "1024: starts exactly at measured hero waypoint",
+      "passed": true
+    },
+    {
+      "name": "1024: offscreen decoration is paused",
+      "passed": true
+    },
+    {
+      "name": "1024: no teleport during normal hero scroll",
+      "passed": true
+    },
+    {
+      "name": "1024: hero scroll follows continuous path",
+      "passed": true
+    },
+    {
+      "name": "1024: intro has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: intro activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1024: focus has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: focus activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1024: progression has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: progression activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1024: companion has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: companion activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1024: planning has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: planning activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1024: together has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: together activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1024: finale has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: finale activates on entry",
+      "passed": true
+    },
+    {
+      "name": "1024: footer has no overflow",
+      "passed": true
+    },
+    {
+      "name": "1024: footer activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: nine section compositions",
+      "passed": true
+    },
+    {
+      "name": "820: single traveling Sylf",
+      "passed": true
+    },
+    {
+      "name": "820: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820: aria hidden and non-interactive",
+      "passed": true
+    },
+    {
+      "name": "820: SVG world has no canvas, videos, images or filters",
+      "passed": true
+    },
+    {
+      "name": "820: approved canonical character asset",
+      "passed": true
+    },
+    {
+      "name": "820: companion visible at hero start",
+      "passed": true
+    },
+    {
+      "name": "820: starts exactly at measured hero waypoint",
+      "passed": true
+    },
+    {
+      "name": "820: offscreen decoration is paused",
+      "passed": true
+    },
+    {
+      "name": "820: no teleport during normal hero scroll",
+      "passed": true
+    },
+    {
+      "name": "820: hero scroll follows continuous path",
+      "passed": true
+    },
+    {
+      "name": "820: intro has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: intro activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: focus has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: focus activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: progression has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: progression activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: companion has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: companion activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: planning has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: planning activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: together has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: together activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: finale has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: finale activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: footer has no overflow",
+      "passed": true
+    },
+    {
+      "name": "820: footer activates on entry",
+      "passed": true
+    },
+    {
+      "name": "820: parallax disabled",
+      "passed": true
+    },
+    {
+      "name": "768: nine section compositions",
+      "passed": true
+    },
+    {
+      "name": "768: single traveling Sylf",
+      "passed": true
+    },
+    {
+      "name": "768: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "768: aria hidden and non-interactive",
+      "passed": true
+    },
+    {
+      "name": "768: SVG world has no canvas, videos, images or filters",
+      "passed": true
+    },
+    {
+      "name": "768: approved canonical character asset",
+      "passed": true
+    },
+    {
+      "name": "768: companion visible at hero start",
+      "passed": true
+    },
+    {
+      "name": "768: starts exactly at measured hero waypoint",
+      "passed": true
+    },
+    {
+      "name": "768: offscreen decoration is paused",
+      "passed": true
+    },
+    {
+      "name": "768: no teleport during normal hero scroll",
+      "passed": true
+    },
+    {
+      "name": "768: hero scroll follows continuous path",
+      "passed": true
+    },
+    {
+      "name": "768: parallax disabled",
+      "passed": true
+    },
+    {
+      "name": "390: nine section compositions",
+      "passed": true
+    },
+    {
+      "name": "390: single traveling Sylf",
+      "passed": true
+    },
+    {
+      "name": "390: no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390: aria hidden and non-interactive",
+      "passed": true
+    },
+    {
+      "name": "390: SVG world has no canvas, videos, images or filters",
+      "passed": true
+    },
+    {
+      "name": "390: approved canonical character asset",
+      "passed": true
+    },
+    {
+      "name": "390: companion visible at hero start",
+      "passed": true
+    },
+    {
+      "name": "390: starts exactly at measured hero waypoint",
+      "passed": true
+    },
+    {
+      "name": "390: offscreen decoration is paused",
+      "passed": true
+    },
+    {
+      "name": "390: no teleport during normal hero scroll",
+      "passed": true
+    },
+    {
+      "name": "390: hero scroll follows continuous path",
+      "passed": true
+    },
+    {
+      "name": "390: intro has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: intro activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: focus has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: focus activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: progression has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: progression activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: companion has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: companion activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: planning has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: planning activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: together has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: together activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: finale has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: finale activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: footer has no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: footer activates on entry",
+      "passed": true
+    },
+    {
+      "name": "390: parallax disabled",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion: same traveler stays visible in hero",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion: world keeps its artwork and disables motion",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion: companion does not follow scroll",
+      "passed": true
+    },
+    {
+      "name": "Light theme remains available",
+      "passed": true
+    },
+    {
+      "name": "Pause control pauses all world decorations",
+      "passed": true
+    },
+    {
+      "name": "Resume reactivates visible world decorations",
+      "passed": true
+    },
+    {
+      "name": "Hidden page suspends world animation",
+      "passed": true
+    },
+    {
+      "name": "Visible page resumes the hero world",
+      "passed": true
+    },
+    {
+      "name": "No JavaScript runtime errors",
+      "passed": true
+    },
+    {
+      "name": "No landing resource errors",
+      "passed": true
+    }
+  ],
+  "metrics": [
+    {
+      "width": 1600,
+      "height": 1000,
+      "atTop": {
+        "x": 1408.5,
+        "y": 573.808,
+        "rect": {
+          "x": 1336.5,
+          "y": 393.8079833984375,
+          "width": 144,
+          "height": 180
+        },
+        "visibility": "visible",
+        "display": "block",
+        "motion": "GREETING",
+        "hero": "true"
+      },
+      "density": {
+        "total": 360,
+        "displayed": 360,
+        "active": [
+          "hero"
+        ],
+        "animations": 38,
+        "runningDecorAnimations": 6
+      },
+      "heroGeometry": {
+        "h1": {
+          "x": 212,
+          "y": 206,
+          "w": 1176,
+          "h": 203.5
+        },
+        "description": {
+          "x": 212,
+          "y": 432.5,
+          "w": 1176,
+          "h": 54
+        },
+        "stage": {
+          "x": 212,
+          "y": 597.296875,
+          "w": 1176,
+          "h": 0
+        }
+      },
+      "scrollFrames": {
+        "samples": 42,
+        "largestStep": 18.60733481721659,
+        "meanFrameMs": 24.387804878048772,
+        "maxFrameMs": 66.59999999999945
+      }
+    },
+    {
+      "width": 1440,
+      "height": 960,
+      "atTop": {
+        "x": 1267.69,
+        "y": 557.808,
+        "rect": {
+          "x": 1195.6875,
+          "y": 377.8079833984375,
+          "width": 144,
+          "height": 180
+        },
+        "visibility": "visible",
+        "display": "block",
+        "motion": "GREETING",
+        "hero": "true"
+      },
+      "density": {
+        "total": 360,
+        "displayed": 360,
+        "active": [
+          "hero"
+        ],
+        "animations": 38,
+        "runningDecorAnimations": 6
+      },
+      "heroGeometry": {
+        "h1": {
+          "x": 132,
+          "y": 190,
+          "w": 1176,
+          "h": 203.5
+        },
+        "description": {
+          "x": 132,
+          "y": 416.5,
+          "w": 1176,
+          "h": 54
+        },
+        "stage": {
+          "x": 132,
+          "y": 581.296875,
+          "w": 1176,
+          "h": 0
+        }
+      },
+      "scrollFrames": {
+        "samples": 61,
+        "largestStep": 5.596047176355902,
+        "meanFrameMs": 16.666666666666668,
+        "maxFrameMs": 16.800000000000182
+      }
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "atTop": {
+        "x": 1126.89,
+        "y": 538.98,
+        "rect": {
+          "x": 1054.890625,
+          "y": 358.97991943359375,
+          "width": 144,
+          "height": 180
+        },
+        "visibility": "visible",
+        "display": "block",
+        "motion": "GREETING",
+        "hero": "true"
+      },
+      "density": {
+        "total": 360,
+        "displayed": 360,
+        "active": [
+          "hero"
+        ],
+        "animations": 34,
+        "runningDecorAnimations": 6
+      },
+      "heroGeometry": {
+        "h1": {
+          "x": 52,
+          "y": 190,
+          "w": 1176,
+          "h": 184.671875
+        },
+        "description": {
+          "x": 52,
+          "y": 397.671875,
+          "w": 1176,
+          "h": 54
+        },
+        "stage": {
+          "x": 52,
+          "y": 562.46875,
+          "w": 1176,
+          "h": 0
+        }
+      },
+      "scrollFrames": {
+        "samples": 33,
+        "largestStep": 14.390227969007382,
+        "meanFrameMs": 31.768749999999955,
+        "maxFrameMs": 66.59999999999854
+      }
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "atTop": {
+        "x": 901.609,
+        "y": 501.9,
+        "rect": {
+          "x": 841.609375,
+          "y": 351.90032958984375,
+          "width": 120,
+          "height": 150
+        },
+        "visibility": "visible",
+        "display": "block",
+        "motion": "GREETING",
+        "hero": "true"
+      },
+      "density": {
+        "total": 360,
+        "displayed": 356,
+        "active": [
+          "hero"
+        ],
+        "animations": 34,
+        "runningDecorAnimations": 4
+      },
+      "heroGeometry": {
+        "h1": {
+          "x": 32,
+          "y": 190,
+          "w": 960,
+          "h": 147.59375
+        },
+        "description": {
+          "x": 32,
+          "y": 360.59375,
+          "w": 960,
+          "h": 54
+        },
+        "stage": {
+          "x": 32,
+          "y": 525.390625,
+          "w": 960,
+          "h": 0
+        }
+      },
+      "scrollFrames": {
+        "samples": 31,
+        "largestStep": 14.904442995295003,
+        "meanFrameMs": 33.88666666666662,
+        "maxFrameMs": 66.59999999999854
+      }
+    },
+    {
+      "width": 820,
+      "height": 1180,
+      "atTop": {
+        "x": 763.094,
+        "y": 492.087,
+        "rect": {
+          "x": 715.09375,
+          "y": 372.08709716796875,
+          "width": 96,
+          "height": 120
+        },
+        "visibility": "visible",
+        "display": "block",
+        "motion": "GREETING",
+        "hero": "true"
+      },
+      "density": {
+        "total": 360,
+        "displayed": 151,
+        "active": [
+          "hero",
+          "intro"
+        ],
+        "animations": 21,
+        "runningDecorAnimations": 0
+      },
+      "heroGeometry": {
+        "h1": {
+          "x": 32,
+          "y": 168,
+          "w": 756,
+          "h": 159.40625
+        },
+        "description": {
+          "x": 32,
+          "y": 350.40625,
+          "w": 756,
+          "h": 50.375
+        },
+        "stage": {
+          "x": 32,
+          "y": 511.578125,
+          "w": 756,
+          "h": 0
+        }
+      },
+      "scrollFrames": {
+        "samples": 39,
+        "largestStep": 25.895030893976646,
+        "meanFrameMs": 29.821052631578965,
+        "maxFrameMs": 383.2000000000007
+      }
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "atTop": {
+        "x": 714.734,
+        "y": 492.087,
+        "rect": {
+          "x": 666.734375,
+          "y": 372.08709716796875,
+          "width": 96,
+          "height": 120
+        },
+        "visibility": "visible",
+        "display": "block",
+        "motion": "GREETING",
+        "hero": "true"
+      },
+      "density": {
+        "total": 360,
+        "displayed": 151,
+        "active": [
+          "hero",
+          "intro"
+        ],
+        "animations": 19,
+        "runningDecorAnimations": 0
+      },
+      "heroGeometry": {
+        "h1": {
+          "x": 32,
+          "y": 168,
+          "w": 704,
+          "h": 159.40625
+        },
+        "description": {
+          "x": 32,
+          "y": 350.40625,
+          "w": 704,
+          "h": 50.375
+        },
+        "stage": {
+          "x": 32,
+          "y": 511.578125,
+          "w": 704,
+          "h": 0
+        }
+      },
+      "scrollFrames": {
+        "samples": 54,
+        "largestStep": 16.906289865017754,
+        "meanFrameMs": 18.86603773584905,
+        "maxFrameMs": 50
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "atTop": {
+        "x": 351.5,
+        "y": 524.901,
+        "rect": {
+          "x": 323.5,
+          "y": 454.9007568359375,
+          "width": 56,
+          "height": 70
+        },
+        "visibility": "visible",
+        "display": "block",
+        "motion": "GREETING",
+        "hero": "true"
+      },
+      "density": {
+        "total": 360,
+        "displayed": 151,
+        "active": [
+          "hero",
+          "intro"
+        ],
+        "animations": 21,
+        "runningDecorAnimations": 0
+      },
+      "heroGeometry": {
+        "h1": {
+          "x": 22,
+          "y": 167.796875,
+          "w": 346,
+          "h": 113.0625
+        },
+        "description": {
+          "x": 30,
+          "y": 302.859375,
+          "w": 330,
+          "h": 72.140625
+        },
+        "stage": {
+          "x": 22,
+          "y": 479.390625,
+          "w": 346,
+          "h": 0
+        }
+      },
+      "scrollFrames": {
+        "samples": 61,
+        "largestStep": 5.712358532165178,
+        "meanFrameMs": 16.666666666666668,
+        "maxFrameMs": 16.799999999999272
+      }
+    }
+  ],
+  "errors": [],
+  "logs": [
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858290029.706,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.187"
+    },
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858296932.399,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.375"
+    },
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858354711.217,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.570"
+    },
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858368601.361,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.761"
+    },
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858413106.879,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.952"
+    },
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858445706.344,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.1143"
+    },
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858456180.042,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.1334"
+    },
+    {
+      "source": "network",
+      "level": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "timestamp": 1790858489806.803,
+      "url": "http://localhost:3000/api/user/stats",
+      "networkRequestId": "75127.1525"
+    }
+  ],
+  "sources": [
+    {
+      "file": "CelestialDecor.tsx",
+      "bytes": 13530
+    },
+    {
+      "file": "CelestialDecor.module.css",
+      "bytes": 5741
+    },
+    {
+      "file": "CelestialMotifs.tsx",
+      "bytes": 5798
+    }
+  ]
+}

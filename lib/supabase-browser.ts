@@ -25,6 +25,12 @@ let cachedJwt: { token: string; expiresAt: number } | null = null;
 const JWT_CACHE_MS = 25 * 60 * 1000; // minted tokens live 30min; refresh at 25min
 
 export function isRealtimeConfigured(): boolean {
+  if (
+    typeof window !== "undefined" &&
+    (window as unknown as { __SYLF_MOCK_MODE__?: boolean }).__SYLF_MOCK_MODE__
+  ) {
+    return false;
+  }
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );

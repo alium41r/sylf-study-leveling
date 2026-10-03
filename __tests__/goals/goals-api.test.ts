@@ -20,6 +20,10 @@ const authedJsonRequest = (url: string, method: string, body: unknown) =>
 describe("Goals API — Objective Theming & Exact Deadlines", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Unit transport assertions use the same mocked models inside the new
+    // transaction boundary. PostgreSQL suites qualify actual locks/rollback.
+    vi.spyOn(prisma, "$queryRaw").mockResolvedValue([]);
+    vi.spyOn(prisma, "$transaction").mockImplementation(async (run: any) => run(prisma));
     vi.mocked(auth.verifyToken).mockResolvedValue({ userId: 1 } as any);
   });
 
@@ -68,7 +72,16 @@ describe("Goals API — Objective Theming & Exact Deadlines", () => {
   });
 
   it("PATCH /api/goals/[id] stores targetDate as UTC midnight and derives weeks", async () => {
-    vi.spyOn(prisma.goal, "findFirst").mockResolvedValue({ id: 5, userId: 1, title: "Physics" } as any);
+    // The Planner's guards read the same table the route does, asking a different
+    // question: "is this goal linked to a planner plan or a planner Quest?" These
+    // fixtures are not, so that read answers null while the route's own existence
+    // check still finds the goal. With Planner Modes now permanently available, the
+    // guard always runs, so a double that ignored it would be modelling a world where
+    // plan-linked goals can be edited behind the planner's back.
+    vi
+      .spyOn(prisma.goal, "findFirst")
+      .mockImplementation((async (args: { where?: { OR?: unknown } }) =>
+        args?.where?.OR ? null : { id: 5, userId: 1, title: "Physics" }) as never);
     const updateSpy = vi.spyOn(prisma.goal, "update").mockResolvedValue({ id: 5 } as any);
 
     const res = await PATCH(
@@ -87,7 +100,11 @@ describe("Goals API — Objective Theming & Exact Deadlines", () => {
   });
 
   it("PATCH /api/goals/[id] clears the deadline on null targetDate", async () => {
-    vi.spyOn(prisma.goal, "findFirst").mockResolvedValue({ id: 5, userId: 1, title: "Physics" } as any);
+    vi
+      .spyOn(prisma.goal, "findFirst")
+      .mockImplementation((async (args: { where?: { OR?: unknown } }) =>
+        args?.where?.OR ? null : { id: 5, userId: 1, title: "Physics" }) as never);
+
     const updateSpy = vi.spyOn(prisma.goal, "update").mockResolvedValue({ id: 5 } as any);
 
     const res = await PATCH(
@@ -100,7 +117,11 @@ describe("Goals API — Objective Theming & Exact Deadlines", () => {
   });
 
   it("PATCH /api/goals/[id] rejects malformed target dates", async () => {
-    vi.spyOn(prisma.goal, "findFirst").mockResolvedValue({ id: 5, userId: 1, title: "Physics" } as any);
+    vi
+      .spyOn(prisma.goal, "findFirst")
+      .mockImplementation((async (args: { where?: { OR?: unknown } }) =>
+        args?.where?.OR ? null : { id: 5, userId: 1, title: "Physics" }) as never);
+
 
     const res = await PATCH(
       authedJsonRequest("http://localhost/api/goals/5", "PATCH", { targetDate: "31/08/2026" }),
@@ -111,7 +132,11 @@ describe("Goals API — Objective Theming & Exact Deadlines", () => {
   });
 
   it("PATCH /api/goals/[id] rejects unknown color tokens", async () => {
-    vi.spyOn(prisma.goal, "findFirst").mockResolvedValue({ id: 5, userId: 1, title: "Physics" } as any);
+    vi
+      .spyOn(prisma.goal, "findFirst")
+      .mockImplementation((async (args: { where?: { OR?: unknown } }) =>
+        args?.where?.OR ? null : { id: 5, userId: 1, title: "Physics" }) as never);
+
 
     const res = await PATCH(
       authedJsonRequest("http://localhost/api/goals/5", "PATCH", { color: "NEON_PINK" }),

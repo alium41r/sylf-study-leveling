@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
 import {
@@ -12,6 +12,7 @@ import {
   TraitOption,
 } from "@/lib/character-traits";
 import { isRankSufficient } from "@/lib/shop-items";
+import styles from "../../Locker.module.css";
 import {
   User,
   Sparkles,
@@ -36,7 +37,7 @@ const STUDIO_TABS: { key: StudioCategory; label: string; icon: React.ComponentTy
 ];
 
 const RARITY_BORDER_STYLES: Record<string, string> = {
-  COMMON: "border-zinc-700/70 hover:border-zinc-500",
+  COMMON: "border-border-subtle dark:border-zinc-700/70 hover:border-accent-primary/40 dark:hover:border-zinc-500",
   RARE: "border-blue-500/40 hover:border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.12)]",
   EPIC: "border-purple-500/40 hover:border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)]",
   LEGENDARY: "border-amber-500/40 hover:border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.18)]",
@@ -44,11 +45,11 @@ const RARITY_BORDER_STYLES: Record<string, string> = {
 };
 
 const RARITY_BADGE_STYLES: Record<string, string> = {
-  COMMON: "border-zinc-700 bg-zinc-800/80 text-zinc-300",
-  RARE: "border-blue-500/50 bg-blue-500/15 text-blue-400",
-  EPIC: "border-purple-500/50 bg-purple-500/15 text-purple-400",
-  LEGENDARY: "border-amber-500/50 bg-amber-500/15 text-amber-400",
-  MYTHIC: "border-rose-500/60 bg-rose-500/15 text-rose-400",
+  COMMON: "border-border-subtle dark:border-zinc-700 bg-slate-900/5 dark:bg-zinc-800/80 text-text-secondary dark:text-zinc-300",
+  RARE: "border-blue-500/50 bg-blue-500/15 text-blue-600 dark:text-blue-400",
+  EPIC: "border-purple-500/50 bg-purple-500/15 text-purple-600 dark:text-purple-400",
+  LEGENDARY: "border-amber-500/50 bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  MYTHIC: "border-rose-500/60 bg-rose-500/15 text-rose-600 dark:text-rose-400",
 };
 
 interface CharacterStudioViewProps {
@@ -77,6 +78,11 @@ export function CharacterStudioView({
   saving,
 }: CharacterStudioViewProps) {
   const [activeTab, setActiveTab] = useState<StudioCategory>("FORMS");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [activeTab]);
 
   const userRank = user?.hunterRank || "RANK E";
   const userLevel = user?.level || 1;
@@ -114,25 +120,25 @@ export function CharacterStudioView({
   const activeAura = AURA_PRESETS.find((a) => a.id === (characterConfig.aura || "none")) || AURA_PRESETS[0];
 
   return (
-    <div className="system-card rounded-2xl bg-bg-panel/70 border border-white/10 shadow-2xl backdrop-blur-xl p-5 sm:p-7 relative overflow-hidden flex flex-col gap-6">
-      {/* Top Accent Gradient Border */}
-      <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-accent-primary/60 to-transparent" />
+    <div className={`${styles.card} p-5 sm:p-7 relative overflow-hidden flex flex-col gap-6`}>
+      {/* Specular Highlight */}
+      <div className={styles.topHighlight} aria-hidden="true" />
 
       {/* ─── Studio Header Bar ───────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-subtle pb-5">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onBackToHub}
-            className="p-2.5 rounded-xl bg-bg-abyss hover:bg-bg-shadow border border-white/10 hover:border-accent-primary text-text-secondary hover:text-text-primary transition-all flex items-center gap-2 text-xs font-['Rajdhani'] font-bold group shadow-sm"
+            className={styles.navBtn}
             title="Return to Studio Hub"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="w-4 h-4" />
             <span>Studio Hub</span>
           </button>
 
           <div>
-            <h2 className="text-2xl font-bold font-['Rajdhani'] text-text-primary flex items-center gap-2 tracking-wide">
+            <h2 className="text-2xl font-bold font-['Rajdhani'] text-text-primary flex items-center gap-2.5 tracking-wide">
               <Palette className="w-5 h-5 text-accent-primary" />
               <span>Character Studio</span>
             </h2>
@@ -147,7 +153,7 @@ export function CharacterStudioView({
           <button
             type="button"
             onClick={onPreviewProfile}
-            className="px-3.5 py-2 rounded-xl bg-bg-abyss hover:bg-bg-shadow border border-white/10 hover:border-accent-primary text-xs font-['Rajdhani'] font-bold text-text-primary flex items-center gap-2 transition-all shadow-sm"
+            className={styles.navBtn}
             title="Preview Public Profile Modal"
           >
             <Eye className="w-3.5 h-3.5 text-accent-text-light" />
@@ -157,7 +163,7 @@ export function CharacterStudioView({
           <button
             type="button"
             onClick={handleRandomize}
-            className="px-3.5 py-2 rounded-xl bg-bg-abyss hover:bg-bg-shadow border border-white/10 hover:border-accent-primary text-xs font-['Rajdhani'] font-bold text-text-primary flex items-center gap-2 transition-all shadow-sm"
+            className={styles.navBtn}
             title="Randomize Character Traits"
           >
             <Dices className="w-3.5 h-3.5 text-accent-text-light" />
@@ -168,7 +174,7 @@ export function CharacterStudioView({
             type="button"
             onClick={handleReset}
             disabled={!isConfigChanged}
-            className="px-3.5 py-2 rounded-xl bg-bg-abyss hover:bg-bg-shadow border border-white/10 hover:border-accent-primary text-xs font-['Rajdhani'] font-bold text-text-secondary disabled:opacity-40 disabled:pointer-events-none flex items-center gap-2 transition-all shadow-sm"
+            className={`${styles.navBtn} disabled:opacity-40 disabled:pointer-events-none`}
             title="Reset to Saved"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -179,56 +185,54 @@ export function CharacterStudioView({
             type="button"
             onClick={onSaveCharacter}
             disabled={saving}
-            className="btn-primary px-5 py-2 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-md active:scale-95"
-            style={{
-              background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-              color: "var(--text-primary)",
-              border: "none",
-            }}
+            className={styles.btnPrimaryAction}
+            title="Equip Configuration"
           >
-            <Save className="w-3.5 h-3.5" />
+            <Save className="w-4 h-4" />
             <span>{saving ? "Equipping..." : "Equip Configuration"}</span>
           </button>
         </div>
       </div>
 
       {/* ─── Dual Column Workbench Grid ────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* ─── Left Column: Framed Character Showcase Stage (5 Cols) ─ */}
-        <div className="lg:col-span-5 rounded-2xl bg-bg-abyss/80 border border-white/10 p-6 flex flex-col justify-between relative overflow-hidden shadow-inner min-h-[460px]">
+        <div className={`${styles.stageCard} lg:col-span-5 p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden lg:h-[540px]`}>
+          {/* Top Specular Highlight */}
+          <div className={styles.topHighlight} aria-hidden="true" />
+
           {/* Ambient Glow Behind Stage */}
           <div className="absolute inset-0 bg-gradient-to-b from-accent-primary-dim/20 via-transparent to-accent-primary-dim/10 pointer-events-none" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-accent-primary/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Stage Top Bar */}
-          <div className="flex items-center justify-between z-10 border-b border-white/5 pb-3">
+          <div className="flex items-center justify-between z-10 border-b border-border-subtle dark:border-white/5 pb-3 shrink-0">
             <span className="text-[10px] font-bold font-['Rajdhani'] uppercase tracking-widest text-text-muted flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-accent-text-light" />
               <span>Live Sprite Stage</span>
             </span>
-            <span className="text-[11px] font-bold font-mono px-2.5 py-0.5 rounded-full bg-bg-panel border border-white/10 text-accent-text-light">
+            <span className="text-[11px] font-bold font-mono px-2.5 py-0.5 rounded-full bg-slate-900/5 dark:bg-bg-panel border border-border-subtle text-accent-text-light">
               Lv. {userLevel} • {userRank}
             </span>
           </div>
 
           {/* Character Stage Center */}
-          <div className="relative z-10 py-4 sm:py-6 flex flex-col items-center justify-center">
-            <div className="w-full max-w-[320px] sm:max-w-md mx-auto aspect-square flex items-center justify-center">
-              <div className="scale-95 sm:scale-110 md:scale-125 transform transition-transform">
-                <CharacterRenderer
-                  config={characterConfig}
-                  seed={characterConfig.seed || user.username}
-                  size={260}
-                  showPedestal={true}
-                  showAura={true}
-                />
-              </div>
+          <div className="relative z-10 flex flex-col items-center justify-center my-auto py-1">
+            <div className="relative w-full max-w-[280px] h-[230px] flex items-center justify-center">
+              <CharacterRenderer
+                config={characterConfig}
+                seed={characterConfig.seed || user.username}
+                size={210}
+                showPedestal={true}
+                showAura={true}
+              />
             </div>
 
-            <div className="text-center mt-3">
-              <span className="text-[10px] font-bold font-['Rajdhani'] uppercase tracking-widest px-3 py-1 rounded-full bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid inline-block mb-1 shadow-sm">
+            <div className="text-center mt-1.5">
+              <span className="text-[10px] font-bold font-['Rajdhani'] uppercase tracking-widest px-3 py-0.5 rounded-full bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid inline-block mb-1 shadow-sm">
                 {activeForm.label}
               </span>
-              <h3 className="text-xl font-bold font-['Rajdhani'] text-text-primary">
+              <h3 className="text-xl font-bold font-['Rajdhani'] text-text-primary leading-snug">
                 {user.name || user.username}
               </h3>
               <span className="text-xs text-text-muted font-mono">@{user.username}</span>
@@ -236,22 +240,22 @@ export function CharacterStudioView({
           </div>
 
           {/* Stage Footer: Visual Traits Chips & Integrated XP Bar */}
-          <div className="relative z-10 flex flex-col gap-3 pt-4 border-t border-white/10">
+          <div className="relative z-10 flex flex-col gap-2.5 pt-3 border-t border-border-subtle shrink-0">
             {/* Traits Summary Pills (3 Cosmetic Categories) */}
             <div className="grid grid-cols-3 gap-2 text-center text-xs font-['Rajdhani']">
-              <div className="p-2 rounded-xl bg-bg-panel/70 border border-white/10">
+              <div className="p-2 rounded-xl bg-slate-900/5 dark:bg-bg-panel/70 border border-border-subtle">
                 <span className="text-[9px] text-text-muted block uppercase tracking-wider">Form</span>
                 <span className="font-bold text-text-primary truncate block text-[10px]">
                   {activeForm.label.split(" ")[0]}
                 </span>
               </div>
-              <div className="p-2 rounded-xl bg-bg-panel/70 border border-white/10">
+              <div className="p-2 rounded-xl bg-slate-900/5 dark:bg-bg-panel/70 border border-border-subtle">
                 <span className="text-[9px] text-text-muted block uppercase tracking-wider">Pedestal</span>
                 <span className="font-bold text-text-primary truncate block text-[10px]">
                   {activePedestal.label.split(" ")[0]}
                 </span>
               </div>
-              <div className="p-2 rounded-xl bg-bg-panel/70 border border-white/10">
+              <div className="p-2 rounded-xl bg-slate-900/5 dark:bg-bg-panel/70 border border-border-subtle">
                 <span className="text-[9px] text-text-muted block uppercase tracking-wider">Aura</span>
                 <span className="font-bold text-accent-text-light truncate block text-[10px]">
                   {activeAura.label.split(" ")[0]}
@@ -260,14 +264,14 @@ export function CharacterStudioView({
             </div>
 
             {/* Integrated XP Progress */}
-            <div className="p-3 rounded-xl bg-bg-panel/50 border border-white/5 flex flex-col gap-1.5">
+            <div className="p-2.5 rounded-xl bg-slate-900/[0.03] dark:bg-bg-panel/50 border border-border-subtle dark:border-white/5 flex flex-col gap-1.5">
               <div className="flex justify-between text-[11px] font-['Rajdhani'] font-bold">
                 <span className="text-text-secondary">Evolution Progress</span>
                 <span className="text-accent-text-light font-mono">
                   {currentXP} / {requiredXP} XP ({xpPercent}%)
                 </span>
               </div>
-              <div className="w-full h-1.5 bg-bg-abyss rounded-full overflow-hidden border border-white/5">
+              <div className="w-full h-1.5 bg-slate-900/10 dark:bg-bg-abyss rounded-full overflow-hidden border border-border-subtle dark:border-white/5">
                 <div
                   style={{ width: `${xpPercent}%` }}
                   className="h-full bg-gradient-to-r from-accent-primary to-accent-primary-light rounded-full transition-all duration-300"
@@ -278,9 +282,12 @@ export function CharacterStudioView({
         </div>
 
         {/* ─── Right Column: 3-Category Cosmetic Visual Workbench (7 Cols) ─ */}
-        <div className="lg:col-span-7 rounded-2xl bg-bg-abyss/60 border border-white/10 p-5 sm:p-6 flex flex-col gap-5 shadow-inner min-h-[460px]">
+        <div className={`${styles.card} lg:col-span-7 p-5 sm:p-6 flex flex-col gap-4 lg:h-[540px] overflow-hidden relative`}>
+          {/* Top Specular Highlight */}
+          <div className={styles.topHighlight} aria-hidden="true" />
+
           {/* Deck Tab Bar */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-white/10">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-border-subtle shrink-0">
             {STUDIO_TABS.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -289,10 +296,10 @@ export function CharacterStudioView({
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shrink-0 flex items-center gap-2 border ${
+                  className={`px-4 py-2.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shrink-0 flex items-center gap-2 border cursor-pointer ${
                     isActive
                       ? "bg-accent-primary text-white border-accent-primary shadow-[0_0_14px_rgba(124,58,237,0.35)]"
-                      : "bg-bg-panel/80 text-text-secondary hover:text-text-primary border-white/10 hover:border-white/20"
+                      : "bg-slate-900/5 dark:bg-bg-panel/80 text-text-secondary hover:text-text-primary border-border-subtle hover:border-accent-primary/40"
                   }`}
                 >
                   <TabIcon className="w-4 h-4" />
@@ -302,14 +309,19 @@ export function CharacterStudioView({
             })}
           </div>
 
-          {/* ─── CATEGORY 1: CHARACTER FORMS ───────────────────── */}
-          {activeTab === "FORMS" && (
-            <motion.div
-              key="forms"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4"
-            >
+          {/* Scrollable Trait Selection Matrix */}
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar pr-1 sm:pr-2"
+          >
+            {/* ─── CATEGORY 1: CHARACTER FORMS ───────────────────── */}
+            {activeTab === "FORMS" && (
+              <motion.div
+                key="forms"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col gap-4 pb-2"
+              >
               <div>
                 <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
                   Full-Body Hunter Forms
@@ -332,10 +344,10 @@ export function CharacterStudioView({
                       type="button"
                       disabled={!unlocked}
                       onClick={() => updateTrait("outfit", form.value)}
-                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group ${borderStyle} ${
+                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group shadow-sm ${borderStyle} ${
                         isSelected
                           ? "ring-2 ring-accent-primary bg-accent-primary/10 shadow-lg"
-                          : "bg-bg-panel/75 hover:bg-bg-panel"
+                          : "bg-slate-900/[0.02] dark:bg-bg-panel/75 hover:bg-slate-900/[0.05] dark:hover:bg-bg-panel"
                       } ${!unlocked ? "opacity-65 cursor-not-allowed grayscale-[35%]" : "cursor-pointer"}`}
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -371,7 +383,7 @@ export function CharacterStudioView({
                 })}
 
                 {/* Dynamic Armory Acquisition Slot */}
-                <div className="p-4 rounded-xl border border-dashed border-white/10 bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
+                <div className="p-4 rounded-xl border border-dashed border-border-subtle bg-slate-900/[0.02] dark:bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
                   <Sparkles className="w-5 h-5 text-accent-text-light opacity-50" />
                   <span className="text-xs font-bold font-['Rajdhani'] text-text-secondary">
                     Armory Form Ingestion
@@ -390,7 +402,7 @@ export function CharacterStudioView({
               key="pedestals"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-4 pb-2"
             >
               <div>
                 <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
@@ -418,10 +430,10 @@ export function CharacterStudioView({
                         updateTrait("pedestal", ped.value);
                         updateTrait("pedestalKey", ped.value);
                       }}
-                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group ${borderStyle} ${
+                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group shadow-sm ${borderStyle} ${
                         isSelected
                           ? "ring-2 ring-accent-primary bg-accent-primary/10 shadow-lg"
-                          : "bg-bg-panel/75 hover:bg-bg-panel"
+                          : "bg-slate-900/[0.02] dark:bg-bg-panel/75 hover:bg-slate-900/[0.05] dark:hover:bg-bg-panel"
                       } ${!unlocked ? "opacity-65 cursor-not-allowed grayscale-[35%]" : "cursor-pointer"}`}
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -457,7 +469,7 @@ export function CharacterStudioView({
                 })}
 
                 {/* Dynamic Armory Pedestal Acquisition Slot */}
-                <div className="p-4 rounded-xl border border-dashed border-white/10 bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
+                <div className="p-4 rounded-xl border border-dashed border-border-subtle bg-slate-900/[0.02] dark:bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
                   <Shield className="w-5 h-5 text-accent-text-light opacity-50" />
                   <span className="text-xs font-bold font-['Rajdhani'] text-text-secondary">
                     Platform Telemetry
@@ -476,7 +488,7 @@ export function CharacterStudioView({
               key="auras"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-4 pb-2"
             >
               <div>
                 <h4 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mb-1">
@@ -500,16 +512,16 @@ export function CharacterStudioView({
                       type="button"
                       disabled={!unlocked}
                       onClick={() => updateTrait("aura", aura.id)}
-                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group ${borderStyle} ${
+                      className={`p-4 rounded-xl border text-left flex flex-col justify-between gap-3 transition-all relative overflow-hidden group shadow-sm ${borderStyle} ${
                         isSelected
                           ? "ring-2 ring-accent-primary bg-accent-primary/10 shadow-lg"
-                          : "bg-bg-panel/75 hover:bg-bg-panel"
+                          : "bg-slate-900/[0.02] dark:bg-bg-panel/75 hover:bg-slate-900/[0.05] dark:hover:bg-bg-panel"
                       } ${!unlocked ? "opacity-65 cursor-not-allowed grayscale-[35%]" : "cursor-pointer"}`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span
-                            className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0"
+                            className="w-3.5 h-3.5 rounded-full border border-black/20 dark:border-white/20 shrink-0"
                             style={{ backgroundColor: aura.color }}
                           />
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider border ${badgeStyle}`}>
@@ -545,7 +557,7 @@ export function CharacterStudioView({
                 })}
 
                 {/* Dynamic Armory Aura Acquisition Slot */}
-                <div className="p-4 rounded-xl border border-dashed border-white/10 bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
+                <div className="p-4 rounded-xl border border-dashed border-border-subtle bg-slate-900/[0.02] dark:bg-bg-panel/20 flex flex-col justify-center items-center text-center gap-2 min-h-[130px]">
                   <Zap className="w-5 h-5 text-accent-text-light opacity-50" />
                   <span className="text-xs font-bold font-['Rajdhani'] text-text-secondary">
                     Resonance Auras
@@ -557,6 +569,7 @@ export function CharacterStudioView({
               </div>
             </motion.div>
           )}
+          </div>
         </div>
       </div>
     </div>

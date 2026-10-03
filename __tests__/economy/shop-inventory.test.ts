@@ -91,6 +91,9 @@ describe("Gamification Engine Phase 2 — Economy, Consumables & Wardrobe Engine
   describe("Consumable Interceptors & Zero-Quantity Cleanup in HpPenaltyService", () => {
     beforeEach(() => {
       vi.clearAllMocks();
+    vi.spyOn(prisma, "$queryRaw").mockResolvedValue([]);
+    vi.spyOn(prisma, "$transaction").mockImplementation(async (cb: any) => cb(prisma));
+    vi.spyOn(prisma.floatingRestDay, "findMany").mockResolvedValue([]);
     });
 
     it("intercepts streak failures with Streak Shield and deletes record at zero quantity", async () => {
@@ -105,6 +108,7 @@ describe("Gamification Engine Phase 2 — Economy, Consumables & Wardrobe Engine
       const mockSystemMessage = vi.fn().mockResolvedValue({});
 
       const mockTx = {
+        $queryRaw: vi.fn().mockResolvedValue([]),
         userInventory: {
           findFirst: vi.fn().mockResolvedValue(mockShield),
           delete: mockDelete,
@@ -135,6 +139,7 @@ describe("Gamification Engine Phase 2 — Economy, Consumables & Wardrobe Engine
       const mockSystemMessage = vi.fn().mockResolvedValue({});
 
       const mockTx = {
+        $queryRaw: vi.fn().mockResolvedValue([]),
         userInventory: {
           findFirst: vi.fn().mockResolvedValue(mockShield),
           delete: mockDelete,
@@ -185,6 +190,9 @@ describe("Gamification Engine Phase 2 — Economy, Consumables & Wardrobe Engine
 
       vi.spyOn(prisma, "$transaction").mockImplementation(async (callback: any) => {
         return callback({
+          $queryRaw: vi.fn().mockResolvedValue([]),
+          studySession: prisma.studySession,
+          floatingRestDay: prisma.floatingRestDay,
           userInventory: {
             findFirst: vi.fn().mockResolvedValue(mockPhoenixTear),
             delete: mockInventoryDelete,
@@ -197,6 +205,7 @@ describe("Gamification Engine Phase 2 — Economy, Consumables & Wardrobe Engine
             create: mockSystemMessageCreate,
           },
           user: {
+            findUnique: prisma.user.findUnique,
             update: mockUserUpdate,
           },
         });

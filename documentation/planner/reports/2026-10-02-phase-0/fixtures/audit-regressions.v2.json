@@ -1,0 +1,677 @@
+{
+  "schemaVersion": 2,
+  "corpusId": "planner-v2-phase0-audit-2026-10-02",
+  "source": {
+    "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+    "sha256": "f4b260e35c71c9d4c9adf3a10285be5163a02a701c28eda4d78201c6cc8820ae",
+    "auditedAt": "2026-10-02",
+    "scope": "Audited working tree; historical observations are not new verification."
+  },
+  "findings": [
+    {
+      "id": "A01",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 148
+      },
+      "observed": "Availability replanning sends a partial object into a full-input schema. A central advertised adaptation action cannot work.",
+      "v2Boundary": "Canonical intent / typed change",
+      "expectedInvariant": "A calendar patch preserves unchanged constraints and is validated server-side against complete canonical intent.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A02",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 149
+      },
+      "observed": "Replan retention ignores descriptions, completion criteria and other semantic metadata. “Unchanged” tasks can have different saved plan and live execution instructions.",
+      "v2Boundary": "Execution specification / semantic diff",
+      "expectedInvariant": "Changed instructions or criteria are CHANGED; kept work matches the applied Quest exactly.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A03",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 150
+      },
+      "observed": "Changed-brief generation reuses a session-wide key; a rejection is followed by recovery of an older operation. The user sees an old draft under new intent.",
+      "v2Boundary": "Attempt identity / recovery",
+      "expectedInvariant": "Changed intent has a new attempt hash; an old result cannot become its candidate.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A04",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 151
+      },
+      "observed": "Quick generation/confirmation state is not restored with durable intake. Already-confirmed work is offered as a new draft and fails when confirmed again.",
+      "v2Boundary": "Workspace projection",
+      "expectedInvariant": "Restoration displays the applied active revision and receipt, not a confirmable old draft.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A05",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 152
+      },
+      "observed": "Availability presented in Quick is not the availability used for generation, because scheduling context is dropped. The brief is not a truthful preview of model input.",
+      "v2Boundary": "Effective context",
+      "expectedInvariant": "Displayed and generated capacity are projections of one effective snapshot.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A06",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 153
+      },
+      "observed": "Classic requiredMinutes differs from default targetMinutes; small plan was 120m in preview but 180m in downstream capacity. Calendar/planning consumers disagree about duration.",
+      "v2Boundary": "Duration / migration",
+      "expectedInvariant": "One approved plannedMinutes and explicit remaining estimate govern execution and capacity; legacy conflicts are recorded.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A07",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 154
+      },
+      "observed": "Classic ignores normal daily capacity and existing scheduled workload. An apparently valid emergency plan adds 360m/326m to two days without explaining conflict or triage.",
+      "v2Boundary": "Scheduling envelope",
+      "expectedInvariant": "Existing workload and daily ceilings bind; emergency scope needs useful triage.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A08",
+      "evidenceLevel": "P1 SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 155
+      },
+      "observed": "Classic writes Goal, Quests and chat separately, with no operation identity. Failure between writes can leave partial execution; retries can duplicate it. No partial-write fault injection performed.",
+      "v2Boundary": "Apply transaction / receipt",
+      "expectedInvariant": "All linked execution and Goal writes are atomic and repeat confirmation returns one receipt.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A09",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 156
+      },
+      "observed": "Roadmap Quick confirmation displays no milestone content. Review-before-commit exists as a button order, not an informed review.",
+      "v2Boundary": "Review projection",
+      "expectedInvariant": "Strategic Roadmap review exposes milestones, outcomes and forecast before confirmation.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A10",
+      "evidenceLevel": "P1 LIVE + REPRO",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 157
+      },
+      "observed": "Unrepaired critic concerns can become a confirmable plan; final fatal check uses deterministic findings only. The model review stage is not the quality guarantee its progress copy suggests.",
+      "v2Boundary": "Quality report",
+      "expectedInvariant": "Unresolved concrete severe findings block sealing; repair success requires verified issue resolution.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A11",
+      "evidenceLevel": "P1 REPRO",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 158
+      },
+      "observed": "Exam preflight uses the 200 stored-item bound while proposals allow 90. Thirty-one unknown/new topics require at least 125 items yet pass POTENTIAL_FIT. Generation cannot satisfy both contracts.",
+      "v2Boundary": "Shared technical envelope",
+      "expectedInvariant": "Preflight/output/storage/apply share limits; no provider call for a known structurally impossible proposal.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A12",
+      "evidenceLevel": "P1 REPRO",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 159
+      },
+      "observed": "Roadmap input accepts 49KiB at generation but later readers use 32KiB. Valid larger scope can be generated but cannot reliably be edited, confirmed or replanned.",
+      "v2Boundary": "Shared serialized envelope",
+      "expectedInvariant": "A valid permitted artifact remains parsable at every lifecycle boundary.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A13",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 160
+      },
+      "observed": "Quick's success link points to nonexistent `/planner`. The successful journey immediately becomes a 404.",
+      "v2Boundary": "Workspace / navigation",
+      "expectedInvariant": "Successful confirmation has a supported owned Planner destination on web and mobile.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A14",
+      "evidenceLevel": "P1 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 161
+      },
+      "observed": "Classic substitutes synthetic curriculum fallback after research 503 but continues to claim live/official research progress. Users cannot assess source reliability.",
+      "v2Boundary": "Research provenance",
+      "expectedInvariant": "Provider failure cannot become verified or official research; supported claims retain applicable source evidence.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A15",
+      "evidenceLevel": "P2 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 162
+      },
+      "observed": "One covered/confident Exam topic expands into 20 sessions and 15h. Budget/date opportunity is mistaken for necessary study work; repetitive sessions burden the learner.",
+      "v2Boundary": "Planning quality",
+      "expectedInvariant": "Secure tiny scope receives only useful work; high available capacity cannot justify repetition.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A16",
+      "evidenceLevel": "P2 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 163
+      },
+      "observed": "Quick→Advanced does not carry current setup or target the generated revision. Users re-enter information or find a saved plan manually.",
+      "v2Boundary": "One canonical intent",
+      "expectedInvariant": "Optional controls preserve the same accepted intent and current artifact identity.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A17",
+      "evidenceLevel": "P2 LIVE + SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 164
+      },
+      "observed": "Mastery Quick requires a date although the mode supports a derived horizon. Longer date fails with a connectivity message, and local field/summary diverge.",
+      "v2Boundary": "Optional deadline / errors",
+      "expectedInvariant": "No-deadline Mastery is valid; bounds failures preserve accepted data and return an actionable typed error.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A18",
+      "evidenceLevel": "P2 LIVE + SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 165
+      },
+      "observed": "Failure codes, actionable validator details and recovery paths are suppressed. E1's real failed generation becomes “plan created without draft”; Roadmap stale calendar looks like a generic inability to finish.",
+      "v2Boundary": "Structured error / checkpoint",
+      "expectedInvariant": "Failure identifies stage, code, retryability and next action; retained checkpoints are not confirmable plans.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A19",
+      "evidenceLevel": "P2 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 166
+      },
+      "observed": "Every on-blur save disables the shared form. Twenty-seven observed intake actions had median 2.865s, p90 5.118s, maximum 14.042s. Ordinary typing becomes a sequence of waits.",
+      "v2Boundary": "Optimistic persistence",
+      "expectedInvariant": "Typing remains responsive; outdated save acknowledgments cannot replace newer input.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A20",
+      "evidenceLevel": "P2 LIVE + SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 167
+      },
+      "observed": "Brief changes do not invalidate visible REVIEW. Date, goal and budget can refer to one brief while Confirm refers to another revision.",
+      "v2Boundary": "Consequential currentness",
+      "expectedInvariant": "A material dirty/new intent disables old confirmation before persistence completes.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A21",
+      "evidenceLevel": "P2 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 168
+      },
+      "observed": "Four of seven Roadmap outcomes are identical generic defaults; short scope is spread across six months without an earlier-finish choice. Useful checkpoint detail is present in stored data but not fully exposed in review.",
+      "v2Boundary": "Useful outcomes / pacing",
+      "expectedInvariant": "Concrete outcomes and comfortable early completion replace horizon filling.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A22",
+      "evidenceLevel": "P2 SOURCE + LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 169
+      },
+      "observed": "Completion/outcome filtering is an English substring/regex gate, then silent fallback. “Build and run” was rejected as unobservable; arbitrary question counts written as words survived while digit counts are rejected. Pedagogical specificity is not consistently preserved.",
+      "v2Boundary": "Content preservation",
+      "expectedInvariant": "Observable specific instructions survive lexical wording; substantive rejection carries exact diagnostics.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A23",
+      "evidenceLevel": "P2 SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 170
+      },
+      "observed": "Classic reserves quota before parsing/validating. Early missing-field return and malformed-body exception do not release the reserved unit. Quota failure behavior was not live-tested under limited entitlement.",
+      "v2Boundary": "Accounting / admission",
+      "expectedInvariant": "Validation precedes quota reservation; unused reservation settles once after failure.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A24",
+      "evidenceLevel": "P2 SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 171
+      },
+      "observed": "Capacity/readiness/preparedness defaults disagree across surfaces. Completed work is counted at full planned duration in capacity while intake weighting uses open work; incomplete confidence becomes different assumptions in Quick and Advanced.",
+      "v2Boundary": "Remaining work / evidence",
+      "expectedInvariant": "Actual work and remaining commitments count once; weak signals are not proof of mastery.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A25",
+      "evidenceLevel": "P2 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 172
+      },
+      "observed": "Advanced confirmation does not refresh detail immediately. After successful commit the old draft UI remained until reload; copy still said reconciliation was a future flow while Review plan was available.",
+      "v2Boundary": "Workspace / receipt",
+      "expectedInvariant": "Confirmation response restores authoritative active state immediately.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A26",
+      "evidenceLevel": "P2 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 173
+      },
+      "observed": "Modern confirmation defaults createGoal=false, and ordinary Quest Log renders null goals as “Unknown Goal”. Plan/subject context is lost at the execution surface.",
+      "v2Boundary": "Owned execution context",
+      "expectedInvariant": "Confirmed tasks have owned Goal/context and preserve Planner-to-Focus purpose.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A27",
+      "evidenceLevel": "P2 SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 174
+      },
+      "observed": "Shared selection helpers include STRETCH items, whereas confirmation requires separate stretch promotion. A proposal containing stretch can fail normal confirmation. No live stretch proposal was generated.",
+      "v2Boundary": "Commitment category",
+      "expectedInvariant": "Only committed activities materialize; contingent/optional work requires explicit requested change.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A28",
+      "evidenceLevel": "P2 SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 175
+      },
+      "observed": "Failed acceptance flow replaces REVIEW with FAILED, then offers “Accept this and continue”; confirm immediately returns unless phase is REVIEW. That recovery button cannot complete the advertised action.",
+      "v2Boundary": "Recovery actions",
+      "expectedInvariant": "Workspace next actions match durable state; no accept action for an unconfirmable checkpoint.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A29",
+      "evidenceLevel": "P2 LIVE + SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 176
+      },
+      "observed": "Usage telemetry prices unknown model IDs at zero. All 18 recorded calls/79,048 total tokens logged $0; active `deepseek-flash` is absent from the rate table, and Classic logs a display name. This is not evidence that generation was free.",
+      "v2Boundary": "Usage accounting",
+      "expectedInvariant": "Unknown provider pricing is null/unknown, not zero; usage and reservations are traceable.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A30",
+      "evidenceLevel": "P2 SOURCE / RISK",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 177
+      },
+      "observed": "Classic's rest-day rolling is not bounded by the deadline; floating-rest lookup fails open; app timeout is 180s while route maxDuration is 120s. Deadline and deployment failures remain possible. Late scheduling was not reproduced in C2.",
+      "v2Boundary": "Hard facts / runtime",
+      "expectedInvariant": "Rest/exclusions/deadline fail closed and one root deadline constrains provider work.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A31",
+      "evidenceLevel": "P2 LIVE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 178
+      },
+      "observed": "Unconfirmed Roadmap shows enabled period expansion. The action waits 8.846s only to receive ROADMAP_NOT_CONFIRMED and a generic message.",
+      "v2Boundary": "Roadmap expansion admission",
+      "expectedInvariant": "Expansion is admitted only for a current confirmed strategic base and is reviewed through shared apply.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A32",
+      "evidenceLevel": "P2 SOURCE / RISK",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 179
+      },
+      "observed": "Research/import/Designer budgets and route ceilings are not one shared end-to-end deadline. DEEP research can require multiple long calls through an action route without an explicit maxDuration. Hosted truncation was not tested.",
+      "v2Boundary": "Root request budget",
+      "expectedInvariant": "Research/OCR/fallback/repair share attempt call, token and deadline budgets.",
+      "verificationStage": "PHASE_0_CONTRACT_AND_FUTURE_INTEGRATION"
+    },
+    {
+      "id": "A33",
+      "evidenceLevel": "P3 LIVE + SOURCE",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 180
+      },
+      "observed": "“Ask Sylf” mode recommendation is a regex heuristic with incomplete extraction. It recognized tomorrow but did not configure the date or written-number hours. The wording overpromises assistance.",
+      "v2Boundary": "Conversation interpretation",
+      "expectedInvariant": "Natural language is semantically interpreted against context without a narrow command library.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    },
+    {
+      "id": "A34",
+      "evidenceLevel": "P3 SOURCE + TEST",
+      "source": {
+        "path": "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md",
+        "line": 181
+      },
+      "observed": "Obsolete chooser/modal code, older rollout reports and eight stale chooser tests coexist with the current workspace. There is no single verified current prose specification.",
+      "v2Boundary": "Evidence / verification",
+      "expectedInvariant": "Target contracts, writer inventory and executable fixtures have explicit versions and honest verification coverage.",
+      "verificationStage": "FUTURE_PRODUCT_ACCEPTANCE"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "availability-projection-drift",
+      "auditIds": [
+        "A05"
+      ],
+      "normalization": "Recorded weekly vectors from audit E1; same total, different shape.",
+      "data": {
+        "displayed": [
+          0,
+          53,
+          77,
+          53,
+          77,
+          21,
+          19
+        ],
+        "generated": [
+          0,
+          50,
+          50,
+          50,
+          50,
+          50,
+          50
+        ]
+      },
+      "expected": {
+        "sameTotal": true,
+        "sameEffectiveAvailability": false,
+        "required": "Use the same canonical effective availability projection."
+      }
+    },
+    {
+      "id": "classic-duration-conflict",
+      "auditIds": [
+        "A06"
+      ],
+      "normalization": "Focused illustration of the recorded four-task 120m/180m totals; not a new database observation.",
+      "data": {
+        "quests": [
+          {
+            "id": 1,
+            "requiredMinutes": 30,
+            "targetMinutes": 45,
+            "elapsedSeconds": 0,
+            "status": "PENDING"
+          },
+          {
+            "id": 2,
+            "requiredMinutes": 30,
+            "targetMinutes": 45,
+            "elapsedSeconds": 0,
+            "status": "PENDING"
+          },
+          {
+            "id": 3,
+            "requiredMinutes": 30,
+            "targetMinutes": 45,
+            "elapsedSeconds": 0,
+            "status": "PENDING"
+          },
+          {
+            "id": 4,
+            "requiredMinutes": 30,
+            "targetMinutes": 45,
+            "elapsedSeconds": 0,
+            "status": "PENDING"
+          }
+        ]
+      },
+      "expected": {
+        "previewMinutes": 120,
+        "legacyCapacityMinutes": 180,
+        "migratedPlannedMinutes": 120,
+        "conflicts": 4
+      }
+    },
+    {
+      "id": "known-scope-overwork",
+      "auditIds": [
+        "A15"
+      ],
+      "normalization": "Recorded E2 educational quality case; requires future model/human evaluation, not a deterministic topic-time quota.",
+      "data": {
+        "topic": "Enzymes",
+        "covered": true,
+        "confidence": 4,
+        "horizonDays": 28,
+        "activities": 20,
+        "minutesEach": 45
+      },
+      "expected": {
+        "recordedMinutes": 900,
+        "qualityDecision": "Reject unjustified repetition; justify necessary work using evidence."
+      }
+    },
+    {
+      "id": "proposal-bounds-disagree",
+      "auditIds": [
+        "A11"
+      ],
+      "normalization": "Recorded structural reproduction; V2 removes the old required activity-count heuristic.",
+      "data": {
+        "scopeTopics": 31,
+        "legacyMandatoryItems": 125,
+        "legacyProposalLimit": 90,
+        "legacyStoredLimit": 200
+      },
+      "expected": {
+        "legacyPreflightMisleading": true,
+        "v2NewActivitiesMaximum": 60,
+        "required": "One shared envelope and segmentation; no pedagogical minimum item count."
+      }
+    },
+    {
+      "id": "changed-instructions-same-placement",
+      "auditIds": [
+        "A02"
+      ],
+      "normalization": "Synthetic focused semantic equality case derived from recorded divergence.",
+      "data": {
+        "beforeInstructions": "Draw a labelled recall sheet and check five statements.",
+        "afterInstructions": "Explain active site specificity from memory, then check your notes.",
+        "title": "Enzymes recall",
+        "date": "2026-10-03",
+        "plannedMinutes": 30
+      },
+      "expected": {
+        "labels": [
+          "CHANGED"
+        ],
+        "kept": false
+      }
+    },
+    {
+      "id": "stale-intent-recovery",
+      "auditIds": [
+        "A03",
+        "A20"
+      ],
+      "normalization": "Synthetic identities representing the recorded older-operation recovery.",
+      "data": {
+        "requestedIntentVersionId": "11111111-1111-4111-8111-111111111111",
+        "returnedIntentVersionId": "22222222-2222-4222-8222-222222222222",
+        "transportKey": "same-intake-session",
+        "requestHashChanged": true
+      },
+      "expected": {
+        "confirmable": false,
+        "required": "New intent produces a new attempt; inspect old result only as historical."
+      }
+    },
+    {
+      "id": "incomplete-overrun",
+      "auditIds": [
+        "A24"
+      ],
+      "normalization": "V2 boundary case extending audit duration/remaining-work findings.",
+      "data": {
+        "plannedMinutes": 30,
+        "elapsedSeconds": 2400,
+        "status": "IN_PROGRESS",
+        "remainingMinutesEstimate": 10
+      },
+      "expected": {
+        "remainingPositive": true,
+        "automaticallyCompleted": false
+      }
+    },
+    {
+      "id": "completed-actual-capacity",
+      "auditIds": [
+        "A24"
+      ],
+      "normalization": "V2 actual-time boundary case; not a claim that the audited completed task took this duration.",
+      "data": {
+        "plannedMinutes": 90,
+        "actualSecondsToday": 1800,
+        "status": "COMPLETED"
+      },
+      "expected": {
+        "actualCapacityMinutesToday": 30,
+        "futureRemainingMinutes": 0
+      }
+    },
+    {
+      "id": "unrepaired-critical-quality",
+      "auditIds": [
+        "A10"
+      ],
+      "normalization": "Focused retained issue state derived from recorded UNREPAIRED failure.",
+      "data": {
+        "issueId": "q-1",
+        "category": "UNREALISTIC_WORKLOAD",
+        "severity": "BLOCKER",
+        "status": "UNRESOLVED",
+        "targetedRepairs": 1,
+        "verifiedRepairs": 0
+      },
+      "expected": {
+        "sealAllowed": false
+      }
+    },
+    {
+      "id": "provider-price-unknown",
+      "auditIds": [
+        "A29"
+      ],
+      "normalization": "Recorded total tokens and unrecognized active model pricing.",
+      "data": {
+        "model": "deepseek-flash",
+        "promptTokens": 38761,
+        "completionTokens": 40287,
+        "knownPrice": false
+      },
+      "expected": {
+        "totalTokens": 79048,
+        "estimatedCostUsd": null
+      }
+    },
+    {
+      "id": "research-only-recovery",
+      "auditIds": [
+        "A14",
+        "A32"
+      ],
+      "normalization": "V2 read-only durable research requirement extending audited research/runtime issues.",
+      "data": {
+        "kind": "RESEARCH_ADVICE",
+        "targets": [],
+        "canUseWorker": true
+      },
+      "expected": {
+        "intentPublicationAllowed": false,
+        "candidatePublicationAllowed": false,
+        "questMutationAllowed": false
+      }
+    },
+    {
+      "id": "diagnostic-not-action",
+      "auditIds": [
+        "A24",
+        "A27"
+      ],
+      "normalization": "V2 consent boundary; self-report triggers a recommendation, not a mutation.",
+      "data": {
+        "report": "I could not solve it",
+        "explicitAction": false
+      },
+      "expected": {
+        "recordEvidence": true,
+        "prepareChange": false,
+        "applyChange": false
+      }
+    }
+  ]
+}

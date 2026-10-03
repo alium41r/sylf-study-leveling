@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { normalizeAppBackgroundId } from "@/lib/cosmetics-catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +15,17 @@ export async function GET(req: NextRequest) {
     // @ts-ignore - Prisma types are cached in IDE
     const user = await prisma.user.findUnique({
       where: { id: session.userId },
-      // @ts-ignore
-      include: { cosmetics: true },
-    }) as any;
+      select: {
+        cosmetics: true,
+        activeTheme: true,
+        activeBackground: true,
+        activeAvatar: true,
+        activeFrame: true,
+        activeTitle: true,
+        activeAura: true,
+        activeNameColor: true,
+      },
+    });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -26,7 +35,7 @@ export async function GET(req: NextRequest) {
       cosmetics: user.cosmetics || [],
       active: {
         activeTheme: user.activeTheme || "cyberpunk",
-        activeBackground: user.activeBackground || "default",
+        activeBackground: normalizeAppBackgroundId(user.activeBackground) || "simple",
         activeAvatar: user.activeAvatar || "class_scholar",
         activeFrame: user.activeFrame || "none",
         activeTitle: user.activeTitle || "title_novice",
@@ -57,7 +66,7 @@ export async function POST(req: NextRequest) {
     // Determine the field to update based on category
     let updateData: any = {};
     if (category === "THEME") updateData.activeTheme = itemKey;
-    else if (category === "BACKGROUND") updateData.activeBackground = itemKey;
+    else if (category === "BACKGROUND") updateData.activeBackground = normalizeAppBackgroundId(itemKey);
     else if (category === "CLASS" || category === "AVATAR") updateData.activeAvatar = itemKey;
     else if (category === "FRAME") updateData.activeFrame = itemKey;
     else if (category === "TITLE") updateData.activeTitle = itemKey;

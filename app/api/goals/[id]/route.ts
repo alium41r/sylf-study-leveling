@@ -1,4 +1,6 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
+import { assertNoPlannerGoals, isPlannerConflict, manualPlannerGoal } from "@/lib/planner/server/mutation-guards";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -110,10 +112,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Invalid color token." }, { status: 400 });
     }
 
-    const updated = await prisma.goal.update({
+    const updated = await manualPlannerGoal(session.userId, parseInt(id), dataToUpdate) ?? await executionTransaction(session.userId, tx => tx.goal.update({
       where: { id: parseInt(id) },
       data: dataToUpdate,
-    });
+    }));
 
     return NextResponse.json(updated, { status: 200 });
   } catch {
@@ -141,10 +143,12 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Goal not found" }, { status: 404 });
     }
 
-    await prisma.goal.delete({ where: { id: parseInt(id) } });
+    await assertNoPlannerGoals(session.userId, [parseInt(id)]);
+    await executionTransaction(session.userId, tx => tx.goal.delete({ where: { id: parseInt(id) } }));
 
     return NextResponse.json({ message: "Goal abandoned" }, { status: 200 });
-  } catch {
+  } catch (error) {
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

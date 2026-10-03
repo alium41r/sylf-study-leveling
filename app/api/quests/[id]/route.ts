@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import { awardXP, getStreakMultiplier } from "@/lib/game-engine";
 import { DIFFICULTY_CONFIG } from "@/lib/difficulty-engine";
 import { TimezoneService } from "@/lib/timezone-service";
-import { getUserTimezone } from "@/lib/timezone-server";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
+import { manualLinkedQuest, isPlannerConflict } from "@/lib/planner/server/mutation-guards";
+import { PlannerError } from "@/lib/planner/errors";
+import { durablePlanner } from "@/lib/planner/v2/server/web";
+import { DurablePlannerError } from "@/lib/planner/v2/server/database";
+import { executionTransaction } from "@/lib/execution-coordination";
+import { projectQuestDuration } from "@/lib/planner/v2/quest-read";
 
 const updateQuestSchema = z.object({
   title: z.string().min(1).optional(),
@@ -18,6 +22,8 @@ const updateQuestSchema = z.object({
   elapsedSeconds: z.number().int().min(0).optional(),
   difficulty: z.enum(["EASY", "NORMAL", "HARD", "EXPERT"]).optional(),
   goalId: z.number().int().positive().nullable().optional(),
+  executionProtocol: z.literal(2).optional(),
+  expectedExecutionVersion: z.number().int().nonnegative().optional(),
 });
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -41,7 +47,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });
     }
 
-    return NextResponse.json(quest, { status: 200 });
+    return NextResponse.json(projectQuestDuration(quest), { status: 200 });
   } catch (error) {
     console.error("GET quest error:", error);
     return NextResponse.json(
@@ -76,17 +82,38 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     const { status, title, description, requiredMinutes, scheduledFor, elapsedSeconds, difficulty, goalId } = validation.data;
 
+    if (validation.data.executionProtocol === 2) {
+      const owned = await prisma.quest.findFirst({ where: { id: parseInt(id), userId: session.userId } });
+      if (!owned) return NextResponse.json({ error: "Quest not found" }, { status: 404 });
+      if (owned.plannedMinutes !== null && owned.plannedMinutes !== undefined) {
+        if (status !== "COMPLETED" || validation.data.expectedExecutionVersion === undefined ||
+          [title, description, requiredMinutes, scheduledFor, elapsedSeconds, difficulty, goalId].some(value => value !== undefined))
+          return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED", message: "Review plan changes in Planner." }, { status: 409 });
+        const rewards = await durablePlanner().sessions.complete(session.userId, owned.id, validation.data.expectedExecutionVersion);
+        const quest = await prisma.quest.findFirst({ where: { id: owned.id, userId: session.userId } });
+        invalidateRankingsCache();
+        return NextResponse.json({ quest, rewards });
+      }
+    }
+
+    const linkedResult = await manualLinkedQuest(session.userId, parseInt(id), validation.data);
+    if (linkedResult) return NextResponse.json(linkedResult);
+
+    if (elapsedSeconds !== undefined) return NextResponse.json({ error: "SESSION_PROGRESS_REQUIRED", message: "Study time is accepted through the session protocol." }, { status: 409 });
+    return await executionTransaction(session.userId, async tx => {
     // Verify quest ownership
-    const quest = await prisma.quest.findFirst({
+    const quest = await tx.quest.findFirst({
       where: { id: parseInt(id), userId: session.userId },
     });
     if (!quest) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });
     }
 
+    if (quest.plannedMinutes != null) return NextResponse.json({ error: "PLANNER_EXECUTION_PROTOCOL_REQUIRED", message: "Reload or update this client to change this plan's work." }, { status: 409 });
+
     // Goal relink: verify the target goal belongs to the user before applying.
     if (goalId !== undefined && goalId !== null) {
-      const goal = await prisma.goal.findFirst({
+      const goal = await tx.goal.findFirst({
         where: { id: goalId, userId: session.userId },
         select: { id: true },
       });
@@ -106,7 +133,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       }
       const isRestDay = await StudyScheduleService.isUserRestDay(
         session.userId,
-        scheduledFor
+        scheduledFor,
+        tx
       );
       if (isRestDay) {
         return NextResponse.json(
@@ -120,7 +148,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     }
 
     // Get current user stats
-    const user = await prisma.user.findUnique({
+    const user = await tx.user.findUnique({
       where: { id: session.userId },
     });
     if (!user) {
@@ -130,7 +158,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     const dataToUpdate: any = {};
     if (title !== undefined) dataToUpdate.title = title;
     if (description !== undefined) dataToUpdate.description = description;
-    if (requiredMinutes !== undefined) dataToUpdate.requiredMinutes = requiredMinutes;
+    if (requiredMinutes !== undefined) { dataToUpdate.requiredMinutes = requiredMinutes; dataToUpdate.targetMinutes = requiredMinutes; }
     if (scheduledFor !== undefined) dataToUpdate.scheduledFor = scheduledFor;
     if (elapsedSeconds !== undefined) dataToUpdate.elapsedSeconds = elapsedSeconds;
     if (difficulty !== undefined) dataToUpdate.difficulty = difficulty;
@@ -140,8 +168,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       dataToUpdate.completedAt = status === "COMPLETED" ? new Date() : null;
     }
 
-    const tz = await getUserTimezone(session.userId);
-    const today = TimezoneService.getUserLocalDate(tz);
+    const today = TimezoneService.getUserLocalDate(user.timezone || "UTC");
 
     const isNewlyCompleted = status === "COMPLETED" && quest.status !== "COMPLETED";
     const isNewlyFailed = status === "FAILED" && quest.status !== "FAILED";
@@ -152,7 +179,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     // drop between the claim and the field update below can therefore
     // never leave a COMPLETED quest with a permanently lost reward.
     if (isNewlyCompleted) {
-      const rows = await prisma.$queryRaw<
+      const rows = await tx.$queryRaw<
         [{ claim_quest_reward: { success: boolean; questId: number; status: string; xpGained?: number; sylphGained?: number; totalSylphEarned?: number; hpHealed?: number; currentHp?: number; level?: number; currentXP?: number; xpToNextLevel?: number; hunterRank?: string; levelsGained?: number; didRankUp?: boolean; penalty?: { hpLost: number; currentHp: number } } }]
       >`
         SELECT public.claim_quest_reward(
@@ -169,7 +196,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
         // atomically. Persist any OTHER field edits without clobbering the
         // FAILED status.
         const { status: _s, completedAt: _c, ...restData } = dataToUpdate;
-        const updatedQuest = await prisma.quest.update({
+        const updatedQuest = await tx.quest.update({
           where: { id: parseInt(id) },
           data: restData,
         });
@@ -184,7 +211,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       // Apply the (idempotent) field update AFTER the atomic claim — purely
       // for response-shape parity; the RPC already persisted status and
       // completedAt inside its own transaction.
-      const updatedQuest = await prisma.quest.update({
+      const updatedQuest = await tx.quest.update({
         where: { id: parseInt(id) },
         data: dataToUpdate,
       });
@@ -209,7 +236,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     }
 
     // Update the quest fields (non-completion paths)
-    const updatedQuest = await prisma.quest.update({
+    const updatedQuest = await tx.quest.update({
       where: { id: parseInt(id) },
       data: dataToUpdate,
     });
@@ -229,7 +256,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
       const newHp = Math.max(0, user.hp - penalty);
 
-      await prisma.$transaction(async (tx) => {
+      {
         await tx.user.update({
           where: { id: user.id },
           data: { hp: newHp },
@@ -252,7 +279,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
             type: "WARNING",
           },
         });
-      });
+      }
 
       return NextResponse.json(
         {
@@ -265,7 +292,10 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     // ─── Handle other status changes (IN_PROGRESS, PENDING) ──
     return NextResponse.json({ quest: updatedQuest }, { status: 200 });
-  } catch {
+    });
+  } catch (error) {
+    if (error instanceof DurablePlannerError) return NextResponse.json({ error: error.detail.code, detail: error.detail }, { status: 409 });
+    if (isPlannerConflict(error)) return NextResponse.json({ error: error instanceof PlannerError ? error.code : "PLANNER_REVIEW_REQUIRED" }, { status: error instanceof PlannerError ? error.status : 409 });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -289,9 +319,11 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });
     }
 
-    await prisma.quest.delete({ where: { id: parseInt(id) } });
+    const linkedResult = await manualLinkedQuest(session.userId, parseInt(id), {}, true);
+    if (!linkedResult) await executionTransaction(session.userId, tx => tx.quest.delete({ where: { id: parseInt(id), userId: session.userId } }));
     return NextResponse.json({ message: "Quest deleted" }, { status: 200 });
-  } catch {
+  } catch (error) {
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

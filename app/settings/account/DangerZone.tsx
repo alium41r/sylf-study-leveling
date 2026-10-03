@@ -5,6 +5,9 @@ import { useAuth } from "../../components/AuthProvider";
 import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff, AlertTriangle, X } from "lucide-react";
+import { getAccountCapability } from "./services/account-capability";
+import styles from "../components/SystemHubPage.module.css";
 
 interface DangerAction {
   id: "logout" | "logout_all" | "reset_progress" | "delete_account";
@@ -77,7 +80,7 @@ export default function DangerZone() {
   const handleLogout = async () => {
     setIsSubmitting(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await getAccountCapability().logoutThisDevice();
     } catch {
       // Proceed with local logout regardless
     } finally {
@@ -93,20 +96,13 @@ export default function DangerZone() {
     setFeedback(null);
 
     try {
-      const res = await fetch("/api/auth/logout-all", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ password }),
-      });
+      const result = await getAccountCapability().logoutAllDevices(password);
 
-      const data = await res.json();
-      if (res.ok) {
+      if (result.ok) {
         logout();
         router.push("/login");
       } else {
-        setFeedback({ type: "error", message: data.error || "Failed to revoke all sessions." });
+        setFeedback({ type: "error", message: result.error || "Failed to revoke all sessions." });
       }
     } catch {
       setFeedback({ type: "error", message: "Network error. Could not revoke sessions." });
@@ -122,17 +118,10 @@ export default function DangerZone() {
     setFeedback(null);
 
     try {
-      const res = await fetch("/api/user/security/send-code", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ action }),
-      });
+      const result = await getAccountCapability().sendSecurityCode(action);
 
-      const data = await res.json();
-      if (res.ok) {
-        setFeedback({ type: "success", message: data.message || "Verification code sent to your email." });
+      if (result.ok) {
+        setFeedback({ type: "success", message: result.message || "Verification code sent to your email." });
         setCooldown(30);
         const timer = setInterval(() => {
           setCooldown((prev) => {
@@ -144,7 +133,7 @@ export default function DangerZone() {
           });
         }, 1000);
       } else {
-        setFeedback({ type: "error", message: data.error || "Failed to send code." });
+        setFeedback({ type: "error", message: result.error || "Failed to send code." });
       }
     } catch {
       setFeedback({ type: "error", message: "Network error. Failed to send verification code." });
@@ -164,24 +153,17 @@ export default function DangerZone() {
 
     try {
       const payload = isVerified ? { code: otpCode } : { password };
-      const res = await fetch("/api/user/reset-progress", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const result = await getAccountCapability().resetProgress(payload);
 
-      const data = await res.json();
-      if (res.ok) {
+      if (result.ok) {
         if (refreshStats) await refreshStats();
-        setFeedback({ type: "success", message: "Progress reset successfully! Starting at Level 1." });
+        setFeedback({ type: "success", message: result.message || "Progress reset successfully! Starting at Level 1." });
         setTimeout(() => {
           handleCloseModal();
           router.push("/dashboard");
         }, 1200);
       } else {
-        setFeedback({ type: "error", message: data.error || "Failed to reset progression." });
+        setFeedback({ type: "error", message: result.error || "Failed to reset progression." });
       }
     } catch {
       setFeedback({ type: "error", message: "Network error. Failed to reset progression." });
@@ -201,20 +183,13 @@ export default function DangerZone() {
 
     try {
       const payload = isVerified ? { code: otpCode } : { password };
-      const res = await fetch("/api/user/account/delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const result = await getAccountCapability().deleteAccount(payload);
 
-      const data = await res.json();
-      if (res.ok) {
+      if (result.ok) {
         logout();
         router.push("/register");
       } else {
-        setFeedback({ type: "error", message: data.error || "Failed to delete account." });
+        setFeedback({ type: "error", message: result.error || "Failed to delete account." });
       }
     } catch {
       setFeedback({ type: "error", message: "Network error. Could not delete account." });
@@ -224,7 +199,7 @@ export default function DangerZone() {
   };
 
   return (
-    <div className="pt-2">
+    <div className="pt-1">
       <SettingsRowGroup danger={true}>
         {actions.map((action) => (
           <SettingsRow
@@ -235,8 +210,7 @@ export default function DangerZone() {
           >
             <button 
               onClick={() => handleOpenModal(action.id)} 
-              className="btn-danger shrink-0"
-              style={{ padding: "6px 16px", fontSize: "0.75rem" }}
+              className="px-3.5 py-1.5 rounded-xl font-['Rajdhani'] font-bold text-xs uppercase tracking-wider transition-all border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white shrink-0"
             >
               {action.actionText}
             </button>
@@ -248,14 +222,14 @@ export default function DangerZone() {
       {activeModal === "logout" && (
         <ModalWrapper title="Log Out" onClose={handleCloseModal}>
           <div className="space-y-4">
-            <p className="text-gray-300 text-sm">
+            <p className="text-[var(--muted)] text-sm">
               Are you sure you want to sign out of your account on this device?
             </p>
-            <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
-              <button onClick={handleCloseModal} className="btn-secondary text-xs px-4 py-2">
+            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--subtle-line)]">
+              <button onClick={handleCloseModal} className={styles.btnSecondary}>
                 Cancel
               </button>
-              <button onClick={handleLogout} disabled={isSubmitting} className="btn-danger text-xs px-4 py-2">
+              <button onClick={handleLogout} disabled={isSubmitting} className={styles.btnDanger}>
                 {isSubmitting ? "Signing Out..." : "Log Out"}
               </button>
             </div>
@@ -265,14 +239,14 @@ export default function DangerZone() {
 
       {/* ─── 2. Log Out All Devices Modal (Password Protected) ─── */}
       {activeModal === "logout_all" && (
-        <ModalWrapper title="Log Out Everywhere" onClose={handleCloseModal}>
+        <ModalWrapper title="Log Out Everywhere" onClose={handleCloseModal} danger={true}>
           <form onSubmit={handleLogoutAll} className="space-y-4">
-            <p className="text-gray-300 text-sm">
+            <p className="text-[var(--muted)] text-sm">
               This will revoke all active authentication sessions across all browsers and devices. Enter your account password to confirm.
             </p>
 
             <div>
-              <label className="stat-label block mb-1 text-xs">Account Password</label>
+              <label className={styles.configLabel}>Account Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -280,29 +254,31 @@ export default function DangerZone() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="input-field w-full text-sm pr-10"
+                  className={styles.configInput}
+                  style={{ paddingRight: "40px" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? "👁" : "👁‍🗨"}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
             {feedback && (
-              <p className={`text-xs font-[Rajdhani] ${feedback.type === "success" ? "text-accent-green" : "text-accent-red"}`}>
+              <p className={`text-xs font-['Rajdhani'] font-bold ${feedback.type === "success" ? "text-emerald-500" : "text-rose-500"}`}>
                 {feedback.message}
               </p>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
-              <button type="button" onClick={handleCloseModal} className="btn-secondary text-xs px-4 py-2">
+            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--subtle-line)]">
+              <button type="button" onClick={handleCloseModal} className={styles.btnSecondary}>
                 Cancel
               </button>
-              <button type="submit" disabled={isSubmitting || !password} className="btn-danger text-xs px-4 py-2">
+              <button type="submit" disabled={isSubmitting || !password} className={styles.btnDanger}>
                 {isSubmitting ? "Revoking..." : "Revoke All Sessions"}
               </button>
             </div>
@@ -312,33 +288,33 @@ export default function DangerZone() {
 
       {/* ─── 3. Reset Progress Modal ─── */}
       {activeModal === "reset_progress" && (
-        <ModalWrapper title="Reset Hunter Progress" onClose={handleCloseModal}>
+        <ModalWrapper title="Reset Hunter Progress" onClose={handleCloseModal} danger={true}>
           <form onSubmit={handleResetProgress} className="space-y-4">
-            <p className="text-gray-300 text-sm">
-              This action will reset your level back to <strong className="text-accent-primary-light">Level 1</strong>, XP to 0, and clear your active quest log. Your account identity and unlocked cosmetics will remain intact.
+            <p className="text-[var(--muted)] text-sm">
+              This action will reset your level back to <strong className="text-[var(--accent)] font-bold">Level 1</strong>, XP to 0, and clear your active quest log. Your account identity and unlocked cosmetics will remain intact.
             </p>
 
             {isVerified ? (
               <>
-                <div className="p-3 bg-black/40 border border-white/10 rounded-lg flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-text-muted block">
+                <div className="p-3.5 bg-[var(--sub-surface)] border border-[var(--sub-border)] rounded-xl flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--quiet)] block">
                       Security Code Destination
                     </span>
-                    <span className="text-sm text-text-primary font-mono">{user?.email || "Registered Email"}</span>
+                    <span className="text-sm text-[var(--ink)] font-mono truncate block">{user?.email || "Registered Email"}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleSendCode("RESET_PROGRESS")}
                     disabled={isSendingCode || cooldown > 0}
-                    className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded border border-accent-primary-mid bg-accent-primary-dim text-accent-primary-light hover:bg-accent-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-[var(--line)] bg-[var(--accent-dim)] text-[var(--accent)] hover:bg-[var(--accent-strong)] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSendingCode ? "Sending..." : cooldown > 0 ? `Resend (${cooldown}s)` : "Send Code"}
                   </button>
                 </div>
 
                 <div>
-                  <label className="stat-label block mb-1 text-xs">6-Digit Verification Code</label>
+                  <label className={styles.configLabel}>6-Digit Verification Code</label>
                   <input
                     type="text"
                     maxLength={6}
@@ -346,16 +322,17 @@ export default function DangerZone() {
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                     placeholder="123456"
                     required
-                    className="input-field w-full text-center tracking-[0.4em] font-mono text-lg font-bold"
+                    className={styles.configInput}
+                    style={{ textAlign: "center", letterSpacing: "0.3em", fontSize: "1.1rem" }}
                   />
                 </div>
               </>
             ) : (
               <div>
-                <p className="text-xs text-amber-400/90 mb-2">
+                <p className="text-xs text-amber-500 mb-2">
                   ℹ️ Your email is unverified. Enter your account password to confirm reset:
                 </p>
-                <label className="stat-label block mb-1 text-xs">Account Password</label>
+                <label className={styles.configLabel}>Account Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -363,33 +340,35 @@ export default function DangerZone() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
                     required
-                    className="input-field w-full text-sm pr-10"
+                    className={styles.configInput}
+                    style={{ paddingRight: "40px" }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "👁" : "👁‍🗨"}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
             )}
 
             {feedback && (
-              <p className={`text-xs font-[Rajdhani] ${feedback.type === "success" ? "text-accent-green" : "text-accent-red"}`}>
+              <p className={`text-xs font-['Rajdhani'] font-bold ${feedback.type === "success" ? "text-emerald-500" : "text-rose-500"}`}>
                 {feedback.message}
               </p>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
-              <button type="button" onClick={handleCloseModal} className="btn-secondary text-xs px-4 py-2">
+            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--subtle-line)]">
+              <button type="button" onClick={handleCloseModal} className={styles.btnSecondary}>
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || (isVerified ? otpCode.length !== 6 : !password)}
-                className="btn-danger text-xs px-4 py-2"
+                className={styles.btnDanger}
               >
                 {isSubmitting ? "Resetting..." : "Confirm Reset"}
               </button>
@@ -402,31 +381,34 @@ export default function DangerZone() {
       {activeModal === "delete_account" && (
         <ModalWrapper title="PERMANENT ACCOUNT DELETION" onClose={handleCloseModal} danger={true}>
           <form onSubmit={handleDeleteAccount} className="space-y-4">
-            <div className="p-3 bg-red-950/40 border border-red-900/60 rounded-lg text-xs text-red-300 leading-relaxed">
-              ⚠️ <strong>WARNING:</strong> This action permanently deletes your Scholar account, all study history, quests, level progression, and social records. <strong>This action CANNOT be undone.</strong>
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-500 leading-relaxed flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <span>
+                <strong>WARNING:</strong> This action permanently deletes your Scholar account, all study history, quests, level progression, and social records. <strong>This action CANNOT be undone.</strong>
+              </span>
             </div>
 
             {isVerified ? (
               <>
-                <div className="p-3 bg-black/40 border border-white/10 rounded-lg flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-text-muted block">
+                <div className="p-3.5 bg-[var(--sub-surface)] border border-[var(--sub-border)] rounded-xl flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--quiet)] block">
                       Confirmation Code Destination
                     </span>
-                    <span className="text-sm text-text-primary font-mono">{user?.email || "Registered Email"}</span>
+                    <span className="text-sm text-[var(--ink)] font-mono truncate block">{user?.email || "Registered Email"}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleSendCode("DELETE_ACCOUNT")}
                     disabled={isSendingCode || cooldown > 0}
-                    className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSendingCode ? "Sending..." : cooldown > 0 ? `Resend (${cooldown}s)` : "Send Code"}
                   </button>
                 </div>
 
                 <div>
-                  <label className="stat-label block mb-1 text-xs">6-Digit Verification Code</label>
+                  <label className={styles.configLabel}>6-Digit Verification Code</label>
                   <input
                     type="text"
                     maxLength={6}
@@ -434,16 +416,17 @@ export default function DangerZone() {
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                     placeholder="123456"
                     required
-                    className="input-field w-full text-center tracking-[0.4em] font-mono text-lg font-bold border-red-900/50 focus:border-red-500"
+                    className={styles.configInput}
+                    style={{ textAlign: "center", letterSpacing: "0.3em", fontSize: "1.1rem" }}
                   />
                 </div>
               </>
             ) : (
               <div>
-                <p className="text-xs text-red-300/90 mb-2">
+                <p className="text-xs text-red-400 mb-2">
                   ℹ️ Your email is unverified. Enter your account password to confirm permanent deletion:
                 </p>
-                <label className="stat-label block mb-1 text-xs">Account Password</label>
+                <label className={styles.configLabel}>Account Password</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -451,33 +434,35 @@ export default function DangerZone() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
                     required
-                    className="input-field w-full text-sm pr-10 border-red-900/50 focus:border-red-500"
+                    className={styles.configInput}
+                    style={{ paddingRight: "40px" }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "👁" : "👁‍🗨"}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
             )}
 
             {feedback && (
-              <p className={`text-xs font-[Rajdhani] ${feedback.type === "success" ? "text-accent-green" : "text-accent-red"}`}>
+              <p className={`text-xs font-['Rajdhani'] font-bold ${feedback.type === "success" ? "text-emerald-500" : "text-rose-500"}`}>
                 {feedback.message}
               </p>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-border-subtle">
-              <button type="button" onClick={handleCloseModal} className="btn-secondary text-xs px-4 py-2">
+            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--subtle-line)]">
+              <button type="button" onClick={handleCloseModal} className={styles.btnSecondary}>
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || (isVerified ? otpCode.length !== 6 : !password)}
-                className="btn-danger text-xs px-4 py-2"
+                className={styles.btnDanger}
               >
                 {isSubmitting ? "Deleting..." : "Permanently Delete Account"}
               </button>
@@ -501,22 +486,18 @@ function ModalWrapper({
   danger?: boolean;
 }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
-      <div
-        className={`system-card relative w-full max-w-md p-6 z-10 flex flex-col ${
-          danger ? "border-red-900/60 shadow-[0_0_30px_rgba(239,68,68,0.25)]" : "shadow-2xl border-border-subtle"
-        }`}
-      >
+    <div className={styles.configModalBackdrop} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className={danger ? styles.configModalCardDanger : styles.configModalCard}>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white text-lg font-bold"
+          className="absolute top-4 right-4 text-[var(--muted)] hover:text-[var(--ink)] transition-colors p-1.5 rounded-lg hover:bg-[var(--chip-bg)]"
+          aria-label="Close dialog"
         >
-          ✕
+          <X className="w-5 h-5" />
         </button>
         <h2
-          className={`text-xl font-bold mb-4 font-rajdhani uppercase tracking-wide ${
-            danger ? "text-accent-red" : "text-accent-primary-light"
+          className={`text-lg sm:text-xl font-bold mb-4 font-['Rajdhani'] uppercase tracking-wider ${
+            danger ? "text-red-500" : "text-[var(--ink)]"
           }`}
         >
           {title}

@@ -214,9 +214,11 @@ export async function POST(req: NextRequest) {
 
     // ── Quota enforcement (shared 10-prompt daily pool for General Chat + Focus Drawer) ──
     // S4: RESERVE the unit atomically BEFORE any LLM call; release on failure.
+    // A configured owner account is entitled to unlimited chat: the reservation
+    // is bypassed (charged === false) and `unlimited` carries the permission.
     const quota = await reserveQuota(userId, "chat");
     let quotaReserved = quota.charged;
-    if (!quota.charged) {
+    if (!quota.charged && !quota.unlimited) {
       return NextResponse.json(
         {
           error: "DAILY_QUOTA_EXHAUSTED",

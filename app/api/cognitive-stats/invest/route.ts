@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -112,7 +113,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await executionTransaction(session.userId, async (tx) => {
       // Ensure UserStats exists (init mirrors the canonical RPC convention).
       const user = await tx.user.findUnique({
         where: { id: userId },

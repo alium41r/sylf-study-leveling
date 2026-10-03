@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "package": "@embedded-postgres/darwin-arm64",
+  "version": "18.4.0-beta.17",
+  "postgresVersion": "18.4",
+  "source": "https://registry.npmjs.org/@embedded-postgres/darwin-arm64/-/darwin-arm64-18.4.0-beta.17.tgz",
+  "documentation": "https://github.com/leinelissen/embedded-postgres",
+  "sha512": "Kg1ZMNFzkVIJs3g4V2UYEc5X005km9rGinxFBH8R1sOU2Rblvz4pt2Uf93Pu8Rk273Ue9HIdrbMPpgUqwjUi0Q==",
+  "integrityVerified": true,
+  "isolatedPath": "/private/tmp/sylf-planner-phase0-runtime/package/native/bin",
+  "repositoryDependencyChanged": false,
+  "symlinkHydration": "17 package-local paths checked for confinement before hydration",
+  "testDatabase": "Disposable localhost only; no hosted URL accepted"
+}

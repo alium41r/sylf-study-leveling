@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
     const { code, password } = body;
+    let verifiedTokenId: number | null = null;
 
     // Unverified accounts can authenticate directly via password
     if (user.verificationStatus === "UNVERIFIED" && password) {
@@ -57,14 +59,17 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      await prisma.verificationToken.delete({
-        where: { id: validToken.id },
-      });
+      verifiedTokenId = validToken.id;
     }
 
     // Delete user (cascades to all child relations)
-    await prisma.user.delete({
-      where: { id: session.userId },
+    await executionTransaction(session.userId, async tx => {
+      if (verifiedTokenId !== null) {
+        const consumed = await tx.verificationToken.deleteMany({ where: { id: verifiedTokenId, userId: session.userId,
+          token: `DELETE_ACCOUNT:${code.trim()}`, expiresAt: { gt: new Date() } } });
+        if (consumed.count !== 1) throw new Error("SECURITY_CODE_EXPIRED_OR_USED");
+      }
+      return tx.user.delete({ where: { id: session.userId } });
     });
 
     const response = NextResponse.json(
@@ -86,6 +91,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
+    if (error instanceof Error && error.message === "SECURITY_CODE_EXPIRED_OR_USED") return NextResponse.json({ error: "Invalid or expired security code. Please request a new one." }, { status: 400 });
     console.error("Delete account error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

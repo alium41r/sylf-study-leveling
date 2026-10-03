@@ -1,0 +1,447 @@
+{
+  "at": "2026-09-14T13:46:50.571Z",
+  "origin": "http://localhost:3001",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 OPR/135.0.0.0",
+  "samples": [
+    {
+      "path": "/api/user/stats",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 2247.5,
+      "totalMs": 2248.399999976158,
+      "decodedBytes": 142780
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 551.6999999880791,
+      "totalMs": 552.1999999880791,
+      "decodedBytes": 142780
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 641.9000000059605,
+      "totalMs": 642.5999999940395,
+      "decodedBytes": 142780
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 519.5,
+      "totalMs": 519.9000000059605,
+      "decodedBytes": 142780
+    },
+    {
+      "path": "/api/user/stats",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 534.5,
+      "totalMs": 534.9000000059605,
+      "decodedBytes": 142780
+    },
+    {
+      "path": "/api/goals",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 414.10000002384186,
+      "totalMs": 415.5,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/goals",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 386.5,
+      "totalMs": 386.69999998807907,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/goals",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 387.2000000178814,
+      "totalMs": 387.7000000178814,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/goals",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 389.09999999403954,
+      "totalMs": 389.7999999821186,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/goals",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 387.5,
+      "totalMs": 387.69999998807907,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/quests",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 1056.5,
+      "totalMs": 1056.9000000059605,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/quests",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 780.9000000059605,
+      "totalMs": 781.3000000119209,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/quests",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 520.5999999940395,
+      "totalMs": 521.9000000059605,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/quests",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 524,
+      "totalMs": 524.4000000059605,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/quests",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 516,
+      "totalMs": 516.2999999821186,
+      "decodedBytes": 2
+    },
+    {
+      "path": "/api/friends",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 945,
+      "totalMs": 945.7000000178814,
+      "decodedBytes": 199772
+    },
+    {
+      "path": "/api/friends",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 922.8000000119209,
+      "totalMs": 923.4000000059605,
+      "decodedBytes": 199772
+    },
+    {
+      "path": "/api/friends",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 898.4000000059605,
+      "totalMs": 898.8000000119209,
+      "decodedBytes": 199772
+    },
+    {
+      "path": "/api/friends",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 771.0999999940395,
+      "totalMs": 771.3000000119209,
+      "decodedBytes": 199772
+    },
+    {
+      "path": "/api/friends",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 892.2999999821186,
+      "totalMs": 892.9000000059605,
+      "decodedBytes": 199772
+    },
+    {
+      "path": "/api/notifications",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 413,
+      "totalMs": 413.39999997615814,
+      "decodedBytes": 685
+    },
+    {
+      "path": "/api/notifications",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 387.89999997615814,
+      "totalMs": 388.09999999403954,
+      "decodedBytes": 685
+    },
+    {
+      "path": "/api/notifications",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 420.90000000596046,
+      "totalMs": 421.5,
+      "decodedBytes": 685
+    },
+    {
+      "path": "/api/notifications",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 392,
+      "totalMs": 392.2000000178814,
+      "decodedBytes": 685
+    },
+    {
+      "path": "/api/notifications",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 400.2999999821186,
+      "totalMs": 400.5,
+      "decodedBytes": 685
+    },
+    {
+      "path": "/api/ai-usage",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 545,
+      "totalMs": 545.4000000059605,
+      "decodedBytes": 392
+    },
+    {
+      "path": "/api/ai-usage",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 740.9000000059605,
+      "totalMs": 741.0999999940395,
+      "decodedBytes": 392
+    },
+    {
+      "path": "/api/ai-usage",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 530.4000000059605,
+      "totalMs": 530.7000000178814,
+      "decodedBytes": 392
+    },
+    {
+      "path": "/api/ai-usage",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 529.5999999940395,
+      "totalMs": 529.9000000059605,
+      "decodedBytes": 392
+    },
+    {
+      "path": "/api/ai-usage",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 533.2000000178814,
+      "totalMs": 533.5,
+      "decodedBytes": 392
+    },
+    {
+      "path": "/api/cosmetics",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 415.19999998807907,
+      "totalMs": 415.39999997615814,
+      "decodedBytes": 528
+    },
+    {
+      "path": "/api/cosmetics",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 390.69999998807907,
+      "totalMs": 390.89999997615814,
+      "decodedBytes": 528
+    },
+    {
+      "path": "/api/cosmetics",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 657.2000000178814,
+      "totalMs": 657.6000000238419,
+      "decodedBytes": 528
+    },
+    {
+      "path": "/api/cosmetics",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 397.90000000596046,
+      "totalMs": 398.30000001192093,
+      "decodedBytes": 528
+    },
+    {
+      "path": "/api/cosmetics",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 412.19999998807907,
+      "totalMs": 412.39999997615814,
+      "decodedBytes": 528
+    },
+    {
+      "path": "/api/subjects",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 769.2000000178814,
+      "totalMs": 773.5,
+      "decodedBytes": 702
+    },
+    {
+      "path": "/api/subjects",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 612.1999999880791,
+      "totalMs": 612.5999999940395,
+      "decodedBytes": 702
+    },
+    {
+      "path": "/api/subjects",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 577.5999999940395,
+      "totalMs": 578.5,
+      "decodedBytes": 702
+    },
+    {
+      "path": "/api/subjects",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 543.5,
+      "totalMs": 543.9000000059605,
+      "decodedBytes": 702
+    },
+    {
+      "path": "/api/subjects",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 532.5,
+      "totalMs": 533.4000000059605,
+      "decodedBytes": 702
+    },
+    {
+      "path": "/api/conversations",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 836.9000000059605,
+      "totalMs": 838.4000000059605,
+      "decodedBytes": 492043
+    },
+    {
+      "path": "/api/conversations",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 894.5,
+      "totalMs": 896.7000000178814,
+      "decodedBytes": 492043
+    },
+    {
+      "path": "/api/conversations",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 715.2999999821186,
+      "totalMs": 744.4000000059605,
+      "decodedBytes": 492043
+    },
+    {
+      "path": "/api/conversations",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 734.9000000059605,
+      "totalMs": 741.1999999880791,
+      "decodedBytes": 492043
+    },
+    {
+      "path": "/api/conversations",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 682.4000000059605,
+      "totalMs": 684,
+      "decodedBytes": 492043
+    },
+    {
+      "path": "dm-detail",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 1037.5,
+      "totalMs": 1039,
+      "decodedBytes": 334570
+    },
+    {
+      "path": "dm-detail",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 990.4000000059605,
+      "totalMs": 993.1999999880791,
+      "decodedBytes": 334570
+    },
+    {
+      "path": "dm-detail",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 931.7999999821186,
+      "totalMs": 934.5999999940395,
+      "decodedBytes": 334570
+    },
+    {
+      "path": "dm-detail",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 906.1999999880791,
+      "totalMs": 907.3000000119209,
+      "decodedBytes": 334570
+    },
+    {
+      "path": "dm-detail",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 890.3000000119209,
+      "totalMs": 891,
+      "decodedBytes": 334570
+    },
+    {
+      "path": "group-detail",
+      "sample": 1,
+      "status": 200,
+      "headersMs": 779.5,
+      "totalMs": 783,
+      "decodedBytes": 175191
+    },
+    {
+      "path": "group-detail",
+      "sample": 2,
+      "status": 200,
+      "headersMs": 768.2999999821186,
+      "totalMs": 770.2999999821186,
+      "decodedBytes": 175191
+    },
+    {
+      "path": "group-detail",
+      "sample": 3,
+      "status": 200,
+      "headersMs": 774.4000000059605,
+      "totalMs": 774.9000000059605,
+      "decodedBytes": 175191
+    },
+    {
+      "path": "group-detail",
+      "sample": 4,
+      "status": 200,
+      "headersMs": 778.0999999940395,
+      "totalMs": 779.3000000119209,
+      "decodedBytes": 175191
+    },
+    {
+      "path": "group-detail",
+      "sample": 5,
+      "status": 200,
+      "headersMs": 1080.2999999821186,
+      "totalMs": 1080.7999999821186,
+      "decodedBytes": 175191
+    }
+  ]
+}

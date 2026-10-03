@@ -80,7 +80,7 @@ describe("Multi-Engine AI Architecture & Dynamic Router Tests", () => {
       expect(route.route.fallback.model).toBe(GROQ_MODELS.chatFallback);
     });
 
-    it("routes syllabus constellation compilation to deepseek-v4-pro with gemini-3.1-pro fallback", () => {
+    it("routes syllabus constellation compilation to the DeepSeek compiler model with gemini fallback", () => {
       const route = classifyWorkload("Decompose 9702 syllabus into 48 nodes", undefined, {
         isSyllabus: true,
       });

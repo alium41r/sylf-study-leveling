@@ -1,0 +1,129 @@
+{
+  "at": "2026-09-14T13:49:19.296Z",
+  "samples": [
+    {
+      "path": "/api/user/stats",
+      "status": 200,
+      "decodedBytes": 142780,
+      "largeFieldCount": 2,
+      "largeFieldBytes": 141830,
+      "fields": [
+        {
+          "field": "$.bannerUrl",
+          "bytes": 121991,
+          "category": "data-url"
+        },
+        {
+          "field": "$.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        }
+      ]
+    },
+    {
+      "path": "/api/friends",
+      "status": 200,
+      "decodedBytes": 199772,
+      "itemCount": 5,
+      "largeFieldCount": 3,
+      "largeFieldBytes": 197013,
+      "fields": [
+        {
+          "field": "$.1.avatarUrl",
+          "bytes": 96951,
+          "category": "data-url"
+        },
+        {
+          "field": "$.0.avatarUrl",
+          "bytes": 57015,
+          "category": "data-url"
+        },
+        {
+          "field": "$.2.avatarUrl",
+          "bytes": 43047,
+          "category": "data-url"
+        }
+      ]
+    },
+    {
+      "path": "/api/conversations",
+      "status": 200,
+      "decodedBytes": 492043,
+      "itemCount": 8,
+      "largeFieldCount": 14,
+      "largeFieldBytes": 484898,
+      "fields": [
+        {
+          "field": "$.4.participants.0.avatarUrl",
+          "bytes": 96951,
+          "category": "data-url"
+        },
+        {
+          "field": "$.5.participants.0.avatarUrl",
+          "bytes": 96951,
+          "category": "data-url"
+        },
+        {
+          "field": "$.0.participants.0.avatarUrl",
+          "bytes": 57015,
+          "category": "data-url"
+        },
+        {
+          "field": "$.6.participants.0.avatarUrl",
+          "bytes": 43047,
+          "category": "data-url"
+        },
+        {
+          "field": "$.5.participants.2.avatarUrl",
+          "bytes": 20167,
+          "category": "data-url"
+        },
+        {
+          "field": "$.0.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.1.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.2.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.3.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.4.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.5.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.6.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.7.participants.1.avatarUrl",
+          "bytes": 19839,
+          "category": "data-url"
+        },
+        {
+          "field": "$.2.avatarUrl",
+          "bytes": 12055,
+          "category": "data-url"
+        }
+      ]
+    }
+  ]
+}

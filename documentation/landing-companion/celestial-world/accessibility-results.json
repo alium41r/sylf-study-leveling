@@ -1,0 +1,41 @@
+{
+  "checks": [
+    {
+      "name": "1440: static traveler visible after enabling reduced motion down-page",
+      "passed": true
+    },
+    {
+      "name": "1440: world static and parallax disabled",
+      "passed": true
+    },
+    {
+      "name": "1440: no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440: same static hero visible after pausing at footer",
+      "passed": true
+    },
+    {
+      "name": "390: static traveler visible after enabling reduced motion down-page",
+      "passed": true
+    },
+    {
+      "name": "390: world static and parallax disabled",
+      "passed": true
+    },
+    {
+      "name": "390: no overflow",
+      "passed": true
+    },
+    {
+      "name": "390: same static hero visible after pausing at footer",
+      "passed": true
+    },
+    {
+      "name": "No runtime errors in static regression",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

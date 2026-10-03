@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { backdropVariants, modalDialogVariants } from "@/lib/motion";
+import { X, Check } from "lucide-react";
+import styles from "../Calendar.module.css";
 
 interface StudyScheduleModalProps {
   isOpen: boolean;
@@ -88,56 +91,64 @@ export default function StudyScheduleModal({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-        {/* Backdrop */}
+      {isOpen && (
         <motion.div
+          key="study-schedule-modal-root"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 bg-bg-overlay backdrop-blur-md transition-opacity"
-        />
-
-        {/* Modal Window */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 16 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 16 }}
-          transition={{ type: "spring", damping: 25, stiffness: 320 }}
-          className="relative z-10 w-full max-w-xl bg-bg-panel border border-border-subtle rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8"
+          exit={{ opacity: 0, transition: { duration: 0.15 } }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-border-subtle">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent-dim flex items-center justify-center text-accent-light">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" />
-                  <circle cx="12" cy="12" r="6" />
-                  <circle cx="12" cy="12" r="2" />
-                </svg>
+          {/* Backdrop */}
+          <motion.div
+            variants={backdropVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            onClick={onClose}
+            className="fixed inset-0 bg-bg-overlay backdrop-blur-md transition-opacity"
+          />
+
+          {/* Modal Window */}
+          <motion.div
+            variants={modalDialogVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className={`relative z-10 w-full max-w-xl ${styles.modalContent} rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8`}
+          >
+            <div className={styles.topHighlight} />
+
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-border-subtle">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-accent-dim border border-accent-mid/30 flex items-center justify-center text-accent-light shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="6" />
+                    <circle cx="12" cy="12" r="2" />
+                  </svg>
+                </div>
+                <div>
+                  <div className={styles.eyebrow}>
+                    <span className={styles.eyebrowDot} />
+                    Schedule Configuration
+                  </div>
+                  <h2 className={styles.title} style={{ fontSize: "1.45rem" }}>
+                    Daily Study Goal & <em>Rest Days</em>
+                  </h2>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-bold tracking-widest text-accent-text-light uppercase font-['Rajdhani']">
-                  Schedule Configuration
-                </p>
-                <h2 className="text-xl sm:text-2xl font-bold text-text-primary font-['Rajdhani']">
-                  Daily Study Goal & Rest Days
-                </h2>
-              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors cursor-pointer text-text-muted hover:text-text-primary"
+              >
+                <X size={16} />
+              </button>
             </div>
-            <button
-              onClick={onClose}
-              className="text-text-muted hover:text-text-primary p-2 rounded-lg hover:bg-bg-shadow transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
 
           {errorMsg && (
             <div className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-sm flex items-center gap-2">
@@ -274,7 +285,7 @@ export default function StudyScheduleModal({
               type="button"
               onClick={onClose}
               disabled={isSaving}
-              className="px-5 py-2.5 rounded-xl border border-border-subtle hover:bg-bg-shadow text-text-muted hover:text-text-primary font-['Rajdhani'] font-bold text-sm uppercase tracking-wider transition-colors"
+              className={styles.ghostBtn}
             >
               Cancel
             </button>
@@ -282,7 +293,7 @@ export default function StudyScheduleModal({
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="px-6 py-2.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white font-['Rajdhani'] font-bold text-sm uppercase tracking-wider shadow-lg shadow-accent-primary/25 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+              className={`${styles.btnPrimaryAction} px-6 py-2.5`}
             >
               {isSaving ? (
                 <>
@@ -294,16 +305,15 @@ export default function StudyScheduleModal({
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check size={16} strokeWidth={2.5} />
                   <span>Save Settings</span>
                 </>
               )}
             </button>
           </div>
         </motion.div>
-      </div>
-    </AnimatePresence>
+      </motion.div>
+    )}
+  </AnimatePresence>
   );
 }

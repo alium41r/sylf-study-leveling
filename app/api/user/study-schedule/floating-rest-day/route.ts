@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isPlannerConflict } from "@/lib/planner/server/mutation-guards";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import { Prisma } from "@prisma/client";
+import { executionTransaction } from "@/lib/execution-coordination";
 import {
   StudyScheduleService,
   FLOATING_REST_DAY_QUOTA,
@@ -14,6 +15,7 @@ const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 const toggleSchema = z.object({
   dateKey: z.string().regex(DATE_KEY_RE, "dateKey must be YYYY-MM-DD"),
+  enabled: z.boolean().optional(),
 });
 
 /**
@@ -71,103 +73,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { dateKey } = parsed.data;
-    const status = await StudyScheduleService.getFloatingRestDayStatus(userId, dateKey);
-
-    // ─── Toggle OFF ────────────────────────────────────────────
-    if (status.isFloatingRest) {
-      try {
-        await prisma.floatingRestDay.delete({
-          where: { userId_dateKey: { userId, dateKey } },
-        });
-      } catch {
-        // Already deleted concurrently — still return a stable removed state.
+    const { dateKey, enabled } = parsed.data;
+    return await executionTransaction(userId, async tx => {
+      const status = await StudyScheduleService.getFloatingRestDayStatus(userId, dateKey, tx);
+      // Supported clients send desired state, making transport retries harmless.
+      const wanted = enabled ?? !status.isFloatingRest;
+      if (!wanted) {
+        await tx.floatingRestDay.deleteMany({ where: { userId, dateKey } });
+        return NextResponse.json({ action: "removed", dateKey, weekKey: status.weekKey,
+          weekUsage: Math.max(0, status.weekUsage - Number(status.isFloatingRest)), weekQuota: FLOATING_REST_DAY_QUOTA, shiftedQuests: [] });
       }
-      return NextResponse.json(
-        {
-          action: "removed",
-          dateKey,
-          weekKey: status.weekKey,
-          weekUsage: 0,
-          weekQuota: FLOATING_REST_DAY_QUOTA,
-          shiftedQuests: [],
-        },
-        { status: 200 }
-      );
-    }
-
-    // ─── Guardrail: fixed rest days cannot be re-designated ────
-    if (status.isFixedRest) {
-      return NextResponse.json(
-        {
-          error: "FIXED_REST_DAY",
-          message: "This day is already a fixed rest day on your weekly schedule.",
-        },
-        { status: 400 }
-      );
-    }
-
-    // ─── Guardrail: 1 floating rest day per ISO week ───────────
-    if (status.weekUsage >= FLOATING_REST_DAY_QUOTA) {
-      return NextResponse.json(
-        {
-          error: "WEEKLY_REST_DAY_LIMIT_REACHED",
-          message: `You can only designate ${FLOATING_REST_DAY_QUOTA} floating rest day per week.`,
-        },
-        { status: 400 }
-      );
-    }
-
-    // ─── Commit: create record + automatic quest cascade ───────
-    let record;
-    let shiftedQuests: Awaited<ReturnType<typeof StudyScheduleService.cascadeQuestShifts>> = [];
-    try {
-      const result = await prisma.$transaction(async (tx) => {
-        const created = await tx.floatingRestDay.create({
-          data: { userId, dateKey, weekKey: status.weekKey },
-        });
-        const shifts = await StudyScheduleService.cascadeQuestShifts(userId, dateKey, { tx });
-        return { created, shifts };
-      });
-      record = result.created;
-      shiftedQuests = result.shifts;
-    } catch (error) {
-      // Unique-constraint race: another request already created it → toggle off.
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      ) {
-        await prisma.floatingRestDay
-          .delete({ where: { userId_dateKey: { userId, dateKey } } })
-          .catch(() => {});
-        return NextResponse.json(
-          {
-            action: "removed",
-            dateKey,
-            weekKey: status.weekKey,
-            weekUsage: 0,
-            weekQuota: FLOATING_REST_DAY_QUOTA,
-            shiftedQuests: [],
-          },
-          { status: 200 }
-        );
-      }
-      throw error;
-    }
-
-    return NextResponse.json(
-      {
-        action: "added",
-        dateKey,
-        weekKey: status.weekKey,
-        weekUsage: 1,
-        weekQuota: FLOATING_REST_DAY_QUOTA,
-        restDay: record,
-        shiftedQuests,
-      },
-      { status: 200 }
-    );
+      if (status.isFloatingRest) return NextResponse.json({ action: "added", dateKey, weekKey: status.weekKey,
+        weekUsage: status.weekUsage, weekQuota: FLOATING_REST_DAY_QUOTA, shiftedQuests: [] });
+      if (status.isFixedRest) return NextResponse.json({ error: "FIXED_REST_DAY", message: "This day is already a fixed rest day on your weekly schedule." }, { status: 400 });
+      if (status.weekUsage >= FLOATING_REST_DAY_QUOTA) return NextResponse.json({ error: "WEEKLY_REST_DAY_LIMIT_REACHED",
+        message: `You can only designate ${FLOATING_REST_DAY_QUOTA} floating rest day per week.` }, { status: 400 });
+      const record = await tx.floatingRestDay.create({ data: { userId, dateKey, weekKey: status.weekKey } });
+      const shifts = await StudyScheduleService.cascadeQuestShifts(userId, dateKey, { tx });
+      // V2 placements remain sealed until a reviewed apply. The availability
+      // change is immediately real and makes their schedule health truthful.
+      const affected = await tx.quest.findMany({ where: { userId, scheduledFor: dateKey, plannedMinutes: { not: null },
+        remainingDisposition: "OPEN", status: { not: "COMPLETED" } }, select: { id: true } });
+      return NextResponse.json({ action: "added", dateKey, weekKey: status.weekKey, weekUsage: status.weekUsage + 1,
+        weekQuota: FLOATING_REST_DAY_QUOTA, restDay: record, shiftedQuests: shifts,
+        plannerReviewRequired: affected.length > 0, affectedPlannerQuestIds: affected.map(quest => quest.id) });
+    });
   } catch (error) {
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     console.error("POST floating-rest-day error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

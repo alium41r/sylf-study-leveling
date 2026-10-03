@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Sylf</string>
+    <string name="title_activity_main">Sylf</string>
+    <string name="package_name">app.sylf.study</string>
+    <string name="custom_url_scheme">app.sylf.study</string>
+</resources>

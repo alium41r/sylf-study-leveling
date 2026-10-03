@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Sylf Phase 0 API measurements</title>
+<style>body{font:14px monospace;max-width:1000px;margin:32px auto;background:#111;color:#eee}pre{white-space:pre-wrap}</style>
+<h1>Phase 0: authenticated API timings</h1><p>Read-only requests using this browser's existing cookie. No credentials or response contents are exported. This measures APIs, not rendered navigation latency.</p><pre id="result">Running…</pre>
+<script>
+(async()=>{
+ const result={at:new Date().toISOString(),origin:location.origin,userAgent:navigator.userAgent,samples:[]};
+ const endpoints=['/api/user/stats','/api/goals','/api/quests','/api/friends','/api/notifications','/api/ai-usage','/api/cosmetics','/api/subjects','/api/conversations'];
+ let conversations=[];
+ for(const path of endpoints){
+  for(let sample=1;sample<=5;sample++){
+   const start=performance.now();
+   try{
+    const r=await fetch(path,{credentials:'include',cache:'no-store',signal:AbortSignal.timeout(12000)});
+    const headersMs=performance.now()-start;const raw=await r.text();
+    result.samples.push({path,sample,status:r.status,headersMs,totalMs:performance.now()-start,decodedBytes:new TextEncoder().encode(raw).length});
+    if(path==='/api/user/stats'&&r.status===401)throw new Error('NO_SESSION');
+    if(path==='/api/conversations'&&r.ok)conversations=JSON.parse(raw);
+   }catch(e){result.samples.push({path,sample,error:e.message==='NO_SESSION'?'NO_SESSION':e.name});if(e.message==='NO_SESSION'){document.getElementById('result').textContent=JSON.stringify(result,null,2);return;}}
+   document.getElementById('result').textContent=JSON.stringify(result,null,2);
+  }
+ }
+ for(const group of [false,true]){
+  const c=conversations.find(c=>c.isGroup===group);if(!c){result.samples.push({path:group?'group':'dm',unavailable:'no existing conversation'});continue;}
+  for(let sample=1;sample<=5;sample++){
+   const start=performance.now();
+   try{const r=await fetch(`/api/conversations/${c.id}?refresh=1`,{credentials:'include',cache:'no-store',signal:AbortSignal.timeout(12000)});const headersMs=performance.now()-start;const raw=await r.text();result.samples.push({path:group?'group-detail':'dm-detail',sample,status:r.status,headersMs,totalMs:performance.now()-start,decodedBytes:new TextEncoder().encode(raw).length});}catch(e){result.samples.push({path:group?'group-detail':'dm-detail',sample,error:e.name});}
+  }
+ }
+ document.getElementById('result').textContent=JSON.stringify(result,null,2);
+ const a=document.createElement('a');a.textContent='Download measurements';a.download='sylf-phase0-authenticated.json';a.href=URL.createObjectURL(new Blob([JSON.stringify(result,null,2)],{type:'application/json'}));document.body.append(a);
+})()
+</script></html>

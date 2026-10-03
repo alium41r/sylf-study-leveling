@@ -6,7 +6,7 @@ export class GroqAdapter implements LLMAdapter {
   private groq: Groq;
   private model: string;
 
-  constructor(apiKey: string, model: string = process.env.GROQ_MODEL || "qwen/qwen3.6-27b") {
+  constructor(apiKey: string, model: string = process.env.GROQ_MODEL || "openai/gpt-oss-120b") {
     this.groq = new Groq({ apiKey });
     this.model = model;
   }
@@ -98,14 +98,15 @@ export class GroqAdapter implements LLMAdapter {
     const groqMessages = this.mapMessages(messages, systemInstruction);
     const groqTools = tools.length > 0 ? tools.map(this.mapTool) : undefined;
 
-    const candidateModels = Array.from(
+    const candidateModels = options?.singleAttempt ? [this.model] : Array.from(
       new Set(
         [
           this.model,
           process.env.GROQ_MODEL,
-          "qwen/qwen3.6-27b",
-          "qwen-2.5-32b",
-          "qwen-2.5-coder-32b",
+          "openai/gpt-oss-120b",
+          "openai/gpt-oss-20b",
+          "llama-3.3-70b-versatile",
+          "qwen/qwen3.8-27b",
         ].filter(Boolean) as string[]
       )
     );
@@ -124,8 +125,10 @@ export class GroqAdapter implements LLMAdapter {
               ? { type: "json_object" }
               : undefined,
           temperature: options?.temperature,
+          max_tokens: options?.maxTokens,
         }, {
           signal: options?.signal,
+          ...(options?.singleAttempt ? { maxRetries: 0 } : {}),
         });
 
         const responseMessage = completion.choices[0].message;
@@ -172,6 +175,8 @@ export class GroqAdapter implements LLMAdapter {
         const cleanContent = rawContent ? rawContent.replace(/<think>[\s\S]*?<\/think>/gi, "").trim() : undefined;
 
         return {
+          finishReason: completion.choices?.[0]?.finish_reason === "length" ? "MAX_TOKENS" :
+            ["stop", "tool_calls"].includes(completion.choices?.[0]?.finish_reason ?? "") ? "STOP" : "OTHER",
           text: cleanContent || undefined,
           toolCalls: normalizedToolCalls.length > 0 ? normalizedToolCalls : undefined,
           usage: completion.usage ? {
@@ -185,7 +190,7 @@ export class GroqAdapter implements LLMAdapter {
 
         // Handle the Llama-3 400 error where it throws raw XML back at the API
         const groqInnerError = error.error?.error;
-        if (groqInnerError?.code === "tool_use_failed" && groqInnerError?.failed_generation) {
+        if (!options?.singleAttempt && groqInnerError?.code === "tool_use_failed" && groqInnerError?.failed_generation) {
           const failedGen = groqInnerError.failed_generation;
           const match = failedGen.match(/<function[=(](\w+)[=)>]*([\s\S]*?)<\/function>/i);
           if (match) {
@@ -207,11 +212,16 @@ export class GroqAdapter implements LLMAdapter {
           }
         }
 
-        // If error is model_not_found or 404, try next candidate model
+        // If error is model_not_found, 404, or decommissioned, try next candidate model
         const isModelNotFound =
           error.status === 404 ||
           groqInnerError?.code === "model_not_found" ||
-          (error.message && error.message.includes("model_not_found"));
+          groqInnerError?.code === "model_decommissioned" ||
+          (error.message && (
+            error.message.includes("model_not_found") ||
+            error.message.includes("model_decommissioned") ||
+            error.message.includes("decommissioned")
+          ));
 
         if (!isModelNotFound) {
           throw new LLMProviderError(

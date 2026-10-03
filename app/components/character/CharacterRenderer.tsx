@@ -27,7 +27,12 @@ export function CharacterRenderer({
   return (
     <div
       className={`relative flex flex-col items-center justify-center select-none ${className}`}
-      style={{ width: size, height: showPedestal ? size + 24 : size }}
+      style={{
+        width: "var(--character-size, " + size + "px)",
+        height: showPedestal
+          ? "calc(var(--character-size, " + size + "px) + 24px)"
+          : "var(--character-size, " + size + "px)",
+      }}
     >
       {/* ─── Layer 3: Visual Aura Ring / Energy Field (z-[30]) ─── */}
       {showAura && layers.aura && layers.aura.id !== "none" && (
@@ -40,7 +45,7 @@ export function CharacterRenderer({
       {/* ─── Layer 1: Holographic Pedestal Platform (z-[10]) ───── */}
       {showPedestal && (
         <div
-          className="absolute bottom-0 w-[90%] h-8 pointer-events-none z-[10] flex items-center justify-center"
+          className="absolute bottom-0 w-[90%] h-6 sm:h-8 pointer-events-none z-[10] flex items-center justify-center"
         >
           <img
             src={layers.pedestal}
@@ -56,7 +61,10 @@ export function CharacterRenderer({
       {/* ─── Unified Character Canvas (Centered) ──────────────── */}
       <div
         className="relative flex items-center justify-center"
-        style={{ width: size, height: size }}
+        style={{
+          width: "var(--character-size, " + size + "px)",
+          height: "var(--character-size, " + size + "px)",
+        }}
       >
         {/* ─── Layer 2: Full-Body Character Form (z-[20]) ───────── */}
         {layers.form && (

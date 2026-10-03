@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -85,7 +86,7 @@ export async function PATCH(req: NextRequest) {
       data.enableHpPenalty = parsed.data.enableHpPenalty;
     }
 
-    const updated = await prisma.user.update({
+    const updated = await executionTransaction(userId, tx => tx.user.update({
       where: { id: userId },
       data,
       select: {
@@ -93,7 +94,7 @@ export async function PATCH(req: NextRequest) {
         restDays: true,
         enableHpPenalty: true,
       },
-    });
+    }));
 
     return NextResponse.json(updated, { status: 200 });
   } catch (error: any) {

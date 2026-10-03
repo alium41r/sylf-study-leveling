@@ -1,4 +1,6 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
+import { assertNoLinkedQuests, assertNoPlannerGoals, isPlannerConflict } from "@/lib/planner/server/mutation-guards";
 import { getSession } from "@/lib/auth-server";
 import { signToken, AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -21,8 +23,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    await assertNoLinkedQuests(session.userId);
+    await assertNoPlannerGoals(session.userId);
     const body = await req.json().catch(() => ({}));
     const { code, password } = body;
+    let verifiedTokenId: number | null = null;
 
     // Unverified accounts can authenticate directly via password
     if (user.verificationStatus === "UNVERIFIED" && password) {
@@ -58,13 +63,21 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      await prisma.verificationToken.delete({
-        where: { id: validToken.id },
-      });
+      verifiedTokenId = validToken.id;
     }
 
     // Execute atomic reset
-    const updatedUser = await prisma.$transaction(async (tx) => {
+    const updatedUser = await executionTransaction(session.userId, async tx => {
+      await assertNoLinkedQuests(session.userId, {}, tx);
+      await assertNoPlannerGoals(session.userId, undefined, tx);
+      if (await tx.studySession.findFirst({ where: { userId: session.userId, endedAt: null }, select: { id: true } })) {
+        throw new Error("PLANNER_EXECUTION_PROTECTED: end the active study session before resetting progress");
+      }
+      if (verifiedTokenId !== null) {
+        const consumed = await tx.verificationToken.deleteMany({ where: { id: verifiedTokenId, userId: session.userId,
+          token: `RESET_PROGRESS:${code.trim()}`, expiresAt: { gt: new Date() } } });
+        if (consumed.count !== 1) throw new Error("SECURITY_CODE_EXPIRED_OR_USED");
+      }
       // 1. Reset user progress fields
       const u = await tx.user.update({
         where: { id: session.userId },
@@ -76,8 +89,13 @@ export async function POST(req: NextRequest) {
           maxHp: 100,
           streakDays: 0,
           totalStudyMinutes: 0,
+          totalStudySeconds: 0,
         },
       });
+      // User and UserStats are mirrors of the same progression authority.
+      // Preserve purchases/investments while resetting the requested XP history.
+      await tx.userStats.updateMany({ where: { userId: session.userId }, data: { level: 1, xp: 0, rank: "RANK E" } });
+      await tx.xpLedger.deleteMany({ where: { userId: session.userId } });
 
       // 2. Wipe user quest logs and active quests
       await tx.quest.deleteMany({ where: { userId: session.userId } });
@@ -131,6 +149,8 @@ export async function POST(req: NextRequest) {
     response.cookies.set(AUTH_COOKIE_NAME, newToken, AUTH_COOKIE_OPTIONS);
     return response;
   } catch (error) {
+    if (error instanceof Error && error.message === "SECURITY_CODE_EXPIRED_OR_USED") return NextResponse.json({ error: "Invalid or expired security code. Please request a new one." }, { status: 400 });
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     console.error("Reset progress error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

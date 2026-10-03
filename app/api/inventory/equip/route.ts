@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await executionTransaction(userId, async (tx) => {
       const target = await tx.userInventory.findFirst({
         where: { id: inventoryId, userId },
         include: { item: true },

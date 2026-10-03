@@ -9,6 +9,8 @@
 // scaling Next.js + Supabase apps (stale-while-revalidate + client caching).
 // ============================================================================
 
+import { resolveApiUrl } from "./api-transport";
+
 interface CacheEntry {
   data: unknown;
   fetchedAt: number;
@@ -16,13 +18,14 @@ interface CacheEntry {
 
 const memoryCache = new Map<string, CacheEntry>();
 const inflight = new Map<string, Promise<unknown>>();
+const generations = new Map<string, number>();
 
 const MAX_MEMORY_ENTRIES = 200;
 
 // S3: never persist these endpoints to localStorage — they contain private
 // AI content (daily briefings, insights) that must not outlive the session
 // on a shared device. They still benefit from the in-memory cache.
-const NO_PERSIST_FRAGMENTS = ["briefing", "insights", "ai-memory", "ai-insight"];
+const NO_PERSIST_FRAGMENTS = ["briefing", "insights", "ai-memory", "ai-insight", "planner"];
 
 function isPersistable(key: string): boolean {
   const k = key.toLowerCase();
@@ -50,6 +53,8 @@ export function clearClientCache(): void {
     // Quota/corruption — nothing critical.
   }
   memoryCache.clear();
+  for (const key of inflight.keys()) generations.set(key, (generations.get(key) ?? 0) + 1);
+  inflight.clear();
 }
 
 function pruneMemory() {
@@ -93,6 +98,37 @@ export interface FetchCachedOptions {
   staleMs?: number;
   /** Optional localStorage key so the first paint is instant even after a full page reload. */
   storageKey?: string;
+  /** Bypass the cache completely and fetch fresh from network. */
+  forceFresh?: boolean;
+}
+
+/** Invalidate client-side cache entries matching a URL or key fragment. */
+export function invalidateClientCache(urlOrPrefix: string): void {
+  invalidateClientCaches([urlOrPrefix]);
+}
+
+/** One invalidation pass; never starts a fetch. Ignore stale in-flight responses. */
+export function invalidateClientCaches(fragments: readonly string[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    for (const key of new Set([...memoryCache.keys(), ...inflight.keys()])) {
+      if (fragments.some(fragment => key.includes(fragment))) {
+        memoryCache.delete(key);
+        generations.set(key, (generations.get(key) ?? 0) + 1);
+        inflight.delete(key);
+      }
+    }
+    const doomed: string[] = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (key && key.startsWith("sylf_cache:") && fragments.some(fragment => key.includes(fragment))) {
+        doomed.push(key);
+      }
+    }
+    for (const key of doomed) window.localStorage.removeItem(key);
+  } catch {
+    // ignore
+  }
 }
 
 /**
@@ -106,23 +142,25 @@ export async function fetchCachedJSON<T = unknown>(
   init?: RequestInit,
   opts: FetchCachedOptions = {}
 ): Promise<T | null> {
-  const { ttlMs = 10_000, staleMs = 60_000, storageKey } = opts;
+  const { ttlMs = 10_000, staleMs = 60_000, storageKey, forceFresh = false } = opts;
   const now = Date.now();
   const cacheKey = storageKey || url;
 
-  const memoryHit = memoryCache.get(cacheKey);
-  const entry: CacheEntry | null =
-    memoryHit ?? (storageKey ? readStorage(storageKey) : null);
-  if (entry) {
-    if (!memoryHit) memoryCache.set(cacheKey, entry);
-    const age = now - entry.fetchedAt;
-    if (age < ttlMs) {
-      return entry.data as T;
-    }
-    if (age < staleMs) {
-      // Stale but usable: paint now, refresh in the background.
-      void doFetch(url, init, storageKey);
-      return entry.data as T;
+  if (!forceFresh) {
+    const memoryHit = memoryCache.get(cacheKey);
+    const entry: CacheEntry | null =
+      memoryHit ?? (storageKey && isPersistable(storageKey) && isPersistable(url) ? readStorage(storageKey) : null);
+    if (entry) {
+      if (!memoryHit) memoryCache.set(cacheKey, entry);
+      const age = now - entry.fetchedAt;
+      if (age < ttlMs) {
+        return entry.data as T;
+      }
+      if (age < staleMs) {
+        // Stale but usable: paint now, refresh in the background.
+        void doFetch(url, init, storageKey);
+        return entry.data as T;
+      }
     }
   }
 
@@ -133,15 +171,18 @@ function doFetch(url: string, init?: RequestInit, storageKey?: string): Promise<
   const cacheKey = storageKey || url;
   const existing = inflight.get(cacheKey);
   if (existing) return existing; // Single-flight: share in-flight requests.
+  const generation = generations.get(cacheKey) ?? 0;
 
   const request = (async () => {
     try {
-      const res = await fetch(url, { credentials: "include", ...init, cache: "no-store" });
+      const resolvedUrl = resolveApiUrl(url);
+      const res = await fetch(resolvedUrl, { credentials: "include", ...init, cache: "no-store" });
       if (!res.ok) {
         throw new Error(`Request failed with status ${res.status}`);
       }
       const data = await res.json();
       const entry: CacheEntry = { data, fetchedAt: Date.now() };
+      if ((generations.get(cacheKey) ?? 0) !== generation) return null;
       memoryCache.set(cacheKey, entry);
       // S3: sensitive endpoints stay memory-only even when a storageKey was
       // requested.
@@ -154,10 +195,10 @@ function doFetch(url: string, init?: RequestInit, storageKey?: string): Promise<
       // Errors are never cached. Callers fall back to their previous state.
       return null;
     } finally {
-      inflight.delete(url);
+      if ((generations.get(cacheKey) ?? 0) === generation) inflight.delete(cacheKey);
     }
   })();
 
-  inflight.set(url, request);
+  inflight.set(cacheKey, request);
   return request;
 }

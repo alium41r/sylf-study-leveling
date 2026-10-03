@@ -8,6 +8,19 @@ import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
+// Route tests exercise transport only. Durable settlement and weekly atomicity
+// run against real PostgreSQL in the required Phase 1 suite.
+vi.mock("@/lib/planner/v2/server/web", () => ({
+  durablePlanner: () => ({ sessions: {
+    settleLegacy: async (ownerId: number, request: { id: number; focus: number; breaks: number; questId?: number; complete: boolean; final: boolean }) => {
+      const result = await prisma.$queryRaw<Array<{ settle_study_session_atomic: Record<string, unknown> }>>`
+        SELECT public.settle_study_session_atomic(${ownerId},${request.id},${request.focus},${request.breaks},${request.questId ?? null},${null},${request.complete},${request.final},${new Date().toISOString().slice(0, 10)}) AS settle_study_session_atomic
+      `;
+      return { ...result[0].settle_study_session_atomic, weeklyAwarded: false };
+    },
+  } }),
+}));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
@@ -17,6 +30,7 @@ vi.mock("@/lib/prisma", () => ({
     subject: {
       findFirst: vi.fn(),
     },
+    floatingRestDay: { findUnique: vi.fn().mockResolvedValue(null) },
     subjectNode: {
       findFirst: vi.fn(),
       findMany: vi.fn(),
@@ -249,6 +263,7 @@ describe("Phase 5: Contextual Quest Modal & Progress Reconciliation", () => {
       });
 
       (prisma.user.findUnique as any).mockResolvedValue({ id: 101, username: "scholar_test" });
+      (prisma.subject.findFirst as any).mockResolvedValue({ id: 1 });
 
       const req = new NextRequest("http://localhost:3000/api/quests", {
         method: "POST",

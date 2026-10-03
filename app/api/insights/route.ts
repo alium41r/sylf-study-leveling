@@ -13,9 +13,15 @@ export async function GET(req: NextRequest) {
 
     const userId = session.userId;
     
-    // Fetch the most recent insights for this user, ordered by creation date
+    // Fetch the most recent active insights for this user, excluding warnings and dismissed
     const insights = await prisma.aiInsight.findMany({
-      where: { userId },
+      where: {
+        userId,
+        dismissed: false,
+        category: {
+          not: "warning",
+        },
+      },
       orderBy: { createdAt: "desc" },
       take: 10,
     });

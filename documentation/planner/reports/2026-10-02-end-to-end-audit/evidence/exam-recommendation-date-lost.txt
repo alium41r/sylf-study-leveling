@@ -1,0 +1,35 @@
+Browser tab: 2, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/system".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system
+	2 container
+		3 container
+			4 button CONVERSATION
+				5 text CONVERSATION
+			6 button PLANNER
+			7 text THE SYSTEM
+			8 text INTELLIGENCE LAYER
+			9 heading System Workspace, Value: 1
+				10 text System 
+				11 text Workspace
+			12 button (collapsed) Description: Open Archives, Secondary Actions: Expand
+				13 text ARCHIVES
+				14 text 0
+		15 container
+			16 heading HOW CAN THE SYSTEM ASSIST YOU?, Value: 2
+				17 text HOW CAN THE SYSTEM ASSIST YOU?
+			18 button SYLLABUS BREAKDOWN
+			19 button CONCEPT DEEP-DIVE
+			20 button ACTIVE RECALL QUIZ
+			21 button STUDY HABIT AUDIT
+			22 text entry area (settable)
+			23 button Attach File, Help: Attach syllabus, notes, or image
+			24 container Daily AI Messages: 15/15 remaining
+				25 image
+				26 text 15
+			27 button (disabled) SEND
+		28 container
+			29 text ARCHIVES 0
+			30 button NEW, Help: New Chat Session
+			31 button Close Archives
+			32 text NO ARCHIVES YET Your study discussions and intelligence quests will be preserved here.
+
+The focused UI element is 1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system

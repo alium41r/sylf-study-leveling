@@ -1,3 +1,4 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -8,6 +9,7 @@ import { TimezoneService } from "@/lib/timezone-service";
 import { hash } from "bcryptjs";
 import { revalidateTag } from "next/cache";
 import { SKELETON_NODES } from "@/lib/skill-tree-skeleton";
+import { normalizeAppBackgroundId } from "@/lib/cosmetics-catalog";
 
 export async function POST(req: NextRequest) {
   try {
@@ -87,7 +89,7 @@ export async function POST(req: NextRequest) {
     const { themeId, backgroundId, avatarId, classId, username, name, password, timezone, subjects } = body;
 
     const safeThemeId = themeId || "cyberpunk";
-    const safeBackgroundId = backgroundId || "void";
+    const safeBackgroundId = normalizeAppBackgroundId(backgroundId) || "simple";
     const safeClassId = classId || avatarId || "class_scholar";
 
     const userUpdates: any = {
@@ -134,7 +136,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Perform update in a transaction
-    const updatedUser = await prisma.$transaction(async (tx) => {
+    const updatedUser = await executionTransaction(userId, async (tx) => {
       // Unlock selected cosmetics permanently
       const cosmeticsToUnlock = [
         { category: "THEME" as const, itemKey: safeThemeId },
@@ -162,10 +164,35 @@ export async function POST(req: NextRequest) {
 
       // Provision subjects and 48-node constellation skeletons if provided
       if (Array.isArray(subjects) && subjects.length > 0) {
+        // Track used codes to ensure unique constraint (userId_code) is satisfied
+        const existingSubjects =
+          typeof tx.subject?.findMany === "function"
+            ? (await tx.subject.findMany({
+                where: { userId },
+                select: { code: true },
+              })) || []
+            : [];
+        const usedCodes = new Set<string>(
+          Array.isArray(existingSubjects) ? existingSubjects.map((s) => s.code.toUpperCase()) : []
+        );
+
         for (const sub of subjects) {
-          if (!sub.name || !sub.code) continue;
-          const cleanCode = String(sub.code).trim().toUpperCase();
+          if (!sub.name || !String(sub.name).trim()) continue;
           const cleanName = String(sub.name).trim();
+
+          // Syllabus code is optional: if omitted, generate a clean unique alphanumeric code
+          const rawCode = sub.code ? String(sub.code).trim().toUpperCase() : "";
+          let cleanCode = rawCode;
+          if (!cleanCode) {
+            const slug = cleanName.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "SUB";
+            cleanCode = slug;
+            let counter = 1;
+            while (usedCodes.has(cleanCode)) {
+              cleanCode = `${slug.slice(0, 6)}-${counter++}`;
+            }
+          }
+          usedCodes.add(cleanCode);
+
           const cleanExamBoard = String(sub.examBoard || "CAIE").trim().toUpperCase();
           const cleanLevel = String(sub.level || "A-Level").trim();
           const cleanColor = String(sub.color || "#8B5CF6").trim();

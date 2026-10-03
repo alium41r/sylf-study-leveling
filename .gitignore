@@ -56,3 +56,21 @@ backup_*
 repomix-output.md
 scratch/
 *.log
+
+# CodeGraph local index (see codegraph.json)
+/.cg/
+
+# Android / Capacitor native builds
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+.idea/
+android/.idea/
+android/*.iml
+android/app/*.iml
+android/captures/

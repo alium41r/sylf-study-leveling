@@ -1,0 +1,577 @@
+/* ============================================================
+   SCHOLAR GOALS & QUESTS (CSS MODULE)
+   Harmonized with Scholar Dashboard & Study Timer design tokens.
+   Supports seamless Dark Mode and Light Mode switching.
+   ============================================================ */
+
+.goalsContainer {
+  --page: var(--app-canvas, #080d17);
+  --surface: var(--surface-1, #0e1522);
+  --surface-hover: var(--surface-raised, #121c2b);
+  --elevated: var(--surface-2, #121c2b);
+  --ink: var(--text-primary, #eef1f8);
+  --muted: var(--text-secondary, #a1adc1);
+  --quiet: var(--text-muted, #8291aa);
+  --accent: var(--accent-text, var(--accent-primary-light, #b7cbf7));
+  --accent-strong: var(--accent-primary, #86aaf4);
+  --accent-dim: var(--accent-primary-dim, rgba(183, 203, 247, 0.12));
+  --accent-mid: var(--accent-primary-mid, rgba(134, 170, 244, 0.32));
+  --line: var(--border-strong, #263247);
+  --subtle-line: var(--border-subtle, #1a2435);
+  --card-shadow: 0 0 22px -4px var(--accent-dim), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 0 28px -2px var(--accent-dim), 0 6px 20px rgba(0, 0, 0, 0.4);
+  --top-highlight-opacity: 0.6;
+  --chip-bg: rgba(255, 255, 255, 0.03);
+  --chip-border: rgba(255, 255, 255, 0.06);
+  --btn-ghost-bg: rgba(255, 255, 255, 0.04);
+  --btn-ghost-border: rgba(255, 255, 255, 0.1);
+  --btn-ghost-hover: rgba(255, 255, 255, 0.08);
+  --tab-bar-bg: rgba(14, 21, 34, 0.88);
+  --tab-bar-border: #1a2435;
+  --tab-bar-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  --track-bg: #080d17;
+  --track-border: rgba(255, 255, 255, 0.1);
+  --input-bg: #080d17;
+  --input-border: #1a2435;
+  --dialog-bg: #0e1522;
+  --dialog-border: #1a2435;
+  --dialog-backdrop: rgba(0, 0, 0, 0.75);
+  --badge-completed-bg: rgba(16, 185, 129, 0.12);
+  --badge-completed-border: rgba(16, 185, 129, 0.3);
+  --badge-completed-text: #34d399;
+  --badge-failed-bg: rgba(239, 68, 68, 0.12);
+  --badge-failed-border: rgba(239, 68, 68, 0.3);
+  --badge-failed-text: #f87171;
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100vh;
+  color: var(--ink);
+  color-scheme: dark;
+}
+
+:global(html[data-mode="light"]) .goalsContainer {
+  --page: var(--app-canvas, #f1f4fa);
+  --surface: var(--surface-1, #ffffff);
+  --surface-hover: var(--surface-raised, #f8fafc);
+  --elevated: var(--surface-2, #e5ebf5);
+  --ink: var(--text-primary, #18283e);
+  --muted: var(--text-secondary, #475c77);
+  --quiet: var(--text-muted, #52657f);
+  --accent: var(--accent-text, var(--accent-primary-dark, #395d9f));
+  --accent-strong: var(--accent-primary, #2b4982);
+  --accent-dim: var(--accent-primary-dim, rgba(57, 93, 159, 0.1));
+  --accent-mid: var(--accent-primary-mid, rgba(57, 93, 159, 0.28));
+  --line: var(--border-strong, #bdcbe0);
+  --subtle-line: var(--border-subtle, #d6dfed);
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --card-shadow-hover: 0 8px 24px -4px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+  --top-highlight-opacity: 0.35;
+  --chip-bg: rgba(15, 23, 42, 0.04);
+  --chip-border: rgba(15, 23, 42, 0.08);
+  --btn-ghost-bg: rgba(15, 23, 42, 0.04);
+  --btn-ghost-border: rgba(15, 23, 42, 0.12);
+  --btn-ghost-hover: rgba(15, 23, 42, 0.08);
+  --tab-bar-bg: rgba(255, 255, 255, 0.94);
+  --tab-bar-border: #d6dfed;
+  --tab-bar-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  --track-bg: #e2e8f0;
+  --track-border: #cbd5e1;
+  --input-bg: #f8fafc;
+  --input-border: #cbd5e1;
+  --dialog-bg: #ffffff;
+  --dialog-border: #d6dfed;
+  --dialog-backdrop: rgba(15, 23, 42, 0.45);
+  --badge-completed-bg: rgba(16, 185, 129, 0.1);
+  --badge-completed-border: rgba(16, 185, 129, 0.3);
+  --badge-completed-text: #059669;
+  --badge-failed-bg: rgba(239, 68, 68, 0.1);
+  --badge-failed-border: rgba(239, 68, 68, 0.3);
+  --badge-failed-text: #dc2626;
+
+  color-scheme: light;
+}
+
+/* ─── Ambient Starlight Canvas Glow ────────────────────────── */
+.topGlow {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 520px;
+  background:
+    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(34, 51, 80, 0.25), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 85% 10%, rgba(24, 39, 59, 0.16), transparent 70%);
+  overflow: hidden;
+}
+
+.topGlow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px),
+    radial-gradient(circle, #a5b6d6 1px, transparent 1.3px);
+  background-size: 277px 213px, 367px 301px;
+  background-position: 31px 37px, 147px 73px;
+  mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
+}
+
+:global(html[data-mode="light"]) .topGlow {
+  background:
+    radial-gradient(ellipse 65% 40% at 50% -5%, rgba(180, 200, 235, 0.18), transparent 70%),
+    radial-gradient(ellipse 45% 30% at 85% 10%, rgba(195, 215, 245, 0.12), transparent 70%);
+}
+
+:global(html[data-mode="light"]) .topGlow::before {
+  opacity: 0.08;
+}
+
+/* ─── Tab Switcher ─────────────────────────────────────────── */
+.tabSwitcher {
+  background: var(--tab-bar-bg);
+  border: 1px solid var(--tab-bar-border);
+  box-shadow: var(--tab-bar-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto;
+  width: fit-content;
+  max-width: 100%;
+}
+
+/* ─── Card Surface ─────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, background-color 220ms ease;
+}
+
+.card:hover {
+  background: var(--surface-hover);
+  border-color: var(--line);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.topHighlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  opacity: var(--top-highlight-opacity);
+  pointer-events: none;
+}
+
+/* ─── Telemetry Chip ───────────────────────────────────────── */
+.telemetryChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  color: var(--muted);
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.telemetryChip strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ─── Ghost / Action Buttons ───────────────────────────────── */
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: var(--btn-ghost-bg);
+  border: 1px solid var(--btn-ghost-border);
+  color: var(--muted);
+  font-size: 13px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 180ms ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.ghostBtn:hover {
+  background: var(--btn-ghost-hover);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.actionIconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--btn-ghost-bg);
+  border: 1px solid var(--btn-ghost-border);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.actionIconBtn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent-mid);
+  color: var(--accent);
+}
+
+.actionIconBtnDelete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+
+/* ─── Play Button (Quick-Focus) ────────────────────────────── */
+.playBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.playBtn:hover {
+  background: var(--accent-strong);
+  color: #ffffff;
+  border-color: var(--accent-strong);
+  transform: scale(1.06);
+  box-shadow: 0 0 14px var(--accent-dim);
+}
+
+/* ─── Status Badges ────────────────────────────────────────── */
+.badgeCompleted {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--badge-completed-bg);
+  border: 1px solid var(--badge-completed-border);
+  color: var(--badge-completed-text);
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badgeFailed {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--badge-failed-bg);
+  border: 1px solid var(--badge-failed-border);
+  color: var(--badge-failed-text);
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badgeProgress {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badgePending {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--btn-ghost-bg);
+  border: 1px solid var(--btn-ghost-border);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Difficulty Chips ─────────────────────────────────────── */
+.diffEasy {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+:global(html[data-mode="light"]) .diffEasy {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.diffNormal {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+}
+
+.diffHard {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+:global(html[data-mode="light"]) .diffHard {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.diffExpert {
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+:global(html[data-mode="light"]) .diffExpert {
+  color: #7e22ce;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.28);
+}
+
+/* ─── Progress Bar ─────────────────────────────────────────── */
+.progressTrack {
+  height: 9px;
+  border-radius: 9999px;
+  background: var(--track-bg);
+  border: 1px solid var(--track-border);
+  overflow: hidden;
+  position: relative;
+  padding: 1px;
+}
+
+/* ─── Modal Dialog ─────────────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--dialog-backdrop);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.modalContent {
+  position: relative;
+  z-index: 20;
+  background: var(--dialog-bg);
+  border: 1px solid var(--dialog-border);
+  color: var(--ink);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 24px var(--accent-dim);
+}
+
+:global(html[data-mode="light"]) .modalContent {
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px var(--dialog-border);
+}
+
+.inputField {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.inputField:focus {
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+/* ─── Typography & Eyebrow ─────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-strong);
+}
+
+.title {
+  font-family: "Rajdhani", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(1.5rem, 2.75vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ─── Primary Action Gradient Button ───────────────────────── */
+.btnPrimaryAction {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%);
+  color: #ffffff !important;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 14px var(--accent-dim);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 8px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnPrimaryAction:hover {
+  box-shadow: 0 0 20px var(--accent-mid);
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.btnPrimaryAction:active {
+  transform: scale(0.98);
+}
+
+.btnPrimaryAction:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ─── Refined Empty State Card ─────────────────────────────── */
+.emptyStateCard {
+  background: var(--surface);
+  border: 1px solid var(--subtle-line);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.emptyIconBox {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-mid);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 20px var(--accent-dim);
+}
+
+.emptyTitle {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.emptySubtitle {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 320px;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+/* ─── Streak Quest Card ─────────────────────────────────────── */
+.streakCard {
+  background: var(--surface);
+  border: 1px solid var(--accent-mid);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 24px -4px var(--accent-dim), 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+:global(html[data-mode="light"]) .streakCard {
+  background: #ffffff;
+  border-color: var(--accent-mid);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+}
+

@@ -1,0 +1,99 @@
+{
+  "phase": 2,
+  "algorithm": "SHA-256",
+  "baselineStage": "User-provided transparent replacement sources, before resumed Phase 2 asset preparation",
+  "sourceCount": 9,
+  "allSourcesUnchanged": true,
+  "allBaseRuntimeCopiesByteIdentical": true,
+  "sources": [
+    {
+      "file": "sylf pixel companion without eyes no bg.png",
+      "beforeSha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a",
+      "afterSha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a",
+      "unchanged": true,
+      "bytes": 746814,
+      "baselineEvidence": "base-asset-audit.json"
+    },
+    {
+      "file": "sylf pixel companion.png",
+      "beforeSha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607",
+      "afterSha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607",
+      "unchanged": true,
+      "bytes": 776130,
+      "baselineEvidence": "base-asset-audit.json"
+    },
+    {
+      "file": "eye batch 1 (1).png",
+      "beforeSha256": "9a47ca26d91b37e7811a68987fcf20608f8d0df28a223f777ff010a9c5097550",
+      "afterSha256": "9a47ca26d91b37e7811a68987fcf20608f8d0df28a223f777ff010a9c5097550",
+      "unchanged": true,
+      "bytes": 860265,
+      "baselineEvidence": "eye-asset-audit.json"
+    },
+    {
+      "file": "eye batch 2 (1).png",
+      "beforeSha256": "32a8a1c95337ef644c0c96b6db054e46d1f671261020d98db287daedcf054300",
+      "afterSha256": "32a8a1c95337ef644c0c96b6db054e46d1f671261020d98db287daedcf054300",
+      "unchanged": true,
+      "bytes": 700320,
+      "baselineEvidence": "eye-asset-audit.json"
+    },
+    {
+      "file": "eye batch 3 (1).png",
+      "beforeSha256": "0942c93d9ba3059e2f150853c75d37ebfb54b7de8d6808a9b299bc64bcaf498d",
+      "afterSha256": "0942c93d9ba3059e2f150853c75d37ebfb54b7de8d6808a9b299bc64bcaf498d",
+      "unchanged": true,
+      "bytes": 654800,
+      "baselineEvidence": "Root agent baseline captured immediately after source replacement, before resumed Phase 2 preparation"
+    },
+    {
+      "file": "eye batch 4 (1).png",
+      "beforeSha256": "784e8107e54edd693a7a63b02dd5348b43c7802866582148488c17216ac30707",
+      "afterSha256": "784e8107e54edd693a7a63b02dd5348b43c7802866582148488c17216ac30707",
+      "unchanged": true,
+      "bytes": 484586,
+      "baselineEvidence": "eye-asset-audit.json"
+    },
+    {
+      "file": "eye batch 5 (1).png",
+      "beforeSha256": "8db2f3fc1a612019808a563efc4a521f065c6d0bc28c49834f4f981d8ffaccf4",
+      "afterSha256": "8db2f3fc1a612019808a563efc4a521f065c6d0bc28c49834f4f981d8ffaccf4",
+      "unchanged": true,
+      "bytes": 668616,
+      "baselineEvidence": "Root agent baseline captured immediately after source replacement, before resumed Phase 2 preparation"
+    },
+    {
+      "file": "eye batch 6 (1).png",
+      "beforeSha256": "30217d6e958c3115c7b9236821c97d5479b6c051f102b8cdfc1c18c497d6e5b9",
+      "afterSha256": "30217d6e958c3115c7b9236821c97d5479b6c051f102b8cdfc1c18c497d6e5b9",
+      "unchanged": true,
+      "bytes": 926571,
+      "baselineEvidence": "Root agent baseline captured immediately after source replacement, before resumed Phase 2 preparation"
+    },
+    {
+      "file": "eye batch 7 (1).png",
+      "beforeSha256": "2cb2713c50549a8fa7bf5b01245d1f3a5fd0b65c8f5c5f528e00fa9bf4a993e4",
+      "afterSha256": "2cb2713c50549a8fa7bf5b01245d1f3a5fd0b65c8f5c5f528e00fa9bf4a993e4",
+      "unchanged": true,
+      "bytes": 620884,
+      "baselineEvidence": "Root agent baseline captured immediately after source replacement, before resumed Phase 2 preparation"
+    }
+  ],
+  "runtimeCopies": [
+    {
+      "source": "sylf pixel companion without eyes no bg.png",
+      "runtime": "public/companions/pixel/sylf/base/body.png",
+      "sourceSha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a",
+      "runtimeSha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a",
+      "bytesIdentical": true
+    },
+    {
+      "source": "sylf pixel companion.png",
+      "runtime": "public/companions/sylf-pixel-companion.png",
+      "sourceSha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607",
+      "runtimeSha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607",
+      "bytesIdentical": true
+    }
+  ],
+  "note": "This final integrity audit reads file bytes only. No source artwork was changed, copied over, decoded, cropped, resampled or re-encoded by this audit. Runtime base/full images are byte-for-byte copies of the current supplied transparent sources."
+}

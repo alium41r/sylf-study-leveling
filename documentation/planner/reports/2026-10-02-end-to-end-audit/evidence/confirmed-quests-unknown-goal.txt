@@ -1,0 +1,470 @@
+Browser tab: 2, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/goals?tab=quests".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/goals?tab=quests
+	2 container
+		3 container
+			4 button Collapse sidebar
+			5 button Description: Open System Hub, Help: System Hub
+				6 image
+			7 button Notifications
+				8 image
+			9 button View Profile Card
+				10 text P
+				11 text Scholar
+				12 container
+					13 text E -Rank • Lv.  1
+		14 container Main Navigation
+			15 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			16 link Description: Timer, Value: 127.0.0.1:3101/timer
+			17 link Description: Social, Value: 127.0.0.1:3101/social
+			18 link Description: The System AI, Value: 127.0.0.1:3101/system
+			19 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			20 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			21 link Description: Locker, Value: 127.0.0.1:3101/locker
+			22 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		23 button Logout
+			24 image
+			25 text Logout
+		99 container
+			100 button GOALS
+			101 button QUESTS
+				102 text QUESTS
+			103 text SCHOLAR TASKS
+			104 heading Quest Log, Value: 2
+				105 text Quest 
+				106 text Log
+			107 button NEW QUEST
+			108 button SELECT
+			109 text STREAK QUEST Resets in  3 d (Sunday 23:59)
+			110 heading Cumulative Focus, Value: 2
+				111 text Cumulative Focus
+			112 text LEVEL-SCALED PAYOUT + 200  XP + 65  Sylph IN PROGRESS 0 h  0 m / 3h 00m 0 %
+			113 heading Value: 3, Ch 1: Quadratic Equations - Core Factorising & Solving ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY
+				114 text Ch 1: Quadratic Equations - Core Factorising & Solving ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY
+			115 container
+				116 text Part of:  Algebra Awakening: Quadratic, Simultaneous & Rearranging Mastery  •  02/10/2026
+			117 text + 120  XP
+			118 image Sylph
+			119 text + 15 30  min PENDING
+			120 button Edit Quest
+			121 button Delete Quest
+			122 heading Value: 3, Ch 1: Quadratic Equations - Completing Square, Formula & Graphs ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY
+				123 text Ch 1: Quadratic Equations - Completing Square, Formula & Graphs ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY
+			124 container
+				125 text Part of:  Algebra Awakening: Quadratic, Simultaneous & Rearranging Mastery  •  03/10/2026
+			126 text + 120  XP
+			127 image Sylph
+			128 text + 15 30  min PENDING
+			129 button Edit Quest
+			130 button Delete Quest
+			131 heading Ch 2: Simultaneous Equations ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY, Value: 3
+				132 text Ch 2: Simultaneous Equations ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY
+			133 container
+				134 text Part of:  Algebra Awakening: Quadratic, Simultaneous & Rearranging Mastery  •  05/10/2026
+			135 text + 140  XP
+			136 image Sylph
+			137 text + 17 35  min PENDING
+			138 button Edit Quest
+			139 button Delete Quest
+			140 heading Ch 3: Rearranging Formulae ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY, Value: 3
+				141 text Ch 3: Rearranging Formulae ALGEBRA AWAKENING: QUADRATIC, SIMULTANEOUS & REARRANGING MASTERY
+			142 container
+				143 text Part of:  Algebra Awakening: Quadratic, Simultaneous & Rearranging Mastery  •  07/10/2026
+			144 text + 100  XP
+			145 image Sylph
+			146 text + 12 25  min PENDING
+			147 button Edit Quest
+			148 button Delete Quest
+			149 heading Ch 1: Cell Structure BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				150 text Ch 1: Cell Structure BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			151 container
+				152 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  02/10/2026
+			153 text + 240  XP
+			154 image Sylph
+			155 text + 30 60  min PENDING
+			156 button Edit Quest
+			157 button Delete Quest
+			158 heading Ch 2: Enzymes BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				159 text Ch 2: Enzymes BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			160 container
+				161 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  02/10/2026
+			162 text + 220  XP
+			163 image Sylph
+			164 text + 27 55  min PENDING
+			165 button Edit Quest
+			166 button Delete Quest
+			167 heading Ch 3: Transport BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				168 text Ch 3: Transport BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			169 container
+				170 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  02/10/2026
+			171 text + 475  XP
+			172 image Sylph
+			173 text + 47 95  min PENDING
+			174 button Edit Quest
+			175 button Delete Quest
+			176 heading Ch 4: Photosynthesis BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				177 text Ch 4: Photosynthesis BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			178 container
+				179 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  02/10/2026
+			180 text + 300  XP
+			181 image Sylph
+			182 text + 37 75  min PENDING
+			183 button Edit Quest
+			184 button Delete Quest
+			185 heading Ch 5: Respiration BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				186 text Ch 5: Respiration BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			187 container
+				188 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  02/10/2026
+			189 text + 300  XP
+			190 image Sylph
+			191 text + 37 75  min PENDING
+			192 button Edit Quest
+			193 button Delete Quest
+			194 heading Ch 6: Inheritance BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				195 text Ch 6: Inheritance BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			196 container
+				197 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  03/10/2026
+			198 text + 300  XP
+			199 image Sylph
+			200 text + 37 75  min PENDING
+			201 button Edit Quest
+			202 button Delete Quest
+			203 heading Ch 7: Ecology BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				204 text Ch 7: Ecology BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			205 container
+				206 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  03/10/2026
+			207 text + 220  XP
+			208 image Sylph
+			209 text + 27 55  min PENDING
+			210 button Edit Quest
+			211 button Delete Quest
+			212 heading Ch 8: Immunity BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				213 text Ch 8: Immunity BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			214 container
+				215 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  03/10/2026
+			216 text + 240  XP
+			217 image Sylph
+			218 text + 30 60  min PENDING
+			219 button Edit Quest
+			220 button Delete Quest
+			221 heading Ch 9: Nervous System BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				222 text Ch 9: Nervous System BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			223 container
+				224 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  03/10/2026
+			225 text + 280  XP
+			226 image Sylph
+			227 text + 35 70  min PENDING
+			228 button Edit Quest
+			229 button Delete Quest
+			230 heading Ch 10: Homeostasis BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT, Value: 3
+				231 text Ch 10: Homeostasis BIOLOGY EMERGENCY REVIEW: 10-CHAPTER SPRINT
+			232 container
+				233 text Part of:  Biology Emergency Review: 10-Chapter Sprint  •  03/10/2026
+			234 text + 264  XP
+			235 image Sylph
+			236 text + 33 66  min PENDING
+			237 button Edit Quest
+			238 button Delete Quest
+			239 heading Enzymes practice: mixed exam-style questions, Value: 3
+				240 text Enzymes practice: mixed exam-style questions
+			241 container
+				242 text Part of:  Unknown Goal  •  17/10/2026
+			243 text + 180  XP
+			244 image Sylph
+			245 text + 22 45  min PENDING
+			246 button Edit Quest
+			247 button Delete Quest
+			248 heading Enzymes review: practical investigations, Value: 3
+				249 text Enzymes review: practical investigations
+			250 container
+				251 text Part of:  Unknown Goal  •  14/10/2026
+			252 text + 180  XP
+			253 image Sylph
+			254 text + 22 45  min PENDING
+			255 button Edit Quest
+			256 button Delete Quest
+			257 heading Enzymes timed practice: practical and data questions, Value: 3
+				258 text Enzymes timed practice: practical and data questions
+			259 container
+				260 text Part of:  Unknown Goal  •  15/10/2026
+			261 text + 180  XP
+			262 image Sylph
+			263 text + 22 45  min PENDING
+			264 button Edit Quest
+			265 button Delete Quest
+			266 heading Enzymes recall: full topic summary, Value: 3
+				267 text Enzymes recall: full topic summary
+			268 container
+				269 text Part of:  Unknown Goal  •  16/10/2026
+			270 text + 180  XP
+			271 image Sylph
+			272 text + 22 45  min PENDING
+			273 button Edit Quest
+			274 button Delete Quest
+			275 heading Enzymes timed practice: full-topic set, Value: 3
+				276 text Enzymes timed practice: full-topic set
+			277 container
+				278 text Part of:  Unknown Goal  •  19/10/2026
+			279 text + 180  XP
+			280 image Sylph
+			281 text + 22 45  min PENDING
+			282 button Edit Quest
+			283 button Delete Quest
+			284 heading Enzymes review: error log and corrections, Value: 3
+				285 text Enzymes review: error log and corrections
+			286 container
+				287 text Part of:  Unknown Goal  •  20/10/2026
+			288 text + 180  XP
+			289 image Sylph
+			290 text + 22 45  min PENDING
+			291 button Edit Quest
+			292 button Delete Quest
+			293 heading Enzymes practice: graph and calculation questions, Value: 3
+				294 text Enzymes practice: graph and calculation questions
+			295 container
+				296 text Part of:  Unknown Goal  •  21/10/2026
+			297 text + 180  XP
+			298 image Sylph
+			299 text + 22 45  min PENDING
+			300 button Edit Quest
+			301 button Delete Quest
+			302 heading Enzymes recall: key definitions and equations, Value: 3
+				303 text Enzymes recall: key definitions and equations
+			304 container
+				305 text Part of:  Unknown Goal  •  22/10/2026
+			306 text + 180  XP
+			307 image Sylph
+			308 text + 22 45  min PENDING
+			309 button Edit Quest
+			310 button Delete Quest
+			311 heading Enzymes timed practice: mixed question set, Value: 3
+				312 text Enzymes timed practice: mixed question set
+			313 container
+				314 text Part of:  Unknown Goal  •  23/10/2026
+			315 text + 180  XP
+			316 image Sylph
+			317 text + 22 45  min PENDING
+			318 button Edit Quest
+			319 button Delete Quest
+			320 heading Enzymes review: weak areas from timed practice, Value: 3
+				321 text Enzymes review: weak areas from timed practice
+			322 container
+				323 text Part of:  Unknown Goal  •  24/10/2026
+			324 text + 180  XP
+			325 image Sylph
+			326 text + 22 45  min PENDING
+			327 button Edit Quest
+			328 button Delete Quest
+			329 heading Enzymes practice: exam-style extended answers, Value: 3
+				330 text Enzymes practice: exam-style extended answers
+			331 container
+				332 text Part of:  Unknown Goal  •  26/10/2026
+			333 text + 180  XP
+			334 image Sylph
+			335 text + 22 45  min PENDING
+			336 button Edit Quest
+			337 button Delete Quest
+			338 heading Enzymes timed practice: final mixed set, Value: 3
+				339 text Enzymes timed practice: final mixed set
+			340 container
+				341 text Part of:  Unknown Goal  •  27/10/2026
+			342 text + 180  XP
+			343 image Sylph
+			344 text + 22 45  min PENDING
+			345 button Edit Quest
+			346 button Delete Quest
+			347 heading Enzymes review: final error correction, Value: 3
+				348 text Enzymes review: final error correction
+			349 container
+				350 text Part of:  Unknown Goal  •  28/10/2026
+			351 text + 180  XP
+			352 image Sylph
+			353 text + 22 45  min PENDING
+			354 button Edit Quest
+			355 button Delete Quest
+			356 heading Enzymes final review: key points and definitions, Value: 3
+				357 text Enzymes final review: key points and definitions
+			358 container
+				359 text Part of:  Unknown Goal  •  29/10/2026
+			360 text + 180  XP
+			361 image Sylph
+			362 text + 22 45  min PENDING
+			363 button Edit Quest
+			364 button Delete Quest
+			365 heading Enzymes: recall active site from memory, Value: 3
+				366 text Enzymes: recall active site from memory
+			367 container
+				368 text Part of:  Unknown Goal  •  06/10/2026
+			369 text + 120  XP
+			370 image Sylph
+			371 text + 15 30  min PENDING
+			372 button Edit Quest
+			373 button Delete Quest
+			374 heading Enzymes practice: factors affecting rate, Value: 3
+				375 text Enzymes practice: factors affecting rate
+			376 container
+				377 text Part of:  Unknown Goal  •  08/10/2026
+			378 text + 180  XP
+			379 image Sylph
+			380 text + 22 45  min PENDING
+			381 button Edit Quest
+			382 button Delete Quest
+			383 heading Enzymes review: rate graphs and denaturation, Value: 3
+				384 text Enzymes review: rate graphs and denaturation
+			385 container
+				386 text Part of:  Unknown Goal  •  09/10/2026
+			387 text + 180  XP
+			388 image Sylph
+			389 text + 22 45  min PENDING
+			390 button Edit Quest
+			391 button Delete Quest
+			392 heading Enzymes timed practice: mixed short answers, Value: 3
+				393 text Enzymes timed practice: mixed short answers
+			394 container
+				395 text Part of:  Unknown Goal  •  10/10/2026
+			396 text + 180  XP
+			397 image Sylph
+			398 text + 22 45  min PENDING
+			399 button Edit Quest
+			400 button Delete Quest
+			401 heading Enzymes recall: inhibitors and cofactors, Value: 3
+				402 text Enzymes recall: inhibitors and cofactors
+			403 container
+				404 text Part of:  Unknown Goal  •  12/10/2026
+			405 text + 180  XP
+			406 image Sylph
+			407 text + 22 45  min PENDING
+			408 button Edit Quest
+			409 button Delete Quest
+			410 heading Enzymes practice: inhibition and cofactors, Value: 3
+				411 text Enzymes practice: inhibition and cofactors
+			412 container
+				413 text Part of:  Unknown Goal  •  13/10/2026
+			414 text + 180  XP
+			415 image Sylph
+			416 text + 22 45  min PENDING
+			417 button Edit Quest
+			418 button Delete Quest
+			419 heading Learn the chain rule statement and notation, Value: 3
+				420 text Learn the chain rule statement and notation
+			421 container
+				422 text Part of:  Unknown Goal  •  06/10/2026
+			423 text + 180  XP
+			424 image Sylph
+			425 text + 22 45  min PENDING
+			426 button Edit Quest
+			427 button Delete Quest
+			428 heading Learn chain rule with polynomial and root composites, Value: 3
+				429 text Learn chain rule with polynomial and root composites
+			430 container
+				431 text Part of:  Unknown Goal  •  07/10/2026
+			432 text + 180  XP
+			433 image Sylph
+			434 text + 22 45  min PENDING
+			435 button Edit Quest
+			436 button Delete Quest
+			437 heading Learn chain rule with trigonometric and exponential composites, Value: 3
+				438 text Learn chain rule with trigonometric and exponential composites
+			439 container
+				440 text Part of:  Unknown Goal  •  08/10/2026
+			441 text + 180  XP
+			442 image Sylph
+			443 text + 22 45  min PENDING
+			444 button Edit Quest
+			445 button Delete Quest
+			446 heading Recall the chain rule statement and structure, Value: 3
+				447 text Recall the chain rule statement and structure
+			448 container
+				449 text Part of:  Unknown Goal  •  09/10/2026
+			450 text + 120  XP
+			451 image Sylph
+			452 text + 15 30  min PENDING
+			453 button Edit Quest
+			454 button Delete Quest
+			455 heading Orientation to composite functions and the chain rule, Value: 3
+				456 text Orientation to composite functions and the chain rule
+			457 container
+				458 text Part of:  Unknown Goal  •  05/10/2026
+			459 text + 120  XP
+			460 image Sylph
+			461 text + 15 30  min PENDING
+			462 button Edit Quest
+			463 button Delete Quest
+			464 heading Second mistake review before the mastery check, Value: 3
+				465 text Second mistake review before the mastery check
+			466 container
+				467 text Part of:  Unknown Goal  •  17/10/2026
+			468 text + 120  XP
+			469 image Sylph
+			470 text + 15 30  min PENDING
+			471 button Edit Quest
+			472 button Delete Quest
+			473 heading Bounded chain rule check, Value: 3
+				474 text Bounded chain rule check
+			475 container
+				476 text Part of:  Unknown Goal  •  19/10/2026
+			477 text + 228  XP
+			478 image Sylph
+			479 text + 28 57  min PENDING
+			480 button Edit Quest
+			481 button Delete Quest
+			482 heading Guided practice with polynomial composites, Value: 3
+				483 text Guided practice with polynomial composites
+			484 container
+				485 text Part of:  Unknown Goal  •  10/10/2026
+			486 text + 180  XP
+			487 image Sylph
+			488 text + 22 45  min PENDING
+			489 button Edit Quest
+			490 button Delete Quest
+			491 heading Mixed practice with trigonometric and exponential composites, Value: 3
+				492 text Mixed practice with trigonometric and exponential composites
+			493 container
+				494 text Part of:  Unknown Goal  •  12/10/2026
+			495 text + 180  XP
+			496 image Sylph
+			497 text + 22 45  min PENDING
+			498 button Edit Quest
+			499 button Delete Quest
+			500 heading Second recall of chain rule steps and common composites, Value: 3
+				501 text Second recall of chain rule steps and common composites
+			502 container
+				503 text Part of:  Unknown Goal  •  13/10/2026
+			504 text + 120  XP
+			505 image Sylph
+			506 text + 15 30  min PENDING
+			507 button Edit Quest
+			508 button Delete Quest
+			509 heading Timed chain rule practice under light time pressure, Value: 3
+				510 text Timed chain rule practice under light time pressure
+			511 container
+				512 text Part of:  Unknown Goal  •  14/10/2026
+			513 text + 180  XP
+			514 image Sylph
+			515 text + 22 45  min PENDING
+			516 button Edit Quest
+			517 button Delete Quest
+			518 heading Review chain rule mistakes from practice, Value: 3
+				519 text Review chain rule mistakes from practice
+			520 container
+				521 text Part of:  Unknown Goal  •  15/10/2026
+			522 text + 180  XP
+			523 image Sylph
+			524 text + 22 45  min PENDING
+			525 button Edit Quest
+			526 button Delete Quest
+			527 heading Applied chain rule practice with nested composites, Value: 3
+				528 text Applied chain rule practice with nested composites
+			529 container
+				530 text Part of:  Unknown Goal  •  16/10/2026
+			531 text + 180  XP
+			532 image Sylph
+			533 text + 22 45  min PENDING
+			534 button Edit Quest
+			535 button Delete Quest
+	536 button Ask The System — Quests context
+		537 text ASK THE SYSTEM
+		538 text QUESTS
+	97 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		98 image
+
+The focused UI element is 1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/goals?tab=quests

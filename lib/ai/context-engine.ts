@@ -398,7 +398,7 @@ async function buildCalendarSection(userId: number): Promise<CalendarSection> {
 
 async function buildSubjectSection(userId: number): Promise<SubjectSection> {
   const subjects = await prisma.subject.findMany({
-    where: { userId },
+    where: { userId, archivedAt: null },
     select: {
       name: true,
       sessions: {

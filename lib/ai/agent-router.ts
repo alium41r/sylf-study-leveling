@@ -189,7 +189,7 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
   planner: {
     workload: "planner",
     // In-chat planning = goal/quest CRUD via tools. Runs on the cheap flash
-    // tier; deepseek-v4-pro is reserved for the dedicated /api/ai-planner
+    // tier; the shared Flash model is reserved for the dedicated /api/ai-planner
     // orchestration (research + structured plan synthesis).
     primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },

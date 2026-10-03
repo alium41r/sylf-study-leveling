@@ -1,0 +1,78 @@
+{
+  "phase": 2,
+  "inspection": "All source companion artwork and seven eye sheets inspected. Only six selected pairs from sheets 1, 2, 4 converted to runtime layers.",
+  "records": [
+    {
+      "file": "sylf pixel companion without eyes no bg.png",
+      "width": 1254,
+      "height": 1254,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Supplied transparent companion artwork; byte-identical runtime copy."
+    },
+    {
+      "file": "sylf pixel companion.png",
+      "width": 1254,
+      "height": 1254,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Supplied transparent companion artwork; byte-identical runtime copy."
+    },
+    {
+      "file": "eye batch 1 (1).png",
+      "width": 1774,
+      "height": 887,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Neutral / Idle and Soft Happy selected."
+    },
+    {
+      "file": "eye batch 2 (1).png",
+      "width": 1536,
+      "height": 1024,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Thinking and Focused selected."
+    },
+    {
+      "file": "eye batch 3 (1).png",
+      "width": 1536,
+      "height": 1024,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Affectionate, playful, mischievous, shy, magical and wink artwork inspected; no extraction."
+    },
+    {
+      "file": "eye batch 4 (1).png",
+      "width": 1536,
+      "height": 1024,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Sleepy and Resting / Closed eyes selected; clean closed pair used for blink."
+    },
+    {
+      "file": "eye batch 5 (1).png",
+      "width": 1536,
+      "height": 1024,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Worried, confused, embarrassed, hurt, surprised and shocked artwork inspected; no extraction."
+    },
+    {
+      "file": "eye batch 6 (1).png",
+      "width": 1448,
+      "height": 1086,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Amazed, alert, victory, level-up, encouraging and approving artwork inspected; no extraction."
+    },
+    {
+      "file": "eye batch 7 (1).png",
+      "width": 1536,
+      "height": 1024,
+      "hasAlpha": true,
+      "channels": 4,
+      "note": "Loading, AI analyzing, offline, locked, blink / transition and closed-eye smile inspected; no extraction. Sheet 4 closed eyes avoid the extra transition flourishes."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Sylf Phase 0 payload sizes</title><h1>Payload size attribution</h1><p>Only field names, lengths, counts, and value categories are retained.</p><pre id="result">Running…</pre><script>
+(async()=>{
+ const result={at:new Date().toISOString(),samples:[]};
+ for(const path of ['/api/user/stats','/api/friends','/api/conversations']){
+  const r=await fetch(path,{credentials:'include',cache:'no-store'});const raw=await r.text();if(!r.ok){result.samples.push({path,status:r.status});continue;}
+  const data=JSON.parse(raw),fields=[];
+  function walk(value,field){if(typeof value==='string'){const bytes=new TextEncoder().encode(value).length;if(bytes>1024)fields.push({field,bytes,category:value.startsWith('data:')?'data-url':/^https?:/.test(value)?'http-url':'text'});}else if(value&&typeof value==='object'){Object.entries(value).forEach(([k,v])=>walk(v,field+'.'+k));}}
+  walk(data,'$');fields.sort((a,b)=>b.bytes-a.bytes);
+  result.samples.push({path,status:r.status,decodedBytes:new TextEncoder().encode(raw).length,itemCount:Array.isArray(data)?data.length:undefined,largeFieldCount:fields.length,largeFieldBytes:fields.reduce((n,x)=>n+x.bytes,0),fields:fields.slice(0,30)});
+ }
+ document.getElementById('result').textContent=JSON.stringify(result,null,2);
+ const a=document.createElement('a');a.textContent='Download payload sizes';a.download='sylf-phase0-payloads.json';a.href=URL.createObjectURL(new Blob([JSON.stringify(result,null,2)],{type:'application/json'}));document.body.append(a);
+})();
+</script></html>

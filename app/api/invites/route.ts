@@ -92,6 +92,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invite already sent recently" }, { status: 400 });
     }
 
+    if (subjectId) {
+      const activeSub = await prisma.subject.findFirst({
+        where: { id: Number(subjectId), userId, archivedAt: null },
+        select: { id: true },
+      });
+      if (!activeSub) {
+        return NextResponse.json({ error: "Subject not found or archived" }, { status: 400 });
+      }
+    }
+
     const invite = await prisma.sessionInvite.create({
       data: {
         senderId: userId,

@@ -1,24 +1,23 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../components/AuthProvider";
 import OAuthButtons from "../components/OAuthButtons";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import { AuthSplitLayout } from "../components/auth/AuthSplitLayout";
+import styles from "../components/auth/AuthLayout.module.css";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft,
-  Sparkles,
   Eye,
   EyeOff,
-  ShieldCheck,
   User,
   AtSign,
   Mail,
   Lock,
-  Zap,
 } from "lucide-react";
+import { SystemApertureIcon } from "@/app/components/icons";
 import { z } from "zod";
 
 const registerSchema = z.object({
@@ -47,7 +46,6 @@ function RegisterForm() {
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login } = useAuth();
 
   // Debounced check username availability
@@ -144,172 +142,99 @@ function RegisterForm() {
     }
   };
 
-  const isFormValid =
-    name.trim().length > 0 &&
-    username.length >= 3 &&
-    usernameStatus === "available" &&
-    email.includes("@") &&
-    password.length >= 6;
-
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden"
-      style={{ backgroundColor: "var(--bg-void)", color: "var(--text-primary)" }}
-    >
-      {/* ─── Layered Ambient Atmosphere ──────────────────────── */}
-      <div
-        className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[900px] h-[500px] pointer-events-none -z-10 opacity-30 dark:opacity-50"
-        style={{
-          background: "radial-gradient(ellipse at center, var(--accent-primary) 0%, rgba(0,0,0,0) 70%)",
-          filter: "blur(100px)",
-        }}
-      />
-      <div
-        className="absolute bottom-10 left-10 w-[400px] h-[400px] pointer-events-none -z-10 opacity-20"
-        style={{
-          background: "radial-gradient(circle, var(--accent-primary-light) 0%, transparent 70%)",
-          filter: "blur(90px)",
-        }}
-      />
-
-      {/* Cyber Grid Texture */}
-      <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.07] pointer-events-none -z-20"
-        style={{
-          backgroundImage:
-            "linear-gradient(var(--accent-primary) 1px, transparent 1px), linear-gradient(90deg, var(--accent-primary) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
-
-      {/* ─── Top Floating Navigation Bar ──────────────────────── */}
-      <div className="w-full max-w-lg mb-6 flex items-center justify-between z-20">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-secondary hover:text-text-primary px-4 py-2 rounded-xl border border-border-subtle bg-bg-abyss/80 hover:border-accent-primary transition-all group backdrop-blur-md cursor-pointer shadow-sm hover:shadow-[0_0_15px_var(--accent-primary-dim)]"
-        >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-accent-primary-light" />
-          <span>Back to Sylf</span>
-        </Link>
-
-        {/* Telemetry Status Chip */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border-subtle bg-bg-abyss/60 text-[10px] font-mono text-text-muted backdrop-blur-md">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>REGISTRATION: ACTIVE</span>
-        </div>
-      </div>
-
-      {/* ─── Main HUD System Terminal Card ────────────────────── */}
+    <AuthSplitLayout>
       <motion.div
-        initial={{ opacity: 0, y: 24, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-lg relative z-10 p-7 sm:p-10 rounded-2xl sm:rounded-3xl border border-border-active bg-bg-abyss/90 backdrop-blur-2xl shadow-2xl overflow-hidden"
-        style={{
-          boxShadow: "0 20px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px -10px var(--accent-primary-dim)",
-        }}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full flex flex-col"
       >
-        {/* Glowing Top Neon Accent Bar */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-accent-primary to-transparent opacity-90 shadow-[0_0_12px_var(--accent-primary)]" />
-
-        {/* Corner HUD Accents */}
-        <div className="absolute top-3 left-3 w-2 h-2 border-t-2 border-l-2 border-accent-primary/60" />
-        <div className="absolute top-3 right-3 w-2 h-2 border-t-2 border-r-2 border-accent-primary/60" />
-        <div className="absolute bottom-3 left-3 w-2 h-2 border-b-2 border-l-2 border-accent-primary/60" />
-        <div className="absolute bottom-3 right-3 w-2 h-2 border-b-2 border-r-2 border-accent-primary/60" />
-
-        {/* Card Header */}
-        <div className="text-center mb-6">
-          <div
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] tracking-[0.25em] uppercase font-bold border mb-3.5 shadow-sm"
-            style={{
-              background: "var(--accent-primary-dim)",
-              borderColor: "var(--accent-primary-mid)",
-              color: "var(--accent-text-light)",
-              fontFamily: "'Rajdhani', sans-serif",
-            }}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-accent-primary-light animate-pulse" />
-            <span>INITIALIZE PLAYER DATA</span>
-          </div>
-
-          <h1
-            className="text-3xl sm:text-4xl font-extrabold uppercase tracking-wider text-text-primary mb-1"
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Create Account
-          </h1>
-          <p className="text-xs mt-1.5 text-text-muted">
-            Register qualifications to awaken as an E-Rank Scholar.
-          </p>
+        {/* Subtle System Badge */}
+        <div className={styles.systemBadge}>
+          <SystemApertureIcon size={13} className="text-cyan-400" />
+          <span>THE SYSTEM • REGISTRATION</span>
         </div>
+
+        {/* Editorial Heading */}
+        <h1 className={styles.headline}>
+          <span className={styles.headlinePrimary}>Create your account.</span>
+          <span className={styles.headlineAccent}>Begin your next chapter.</span>
+        </h1>
+        <p className={styles.subheadline}>
+          Start your journey to calmer, more focused study sessions.
+        </p>
 
         {/* Error notification */}
         {error && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="p-3.5 mb-5 rounded-xl border text-xs flex items-center gap-2.5 bg-red-500/10 border-red-500/30 text-red-400 font-['Rajdhani'] font-semibold"
-          >
+          <div className="p-3 mb-4 rounded-xl border text-xs flex items-center gap-2.5 bg-red-500/10 border-red-500/30 text-red-400">
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span>{error}</span>
-          </motion.div>
+          </div>
         )}
 
         {/* OAuth Buttons */}
-        <div className="mb-6">
-          <OAuthButtons isLoading={isLoading} />
+        <div className={styles.socialSection}>
+          <OAuthButtons
+            isLoading={isLoading}
+            buttonClassName={styles.googleBtn}
+          />
         </div>
 
         {/* Hairline Divider */}
-        <div className="relative my-6 text-center">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border-subtle" />
-          </div>
-          <span
-            className="relative px-3 py-0.5 text-[10px] tracking-[0.25em] uppercase font-bold font-['Rajdhani'] bg-bg-abyss text-text-muted border border-border-subtle/50 rounded-md"
-          >
-            OR CREDENTIALS
-          </span>
+        <div className={styles.credentialsDivider}>
+          <div className={styles.dividerLine} />
+          <span className={styles.dividerPill}>OR CREDENTIALS</span>
         </div>
 
         {/* Registration Form */}
-        <form onSubmit={handleRegister} className="space-y-4">
+        <form onSubmit={handleRegister} className={styles.formGroup}>
           <div>
-            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
+            <label className={styles.fieldLabel} htmlFor="displayName">
               Display Name
             </label>
-            <div className="relative flex items-center">
-              <div className="absolute left-3.5 text-text-muted pointer-events-none">
-                <User className="w-4 h-4" />
-              </div>
+            <div className={styles.inputWrapper}>
+              <User className={styles.inputIcon} />
               <input
+                id="displayName"
                 type="text"
                 placeholder="Your full name"
                 required
+                maxLength={30}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full text-sm py-3 pl-10 pr-4 rounded-xl border border-border-subtle bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none transition-all"
+                className={styles.inputField}
                 disabled={isLoading}
-                maxLength={30}
+                autoComplete="name"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
-              Scholar Username
-            </label>
-            <div className="relative flex items-center">
-              <div className="absolute left-3.5 text-text-muted pointer-events-none">
-                <AtSign className="w-4 h-4" />
-              </div>
+            <div className="flex items-center justify-between mb-1">
+              <label className={styles.fieldLabel} htmlFor="username">
+                Scholar Username
+              </label>
+              {username && (
+                <span
+                  className={`text-[10px] font-mono tracking-wider font-semibold ${
+                    usernameStatus === "available"
+                      ? "text-emerald-400"
+                      : usernameStatus === "taken" || usernameStatus === "invalid"
+                      ? "text-red-400"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {usernameMsg}
+                </span>
+              )}
+            </div>
+            <div className={styles.inputWrapper}>
+              <AtSign className={styles.inputIcon} />
               <input
+                id="username"
                 type="text"
                 placeholder="your_username"
                 required
@@ -317,92 +242,62 @@ function RegisterForm() {
                 maxLength={20}
                 value={username}
                 onChange={handleUsernameChange}
-                className={`w-full font-mono text-sm py-3 pl-10 pr-10 rounded-xl border bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:outline-none transition-all ${
-                  usernameStatus === "taken" || usernameStatus === "invalid"
-                    ? "border-red-500/70 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                    : usernameStatus === "available"
-                    ? "border-emerald-500/70 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                    : "border-border-subtle focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
-                }`}
+                className={styles.inputField}
                 disabled={isLoading}
+                autoComplete="username"
               />
-              {usernameStatus === "checking" && (
-                <div className="absolute right-3.5 w-4 h-4 border-2 border-white/20 border-t-accent-primary rounded-full animate-spin" />
-              )}
             </div>
-
-            {/* Real-time username feedback */}
-            {usernameMsg && (
-              <p
-                className={`text-xs mt-1.5 font-['Rajdhani'] font-semibold ${
-                  usernameStatus === "taken" || usernameStatus === "invalid"
-                    ? "text-red-400"
-                    : usernameStatus === "available"
-                    ? "text-emerald-400"
-                    : "text-text-muted"
-                }`}
-              >
-                {usernameMsg}
-              </p>
-            )}
-
-            {!usernameMsg && (
-              <p className="text-[11px] mt-1.5 text-text-muted font-['Rajdhani']">
-                3-20 characters: lowercase letters, numbers, and underscores only.
-              </p>
-            )}
+            <p className="text-[10px] text-slate-400 mt-1">
+              3-20 characters: lowercase letters, numbers, and underscores only.
+            </p>
           </div>
 
           <div>
-            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
+            <label className={styles.fieldLabel} htmlFor="email">
               Email Address
             </label>
-            <div className="relative flex items-center">
-              <div className="absolute left-3.5 text-text-muted pointer-events-none">
-                <Mail className="w-4 h-4" />
-              </div>
+            <div className={styles.inputWrapper}>
+              <Mail className={styles.inputIcon} />
               <input
+                id="email"
                 type="email"
                 placeholder="you@example.com"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
-                className="w-full text-sm py-3 pl-10 pr-4 rounded-xl border border-border-subtle bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none transition-all"
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.inputField}
                 disabled={isLoading}
+                autoComplete="email"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs uppercase font-bold text-text-muted tracking-wider font-['Rajdhani'] mb-1.5">
+            <label className={styles.fieldLabel} htmlFor="password">
               Password
             </label>
-            <div className="relative flex items-center">
-              <div className="absolute left-3.5 text-text-muted pointer-events-none">
-                <Lock className="w-4 h-4" />
-              </div>
+            <div className={styles.inputWrapper}>
+              <Lock className={styles.inputIcon} />
               <input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="At least 6 characters"
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full text-sm py-3 pl-10 pr-11 rounded-xl border border-border-subtle bg-bg-void/90 text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 focus:outline-none transition-all"
+                className={styles.inputField}
                 disabled={isLoading}
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 text-text-muted hover:text-text-primary transition-colors cursor-pointer p-1 rounded"
+                className={styles.passwordToggle}
                 tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             <PasswordStrengthMeter password={password} />
@@ -410,12 +305,8 @@ function RegisterForm() {
 
           <button
             type="submit"
-            className="btn-primary mt-3 w-full py-3.5 rounded-xl text-sm sm:text-base font-bold font-['Rajdhani'] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-[0_0_20px_var(--accent-primary-mid)] active:scale-[0.99] transition-all"
-            disabled={isLoading || !isFormValid}
-            style={{
-              opacity: isLoading || !isFormValid ? 0.6 : 1,
-              cursor: isFormValid ? "pointer" : "not-allowed",
-            }}
+            className={styles.submitBtn}
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
@@ -424,7 +315,7 @@ function RegisterForm() {
               </>
             ) : (
               <>
-                <Zap className="w-4 h-4" />
+                <SystemApertureIcon size={16} />
                 <span>INITIALIZE SCHOLAR</span>
               </>
             )}
@@ -432,19 +323,14 @@ function RegisterForm() {
         </form>
 
         {/* Footer Link */}
-        <div className="text-center mt-7">
-          <p className="text-xs text-text-muted font-medium">
-            Already have an active link?{" "}
-            <Link
-              href="/login?force=true"
-              className="font-bold hover:underline text-accent-text-light font-['Rajdhani'] ml-1 transition-colors"
-            >
-              Access System
-            </Link>
-          </p>
-        </div>
+        <p className={styles.footerText}>
+          Already have an active link?{" "}
+          <Link href="/login" className={styles.footerLink}>
+            ACCESS SYSTEM
+          </Link>
+        </p>
       </motion.div>
-    </div>
+    </AuthSplitLayout>
   );
 }
 
@@ -452,11 +338,8 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div
-          className="min-h-screen flex items-center justify-center"
-          style={{ background: "var(--bg-void)", color: "var(--text-muted)" }}
-        >
-          Loading System Registration...
+        <div className="min-h-screen flex items-center justify-center bg-[#070913]">
+          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
         </div>
       }
     >

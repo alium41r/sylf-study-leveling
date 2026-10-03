@@ -40,9 +40,15 @@ export async function proxy(request: NextRequest) {
 
   const isOnboardingRoute = pathname === "/onboarding" || pathname.startsWith("/onboarding/");
 
-  // Prelaunch lockdown: no one may even reach the login/register pages while
-  // the landing page is collecting waitlist interest. Set PRELAUNCH_MODE=true.
-  if (isPrelaunchMode() && (isGuestRoute || isOnboardingRoute)) {
+  // Prelaunch exposes only the landing page, including for existing sessions.
+  // Preserve API handlers (especially /api/waitlist) and public/Next assets.
+  const isResourceRequest =
+    pathname === "/api" ||
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/_next/") ||
+    /\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|woff|woff2|ttf|otf|css|js|map|json|txt|xml|webmanifest|mp4|webm|ogg|mp3|wav|pdf)$/i.test(pathname);
+
+  if (isPrelaunchMode() && pathname !== "/" && !isResourceRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

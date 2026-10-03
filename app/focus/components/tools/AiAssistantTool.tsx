@@ -5,7 +5,6 @@ import { useFocusTools } from "../FocusToolsContext";
 import MarkdownRenderer from "@/app/components/MarkdownRenderer";
 import {
   Send,
-  Bot,
   User,
   RotateCcw,
   Check,
@@ -18,9 +17,11 @@ import {
   ChevronDown,
   Trash2,
   X,
-  Sparkles,
   Lock,
+  GitBranch,
+  Search,
 } from "lucide-react";
+import { SystemApertureIcon } from "@/app/components/icons";
 
 interface ChatMessage {
   id: string;
@@ -574,7 +575,7 @@ export default function AiAssistantTool() {
                       : "bg-bg-panel text-text-secondary border border-border-subtle"
                   }`}
                 >
-                  {isAi ? <Bot className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                  {isAi ? <SystemApertureIcon size={14} className="text-accent-primary-light" /> : <User className="w-3.5 h-3.5" />}
                 </div>
 
                 <div
@@ -644,7 +645,7 @@ export default function AiAssistantTool() {
       {unlockedSkills.includes("analyst-logic-breakdown") && (
         <div className="px-3 pt-2 pb-1.5 bg-bg-abyss/95 flex items-center gap-1.5 overflow-x-auto border-t border-border-subtle scrollbar-none">
           <span className="text-[10px] font-bold font-['Rajdhani'] text-cyan-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-            <Sparkles className="w-3 h-3 text-cyan-400" />
+            <SystemApertureIcon size={12} className="text-cyan-400" />
             Analyst:
           </span>
           <button
@@ -653,9 +654,10 @@ export default function AiAssistantTool() {
                 "Please decompose this problem/theorem into formal step-by-step logic and verify every premise."
               )
             }
-            className="px-2 py-0.5 rounded-lg bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-900/60 text-[10px] whitespace-nowrap transition-colors"
+            className="px-2 py-0.5 rounded-lg bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-900/60 text-[10px] whitespace-nowrap transition-colors flex items-center gap-1 cursor-pointer"
           >
-            📐 Decompose Logic
+            <GitBranch className="w-3 h-3 text-cyan-400" />
+            <span>Decompose Logic</span>
           </button>
           <button
             onClick={() =>
@@ -663,9 +665,10 @@ export default function AiAssistantTool() {
                 "Verify the mathematical proof rigorously and check for edge conditions or boundary violations."
               )
             }
-            className="px-2 py-0.5 rounded-lg bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-900/60 text-[10px] whitespace-nowrap transition-colors"
+            className="px-2 py-0.5 rounded-lg bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-900/60 text-[10px] whitespace-nowrap transition-colors flex items-center gap-1 cursor-pointer"
           >
-            🔍 Verify Proof
+            <Search className="w-3 h-3 text-cyan-400" />
+            <span>Verify Proof</span>
           </button>
         </div>
       )}

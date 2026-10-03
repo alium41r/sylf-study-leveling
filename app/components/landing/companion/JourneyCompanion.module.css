@@ -1,0 +1,36 @@
+.surface {
+  width: 100%;
+  height: 100%;
+  transform: rotate(var(--journey-lean, 0deg));
+  transform-origin: 50% 75%;
+  pointer-events: none;
+}
+.character.character {
+  width: 100%;
+  height: 100%;
+  /*
+   * Forward pitch along the travel axis. A real 3D rotateX about the figure's
+   * middle: the head swings toward the viewer and the feet away, so the head
+   * reads larger and the legs foreshorten. A uniform scaleY could only shrink
+   * the whole figure, which does not read as leaning forward at all.
+   */
+  transform: perspective(400px) rotateX(var(--body-pitch, 0deg));
+  /* Pivot at the hips: far enough below the head that the head gains size and
+     close enough above the feet that they foreshorten. */
+  transform-origin: 50% 62%;
+}
+.surface[data-activity="paused"] * {
+  animation-play-state: paused !important;
+}
+/* Phase 1 raster comparison keeps page travel, without SVG lean/deformation. */
+.surface:has([data-sylf-companion="pixel"]),
+.surface [data-sylf-companion="pixel"] {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .surface,
+  .character.character {
+    transform: none;
+    transition: none;
+  }
+}

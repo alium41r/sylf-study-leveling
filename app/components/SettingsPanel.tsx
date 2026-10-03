@@ -6,6 +6,8 @@ import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { lockPageScroll } from "../../lib/scroll-lock";
 import { motion, AnimatePresence } from "framer-motion";
+import { backdropVariants, modalDialogVariants } from "@/lib/motion";
+import styles from "./SettingsPanel.module.css";
 
 /* ─── Settings Data ────────────────────────────────────────────── */
 
@@ -64,17 +66,8 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
     label: "APPEARANCE",
     tiles: [
       {
-        key: "backgrounds",
-        label: "Backgrounds",
-        icon: (
-          <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        ),
-      },
-      {
-        key: "themes",
-        label: "Themes",
+        key: "appearance",
+        label: "Appearance",
         icon: (
           <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -87,6 +80,15 @@ const SETTINGS_CATEGORIES: SettingsCategory[] = [
         icon: (
           <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        ),
+      },
+      {
+        key: "focus-backgrounds",
+        label: "Focus Environments",
+        icon: (
+          <svg className={ICON_SIZE} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         ),
         colSpan: 2,
@@ -171,7 +173,7 @@ const PREFETCHABLE_TILE_KEYS = SETTINGS_CATEGORIES.flatMap((c) =>
 );
 
 export default function SettingsPanel() {
-  const { isOpen, openSettings, closeSettings, originRoute } = useSettings();
+  const { isOpen, openSettings, closeSettings, clearOriginRoute, originRoute } = useSettings();
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout } = useAuth();
@@ -194,22 +196,36 @@ export default function SettingsPanel() {
     return lockPageScroll();
   }, [isOpen]);
 
-  // Don't render on public pages or when user is not logged in
-  const PUBLIC_PATHS = ["/", "/login", "/register", "/focus"];
-  if (!user || PUBLIC_PATHS.includes(pathname)) return null;
-
   const handleClose = () => {
     closeSettings();
     // If we're currently on a /settings/* route, navigate back to the origin page
+    const target = originRoute && !originRoute.startsWith("/settings") ? originRoute : "/dashboard";
     if (pathname.startsWith("/settings")) {
-      router.push(originRoute || "/dashboard");
+      router.push(target);
     }
+    clearOriginRoute();
   };
+
+  // Close on Escape key press
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, originRoute, pathname]);
+
+  // Don't render on public pages or when user is not logged in
+  const PUBLIC_PATHS = ["/", "/companion-prototype", "/login", "/register", "/focus"];
+  if (!user || PUBLIC_PATHS.includes(pathname)) return null;
 
   const handleTileClick = (tile: SettingsTile) => {
     if (tile.action === "logout") {
       closeSettings();
-      logout();
+      router.push("/settings/logout");
       return;
     }
     closeSettings();
@@ -220,15 +236,25 @@ export default function SettingsPanel() {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
-          className="fixed inset-0 z-60 bg-bg-overlay backdrop-blur-xl overflow-y-auto overscroll-contain"
+          key="settings-backdrop"
+          variants={backdropVariants}
+          initial="closed"
+          animate="open"
+          exit="closed"
+          className={`${styles.hubBackdrop} fixed inset-0 z-60 overflow-y-auto overscroll-contain`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) handleClose();
+          }}
         >
+          {/* Hardware-accelerated full-screen frosted glass blur layer */}
+          <div className={styles.backdropLayer} aria-hidden="true" />
+
+          {/* ─── Ambient Starlight Canvas Glow ────────────────────────── */}
+          <div className={styles.topGlow} aria-hidden="true" />
+
           {/* Close button */}
           <button
-            className="settings-close-btn"
+            className={styles.closeBtn}
             onClick={handleClose}
             aria-label="Close settings"
           >
@@ -237,63 +263,48 @@ export default function SettingsPanel() {
             </svg>
           </button>
 
-          {/* ─── Settings Grid ──────────────────────────── */}
+          {/* ─── Settings Dialog ──────────────────────────── */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 16 }}
-            transition={{ type: "spring", damping: 28, stiffness: 350 }}
+            key="settings-dialog"
+            variants={modalDialogVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
             style={{
-              maxWidth: "860px",
+              maxWidth: "880px",
               margin: "0 auto",
-              padding: "64px 16px calc(60px + env(safe-area-inset-bottom))",
+              padding: "64px 20px calc(64px + env(safe-area-inset-bottom))",
             }}
-            className="w-full"
+            className="w-full relative z-10"
           >
             {/* Panel title */}
-            <div style={{ textAlign: "center", marginBottom: "40px" }}>
-              <p
-                style={{
-                  fontFamily: "'Rajdhani', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "0.75rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.25em",
-                  color: "var(--accent-text-light)",
-                  marginBottom: "8px",
-                }}
-              >
-                System Interface
-              </p>
-              <h2
-                style={{
-                  fontFamily: "'Rajdhani', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "1.8rem",
-                  color: "var(--text-primary)",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                SYSTEM HUB
+            <div className={styles.headerWrapper}>
+              <h2 className={styles.title} aria-label="SYSTEM HUB">
+                <span>SYSTEM</span> <em>HUB</em>
               </h2>
             </div>
 
             {/* Responsive Category Grid (1-col mobile, 2-col sm+) */}
-            <div className="settings-panel-grid">
+            <div className={styles.panelGrid}>
               {SETTINGS_CATEGORIES.map((category, catIdx) => (
                 <motion.div
                   key={category.label}
-                  initial={{ opacity: 0, y: 12 }}
+                  initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: catIdx * 0.05, duration: 0.3 }}
-                  className="settings-category-card"
+                  transition={{ delay: catIdx * 0.05, duration: 0.25 }}
+                  className={styles.categoryCard}
                 >
-                  <p className="settings-category-label">{category.label}</p>
-                  <div className="settings-category-tiles">
+                  <div className={styles.topHighlight} aria-hidden="true" />
+                  <p className={styles.categoryLabel}>
+                    {category.label}
+                  </p>
+                  <div className={styles.categoryTiles}>
                     {category.tiles.map((tile) => (
                       <button
                         key={tile.key}
-                        className={`settings-tile ${tile.danger ? "settings-tile-danger" : ""} ${tile.colSpan === 2 ? "settings-tile-wide" : ""}`}
+                        className={`${styles.tile} ${
+                          tile.danger ? styles.tileDanger : ""
+                        } ${tile.colSpan === 2 ? styles.tileWide : ""}`}
                         onClick={() => handleTileClick(tile)}
                         onMouseEnter={
                           tile.action !== "logout"
@@ -309,8 +320,12 @@ export default function SettingsPanel() {
                           gridColumn: tile.colSpan ? `span ${tile.colSpan}` : undefined,
                         }}
                       >
-                        <span className="settings-tile-icon">{tile.icon}</span>
-                        <span className="settings-tile-label">{tile.label}</span>
+                        <span className={styles.tileIcon}>
+                          {tile.icon}
+                        </span>
+                        <span className={styles.tileLabel}>
+                          {tile.label}
+                        </span>
                       </button>
                     ))}
                   </div>

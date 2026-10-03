@@ -1,0 +1,287 @@
+{
+  "phase": 2,
+  "method": "Byte-for-byte copy of supplied transparent PNG source artwork",
+  "note": "The user replaced the opaque artwork with transparent source assets. No alpha removal, RGB changes, cropping, resampling, palette conversion or image reconstruction is performed. Pixel inspection only verifies the supplied alpha and records samples; no eye sheet is read or processed by this script.",
+  "assets": [
+    {
+      "role": "eyeless-base",
+      "source": "sylf pixel companion without eyes no bg.png",
+      "sourceSha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a",
+      "sourceHadAlpha": true,
+      "sourceChannels": "RGBA",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": "public/companions/pixel/sylf/base/body.png",
+      "outputSha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a",
+      "outputChannels": "RGBA",
+      "outputDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "alpha": {
+        "transparentPixels": 1098595,
+        "partialAlphaPixels": 0,
+        "opaquePixels": 473921,
+        "values": [
+          0,
+          255
+        ],
+        "visibleBounds": [
+          212,
+          67,
+          1037,
+          1152
+        ]
+      },
+      "suppliedFringeNote": "The supplied source has binary alpha. Existing RGB edge colors are copied without cleanup or thresholding.",
+      "inspectionSamples": {
+        "characterSamples": [
+          {
+            "coordinate": [
+              550,
+              515
+            ],
+            "rgba": [
+              30,
+              32,
+              73,
+              255
+            ]
+          },
+          {
+            "coordinate": [
+              700,
+              565
+            ],
+            "rgba": [
+              29,
+              32,
+              73,
+              255
+            ]
+          }
+        ],
+        "shadowSample": {
+          "coordinate": [
+            620,
+            1100
+          ],
+          "rgba": [
+            21,
+            22,
+            35,
+            255
+          ]
+        },
+        "backgroundSamples": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "coordinate": [
+              500,
+              210
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "coordinate": [
+              380,
+              855
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "coordinate": [
+              860,
+              850
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "sourceAndRuntimeBytesIdentical": true,
+        "sourceSha256Unchanged": true,
+        "changedRgbPixels": 0,
+        "changedAlphaPixels": 0,
+        "crop": false,
+        "resample": false,
+        "reencode": false,
+        "backgroundRemoval": false
+      },
+      "faceOpeningBounds": [
+        460,
+        450,
+        786,
+        662
+      ],
+      "centralEyePlacementBounds": [
+        490,
+        470,
+        755,
+        615
+      ]
+    },
+    {
+      "role": "phase1-full-reference",
+      "source": "sylf pixel companion.png",
+      "sourceSha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607",
+      "sourceHadAlpha": true,
+      "sourceChannels": "RGBA",
+      "sourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "output": "public/companions/sylf-pixel-companion.png",
+      "outputSha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607",
+      "outputChannels": "RGBA",
+      "outputDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "alpha": {
+        "transparentPixels": 1121762,
+        "partialAlphaPixels": 0,
+        "opaquePixels": 450754,
+        "values": [
+          0,
+          255
+        ],
+        "visibleBounds": [
+          226,
+          96,
+          1022,
+          1138
+        ]
+      },
+      "suppliedFringeNote": "The supplied source has binary alpha. Existing RGB edge colors are copied without cleanup or thresholding.",
+      "inspectionSamples": {
+        "characterSamples": [
+          {
+            "coordinate": [
+              625,
+              540
+            ],
+            "rgba": [
+              34,
+              37,
+              90,
+              255
+            ]
+          },
+          {
+            "coordinate": [
+              550,
+              620
+            ],
+            "rgba": [
+              255,
+              255,
+              255,
+              255
+            ]
+          }
+        ],
+        "shadowSample": {
+          "coordinate": [
+            620,
+            1100
+          ],
+          "rgba": [
+            27,
+            26,
+            50,
+            255
+          ]
+        },
+        "backgroundSamples": [
+          {
+            "coordinate": [
+              0,
+              0
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "coordinate": [
+              500,
+              220
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "coordinate": [
+              400,
+              868
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "coordinate": [
+              840,
+              868
+            ],
+            "rgba": [
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "sourceAndRuntimeBytesIdentical": true,
+        "sourceSha256Unchanged": true,
+        "changedRgbPixels": 0,
+        "changedAlphaPixels": 0,
+        "crop": false,
+        "resample": false,
+        "reencode": false,
+        "backgroundRemoval": false
+      }
+    }
+  ]
+}

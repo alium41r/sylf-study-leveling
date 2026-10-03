@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "./components/AuthProvider";
 import { ThemeProvider } from "./components/ThemeProvider";
-import SidebarWrapper from "./components/SidebarWrapper";
+import { SylfAppShell } from "./components/SylfAppShell";
 import { GlobalSystemWrapper } from "./components/GlobalSystemWrapper";
 
 export const metadata: Metadata = {
@@ -28,16 +28,22 @@ export default function RootLayout({
       className="h-full"
       suppressHydrationWarning
     >
+      <head suppressHydrationWarning>
+        <script
+          id="sylf-theme-init"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var m=localStorage.getItem("app_mode")||"dark";document.documentElement.setAttribute("data-mode",m);if(m==="dark"){document.documentElement.classList.add("dark");}else{document.documentElement.classList.remove("dark");}var b=localStorage.getItem("app_background")||"simple";if(b==="simple-black"||b==="simple-white"||b==="black"||b==="white"||b==="pure-black"||b==="pure-white"||b==="void"||b==="none"||b==="default"){b="simple";}document.documentElement.setAttribute("data-app-background",b);if(b==="simple"||b==="#000000"||b==="#ffffff"||b==="pure-black"||b==="pure-white"){document.documentElement.style.backgroundColor=m==="light"?"#ffffff":"#000000";}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-full w-full" suppressHydrationWarning>
         <ThemeProvider>
           <AuthProvider>
             <GlobalSystemWrapper>
-              <div className="min-h-screen w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-x-clip">
-                <SidebarWrapper />
-                <main className="flex-1 w-full min-w-0 flex flex-col">
-                  {children}
-                </main>
-              </div>
+              <SylfAppShell>
+                {children}
+              </SylfAppShell>
             </GlobalSystemWrapper>
           </AuthProvider>
         </ThemeProvider>

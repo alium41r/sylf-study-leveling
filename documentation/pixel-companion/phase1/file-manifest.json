@@ -1,0 +1,33 @@
+{
+  "modified": [
+    "app/components/landing/companion/Companion.tsx",
+    "app/components/landing/companion/CompanionReview.tsx",
+    "app/components/landing/companion/CompanionReview.module.css",
+    "app/components/landing/companion/JourneyCompanion.module.css"
+  ],
+  "added": [
+    "__tests__/landing/pixel-companion-prototype.test.tsx",
+    "app/components/landing/companion/PixelCompanion.module.css",
+    "app/components/landing/companion/PixelCompanion.tsx",
+    "app/components/landing/companion/pixel-preview.ts",
+    "documentation/pixel-companion/phase1-report.md",
+    "documentation/pixel-companion/phase1/file-manifest.json",
+    "documentation/pixel-companion/phase1/landing-1024-d2-svg.png",
+    "documentation/pixel-companion/phase1/landing-1440-d2-svg.png",
+    "documentation/pixel-companion/phase1/landing-320-d3-svg.png",
+    "documentation/pixel-companion/phase1/landing-390-d2-svg.png",
+    "documentation/pixel-companion/phase1/landing-820-d2-svg.png",
+    "documentation/pixel-companion/phase1/onboarding-1440-d2-svg.png",
+    "documentation/pixel-companion/phase1/onboarding-320-d3-svg.png",
+    "documentation/pixel-companion/phase1/onboarding-390-d2-svg.png",
+    "documentation/pixel-companion/phase1/provisional-opaque-landing-390.png",
+    "documentation/pixel-companion/phase1/provisional-opaque-onboarding-390.png",
+    "documentation/pixel-companion/phase1/review-mobile-svg.png",
+    "documentation/pixel-companion/phase1/review-svg.png",
+    "documentation/pixel-companion/phase1/source-integrity.json",
+    "documentation/pixel-companion/phase1/svg-baseline-results.json",
+    "documentation/pixel-companion/phase1/typecheck-after-build.log",
+    "public/companions/sylf-pixel-companion.png",
+    "scripts/verify-pixel-companion-phase1.mjs"
+  ]
+}

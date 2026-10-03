@@ -12,6 +12,7 @@ import {
   RELIC_OPTIONS,
 } from "@/lib/character-traits";
 import { getClassInfo } from "@/lib/cosmetics-catalog";
+import styles from "../../Locker.module.css";
 import {
   User,
   Sparkles,
@@ -82,13 +83,17 @@ export function StudioHubView({
       {/* ─── Studio Hub Header ───────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-subtle pb-5">
         <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            <span className="p-2 rounded-xl bg-accent-primary-dim border border-accent-primary-mid text-accent-text-light flex items-center justify-center">
-              <Layers className="w-5 h-5" />
+          <div className={`${styles.eyebrow} mb-2`}>
+            <span className={styles.eyebrowDot} />
+            <span>Scholar Arsenal // Identity Hub</span>
+          </div>
+          <div className="flex items-center gap-3 mb-1">
+            <span className="p-2.5 rounded-xl bg-accent-primary-dim border border-accent-primary-mid text-accent-text-light flex items-center justify-center shadow-[0_0_12px_var(--accent-primary-dim)]">
+              <Layers className="w-5 h-5 text-accent-primary" />
             </span>
-            <h2 className="text-2xl font-bold font-['Rajdhani'] text-text-primary tracking-wide">
-              Identity Studio Hub
-            </h2>
+            <h1 className={styles.title}>
+              Identity <em>Studio Hub</em>
+            </h1>
           </div>
           <p className="text-xs text-text-muted font-['Rajdhani']">
             Select a specialized studio workbench below to customize your sprite visuals, academic gear, and public profile dossier.
@@ -100,10 +105,10 @@ export function StudioHubView({
           <button
             type="button"
             onClick={onPreviewProfile}
-            className="px-4 py-2.5 rounded-xl bg-bg-panel hover:bg-bg-shadow border border-border-subtle hover:border-accent-primary text-xs font-['Rajdhani'] font-bold text-text-primary flex items-center gap-2 transition-all shadow-sm group"
+            className={styles.navBtn}
             title="Preview Public Profile Modal"
           >
-            <Eye className="w-4 h-4 text-accent-text-light group-hover:scale-110 transition-transform" />
+            <Eye className="w-4 h-4 text-accent-text-light" />
             <span>Preview Profile</span>
           </button>
 
@@ -112,12 +117,7 @@ export function StudioHubView({
               type="button"
               onClick={onSaveAll}
               disabled={saving}
-              className="btn-primary px-5 py-2.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-md animate-pulse"
-              style={{
-                background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-                color: "var(--text-primary)",
-                border: "none",
-              }}
+              className={`${styles.btnPrimaryAction} animate-pulse`}
             >
               <Save className="w-4 h-4" />
               <span>{saving ? "Saving..." : "Save All Changes"}</span>
@@ -131,8 +131,11 @@ export function StudioHubView({
         {/* ─── Portal Card 1: Character Studio ────────────────────── */}
         <motion.div
           whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="system-card bg-bg-panel/90 border border-border-subtle hover:border-accent-primary/60 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-xl group transition-all"
+          className={`${styles.card} p-6 flex flex-col justify-between relative overflow-hidden group`}
         >
+          {/* Top Specular Highlight */}
+          <div className={styles.topHighlight} aria-hidden="true" />
+
           {/* Ambient Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary-dim/15 rounded-full blur-3xl pointer-events-none group-hover:bg-accent-primary-dim/25 transition-all" />
 
@@ -140,8 +143,8 @@ export function StudioHubView({
             {/* Card Badge & Title */}
             <div className="flex items-center justify-between gap-2 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-accent-primary-dim border border-accent-primary-mid text-accent-text-light">
-                  <Palette className="w-5 h-5" />
+                <div className="p-2 rounded-xl bg-accent-primary-dim border border-accent-primary-mid text-accent-text-light shadow-sm">
+                  <Palette className="w-5 h-5 text-accent-primary" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold font-['Rajdhani'] text-text-primary tracking-wide">
@@ -207,7 +210,7 @@ export function StudioHubView({
           <button
             type="button"
             onClick={() => onNavigate("character-studio")}
-            className="w-full py-3 px-4 rounded-xl bg-accent-primary hover:bg-accent-primary-light text-white text-xs font-['Rajdhani'] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md group/btn"
+            className={`${styles.btnPrimaryAction} w-full py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 group/btn`}
           >
             <span>Enter Character Studio</span>
             <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
@@ -217,8 +220,11 @@ export function StudioHubView({
         {/* ─── Portal Card 2: Profile Studio ──────────────────────── */}
         <motion.div
           whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="system-card bg-bg-panel/90 border border-border-subtle hover:border-accent-primary/60 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden shadow-xl group transition-all"
+          className={`${styles.card} p-6 flex flex-col justify-between relative overflow-hidden group`}
         >
+          {/* Top Specular Highlight */}
+          <div className={styles.topHighlightEmerald} aria-hidden="true" />
+
           {/* Ambient Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/15 transition-all" />
 
@@ -226,7 +232,7 @@ export function StudioHubView({
             {/* Card Badge & Title */}
             <div className="flex items-center justify-between gap-2 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+                <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-sm">
                   <User className="w-5 h-5" />
                 </div>
                 <div>
@@ -297,7 +303,7 @@ export function StudioHubView({
           <button
             type="button"
             onClick={() => onNavigate("profile-studio")}
-            className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-['Rajdhani'] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md group/btn"
+            className={`${styles.btnEmeraldAction} w-full py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 group/btn`}
           >
             <span>Enter Profile Studio</span>
             <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />

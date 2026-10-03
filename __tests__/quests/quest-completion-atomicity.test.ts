@@ -24,6 +24,10 @@ vi.mock("@/lib/prisma", () => ({
     hpLedger: {
       create: vi.fn(),
     },
+    // Planner Modes are permanently available, so the guards that protect
+    // planner-linked rows always run: these fixtures have none.
+    plannerPlan: { findFirst: vi.fn().mockResolvedValue(null) },
+    plannerQuestLink: { findFirst: vi.fn().mockResolvedValue(null) },
     $queryRaw: vi.fn(),
     $transaction: vi.fn(async (cb: (tx: any) => Promise<any>) => cb(prisma)),
   },

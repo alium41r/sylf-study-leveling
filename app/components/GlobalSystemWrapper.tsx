@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { MotionConfig } from "framer-motion";
 import { useHeartbeat } from "../hooks/useHeartbeat";
 import { SessionInviteToast } from "./SessionInviteToast";
 import SessionEndToast from "./SessionEndToast";
 import SettingsPanel from "./SettingsPanel";
 import { SettingsProvider } from "./SettingsContext";
 import { AcousticsProvider } from "./AcousticsContext";
+import { CustomAudioProvider } from "./CustomAudioContext";
 import { AcousticsDynamicIsland } from "./AcousticsDynamicIsland";
 import TopRightBar from "./TopRightBar";
 
@@ -117,12 +119,48 @@ const THEME_MAP: Record<string, Record<string, string>> = {
   },
 };
 
+import { normalizeAppBackgroundId } from "@/lib/cosmetics-catalog";
+
 const BG_MAP: Record<string, { value: string; size?: string; repeat?: string; lightValue: string }> = {
+  simple: {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  "simple-black": {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  "simple-white": {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  black: {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  white: {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  "pure-black": {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  "pure-white": {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
   void: {
-    value:
-      "radial-gradient(ellipse at top, rgba(129, 140, 248, 0.20) 0%, transparent 55%), radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.10) 0%, transparent 60%), linear-gradient(180deg, #0d0f1e 0%, #070811 55%, #04050c 100%)",
-    lightValue:
-      "radial-gradient(ellipse at top, rgba(129, 140, 248, 0.28) 0%, transparent 55%), radial-gradient(ellipse at bottom, rgba(56, 189, 248, 0.18) 0%, transparent 60%), linear-gradient(180deg, #eef2ff 0%, #e4e9f5 55%, #dde3ef 100%)",
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  none: {
+    value: "#000000",
+    lightValue: "#ffffff",
+  },
+  default: {
+    value: "#000000",
+    lightValue: "#ffffff",
   },
   "cyber-grid": {
     value:
@@ -174,52 +212,91 @@ import { ProfileModalProvider } from "./ProfileModalContext";
 import { PublicProfileModal } from "./PublicProfileModal";
 import { useAuth } from "./AuthProvider";
 import { SystemAIProvider } from "./system/SystemAIProvider";
+import { LevelUpProvider } from "./LevelUpProvider";
+import {
+  resolveLegacyTheme,
+  resolveLegacyBackground,
+  getAccentTokens,
+  getBackgroundTokens,
+  DEFAULT_ACCENT_HEX,
+  DEFAULT_DARK_BG_HEX,
+  DEFAULT_LIGHT_BG_HEX,
+  isValidHex,
+} from "@/lib/color-utils";
 
-export function applyGlobalBackground(bgId?: string | null, mode?: string | null) {
+export function applyAppMode(mode?: string | null) {
   if (typeof window === "undefined") return;
-  const currentMode = mode || document.documentElement.getAttribute("data-mode") || localStorage.getItem("app_mode") || "dark";
-  const currentBg = bgId || localStorage.getItem("app_background") || "void";
-  const bgData = BG_MAP[currentBg] || BG_MAP["void"];
-  if (!bgData) return;
-
-  // The wallpaper lives on a dedicated in-flow layer (#app-bg-layer) that is
-  // absolutely positioned inside a `position: relative` wrapper around the
-  // page content, so it spans the FULL document height and scrolls with the
-  // content on every device.
-  //
-  // Why not a viewport-fixed element or a <body> background?
-  //   • `background-attachment: fixed` — ignored on iOS Safari, mis-painted
-  //     on Android Chrome (the original mobile "cut off" bug).
-  //   • `position: fixed` layer — Android Chrome rasterizes fixed layers
-  //     lazily during scroll gestures, so the wallpaper lags behind and
-  //     catches up ~0.1s after scrolling stops.
-  //   • <body> background — promoted to the canvas (because <html> carries
-  //     no background), and mobile Chrome re-tiles that canvas background in
-  //     viewport-sized chunks. The gradient repeats instead of running the
-  //     full document, producing a visible seam past the first viewport.
-  //   An in-flow element is painted eagerly and exactly once, covering the
-  //   full document — none of the above rendering quirks apply.
-  const layer = document.getElementById("app-bg-layer") as HTMLElement | null;
-  if (layer) {
-    layer.style.background = currentMode === "light" ? bgData.lightValue : bgData.value;
-    layer.style.backgroundSize = bgData.size || "cover";
-    layer.style.backgroundRepeat = bgData.repeat || "no-repeat";
+  const currentMode = mode === "light" ? "light" : "dark";
+  document.documentElement.setAttribute("data-mode", currentMode);
+  if (currentMode === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
   }
-  // Never leave a stale background paint on <body>: the layer is the single
-  // source of truth, and a body paint would cover it (body backgrounds paint
-  // above negative z-index children).
-  document.body.style.background = "transparent";
-  document.body.style.backgroundColor = "transparent";
 }
 
-export function applyGlobalTheme(themeId?: string | null) {
+export function applyGlobalBackground(bgIdOrHex?: string | null, mode?: string | null) {
   if (typeof window === "undefined") return;
-  const currentTheme = themeId || localStorage.getItem("app_theme") || "cyberpunk";
-  const vars = THEME_MAP[currentTheme];
-  if (vars) {
-    for (const [prop, val] of Object.entries(vars)) {
-      document.documentElement.style.setProperty(prop, val);
-    }
+  const currentMode = (mode || document.documentElement.getAttribute("data-mode") || localStorage.getItem("app_mode") || "dark") as "dark" | "light";
+  const rawBg = bgIdOrHex || localStorage.getItem("app_background") || (currentMode === "light" ? DEFAULT_LIGHT_BG_HEX : DEFAULT_DARK_BG_HEX);
+  const normalizedLegacy = normalizeAppBackgroundId(rawBg);
+  const isLegacyKey = Boolean(BG_MAP[normalizedLegacy] && !isValidHex(rawBg) && !isValidHex("#" + rawBg));
+
+  let bgVal: string;
+  let bgSize = "cover";
+  let bgRepeat = "no-repeat";
+  let semanticBg = isLegacyKey ? normalizedLegacy : "custom";
+  let baseHex: string;
+
+  if (isLegacyKey && normalizedLegacy !== "simple" && BG_MAP[normalizedLegacy]) {
+    const bgData = BG_MAP[normalizedLegacy];
+    bgVal = currentMode === "light" ? bgData.lightValue : bgData.value;
+    bgSize = bgData.size || "cover";
+    bgRepeat = bgData.repeat || "no-repeat";
+    baseHex = resolveLegacyBackground(normalizedLegacy, currentMode);
+  } else {
+    // Solid background color (custom or simple)
+    baseHex = resolveLegacyBackground(rawBg, currentMode);
+    bgVal = baseHex;
+    semanticBg = baseHex === "#000000" || baseHex === "#ffffff" ? "simple" : "custom";
+  }
+
+  const bgTokens = getBackgroundTokens(baseHex, currentMode);
+  for (const [prop, val] of Object.entries(bgTokens)) {
+    if (val) document.documentElement.style.setProperty(prop, val);
+  }
+
+  // Set semantic attribute on root for clean theme-token targeting
+  document.documentElement.setAttribute("data-app-background", semanticBg);
+
+  // Directly set canvas background on root elements
+  document.documentElement.style.backgroundColor = baseHex;
+  document.body.style.background = "transparent";
+
+  const layer = document.getElementById("app-bg-layer") as HTMLElement | null;
+  if (layer) {
+    layer.style.background = bgVal;
+    layer.style.backgroundColor = baseHex;
+    layer.style.backgroundSize = bgSize;
+    layer.style.backgroundRepeat = bgRepeat;
+  }
+
+  // Re-sync accent text tokens against the freshly derived surface
+  const activeAccent = localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
+  const accentTokens = getAccentTokens(activeAccent, bgTokens["--surface-1"]);
+  for (const [prop, val] of Object.entries(accentTokens)) {
+    if (val) document.documentElement.style.setProperty(prop, val);
+  }
+}
+
+export function applyGlobalTheme(themeIdOrHex?: string | null) {
+  if (typeof window === "undefined") return;
+  const rawTheme = themeIdOrHex || localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
+  const accentHex = resolveLegacyTheme(rawTheme);
+  const targetSurface = document.documentElement.style.getPropertyValue("--surface-1") || "#090d16";
+  const vars = getAccentTokens(accentHex, targetSurface);
+  for (const [prop, val] of Object.entries(vars)) {
+    document.documentElement.style.setProperty(prop, val);
   }
 }
 
@@ -231,82 +308,106 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
   useEffect(() => {
     // Mode
     const savedMode = localStorage.getItem("app_mode") || "dark";
-    document.documentElement.setAttribute("data-mode", savedMode);
+    applyAppMode(savedMode);
 
     // Theme
-    const activeTheme = user?.activeTheme || localStorage.getItem("app_theme") || "cyberpunk";
+    const activeTheme = user?.activeTheme || localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
     if (user?.activeTheme && user.activeTheme !== localStorage.getItem("app_theme")) {
       localStorage.setItem("app_theme", user.activeTheme);
     }
     applyGlobalTheme(activeTheme);
 
     // Background
-    const activeBg = user?.activeBackground || localStorage.getItem("app_background") || "void";
+    const rawBg = user?.activeBackground || localStorage.getItem("app_background") || "simple";
     if (user?.activeBackground && user.activeBackground !== localStorage.getItem("app_background")) {
       localStorage.setItem("app_background", user.activeBackground);
     }
-    applyGlobalBackground(activeBg, savedMode);
+    applyGlobalBackground(rawBg, savedMode);
 
     const handleBgUpdate = () => {
-      const latestBg = localStorage.getItem("app_background") || "void";
+      const latestBg = localStorage.getItem("app_background") || "simple";
       const latestMode = localStorage.getItem("app_mode") || "dark";
       applyGlobalBackground(latestBg, latestMode);
     };
 
+    const handleModeUpdate = () => {
+      const latestMode = localStorage.getItem("app_mode") || "dark";
+      applyAppMode(latestMode);
+      const latestBg = localStorage.getItem("app_background") || "simple";
+      applyGlobalBackground(latestBg, latestMode);
+    };
+
     const handleThemeUpdate = () => {
-      const latestTheme = localStorage.getItem("app_theme") || "cyberpunk";
+      const latestTheme = localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
       applyGlobalTheme(latestTheme);
     };
 
-    // Re-apply on viewport resize/rotate is unnecessary: the wallpaper layer
-    // is an in-flow element that spans the document, which is stable across
-    // breakpoints by construction.
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "app_mode") {
+        handleModeUpdate();
+      } else if (e.key === "app_background") {
+        handleBgUpdate();
+      } else if (e.key === "app_theme") {
+        handleThemeUpdate();
+      } else if (!e.key) {
+        handleModeUpdate();
+        handleBgUpdate();
+        handleThemeUpdate();
+      }
+    };
 
     window.addEventListener("background-updated", handleBgUpdate);
+    window.addEventListener("mode-updated", handleModeUpdate);
     window.addEventListener("theme-updated", handleThemeUpdate);
-    window.addEventListener("storage", handleBgUpdate);
-    window.addEventListener("storage", handleThemeUpdate);
+    window.addEventListener("storage", handleStorage);
 
     return () => {
       window.removeEventListener("background-updated", handleBgUpdate);
+      window.removeEventListener("mode-updated", handleModeUpdate);
       window.removeEventListener("theme-updated", handleThemeUpdate);
-      window.removeEventListener("storage", handleBgUpdate);
-      window.removeEventListener("storage", handleThemeUpdate);
+      window.removeEventListener("storage", handleStorage);
     };
   }, [user?.activeBackground, user?.activeTheme]);
 
+
   return (
-    <AcousticsProvider>
-      <SettingsProvider>
-        <ProfileModalProvider>
-          <SystemAIProvider>
-            {/* Wallpaper layer: in-flow, absolutely positioned against this
-                relative wrapper so it spans the full document height and
-                scrolls with the content — see applyGlobalBackground. */}
-            <div className="relative isolate">
-              <div
-                id="app-bg-layer"
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  zIndex: -10,
-                  pointerEvents: "none",
-                  transition: "background 0.3s ease",
-                }}
-              />
-              {children}
-            </div>
-          </SystemAIProvider>
-          <PublicProfileModal />
-          <AcousticsDynamicIsland />
-          <SessionInviteToast />
-          <SessionEndToast />
-          <TopRightBar />
-          <SettingsPanel />
-        </ProfileModalProvider>
-      </SettingsProvider>
-    </AcousticsProvider>
+    <MotionConfig reducedMotion="user">
+      <AcousticsProvider>
+        <CustomAudioProvider>
+        <SettingsProvider>
+          <ProfileModalProvider>
+            <SystemAIProvider>
+              {/* Wallpaper layer: in-flow, absolutely positioned against this
+                  relative wrapper so it spans the full document height and
+                  scrolls with the content — see applyGlobalBackground. */}
+              <LevelUpProvider>
+                <div className="relative isolate min-h-screen w-full">
+                  <div
+                    id="app-bg-layer"
+                    aria-hidden="true"
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      zIndex: -10,
+                      pointerEvents: "none",
+                      transition: "background 0.3s ease",
+                    }}
+                  />
+                  {children}
+                </div>
+              </LevelUpProvider>
+            </SystemAIProvider>
+            <PublicProfileModal />
+            <AcousticsDynamicIsland />
+            <SessionInviteToast />
+            <SessionEndToast />
+            <TopRightBar />
+            <SettingsPanel />
+          </ProfileModalProvider>
+        </SettingsProvider>
+        </CustomAudioProvider>
+      </AcousticsProvider>
+    </MotionConfig>
   );
 }
 

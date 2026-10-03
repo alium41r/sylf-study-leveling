@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": [
+    "lib/planner/v2/contracts/**/*.ts",
+    "__tests__/planner-v2/**/*.ts",
+    "vitest.planner-v2-postgres.config.ts"
+  ],
+  "exclude": ["node_modules", ".next", "mobile", "android"]
+}

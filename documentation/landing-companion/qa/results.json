@@ -1,0 +1,513 @@
+{
+  "base": "http://localhost:3000",
+  "createdAt": "2026-09-30T11:23:48.274Z",
+  "results": [
+    {
+      "name": "Nine eye variants and six actions share the canonical renderer",
+      "passed": true
+    },
+    {
+      "name": "No video/canvas or whole-character frame playback",
+      "passed": true
+    },
+    {
+      "name": "Every character part uses the same painted master",
+      "passed": true
+    },
+    {
+      "name": "Desktop review has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Layer animation changes the halo transform",
+      "passed": true
+    },
+    {
+      "name": "Idle animation creates no character DOM mutations",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through FOCUSING",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through READING",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through PLANNING",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through AI_THINKING",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through DISCOVERING",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through REST",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through ERROR",
+      "passed": true
+    },
+    {
+      "name": "Persistent SVG/hood through IDLE",
+      "passed": true
+    },
+    {
+      "name": "Occasional happy and curious eye motion uses the persistent character",
+      "passed": true
+    },
+    {
+      "name": "Focus accepts a bounded happy reaction",
+      "passed": true
+    },
+    {
+      "name": "Celebration supersedes happy and rejects lower-priority hello",
+      "passed": true
+    },
+    {
+      "name": "Reaction expires back to Focus",
+      "passed": true
+    },
+    {
+      "name": "Base change cancels reaction without remounting",
+      "passed": true
+    },
+    {
+      "name": "Offscreen character animation pauses",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion retains excited expression",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion stops all companion animation",
+      "passed": true
+    },
+    {
+      "name": "Mobile review has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Headless Chrome mobile viewport RAF cadence (not hardware/mobile paint benchmark)",
+      "medianMs": 16.700000000000728,
+      "p95Ms": 16.799999999999272,
+      "samples": 90
+    },
+    {
+      "name": "Landing 1440px has no overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 1440px at focus",
+      "state": "FOCUSING",
+      "moving": "false",
+      "visible": "visible",
+      "x": 549.5297241210938,
+      "y": 500.00341796875,
+      "width": 144,
+      "height": 180,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 1440px focus",
+      "passed": true
+    },
+    {
+      "name": "Scroll reversal motion sample",
+      "sampleCount": 254,
+      "peakCapeDegrees": 2.05,
+      "peakRibbonDegrees": 4.1,
+      "maxPageStepPx": 20.037109375,
+      "last": {
+        "time": 4216.4,
+        "y": 1824.9912109375,
+        "cape": 0,
+        "left": 0,
+        "right": 0,
+        "body": 0
+      }
+    },
+    {
+      "name": "Scroll drives independent cape and ribbon inertia without remounting",
+      "passed": true
+    },
+    {
+      "name": "Normal scroll reversal preserves continuous page movement",
+      "passed": true
+    },
+    {
+      "name": "Fabric settles completely after page travel stops",
+      "passed": true
+    },
+    {
+      "name": "Landing 1440px at study-ai",
+      "state": "IDLE",
+      "moving": "true",
+      "visible": "visible",
+      "x": 747.4778442382812,
+      "y": 498.9501953125,
+      "width": 144,
+      "height": 180,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 1440px study-ai",
+      "passed": true
+    },
+    {
+      "name": "Landing 1440px at early-access",
+      "state": "QUEST_COMPLETE",
+      "moving": "false",
+      "visible": "visible",
+      "x": 648.4990234375,
+      "y": 499.99267578125,
+      "width": 144,
+      "height": 180,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 1440px early-access",
+      "passed": true
+    },
+    {
+      "name": "Landing 390px has no overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 390px at focus",
+      "state": "FOCUSING",
+      "moving": "false",
+      "visible": "visible",
+      "x": 2.500293731689453,
+      "y": 503.9183349609375,
+      "width": 56,
+      "height": 70,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 390px focus",
+      "passed": true
+    },
+    {
+      "name": "Landing 390px at study-ai",
+      "state": "IDLE",
+      "moving": "true",
+      "visible": "visible",
+      "x": 2.5,
+      "y": 499.58837890625,
+      "width": 56,
+      "height": 70,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 390px study-ai",
+      "passed": true
+    },
+    {
+      "name": "Landing 390px at early-access",
+      "state": "QUEST_COMPLETE",
+      "moving": "false",
+      "visible": "visible",
+      "x": 167.4962921142578,
+      "y": 503.92919921875,
+      "width": 56,
+      "height": 70,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 390px early-access",
+      "passed": true
+    },
+    {
+      "name": "Landing 320px has no overflow",
+      "passed": true
+    },
+    {
+      "name": "Landing 320px at focus",
+      "state": "FOCUSING",
+      "moving": "false",
+      "visible": "visible",
+      "x": 2.5,
+      "y": 433.19384765625,
+      "width": 56,
+      "height": 70,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 320px focus",
+      "passed": true
+    },
+    {
+      "name": "Landing 320px at study-ai",
+      "state": "IDLE",
+      "moving": "true",
+      "visible": "visible",
+      "x": 2.5,
+      "y": 429.040771484375,
+      "width": 56,
+      "height": 70,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 320px study-ai",
+      "passed": true
+    },
+    {
+      "name": "Landing 320px at early-access",
+      "state": "QUEST_COMPLETE",
+      "moving": "false",
+      "visible": "visible",
+      "x": 132.47445678710938,
+      "y": 433.20703125,
+      "width": 56,
+      "height": 70,
+      "controls": [],
+      "sameSvg": true,
+      "overflow": 0
+    },
+    {
+      "name": "Stable visible character and clear controls at 320px early-access",
+      "passed": true
+    },
+    {
+      "name": "Reduced motion landing hides traveling character",
+      "passed": true
+    },
+    {
+      "name": "No retired video/Pixi/atlas assets requested",
+      "passed": true
+    },
+    {
+      "name": "Final navigation resource sizes (cache may affect bytes)",
+      "resources": [
+        {
+          "name": "timer.webp",
+          "bytes": 0,
+          "type": "link"
+        },
+        {
+          "name": "app_1kgs4b2._.css",
+          "bytes": 48832,
+          "type": "link"
+        },
+        {
+          "name": "app_components_landing_1h1jew1._.css",
+          "bytes": 13123,
+          "type": "link"
+        },
+        {
+          "name": "%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1xx01vv._.js",
+          "bytes": 675,
+          "type": "link"
+        },
+        {
+          "name": "node_modules_next_dist_compiled_next-devtools_index_090k2jm.js",
+          "bytes": 217501,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_next_dist_compiled_react-dom_096_9a-._.js",
+          "bytes": 184025,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-6._.js",
+          "bytes": 31817,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_next_dist_compiled_1amofcm._.js",
+          "bytes": 28314,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_next_dist_1ybzpk2._.js",
+          "bytes": 46077,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_next_dist_client_0r5nbpw._.js",
+          "bytes": 152502,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_%40swc_helpers_cjs_1r9vbqw._.js",
+          "bytes": 738,
+          "type": "script"
+        },
+        {
+          "name": "_1anvha4._.js",
+          "bytes": 756,
+          "type": "script"
+        },
+        {
+          "name": "turbopack-_01_ro95._.js",
+          "bytes": 22493,
+          "type": "script"
+        },
+        {
+          "name": "lib_acoustics_custom-audio-store_ts_0fgcmgy._.js",
+          "bytes": 643,
+          "type": "script"
+        },
+        {
+          "name": "lib_0d3kyxi._.js",
+          "bytes": 33126,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_next_0af92_m._.js",
+          "bytes": 45779,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_motion-dom_dist_es_0g6cuzy._.js",
+          "bytes": 91661,
+          "type": "script"
+        },
+        {
+          "name": "app_1s7-2do._.js",
+          "bytes": 101477,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_framer-motion_dist_es_19yb9xk._.js",
+          "bytes": 35848,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_micromark-core-commonmark_dev_lib_2079wuz._.js",
+          "bytes": 23732,
+          "type": "script"
+        },
+        {
+          "name": "app_layout_tsx_007e4b2._.js",
+          "bytes": 721,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_1osqjvm._.js",
+          "bytes": 30879,
+          "type": "script"
+        },
+        {
+          "name": "app_components_landing_0wewola._.js",
+          "bytes": 45167,
+          "type": "script"
+        },
+        {
+          "name": "004v_katex_dist_katex_mjs_14ek3ea._.js",
+          "bytes": 157598,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_1g_i4ad._.js",
+          "bytes": 172679,
+          "type": "script"
+        },
+        {
+          "name": "app_page_tsx_20puqq6._.js",
+          "bytes": 358,
+          "type": "script"
+        },
+        {
+          "name": "node_modules_next_dist_client_components_builtin_global-error_20puqq6.js",
+          "bytes": 212,
+          "type": "script"
+        },
+        {
+          "name": "css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap",
+          "bytes": 990,
+          "type": "css"
+        },
+        {
+          "name": "original-rig.webp",
+          "bytes": 0,
+          "type": "image"
+        },
+        {
+          "name": "dashboard.webp",
+          "bytes": 0,
+          "type": "img"
+        },
+        {
+          "name": "character.webp",
+          "bytes": 0,
+          "type": "img"
+        },
+        {
+          "name": "ai.webp",
+          "bytes": 0,
+          "type": "img"
+        },
+        {
+          "name": "social.webp",
+          "bytes": 0,
+          "type": "img"
+        },
+        {
+          "name": "UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+          "bytes": 48432,
+          "type": "css"
+        },
+        {
+          "name": "%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js",
+          "bytes": 3887,
+          "type": "script"
+        },
+        {
+          "name": "%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1xch-cm._.js",
+          "bytes": 289,
+          "type": "script"
+        },
+        {
+          "name": "lib_acoustics_custom-audio-store_ts_1897nw_._.js",
+          "bytes": 3247,
+          "type": "script"
+        },
+        {
+          "name": "lib_acoustics_custom-audio-store_ts_14-p7mf._.js",
+          "bytes": 276,
+          "type": "script"
+        },
+        {
+          "name": "acoustics",
+          "bytes": 4590,
+          "type": "fetch"
+        },
+        {
+          "name": "stats",
+          "bytes": 24,
+          "type": "fetch"
+        }
+      ]
+    },
+    {
+      "name": "No browser runtime exceptions",
+      "passed": true
+    }
+  ]
+}

@@ -29,7 +29,13 @@ vi.mock("../../lib/prisma", () => ({
         hasCompletedOnboarding: true,
       })
     },
+    // Planner Modes are permanent, so the guards protecting planner-linked rows
+    // always run. Nothing in these fixtures is planner-linked.
+    plannerPlan: { findFirst: vi.fn().mockResolvedValue(null) },
+    plannerQuestLink: { findFirst: vi.fn().mockResolvedValue(null) },
+    floatingRestDay: { findUnique: vi.fn().mockResolvedValue(null) },
     $transaction: vi.fn(),
+    $queryRaw: vi.fn().mockResolvedValue([]),
   }
 }));
 
@@ -73,7 +79,9 @@ describe("Phase 3A: Calendar Tools", () => {
   };
 
   beforeEach(() => {
+    vi.mocked(prisma.$transaction).mockImplementation(async (run: any) => run(prisma));
     vi.clearAllMocks();
+    vi.mocked(calculateDailyCapacity).mockReset();
   });
 
   describe("moveQuestTool", () => {

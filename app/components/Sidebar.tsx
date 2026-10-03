@@ -3,12 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeft } from "lucide-react";
+import { PanelLeft, Bell } from "lucide-react";
+import { SystemApertureIcon, ObjectiveTargetIcon } from "@/app/components/icons";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { useProfileModal } from "./ProfileModalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import MarkdownRenderer from "./MarkdownRenderer";
+import { MOTION_SPRING } from "@/lib/motion";
 
 interface SystemMessage {
   id: number;
@@ -49,21 +51,13 @@ const NAV_ITEMS = [
   {
     href: "/system",
     label: "The System",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-      </svg>
-    ),
+    icon: <SystemApertureIcon size={20} />,
     badge: "AI",
   },
   {
     href: "/goals",
     label: "Objectives",
-    icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
+    icon: <ObjectiveTargetIcon size={20} />,
   },
   {
     href: "/calendar",
@@ -238,194 +232,200 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
     }
   };
 
+  // Reusable notification button & dropdown renderer
+  const renderNotificationButton = () => (
+    <div className={`relative pointer-events-auto ${showNotifications ? "z-50" : "z-10"} group`} ref={notifRef}>
+      <button
+        className={`w-10 h-10 flex items-center justify-center rounded-2xl border transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary shadow-sm ${
+          showNotifications
+            ? "border-2 border-accent-primary text-[var(--accent-text,var(--accent-primary))] bg-accent-primary/20 shadow-[0_0_16px_var(--accent-primary-dim)]"
+            : "border-[var(--border-subtle)] bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] text-[var(--sidebar-fg,var(--text-secondary))] hover:text-[var(--accent-text,var(--accent-primary))] hover:border-accent-primary/50 hover:shadow-[0_0_12px_var(--accent-primary-dim)]"
+        }`}
+        onClick={handleOpenNotifications}
+        aria-label="Notifications"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+        )}
+      </button>
+
+      {/* Tooltip when collapsed */}
+      {isCollapsed && !showNotifications && (
+        <div 
+          role="tooltip"
+          className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-text-primary uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-[var(--border-subtle)]"
+        >
+          Notifications {unreadCount > 0 ? `(${unreadCount})` : ""}
+        </div>
+      )}
+
+      {/* ─── Notifications Dropdown (Desktop Only) ────────── */}
+      <AnimatePresence>
+        {!mobile && showNotifications && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -6 }}
+            transition={MOTION_SPRING.popover}
+            className={`absolute ${
+              isCollapsed
+                ? "top-0 left-14 liquid-glass-sidebar border border-[var(--border-subtle)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]"
+                : "top-12 left-0 bg-[var(--surface-1)] border border-[var(--border-subtle)] shadow-2xl"
+            } w-80 max-h-96 overflow-y-auto rounded-[24px] p-4 custom-scrollbar z-[100]`}
+            style={
+              !isCollapsed
+                ? {
+                    backgroundColor: "var(--surface-1)",
+                    backdropFilter: "none",
+                    WebkitBackdropFilter: "none",
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--border-subtle)",
+                  }
+                : undefined
+            }
+          >
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
+              <h3 className="text-xs tracking-widest text-accent-light font-['Rajdhani'] font-bold uppercase">
+                SYSTEM NOTIFICATIONS
+              </h3>
+              {notifications.length > 0 && (
+                <button 
+                  onClick={handleClearNotifications}
+                  className="text-[10px] text-text-muted hover:text-red-400 transition-colors font-bold tracking-wider uppercase font-['Rajdhani']"
+                >
+                  CLEAR ALL
+                </button>
+              )}
+            </div>
+            {notifications.length === 0 ? (
+              <p className="text-xs text-text-muted p-4 text-center">No recent messages.</p>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {notifications.map((n, idx) => {
+                  const content = n.content || "";
+                  let badgeLabel = n.type || "SYSTEM";
+                  let badgeStyle = "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30";
+
+                  if (content.includes("[FRIEND_REQUEST]") || content.toLowerCase().includes("friend request")) {
+                    badgeLabel = "FRIEND REQUEST";
+                    badgeStyle = "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30";
+                  } else if (content.includes("[GROUP_ADDED]") || content.toLowerCase().includes("added you to the group")) {
+                    badgeLabel = "GROUP";
+                    badgeStyle = "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30";
+                  } else if (content.includes("[DIRECT_MESSAGE]") || content.toLowerCase().includes("direct message")) {
+                    badgeLabel = "DIRECT MESSAGE";
+                    badgeStyle = "bg-sky-500/15 text-sky-700 dark:text-sky-400 border-sky-500/30";
+                  } else if (content.includes("[GROUP_CHAT]") || content.toLowerCase().includes("group chat")) {
+                    badgeLabel = "GROUP CHAT";
+                    badgeStyle = "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30";
+                  } else if (content.includes("[ACHIEVEMENT]") || n.type === "REWARD") {
+                    badgeLabel = "ACHIEVEMENT";
+                    badgeStyle = "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30";
+                  } else if (n.type === "LEVEL_UP" || content.toLowerCase().includes("level up")) {
+                    badgeLabel = "LEVEL UP";
+                    badgeStyle = "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30";
+                  } else if (n.type === "STREAK" || content.toLowerCase().includes("streak")) {
+                    badgeLabel = "STREAK";
+                    badgeStyle = "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30";
+                  } else if (n.type === "QUEST" || content.toLowerCase().includes("quest")) {
+                    badgeLabel = "QUEST";
+                    badgeStyle = "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30";
+                  } else if (n.type === "WARNING") {
+                    badgeLabel = "ALERT";
+                    badgeStyle = "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30";
+                  }
+
+                  const cleanContent = content.replace(/^\[[A-Z_]+\]\s*/, "");
+
+                  return (
+                    <div key={n.id}>
+                      <div className={`p-2.5 rounded-lg text-sm transition-colors ${!n.read ? "bg-accent-primary-dim" : "bg-transparent hover:bg-bg-shadow/50"}`}>
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className={`text-[9px] font-bold tracking-wider px-2 py-0.5 rounded border ${badgeStyle}`}>
+                            {badgeLabel}
+                          </span>
+                          <span className="text-[10px] font-mono text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div className="text-text-primary text-xs leading-relaxed">
+                          <MarkdownRenderer content={cleanContent} compact />
+                        </div>
+                      </div>
+                      {idx < notifications.length - 1 && (
+                        <hr className="border-border-subtle my-1 mx-1" />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
   return (
     <aside
-      className={`flex flex-col py-6 ${
+      className={`flex flex-col ${
         mobile
-          ? "relative h-full w-full overflow-y-auto"
-          : "fixed left-0 top-0 h-full z-50 overflow-visible hidden md:flex"
+          ? "relative h-full w-full overflow-y-auto liquid-glass-sidebar border border-[var(--sidebar-border,var(--border-subtle))] shadow-2xl rounded-[28px] py-5 px-2.5"
+          : "fixed left-0 top-0 bottom-0 z-50 overflow-visible hidden md:flex border-r border-[var(--sidebar-border,var(--border-subtle))] border-t-0 border-b-0 border-l-0 liquid-glass-sidebar py-3.5 px-1.5"
       }`}
       style={
         mobile
-          ? {
-              background: "var(--bg-panel)",
-              borderRight: "1px solid var(--border-subtle)",
-            }
+          ? undefined
           : {
               width: isCollapsed ? "var(--sidebar-collapsed-width)" : "var(--sidebar-width)",
-              background: "var(--bg-panel)",
-              borderRight: "1px solid var(--border-subtle)",
+              height: "100vh",
               transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+              borderTop: "none",
+              borderBottom: "none",
+              borderLeft: "none",
+              borderRadius: "0px",
             }
       }
     >
-      {/* Top: Toggle + Profile Badge */}
-      <div className="px-4">
-        {/* Controls: Settings, Notifications, Toggle Button */}
-        <div className={`flex ${isCollapsed ? "flex-col-reverse items-center gap-4" : "flex-row justify-between items-center"} mb-4 relative`}>
-          <div className={`flex ${isCollapsed ? "flex-col gap-3" : "flex-row gap-2"}`}>
-            {/* ─── System Hub Icon Button ───────────────────────── */}
-            <button
-              className="pointer-events-auto w-10 h-10 flex items-center justify-center bg-bg-panel/70 backdrop-blur-md border border-border-subtle rounded-lg text-text-secondary hover:text-accent-primary-light hover:border-accent-primary-light hover:shadow-[0_0_16px_var(--accent-primary-dim)] hover:scale-105 active:scale-95 transition-all duration-200"
-              onClick={openSettings}
-              aria-label="Open System Hub"
-              title="System Hub"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            {/* ─── Notification Bell ──────────────────────────────── */}
-            <div className="relative pointer-events-auto" ref={notifRef}>
+      {/* Specular Liquid Glass Top Rim Highlight (mobile floating drawer only) */}
+      {mobile && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/12 via-white/5 to-transparent"
+        />
+      )}
+
+      {/* Top: Controls + Scholar Profile */}
+      {mobile ? (
+        /* ─── Mobile Drawer Header (Static Full-Width) ─── */
+        <div className={`relative ${showNotifications ? "z-50" : "z-20"} pl-[3px] pr-2`}>
+          <div className={`flex items-center justify-between mb-3 relative ${showNotifications ? "z-30" : "z-10"}`}>
+            <div className="flex items-center gap-2">
               <button
-                className={`w-10 h-10 flex items-center justify-center bg-bg-panel/70 backdrop-blur-md border rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
-                  showNotifications ? "border-accent-primary text-accent-text-light" : "border-border-subtle text-text-secondary hover:text-accent-primary hover:border-accent-primary hover:shadow-lg"
-                }`}
-                onClick={handleOpenNotifications}
+                className="pointer-events-auto w-10 h-10 flex items-center justify-center bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 rounded-2xl text-[var(--sidebar-fg,var(--text-secondary))] hover:text-[var(--accent-text,var(--accent-primary))] hover:shadow-[0_0_16px_var(--accent-primary-dim)] active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
+                onClick={openSettings}
+                aria-label="Open System Hub"
+                title="System Hub"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
-                )}
               </button>
 
-              {/* ─── Notifications Dropdown (Desktop Only) ────────── */}
-              <AnimatePresence>
-                {!mobile && showNotifications && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -6 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -6 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 380 }}
-                    className={`absolute ${isCollapsed ? 'top-0 left-12' : 'top-12 left-0'} w-80 max-h-96 overflow-y-auto bg-bg-abyss border border-border-subtle shadow-2xl rounded-xl p-3 custom-scrollbar z-[100]`}
-                  >
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
-                      <h3 className="text-xs tracking-widest text-accent-light font-['Rajdhani'] font-bold uppercase">
-                        SYSTEM NOTIFICATIONS
-                      </h3>
-                      {notifications.length > 0 && (
-                        <button 
-                          onClick={handleClearNotifications}
-                          className="text-[10px] text-text-muted hover:text-red-400 transition-colors font-bold tracking-wider uppercase font-['Rajdhani']"
-                        >
-                          CLEAR ALL
-                        </button>
-                      )}
-                    </div>
-                    {notifications.length === 0 ? (
-                      <p className="text-xs text-text-muted p-4 text-center">No recent messages.</p>
-                    ) : (
-                      <div className="flex flex-col gap-1.5">
-                        {notifications.map((n, idx) => {
-                          const content = n.content || "";
-                          let badgeLabel = n.type || "SYSTEM";
-                          let badgeStyle = "bg-blue-500/20 text-blue-400 border-blue-500/30";
-
-                          if (content.includes("[FRIEND_REQUEST]") || content.toLowerCase().includes("friend request")) {
-                            badgeLabel = "FRIEND REQUEST";
-                            badgeStyle = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
-                          } else if (content.includes("[GROUP_ADDED]") || content.toLowerCase().includes("added you to the group")) {
-                            badgeLabel = "GROUP";
-                            badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
-                          } else if (content.includes("[DIRECT_MESSAGE]") || content.toLowerCase().includes("direct message")) {
-                            badgeLabel = "DIRECT MESSAGE";
-                            badgeStyle = "bg-sky-500/20 text-sky-400 border-sky-500/30";
-                          } else if (content.includes("[GROUP_CHAT]") || content.toLowerCase().includes("group chat")) {
-                            badgeLabel = "GROUP CHAT";
-                            badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
-                          } else if (content.includes("[ACHIEVEMENT]") || n.type === "REWARD") {
-                            badgeLabel = "ACHIEVEMENT";
-                            badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
-                          } else if (n.type === "LEVEL_UP" || content.toLowerCase().includes("level up")) {
-                            badgeLabel = "LEVEL UP";
-                            badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
-                          } else if (n.type === "STREAK" || content.toLowerCase().includes("streak")) {
-                            badgeLabel = "STREAK";
-                            badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
-                          } else if (n.type === "QUEST" || content.toLowerCase().includes("quest")) {
-                            badgeLabel = "QUEST";
-                            badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
-                          } else if (n.type === "WARNING") {
-                            badgeLabel = "ALERT";
-                            badgeStyle = "bg-red-500/20 text-red-400 border-red-500/30";
-                          }
-
-                          const cleanContent = content.replace(/^\[[A-Z_]+\]\s*/, "");
-
-                          return (
-                            <div key={n.id}>
-                              <div className={`p-2.5 rounded-lg text-sm transition-colors ${!n.read ? "bg-accent-primary-dim" : "bg-transparent hover:bg-bg-shadow/50"}`}>
-                                <div className="flex items-center justify-between gap-2 mb-1">
-                                  <span className={`text-[9px] font-bold tracking-wider px-2 py-0.5 rounded border ${badgeStyle}`}>
-                                    {badgeLabel}
-                                  </span>
-                                  <span className="text-[10px] font-mono text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
-                                </div>
-                                <div className="text-text-primary text-xs leading-relaxed">
-                                  <MarkdownRenderer content={cleanContent} compact />
-                                </div>
-                              </div>
-                              {idx < notifications.length - 1 && (
-                                <hr className="border-border-subtle my-1 mx-1" />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {renderNotificationButton()}
             </div>
           </div>
-          
-          {/* Toggle Button (desktop rail only — mobile drawer is never collapsed) */}
-          {!mobile && (
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="text-text-secondary hover:text-text-primary transition-all duration-200 hover:scale-110 active:scale-95 p-1 rounded-lg hover:bg-bg-shadow/50"
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              <PanelLeft className="w-5 h-5" />
-            </button>
-          )}
-        </div>
 
-        {/* ─── Scholar Profile (Compact) ──────────────── */}
-        <button
-          type="button"
-          onClick={handleOpenProfile}
-          className={`system-card w-full text-left transition-all duration-300 cursor-pointer hover:border-accent-primary/60 hover:shadow-[0_0_16px_var(--accent-primary-dim)] hover:scale-[1.02] active:scale-[0.98] group rounded-xl select-none focus:outline-none focus:ring-1 focus:ring-accent-primary ${
-            isCollapsed ? "p-2 flex justify-center" : "p-3.5 block"
-          }`}
-          title="View Profile Card"
-          aria-label="View Profile Card"
-        >
-          {isCollapsed ? (
-            <div className="flex flex-col items-center gap-2">
-              <div
-                className="w-8 h-8 rounded-lg overflow-hidden border border-border-subtle group-hover:border-accent-primary-light bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 group-hover:shadow-[0_0_10px_var(--accent-primary-dim)] transition-all duration-200"
-                title={user.name || user.username || "Scholar"}
-              >
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.name || user.username || "Scholar"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400 group-hover:text-accent-primary-light transition-colors">
-                    {(user.name || user.username || "S").charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-            </div>
-          ) : (
+          {/* Scholar Profile Card */}
+          <button
+            type="button"
+            onClick={handleOpenProfile}
+            className="w-full text-left transition-all duration-300 cursor-pointer rounded-2xl select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary group relative z-0 overflow-hidden bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 hover:shadow-[0_0_18px_var(--accent-primary-dim)] active:scale-[0.98] p-3 block"
+            title="View Profile Card"
+            aria-label="View Profile Card"
+          >
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-xl overflow-hidden border border-border-subtle group-hover:border-accent-primary-light bg-bg-abyss flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 group-hover:shadow-[0_0_12px_var(--accent-primary-dim)] transition-all duration-200">
+              <div className="w-10 h-10 rounded-xl overflow-hidden border border-[var(--border-subtle)] group-hover:border-[var(--accent-primary)] bg-[var(--surface-1)] flex items-center justify-center shrink-0 shadow-sm group-hover:shadow-[0_0_12px_var(--accent-primary-dim)] transition-all duration-200">
                 {user.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
@@ -439,82 +439,413 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-bold text-sm truncate group-hover:text-accent-primary-light transition-colors" style={{ color: "var(--text-primary)" }}>
+                <p className="font-bold text-sm truncate group-hover:text-accent-primary-light transition-colors text-text-primary">
                   {user.name || "Scholar"}
                 </p>
-                <p className="text-xs truncate" style={{ color: "var(--text-secondary)" }}>
+                <p className="text-xs truncate text-text-secondary">
                   {user.hunterRank}-Rank • Lv. {user.level}
                 </p>
               </div>
             </div>
-          )}
-        </button>
-      </div>
+          </button>
+        </div>
+      ) : (
+        /* ─── Desktop Top Section (Seamless Sliding Layout) ─── */
+        <div 
+          className={`relative ${showNotifications ? "z-50" : "z-20"} px-[3px]`}
+          style={{
+            height: isCollapsed ? 190 : 112,
+            transition: "height 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          {/* 1. Toggle Button (anchored at top-left x=0, y=0) */}
+          <div 
+            className="absolute top-0 left-0 w-10 h-10 group"
+            style={{
+              left: isCollapsed ? "3px" : "0px",
+              transition: "left 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="w-10 h-10 flex items-center justify-center rounded-2xl bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 text-[var(--sidebar-fg,var(--text-secondary))] hover:text-[var(--accent-text,var(--accent-primary))] hover:shadow-[0_0_14px_var(--accent-primary-dim)] shadow-sm active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={isCollapsed ? undefined : "Collapse sidebar"}
+            >
+              <PanelLeft className="w-5 h-5" />
+            </button>
+            {isCollapsed && (
+              <div 
+                role="tooltip"
+                className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-text-primary uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-[var(--border-subtle)]"
+              >
+                Expand Sidebar
+              </div>
+            )}
+          </div>
+
+          {/* 2. System Hub Button (slides between (48px, 0px) and (0px, 50px)) */}
+          <div 
+            className="absolute top-0 left-0 w-10 h-10 group"
+            style={{
+              left: isCollapsed ? "3px" : "0px",
+              transform: isCollapsed ? "translate3d(0px, 50px, 0)" : "translate3d(48px, 0px, 0)",
+              transition: "left 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            <button
+              className="w-10 h-10 flex items-center justify-center bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 rounded-2xl text-[var(--sidebar-fg,var(--text-secondary))] hover:text-[var(--accent-text,var(--accent-primary))] hover:shadow-[0_0_14px_var(--accent-primary-dim)] shadow-sm active:scale-95 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
+              onClick={openSettings}
+              aria-label="Open System Hub"
+              title={isCollapsed ? undefined : "System Hub"}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            {isCollapsed && (
+              <div 
+                role="tooltip"
+                className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-text-primary uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-[var(--border-subtle)]"
+              >
+                System Hub
+              </div>
+            )}
+          </div>
+
+          {/* 3. Notifications Bell (slides between (96px, 0px) and (0px, 100px)) */}
+          <div 
+            className="absolute top-0 left-0 w-10 h-10"
+            style={{
+              left: isCollapsed ? "3px" : "0px",
+              transform: isCollapsed ? "translate3d(0px, 100px, 0)" : "translate3d(96px, 0px, 0)",
+              transition: "left 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+              zIndex: showNotifications ? 50 : 20,
+            }}
+          >
+            {renderNotificationButton()}
+          </div>
+
+          {/* 4. Scholar Profile / Avatar Button (slides between (0px, 50px) and (0px, 150px)) */}
+          <div 
+            className="absolute top-0 left-0 group"
+            style={{
+              left: isCollapsed ? "3px" : "0px",
+              transform: isCollapsed ? "translate3d(0px, 150px, 0)" : "translate3d(0px, 50px, 0)",
+              width: isCollapsed ? "40px" : "100%",
+              height: isCollapsed ? "40px" : "58px",
+              transition: "left 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleOpenProfile}
+              className={`w-full h-full text-left transition-all duration-300 cursor-pointer rounded-2xl select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary relative z-0 overflow-hidden flex items-center active:scale-[0.98] ${
+                isCollapsed
+                  ? "p-0 justify-center border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] bg-[var(--surface-2)] shadow-sm hover:shadow-[0_0_14px_var(--accent-primary-dim)]"
+                  : "p-2 gap-3 bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/50 hover:shadow-[0_0_18px_var(--accent-primary-dim)] shadow-sm"
+              }`}
+              title={isCollapsed ? undefined : "View Profile Card"}
+              aria-label="View Profile Card"
+            >
+              {/* Avatar: Fixed 40x40 container */}
+              <div className={`overflow-hidden bg-[var(--surface-1)] flex items-center justify-center shrink-0 shadow-sm transition-all duration-200 ${
+                isCollapsed
+                  ? "w-full h-full rounded-2xl border-0"
+                  : "w-10 h-10 rounded-2xl border border-[var(--border-subtle)] group-hover:border-[var(--accent-primary)] group-hover:shadow-[0_0_12px_var(--accent-primary-dim)]"
+              }`}>
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name || user.username || "Scholar"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-bold font-['Rajdhani'] text-emerald-400 group-hover:text-accent-primary-light transition-colors">
+                    {(user.name || user.username || "S").charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+
+              {/* Scholar details: Smooth cross-fade and glide */}
+              <div 
+                className="min-w-0 flex-1 overflow-hidden"
+                style={{
+                  opacity: isCollapsed ? 0 : 1,
+                  transform: isCollapsed ? "translateX(-8px)" : "translateX(0)",
+                  transition: isCollapsed
+                    ? "opacity 0.15s ease-out, transform 0.15s ease-out"
+                    : "opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s",
+                  whiteSpace: "nowrap",
+                  pointerEvents: isCollapsed ? "none" : "auto",
+                }}
+              >
+                <p className="font-bold text-sm truncate group-hover:text-accent-primary-light transition-colors text-text-primary">
+                  {user.name || "Scholar"}
+                </p>
+                <p className="text-xs truncate text-text-secondary">
+                  {user.hunterRank}-Rank • Lv. {user.level}
+                </p>
+              </div>
+            </button>
+
+            {/* Collapsed Tooltip */}
+            {isCollapsed && (
+              <div 
+                role="tooltip"
+                className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-text-primary uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-border-subtle dark:border-white/15 flex items-center gap-1.5"
+              >
+                <span>{user.name || "Scholar Profile"}</span>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-accent-primary/25 text-accent-primary-light border border-accent-primary/40">
+                  Lv.{user.level}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ─── Navigation ────────── */}
-      <nav className="flex-1 flex flex-col justify-start mt-8 gap-1 px-4">
+      <nav 
+        className={`flex-1 flex flex-col justify-start mt-2 gap-1.5 px-0.5 py-1 relative z-10 ${
+          isCollapsed && !mobile ? "overflow-visible" : "overflow-y-auto sidebar-scroll"
+        }`}
+        aria-label="Main Navigation"
+      >
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href === "/goals" && pathname === "/quests");
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center rounded transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
-                isCollapsed ? "justify-center p-2" : "gap-3 px-3 py-2.5"
-              }`}
-              style={{
-                color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                background: isActive ? "var(--accent-primary-dim)" : "transparent",
-                borderLeft: isActive && !isCollapsed ? "2px solid var(--accent-primary)" : "2px solid transparent",
-              }}
-              title={isCollapsed ? item.label : undefined}
+            <div 
+              key={item.href} 
+              className="relative group"
             >
-              <span className="flex items-center justify-center transition-colors" style={isActive ? { color: 'var(--accent-primary-light)' } : undefined}>
-                {item.icon}
-              </span>
-              {!isCollapsed && (
-                <>
-                  <span className="truncate" style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 600 }}>
+              {/* Active Indicator Line on the sidebar wall edge (zero overlap with icon) */}
+              {isActive && (
+                <span 
+                  aria-hidden="true" 
+                  className={`absolute top-1/2 -translate-y-1/2 bg-accent-primary shadow-[0_0_8px_var(--accent-primary)] z-20 pointer-events-none transition-all duration-200 ${
+                    mobile
+                      ? "left-0 w-1 h-5 rounded-full"
+                      : "-left-2 w-1 h-5 rounded-r-full"
+                  }`}
+                />
+              )}
+
+              <Link
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative flex items-center rounded-2xl active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary ${
+                  isCollapsed ? "justify-center" : ""
+                } ${
+                  isActive
+                    ? isCollapsed
+                      ? "bg-accent-primary/20 border-2 border-accent-primary text-[var(--accent-text,var(--accent-primary))] shadow-[0_0_12px_var(--accent-primary-dim)] font-semibold"
+                      : "bg-accent-primary/20 border border-accent-primary/40 text-[var(--accent-text,var(--accent-primary))] shadow-[0_0_12px_var(--accent-primary-dim)] font-semibold"
+                    : isCollapsed
+                      ? "bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] border border-[var(--border-subtle)] text-[var(--sidebar-fg,var(--text-secondary))] hover:text-[var(--accent-text,var(--accent-primary))] hover:border-accent-primary/50 hover:shadow-[0_0_12px_var(--accent-primary-dim)]"
+                      : "text-[var(--sidebar-fg,var(--text-secondary))] hover:text-[var(--accent-text,var(--accent-primary))] hover:bg-[var(--surface-raised)] hover:border-[var(--border-subtle)] hover:shadow-[0_0_12px_var(--accent-primary-dim)] border border-transparent"
+                }`}
+                style={{
+                  width: isCollapsed ? "40px" : "100%",
+                  height: "40px",
+                  margin: isCollapsed ? "0 auto" : "0",
+                  transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s, border-color 0.2s, box-shadow 0.2s",
+                }}
+              >
+                {/* Fixed icon centering wrapper */}
+                <div 
+                  className={`flex items-center justify-center transition-colors duration-200 ${
+                    isCollapsed ? "w-full h-full" : "w-10 h-10 shrink-0"
+                  } ${
+                    isActive ? "text-[var(--accent-text,var(--accent-primary))]" : "text-[var(--sidebar-fg,var(--text-secondary))] group-hover:text-[var(--accent-text,var(--accent-primary))]"
+                  }`}
+                >
+                  {item.icon}
+                </div>
+
+                {/* Label + Badge (smooth fade/glide with no overflow wrap) */}
+                <div
+                  className={`flex items-center overflow-hidden ${
+                    isCollapsed ? "w-0 p-0 m-0 pointer-events-none opacity-0" : "flex-1 min-w-0 pr-2.5 opacity-100"
+                  }`}
+                  style={{
+                    opacity: isCollapsed ? 0 : 1,
+                    width: isCollapsed ? 0 : undefined,
+                    paddingRight: isCollapsed ? 0 : undefined,
+                    transform: isCollapsed ? "translateX(-6px)" : "translateX(0)",
+                    transition: isCollapsed
+                      ? "opacity 0.15s ease-out, transform 0.15s ease-out, width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s"
+                      : "opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s",
+                    whiteSpace: "nowrap",
+                    pointerEvents: isCollapsed ? "none" : "auto",
+                  }}
+                >
+                  <span className="truncate font-['Rajdhani'] font-semibold tracking-wide text-sm">
                     {item.label}
                   </span>
                   {"badge" in item && item.badge && (
                     <span
-                      className="ml-auto text-[8px] font-bold tracking-widest px-1.5 py-0.5 rounded border"
-                      style={{
-                        color: isActive ? "var(--accent-text-light)" : "var(--text-muted)",
-                        background: "var(--accent-primary-dim)",
-                        borderColor: "var(--accent-primary-mid)",
-                      }}
+                      className="ml-auto text-[8px] font-bold tracking-widest px-1.5 py-0.5 rounded-full border border-accent-primary/40 bg-accent-primary/20 text-[var(--accent-text,var(--accent-primary))]"
                     >
                       {item.badge}
                     </span>
                   )}
-                </>
+                </div>
+              </Link>
+
+              {/* Floating Tooltip when Collapsed */}
+              {isCollapsed && (
+                <div 
+                  role="tooltip"
+                  className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-text-primary uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-[var(--border-subtle)] flex items-center gap-1.5"
+                >
+                  <span>{item.label}</span>
+                  {"badge" in item && item.badge && (
+                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-accent-primary/25 text-accent-primary-light border border-accent-primary/40">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
               )}
-            </Link>
+            </div>
           );
         })}
+
+        {user?.isAdmin && (
+          <div key="/admin/background-studio" className="relative group">
+            {pathname === "/admin/background-studio" && (
+              <span
+                aria-hidden="true"
+                className={`absolute top-1/2 -translate-y-1/2 bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-20 pointer-events-none transition-all duration-200 ${
+                  mobile ? "left-0 w-1 h-5 rounded-full" : "-left-2 w-1 h-5 rounded-r-full"
+                }`}
+              />
+            )}
+            <Link
+              href="/admin/background-studio"
+              aria-current={pathname === "/admin/background-studio" ? "page" : undefined}
+              className={`relative flex items-center rounded-2xl active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 ${
+                isCollapsed ? "justify-center" : ""
+              } ${
+                pathname === "/admin/background-studio"
+                  ? isCollapsed
+                    ? "bg-amber-500/20 border-2 border-amber-500 text-amber-600 dark:text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.2)] font-semibold"
+                    : "bg-amber-500/20 border border-amber-500/40 text-amber-600 dark:text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.2)] font-semibold"
+                  : isCollapsed
+                    ? "bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] border border-[var(--border-subtle)] text-[var(--sidebar-fg,var(--text-secondary))] hover:text-amber-500 hover:border-amber-500/50"
+                    : "text-[var(--sidebar-fg,var(--text-secondary))] hover:text-amber-500 hover:bg-[var(--surface-raised)] hover:border-amber-500/30 border border-transparent"
+              }`}
+              style={{
+                width: isCollapsed ? "40px" : "100%",
+                height: "40px",
+                margin: isCollapsed ? "0 auto" : "0",
+                transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s, border-color 0.2s, box-shadow 0.2s",
+              }}
+            >
+              <div 
+                className={`flex items-center justify-center transition-colors duration-200 ${
+                  isCollapsed ? "w-full h-full" : "w-10 h-10 shrink-0"
+                } ${
+                  pathname === "/admin/background-studio" ? "text-amber-500 dark:text-amber-400" : "text-text-secondary group-hover:text-amber-500 dark:group-hover:text-amber-400"
+                }`}
+              >
+                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+
+              <div
+                className={`flex items-center overflow-hidden ${
+                  isCollapsed ? "w-0 p-0 m-0 pointer-events-none opacity-0" : "flex-1 min-w-0 pr-2.5 opacity-100"
+                }`}
+                style={{
+                  opacity: isCollapsed ? 0 : 1,
+                  width: isCollapsed ? 0 : undefined,
+                  paddingRight: isCollapsed ? 0 : undefined,
+                  transform: isCollapsed ? "translateX(-6px)" : "translateX(0)",
+                  transition: isCollapsed
+                    ? "opacity 0.15s ease-out, transform 0.15s ease-out, width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s"
+                    : "opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s",
+                  whiteSpace: "nowrap",
+                  pointerEvents: isCollapsed ? "none" : "auto",
+                }}
+              >
+                <span className="truncate font-['Rajdhani'] font-semibold tracking-wide text-sm">
+                  Studio
+                </span>
+                <span className="ml-auto text-[8px] font-bold tracking-widest px-1.5 py-0.5 rounded-full border border-amber-500/40 bg-amber-500/20 text-amber-600 dark:text-amber-300">
+                  ADMIN
+                </span>
+              </div>
+            </Link>
+
+            {isCollapsed && (
+              <div
+                role="tooltip"
+                className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-amber-500 dark:text-amber-300 uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-amber-500/30 flex items-center gap-1.5"
+              >
+                Background Studio
+              </div>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* ─── Logout ──────────────────────────────────── */}
-      <div className="px-4">
-        <button
-          onClick={logout}
-          className={`flex items-center text-sm transition-all duration-200 w-full hover:bg-bg-shadow/50 hover:scale-[1.02] active:scale-[0.98] rounded ${
-            isCollapsed ? "justify-center p-2" : "gap-2 px-3 py-2"
-          }`}
-          style={{
-            color: "var(--text-muted)",
-            fontFamily: "'Rajdhani', sans-serif",
-            fontWeight: 600,
-          }}
-          title={isCollapsed ? "Logout" : undefined}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          {!isCollapsed && <span>Logout</span>}
-        </button>
+      <div className="px-0.5 pt-2 mt-auto border-t border-[var(--border-subtle)] relative z-10">
+        <div className="relative group">
+          <button
+            onClick={logout}
+            className={`flex items-center text-sm rounded-2xl bg-[var(--surface-2)] hover:bg-rose-500/15 border border-[var(--border-subtle)] hover:border-rose-500/30 text-[var(--text-muted)] hover:text-rose-500 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50 shadow-sm overflow-hidden ${
+              isCollapsed ? "justify-center" : ""
+            }`}
+            style={{
+              fontFamily: "'Rajdhani', sans-serif",
+              fontWeight: 600,
+              width: isCollapsed ? "40px" : "100%",
+              height: "40px",
+              margin: isCollapsed ? "0 auto" : "0",
+              transition: "width 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s, border-color 0.2s, box-shadow 0.2s",
+            }}
+            aria-label="Logout"
+            title={isCollapsed ? undefined : "Logout"}
+          >
+            <div className={`flex items-center justify-center ${isCollapsed ? "w-full h-full" : "w-10 h-10 shrink-0"}`}>
+              <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </div>
+            <span
+              className={`overflow-hidden ${
+                isCollapsed ? "w-0 p-0 m-0 pointer-events-none opacity-0" : "flex-1 min-w-0 pr-2.5 opacity-100"
+              }`}
+              style={{
+                opacity: isCollapsed ? 0 : 1,
+                width: isCollapsed ? 0 : undefined,
+                paddingRight: isCollapsed ? 0 : undefined,
+                transform: isCollapsed ? "translateX(-6px)" : "translateX(0)",
+                transition: isCollapsed
+                  ? "opacity 0.15s ease-out, transform 0.15s ease-out, width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s"
+                  : "opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.08s, width 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s",
+                whiteSpace: "nowrap",
+                pointerEvents: isCollapsed ? "none" : "auto",
+              }}
+            >
+              Logout
+            </span>
+          </button>
+
+          {/* Floating Tooltip when Collapsed */}
+          {isCollapsed && (
+            <div 
+              role="tooltip"
+              className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-rose-500 dark:text-rose-400 uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-rose-500/30"
+            >
+              Logout
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ─── Mobile Drawer Notifications Full-Panel View ───────────── */}
@@ -525,7 +856,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
               initial={{ opacity: 0, x: "100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 350 }}
+              transition={MOTION_SPRING.drawer}
               className="absolute inset-0 z-50 bg-bg-panel p-4 flex flex-col h-full overflow-hidden shadow-2xl"
             >
               {/* Header with Back button */}
@@ -562,7 +893,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
                 {notifications.length === 0 ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
                     <div className="w-12 h-12 rounded-xl bg-bg-abyss border border-border-subtle flex items-center justify-center text-xl mb-2 text-text-muted">
-                      🔔
+                      <Bell className="w-6 h-6 text-text-muted" />
                     </div>
                     <p className="text-sm font-['Rajdhani'] font-bold text-text-muted uppercase tracking-wider">
                       No Recent Messages
@@ -575,35 +906,35 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
                   notifications.map((n) => {
                     const content = n.content || "";
                     let badgeLabel = n.type || "SYSTEM";
-                    let badgeStyle = "bg-blue-500/20 text-blue-400 border-blue-500/30";
+                    let badgeStyle = "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30";
 
                     if (content.includes("[FRIEND_REQUEST]") || content.toLowerCase().includes("friend request")) {
                       badgeLabel = "FRIEND REQUEST";
-                      badgeStyle = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+                      badgeStyle = "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30";
                     } else if (content.includes("[GROUP_ADDED]") || content.toLowerCase().includes("added you to the group")) {
                       badgeLabel = "GROUP";
-                      badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
+                      badgeStyle = "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30";
                     } else if (content.includes("[DIRECT_MESSAGE]") || content.toLowerCase().includes("direct message")) {
                       badgeLabel = "DIRECT MESSAGE";
-                      badgeStyle = "bg-sky-500/20 text-sky-400 border-sky-500/30";
+                      badgeStyle = "bg-sky-500/15 text-sky-700 dark:text-sky-400 border-sky-500/30";
                     } else if (content.includes("[GROUP_CHAT]") || content.toLowerCase().includes("group chat")) {
                       badgeLabel = "GROUP CHAT";
-                      badgeStyle = "bg-purple-500/20 text-purple-400 border-purple-500/30";
+                      badgeStyle = "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30";
                     } else if (content.includes("[ACHIEVEMENT]") || n.type === "REWARD") {
                       badgeLabel = "ACHIEVEMENT";
-                      badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+                      badgeStyle = "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30";
                     } else if (n.type === "LEVEL_UP" || content.toLowerCase().includes("level up")) {
                       badgeLabel = "LEVEL UP";
-                      badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+                      badgeStyle = "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30";
                     } else if (n.type === "STREAK" || content.toLowerCase().includes("streak")) {
                       badgeLabel = "STREAK";
-                      badgeStyle = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+                      badgeStyle = "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30";
                     } else if (n.type === "QUEST" || content.toLowerCase().includes("quest")) {
                       badgeLabel = "QUEST";
-                      badgeStyle = "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
+                      badgeStyle = "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30";
                     } else if (n.type === "WARNING") {
                       badgeLabel = "ALERT";
-                      badgeStyle = "bg-red-500/20 text-red-400 border-red-500/30";
+                      badgeStyle = "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30";
                     }
 
                     const cleanContent = content.replace(/^\[[A-Z_]+\]\s*/, "");

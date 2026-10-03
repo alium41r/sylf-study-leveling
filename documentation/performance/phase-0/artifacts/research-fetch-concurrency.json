@@ -1,0 +1,47 @@
+{
+  "pages": 6,
+  "concurrency": 3,
+  "sequentialMs": 16736,
+  "wavedMs": 6151,
+  "savedMs": 10585,
+  "speedup": 2.72,
+  "sameOutcome": true,
+  "perPage": [
+    {
+      "host": "cambridgeinternational.org",
+      "ok": true,
+      "sequentialChars": 55,
+      "wavedChars": 55
+    },
+    {
+      "host": "youtube.com",
+      "ok": true,
+      "sequentialChars": 321,
+      "wavedChars": 321
+    },
+    {
+      "host": "scribd.com",
+      "ok": true,
+      "sequentialChars": 2630,
+      "wavedChars": 2630
+    },
+    {
+      "host": "reddit.com",
+      "ok": true,
+      "sequentialChars": 6,
+      "wavedChars": 6
+    },
+    {
+      "host": "syllabus.papacambridge.com",
+      "ok": true,
+      "sequentialChars": 3235,
+      "wavedChars": 3235
+    },
+    {
+      "host": "iitianacademy.com",
+      "ok": true,
+      "sequentialChars": 2804,
+      "wavedChars": 2804
+    }
+  ]
+}

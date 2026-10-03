@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import {
   Calendar,
   Lock,
-  Sparkles,
   X,
   Clock,
   AlertCircle,
@@ -13,13 +12,24 @@ import {
   RotateCcw,
   CheckCircle2,
 } from "lucide-react";
+import { SystemApertureIcon } from "@/app/components/icons";
+import CustomDatePicker from "./CustomDatePicker";
 
 export interface QuotaInfo {
   used: number;
-  limit: number;
-  remaining: number;
+  /** `null` when the account holds the unlimited entitlement (no finite cap). */
+  limit: number | null;
+  /** `null` when the account holds the unlimited entitlement. */
+  remaining: number | null;
   resetsAt: string;
   allowed?: boolean;
+  /**
+   * Explicit unlimited state for a configured owner account. Server-derived
+   * from the authenticated session only — the client can neither set nor
+   * request it. The UI must branch on this flag rather than inventing a
+   * large placeholder number.
+   */
+  unlimited?: boolean;
 }
 
 interface AiPlannerPanelProps {
@@ -65,7 +75,6 @@ export default function AiPlannerPanel({
   const [successResult, setSuccessResult] = useState<any>(null);
 
   const thoughtsEndRef = useRef<HTMLDivElement>(null);
-  const dateInputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Sync prop quota to local quota
@@ -109,8 +118,12 @@ export default function AiPlannerPanel({
     }
   }, [thoughts]);
 
+  // An unlimited account is never exhausted: its `remaining` is deliberately
+  // `null`, which must not be read as "0 left".
   const isQuotaExhausted =
-    localQuota !== null && (localQuota.remaining === 0 || localQuota.allowed === false);
+    localQuota !== null &&
+    !localQuota.unlimited &&
+    (localQuota.remaining === 0 || localQuota.allowed === false);
 
   const formatResetTime = (isoString?: string) => {
     if (!isoString) return "Midnight (12:00 AM)";
@@ -215,10 +228,19 @@ export default function AiPlannerPanel({
                 } else if (data.type === "result") {
                   setThoughts((prev) => [...prev, "Plan finalized and quests created!"]);
 
+                  // Server-supplied quota is authoritative. The local fallback
+                  // only applies when it is absent: it must keep an unlimited
+                  // account unlimited instead of faking an exhausted state.
+                  const nextQuota: QuotaInfo = data.quota || {
+                    used: (localQuota?.used ?? 0) + 1,
+                    limit: localQuota?.unlimited ? null : localQuota?.limit ?? 1,
+                    remaining: localQuota?.unlimited ? null : 0,
+                    allowed: localQuota?.unlimited === true,
+                    unlimited: localQuota?.unlimited === true,
+                    resetsAt: localQuota?.resetsAt || new Date().toISOString(),
+                  };
+                  setLocalQuota(nextQuota);
                   if (onQuotaRefresh) onQuotaRefresh();
-                  setLocalQuota((prev) =>
-                    prev ? { ...prev, used: prev.used + 1, remaining: 0, allowed: false } : null
-                  );
 
                   setIsGenerating(false);
                   setSuccess(true);
@@ -270,7 +292,7 @@ export default function AiPlannerPanel({
             <CheckCircle2 className="w-10 h-10" />
           </div>
           <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-bg-abyss border border-border-subtle text-accent-text-light">
-            <Sparkles className="w-4 h-4" />
+            <SystemApertureIcon size={16} />
           </div>
         </div>
 
@@ -290,8 +312,16 @@ export default function AiPlannerPanel({
             <button
               type="button"
               onClick={onViewConversation}
-              className="btn-primary py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2"
-              style={{ fontFamily: "'Rajdhani', sans-serif" }}
+              className="py-2.5 px-5 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-all hover:brightness-105 active:scale-95"
+              style={{
+                fontFamily: "'Rajdhani', sans-serif",
+                fontWeight: 700,
+                background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
+                color: "#ffffff",
+                textShadow: "0 1px 2px rgba(0, 0, 0, 0.35)",
+                boxShadow: "0 4px 14px var(--accent-primary-dim, rgba(134, 170, 244, 0.25))",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+              }}
             >
               <MessageSquare className="w-3.5 h-3.5" />
               <span>View Conversation</span>
@@ -312,45 +342,48 @@ export default function AiPlannerPanel({
 
   if (isQuotaExhausted && !isGenerating) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-6 px-4 space-y-5">
+      <div className="flex flex-col items-center justify-center text-center py-8 px-4 space-y-5 relative">
+        {/* Ambient amber glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
         {/* Glowing Lock Icon */}
         <div className="relative">
-          <div className="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
-            <Lock className="w-10 h-10 animate-pulse" />
+          <div className="w-20 h-20 rounded-2xl bg-amber-500/10 border border-amber-500/35 flex items-center justify-center text-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.22)] backdrop-blur-sm">
+            <Lock className="w-9 h-9 animate-pulse" />
           </div>
-          <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-bg-abyss border border-border-subtle text-amber-400">
+          <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-[#0d1117] border border-amber-500/40 text-amber-400 shadow-md">
             <Clock className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="space-y-2 max-w-md">
-          <h3 className="text-xl font-bold font-['Rajdhani'] text-text-primary tracking-wide">
+        <div className="space-y-2 max-w-md relative z-10">
+          <h3 className="text-xl sm:text-2xl font-bold font-['Rajdhani'] text-text-primary tracking-wide uppercase">
             Weekly Planner Quota Reached
           </h3>
-          <p className="text-xs text-text-secondary font-['Rajdhani'] leading-relaxed">
+          <p className="text-xs sm:text-sm text-text-secondary font-['Rajdhani'] leading-relaxed">
             You have already used your{" "}
-            <span className="text-amber-400 font-bold">1 free AI Study Plan</span> for today. Free
+            <span className="text-amber-400 font-bold">1 free AI Study Plan</span> for this week. Free
             tier accounts receive 1 comprehensive multi-week syllabus generation per week.
           </p>
         </div>
 
         {/* Reset Information Card */}
-        <div className="w-full max-w-sm p-4 rounded-xl bg-bg-abyss/80 border border-border-subtle flex items-center justify-between text-xs font-['Rajdhani']">
+        <div className="w-full max-w-sm p-4 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-md flex items-center justify-between text-xs font-['Rajdhani'] relative z-10 shadow-sm">
           <div className="flex items-center gap-2.5 text-text-muted">
             <Clock className="w-4 h-4 text-accent-text-light" />
-            <span>Daily Quota Reset:</span>
+            <span className="font-semibold text-text-secondary">Quota Reset:</span>
           </div>
-          <span className="font-bold font-mono text-accent-text-light">
+          <span className="font-bold font-mono text-accent-text-light bg-accent-primary/10 border border-accent-primary/25 px-2.5 py-1 rounded-lg">
             {formatResetTime(localQuota?.resetsAt)}
           </span>
         </div>
 
         {!embedded && (
-          <div className="w-full max-w-sm pt-2">
+          <div className="w-full max-w-sm pt-2 relative z-10">
             <button
               type="button"
               onClick={() => (onClose ? onClose() : resetForm())}
-              className="w-full py-3 rounded-xl bg-bg-panel hover:bg-bg-shadow border border-border-subtle hover:border-accent-primary text-xs font-['Rajdhani'] font-bold text-text-primary uppercase tracking-wider transition-all shadow-sm"
+              className="w-full py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-accent-primary/50 text-xs font-['Rajdhani'] font-bold text-text-primary uppercase tracking-wider transition-all shadow-sm active:scale-98"
             >
               Close Planner
             </button>
@@ -376,7 +409,7 @@ export default function AiPlannerPanel({
               transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
             />
             <div className="absolute inset-0 flex items-center justify-center text-accent-text-light">
-              <Sparkles className="w-7 h-7 animate-pulse" />
+              <SystemApertureIcon size={26} className="animate-pulse" />
             </div>
           </div>
         </div>
@@ -419,7 +452,7 @@ export default function AiPlannerPanel({
 
       {/* Subject / Master Topic */}
       <div>
-        <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted mb-1.5">
+        <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary mb-1.5">
           What do you want to master?
         </label>
         <input
@@ -431,80 +464,29 @@ export default function AiPlannerPanel({
         />
       </div>
 
-      {/* Deadline Date Picker Container with Visual Button */}
+      {/* Custom In-App Calendar Date Picker */}
       <div>
         <div className="flex justify-between items-center mb-1.5">
-          <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted">
+          <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary">
             Deadline / Exam Date (Optional)
           </label>
           {targetDate && (
-            <span className="text-[10px] text-accent-text-light font-mono font-bold">
-              Selected: {targetDate}
+            <span className="text-[11px] text-accent-text-light font-mono font-bold">
+              {targetDate}
             </span>
           )}
         </div>
 
-        <div className="relative flex items-center group">
-          <input
-            ref={dateInputRef}
-            type="date"
-            value={targetDate}
-            onChange={(e) => setTargetDate(e.target.value)}
-            min={new Date().toISOString().split("T")[0]}
-            className="w-full rounded-xl px-4 py-3 pl-11 pr-24 bg-bg-void border border-border-subtle text-xs font-['Rajdhani'] text-text-primary focus:outline-none focus:border-accent-primary transition-all shadow-inner cursor-pointer"
-            style={{ colorScheme: "dark" }}
-            onClick={() => {
-              try {
-                dateInputRef.current?.showPicker();
-              } catch {}
-            }}
-          />
-
-          {/* Left Calendar Icon */}
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-accent-text-light flex items-center">
-            <Calendar className="w-4 h-4" />
-          </div>
-
-          {/* Right Visual Action Buttons */}
-          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-            {targetDate && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setTargetDate("");
-                }}
-                className="p-1.5 rounded-lg hover:bg-rose-500/20 text-text-muted hover:text-rose-400 transition-colors"
-                title="Clear date"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => {
-                try {
-                  dateInputRef.current?.showPicker();
-                } catch {}
-              }}
-              className="px-2.5 py-1.5 rounded-lg bg-bg-abyss hover:bg-bg-shadow border border-border-subtle hover:border-accent-primary text-accent-text-light text-[11px] font-['Rajdhani'] font-bold flex items-center gap-1.5 transition-all shadow-sm"
-              title="Pick Deadline Date"
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Pick Date</span>
-            </button>
-          </div>
-        </div>
-
-        <p className="text-[11px] text-text-muted font-['Rajdhani'] mt-1">
-          Leave blank for continuous learning with no strict deadlines.
-        </p>
+        <CustomDatePicker
+          value={targetDate}
+          onChange={setTargetDate}
+          placeholder="Pick deadline or target exam date..."
+        />
       </div>
 
       {/* Syllabus / Topics */}
       <div>
-        <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted mb-1.5">
+        <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary mb-1.5">
           Syllabus / Topics (Optional)
         </label>
         <textarea
@@ -519,8 +501,8 @@ export default function AiPlannerPanel({
       {/* Target Effort Level Slider */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted">
-            Target Effort Level
+          <label className="block text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary">
+            Target Effort
           </label>
           <span className="text-xs text-accent-text-light font-bold font-['Rajdhani'] bg-accent-primary-dim px-3 py-1 rounded-full border border-accent-primary-mid">
             {effortLevel} hrs / week
@@ -536,9 +518,8 @@ export default function AiPlannerPanel({
           style={{ accentColor: "var(--accent-primary)" }}
         />
         <div className="flex justify-between text-[10px] text-text-muted mt-1.5 font-['Rajdhani'] font-medium">
-          <span>Chill (1 hr)</span>
-          <span>Moderate (15 hrs)</span>
-          <span>Intense (40 hrs)</span>
+          <span>1 hr / wk</span>
+          <span>40 hrs / wk</span>
         </div>
       </div>
 
@@ -546,14 +527,16 @@ export default function AiPlannerPanel({
       <button
         type="button"
         onClick={handleGenerate}
-        className="w-full btn-primary py-3.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider mt-2 flex items-center justify-center gap-2 shadow-md transition-all"
+        className="w-full py-3.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider mt-2 flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:brightness-105 active:scale-[0.99]"
         style={{
           background: "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-          color: "var(--text-primary)",
-          border: "none",
+          color: "#ffffff",
+          textShadow: "0 1px 2px rgba(0, 0, 0, 0.35)",
+          boxShadow: "0 4px 16px var(--accent-primary-dim, rgba(134, 170, 244, 0.25))",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
         }}
       >
-        <Sparkles className="w-4 h-4" />
+        <SystemApertureIcon size={16} />
         <span>Generate AI Study Plan</span>
       </button>
     </div>

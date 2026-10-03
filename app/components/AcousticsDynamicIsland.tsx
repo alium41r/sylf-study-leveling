@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { useAcoustics } from "./AcousticsContext";
+import { useCustomAudio } from "./CustomAudioContext";
 import { useSettings } from "./SettingsContext";
 
 const STORAGE_KEY = "scholar_audio_controller_pos";
@@ -17,19 +18,65 @@ interface Position {
   y: number;
 }
 
+function CustomAudioIslandSeeker({
+  customAudio,
+}: {
+  customAudio: ReturnType<typeof useCustomAudio>;
+}) {
+  const [time, setTime] = useState<number>(0);
+  const isDraggingRef = useRef(false);
+
+  useEffect(() => {
+    return customAudio.subscribeToTime((t) => {
+      if (!isDraggingRef.current) {
+        setTime(t);
+      }
+    });
+  }, [customAudio]);
+
+  const duration = customAudio.duration || customAudio.activeEntry?.duration || 0;
+  const formatTime = (secs: number) => {
+    if (!isFinite(secs) || secs < 0) return "0:00";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div
+      className="flex flex-col gap-1 bg-bg-abyss/80 px-2.5 py-1.5 rounded-xl border border-border-subtle"
+      onPointerDownCapture={(e) => e.stopPropagation()}
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono text-text-muted">
+        <span>{formatTime(time)}</span>
+        <span>{formatTime(duration)}</span>
+      </div>
+      <input
+        type="range"
+        min="0"
+        max={duration > 0 ? duration : 100}
+        step="0.5"
+        value={time}
+        onPointerDown={() => {
+          isDraggingRef.current = true;
+        }}
+        onChange={(e) => {
+          setTime(Number(e.target.value));
+        }}
+        onPointerUp={(e) => {
+          isDraggingRef.current = false;
+          customAudio.seek(Number((e.target as HTMLInputElement).value));
+        }}
+        className="w-full accent-[var(--accent-primary)] h-1 cursor-pointer bg-bg-void rounded"
+        aria-label="Seek custom audio"
+      />
+    </div>
+  );
+}
+
 export function AcousticsDynamicIsland() {
-  const {
-    activeTrack,
-    isPlaying,
-    masterVolume,
-    layerVolumes,
-    frequencyData,
-    togglePlay,
-    playNextTrack,
-    playPreviousTrack,
-    setMasterVolume,
-    setLayerVolume,
-  } = useAcoustics();
+  const acoustics = useAcoustics();
+  const customAudio = useCustomAudio();
 
   const { isOpen: isSettingsOpen } = useSettings();
   const pathname = usePathname();
@@ -37,8 +84,9 @@ export function AcousticsDynamicIsland() {
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [showLayerMixer, setShowLayerMixer] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isPausedRetained, setIsPausedRetained] = useState<boolean>(false);
+  const [prevPlaying, setPrevPlaying] = useState<boolean>(false);
   const [position, setPosition] = useState<Position | null>(null);
   const [viewportBounds, setViewportBounds] = useState<{ width: number; height: number }>({
     width: 1200,
@@ -48,6 +96,75 @@ export function AcousticsDynamicIsland() {
   const autoHideTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isDraggingRef = useRef<boolean>(false);
   const dragStartPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  // ─── Unified Audio Source Determination ────────────────────
+  const isCustomActive = Boolean(
+    customAudio.isPlaying || (customAudio.activeTrackId && !acoustics.isPlaying)
+  );
+  const activeCustomTrack = customAudio.activeEntry;
+  const hasActiveTrack = isCustomActive
+    ? Boolean(activeCustomTrack)
+    : Boolean(acoustics.activeTrack);
+
+  const currentTitle = isCustomActive
+    ? activeCustomTrack?.title || "Custom Audio"
+    : acoustics.activeTrack?.title || "";
+
+  const currentCategory = isCustomActive
+    ? activeCustomTrack?.mimeType.split("/")[1]?.toUpperCase() || "CUSTOM"
+    : acoustics.activeTrack?.category || "NATURE";
+
+  const currentSubtitle = isCustomActive
+    ? activeCustomTrack?.originalFilename || "Local File"
+    : acoustics.activeTrack?.frequency || acoustics.activeTrack?.category || "";
+
+  const currentIsPlaying = isCustomActive ? customAudio.isPlaying : acoustics.isPlaying;
+  const currentVolume = isCustomActive ? customAudio.volume : acoustics.masterVolume;
+
+  // Track play/pause state transitions during render
+  if (prevPlaying && !currentIsPlaying) {
+    setPrevPlaying(false);
+    setIsPausedRetained(true);
+  } else if (!prevPlaying && currentIsPlaying) {
+    setPrevPlaying(true);
+    if (isPausedRetained) {
+      setIsPausedRetained(false);
+    }
+  }
+
+  const handleTogglePlay = () => {
+    if (isCustomActive) {
+      if (acoustics.isPlaying) acoustics.pause();
+      customAudio.togglePlay();
+    } else {
+      if (customAudio.isPlaying) customAudio.pause();
+      acoustics.togglePlay();
+    }
+  };
+
+  const handlePlayNext = () => {
+    if (isCustomActive) {
+      customAudio.playNextTrack();
+    } else {
+      acoustics.playNextTrack();
+    }
+  };
+
+  const handlePlayPrev = () => {
+    if (isCustomActive) {
+      customAudio.playPreviousTrack();
+    } else {
+      acoustics.playPreviousTrack();
+    }
+  };
+
+  const handleSetVolume = (vol: number) => {
+    if (isCustomActive) {
+      customAudio.setVolume(vol);
+    } else {
+      acoustics.setMasterVolume(vol);
+    }
+  };
 
   // ─── Initialize Coordinates & Viewport Listener ────────────
   useEffect(() => {
@@ -64,7 +181,9 @@ export function AcousticsDynamicIsland() {
           const clampedY = Math.max(PADDING, Math.min(vh - PILL_HEIGHT - PADDING, parsed.y));
           setPosition({ x: clampedX, y: clampedY });
           return;
-        } catch (e) {}
+        } catch {
+          // ignore parsing error
+        }
       }
 
       // Default bottom-right positioning
@@ -86,12 +205,10 @@ export function AcousticsDynamicIsland() {
       autoHideTimerRef.current = null;
     }
 
-    if (isPlaying) {
-      setIsVisible(true);
-    } else if (activeTrack && isVisible) {
+    if (isPausedRetained && !currentIsPlaying) {
       if (!isHovered && !isExpanded) {
         autoHideTimerRef.current = setTimeout(() => {
-          setIsVisible(false);
+          setIsPausedRetained(false);
         }, 5000);
       }
     }
@@ -101,7 +218,7 @@ export function AcousticsDynamicIsland() {
         clearTimeout(autoHideTimerRef.current);
       }
     };
-  }, [isPlaying, activeTrack, isHovered, isExpanded]);
+  }, [isPausedRetained, currentIsPlaying, isHovered, isExpanded]);
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -113,9 +230,9 @@ export function AcousticsDynamicIsland() {
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    if (!isPlaying && !isExpanded && activeTrack) {
+    if (isPausedRetained && !currentIsPlaying && !isExpanded) {
       autoHideTimerRef.current = setTimeout(() => {
-        setIsVisible(false);
+        setIsPausedRetained(false);
       }, 5000);
     }
   };
@@ -128,7 +245,7 @@ export function AcousticsDynamicIsland() {
     }
   };
 
-  const handleDragEnd = (_: any, info: PanInfo) => {
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
     setTimeout(() => {
       isDraggingRef.current = false;
     }, 60);
@@ -147,7 +264,9 @@ export function AcousticsDynamicIsland() {
     setPosition(newPos);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newPos));
-    } catch (e) {}
+    } catch {
+      // ignore storage error
+    }
   };
 
   const handlePillClick = () => {
@@ -156,28 +275,56 @@ export function AcousticsDynamicIsland() {
     }
   };
 
+  // Dynamic rhythmic pulse for custom audio
+  const [customPulse, setCustomPulse] = useState(0);
+  useEffect(() => {
+    if (!currentIsPlaying || !isCustomActive) return;
+    const interval = setInterval(() => {
+      setCustomPulse((prev) => (prev + 1) % 4);
+    }, 180);
+    return () => clearInterval(interval);
+  }, [currentIsPlaying, isCustomActive]);
+
   // ─── Suppression Rules ─────────────────────────────────────
   const isSettingsRoute = pathname?.startsWith("/settings");
-  if (!activeTrack || !isVisible || isSettingsRoute || isSettingsOpen || !position) {
+  if (!position || !hasActiveTrack) {
     return null;
   }
+  const isVisible = Boolean(
+    currentIsPlaying ||
+    isPausedRetained ||
+    isExpanded ||
+    (isHovered && hasActiveTrack)
+  );
+  const shouldShow = Boolean(isVisible && !isSettingsRoute && !isSettingsOpen);
 
   // ─── Directional Expansion Calculation ─────────────────────
-  // If in bottom half of viewport, expand upward; otherwise expand downward
   const opensUpward = position.y > viewportBounds.height / 2;
-  // If in right half of viewport, expand leftward; otherwise expand rightward
   const opensLeftward = position.x > viewportBounds.width / 2;
 
   // Mini Equalizer Bars
-  const miniBar1 = isPlaying ? Math.max(25, frequencyData[1] || 25) : 25;
-  const miniBar2 = isPlaying ? Math.max(35, frequencyData[6] || 35) : 25;
-  const miniBar3 = isPlaying ? Math.max(20, frequencyData[11] || 20) : 25;
+  const miniBar1 = currentIsPlaying
+    ? isCustomActive
+      ? [50, 85, 40, 95][customPulse]
+      : Math.max(25, acoustics.frequencyData[1] || 25)
+    : 25;
+  const miniBar2 = currentIsPlaying
+    ? isCustomActive
+      ? [80, 50, 95, 60][customPulse]
+      : Math.max(35, acoustics.frequencyData[6] || 35)
+    : 25;
+  const miniBar3 = currentIsPlaying
+    ? isCustomActive
+      ? [60, 90, 45, 75][customPulse]
+      : Math.max(20, acoustics.frequencyData[11] || 20)
+    : 25;
 
   return (
     <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden select-none">
       <AnimatePresence>
-        <motion.div
-          key="draggable-acoustics-anchor"
+        {shouldShow && (
+          <motion.div
+            key="draggable-acoustics-anchor"
           drag
           dragMomentum={false}
           dragElastic={0.05}
@@ -205,7 +352,7 @@ export function AcousticsDynamicIsland() {
               transformOrigin: `${opensLeftward ? "right" : "left"} ${opensUpward ? "bottom" : "top"}`,
             }}
             transition={{ type: "spring", stiffness: 450, damping: 32 }}
-            className={`bg-bg-panel/95 border border-border-subtle shadow-[0_12px_40px_rgba(0,0,0,0.22)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-colors ${
+            className={`bg-[var(--surface-1)]/95 text-[var(--text-primary)] border border-[var(--border-subtle)] shadow-[0_12px_40px_rgba(0,0,0,0.22)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl transition-colors ${
               isExpanded
                 ? "rounded-2xl p-5 w-[330px] sm:w-[350px]"
                 : "rounded-full px-4 py-2.5 w-[290px] sm:w-[310px] hover:border-accent-primary/60 hover:shadow-[0_0_20px_var(--accent-primary-dim)] opacity-90 hover:opacity-100 group"
@@ -244,21 +391,21 @@ export function AcousticsDynamicIsland() {
                       animate={{ height: `${miniBar1}%` }}
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className={`w-1 rounded-full ${
-                        isPlaying ? "bg-accent-primary" : "bg-text-muted"
+                        currentIsPlaying ? "bg-accent-primary" : "bg-text-muted"
                       }`}
                     />
                     <motion.div
                       animate={{ height: `${miniBar2}%` }}
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className={`w-1 rounded-full ${
-                        isPlaying ? "bg-accent-primary-light" : "bg-text-muted"
+                        currentIsPlaying ? "bg-accent-primary-light" : "bg-text-muted"
                       }`}
                     />
                     <motion.div
                       animate={{ height: `${miniBar3}%` }}
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className={`w-1 rounded-full ${
-                        isPlaying ? "bg-accent-primary" : "bg-text-muted"
+                        currentIsPlaying ? "bg-accent-primary" : "bg-text-muted"
                       }`}
                     />
                   </div>
@@ -267,10 +414,10 @@ export function AcousticsDynamicIsland() {
                 {/* Track Title & Category */}
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   <span className="text-xs font-bold font-['Rajdhani'] text-text-primary truncate">
-                    {activeTrack.title}
+                    {currentTitle}
                   </span>
                   <span className="text-[9px] font-bold font-['Rajdhani'] uppercase tracking-wider px-1.5 py-0.2 rounded bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid shrink-0 hidden sm:inline-block">
-                    {activeTrack.category}
+                    {currentCategory}
                   </span>
                 </div>
 
@@ -283,12 +430,12 @@ export function AcousticsDynamicIsland() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      togglePlay();
+                      handleTogglePlay();
                     }}
-                    className="w-7 h-7 rounded-full bg-accent-primary hover:opacity-90 active:scale-95 text-text-primary flex items-center justify-center transition-all shadow"
-                    title={isPlaying ? "Pause" : "Play"}
+                    className="w-7 h-7 rounded-full bg-accent-primary hover:opacity-90 active:scale-95 text-[var(--accent-foreground,#ffffff)] flex items-center justify-center transition-all shadow"
+                    title={currentIsPlaying ? "Pause" : "Play"}
                   >
-                    {isPlaying ? (
+                    {currentIsPlaying ? (
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                       </svg>
@@ -303,12 +450,12 @@ export function AcousticsDynamicIsland() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      playNextTrack();
+                      handlePlayNext();
                     }}
-                    className="w-6 h-6 rounded-full bg-bg-abyss hover:bg-bg-shadow text-text-secondary hover:text-text-primary flex items-center justify-center transition-all text-xs border border-border-subtle"
+                    className="w-6 h-6 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-raised)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center justify-center transition-all text-xs border border-[var(--border-subtle)]"
                     title="Next Track"
                   >
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
                     </svg>
                   </button>
@@ -329,16 +476,16 @@ export function AcousticsDynamicIsland() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className="text-[9px] font-bold font-['Rajdhani'] uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid">
-                        {activeTrack.category}
+                        {currentCategory}
                       </span>
-                      {activeTrack.frequency && (
+                      {currentSubtitle && (
                         <span className="text-[10px] text-text-muted font-['Rajdhani'] font-semibold truncate">
-                          {activeTrack.frequency}
+                          {currentSubtitle}
                         </span>
                       )}
                     </div>
                     <h4 className="text-sm font-bold font-['Rajdhani'] text-text-primary truncate">
-                      {activeTrack.title}
+                      {currentTitle}
                     </h4>
                   </div>
 
@@ -359,7 +506,12 @@ export function AcousticsDynamicIsland() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setIsExpanded(false)}
+                      onClick={() => {
+                        setIsExpanded(false);
+                        if (!currentIsPlaying) {
+                          setIsPausedRetained(false);
+                        }
+                      }}
                       className="w-7 h-7 rounded-lg bg-bg-abyss hover:bg-bg-shadow text-text-muted hover:text-text-primary flex items-center justify-center transition-all text-xs border border-border-subtle"
                       title="Collapse"
                     >
@@ -370,19 +522,29 @@ export function AcousticsDynamicIsland() {
 
                 {/* Live FFT Spectrum Visualizer */}
                 <div className="flex items-end gap-1.5 h-8 px-2.5 py-1 bg-bg-abyss/90 rounded-xl border border-border-subtle">
-                  {frequencyData.map((h, i) => (
+                  {(isCustomActive
+                    ? [30, 65, 90, 50, 75, 40, 85, 95, 60, 80, 45, 70, 88, 55, 35]
+                    : acoustics.frequencyData
+                  ).map((h, i) => (
                     <motion.div
                       key={i}
-                      animate={{ height: `${h}%` }}
+                      animate={{
+                        height: `${currentIsPlaying ? (isCustomActive ? Math.max(20, h * (customPulse % 2 === 0 ? 1 : 0.65)) : h) : 20}%`,
+                      }}
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className={`w-full rounded-full ${
-                        isPlaying
+                        currentIsPlaying
                           ? "bg-gradient-to-t from-accent-primary to-accent-primary-light"
                           : "bg-border-subtle"
                       }`}
                     />
                   ))}
                 </div>
+
+                {/* Custom Audio Seeker (if custom audio is active) */}
+                {isCustomActive && (
+                  <CustomAudioIslandSeeker customAudio={customAudio} />
+                )}
 
                 {/* Master Volume Slider */}
                 <div
@@ -396,12 +558,12 @@ export function AcousticsDynamicIsland() {
                     type="range"
                     min="0"
                     max="100"
-                    value={masterVolume}
-                    onChange={(e) => setMasterVolume(Number(e.target.value))}
+                    value={currentVolume}
+                    onChange={(e) => handleSetVolume(Number(e.target.value))}
                     className="w-full accent-[var(--accent-primary)] h-1 cursor-pointer"
                   />
                   <span className="text-xs font-['Rajdhani'] font-bold text-text-secondary w-7 text-right">
-                    {masterVolume}%
+                    {currentVolume}%
                   </span>
                 </div>
 
@@ -425,7 +587,7 @@ export function AcousticsDynamicIsland() {
                   <div className="flex items-center gap-2.5">
                     <button
                       type="button"
-                      onClick={playPreviousTrack}
+                      onClick={handlePlayPrev}
                       className="w-8 h-8 rounded-xl bg-bg-abyss hover:bg-bg-shadow text-text-secondary hover:text-text-primary flex items-center justify-center transition-all border border-border-subtle"
                       title="Previous Track"
                     >
@@ -436,11 +598,11 @@ export function AcousticsDynamicIsland() {
 
                     <button
                       type="button"
-                      onClick={togglePlay}
+                      onClick={handleTogglePlay}
                       className="w-9 h-9 rounded-xl bg-accent-primary hover:opacity-90 active:scale-95 text-white flex items-center justify-center transition-all shadow-md"
-                      title={isPlaying ? "Pause" : "Play"}
+                      title={currentIsPlaying ? "Pause" : "Play"}
                     >
-                      {isPlaying ? (
+                      {currentIsPlaying ? (
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
                         </svg>
@@ -453,7 +615,7 @@ export function AcousticsDynamicIsland() {
 
                     <button
                       type="button"
-                      onClick={playNextTrack}
+                      onClick={handlePlayNext}
                       className="w-8 h-8 rounded-xl bg-bg-abyss hover:bg-bg-shadow text-text-secondary hover:text-text-primary flex items-center justify-center transition-all border border-border-subtle"
                       title="Next Track"
                     >
@@ -481,12 +643,12 @@ export function AcousticsDynamicIsland() {
                           type="range"
                           min="0"
                           max="100"
-                          value={layerVolumes.rain}
-                          onChange={(e) => setLayerVolume("rain", Number(e.target.value))}
+                          value={acoustics.layerVolumes.rain}
+                          onChange={(e) => acoustics.setLayerVolume("rain", Number(e.target.value))}
                           className="w-full accent-[var(--accent-primary)] h-1 cursor-pointer"
                         />
                         <span className="text-[11px] text-text-secondary w-6 text-right">
-                          {layerVolumes.rain}%
+                          {acoustics.layerVolumes.rain}%
                         </span>
                       </div>
 
@@ -497,12 +659,12 @@ export function AcousticsDynamicIsland() {
                           type="range"
                           min="0"
                           max="100"
-                          value={layerVolumes.cafe}
-                          onChange={(e) => setLayerVolume("cafe", Number(e.target.value))}
+                          value={acoustics.layerVolumes.cafe}
+                          onChange={(e) => acoustics.setLayerVolume("cafe", Number(e.target.value))}
                           className="w-full accent-[var(--accent-primary)] h-1 cursor-pointer"
                         />
                         <span className="text-[11px] text-text-secondary w-6 text-right">
-                          {layerVolumes.cafe}%
+                          {acoustics.layerVolumes.cafe}%
                         </span>
                       </div>
 
@@ -513,12 +675,12 @@ export function AcousticsDynamicIsland() {
                           type="range"
                           min="0"
                           max="100"
-                          value={layerVolumes.keyboard}
-                          onChange={(e) => setLayerVolume("keyboard", Number(e.target.value))}
+                          value={acoustics.layerVolumes.keyboard}
+                          onChange={(e) => acoustics.setLayerVolume("keyboard", Number(e.target.value))}
                           className="w-full accent-[var(--accent-primary)] h-1 cursor-pointer"
                         />
                         <span className="text-[11px] text-text-secondary w-6 text-right">
-                          {layerVolumes.keyboard}%
+                          {acoustics.layerVolumes.keyboard}%
                         </span>
                       </div>
 
@@ -529,12 +691,12 @@ export function AcousticsDynamicIsland() {
                           type="range"
                           min="0"
                           max="100"
-                          value={layerVolumes.whitenoise}
-                          onChange={(e) => setLayerVolume("whitenoise", Number(e.target.value))}
+                          value={acoustics.layerVolumes.whitenoise}
+                          onChange={(e) => acoustics.setLayerVolume("whitenoise", Number(e.target.value))}
                           className="w-full accent-[var(--accent-primary)] h-1 cursor-pointer"
                         />
                         <span className="text-[11px] text-text-secondary w-6 text-right">
-                          {layerVolumes.whitenoise}%
+                          {acoustics.layerVolumes.whitenoise}%
                         </span>
                       </div>
                     </motion.div>
@@ -544,6 +706,7 @@ export function AcousticsDynamicIsland() {
             )}
           </motion.div>
         </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

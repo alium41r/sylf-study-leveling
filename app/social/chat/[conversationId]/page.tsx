@@ -478,12 +478,12 @@ export default function ModernChatPage({
       />
 
       {/* ─── Main Chat Viewport ────────────────────────────────── */}
-      <div className="system-card flex-1 flex flex-col min-h-0 rounded-xl sm:rounded-2xl bg-bg-panel/70 border border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden relative">
+      <div className="flex-1 flex flex-col min-h-0 rounded-2xl bg-bg-panel/75 border border-border-subtle shadow-2xl backdrop-blur-2xl overflow-hidden relative">
         {/* Message Stream Container */}
         <div
           ref={messagesContainerRef}
           onScroll={handleScroll}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar p-3 sm:p-5 space-y-3"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar p-3 sm:p-5 space-y-0.5"
           style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}
         >
           {filteredMessages.length === 0 ? (
@@ -504,25 +504,82 @@ export default function ModernChatPage({
             filteredMessages.map((msg, idx) => {
               const isMe = msg.senderId === user.id;
               const prevMsg = idx > 0 ? filteredMessages[idx - 1] : null;
-              
-              // Group consecutive messages from same sender within 5 minutes
-              const isSameSenderAsPrev = prevMsg?.senderId === msg.senderId;
-              const timeDiff = prevMsg
+              const nextMsg = idx < filteredMessages.length - 1 ? filteredMessages[idx + 1] : null;
+
+              // Check date boundaries for day separator
+              const prevDate = prevMsg ? new Date(prevMsg.createdAt).toDateString() : null;
+              const currentDate = new Date(msg.createdAt).toDateString();
+              const isNewDay = prevDate !== currentDate;
+
+              // Cluster calculation: within 5 mins from same sender on same calendar day
+              const isSameSenderAsPrev = !isNewDay && prevMsg?.senderId === msg.senderId;
+              const timeDiffPrev = prevMsg
                 ? Math.abs(new Date(msg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime())
                 : Infinity;
-              const showHeader = !isSameSenderAsPrev || timeDiff > 5 * 60 * 1000;
+              const isFirstInCluster = !isSameSenderAsPrev || timeDiffPrev > 5 * 60 * 1000;
+
+              const nextDate = nextMsg ? new Date(nextMsg.createdAt).toDateString() : null;
+              const isSameDayAsNext = currentDate === nextDate;
+              const isSameSenderAsNext = isSameDayAsNext && nextMsg?.senderId === msg.senderId;
+              const timeDiffNext = nextMsg
+                ? Math.abs(new Date(nextMsg.createdAt).getTime() - new Date(msg.createdAt).getTime())
+                : Infinity;
+              const isLastInCluster = !isSameSenderAsNext || timeDiffNext > 5 * 60 * 1000;
+
+              const getDateSeparatorText = (dateStr: string) => {
+                try {
+                  const date = new Date(dateStr);
+                  const now = new Date();
+                  const isToday =
+                    date.getDate() === now.getDate() &&
+                    date.getMonth() === now.getMonth() &&
+                    date.getFullYear() === now.getFullYear();
+
+                  const yesterday = new Date(now);
+                  yesterday.setDate(now.getDate() - 1);
+                  const isYesterday =
+                    date.getDate() === yesterday.getDate() &&
+                    date.getMonth() === yesterday.getMonth() &&
+                    date.getFullYear() === yesterday.getFullYear();
+
+                  if (isToday) return "Today";
+                  if (isYesterday) return "Yesterday";
+
+                  return date.toLocaleDateString(undefined, {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                    ...(date.getFullYear() !== now.getFullYear() ? { year: "numeric" } : {}),
+                  });
+                } catch {
+                  return "";
+                }
+              };
 
               return (
-                <MessageItem
-                  key={msg.id}
-                  message={msg}
-                  isMe={isMe}
-                  showHeader={showHeader}
-                  isGroup={conversation.isGroup}
-                  onEdit={handleEditMessage}
-                  onDelete={handleDeleteMessage}
-                  onOpenProfile={openProfile}
-                />
+                <div key={msg.id} className="w-full flex flex-col">
+                  {isNewDay && (
+                    <div className="flex items-center justify-center my-3.5 select-none">
+                      <div className="h-[1px] bg-border-subtle flex-1 max-w-[60px] sm:max-w-[100px]" />
+                      <span className="mx-2.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-bold font-['Rajdhani'] uppercase tracking-widest text-text-muted bg-bg-abyss/90 border border-border-subtle backdrop-blur-md shadow-sm">
+                        {getDateSeparatorText(msg.createdAt)}
+                      </span>
+                      <div className="h-[1px] bg-border-subtle flex-1 max-w-[60px] sm:max-w-[100px]" />
+                    </div>
+                  )}
+
+                  <MessageItem
+                    message={msg}
+                    isMe={isMe}
+                    showHeader={isFirstInCluster}
+                    isFirstInCluster={isFirstInCluster}
+                    isLastInCluster={isLastInCluster}
+                    isGroup={conversation.isGroup}
+                    onEdit={handleEditMessage}
+                    onDelete={handleDeleteMessage}
+                    onOpenProfile={openProfile}
+                  />
+                </div>
               );
             })
           )}

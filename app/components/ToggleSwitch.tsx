@@ -16,11 +16,11 @@ export function ToggleSwitch({ checked, onChange, disabled = false }: ToggleSwit
       aria-checked={checked}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-white/10 transition-colors duration-200 ease-in-out focus:outline-none ${
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-border-subtle dark:border-white/10 transition-colors duration-200 ease-in-out focus:outline-none ${
         disabled ? "opacity-50 cursor-not-allowed" : ""
       }`}
       style={{
-        backgroundColor: checked ? "var(--accent-primary)" : "rgba(0, 0, 0, 0.4)",
+        backgroundColor: checked ? "var(--accent-primary)" : "var(--bg-shadow)",
         boxShadow: checked ? "var(--glow-purple)" : "none",
       }}
     >

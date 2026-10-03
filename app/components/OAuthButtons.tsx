@@ -4,9 +4,15 @@ import React, { useState } from "react";
 
 interface OAuthButtonsProps {
   isLoading?: boolean;
+  className?: string;
+  buttonClassName?: string;
 }
 
-export default function OAuthButtons({ isLoading: parentLoading }: OAuthButtonsProps) {
+export default function OAuthButtons({
+  isLoading: parentLoading,
+  className = "",
+  buttonClassName = "",
+}: OAuthButtonsProps) {
   const [loadingProvider, setLoadingProvider] = useState<"google" | null>(null);
 
   const handleGoogleClick = () => {
@@ -17,13 +23,16 @@ export default function OAuthButtons({ isLoading: parentLoading }: OAuthButtonsP
   const isBusy = parentLoading || loadingProvider !== null;
 
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className={`flex flex-col gap-3 w-full ${className}`}>
       {/* ─── Google Button ──────────────────────────────────── */}
       <button
         type="button"
         onClick={handleGoogleClick}
         disabled={isBusy}
-        className="group relative w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-void/60 hover:bg-bg-void/90 text-text-primary hover:border-border-active transition-all duration-200 shadow-sm cursor-pointer disabled:opacity-60"
+        className={
+          buttonClassName ||
+          "group relative w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-border-subtle bg-bg-void/60 hover:bg-bg-void/90 text-text-primary hover:border-border-active transition-all duration-200 shadow-sm cursor-pointer disabled:opacity-60"
+        }
         style={{
           fontFamily: "'Rajdhani', sans-serif",
           fontWeight: 700,

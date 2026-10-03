@@ -1,0 +1,78 @@
+Browser tab: 2, Title: "Sylf — Study Leveling", URL: "http://127.0.0.1:3101/system".
+1 AXWebArea Sylf — Study Leveling, URL: 127.0.0.1:3101/system
+	2 container
+		3 container
+			4 button Collapse sidebar
+			5 button Description: Open System Hub, Help: System Hub
+				6 image
+			7 button Notifications
+				8 image
+			9 button View Profile Card
+				10 text P
+				11 text Scholar
+				12 container
+					13 text E -Rank • Lv.  1
+		14 container Main Navigation
+			15 link Description: Home, Value: 127.0.0.1:3101/dashboard
+			16 link Description: Timer, Value: 127.0.0.1:3101/timer
+			17 link Description: Social, Value: 127.0.0.1:3101/social
+			18 link Description: The System AI, Value: 127.0.0.1:3101/system
+			19 link Description: Objectives, Value: 127.0.0.1:3101/goals
+			20 link Description: Calendar, Value: 127.0.0.1:3101/calendar
+			21 link Description: Locker, Value: 127.0.0.1:3101/locker
+			22 link Description: Shop, Value: 127.0.0.1:3101/inventory
+		23 button Logout
+			24 image
+			25 text Logout
+		26 container
+			27 container
+				28 button CONVERSATION
+				30 button PLANNER ∞
+					31 text PLANNER
+					32 text ∞
+				33 text THE SYSTEM
+				34 text INTELLIGENCE LAYER
+				35 heading System Workspace, Value: 1
+					36 text System 
+					37 text Workspace
+				38 button (collapsed) Description: Open Archives, Secondary Actions: Expand
+					39 text ARCHIVES
+					40 text 1
+			99 container Planner setup
+				100 button Choose a different plan
+				101 text EXAM PLANNER
+				102 button Back to Quick Plan
+				103 button Advanced setup
+				104 button Classic Planner
+			105 container Exam Planner
+				106 heading What are you preparing for?, Value: 2
+					107 text What are you preparing for?
+				108 text STEP  1  OF 6 ·  WHAT ARE YOU PREPARING FOR? 17 % COMPLETE
+				109 container
+					110 container
+						111 text Existing subject
+						112 pop up button (collapsed, settable) Existing subject, Value: Enter a subject name, Secondary Actions: Expand
+							113 menu
+								114 (selected) Enter a subject name
+					115 container
+						116 text Subject or course name
+						117 text field (settable) Subject or course name
+					118 container
+						119 text Exam title (optional)
+						120 text field (settable) Exam title (optional)
+					121 button Back
+					122 button CONTINUE
+			76 container
+				77 text ARCHIVES 1
+				78 button NEW, Help: New Chat Session
+				79 button Close Archives
+				80 text field (settable)
+				81 button SELECT, Help: Select multiple chats
+				82 text TODAY 1
+				83 text Study Plan: GCSE algebra review
+				84 button Description: Rename Study Plan: GCSE algebra review, Help: Rename chat
+				85 button Description: Delete Study Plan: GCSE algebra review, Help: Delete chat
+	97 pop up button (collapsed) Description: Open Next.js Dev Tools, ID: next-logo, Secondary Actions: Expand
+		98 image
+
+The focused UI element is 106 heading What are you preparing for?, Value: 2

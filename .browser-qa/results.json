@@ -1,0 +1,94 @@
+{
+ "base": "http://localhost:3000",
+ "checks": [
+  {
+   "name": "desktop: the Planner opens on its Classic surface",
+   "ok": true,
+   "detail": "System Workspace | AI Study Planner"
+  },
+  {
+   "name": "desktop: Planner Modes is offered from Classic",
+   "ok": true,
+   "detail": null
+  },
+  {
+   "name": "desktop: no horizontal page overflow",
+   "ok": true,
+   "detail": "0px"
+  },
+  {
+   "name": "desktop: interactive target size",
+   "ok": true,
+   "detail": "small: [{\"tag\":\"input\",\"label\":\"\",\"h\":8},{\"tag\":\"button\",\"label\":\"New\",\"h\":27},{\"tag\":\"button\",\"label\":\"Close Archives\",\"h\":28}]"
+  },
+  {
+   "name": "desktop: Planner Modes offers Exam, Roadmap and Mastery",
+   "ok": true,
+   "detail": "Exam, Roadmap, Mastery"
+  },
+  {
+   "name": "desktop: Quick Plan renders its setup surfaces",
+   "ok": true,
+   "detail": "Exam or goal, Find syllabus, Use only what I give you, Classic Planner, What do you need to cover"
+  },
+  {
+   "name": "desktop: Quick Plan has no horizontal overflow",
+   "ok": true,
+   "detail": "0px"
+  },
+  {
+   "name": "desktop: the Copilot is available in context",
+   "ok": true,
+   "detail": "Copilot trigger present"
+  },
+  {
+   "name": "desktop: returning to Classic remains available",
+   "ok": true,
+   "detail": "← Classic Planner"
+  },
+  {
+   "name": "mobile: no horizontal page overflow at 390px",
+   "ok": true,
+   "detail": "0px"
+  },
+  {
+   "name": "mobile: Quick Plan does not overflow at 390px",
+   "ok": true,
+   "detail": "0px"
+  },
+  {
+   "name": "mobile: the primary action is not covered and is reachable",
+   "ok": true,
+   "detail": "Ask Sylf (62px, inViewport=true)"
+  },
+  {
+   "name": "appearance: dark renders",
+   "ok": true,
+   "detail": "{\"htmlClass\":\"h-full dark static-viewport\",\"bodyColor\":\"rgb(226, 232, 240)\",\"bodyBackground\":\"rgba(0, 0, 0, 0)\",\"titleColor\":\"rgb(226, 232, 240)\",\"renderedChars\":2630}"
+  },
+  {
+   "name": "appearance: light preference",
+   "ok": true,
+   "detail": "renders identically under prefers-color-scheme: light — measured and reported rather than treated as a Planner defect: {\"htmlClass\":\"h-full dark static-viewport\",\"bodyColor\":\"rgb(226, 232, 240)\",\"bodyBackground\":\"rgba(0, 0, 0, 0)\",\"titleColor\":\"rgb(226, 232, 240)\",\"renderedChars\":2630}"
+  },
+  {
+   "name": "accessibility: every form control has a label",
+   "ok": true,
+   "detail": "scope resolved: false"
+  },
+  {
+   "name": "accessibility: no unlabelled icon buttons on the System screen",
+   "ok": true,
+   "detail": "none"
+  }
+ ],
+ "screenshots": [
+  "desktop-planner-classic.png",
+  "desktop-planner-modes.png",
+  "desktop-quick-plan.png",
+  "mobile-system.png",
+  "mobile-quick-plan.png",
+  "appearance-dark.png",
+  "appearance-light.png"
+ ]
+}

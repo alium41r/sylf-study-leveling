@@ -3,8 +3,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { backdropVariants, bottomSheetVariants } from "@/lib/motion";
 import { resolveGoalColor } from "@/lib/goal-theme";
+import CustomDatePicker from "../../components/CustomDatePicker";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { QuestEmblemIcon, StreakFlameIcon, FocusClockIcon } from "@/app/components/icons";
+import { Plus, X, Pencil, Trash2, Check } from "lucide-react";
+import styles from "../Goals.module.css";
 
 interface Quest {
   id: number;
@@ -194,87 +199,96 @@ export function QuestsTab() {
       {/* Action Header */}
       <div className="mb-6 flex flex-wrap justify-between items-center gap-2">
         <div>
-          <p className="text-xs tracking-widest mb-1 text-accent-text-light font-['Rajdhani'] font-bold">
-            SCHOLAR TASKS
-          </p>
-          <h2 className="text-2xl font-bold" style={{ fontFamily: "'Rajdhani', sans-serif" }}>
-            Quest Log
+          <div className="flex items-center gap-2 mb-1">
+            <span className={styles.eyebrowDot} />
+            <span className={styles.eyebrow}>
+              Scholar Tasks
+            </span>
+          </div>
+          <h2 className={styles.title}>
+            <QuestEmblemIcon size={24} className="text-accent-primary shrink-0" />
+            <span>Quest <em>Log</em></span>
           </h2>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {isSelectMode ? (
             <>
               <button 
                 onClick={() => { setIsSelectMode(false); setSelectedQuestIds([]); }}
-                className="py-2 px-4 bg-bg-abyss hover:bg-bg-shadow border border-border-subtle hover:border-border-active rounded-lg text-text-secondary font-bold transition-all flex items-center justify-center shrink-0"
+                className={styles.ghostBtn}
               >
                 Done
               </button>
               {selectedQuestIds.length > 0 && (
                 <button 
                   onClick={handleBulkDelete}
-                  className="py-2 px-4 bg-red-900/40 hover:bg-red-800/60 border border-red-500/30 hover:border-red-400 rounded-lg text-red-400 text-sm font-bold tracking-wide transition-all"
+                  className="py-2 px-4 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 hover:border-red-500/60 rounded-xl text-red-400 text-xs sm:text-sm font-bold font-['Rajdhani'] tracking-wide uppercase transition-all shadow-[0_0_12px_rgba(239,68,68,0.2)] cursor-pointer"
                 >
                   DELETE SELECTED ({selectedQuestIds.length})
                 </button>
               )}
             </>
           ) : (
-            <>
+            <div className="flex items-center gap-2.5">
               <button 
                 onClick={() => {
                   setQuestFormError(null);
                   if (!newQuestDate) setNewQuestDate(getTodayLocalDate());
                   setIsNewQuestPanelOpen(true);
                 }}
-                className="px-4 py-2 bg-accent-primary text-white font-bold rounded-lg hover:opacity-90 hover:scale-105 active:scale-95 transition-all text-sm shadow-md flex items-center gap-1.5"
-                style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                className={styles.btnPrimaryAction}
               >
-                <span>+</span> NEW QUEST
+                <Plus size={15} strokeWidth={2.5} />
+                <span>NEW QUEST</span>
               </button>
               {quests.length > 0 && (
                 <button 
                   onClick={() => setIsSelectMode(true)}
-                  className="py-2 px-4 bg-bg-abyss hover:bg-bg-shadow border border-border-subtle hover:border-border-active rounded-lg text-text-secondary font-bold transition-all"
+                  className={styles.ghostBtn}
                 >
                   Select
                 </button>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
 
       {/* ─── Streak Quest Card ───────────────────────── */}
       {weeklyQuest && (
-        <div className="system-card p-6 mb-8 w-full border border-accent-primary/30 bg-bg-panel/70 relative overflow-hidden group">
+        <div className={styles.streakCard}>
+          <div
+            className={styles.topHighlight}
+            style={{ background: "linear-gradient(90deg, transparent, var(--accent-primary), transparent)" }}
+          />
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid tracking-wider uppercase font-['Rajdhani']">
-                  Streak Quest
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid tracking-wider uppercase font-['Rajdhani'] flex items-center gap-1.5 shadow-sm">
+                  <StreakFlameIcon size={12} />
+                  <span>Streak Quest</span>
                 </span>
-                <span className="text-xs text-text-muted font-['Rajdhani'] font-medium">
+                <span className="text-xs font-['Rajdhani'] font-medium" style={{ color: "var(--muted)" }}>
                   Resets in {weeklyQuest.daysRemaining}d (Sunday 23:59)
                 </span>
               </div>
-              <h2 className="text-xl font-bold text-text-primary font-['Rajdhani']">
+              <h2 className="text-xl font-bold font-['Rajdhani'] tracking-wide" style={{ color: "var(--ink)" }}>
                 Cumulative Focus
               </h2>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <div className="text-right">
-                <span className="text-xs text-text-muted font-['Rajdhani'] block uppercase tracking-wider">Level-Scaled Payout</span>
+                <span className="text-[10px] font-['Rajdhani'] block uppercase tracking-wider font-bold" style={{ color: "var(--muted)" }}>Level-Scaled Payout</span>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-accent-text-light font-['Rajdhani']">+{weeklyQuest.xpReward} XP</span>
                   <span className="text-sm font-bold text-accent-text-light/80 font-['Rajdhani']">+{weeklyQuest.sylphReward} Sylph</span>
                 </div>
               </div>
-              <span className={`px-3 py-1 text-xs font-bold rounded-full font-['Rajdhani'] uppercase tracking-wider ${
+              <span className={`px-3 py-1 text-xs font-bold rounded-full font-['Rajdhani'] uppercase tracking-wider border shadow-sm ${
                 weeklyQuest.isCompleted 
-                  ? "bg-green-500/20 text-green-400 border border-green-500/40" 
-                  : "bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid"
+                  ? "bg-green-500/20 text-green-400 border-green-500/40" 
+                  : "bg-accent-primary-dim text-accent-text-light border-accent-primary-mid"
               }`}>
                 {weeklyQuest.isCompleted ? "Milestone Achieved" : "In Progress"}
               </span>
@@ -283,13 +297,13 @@ export function QuestsTab() {
 
           {/* Progress Bar & Stats */}
           <div className="space-y-1.5">
-            <div className="flex justify-between text-xs font-['Rajdhani'] font-bold text-text-secondary">
+            <div className="flex justify-between text-xs font-['Rajdhani'] font-bold" style={{ color: "var(--muted)" }}>
               <span>{Math.floor(weeklyQuest.progressMinutes / 60)}h {weeklyQuest.progressMinutes % 60}m / 3h 00m</span>
-              <span>{weeklyQuest.percentComplete}%</span>
+              <span className="text-accent-text-light">{weeklyQuest.percentComplete}%</span>
             </div>
-            <div className="h-2.5 bg-bg-void/80 rounded-full overflow-hidden border border-border-subtle relative">
+            <div className={styles.progressTrack}>
               <div
-                className="h-full bg-gradient-to-r from-accent-primary to-accent-primary-light transition-all duration-1000 ease-out rounded-full"
+                className="h-full bg-gradient-to-r from-accent-primary to-accent-primary-light transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_var(--accent-dim)]"
                 style={{ width: `${weeklyQuest.percentComplete}%` }}
               />
             </div>
@@ -297,11 +311,29 @@ export function QuestsTab() {
         </div>
       )}
 
-      <div className="system-card p-6 w-full">
+      <div>
         {quests.length === 0 ? (
-          <p className="text-center text-text-secondary py-8">
-            The System has not issued any quests yet. Create a Goal first.
-          </p>
+          <div className={styles.emptyStateCard}>
+            <div className={styles.emptyIconBox}>
+              <QuestEmblemIcon size={26} />
+            </div>
+            <h3 className={styles.emptyTitle}>No Active Quests</h3>
+            <p className={styles.emptySubtitle}>
+              The System has not issued any quests yet. Establish an Objective to generate quests or dispatch a custom quest.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setQuestFormError(null);
+                if (!newQuestDate) setNewQuestDate(getTodayLocalDate());
+                setIsNewQuestPanelOpen(true);
+              }}
+              className={styles.btnPrimaryAction}
+            >
+              <Plus size={15} strokeWidth={2.5} />
+              <span>Dispatch First Quest</span>
+            </button>
+          </div>
         ) : (
           <div className="flex flex-col gap-4">
             <AnimatePresence mode="popLayout">
@@ -326,10 +358,10 @@ export function QuestsTab() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
                   transition={{ type: "spring", damping: 25, stiffness: 350 }}
-                  className={`flex flex-col md:flex-row md:items-center justify-between p-4 rounded w-full bg-bg-panel border border-border-subtle ${isSelectMode ? 'cursor-pointer' : ''} transition-colors ${
+                  className={`${styles.card} flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-5 rounded-xl w-full ${isSelectMode ? 'cursor-pointer' : ''} transition-all ${
                     isSelectMode && selectedQuestIds.includes(quest.id)
                       ? "!bg-red-900/20 !border-red-500/50"
-                      : "hover:border-border-active"
+                      : ""
                   }`}
                   style={{
                     borderLeft: `4px solid ${statusColor}`,
@@ -347,9 +379,7 @@ export function QuestsTab() {
                     {isSelectMode && (
                       <div className={`mt-1.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center transition-colors ${selectedQuestIds.includes(quest.id) ? 'bg-red-500 border-red-500' : 'border-border-subtle'}`}>
                         {selectedQuestIds.includes(quest.id) && (
-                          <svg className="w-3 h-3 text-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
+                          <Check size={12} className="text-white" strokeWidth={3} />
                         )}
                       </div>
                     )}
@@ -360,25 +390,25 @@ export function QuestsTab() {
                           type="text" 
                           value={editQuestTitle} 
                           onChange={e => setEditQuestTitle(e.target.value)} 
-                          className="input-field py-1 px-2 text-sm"
+                          className={styles.inputField}
                         />
                         <div className="flex gap-2 items-center">
                           <input 
                             type="number" 
                             value={editQuestMinutes} 
                             onChange={e => setEditQuestMinutes(Number(e.target.value))} 
-                            className="input-field py-1 px-2 text-sm w-20"
+                            className={`${styles.inputField} w-24`}
                           />
-                          <span className="text-xs text-text-muted">min</span>
+                          <span className="text-xs font-['Rajdhani']" style={{ color: "var(--muted)" }}>min</span>
                         </div>
                       </div>
                     ) : (
                       <>
-                        <h3 className="font-bold mb-1 flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold mb-1 flex items-center gap-2 flex-wrap font-['Rajdhani'] text-base tracking-wide" style={{ color: "var(--ink)" }}>
                           {quest.title}
                           {goalTheme && (
                             <span
-                              className="text-[0.6rem] font-['Rajdhani'] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border"
+                              className="text-[0.65rem] font-['Rajdhani'] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shadow-sm"
                               style={{
                                 color: goalTheme.light,
                                 background: goalTheme.dim,
@@ -389,18 +419,18 @@ export function QuestsTab() {
                             </span>
                           )}
                         </h3>
-                        <p className="text-xs text-text-muted mb-2">
+                        <p className="text-xs mb-2 font-mono" style={{ color: "var(--muted)" }}>
                           Part of: {quest.goal?.title || "Unknown Goal"} • {new Date(quest.scheduledFor).toLocaleDateString()}
                         </p>
                         <div className="flex gap-3 text-sm">
                           <span
-                            className="font-medium"
+                            className="font-bold font-['Rajdhani']"
                             style={{ color: goalTheme ? goalTheme.light : "var(--accent-text-light)" }}
                           >
                             +{quest.xpReward} XP
                           </span>
                           <span
-                            className="flex items-center gap-1.5 font-bold"
+                            className="flex items-center gap-1.5 font-bold font-['Rajdhani']"
                             style={{ color: goalTheme ? goalTheme.light : "var(--accent-text-light)" }}
                           >
                             <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0">
@@ -408,7 +438,10 @@ export function QuestsTab() {
                             </div>
                             +{quest.sylphReward}
                           </span>
-                          <span className="text-text-secondary">⏱️ {quest.requiredMinutes} min</span>
+                          <span className="flex items-center gap-1 font-['Rajdhani'] font-medium" style={{ color: "var(--muted)" }}>
+                            <FocusClockIcon size={13} className="text-accent-primary shrink-0" />
+                            <span>{quest.requiredMinutes} min</span>
+                          </span>
                         </div>
                       </>
                     )}
@@ -417,7 +450,7 @@ export function QuestsTab() {
                   <div className="mt-4 md:mt-0 flex flex-col md:items-end gap-2">
                     {goalTheme ? (
                       <span
-                        className="px-3 py-1 text-xs font-bold rounded-full font-['Rajdhani'] uppercase tracking-wider border"
+                        className="px-3 py-1 text-xs font-bold rounded-full font-['Rajdhani'] uppercase tracking-wider border shadow-sm"
                         style={{
                           color: quest.status === "COMPLETED" ? "var(--accent-green)" : goalTheme.light,
                           background: goalTheme.dim,
@@ -437,19 +470,42 @@ export function QuestsTab() {
                       </span>
                     )}
                     
-                    <div className="flex gap-2 mt-1">
+                    <div className="flex items-center gap-1.5 mt-1">
                       {editingQuestId === quest.id ? (
                         <>
-                          <button onClick={() => handleSaveQuest(quest.id)} className="text-xs text-green-400 hover:text-green-300">Save</button>
-                          <button onClick={() => setEditingQuestId(null)} className="text-xs text-text-muted hover:text-text-secondary">Cancel</button>
+                          <button
+                            onClick={() => handleSaveQuest(quest.id)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-bold text-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <Check size={12} />
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingQuestId(null)}
+                            className={styles.ghostBtn}
+                            style={{ padding: "4px 10px", fontSize: "11px" }}
+                          >
+                            Cancel
+                          </button>
                         </>
                       ) : (
                         <>
                           <button 
                             onClick={() => { setEditingQuestId(quest.id); setEditQuestTitle(quest.title); setEditQuestMinutes(quest.requiredMinutes); }}
-                            className="text-xs text-accent-primary hover:text-accent-primary-light"
-                          >Edit</button>
-                          <button onClick={() => handleDeleteQuest(quest.id)} className="text-xs text-red-400 hover:text-red-300">Delete</button>
+                            className={styles.actionIconBtn}
+                            title="Edit Quest"
+                            aria-label="Edit Quest"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteQuest(quest.id)} 
+                            className={`${styles.actionIconBtn} ${styles.actionIconBtnDelete}`}
+                            title="Delete Quest"
+                            aria-label="Delete Quest"
+                          >
+                            <Trash2 size={13} />
+                          </button>
                         </>
                       )}
                     </div>
@@ -465,35 +521,46 @@ export function QuestsTab() {
       {/* Manual Quest Creation: mobile bottom sheet → centered modal on sm+ */}
       <AnimatePresence>
         {isNewQuestPanelOpen && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+          <motion.div
+            key="new-quest-modal-backdrop"
+            variants={backdropVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+          >
+            <div
               className="absolute inset-0 bg-black/70 backdrop-blur-md"
               onClick={() => setIsNewQuestPanelOpen(false)}
             />
 
             <motion.div
-              initial={{ y: "100%", opacity: 1 }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 350 }}
-              className="relative z-10 w-full max-w-lg sm:max-w-2xl mx-auto sm:my-8 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-bg-panel border border-border-subtle p-4 sm:p-6 shadow-2xl flex flex-col gap-5"
+              key="new-quest-modal-content"
+              variants={bottomSheetVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+              className={`relative z-10 w-full max-w-lg sm:max-w-2xl mx-auto sm:my-8 max-h-[90vh] sm:max-h-[85vh] overflow-y-auto rounded-2xl ${styles.modalContent} p-5 sm:p-7 flex flex-col gap-5`}
             >
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-wide" style={{ fontFamily: "'Rajdhani', sans-serif", color: "var(--accent-primary-light)" }}>
-                  DISPATCH NEW QUEST
-                </h2>
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className={styles.eyebrow}>
+                    <span className={styles.eyebrowDot} />
+                    Scholar Directive
+                  </div>
+                  <h2 className={styles.title} style={{ fontSize: "1.5rem" }}>
+                    Dispatch New <em>Quest</em>
+                  </h2>
+                </div>
                 <button
+                  type="button"
                   onClick={() => {
                     setQuestFormError(null);
                     setIsNewQuestPanelOpen(false);
                   }}
-                  className="text-text-muted hover:text-text-primary transition-colors p-2"
+                  className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors cursor-pointer text-text-muted hover:text-text-primary"
                 >
-                  ✕
+                  <X size={16} />
                 </button>
               </div>
 
@@ -513,13 +580,15 @@ export function QuestsTab() {
                 </div>
               )}
 
-              <form onSubmit={handleCreateQuest} className="flex flex-col gap-5 flex-1">
+              <form onSubmit={handleCreateQuest} className="flex flex-col gap-4 flex-1 pb-6">
                 <div>
-                  <label className="stat-label block mb-2 text-sm">Title</label>
+                  <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider font-['Rajdhani']" style={{ color: "var(--muted)" }}>
+                    Title
+                  </label>
                   <input
                     type="text"
                     required
-                    className="input-field bg-bg-abyss border-border-subtle focus:border-border-active py-3"
+                    className={styles.inputField}
                     value={newQuestTitle}
                     onChange={(e) => setNewQuestTitle(e.target.value)}
                     placeholder="e.g. Physics P1 Past Paper — 2025"
@@ -527,9 +596,11 @@ export function QuestsTab() {
                 </div>
 
                 <div>
-                  <label className="stat-label block mb-2 text-sm">Description (Optional)</label>
+                  <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider font-['Rajdhani']" style={{ color: "var(--muted)" }}>
+                    Description (Optional)
+                  </label>
                   <textarea
-                    className="input-field min-h-24 bg-bg-abyss border-border-subtle focus:border-border-active py-3 resize-none"
+                    className={`${styles.inputField} min-h-24 resize-none`}
                     value={newQuestDescription}
                     onChange={(e) => setNewQuestDescription(e.target.value)}
                     placeholder="Details about what this quest involves..."
@@ -538,34 +609,40 @@ export function QuestsTab() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="stat-label block mb-2 text-sm">Study Duration</label>
+                    <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider font-['Rajdhani']" style={{ color: "var(--muted)" }}>
+                      Study Duration
+                    </label>
                     <input
                       type="number"
                       min={15}
                       max={240}
                       required
-                      className="input-field bg-bg-abyss border-border-subtle focus:border-border-active py-3"
+                      className={styles.inputField}
                       value={newQuestMinutes}
                       onChange={(e) => setNewQuestMinutes(Number(e.target.value))}
                     />
                     <p className="text-[0.65rem] text-text-muted mt-1 font-['Rajdhani']">Clamped 15–240 min</p>
                   </div>
                   <div>
-                    <label className="stat-label block mb-2 text-sm">Scheduled For</label>
-                    <input
-                      type="date"
-                      className="input-field bg-bg-abyss border-border-subtle focus:border-border-active py-3"
-                      style={{ colorScheme: "dark" }}
+                    <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider font-['Rajdhani']" style={{ color: "var(--muted)" }}>
+                      Scheduled For
+                    </label>
+                    <CustomDatePicker
                       value={newQuestDate}
-                      onChange={(e) => setNewQuestDate(e.target.value)}
+                      onChange={setNewQuestDate}
+                      minDate={getTodayLocalDate()}
+                      placeholder="Select scheduled date..."
+                      align="right"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="stat-label block mb-2 text-sm">Difficulty</label>
+                  <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider font-['Rajdhani']" style={{ color: "var(--muted)" }}>
+                    Difficulty
+                  </label>
                   <select
-                    className="input-field bg-bg-abyss border-border-subtle focus:border-border-active py-3"
+                    className={styles.inputField}
                     value={newQuestDifficulty}
                     onChange={(e) => setNewQuestDifficulty(e.target.value)}
                   >
@@ -577,11 +654,11 @@ export function QuestsTab() {
                 </div>
 
                 <div>
-                  <label className="stat-label block mb-2 text-sm">
+                  <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider font-['Rajdhani']" style={{ color: "var(--muted)" }}>
                     Link to Objective (Optional)
                   </label>
                   <select
-                    className="input-field bg-bg-abyss border-border-subtle focus:border-border-active py-3"
+                    className={styles.inputField}
                     value={newQuestGoalId}
                     onChange={(e) => setNewQuestGoalId(e.target.value)}
                   >
@@ -615,17 +692,16 @@ export function QuestsTab() {
                   )}
                 </div>
 
-                <div className="mt-auto pt-6">
+                <div className="mt-auto pt-4">
                   <button
                     type="submit"
                     disabled={isSubmittingQuest}
-                    className="w-full py-4 bg-accent-primary hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 rounded-lg text-text-primary font-bold tracking-widest transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                    style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                    className={`w-full py-3.5 ${styles.btnPrimaryAction}`}
                   >
                     {isSubmittingQuest ? (
                       <>
                         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        DISPATCHING...
+                        <span>DISPATCHING...</span>
                       </>
                     ) : (
                       "DISPATCH QUEST"
@@ -634,7 +710,7 @@ export function QuestsTab() {
                 </div>
               </form>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

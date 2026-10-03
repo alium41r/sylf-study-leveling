@@ -1,0 +1,662 @@
+[
+ {
+  "id": "weekly_target_about",
+  "category": "A_WEEKLY_CAPACITY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2236,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "weekly_target_should_be_enough",
+  "category": "A_WEEKLY_CAPACITY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1745,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "weekly_target_give_me",
+  "category": "A_WEEKLY_CAPACITY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1202,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "weekly_target_make_it",
+  "category": "A_WEEKLY_CAPACITY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "INTAKE_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1845,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "weekly_hard_absolutely",
+  "category": "B_HARD_WEEKLY_MAXIMUM",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1440,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "weekly_hard_max",
+  "category": "B_HARD_WEEKLY_MAXIMUM",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1407,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "session_prefer_45",
+  "category": "C_SESSION_PREFERENCE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREFERENCE_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_CONSTRAINT"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1089,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "session_hard_90",
+  "category": "D_HARD_SESSION_MAXIMUM",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "CONSTRAINT_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_CONSTRAINT"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1209,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "friday_hard_variants",
+  "category": "E_UNAVAILABLE_WEEKDAY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "CONSTRAINT_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_CONSTRAINT"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2268,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "friday_hard_impossible",
+  "category": "E_UNAVAILABLE_WEEKDAY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "CONSTRAINT_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_CONSTRAINT"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1388,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "friday_soft_try_not",
+  "category": "F_SOFT_WEEKDAY_AVOIDANCE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "CONSTRAINT_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_CONSTRAINT"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2580,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "friday_soft_suck",
+  "category": "F_SOFT_WEEKDAY_AVOIDANCE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "CONSTRAINT_UPDATE",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2235,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "friday_soft_keep_light",
+  "category": "F_SOFT_WEEKDAY_AVOIDANCE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREFERENCE_UPDATE",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 4413,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "prep_never_studied",
+  "category": "G_PREPAREDNESS",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREPAREDNESS_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_PREPAREDNESS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1175,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "prep_seen_before",
+  "category": "G_PREPAREDNESS",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREPAREDNESS_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_PREPAREDNESS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1583,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "prep_rusty",
+  "category": "G_PREPAREDNESS",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREPAREDNESS_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_PREPAREDNESS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2157,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "prep_weak",
+  "category": "G_PREPAREDNESS",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREPAREDNESS_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_PREPAREDNESS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 919,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "prep_good",
+  "category": "G_PREPAREDNESS",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREPAREDNESS_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_PREPAREDNESS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1119,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "overlap_not_in_course",
+  "category": "H_OVERLAP_CORRECTION",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "SCOPE_UPDATE",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "NO_OVERLAP_COMMAND",
+  "latencyMs": 2982,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "difficulty_explicit",
+  "category": "I_DIFFICULTY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREFERENCE_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_DIFFICULTY"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1521,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "priority_explicit",
+  "category": "J_PRIORITY",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREFERENCE_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_PRIORITY"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1759,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "scope_add",
+  "category": "K_SCOPE_UPDATE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "SCOPE_UPDATE",
+  "code": null,
+  "commands": [
+   "UPDATE_SCOPE"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1325,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "date_shift",
+  "category": "L_DATE_CHANGE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "CONSTRAINT_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_TARGET_DATE"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2903,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "background_statement",
+  "category": "M_BACKGROUND_CURRICULUM",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "BACKGROUND_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_BACKGROUND_CURRICULUM"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 3229,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "research_explicit",
+  "category": "N_RESEARCH_REQUEST",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "RESEARCH_REQUEST",
+  "code": null,
+  "commands": [
+   "REQUEST_SCOPE_RESEARCH"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1434,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "comparison_explicit",
+  "category": "O_COMPARISON_REQUEST",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "COMPARISON_REQUEST",
+  "code": null,
+  "commands": [
+   "REQUEST_CURRICULUM_COMPARISON"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1142,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "draft_edit_remove",
+  "category": "P_DRAFT_EDIT",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "RELEASE_GENERATED_ITEM",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "NO_DRAFT_EDIT:",
+  "latencyMs": 3186,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "confirmed_replan",
+  "category": "Q_CONFIRMED_PLAN_REPLAN",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "REPLAN_REQUEST",
+  "code": null,
+  "commands": [
+   "REQUEST_REPLAN"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1470,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "explain_topic",
+  "category": "R_EXPLANATION",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "EXPLAIN",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1177,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "release_request",
+  "category": "S_RELEASE_REQUEST",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "RELEASE_GENERATED_ITEM",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "NO_RELEASE:",
+  "latencyMs": 3005,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "general_chat",
+  "category": "T_UNRELATED",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "UNKNOWN",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 735,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "general_chat_poem",
+  "category": "T_UNRELATED",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "UNKNOWN",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 812,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "ambiguous_move_later",
+  "category": "U_AMBIGUOUS",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "DRAFT_EDIT",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1750,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "multi_command",
+  "category": "V_MULTI_COMMAND",
+  "attempt": 1,
+  "outcome": "MODEL_FAILED",
+  "intent": null,
+  "code": "MODEL_TIMEOUT",
+  "commands": [],
+  "diagnosis": {
+   "schemaPassed": true,
+   "keys": [
+    "schemaVersion",
+    "intent",
+    "confidence",
+    "summary",
+    "commands",
+    "clarification",
+    "explanationRefs"
+   ]
+  },
+  "verdict": "MODEL_FAILED:MODEL_TIMEOUT",
+  "latencyMs": 29994,
+  "contractValid": false,
+  "mutating": 0
+ },
+ {
+  "id": "multi_command",
+  "category": "V_MULTI_COMMAND",
+  "attempt": 2,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS",
+   "SET_CONSTRAINT",
+   "SET_PREPAREDNESS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 10584,
+  "contractValid": true,
+  "mutating": 3
+ },
+ {
+  "id": "feelings_hate",
+  "category": "W_EMOTIONAL_LANGUAGE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "UNKNOWN",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 3036,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "feelings_boring",
+  "category": "W_EMOTIONAL_LANGUAGE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "UNKNOWN",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2515,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "importance_not_priority_by_model",
+  "category": "W_EMOTIONAL_LANGUAGE",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREFERENCE_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_PRIORITY"
+  ],
+  "diagnosis": null,
+  "verdict": "STUDENT_WORD_USED",
+  "latencyMs": 2273,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "casual_hours",
+  "category": "X_CASUAL",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_CONSTRAINT",
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 2090,
+  "contractValid": true,
+  "mutating": 2
+ },
+ {
+  "id": "negation_not_friday",
+  "category": "Y_NEGATION",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "CONSTRAINT_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_CONSTRAINT"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1135,
+  "contractValid": true,
+  "mutating": 1
+ },
+ {
+  "id": "negation_not_heavy",
+  "category": "Y_NEGATION",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "PREFERENCE_UPDATE",
+  "code": null,
+  "commands": [],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 3212,
+  "contractValid": true,
+  "mutating": 0
+ },
+ {
+  "id": "contradiction",
+  "category": "Z_CONTRADICTION",
+  "attempt": 1,
+  "outcome": "INTERPRETED",
+  "intent": "AVAILABILITY_UPDATE",
+  "code": null,
+  "commands": [
+   "SET_WEEKLY_HOURS"
+  ],
+  "diagnosis": null,
+  "verdict": "PASS",
+  "latencyMs": 1360,
+  "contractValid": true,
+  "mutating": 1
+ }
+]

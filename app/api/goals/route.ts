@@ -1,4 +1,6 @@
+import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
+import { assertNoPlannerGoals, deleteUnlinkedGoals, isPlannerConflict } from "@/lib/planner/server/mutation-guards";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -92,7 +94,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const goal = await prisma.goal.create({
+    const goal = await executionTransaction(session.userId, tx => tx.goal.create({
       data: {
         userId: session.userId,
         title,
@@ -102,7 +104,7 @@ export async function POST(req: NextRequest) {
         targetDate: effectiveTargetDate,
         color: isGoalColorToken(color) ? color : "EMERALD",
       },
-    });
+    }));
 
     // Create a system message confirming the goal
     await prisma.systemMessage.create({
@@ -138,25 +140,29 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "No IDs provided" }, { status: 400 });
     }
 
+    const guarded = await deleteUnlinkedGoals(session.userId, ids);
+    if (guarded) return NextResponse.json({ success: true, count: guarded.goals });
+    await assertNoPlannerGoals(session.userId, ids);
     // Since onDelete: Cascade is NOT fully reliable across all database wrappers, 
     // it's a good practice to delete quests associated with the goals first (if needed).
     // Let's delete the quests first to be safe, then the goals.
-    await prisma.quest.deleteMany({
+    await executionTransaction(session.userId, tx => tx.quest.deleteMany({
       where: {
         userId: session.userId,
         goalId: { in: ids },
       },
-    });
+    }));
 
-    const result = await prisma.goal.deleteMany({
+    const result = await executionTransaction(session.userId, tx => tx.goal.deleteMany({
       where: {
         userId: session.userId,
         id: { in: ids },
       },
-    });
+    }));
 
     return NextResponse.json({ success: true, count: result.count }, { status: 200 });
   } catch (error) {
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     console.error("Failed to bulk delete goals:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

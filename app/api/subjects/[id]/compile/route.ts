@@ -1,3 +1,5 @@
+import { executionTransaction } from "@/lib/execution-coordination";
+import { PlannerError } from "@/lib/planner/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -95,8 +97,10 @@ export async function POST(
     // 4. RESERVE the quota unit atomically BEFORE the expensive compile (the
     //    authoritative concurrency guard — `charged` means the reservation
     //    actually succeeded; a parallel request would get charged=false).
+    //    A configured owner account bypasses the reservation entirely, so
+    //    `unlimited` is accepted as permission alongside `charged`.
     const reserved = await reserveQuota(userId, "compile");
-    if (!reserved.charged) {
+    if (!reserved.charged && !reserved.unlimited) {
       return NextResponse.json(
         {
           error: "quota_exceeded",
@@ -125,33 +129,17 @@ export async function POST(
       req.signal
     );
 
-    // 5. Batch-update all 48 nodes inside a transaction without touching progress/isMastered
-    await prisma.$transaction(
-      compilationResult.nodes.map((nodeData) =>
-        prisma.subjectNode.updateMany({
-          where: {
-            subjectId: subject.id,
-            nodeId: nodeData.nodeId,
-          },
-          data: {
-            title: nodeData.title,
-            description: nodeData.description,
-            difficulty: nodeData.difficulty,
-            updatedAt: new Date(),
-          },
-        })
-      ),
-      {
-        timeout: 30000,
-        maxWait: 10000,
-      }
-    );
-
-    // 5. Stamp the cooldown timestamp — the commit is the claim anchor,
-    //    so the 30-day window starts only after nodes are persisted.
-    await prisma.subject.update({
-      where: { id: subject.id },
-      data: { lastCompiledAt: new Date() },
+    // Provider work stays outside the lock. Persist only if the owned source
+    // still matches exactly; node content and the claim stamp commit together.
+    await executionTransaction(userId, async tx => {
+      const current = await tx.subject.findFirst({ where: { id: subject.id, userId, archivedAt: null } });
+      if (!current || ["name", "code", "examBoard", "level", "syllabusNote", "lastCompiledAt"].some(key =>
+        Reflect.get(current, key) !== Reflect.get(subject, key))) throw new PlannerError(409, "SUBJECT_CONTEXT_CHANGED");
+      await Promise.all(compilationResult.nodes.map(nodeData => tx.subjectNode.updateMany({
+        where: { subjectId: subject.id, nodeId: nodeData.nodeId },
+        data: { title: nodeData.title, description: nodeData.description, difficulty: nodeData.difficulty, updatedAt: new Date() },
+      })));
+      await tx.subject.update({ where: { id: subject.id }, data: { lastCompiledAt: new Date() } });
     });
 
     // 7. Invalidate edge cache tags
@@ -169,6 +157,7 @@ export async function POST(
       lastCompiledAt: new Date().toISOString(),
     });
   } catch (error) {
+    if (error instanceof PlannerError) return NextResponse.json({ error: error.code }, { status: error.status });
     console.error("POST /api/subjects/[id]/compile error:", error);
     // S4: refund the reservation on any failure after it was made.
     try {

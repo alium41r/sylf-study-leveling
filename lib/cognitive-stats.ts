@@ -13,7 +13,7 @@
 //                streak target, chat quota, mastery multiplier, apex SP).
 // ============================================================
 
-import { COGNITIVE_STAT_MAX, COGNITIVE_STAT_MIN, clampCognitiveStat } from "@/lib/game-engine";
+import { COGNITIVE_STAT_MAX, COGNITIVE_STAT_MIN, clampCognitiveStat } from "./game-engine";
 
 export type CognitiveStatKey =
   | "endurance"

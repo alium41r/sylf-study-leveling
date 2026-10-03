@@ -1,0 +1,202 @@
+{
+  "date": "2026-09-24",
+  "method": "Final successful production build; Next entry+boot manifests, renderer import graph and browser script tags. Local gzip/Brotli estimates, not network transfer. Initial snapshot includes concurrent unrelated changes.",
+  "initial": {
+    "entries": [
+      {
+        "file": "static/chunks/02rptaij7znh7.js",
+        "raw": 50401,
+        "gzip": 12281,
+        "brotli": 10774
+      },
+      {
+        "file": "static/chunks/3-hfsvt4g7lav.js",
+        "raw": 104334,
+        "gzip": 25583,
+        "brotli": 21568
+      },
+      {
+        "file": "static/chunks/1ntn7efqc-iiw.js",
+        "raw": 54763,
+        "gzip": 12926,
+        "brotli": 11280
+      },
+      {
+        "file": "static/chunks/26p7d39aas105.js",
+        "raw": 135907,
+        "gzip": 44445,
+        "brotli": 38864
+      },
+      {
+        "file": "static/chunks/2feqi0rohziqb.js",
+        "raw": 85692,
+        "gzip": 25856,
+        "brotli": 22400
+      },
+      {
+        "file": "static/chunks/07hvr40w77zns.js",
+        "raw": 423198,
+        "gzip": 124036,
+        "brotli": 103792
+      },
+      {
+        "file": "static/chunks/079gju-691pc_.js",
+        "raw": 5103,
+        "gzip": 2001,
+        "brotli": 1787
+      },
+      {
+        "file": "static/chunks/23qusgcxpta-a.js",
+        "raw": 66042,
+        "gzip": 21035,
+        "brotli": 18298
+      },
+      {
+        "file": "static/chunks/1dofafxrdsqhe.js",
+        "raw": 32793,
+        "gzip": 9380,
+        "brotli": 8278
+      },
+      {
+        "file": "static/chunks/3nc6x0_y5iwnk.js",
+        "raw": 44491,
+        "gzip": 9274,
+        "brotli": 7989
+      },
+      {
+        "file": "static/chunks/37n2y244i6xgf.js",
+        "raw": 141865,
+        "gzip": 38714,
+        "brotli": 33211
+      },
+      {
+        "file": "static/chunks/1wpi-_59dw0su.js",
+        "raw": 227425,
+        "gzip": 71049,
+        "brotli": 60686
+      },
+      {
+        "file": "static/chunks/turbopack-3yg6phq9m191r.js",
+        "raw": 10581,
+        "gzip": 4158,
+        "brotli": 3745
+      }
+    ],
+    "totals": {
+      "raw": 1382595,
+      "gzip": 400738,
+      "brotli": 342672
+    }
+  },
+  "observedDeferred": {
+    "entries": [
+      {
+        "file": "static/chunks/42_3clekqp3-v.js",
+        "raw": 455,
+        "gzip": 266,
+        "brotli": 224
+      },
+      {
+        "file": "static/chunks/0tezbzt3u_ssc.js",
+        "raw": 198297,
+        "gzip": 52372,
+        "brotli": 45243
+      },
+      {
+        "file": "static/chunks/2v8kev3tsae35.js",
+        "raw": 142917,
+        "gzip": 43609,
+        "brotli": 37479
+      },
+      {
+        "file": "static/chunks/0fiqumlr9098b.js",
+        "raw": 22176,
+        "gzip": 6732,
+        "brotli": 6071
+      },
+      {
+        "file": "static/chunks/04qaqiql_tpbt.js",
+        "raw": 43184,
+        "gzip": 11211,
+        "brotli": 9829
+      }
+    ],
+    "totals": {
+      "raw": 407029,
+      "gzip": 114190,
+      "brotli": 98846
+    }
+  },
+  "allRendererBranches": {
+    "entries": [
+      {
+        "file": "static/chunks/42_3clekqp3-v.js",
+        "raw": 455,
+        "gzip": 266,
+        "brotli": 224
+      },
+      {
+        "file": "static/chunks/0tezbzt3u_ssc.js",
+        "raw": 198297,
+        "gzip": 52372,
+        "brotli": 45243
+      },
+      {
+        "file": "static/chunks/2v8kev3tsae35.js",
+        "raw": 142917,
+        "gzip": 43609,
+        "brotli": 37479
+      },
+      {
+        "file": "static/chunks/0fiqumlr9098b.js",
+        "raw": 22176,
+        "gzip": 6732,
+        "brotli": 6071
+      },
+      {
+        "file": "static/chunks/04qaqiql_tpbt.js",
+        "raw": 43184,
+        "gzip": 11211,
+        "brotli": 9829
+      },
+      {
+        "file": "static/chunks/0pim5tbo67shx.js",
+        "raw": 22245,
+        "gzip": 6765,
+        "brotli": 6102
+      }
+    ],
+    "totals": {
+      "raw": 429274,
+      "gzip": 120955,
+      "brotli": 104948
+    }
+  },
+  "debug": {
+    "entries": [
+      {
+        "file": "static/chunks/2lr8-ls0dbp0z.js",
+        "raw": 3118,
+        "gzip": 1673,
+        "brotli": 1406
+      }
+    ],
+    "totals": {
+      "raw": 3118,
+      "gzip": 1673,
+      "brotli": 1406
+    }
+  },
+  "initialDeltaFromPhase1": {
+    "raw": 15835,
+    "gzip": 3335,
+    "brotli": 2519
+  },
+  "deferredDeltaFromPhase1": {
+    "raw": 5483,
+    "gzip": 1709,
+    "brotli": 1561
+  },
+  "asset": 55296,
+  "assetDelta": 0
+}

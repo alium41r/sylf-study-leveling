@@ -1,0 +1,117 @@
+{
+  "at": "2026-09-14T13:54:10.226Z",
+  "inventoryAt": "2026-09-14T13:45:57.317Z",
+  "note": "Concurrent user work; audit does not own or revert these changes",
+  "files": [
+    {
+      "file": "app/calendar/components/StudyScheduleModal.tsx",
+      "measuredSha256": "7c085250033bee011a1c5e79b8d00964d4bf98c70fe48b85e4c993aa21a66722",
+      "currentSha256": "57dc0fcb1adb3a44982eb85c98e4be6598bcdf90f0f6ba6225f9ea2729a56ef7"
+    },
+    {
+      "file": "app/components/AddFriendModal.tsx",
+      "measuredSha256": "db309c7a1197d72e1135c086aca0ffb69fbd834566e4eaff415da690994657a5",
+      "currentSha256": "cf746edc3f3a07d4b284dd7df2bc7ff51395efe16fce723dcf3a929508a53632"
+    },
+    {
+      "file": "app/components/AiPlannerModal.tsx",
+      "measuredSha256": "359be3dcaa55d9bfb7199af31cc3b7fd0c7c51b355f72a804dbaa112399f8d73",
+      "currentSha256": "68c43bb15e1707ca00cd14f00e41f6cf10cffedcd19fbe2806f3fec11948c7af"
+    },
+    {
+      "file": "app/components/Calendar/StudyCalendar.tsx",
+      "measuredSha256": "d00735fe496409d31079f1be03fa56c2f3071762b7c9529d0710edd94ef79960",
+      "currentSha256": "3a9de1e416fb937ef39514dd0f6030e0fb32ec1e0d65d226cb4d127efa54840b"
+    },
+    {
+      "file": "app/components/ConfirmationModal.tsx",
+      "measuredSha256": "c91eb1de92ccc890474ac397b1c628d221cb7beccbd09c8a9f067d1d63b460ef",
+      "currentSha256": "ed4dffb804026bf1d6233cd948f05455020a145450b885e7c3297a5d05348df8"
+    },
+    {
+      "file": "app/components/FriendRequestsModal.tsx",
+      "measuredSha256": "2796cfb054dfc1d71bc8cb73fb03e8fb6a496fcd18459730d3d0bfed1e2d1252",
+      "currentSha256": "132df6a656b5c4d65b2784ea2eb8e07ddd51668a7ffc80a5d06fa4efbb8fe961"
+    },
+    {
+      "file": "app/components/GlobalSystemWrapper.tsx",
+      "measuredSha256": "49c67e4edcb9c2b4889920a32c67389ab941f7895b7b2e9cbb1dfe275026c307",
+      "currentSha256": "e3f9da31abad684a1b8d0a5c3cf6fa7d9b754f56c50c72193a84c937e19588b3"
+    },
+    {
+      "file": "app/components/PublicProfileModal.tsx",
+      "measuredSha256": "0c583820a09ef8b93941738c686b598753e0356f560ce20d2e10a650a51f4c37",
+      "currentSha256": "151582825f9aec49dd18bd87e582140725d8c73cbd5cf6400371228b35926d87"
+    },
+    {
+      "file": "app/components/Sidebar.tsx",
+      "measuredSha256": "531b41840859296de5644e5cba4a39178eebafcedbcc90e0e834c8f893a7c612",
+      "currentSha256": "3bfa664f0ded2e62d1953f55f997db20c21b0807d9b8878a53782c4446ac5c5d"
+    },
+    {
+      "file": "app/components/SidebarWrapper.tsx",
+      "measuredSha256": "64b8895086305aa29f1d8fd93e65006e981c5123c7c1422ddb143a9f47a4ff1f",
+      "currentSha256": "4592d493d7caad2852a4e01c60dbea7ab333276912ab20a6ed107db4783bf42a"
+    },
+    {
+      "file": "app/settings/achievements/page.tsx",
+      "measuredSha256": "af978e2b6bcc19f365e0c3835d58b72c38565f5a17b10e014089637e1ad9ddb8",
+      "currentSha256": "8f3edf7e6f9df6210729b0072317e807b4c31b16cc36a8a81b7e4308e3541d0d"
+    },
+    {
+      "file": "app/settings/archive/page.tsx",
+      "measuredSha256": "055e92095b07412e74fe6b0fc0f42e0ca53cb71630b5219a52b28a8501db75ae",
+      "currentSha256": "9438fe49fe294e2c24acdfda79d50ca4fa58883775c19fc77b65d55397d5c552"
+    },
+    {
+      "file": "app/settings/badges/page.tsx",
+      "measuredSha256": "528ea1356a8257e7dd0cab6b7e0a273482e7e9449995af100cbd7a9a87517294",
+      "currentSha256": "9a3e811b39354ddd5dc66d25e1fe3747837367b743a44b8ce240d7b45932ae2e"
+    },
+    {
+      "file": "app/settings/calendar/page.tsx",
+      "measuredSha256": "d61ebacd3a065b9b14084501a724692a92dc3762e80ab051a5cf8a27258d6193",
+      "currentSha256": "248aa66a0bf389c7cd487c392b5253dc1a08d31c683e996098cc79a5121ae6e5"
+    },
+    {
+      "file": "app/settings/collection/page.tsx",
+      "measuredSha256": "917ea507b70766ecf54f9f48d81b17733d7c4436130f02c183050f31dcef370e",
+      "currentSha256": "ed2555ad249ecc4ee77c35fddea9a615ac81ec612933881bc41679537b98bebe"
+    },
+    {
+      "file": "app/settings/focus-backgrounds/page.tsx",
+      "measuredSha256": "e8a59e9f7300f2a0f7a85cdbf5abe7355d5485cd01e6131c3939430fbf9e38fd",
+      "currentSha256": "a0f3e20ea739c8e985934b1c2e3ab5625a94d5f5d7cf92cf6ef64dc30a1b9a6f"
+    },
+    {
+      "file": "app/settings/modes/page.tsx",
+      "measuredSha256": "9141cc5a7db5f5f6766cd59077187604c93925a4f085beed8d88d69eff79ed5c",
+      "currentSha256": "2a66f139e5dda2843a25a16790f503c26e148ea9d7b6949de55e795a1c09d69d"
+    },
+    {
+      "file": "app/settings/notifications/page.tsx",
+      "measuredSha256": "7faec56a7f4cf7cc7889f9be4a29229574e34f72a1b61cfc39a7a0291b140de1",
+      "currentSha256": "54bee4d6dc40049207d5926a20d4cc38b10ade3c1a71bdf4d479f3845c06bf18"
+    },
+    {
+      "file": "app/settings/profile/page.tsx",
+      "measuredSha256": "a52f3eaf513a37126e271cd19566290b2867b675b04dfd5aed69e45f5f433369",
+      "currentSha256": "b243648714d5c0e5e24bc7e94b5ee0a13dc6d285ddcda639fec077188d4f3e66"
+    },
+    {
+      "file": "app/settings/rankings/page.tsx",
+      "measuredSha256": "6f0b3ad665904545757535e9f37b3bb2edfa02dea23f6d6c63eb57dfe8992505",
+      "currentSha256": "404b01e776bc2308aa37384b0eefba71b809cd337c20c11ef8915a224bc58960"
+    },
+    {
+      "file": "app/settings/stats/page.tsx",
+      "measuredSha256": "f266f7e3b4f894e69eea9235ee2a726023d7c719852121bf4e7d75cc85c6f38a",
+      "currentSha256": "076ce82ce4291d8c9d49ac460087eaa71786ed52c35f5adecb6e0cc6ffe3eebf"
+    },
+    {
+      "file": "app/settings/sync/page.tsx",
+      "measuredSha256": "1ba82779ca92ef4247ad978139b9c741b72fdf81d0b69bd2b6fe4ad19f96f3c8",
+      "currentSha256": "dab4609ba9e87ad80123176eccc47218fdd3d1c100878f20dd7bb288aa6af2ab"
+    }
+  ]
+}

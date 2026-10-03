@@ -9,7 +9,7 @@ export interface CosmeticItem {
   unlockCondition: string;
   value: string; // Image path or glyph
   fallbackIcon?: string;
-  bgCategory?: "gradient" | "pattern" | "ambient";
+  bgCategory?: "gradient" | "pattern" | "ambient" | "simple";
   rarity: Rarity;
   source: string;
 }
@@ -119,7 +119,8 @@ export const COSMETICS_CATALOG: Record<CosmeticCategory, CosmeticItem[]> = {
     { id: "solar", category: "THEME", name: "Solar", description: "Vivid orange — a burning drive for long grind sessions.", unlockCondition: "A-Rank", value: "solar", rarity: "Legendary", source: "Rank Reward" },
   ],
   BACKGROUND: [
-    { id: "void", category: "BACKGROUND", name: "The Void", description: "Pure, distraction-free darkness. The original.", unlockCondition: "Default", value: "void", bgCategory: "gradient", rarity: "Common", source: "Base System" },
+    { id: "simple", category: "BACKGROUND", name: "Simple", description: "Distraction-free solid canvas. Pure Black in Dark Mode, Pure White in Light Mode.", unlockCondition: "Default", value: "simple", bgCategory: "simple", rarity: "Common", source: "Base System" },
+    { id: "void", category: "BACKGROUND", name: "The Void", description: "Pure, distraction-free solid darkness.", unlockCondition: "Default", value: "simple", bgCategory: "simple", rarity: "Common", source: "Base System" },
     { id: "cyber-grid", category: "BACKGROUND", name: "Cyber Grid", description: "Tron-inspired digital grid lines pulsing beneath the surface.", unlockCondition: "Level 5", value: "cyber-grid", bgCategory: "pattern", rarity: "Common", source: "Level Reward" },
     { id: "sakura-fall", category: "BACKGROUND", name: "Sakura Dusk", description: "A warm rose glow fading into the dark — gentle and meditative.", unlockCondition: "Level 10", value: "sakura-fall", bgCategory: "ambient", rarity: "Rare", source: "Level Reward" },
     { id: "abyssal-glow", category: "BACKGROUND", name: "Abyssal Glow", description: "A deep purple nebula radiating from the center of the screen.", unlockCondition: "E-Rank", value: "abyssal-glow", bgCategory: "ambient", rarity: "Rare", source: "Rank Reward" },
@@ -159,3 +160,25 @@ export function getClassInfo(id?: string | null): CosmeticItem {
   const found = CLASS_CATALOG.find((c) => c.id === safeId);
   return found || CLASS_CATALOG[0];
 }
+
+export const LEGACY_SIMPLE_BACKGROUND_ALIASES = new Set([
+  "simple-black",
+  "simple-white",
+  "black",
+  "white",
+  "pure-black",
+  "pure-white",
+  "void",
+  "none",
+  "default",
+]);
+
+export function normalizeAppBackgroundId(id?: string | null): string {
+  if (!id) return "simple";
+  const trimmed = id.trim().toLowerCase();
+  if (trimmed === "simple" || LEGACY_SIMPLE_BACKGROUND_ALIASES.has(trimmed)) {
+    return "simple";
+  }
+  return id;
+}
+

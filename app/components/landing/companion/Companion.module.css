@@ -1,0 +1,832 @@
+.companion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--character-size, var(--companion-size, 96px));
+  height: var(--character-size, var(--companion-size, 96px));
+  max-width: 100%;
+  flex-shrink: 0;
+  vertical-align: middle;
+  pointer-events: none;
+  user-select: none;
+  contain: layout style;
+  /* Ambient idle defaults. Unchanged for non-journey consumers. */
+  --float: 9px;
+  --sway: 2deg;
+  --drift: 2px;
+  --roll: 0.35deg;
+  --lag-boost: 1;
+}
+/*
+ * Journey profile. The landing journey is the only consumer that asks for the
+ * full life pass; onboarding keeps the quieter defaults above. Amplitudes are
+ * SVG user units, not screen pixels: one user unit is ~0.229 CSS px at the
+ * desktop journey size (144 CSS px wide over a 630-unit viewBox).
+ */
+.companion[data-motion-profile="journey"] {
+  --float: 34px;
+  --sway: 3.4deg;
+  --drift: 7px;
+  --roll: 1.1deg;
+}
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/*
+ * Layered float. Three nested groups at unrelated durations and phases so the
+ * idle never reads as a single sine wave: bob 6.4s, lateral drift 9.3s,
+ * roll 14.6s. Nothing here shares a period with anything else.
+ */
+.float {
+  animation: float 6.4s ease-in-out infinite;
+  transform-origin: 491px 640px;
+}
+/*
+ * The extra drift/roll layers belong to the journey profile only, so other
+ * consumers of this renderer keep exactly the single-layer idle they had.
+ */
+.floatDrift,
+.floatRoll {
+  animation: none;
+}
+.companion[data-motion-profile="journey"] .floatDrift {
+  animation: float-drift 9.3s ease-in-out infinite;
+}
+.companion[data-motion-profile="journey"] .floatRoll {
+  animation: float-roll 14.6s ease-in-out infinite;
+}
+.floatDrift {
+  transform-origin: 491px 640px;
+}
+.floatRoll {
+  transform-origin: 491px 720px;
+}
+.body {
+  animation: breathe 5.6s ease-in-out infinite;
+  transform-origin: 491px 617px;
+}
+.head {
+  transform-origin: 491px 550px;
+  transition: transform 0.65s ease;
+}
+.halo {
+  animation: halo 11.7s ease-in-out infinite;
+  transform-origin: 491px 166px;
+}
+.star {
+  animation: star 8.9s ease-in-out infinite;
+  transform-origin: 491px 105px;
+}
+.ribbonLeft,
+.ribbonRight {
+  animation: ribbon 6.1s ease-in-out infinite;
+}
+.ribbonLeft,
+.ribbonLagLeft {
+  transform-origin: 425px 562px;
+}
+.ribbonRight,
+.ribbonLagRight {
+  transform-origin: 557px 562px;
+}
+.ribbonLagLeft {
+  transform: translateY(var(--ribbon-left-lift, 0px))
+    rotate(calc(var(--ribbon-left-lag, 0deg) * var(--lag-boost, 1)));
+}
+.ribbonLagRight {
+  transform: translateY(var(--ribbon-right-lift, 0px))
+    rotate(calc(var(--ribbon-right-lag, 0deg) * var(--lag-boost, 1)));
+}
+/*
+ * Cape travel response. Origin sits on the attachment line where the panels
+ * meet the torso, so the anchored edge barely moves and the shear (rather than
+ * the rotation) carries the visible swing. Stretch is clamped positive in
+ * motion, so the panel only ever billows outward.
+ */
+.capeLag {
+  transform-origin: 491px 605px;
+  transform: translateY(calc(var(--cape-lift, 0px) * 3))
+    rotate(calc(var(--cape-lag, 0deg) * var(--lag-boost, 1)))
+    skewX(calc(var(--cape-skew, 0deg) * var(--lag-boost, 1)))
+    scaleY(calc(1 + var(--cape-stretch, 0)));
+}
+.cloakTravelLeft,
+.cloakTravelRight {
+  transform-origin: 491px 605px;
+}
+.cloakTravelLeft {
+  transform: rotate(calc(var(--cape-left-tilt, 0deg) * var(--lag-boost, 1)))
+    skewX(calc(var(--cape-left-skew, 0deg) * var(--lag-boost, 1)));
+}
+.cloakTravelRight {
+  transform: rotate(calc(var(--cape-right-tilt, 0deg) * var(--lag-boost, 1)))
+    skewX(calc(var(--cape-right-skew, 0deg) * var(--lag-boost, 1)));
+}
+.cloakLeft,
+.cloakRight {
+  animation: fabric 7.4s ease-in-out infinite;
+}
+.cloakLeft {
+  transform-origin: 414px 607px;
+  animation-delay: -1.9s;
+}
+.cloakRight {
+  transform-origin: 568px 607px;
+  animation-delay: -4.1s;
+  animation-direction: reverse;
+}
+.haloLag {
+  transform-origin: 491px 166px;
+  transform: translate(
+      calc(var(--halo-x, 0px) * 3),
+      calc(var(--halo-y, 0px) * 3)
+    )
+    rotate(calc(var(--halo-lag, 0deg) * var(--lag-boost, 1)));
+}
+.starLag {
+  transform-origin: 491px 105px;
+  transform: translate(
+      calc(var(--star-x, 0px) * 3),
+      calc(var(--star-y, 0px) * 3)
+    )
+    rotate(calc(var(--star-lag, 0deg) * var(--lag-boost, 1)));
+}
+.ribbonRight {
+  animation-delay: -2.4s;
+  animation-direction: reverse;
+}
+/*
+ * Bank offset. Applied inside the SVG rather than on the HTML surface because
+ * the value is in user units; the surface only carries the rotation, whose
+ * origin is expressed in percentages. A reaction animation takes over this
+ * element's transform for its duration, which is intended.
+ */
+.reaction {
+  transform-origin: 491px 670px;
+  transform: translateX(var(--journey-shift, 0px));
+}
+.shadow {
+  transform-origin: 491px 871px;
+  animation: shadow 6.4s ease-in-out infinite;
+}
+.lowerBodyLag {
+  transform-origin: 491px 617px;
+  transform: translateY(calc(var(--lower-lift, 0px) * 0.8))
+    rotate(calc(var(--lower-tilt, 0deg) * var(--lag-boost, 1)));
+}
+.lowerBody,
+.cloak {
+  transform-origin: 491px 617px;
+  transition: transform 0.65s ease;
+}
+.legLeft,
+.legRight {
+  transition: transform 0.65s ease;
+}
+.legLeft {
+  transform-origin: 444px 721px;
+}
+.legRight {
+  transform-origin: 538px 721px;
+}
+.prop {
+  transform-origin: 491px 700px;
+}
+.sparkles {
+  animation: sparkles 1.4s ease-out 2;
+  transform-origin: 491px 530px;
+}
+.companion[data-expression="CURIOUS"] .head {
+  transform: rotate(-3deg);
+}
+.companion[data-expression="THINKING"] .head {
+  transform: translateY(-1px) rotate(2deg);
+}
+.companion[data-expression="SLEEPY"] .head {
+  transform: translateY(3px) rotate(3deg);
+}
+.companion[data-expression="SLEEPY"] .float {
+  animation-duration: 9.8s;
+  --float: 5px;
+}
+.companion[data-expression="SLEEPY"] .shadow {
+  animation-duration: 9.8s;
+}
+.companion[data-state="QUEST_COMPLETE"] .reaction {
+  animation: happy 1.1s ease-in-out 2;
+}
+/* The capability sequence uses the existing gentle happy lift, without a double bounce. */
+.companion[data-svg-sequence] .reaction {
+  animation: none;
+}
+.companion[data-action="CELEBRATING"] .reaction {
+  animation: celebrate 1.4s ease-in-out 2;
+}
+.companion[data-action="CELEBRATING"] .star {
+  animation: positive-star 1.4s ease-out 2;
+}
+.companion[data-action="TIMER_MODE"] .lowerBody {
+  transform: translateY(3px);
+}
+.companion[data-action="TIMER_MODE"] .legLeft {
+  transform: rotate(7deg) scaleY(0.98);
+}
+.companion[data-action="TIMER_MODE"] .legRight {
+  transform: rotate(-7deg) scaleY(0.98);
+}
+.companion[data-action="TIMER_MODE"] .cloak {
+  transform: translateY(2px) scale(1.01, 0.985);
+}
+.companion[data-motion="quiet"] {
+  --float: 3px;
+  --sway: 0.7deg;
+}
+.companion[data-motion="quiet"] .float,
+.companion[data-motion="quiet"] .shadow {
+  animation-duration: 9s;
+}
+.companion[data-motion="quiet"] .star,
+.companion[data-motion="quiet"] .body {
+  animation: none;
+}
+.companion[data-compact="true"] .sparkles {
+  display: none;
+}
+.companion[data-compact="true"] .ribbonLeft,
+.companion[data-compact="true"] .ribbonRight {
+  animation: none;
+}
+.companion[data-animation="paused"] * {
+  animation-play-state: paused !important;
+}
+.companion[data-motion="none"] * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* State pose is nested inside travel/ambient layers: no travel variable is replaced. */
+.statePose {
+  --pose-y: 0px;
+  --pose-roll: 0deg;
+  transform-origin: 491px 640px;
+  transform: translateY(var(--pose-y)) rotate(var(--pose-roll));
+  transition: transform 650ms ease;
+}
+.actionPose {
+  transform-origin: 491px 640px;
+  transition: transform 650ms ease;
+}
+.gaze {
+  transition: transform 650ms ease;
+}
+.ribbonPoseLeft {
+  transform-origin: 425px 562px;
+}
+.ribbonPoseRight {
+  transform-origin: 557px 562px;
+}
+.cloakPoseLeft {
+  transform-origin: 414px 607px;
+}
+.cloakPoseRight {
+  transform-origin: 568px 607px;
+}
+.haloPose {
+  transform-origin: 491px 166px;
+}
+.starPose {
+  transform-origin: 491px 105px;
+}
+.ribbonPoseLeft,
+.ribbonPoseRight,
+.cloakPoseLeft,
+.cloakPoseRight,
+.haloPose,
+.starPose {
+  transition: transform 650ms ease;
+}
+
+.companion[data-action="FLOATING"] .actionPose {
+  transform: translateY(-10px);
+}
+.companion[data-expression="HAPPY"] .statePose {
+  --pose-y: -12px;
+}
+.companion[data-expression="HAPPY"] .head {
+  transform: translateY(-1px);
+}
+.companion[data-expression="HAPPY"] .ribbonPoseLeft {
+  transform: rotate(2deg);
+}
+.companion[data-expression="HAPPY"] .ribbonPoseRight {
+  transform: rotate(-2deg);
+}
+.companion[data-expression="HAPPY"] .cloakPoseLeft {
+  transform: scaleX(1.015);
+}
+.companion[data-expression="HAPPY"] .cloakPoseRight {
+  transform: scaleX(1.015);
+}
+.companion[data-expression="HAPPY"] .starPose {
+  transform: translateY(-8px);
+}
+
+.companion[data-expression="EXCITED"] .statePose {
+  --pose-y: -36px;
+}
+.companion[data-expression="EXCITED"] .head {
+  transform: translateY(-2px);
+}
+.companion[data-expression="EXCITED"] .ribbonPoseLeft {
+  transform: rotate(5deg) scaleX(1.02);
+}
+.companion[data-expression="EXCITED"] .ribbonPoseRight {
+  transform: rotate(-5deg) scaleX(1.02);
+}
+.companion[data-expression="EXCITED"] .cloakPoseLeft {
+  transform: scaleX(1.045);
+}
+.companion[data-expression="EXCITED"] .cloakPoseRight {
+  transform: scaleX(1.045);
+}
+.companion[data-expression="EXCITED"] .haloPose {
+  transform: translateY(-9px) rotate(-2deg);
+}
+.companion[data-expression="EXCITED"] .starPose {
+  transform: translateY(-20px) rotate(4deg);
+}
+.companion[data-expression="EXCITED"]:not([data-action="CELEBRATING"])
+  .statePose {
+  animation: excited-lift 1.4s ease-in-out 2;
+}
+
+.companion[data-expression="CURIOUS"] .statePose {
+  --pose-roll: 0.8deg;
+}
+.companion[data-expression="CURIOUS"] .ribbonPoseLeft {
+  transform: rotate(2.5deg);
+}
+.companion[data-expression="CURIOUS"] .ribbonPoseRight {
+  transform: rotate(1deg);
+}
+.companion[data-expression="CURIOUS"] .cloakPoseLeft {
+  transform: scaleX(1.01);
+}
+.companion[data-expression="CURIOUS"] .haloPose {
+  transform: translate(10px, 1px) rotate(2deg);
+}
+.companion[data-expression="CURIOUS"] .starPose {
+  transform: translateX(6px);
+}
+
+.companion[data-expression="THINKING"] .ribbonPoseLeft {
+  transform: rotate(-2deg);
+}
+.companion[data-expression="THINKING"] .statePose {
+  --pose-y: 5px;
+  --pose-roll: -0.6deg;
+}
+.companion[data-expression="THINKING"] .gaze {
+  transform: translate(5px, -5px);
+}
+.companion[data-expression="THINKING"] .haloPose {
+  transform: translate(-5px, 4px) rotate(-1deg);
+}
+.companion[data-expression="THINKING"] .ribbonPoseRight {
+  transform: rotate(2deg);
+}
+.companion[data-expression="THINKING"] .ribbonLeft,
+.companion[data-expression="THINKING"] .ribbonRight {
+  --sway: 0.6deg;
+  animation-duration: 10s;
+}
+.companion[data-expression="THINKING"] .halo {
+  animation-duration: 18s;
+}
+.companion[data-expression="THINKING"] .star {
+  animation-duration: 16s;
+}
+.companion[data-expression="THINKING"] .body {
+  animation-duration: 9s;
+}
+.companion[data-expression="THINKING"] .float {
+  --float: 5px;
+  animation-duration: 9s;
+}
+.companion[data-expression="THINKING"] .shadow {
+  animation-duration: 9s;
+}
+.companion[data-expression="THINKING"] .cloakLeft,
+.companion[data-expression="THINKING"] .cloakRight {
+  animation-duration: 12s;
+}
+
+.companion[data-expression="SLEEPY"] .statePose {
+  --pose-y: 14px;
+  --pose-roll: 0.5deg;
+}
+.companion[data-expression="SLEEPY"] .body {
+  animation-duration: 10s;
+}
+.companion[data-expression="SLEEPY"] .ribbonPoseLeft {
+  transform: rotate(-2deg);
+}
+.companion[data-expression="SLEEPY"] .ribbonPoseRight {
+  transform: rotate(2deg);
+}
+.companion[data-expression="SLEEPY"] .ribbonLeft,
+.companion[data-expression="SLEEPY"] .ribbonRight {
+  --sway: 0.5deg;
+  animation-duration: 12s;
+}
+.companion[data-expression="SLEEPY"] .cloakPoseLeft {
+  transform: scaleY(1.01);
+}
+.companion[data-expression="SLEEPY"] .cloakPoseRight {
+  transform: scaleY(1.01);
+}
+.companion[data-expression="SLEEPY"] .cloakLeft,
+.companion[data-expression="SLEEPY"] .cloakRight,
+.companion[data-expression="SLEEPY"] .halo,
+.companion[data-expression="SLEEPY"] .star {
+  animation-duration: 16s;
+}
+.companion[data-expression="SLEEPY"] .haloPose,
+.companion[data-expression="SLEEPY"] .starPose {
+  transform: translateY(5px);
+}
+
+/* Roots are behind the robe; the same shoulder animation drives the visible cuff/mitten. */
+.armLeft,
+.armRight {
+  transform-origin: 0 0;
+}
+.wrist {
+  transform-origin: 0 -109px;
+}
+/* No relative prop sway: sleeves, cuffs and grips keep their shared registration. */
+.armEntrance,
+.prop,
+.timer {
+  animation: detail-appear 240ms ease-out both;
+}
+.companion[data-action="HELLO"] .armRight {
+  animation: sleeve-wave 2.2s ease-in-out 1;
+}
+.companion[data-action="HELLO"] .actionPose {
+  animation: greeting-lift 2.2s ease-in-out 1;
+}
+.companion[data-action="HELLO"] .ribbonPoseRight {
+  transform: rotate(-3deg);
+}
+.companion[data-action="CELEBRATING"] .armLeft {
+  animation: celebrate-arm-left 1.4s ease-in-out 2;
+}
+.companion[data-action="CELEBRATING"] .armRight {
+  animation: celebrate-arm-right 1.4s ease-in-out 2;
+}
+
+.companion[data-action="READING"] .head {
+  transform: translateY(2px) rotate(1deg);
+}
+.companion[data-action="READING"] .gaze {
+  transform: translate(-6px, 19px);
+}
+.companion[data-action="READING"] .haloPose {
+  transform: translateY(3px) rotate(1deg);
+}
+.companion[data-action="USING_TABLET"] .head {
+  transform: translateY(2px) rotate(-2deg);
+}
+.companion[data-action="USING_TABLET"] .gaze {
+  transform: translate(2px, 16px);
+}
+.companion[data-action="TIMER_MODE"] .gaze {
+  transform: translate(14px, 6px);
+}
+.companion[data-action="TIMER_MODE"] .head {
+  transform: translateY(1px) rotate(2deg);
+}
+.companion[data-action="TIMER_MODE"] .actionPose {
+  transform: translateY(-4px);
+}
+.companion[data-action="TIMER_MODE"] .ribbonPoseLeft {
+  transform: rotate(-5deg);
+}
+.companion[data-action="TIMER_MODE"] .ribbonPoseRight {
+  transform: rotate(5deg);
+}
+.timerProgress {
+  animation: timer-progress 8s ease-in-out infinite;
+}
+/* Keep the progress display readable inside the existing mobile character box. */
+.companion[data-action="TIMER_MODE"] [data-part="timer"] {
+  display: inline;
+}
+
+@keyframes sleeve-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  14%,
+  44%,
+  74% {
+    transform: rotate(-10deg);
+  }
+  29%,
+  59%,
+  89% {
+    transform: rotate(7deg);
+  }
+}
+@keyframes detail-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes greeting-lift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  35%,
+  70% {
+    transform: translateY(-5px) rotate(-0.4deg);
+  }
+}
+@keyframes celebrate-arm-left {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  32% {
+    transform: rotate(9deg);
+  }
+  68% {
+    transform: rotate(3deg);
+  }
+}
+@keyframes celebrate-arm-right {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  32% {
+    transform: rotate(-9deg);
+  }
+  68% {
+    transform: rotate(-3deg);
+  }
+}
+@keyframes excited-lift {
+  0%,
+  100% {
+    transform: translateY(var(--pose-y));
+  }
+  30% {
+    transform: translateY(calc(var(--pose-y) - 12px));
+  }
+  66% {
+    transform: translateY(calc(var(--pose-y) - 3px));
+  }
+}
+@keyframes timer-progress {
+  0%,
+  100% {
+    stroke-dasharray: 73 27;
+    opacity: 0.95;
+  }
+  50% {
+    stroke-dasharray: 84 16;
+    opacity: 1;
+  }
+}
+/*
+ * Below the desktop journey size the whole artwork scales down with the SVG, so
+ * a fixed user-unit amplitude gets physically smaller on screen. Boost it back
+ * up so the motion still reads on a phone, where the traveller is ~56 px wide.
+ */
+@media (max-width: 1100px) {
+  .companion[data-motion-profile="journey"] {
+    --float: 38px;
+    --drift: 8px;
+    --roll: 1.25deg;
+    --sway: 3.8deg;
+    --lag-boost: 1.12;
+  }
+}
+@media (max-width: 900px) {
+  .companion[data-motion-profile="journey"] {
+    --float: 43px;
+    --drift: 9px;
+    --roll: 1.4deg;
+    --sway: 4.2deg;
+    --lag-boost: 1.22;
+  }
+}
+@media (max-width: 700px) {
+  .companion[data-motion-profile="journey"] {
+    --float: 52px;
+    --drift: 11px;
+    --roll: 1.7deg;
+    --sway: 5deg;
+    --lag-boost: 1.35;
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-0.35deg);
+  }
+  30% {
+    transform: translate(1.5px, calc(-1 * var(--float))) rotate(0.5deg);
+  }
+  62% {
+    transform: translate(-1px, calc(-0.55 * var(--float))) rotate(-0.1deg);
+  }
+}
+@keyframes float-drift {
+  0%,
+  100% {
+    transform: translateX(calc(-1 * var(--drift)));
+  }
+  38% {
+    transform: translateX(var(--drift));
+  }
+  70% {
+    transform: translateX(calc(0.25 * var(--drift)));
+  }
+}
+@keyframes float-roll {
+  0%,
+  100% {
+    transform: rotate(calc(-1 * var(--roll)));
+  }
+  46% {
+    transform: rotate(var(--roll));
+  }
+  78% {
+    transform: rotate(calc(0.2 * var(--roll)));
+  }
+}
+@keyframes fabric {
+  0%,
+  100% {
+    transform: rotate(-0.75deg) skewX(-0.22deg);
+  }
+  55% {
+    transform: rotate(0.75deg) skewX(0.22deg);
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.016);
+  }
+}
+@keyframes ribbon {
+  0%,
+  100% {
+    transform: rotate(calc(-1 * var(--sway)));
+  }
+  50% {
+    transform: rotate(var(--sway));
+  }
+}
+@keyframes halo {
+  0%,
+  100% {
+    transform: rotate(-2deg) translateY(0);
+  }
+  50% {
+    transform: rotate(2deg) translate(-2px, -4px);
+  }
+}
+@keyframes star {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translate(2px, -7px) scale(1.025);
+  }
+}
+/* Grounded shadow: in step with the 6.4s float, so lift reads as spatial. */
+@keyframes shadow {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.13;
+  }
+  30% {
+    transform: scaleX(0.86);
+    opacity: 0.08;
+  }
+  62% {
+    transform: scaleX(0.93);
+    opacity: 0.105;
+  }
+}
+@keyframes happy {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  35% {
+    transform: translateY(-12px) rotate(-2deg);
+  }
+  65% {
+    transform: translateY(-1px) rotate(1deg);
+  }
+}
+@keyframes celebrate {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  28% {
+    transform: translateY(-21px) rotate(-3deg);
+  }
+  63% {
+    transform: translateY(-9px) rotate(3deg);
+  }
+}
+@keyframes hello {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+@keyframes thinking {
+  0%,
+  100% {
+    transform: rotate(-1deg);
+  }
+  50% {
+    transform: rotate(1deg);
+  }
+}
+@keyframes sparkles {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  30%,
+  65% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+@keyframes positive-star {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .companion * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .sparkles {
+    opacity: 0.6;
+  }
+  .companion[data-svg-sequence] .statePose,
+  .companion[data-svg-sequence] .head,
+  .companion[data-svg-sequence] .ribbonPoseLeft,
+  .companion[data-svg-sequence] .ribbonPoseRight,
+  .companion[data-svg-sequence] .cloakPoseLeft,
+  .companion[data-svg-sequence] .cloakPoseRight,
+  .companion[data-svg-sequence] .haloPose,
+  .companion[data-svg-sequence] .starPose {
+    transform: none;
+  }
+  /* Every travel-driven layer resolves to its neutral pose. */
+  .capeLag,
+  .cloakTravelLeft,
+  .cloakTravelRight,
+  .lowerBodyLag,
+  .ribbonLagLeft,
+  .ribbonLagRight,
+  .haloLag,
+  .starLag {
+    transform: none;
+  }
+}

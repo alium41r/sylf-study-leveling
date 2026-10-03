@@ -1,0 +1,116 @@
+/* Individual growth marks follow the measured journey; the guide path is invisible. */
+.geometry {
+  fill: none;
+  stroke: none;
+}
+
+.mark {
+  color: var(--accent);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.25;
+  transition: opacity 600ms ease;
+}
+
+.mark[data-state="grown"] {
+  opacity: 0.44;
+}
+
+.mark[data-state="growing"] {
+  opacity: 0.72;
+}
+
+.leafFill {
+  fill: currentColor;
+  fill-opacity: 0.1;
+}
+
+.seed {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Page travel and local character motion have independent transform owners. */
+.characterBody.characterBody {
+  left: -72px;
+  bottom: 0;
+  width: 144px;
+  height: 180px;
+  transform: none;
+  animation: none !important;
+  pointer-events: none;
+}
+
+.message.message {
+  bottom: 183px;
+}
+
+/* The hero already introduces Sylf in its copy; keep this opening space calm. */
+.heroTraveler[data-hero="true"] .message {
+  visibility: hidden;
+}
+
+@media (max-width: 1100px) {
+  .characterBody.characterBody {
+    left: -60px;
+    width: 120px;
+    height: 150px;
+  }
+
+  .message.message {
+    bottom: 153px;
+  }
+}
+
+@media (max-width: 900px) {
+  .characterBody.characterBody {
+    left: -48px;
+    width: 96px;
+    height: 120px;
+  }
+
+  .message.message {
+    bottom: 123px;
+  }
+}
+
+@media (max-width: 700px) {
+  .mark {
+    opacity: 0.22;
+    stroke-width: 1.15;
+  }
+
+  .mark[data-state="grown"] {
+    opacity: 0.34;
+  }
+
+  .mark[data-state="growing"] {
+    opacity: 0.55;
+  }
+
+  .characterBody.characterBody {
+    left: -28px;
+    width: 56px;
+    height: 70px;
+  }
+
+  .characterBody [data-part="timer"],
+  .characterBody [data-part="sparkles"] {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reuse the actual traveler as the static hero companion instead of a copy. */
+  .heroTraveler.heroTraveler {
+    display: block;
+    will-change: auto;
+  }
+
+  .mark {
+    transition: none;
+  }
+}

@@ -71,11 +71,17 @@ export function extractJsonValue(rawText: string): unknown {
 
   try {
     return JSON.parse(candidate);
-  } catch (err: any) {
-    throw new JsonExtractionError(
-      "parse",
-      `JSON.parse failed on extracted LLM payload: ${err?.message || String(err)}`
-    );
+  } catch (initialErr: any) {
+    try {
+      // LLMs frequently output unescaped backslashes in math/LaTeX (e.g. \frac, \lim, \alpha)
+      const sanitized = candidate.replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, "\\\\");
+      return JSON.parse(sanitized);
+    } catch {
+      throw new JsonExtractionError(
+        "parse",
+        `JSON.parse failed on extracted LLM payload: ${initialErr?.message || String(initialErr)}`
+      );
+    }
   }
 }
 

@@ -8,8 +8,6 @@ import type { LiveSubjectNode } from "./SubjectConstellationCanvas";
 import { calculateSemanticScopeWeight } from "@/lib/ai/scope-evaluator";
 import {
   X,
-  Target,
-  Sparkles,
   CheckCircle2,
   BookOpen,
   ArrowRight,
@@ -17,6 +15,7 @@ import {
   Zap,
   Info,
 } from "lucide-react";
+import { QuestEmblemIcon, SystemApertureIcon } from "@/app/components/icons";
 
 interface CreateNodeQuestModalProps {
   isOpen: boolean;
@@ -247,7 +246,7 @@ export function CreateNodeQuestModal({
                 </h4>
                 <p className="text-xs text-text-secondary font-rajdhani max-w-sm mx-auto">
                   Completing this {createdQuest.targetMinutes}-minute focus session will reconcile{" "}
-                  <span className="text-purple-300 font-bold font-mono">
+                  <span className="text-purple-600 dark:text-purple-300 font-bold font-mono">
                     ~+{Math.round(createdQuest.scopeWeight * 100)}%
                   </span>{" "}
                   mastery toward {getNodeDisplayCode(skeletonNode.id)}.
@@ -257,7 +256,7 @@ export function CreateNodeQuestModal({
               <div className="p-3.5 rounded-xl bg-bg-abyss border border-border-subtle text-left max-w-md mx-auto space-y-1 text-xs font-rajdhani">
                 <div className="flex justify-between font-mono">
                   <span className="text-text-secondary">Assigned Rewards:</span>
-                  <span className="text-amber-300 font-bold">
+                  <span className="text-amber-600 dark:text-amber-300 font-bold">
                     +{createdQuest.xpReward} XP • +{createdQuest.sylphReward} Sylph
                   </span>
                 </div>
@@ -269,7 +268,7 @@ export function CreateNodeQuestModal({
                 </div>
                 <div className="flex justify-between font-mono pt-1 border-t border-border-subtle">
                   <span className="text-text-secondary">AI Scope Weight:</span>
-                  <span className="text-emerald-400 font-bold font-mono">
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">
                     {Math.round(createdQuest.scopeWeight * 100)}% Chapter Coverage
                   </span>
                 </div>
@@ -299,7 +298,7 @@ export function CreateNodeQuestModal({
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Learning Objectives Reference */}
               <div className="p-3.5 rounded-xl bg-bg-abyss/90 border border-border-subtle space-y-1">
-                <div className="flex items-center gap-2 text-xs font-rajdhani font-bold text-purple-300 uppercase tracking-wide">
+                <div className="flex items-center gap-2 text-xs font-rajdhani font-bold text-purple-600 dark:text-purple-300 uppercase tracking-wide">
                   <BookOpen className="w-3.5 h-3.5" />
                   <span>Syllabus Learning Objectives</span>
                 </div>
@@ -323,13 +322,13 @@ export function CreateNodeQuestModal({
                 />
               </div>
 
-              {/* Scope & Study Plan */}
+              {/* Scope & Practice Plan */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="block text-xs font-mono font-bold uppercase text-text-secondary flex items-center gap-2">
                     <span>Scope & Practice Plan (AI Weighted)</span>
                     {isEvaluatingAI && (
-                      <span className="flex items-center gap-1 text-[10px] font-mono text-purple-400 normal-case font-normal animate-pulse">
+                      <span className="flex items-center gap-1 text-[10px] font-mono text-purple-600 dark:text-purple-400 normal-case font-normal animate-pulse">
                         <Loader2 className="w-3 h-3 animate-spin" />
                         <span>AI evaluating...</span>
                       </span>
@@ -338,12 +337,12 @@ export function CreateNodeQuestModal({
                   <span
                     className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border transition-all ${
                       isEvaluatingAI
-                        ? "bg-purple-950/40 text-purple-300 border-purple-500/40 animate-pulse"
+                        ? "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30 animate-pulse"
                         : currentBoost >= 90
-                        ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/40"
+                        ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
                         : currentBoost >= 50
-                        ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/40"
-                        : "bg-amber-950/40 text-amber-300 border-amber-500/40"
+                        ? "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/30"
+                        : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
                     }`}
                   >
                     {isEvaluatingAI ? "AI Calculating..." : `Est. Coverage: ~+${currentPortion}%`}
@@ -370,7 +369,7 @@ export function CreateNodeQuestModal({
                         setDescription(preset.text);
                         setAiEvaluation(null);
                       }}
-                      className="px-2.5 py-1 rounded-lg text-[10px] font-rajdhani font-semibold bg-bg-abyss border border-border-subtle hover:border-accent-primary/60 hover:text-text-primary text-text-muted transition-colors"
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-rajdhani font-semibold bg-bg-abyss border border-border-subtle hover:border-accent-primary/60 hover:text-text-primary text-text-muted transition-colors cursor-pointer"
                     >
                       {preset.label}
                     </button>
@@ -393,7 +392,7 @@ export function CreateNodeQuestModal({
                         setIsCustomMinutes(false);
                         setAiEvaluation(null);
                       }}
-                      className={`py-2 rounded-xl border text-xs font-mono font-bold transition-all ${
+                      className={`py-2 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer ${
                         targetMinutes === m && !isCustomMinutes
                           ? "bg-accent-primary text-white border-accent-primary shadow-sm"
                           : "bg-bg-abyss border-border-subtle text-text-secondary hover:text-text-primary hover:border-border-active"
@@ -409,7 +408,7 @@ export function CreateNodeQuestModal({
               <div className="p-3.5 rounded-xl bg-accent-primary-dim/20 border border-accent-primary/30 space-y-1.5 transition-all">
                 <div className="flex items-center justify-between text-xs font-rajdhani">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-purple-300" />
+                    <SystemApertureIcon className="w-4 h-4 text-purple-600 dark:text-purple-300" />
                     <span className="text-text-primary font-semibold">
                       Estimated Node Mastery Boost:
                     </span>
@@ -417,12 +416,12 @@ export function CreateNodeQuestModal({
                   <span
                     className={`font-mono font-bold ${
                       isEvaluatingAI
-                        ? "text-purple-300 animate-pulse"
+                        ? "text-purple-600 dark:text-purple-300 animate-pulse"
                         : currentBoost >= 90
-                        ? "text-emerald-400"
+                        ? "text-emerald-600 dark:text-emerald-400"
                         : currentBoost >= 50
-                        ? "text-cyan-400"
-                        : "text-amber-300"
+                        ? "text-cyan-600 dark:text-cyan-400"
+                        : "text-amber-600 dark:text-amber-300"
                     }`}
                   >
                     {isEvaluatingAI ? (
@@ -438,7 +437,7 @@ export function CreateNodeQuestModal({
 
                 {displayRationale && (
                   <div className="flex items-start gap-1.5 text-[11px] text-text-secondary font-rajdhani pt-1 border-t border-accent-primary/10">
-                    <Info className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
+                    <Info className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400 shrink-0 mt-0.5" />
                     <span className="leading-snug">{displayRationale}</span>
                   </div>
                 )}
@@ -471,7 +470,7 @@ export function CreateNodeQuestModal({
                     </>
                   ) : (
                     <>
-                      <Target className="w-3.5 h-3.5" />
+                      <QuestEmblemIcon className="w-3.5 h-3.5" />
                       <span>Create Focus Quest</span>
                     </>
                   )}

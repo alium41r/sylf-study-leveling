@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
+import { SystemApertureIcon } from "@/app/components/icons";
 import { PagePresence } from "./page-presence";
 import { QuotaInfo } from "../AiPlannerModal";
 
@@ -18,7 +19,9 @@ interface SystemFabProps {
  * the quick conversational overlay without leaving the current page.
  */
 export default function SystemFab({ presence, chatQuota, onClick }: SystemFabProps) {
-  const quotaExhausted = chatQuota !== null && chatQuota.remaining === 0;
+  // An unlimited account never shows the limit badge (`remaining` is null there).
+  const quotaExhausted =
+    chatQuota !== null && !chatQuota.unlimited && chatQuota.remaining === 0;
 
   return (
     <motion.button
@@ -30,21 +33,21 @@ export default function SystemFab({ presence, chatQuota, onClick }: SystemFabPro
       onClick={onClick}
       aria-label={`Ask The System — ${presence.label} context`}
       title={`Ask The System — ${presence.label} context`}
-      className="fixed z-[58] right-4 sm:right-6 bottom-5 sm:bottom-6 group flex items-center gap-2 rounded-full border border-accent-mid/70 bg-bg-abyss/95 backdrop-blur-xl pl-1.5 pr-1.5 sm:pl-2 sm:pr-2 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.45),0_0_22px_var(--accent-primary-dim)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.55),0_0_34px_var(--accent-primary-mid)] hover:border-accent-primary-light transition-all duration-200 hover:scale-[1.03] active:scale-95"
+      className="fixed z-[58] right-4 sm:right-6 bottom-5 sm:bottom-6 group flex items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--surface-1)]/95 text-[var(--text-primary)] backdrop-blur-xl pl-1.5 pr-1.5 sm:pl-2 sm:pr-2 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.25),0_0_22px_var(--accent-primary-dim)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.35),0_0_34px_var(--accent-primary-mid)] hover:border-[var(--accent-primary)] transition-all duration-200 hover:scale-[1.03] active:scale-95"
     >
-      <span className="w-8 h-8 rounded-full bg-accent-primary/15 border border-accent-mid/50 flex items-center justify-center text-accent-text-light shrink-0">
-        <Sparkles className="w-4 h-4" />
+      <span className="w-8 h-8 rounded-full bg-[var(--accent-primary)]/15 border border-[var(--accent-primary)]/30 flex items-center justify-center text-[var(--accent-text,var(--accent-primary))] shrink-0">
+        <SystemApertureIcon className="w-4 h-4" />
       </span>
 
       <span
-        className="hidden sm:block text-[11px] font-bold uppercase tracking-widest font-['Rajdhani'] text-text-primary pr-1"
+        className="hidden sm:block text-[11px] font-bold uppercase tracking-widest font-['Rajdhani'] text-[var(--text-primary)] pr-1"
         style={{ fontFamily: "'Rajdhani', sans-serif" }}
       >
         Ask The System
       </span>
 
       <span
-        className="hidden md:flex items-center text-[9px] uppercase tracking-wider font-['Rajdhani'] text-accent-text-light bg-accent-dim border border-accent-mid/50 rounded-full px-2 py-0.5 mr-0.5"
+        className="hidden md:flex items-center text-[9px] uppercase tracking-wider font-['Rajdhani'] text-[var(--accent-text,var(--accent-primary))] bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 rounded-full px-2 py-0.5 mr-0.5"
         style={{ fontFamily: "'Rajdhani', sans-serif" }}
       >
         {presence.label}

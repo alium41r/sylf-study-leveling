@@ -1,0 +1,49 @@
+{
+  "observedAt": "2026-10-07T10:34:14.214073+00:00",
+  "scope": "User-authorized timer failure investigation, separate from Phase 2 educational qualification",
+  "configuredDatabaseReadOnly": true,
+  "studyRecordsRead": false,
+  "hostedDataChanged": false,
+  "schemaObservation": {
+    "StudySession.executionContext": false,
+    "StudySession.executionState": false,
+    "Quest.plannedMinutes": false,
+    "Quest.plannerSpec": false,
+    "User.timezone": true
+  },
+  "queryPlanning": [
+    {
+      "query": "previousWeeklySettlement",
+      "status": "REJECTED",
+      "sqlState": "42703",
+      "executed": false
+    },
+    {
+      "query": "compatibleWeeklySettlement",
+      "status": "PLANS_SUCCESSFULLY",
+      "executed": false
+    },
+    {
+      "query": "previousQuestMarker",
+      "status": "REJECTED",
+      "sqlState": "42703",
+      "executed": false
+    },
+    {
+      "query": "compatibleQuestMarker",
+      "status": "PLANS_SUCCESSFULLY",
+      "executed": false
+    }
+  ],
+  "beforeSourceSha256": {
+    "app/api/sessions/route.ts": "e1e7f86368f08237b0c72f9c793540e4b1c08176e481aa80e44cb1a68de196a1",
+    "lib/planner/v2/server/settlement.ts": "4997d70934b9d17b01d215dab35e4f34b7702bcd985ce4a6b37f1e41638e94a9",
+    "__tests__/planner-v2/postgres/durable-core.postgres.ts": "4630fa652a7db1307b3f84d11e669361e431e69f24df06ec6fcc47ec7d1b0e3e"
+  },
+  "afterSourceSha256": {
+    "app/api/sessions/route.ts": "e4fdb86a2ac0890e2218a69dc64413bac3c56d408526912501baf1a3334e28e3",
+    "lib/planner/v2/server/settlement.ts": "936913f411841ac76f8f1187ead5811c3bcc78b8bd631d9a6e05b624bdf399a9",
+    "__tests__/planner-v2/postgres/durable-core.postgres.ts": "1da7172aa13a45c44672b1d06989dd46c6c6e3f2cd1692e62a17bb68526aaa95",
+    "__tests__/timer/session-route.test.ts": "c4fb1b494d4fe7e404262438a1b1cb70b4a44d2440a76aa379046eb3ffe868c6"
+  }
+}

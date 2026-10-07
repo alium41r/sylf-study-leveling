@@ -1,0 +1,40 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 6,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: triage trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: triage trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: triage trial 3",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: mastery-open trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: mastery-open trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: mastery-open trial 3",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

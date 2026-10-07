@@ -41,7 +41,9 @@
     "reportedInputTokens": 252113,
     "reportedOutputTokens": 36701,
     "settledCalls": 36,
-    "unknownSpendCalls": 37
+    "unknownSpendCalls": 1,
+    "unknownPricedCalls": 37,
+    "pricingNote": "Unknown pricing is distinct from unknown usage/spend. Settled actual token usage does not establish a priced dollar cost."
   },
   "latency": {
     "basis": "actual upstream response latency",

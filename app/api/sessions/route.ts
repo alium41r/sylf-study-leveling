@@ -65,7 +65,12 @@ export async function POST(req: NextRequest) {
 
     const { questId, subjectId, initialSeconds, executionProtocol } = validation.data;
     if (questId) {
-      const linked = await prisma.quest.findFirst({ where: { id: questId, userId }, select: { plannedMinutes: true } });
+      // Read the V2 marker without requiring its column on an older deployment.
+      // This still protects adopted work even if V2 admission is disabled.
+      const [linked] = await prisma.$queryRaw<Array<{ plannedMinutes: number | null }>>`
+        SELECT (to_jsonb(q)->>'plannedMinutes')::int AS "plannedMinutes"
+        FROM public."Quest" AS q WHERE id=${questId} AND "userId"=${userId}
+      `;
       if (linked?.plannedMinutes !== null && linked?.plannedMinutes !== undefined) {
         if (executionProtocol !== 2) return NextResponse.json({ error: "PLANNER_EXECUTION_PROTOCOL_REQUIRED", message: "Update this client before starting this plan's work." }, { status: 409 });
         const execution = await durablePlanner().sessions.start(userId, questId);
@@ -89,11 +94,11 @@ export async function POST(req: NextRequest) {
 
     const session = rows[0]?.start_study_session;
     return NextResponse.json(session, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof DurablePlannerError) return NextResponse.json({ error: error.detail.code, detail: error.detail }, { status: 409 });
     console.error("POST /api/sessions error:", error);
     // S5: map RPC ownership rejections to clean 4xx (cross-user quest/subject).
-    const msg = String(error?.message || "");
+    const msg = error instanceof Error ? error.message : "";
     if (/unauthorized|not found/i.test(msg)) {
       return NextResponse.json(
         { error: "Quest or subject not found or unauthorized" },

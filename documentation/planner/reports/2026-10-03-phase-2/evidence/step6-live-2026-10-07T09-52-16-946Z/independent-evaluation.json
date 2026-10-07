@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-07T10:10:02.339495+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T09-52-16-946Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "db8e8c81ffe5472825589801956f126a1ca82538610b80e372ba7c5642b48941",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "reviewTemperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 18,
+  "usage": {
+    "reportedInputTokens": 115830,
+    "reportedOutputTokens": 12693,
+    "settledCalls": 18,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 18,
+    "pricingNote": "Unknown pricing is distinct from unknown usage/spend. Settled actual token usage does not establish a priced dollar cost."
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 3245.0,
+    "p90Ms": 8054,
+    "maximumMs": 8890
+  },
+  "passed": 8,
+  "total": 9,
+  "cases": [
+    {
+      "id": "method-weakness",
+      "trial": 1,
+      "attemptId": "7b5b7ab0-1e52-437f-ae90-8d67be23b856",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute actually taught-method task with correct series/parallel/mixed/resistance examples and choice/reason/solution criterion. Changed numeric/topology cases, no advanced compulsion or separate extra check; explicit independence could be clearer.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "method-weakness",
+      "trial": 2,
+      "attemptId": "a7618cff-1abf-4e63-af32-ed513ec957d5",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute guide/support plus three independent correct/justified/checked unfamiliar circuits, explicitly restricted to taught methods with mesh planarity where relevant. Supported and unaided evidence distinct; count estimate retained as proportion uncertainty.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "method-weakness",
+      "trial": 3,
+      "attemptId": "a4fe6f71-a7bb-4721-b7ea-acbd2075cb9b",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute actually taught-method task, correct applicability/reason/result/check on at least two unaided unfamiliar circuits; unestablished advanced methods explicitly out of scope.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "mastery-open",
+      "trial": 1,
+      "attemptId": "c70fad81-97bb-4fe8-98f0-2eb6901f8f6c",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Required concrete2x2 medical-test example supplies prevalence1% and sensitivity90% but neither specificity/false-positive rate nor an instruction to choose it. Those givens cannot determine healthy-group cells or overall positive count; reviewer misses the incomplete worked example. Later independent prevalence2%/sensitivity95%/specificity90% posterior is well specified and correct. No compiler repair occurred.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "trial": 2,
+      "attemptId": "7ecc8884-5204-4a67-b9e0-ae6a551137a8",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct labeled Bayes denominator0.018+0.049=0.067 and posterior0.018/0.067=0.268657; quoted acceptance0.268-0.270 is correct. One60-minute task, no unconditional dominance or time-based mastery; answer supplied in criterion limits check independence.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "mastery-open",
+      "trial": 3,
+      "attemptId": "af3854d7-bf85-4866-b49c-868acdf6a0d4",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct labeled supported prior1%/sensitivity90%/FP5% gives15.38%; changed prior10%/sensitivity80%/FP10% gives47.06%. Conditional explanation is applicable, actual errors corrected without required manufactured errors.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 1,
+      "attemptId": "5052964d-201b-481a-988f-168ca8173b67",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Only three assigned equations committed60minutes, negative distribution explained and answers substitution-checked; contrasting example optional, no extra mandatory set.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 2,
+      "attemptId": "0cc0e6f1-2bb7-4f17-a65d-86dd7cd30406",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Only three assigned equations committed40minutes, correct negative-distribution rule, all answers correct and checked. Actually taught inverse operations, no additional compulsory task.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 3,
+      "attemptId": "38989337-87bb-4a07-b1a8-4e775e81cb74",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Only three assigned equations committed40minutes with correct negative distribution and substitution checks. A different valid operation order is an explicitly optional suggestion, no hidden repeated commitment.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    }
+  ]
+}

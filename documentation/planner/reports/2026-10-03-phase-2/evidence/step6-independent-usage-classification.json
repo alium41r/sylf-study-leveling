@@ -1,0 +1,30 @@
+{
+  "correctedAt": "2026-10-07T10:10:02.437666+00:00",
+  "reason": "Correction to newly written assessment metrics: pricing UNKNOWN does not imply token usage unknown. Original assessment snapshots retained; raw calls unchanged.",
+  "corrections": [
+    {
+      "run": "step6-live-2026-10-07T09-17-02-522Z",
+      "beforeSha256": "0271fbdfc1330d4f7aa2c49be0a9c72490b1645e09c0b57e6a80349b38491d3e",
+      "unknownSpendCalls": 0,
+      "unknownPricedCalls": 29
+    },
+    {
+      "run": "step6-live-2026-10-07T09-27-15-878Z",
+      "beforeSha256": "886d871abda72fce9f9f5e9142029cbe56d07a2e842122ecab79c9e4d3a6e9a3",
+      "unknownSpendCalls": 0,
+      "unknownPricedCalls": 40
+    },
+    {
+      "run": "step6-live-2026-10-07T09-43-17-479Z",
+      "beforeSha256": "1f0c24224e6fd175c871599e59625dcf042c872959a7d895f8bf844e3a4fa4f9",
+      "unknownSpendCalls": 1,
+      "unknownPricedCalls": 37
+    },
+    {
+      "run": "step6-live-2026-10-07T09-52-16-946Z",
+      "beforeSha256": "d4ae2b446664a4c640e39e9119adaabb4e2f650d25c5e02b7cab91f7075baf6c",
+      "unknownSpendCalls": 0,
+      "unknownPricedCalls": 18
+    }
+  ]
+}

@@ -17,9 +17,12 @@ async function settleWeeklyMission(sql, ownerId, now) {
     // their accepted civil date even if the student's timezone later changes.
     const localStart = new Intl.DateTimeFormat("en-CA", { timeZone: user.timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(bounds.weekStart);
     const localEnd = new Intl.DateTimeFormat("en-CA", { timeZone: user.timezone, year: "numeric", month: "2-digit", day: "2-digit" }).format(bounds.weekEnd);
-    const minutes = Number((await (0, database_1.rows)(sql, `SELECT COALESCE(sum("durationMinutes"),0) AS minutes FROM "StudySession"
-    WHERE "userId"=$1 AND CASE WHEN "executionContext"->>'actualCivilDate' IS NOT NULL
-      THEN "executionContext"->>'actualCivilDate' BETWEEN $2 AND $3 ELSE "startedAt" BETWEEN $4 AND $5 END`, [ownerId, localStart, localEnd, bounds.weekStart.toISOString(), bounds.weekEnd.toISOString()]))[0].minutes);
+    // Legacy deployments have no executionContext column yet. Inspect the row
+    // representation so their existing timer can settle without a V2 migration;
+    // when present, the accepted V2 civil date remains authoritative.
+    const minutes = Number((await (0, database_1.rows)(sql, `SELECT COALESCE(sum("durationMinutes"),0) AS minutes FROM "StudySession" AS s
+    WHERE "userId"=$1 AND CASE WHEN to_jsonb(s)->'executionContext'->>'actualCivilDate' IS NOT NULL
+      THEN to_jsonb(s)->'executionContext'->>'actualCivilDate' BETWEEN $2 AND $3 ELSE "startedAt" BETWEEN $4 AND $5 END`, [ownerId, localStart, localEnd, bounds.weekStart.toISOString(), bounds.weekEnd.toISOString()]))[0].minutes);
     if (minutes < target)
         return false;
     const freeze = (await (0, database_1.rows)(sql, 'SELECT id FROM "InventoryItem" WHERE "userId"=$1 AND "itemKey"=\'STREAK_FREEZE\' AND quantity>0 ORDER BY id LIMIT 1 FOR UPDATE', [ownerId]))[0];

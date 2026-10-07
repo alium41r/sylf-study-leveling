@@ -11,6 +11,7 @@ import { ApplyService } from "@/lib/planner/v2/server/apply";
 import { SessionService } from "@/lib/planner/v2/server/sessions";
 import { loadExecutionContext, specDigest, contentDigest } from "@/lib/planner/v2/server/context";
 import { ownedPlan } from "@/lib/planner/v2/server/intents";
+import { settleWeeklyMission } from "@/lib/planner/v2/server/settlement";
 
 let connection: pg.Client;
 let pool: pg.Pool;
@@ -171,5 +172,24 @@ describe("Phase 1 actual durable repositories", () => {
     const after = (await connection.query('SELECT sylph,"lastActiveDate" FROM "User" WHERE id=$1', [ownerId])).rows[0];
     expect(after.sylph - before).toBe(65); expect(after.lastActiveDate).toMatch(/-W\d{2}$/);
     expect(history.rows).toHaveLength(1);
+  });
+  it("settles legacy timer history without V2 columns and preserves accepted V2 civil dates", async () => {
+    // A transaction-local table reproduces the deployed pre-V2 schema without
+    // altering the shared test database or mocking PostgreSQL's column lookup.
+    for (const versioned of [false, true]) {
+      const ownerId = await user(connection);
+      await connection.query('UPDATE "User" SET timezone=\'Asia/Karachi\' WHERE id=$1', [ownerId]);
+      await db.coordinated(ownerId, async sql => {
+        const now = new Date();
+        await sql.query(`CREATE TEMP TABLE "StudySession" ("userId" int,"durationMinutes" int,"startedAt" timestamp${versioned ? ',"executionContext" jsonb' : ''}) ON COMMIT DROP`);
+        if (versioned) {
+          const actualCivilDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+          await sql.query('INSERT INTO "StudySession" VALUES ($1,180,$2,$3)', [ownerId, new Date(now.getTime() - 30 * 86400_000).toISOString(), { actualCivilDate }]);
+        } else await sql.query('INSERT INTO "StudySession" VALUES ($1,180,$2)', [ownerId, now.toISOString()]);
+        expect(await settleWeeklyMission(sql, ownerId, now)).toBe(true);
+        expect(await settleWeeklyMission(sql, ownerId, now)).toBe(false);
+      });
+      expect((await connection.query('SELECT count(*)::int AS count FROM "SystemMessage" WHERE "userId"=$1 AND type=\'STREAK\'', [ownerId])).rows[0].count).toBe(1);
+    }
   });
 });

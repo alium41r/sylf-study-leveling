@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "evaluatedAt": "2026-10-07T10:15:12.424475+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T10-08-44-143Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "cfb014e2beebedc563487e31759e0ee50deea3a0e083ea57716d25bfae15776e",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "reviewTemperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 12,
+  "usage": {
+    "reportedInputTokens": 86142,
+    "reportedOutputTokens": 12426,
+    "settledCalls": 12,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 12
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 3780.5,
+    "p90Ms": 10060,
+    "maximumMs": 10815
+  },
+  "passed": 6,
+  "total": 6,
+  "cases": [
+    {
+      "id": "triage",
+      "trial": 1,
+      "attemptId": "7e46015c-dba9-419c-882e-6ae6357b3a85",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Valid structured proposal and grounded review, two25-minute tasks on actual pre-quiz dates, all four scope contributions and explicit sacrificed practice/technique. Correct changed mixed-circuit criterion, actually taught methods only; no invented weights.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "triage",
+      "trial": 2,
+      "attemptId": "bc9f8b0a-c501-4e2c-b1ff-4389c139cd8f",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Valid structured proposal/review with two25-minute pre-quiz tasks, all scope and explicit sacrifice. Series voltage/current division formulas correct; mixed/timed application uses stated limited methods. Most-likely-core wording and intensity are unsupported certainty/proportion concerns, not numerical invented weights or hidden scheduled work.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "triage",
+      "trial": 3,
+      "attemptId": "c5d0e84f-5c94-4a4a-a495-356b914ccb11",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Valid structured proposal/review, two25-minute pre-quiz tasks retain allscope, deliberate depth sacrifice and correct series/parallel/mixed gates. Optional/contingent tasks unbooked; one-page sheet suggestion for quiz-morning review conflicts with no exam-day study and is a retained noncompulsory guidance limitation, with no scheduled quiz-day execution.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "trial": 1,
+      "attemptId": "7d2d8e9c-8086-4a9b-a994-543fac2c94c8",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Complete prior2%/sensitivity90%/FP5% Bayes example gives26.8657%; labeled roles, posterior/complement sum and correct conditional base-rate explanation. Genuine declared two-part continuation keeps all instructions/criteria. One-sitting phrasing in original body is a delivery-clarity limitation, not a required authentic indivisibility constraint.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "trial": 2,
+      "attemptId": "285ed780-bc6d-42d5-a648-995ff8c8c0f1",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Worked and explicitly changed examples require stated prevalence/sensitivity/specificity, correct Bayes steps and independent posterior. No missing indispensable datum or universal probability dominance; course/example availability and return-to-reference on failure limit independence claims.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "trial": 3,
+      "attemptId": "aedc01e5-703e-4000-badc-0dbf3e0bef6f",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Course worked example and fully given changed prior2%/sensitivity90%/FP5% posterior; correctly labeled roles and independent changed performance criterion preserved across declared split. Existing course-example assumption remains uncertainty, not issuer verification or mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-07T09:45:26.458773+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T09-17-02-522Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "6991317c310940d06a60c797969054dff92b1aa1f80eeb3682a59facf149c53e",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 29,
+  "usage": {
+    "reportedInputTokens": 182802,
+    "reportedOutputTokens": 24434,
+    "settledCalls": 29,
+    "unknownSpendCalls": 29
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 5235,
+    "p90Ms": 10232,
+    "maximumMs": 12855
+  },
+  "passed": 12,
+  "total": 15,
+  "cases": [
+    {
+      "id": "secure-topic",
+      "trial": 1,
+      "attemptId": "6e3ee651-a380-4606-a90b-fe778f24130e",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 30-minute unaided simple-series diagnostic permits correct performance or an exact failure explanation; no mastery from confidence or additional committed teaching.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "trial": 2,
+      "attemptId": "7f751cbc-622d-43d6-8d6a-37e2646f794f",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 30-minute two-circuit diagnostic with correct series/voltage-sum criterion, no CREDITED assertion or extra committed education. A diagnostic need not certify mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "trial": 3,
+      "attemptId": "b8e3ee8f-6658-4017-b582-a54a3d331d87",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Actual blueprint is retained but supervised review never dispatches; SAVE_FAILED at 10.338 seconds with only later cancellation classification. No internal renewal cause was recorded, so no provider/quota attribution or acceptance.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "SAVE_FAILED",
+        "stage": "PREFLIGHT",
+        "message": "This stage could not finish; its checkpoint is retained.",
+        "retryable": true,
+        "resumable": true,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "RETRY_STAGE",
+        "traceId": "a4ff4f3b-f966-4932-a460-3ba55e46e9ce"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "method-weakness",
+      "trial": 1,
+      "attemptId": "6468900a-eeea-4767-9292-d159db40ccf5",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 45-minute worked method-selection contrast and two changed correct justified/checked circuits; only taught methods, no ritual extra set. Reference/scaffolding quality remains uncertain.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "method-weakness",
+      "trial": 2,
+      "attemptId": "c7363dad-104c-491c-b0ab-00ec628f1e26",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 60-minute taught-method decision guide, supported example and two changed independently correct/justified circuits. No separate repeated success gate.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "method-weakness",
+      "trial": 3,
+      "attemptId": "46424934-0feb-4540-92a8-7577a4cf1902",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Genuine technical failure: one source is insufficient for series/parallel reducibility, and a valid method need not match the worked reference choice. Unestablished node/mesh repertoire and assumed separate practice sheet compound it. Model review misses these defects and apply is not educational acceptance.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "mastery-open",
+      "trial": 1,
+      "attemptId": "420a12ff-f3c2-4656-84ec-c83e0bedb754",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct Bayes posterior examples at 1/1000 (about1.94%) and1/50 (about28.8%); prior/sensitivity contrast and conditional changed-prevalence explanation. Supplied answers/independence remain limitations, not incorrect mathematics.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "mastery-open",
+      "trial": 2,
+      "attemptId": "1e91bf5e-4aed-44e1-a352-6da2467062c5",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct labeled Bayes calculation followed by an explicitly unaided changed example; effort/time do not certify capability.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "mastery-open",
+      "trial": 3,
+      "attemptId": "8c9d9466-105f-491d-ac81-887ab3791a1d",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct Bayes decomposition and changed prior/sensitivity/false-positive calculation, with correct posterior required. Consistency check/scaffolding breadth remain limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 1,
+      "attemptId": "c23c069f-6193-4f0c-a8a0-c1ae42ecfe48",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Exactly three assigned equations solved, negative distribution explicitly explained, actual errors corrected and substitution checked; no added committed exercise.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 2,
+      "attemptId": "a9d36ca6-1ef3-4540-a1a1-f94a131da025",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Exactly three assigned equations with expansion explanation and passing substitution; no added committed re-solve/check.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 3,
+      "attemptId": "201a93a7-5320-4c8c-bf12-77412207662b",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Exactly three assigned equations solved and verified with a one-sentence sign rule; no mandatory extra work.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 1,
+      "attemptId": "9148a74a-3f5f-4d6e-9374-b0b498d95939",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Supported comparison/correction of diagnostic errors precedes distinct unaided changed evidence, and failure remains an honest gap rather than mastery. Five plus five circuits/105minutes and available solutions are limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 2,
+      "attemptId": "85ad17ce-7b27-4a6d-ada4-2d34d98ccbd3",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual self-reported four failures receive rework with valid reasons, then a fresh unaided correct solved circuit. Rechecking the original correct item and the model phase-warning are proportion/review concerns; no false independent approval.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 3,
+      "attemptId": "2e6ab113-69b0-4495-96c7-ddb0d4e20c1f",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The first five-circuit unaided diagnosis can already show all correct choices/reasons/solutions. Despite a clean permitted result, 60-minute targeted repair remains committed and another identical five-circuit unaided set is compulsory with no distinct need on that path. This silently extends a satisfied stopping point; model approval/apply cannot qualify proportionate education.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    }
+  ]
+}

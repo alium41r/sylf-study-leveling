@@ -1,0 +1,84 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 17,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: tiny-exam",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: tiny-roomy-exam",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: secure-topic",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: zero-new-work",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: concept-foundation",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: method-weakness",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: triage",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: roadmap-open",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: mastery-open",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: general-homework",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: joint-prerequisite",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: infeasible-zero-capacity",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: indivisible-checkpoint",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: owned-course-research",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: contradictory-readiness",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: roadmap-large",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: public-assessment-research",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

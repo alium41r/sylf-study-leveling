@@ -3,11 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RevisionService = exports.qualityEvidenceDigest = exports.educationalDigest = exports.revisionDigest = void 0;
 exports.loadRevision = loadRevision;
 const contracts_1 = require("../contracts");
+const documents_1 = require("./documents");
 const database_1 = require("./database");
 const attempts_1 = require("./attempts");
 const intents_1 = require("./intents");
 const context_1 = require("./context");
 const execution_validation_1 = require("./execution-validation");
+const checkpoint_1 = require("../intelligence/schemas/checkpoint");
 const revisionDigest = (revision) => {
     return (0, database_1.hash)("revision", Object.fromEntries(Object.entries(revision).filter(([key]) => key !== "digest")));
 };
@@ -83,9 +85,8 @@ class RevisionService {
     }
     async publishResearchAnswer(token, answer, evidence) {
         const bundle = contracts_1.ResearchEvidenceV2Schema.parse(evidence);
-        if (bundle.sources.some(source => source.location.kind === "OWNED_DOCUMENT"))
-            (0, database_1.reject)("REFERENCE_NOT_OWNED", "Verified document storage is required before publishing uploaded research.", "RESEARCH");
         await this.attempts.mutate(token, async (sql, attempt, payload) => {
+            await (0, documents_1.verifyOwnedResearchDocuments)(sql, attempt.ownerId, bundle);
             if (attempt.kind !== "RESEARCH_ADVICE")
                 (0, database_1.reject)("INTENT_CONFLICT", "This operation was authorized to prepare a plan, not publish a research answer.", "RESEARCH");
             await (0, attempts_1.persistAttempt)(sql, attempt, { ...attempt, state: "SUCCEEDED", stage: "RESEARCH", lease: null,
@@ -121,6 +122,35 @@ class RevisionService {
             const errors = (0, contracts_1.validateChangeSetCorrespondenceV2)(changeSet, successful, revisions);
             if (errors.length || changeSet.applyReceipt)
                 (0, database_1.reject)("INVALID_OUTPUT", errors.join("; ") || "A new proposal cannot have an apply receipt.");
+            // Actual compiler output must correspond to the independently reviewed
+            // checkpoint, including placement and server-assigned execution identity.
+            // Older trusted Phase 1 producers keep their existing publication checks.
+            if (payload.checkpoint && typeof payload.checkpoint === "object" && Reflect.get(payload.checkpoint, "compilerVersion") === 1) {
+                const checkpoint = checkpoint_1.CompilerCheckpointSchema.parse(payload.checkpoint), reviewed = checkpoint.payload;
+                if (!("quality" in reviewed) || !["REVIEW", "VERIFICATION"].includes(reviewed.stage) ||
+                    !["REVIEWED", "VERIFIED"].includes(reviewed.reviewSupport?.phase ?? "") || reviewed.quality.some(q => q.report.status !== "PASSED") ||
+                    reviewed.allocation.report.status !== "FEASIBLE" || attempt.checkpoint?.digest !== (0, database_1.hash)("checkpoint", checkpoint) || attempt.checkpoint.stage !== reviewed.stage ||
+                    checkpoint.binding.attemptId !== attempt.attemptId || checkpoint.binding.requestHash !== attempt.requestHash || checkpoint.binding.rootRequestId !== attempt.budget.rootRequestId ||
+                    checkpoint.binding.ownerId !== attempt.ownerId || checkpoint.binding.targetAuthorizationDigest !== attempt.acceptedRequest.targetAuthorizationDigest || !payload.providerGuard?.reviewCompleted || reviewed.reviewSupport?.identityDigest !== (0, database_1.hash)("compiler-identities", payload.compilerIdentities ?? []) ||
+                    (0, database_1.hash)("allocation", reviewed.allocation.report) !== reviewed.allocation.digest || (0, database_1.hash)("scheduling-envelope", reviewed.envelope) !== checkpoint.binding.envelopeDigest)
+                    (0, database_1.reject)("QUALITY_INCOMPLETE", "Finish independently checking the exact allocated proposal before sealing.", "PERSISTENCE");
+                for (const revision of revisions) {
+                    const target = checkpoint.binding.targets.find(t => t.planId === revision.planId);
+                    const approved = reviewed.blueprints.plans.find(p => p.planRef === target?.planRef);
+                    const quality = reviewed.quality.find(q => q.planRef === target?.planRef)?.report;
+                    if (!target || !approved || !quality || (0, database_1.hash)("blueprint", revision.blueprint) !== approved.digest || (0, database_1.hash)("quality-report", quality) !== (0, database_1.hash)("quality-report", revision.quality) ||
+                        (0, database_1.hash)("reviewed-context", target.context) !== (0, database_1.hash)("reviewed-context", revision.context) ||
+                        revision.executable.some(spec => {
+                            const placement = reviewed.allocation.report.placements.find(p => p.planRef === target.planRef && p.activityRef === spec.blueprintActivityId);
+                            const identity = payload.compilerIdentities?.find(i => i.planRef === target.planRef && i.activityRef === spec.blueprintActivityId);
+                            return !placement || spec.placement.date !== placement.date || spec.placement.timezone !== reviewed.envelope.timezone || spec.effort.plannedMinutes !== placement.minutes || identity?.activityKey !== spec.activityKey;
+                        }))
+                        (0, database_1.reject)("QUALITY_INCOMPLETE", "The sealed proposal differs from the reviewed content, identity or schedule.", "PERSISTENCE");
+                }
+                if ((0, database_1.hash)("aggregate-quality-issues", changeSet.quality.issues) !== (0, database_1.hash)("aggregate-quality-issues", reviewed.quality.flatMap(q => q.report.issues)) ||
+                    (0, database_1.hash)("aggregate-quality-acknowledgments", changeSet.quality.requiredAcknowledgements) !== (0, database_1.hash)("aggregate-quality-acknowledgments", reviewed.quality.flatMap(q => q.report.requiredAcknowledgements)))
+                    (0, database_1.reject)("QUALITY_INCOMPLETE", "Joint quality must retain every target's issues and acknowledgments.", "PERSISTENCE");
+            }
             const plans = [];
             for (const target of [...attempt.targets].sort((a, b) => a.planId.localeCompare(b.planId)))
                 plans.push(await (0, intents_1.ownedPlan)(sql, attempt.ownerId, target.planId));
@@ -133,7 +163,8 @@ class RevisionService {
                 (0, context_1.verifyContextCorrespondence)(revision.context, context.dependencies, context.quests);
                 const referenceErrors = (0, contracts_1.validateBlueprintReferences)(revision.blueprint, {
                     scopeRefs: intent.scope.map(scope => scope.modelRef), excludedScopeRefs: intent.scope.filter(scope => scope.inclusion === "EXCLUDED").map(scope => scope.modelRef),
-                    evidenceRefs: intent.evidence.map(evidence => evidence.evidenceId), resourceRefs: intent.research?.sources.map(source => source.sourceId) ?? [],
+                    evidenceRefs: [...intent.evidence.map(evidence => evidence.evidenceId), ...intent.research?.claims.map(claim => claim.claimId) ?? [], ...(0, context_1.savedCheckReferences)(context, revision.planId).map(check => check.ref)],
+                    resourceRefs: intent.research?.sources.map(source => source.sourceId) ?? [],
                     externalActivityRefs: revision.context.externalActivityDependencies.map(dependency => (0, context_1.externalActivityAlias)(dependency.activityKey)),
                 });
                 if (referenceErrors.length)

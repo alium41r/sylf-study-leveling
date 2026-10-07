@@ -1,0 +1,469 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-05T16:21:12.110Z",
+  "selectedRunDirectory": "step6-live-2026-10-05T13-23-55-392Z",
+  "liveCorpusSha256": "6c0eeecd0e7d4f674d7420fd144737cc9f57f7e70e3815bf76cd335bd5bdf7aa",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "sourceCorrespondence": {
+    "productionSourcesUnchangedSinceRun": false,
+    "changedDuringRun": [],
+    "subsequentCorrection": "Exam scope publication guard and research verification context were corrected after independent inspection; this historical run cannot qualify current source."
+  },
+  "method": "Codex separately inspected original goals, actual provider answers, persisted checkpoints, allocation, quality issues, sealed content and actual apply receipts. This is independent of the model self-review, but not an external human panel or the Phase 5 held-out benchmark.",
+  "quotaFinding": "DeepSeek was usable. All final responses supplied usage; no final SDK quota/rate-limit failure. Gemini quota remains unavailable and Groq trial quota failed earlier. Final acceptance failures are output reliability, semantic quality and root-budget fit, not unavailable DeepSeek credits.",
+  "productionPolicyQualified": false,
+  "temporaryRoute": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "policiesAttempted": [
+      "EXAM",
+      "ROADMAP",
+      "MASTERY",
+      "GENERAL"
+    ],
+    "policiesWithSeparatelyAcceptableOutputs": [
+      "EXAM",
+      "ROADMAP",
+      "MASTERY",
+      "GENERAL"
+    ],
+    "adaptation": [
+      "indivisible-checkpoint"
+    ],
+    "successfulRevisedAdaptationAndReallocation": [],
+    "repairAndVerification": []
+  },
+  "operationalFailures": [
+    {
+      "id": "concept-foundation",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "REVIEW",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "5eb98b3b-991c-4d27-bfbb-32e5d34112cc"
+      }
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "ADAPTATION",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "edc1addd-a620-4e4f-8380-f4f77c9a6604"
+      }
+    },
+    {
+      "id": "owned-course-research",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "RESEARCH",
+        "message": "The root call/token allowance is exhausted.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "ca799136-9b3f-4f04-8830-49e802b5e613"
+      }
+    },
+    {
+      "id": "contradictory-readiness",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "REVIEW",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "ccc34f74-2a4b-4bb1-a67f-f2d4a5a651ef"
+      }
+    },
+    {
+      "id": "roadmap-large",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "2990ce8a-023e-466a-b4d5-a9f0f7fdf37b"
+      }
+    }
+  ],
+  "latency": {
+    "cases": 17,
+    "medianMs": 11555,
+    "p90Ms": 32785,
+    "maximumMs": 38131
+  },
+  "usage": {
+    "reportedInputTokens": 295452,
+    "reportedOutputTokens": 48080,
+    "usageMissingResponses": 0,
+    "settledCalls": 42,
+    "unknownSpendCalls": 0,
+    "knownPricedCostUsd": 0,
+    "unknownPricedCalls": 42,
+    "estimatedCostComplete": false
+  },
+  "externalAttempts": 42,
+  "fallbackAttempts": 8,
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 30-minute Ohm-law/changed-circuit activity with an observable independent stopping criterion; applied through the canonical path.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "tiny-exam",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 30,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The identical tiny goal schedules 70 minutes in two committed activities versus 30 minutes at smaller capacity. No additional learner evidence justifies this workload inflation. The model warning did not prevent publication.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "tiny-roomy-exam",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 70,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 35-minute diagnostic, no CREDITED mastery from confidence, and an unbooked contingent repair. The diagnostic remains a development limitation to monitor for proportion.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "secure-topic",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 35,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "zero-new-work",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Reviewed zero-activity blueprint explicitly defers the scope at the learner request; canonical apply produces zero Quests.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "zero-new-work",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 0,
+        "actualQuests": 0,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "concept-foundation",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Conceptual work allocated, but both independent review outputs were rejected for invalid grounding/structured content. No sealed plan.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "concept-foundation",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 150,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "method-weakness",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "190 committed minutes include multiple mandatory sets. A contingent branch triggered by one concept error requires redoing two failed diagnostic circuits, which may not exist. The model self-review did not resolve the achievable-criterion defect.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "method-weakness",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 190,
+        "actualQuests": 4,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "triage",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "45 minutes fit the two 25-minute days; every scope remains visible and limited mixed coverage is disclosed. No verified weights are invented; thin quiz coverage remains a warning rather than claimed readiness.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "triage",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 45,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "A concrete integrated CSV-report checkpoint checks grouping and malformed rows with no invented deadline. Its likely effort exceeds the soft timebox, an explicitly retained uncertainty; no automatic mastery or course completion claim.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "roadmap-open",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 60,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Separate conceptual base-rate/sensitivity explanation and a changed Bayes example supply observable capability checks. Time does not certify mastery. The reviewer retains redundancy concerns about conditional further attempts.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "mastery-open",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 70,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "general-homework",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The three specified equations already have explicit sign and substitution checks in the first activity. A further compulsory two-equation transfer task extends the homework stopping point without diagnostic evidence; the model classified this as advisory and applied it.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "general-homework",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 60,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Both distinct CSV/JSON goals apply atomically with one loops/dictionary prerequisite owner, a HARD shared edge, and no CREDITED readiness merely from future shared work. The 240 minutes are counted once across three distinct activities; estimates remain uncertain.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "joint-prerequisite",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 240,
+        "actualQuests": 3,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Positive required work and the zero-capacity proof were preserved, but both adaptation outputs were malformed; no completed educational decision. Safe failure alone is insufficient.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "infeasible-zero-capacity",
+        "checkpointStage": "ADAPTATION",
+        "committedMinutes": 35,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "ADAPTATION",
+          "BLUEPRINT",
+          "ADAPTATION"
+        ]
+      }
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "The 45-minute uninterrupted authentic task is preserved against a 30-minute day bound; one actual ADAPTATION KEEP yields NEEDS_DECISION with zero execution.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "indivisible-checkpoint",
+        "checkpointStage": "ALLOCATION",
+        "committedMinutes": 45,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "ADAPTATION"
+        ]
+      }
+    },
+    {
+      "id": "owned-course-research",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Actual owned hash and text were read. First extraction used page:null, the fallback invented page 1 for unpaged text, and the two-synthesis allowance prevented independent verification. No course adoption or reviewed plan.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "owned-course-research",
+        "checkpointStage": "RESEARCH",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "RESEARCH",
+          "RESEARCH"
+        ]
+      }
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The blueprint allocated, but both independent reviews failed structured/grounding validation. No reviewed contradiction-aware candidate.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "contradictory-readiness",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 145,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT",
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "roadmap-large",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both 40-node blueprint responses were malformed JSON; full raw prose does not count as validated dispositions or a reviewed forecast.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "roadmap-large",
+        "checkpointStage": "PREFLIGHT",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The root published and applied manual source-reading/decision-record activities despite no adopted issuer-verified applicable ASSESSED_SCOPE claims. The learner explicitly required a consequential unconfirmable decision when applicability could not be established. Empty model conflicts bypassed the missing assessed facts; this safety defect was subsequently corrected at the existing verifier and covered by direct/database regressions. This run remains failed.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T13-23-55-392Z/live-corpus.json",
+        "caseId": "public-assessment-research",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 65,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "RESEARCH",
+          "RESEARCH",
+          "BLUEPRINT"
+        ]
+      }
+    }
+  ],
+  "remainingGates": [
+    "Fresh source live corpus after the assessment-publication safeguard.",
+    "Schema/grounding reliability, proportionate achievable work, owned research adoption and one named compiler repair followed by exact independent verification."
+  ]
+}

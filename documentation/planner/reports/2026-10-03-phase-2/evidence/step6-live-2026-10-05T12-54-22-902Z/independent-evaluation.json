@@ -1,0 +1,518 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-05T13:09:53.521Z",
+  "selectedRunDirectory": "step6-live-2026-10-05T12-54-22-902Z",
+  "liveCorpusSha256": "8e6d77e1b54dcb5e5a8b1539900c86fb903975f3c076f86b95c7eb2c6c84e889",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "sourceCorrespondence": {
+    "productionSourcesUnchangedSinceRun": true,
+    "changedDuringRun": [],
+    "rawHarnessStatus": "FAILED because required live assertions failed, not source drift",
+    "testOnlyChangeAfterRun": "Provider unit assertion follows existing workload policy; no production, fixture, corpus or live harness source changed after the run."
+  },
+  "method": "Codex separately inspected original goals, actual provider answers, persisted checkpoints, allocation, quality issues, sealed content and actual apply receipts. This is independent of the model self-review, but not an external human panel or the Phase 5 held-out benchmark.",
+  "quotaFinding": "DeepSeek was usable. All final responses supplied usage; no final SDK quota/rate-limit failure. Gemini quota remains unavailable and Groq trial quota failed earlier. Final acceptance failures are output reliability, semantic quality and root-budget fit, not unavailable DeepSeek credits.",
+  "productionPolicyQualified": false,
+  "temporaryRoute": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "policiesAttempted": [
+      "EXAM",
+      "ROADMAP",
+      "MASTERY",
+      "GENERAL"
+    ],
+    "policiesWithSeparatelyAcceptableOutputs": [
+      "EXAM",
+      "ROADMAP",
+      "MASTERY",
+      "GENERAL"
+    ],
+    "adaptation": [
+      "indivisible-checkpoint"
+    ],
+    "successfulRevisedAdaptationAndReallocation": [],
+    "repairAndVerification": [],
+    "maximumPublicationApply": "separate current-source 400-Quest PostgreSQL witness; fixtures, not live educational evidence"
+  },
+  "operationalFailures": [
+    {
+      "id": "zero-new-work",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "d1686de4-cc2f-4ed7-b9e6-40ec990d815f"
+      }
+    },
+    {
+      "id": "concept-foundation",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "18581496-934f-4716-915a-fa343c78550f"
+      }
+    },
+    {
+      "id": "mastery-open",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "PERSISTENCE",
+        "message": "This call would consume capacity reserved for review or verification.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "dc6036cb-f3b4-40a4-8973-368f6716f366"
+      }
+    },
+    {
+      "id": "joint-prerequisite",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "REVIEW",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "4ee4f247-6d43-4584-ac81-530686548484"
+      }
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "ADAPTATION",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "1c4dc5a3-91f0-4137-8c51-555afc71f37b"
+      }
+    },
+    {
+      "id": "owned-course-research",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "RESEARCH",
+        "message": "The root call/token allowance is exhausted.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "06d73aad-be53-4fc0-b9c5-17ac6061004f"
+      }
+    },
+    {
+      "id": "roadmap-large",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "147134ed-00b2-4a1a-acda-3d943314e571"
+      }
+    },
+    {
+      "id": "public-assessment-research",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "RESEARCH",
+        "message": "The root call/token allowance is exhausted.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "02c1b7c4-2ffa-420a-aca4-81b4c44ca706"
+      }
+    }
+  ],
+  "latency": {
+    "cases": 17,
+    "medianMs": 12726,
+    "p90Ms": 24983,
+    "maximumMs": 37348
+  },
+  "usage": {
+    "reportedInputTokens": 255485,
+    "reportedOutputTokens": 43597,
+    "usageMissingResponses": 0,
+    "settledCalls": 38,
+    "unknownSpendCalls": 0,
+    "knownPricedCostUsd": 0,
+    "unknownPricedCalls": 38,
+    "estimatedCostComplete": false
+  },
+  "externalAttempts": 38,
+  "fallbackAttempts": 7,
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 30-minute Ohm-law activity combines worked learning with one changed-circuit explanation and an early stopping point. One committed scope node; no ritual sequence or falsely credited mastery. The specific calculations, units and independent criterion survive canonical apply.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "tiny-exam",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 30,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "480 daily minutes still yield the same single 30-minute committed activity as the 120-minute tiny case. Additional capacity did not inflate booked effort. Assumed arithmetic fluency is disclosed; the concrete changed-circuit explanation is the stopping point.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "tiny-roomy-exam",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 30,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 30-minute unseen-series-circuit diagnostic, with only an unbooked 20-minute contingent targeted repair if a quantity or rule fails. The checkpoint records either success or the failed rule, so the trigger remains meaningful. Self-report is explicitly not credited mastery.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "secure-topic",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 30,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "zero-new-work",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both actual blueprint attempts were rejected: malformed JSON first, then a DEFERRED scope node omitted the required reason. No execution was created, but a failed Attempt is not the requested reviewed zero-activity strategy.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "zero-new-work",
+        "checkpointStage": "PREFLIGHT",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "concept-foundation",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The first response omitted one contribution and placed decisions outside the blueprint; the fallback was malformed JSON. Neither reached allocation/review. Conceptual intent in rejected prose cannot count as a reviewed prerequisite plan.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "concept-foundation",
+        "checkpointStage": "PREFLIGHT",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "method-weakness",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The candidate applied, but committed 8–10 unfamiliar full solutions across nodal/mesh/dependent-source methods plus error review and three further unseen circuits. Requiring at least three named error patterns and three previously wrong circuits can be impossible if the drill exposes fewer; the unknown curriculum does not establish those advanced methods. The reviewer warned that 60 minutes was implausible for the drill, yet no repair occurred. Specific transfer work exists, but proportionate, achievable weakness targeting is not qualified.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "method-weakness",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 150,
+        "actualQuests": 3,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "triage",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "50 committed minutes fit two confirmed 25-minute days before the quiz. Every scope node remains visible: current/voltage is VERIFY_FIRST, and the three circuit scopes are integrated in two activities. Separate lessons, extra sets and another final check are explicitly sacrificed. No numeric weights are invented. Limitation: highest-yield/likely-quiz-demand wording is an assumption stronger than evidence; readiness after this tight segment remains uncertain, as the model reviewer also noted.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "triage",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 50,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "A concrete CSV reader → grouped totals → bad-row handling sequence schedules 35, 50 and 45 minutes on successive days, with observable file outputs and hand checks. No deadline is invented. Python syntax fluency is an explicit unresolved assumption. The strategy inaccurately says malformed-row handling is folded into the build although it has a separate activity; the distinct robustness contribution remains useful.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "roadmap-open",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 130,
+        "actualQuests": 3,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "mastery-open",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Conceptual Bayes work and a changed example were generated, but the reviewer named a blocking unfamiliar-example concern and a conditional-remediation criterion/trigger concern. Repair plus its independent verification holdback did not fit the original conservative input budget. No repair was dispatched and no candidate published. The severity of the unfamiliar-example objection is debatable; neither model approval nor that objection is substituted for successful repair evidence.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "mastery-open",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 90,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ]
+      }
+    },
+    {
+      "id": "general-homework",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One committed 45-minute three-equation activity targets negative expansion, explicit signs, substitution checks and a bounded explanation. A 20-minute fresh-equation activity is contingent and remains unbooked. The reviewer warns that this alternative reaches beyond the homework stopping point; it adds no current commitment.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "general-homework",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 45,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The accepted blueprint correctly retains both targets, one loops/dictionary owner and a HARD shared dependency, with 90 committed minutes counted once. Both actual independent-review responses were malformed JSON. No sealed joint candidate or joint live apply was produced. Partial allocation success does not qualify the complete joint pipeline.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "joint-prerequisite",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 90,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "REVIEW",
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The valid initial proposal preserves required positive learning effort and allocation proves the zero-capacity shortfall. Both adaptation responses were malformed JSON, so the root fails instead of delivering a completed explicit educational KEEP/revision decision. Zero Quests and at most one semantic adaptation opportunity were preserved; safe failure alone is insufficient live qualification.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "infeasible-zero-capacity",
+        "checkpointStage": "ADAPTATION",
+        "committedMinutes": 30,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "ADAPTATION",
+          "BLUEPRINT",
+          "BLUEPRINT",
+          "ADAPTATION"
+        ]
+      }
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "The required authentic check remains a single committed 45-minute uninterrupted activity, with no invented split or preparation substitution. Allocation proves a 30-minute maximum valid-day capacity bound. A real ADAPTATION KEEP preserves the requirement; the root ends NEEDS_DECISION with zero Quests and no candidate claiming readiness. This qualifies a bounded KEEP path, not a repaired candidate.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "indivisible-checkpoint",
+        "checkpointStage": "ALLOCATION",
+        "committedMinutes": 45,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "ADAPTATION"
+        ]
+      }
+    },
+    {
+      "id": "owned-course-research",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Actual owned upload, content hash and 419 characters were read; the extraction quoted the local course outcomes. The independent research response put scopeBindings outside review and was rejected; the two-synthesis cap then prevented another attempt. No research adoption or reviewed plan was produced. It also asked for formal assessment identity despite a private non-assessment course note, an applicability-reasoning concern. Earlier publication mismatches were fixed and proven with actual claim/check references in PostgreSQL fixtures, but that does not make this live failure pass.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "owned-course-research",
+        "checkpointStage": "RESEARCH",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "RESEARCH",
+          "RESEARCH"
+        ]
+      }
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "VERIFY_FIRST and explicit contradictory self-report replace mastery credit. Five-circuit diagnosis, targeted correction and a fresh four-of-five transfer criterion are concrete; 150 minutes fit three days. The reviewer retains a repetition warning. The post-repair check can supply distinct evidence of changed capability, but production should monitor potential overproduction; no compiler REPAIR or VERIFICATION provider call occurred. A learner activity named repair is not compiler repair coverage.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "contradictory-readiness",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 150,
+        "actualQuests": 3,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "roadmap-large",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both large-scope responses returned STOP with malformed JSON near the end of the 40-node proposal. Full scope in rejected raw text is not validated scope/disposition coverage. No candidate or forecast was published; no silent trim occurred.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "roadmap-large",
+        "checkpointStage": "PREFLIGHT",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "BLUEPRINT"
+        ]
+      }
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Real search and bounded fetch/read recorded public provenance including an official syllabus. The extraction correctly withheld complete Paper-2/topic applicability where selected text was insufficient. The independent research response put scopeBindings outside review and was rejected; the two-synthesis cap blocked a fallback. It did not produce an accepted research decision or applicable reviewed plan; unsupported weighting/identity concerns in candidate extraction were never adopted.",
+      "evidence": {
+        "liveCorpus": "step6-live-2026-10-05T12-54-22-902Z/live-corpus.json",
+        "caseId": "public-assessment-research",
+        "checkpointStage": "RESEARCH",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "RESEARCH",
+          "RESEARCH"
+        ]
+      }
+    }
+  ],
+  "remainingGates": [
+    "Reliable strictly valid blueprint/review/research responses under the existing request ceilings, with scopeBindings inside research.review and every consequential scope reason retained.",
+    "Current-source live research adoption/publication/apply, complete joint planning and reviewed zero-new-work.",
+    "An actual bounded educational revision/re-allocation and one named quality repair with independent exact-issue verification; no quota or budget expansion, silent trimming or review bypass.",
+    "Resolve the concrete method-weakness workload/criterion issues; do not downgrade them merely to certify the corpus.",
+    "Qualify production policy separately; temporary thinking/sampling trials cannot establish default production behavior."
+  ]
+}

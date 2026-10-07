@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-05T19:15:47.517Z",
+  "classification": "Focused diagnosis; cannot qualify the complete corpus",
+  "selectedRunDirectory": "step6-live-2026-10-05T19-11-03-589Z",
+  "liveCorpusSha256": "2f0e7b2eb54fe13be1d2870f61aa540f7373c2933259da4327946f15da427311",
+  "cases": [
+    {
+      "id": "method-weakness",
+      "status": "PASSED",
+      "assessment": "Taught-method scope is explicit and zero-error diagnosis is achievable. Diagnostic selection reasons, construction/application of a decision guide and an unaided transfer check have distinct roles. Six circuits/110 committed minutes remain a proportion/redundancy warning; future feature-specific work is unbooked and contingent. No dependent-source or new method scope is required.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "triage",
+      "status": "PASSED",
+      "assessment": "Both 25-minute tasks fit the two local days, every scope node remains explicit, depth/repetition are sacrificed with reasons rather than invented weights. Strict structured publication and apply succeed. Source-answer availability/correctness checking remains a warning; all scope included with reduced depth is a disclosed trade-off rather than disappearance.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "assessment": "Integrated base-rate/sensitivity explanation and changed-example application precede delayed independent transfer. Capability is the criterion, not time. Conditional correction permits a clean result; the model warning about untested error-location skill overstates the accepted goal and is not acceptance evidence.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "general-homework",
+      "status": "FAILED",
+      "assessment": "The three assigned equations are already solved/explained/substitution-checked, yet a separate synthetic three-expression check is committed. Model warning leaves the requested bounded stopping point expanded. No genuine compiler repair was observed.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    }
+  ],
+  "remainingGates": [
+    "Homework stopping-point commitment",
+    "Genuine named compiler repair and exact independent verification/apply",
+    "Complete current-source seventeen-case corpus"
+  ]
+}

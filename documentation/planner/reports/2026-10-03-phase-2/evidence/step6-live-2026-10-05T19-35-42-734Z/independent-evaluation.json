@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-05T19:46:43.529558+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-05T19-35-42-734Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "f3331b77d61e8aa95957ea529a6b37d8b13b31c49b0dc6332b2b22e3b97d65c1",
+  "method": "Separate inspection of actual outputs, original goals, persisted review/allocation and canonical apply. Not model self-approval or Phase 5 human qualification.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "enabled",
+    "reasoningEffort": "low",
+    "temperature": null,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "sourceCorrespondence": {
+    "changedDuringRun": [],
+    "rawHarnessStatus": "FAILED"
+  },
+  "coverage": {
+    "repairAndVerification": []
+  },
+  "externalAttempts": 22,
+  "usage": {
+    "reportedInputTokens": 160267,
+    "reportedOutputTokens": 81674,
+    "unknownSpendCalls": 0
+  },
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The actual structured blueprint or independent review failed within unchanged limits; zero execution is safe rejection, not educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "21ce2817-962a-44da-beab-3d6ccc7a4281"
+      },
+      "actualProviderPurposes": [
+        "BLUEPRINT",
+        "BLUEPRINT"
+      ],
+      "actualExecution": {
+        "quests": 0,
+        "goals": 0
+      },
+      "actualApply": null
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The actual structured blueprint or independent review failed within unchanged limits; zero execution is safe rejection, not educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "006fe351-6325-4d55-ac10-7fd11926f6c4"
+      },
+      "actualProviderPurposes": [
+        "BLUEPRINT",
+        "BLUEPRINT"
+      ],
+      "actualExecution": {
+        "quests": 0,
+        "goals": 0
+      },
+      "actualApply": null
+    },
+    {
+      "id": "method-weakness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 45-minute selection-and-solve activity uses only methods actually taught in the learner course. Three contrasting course circuits and one unprompted changed circuit expose the reported selection gap; zero errors is explicitly a successful result, and later correction is unbooked contingent work. No generic rereading or mandatory expanded repertoire. Conditional topology examples and the soft 30-minute preference remain caveats.",
+      "error": null,
+      "actualProviderPurposes": [
+        "REVIEW",
+        "BLUEPRINT",
+        "BLUEPRINT"
+      ],
+      "actualExecution": {
+        "quests": 1,
+        "goals": 1
+      },
+      "actualApply": "APPLIED"
+    },
+    {
+      "id": "triage",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The actual structured blueprint or independent review failed within unchanged limits; zero execution is safe rejection, not educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "OUTPUT_TRUNCATED",
+        "stage": "REVIEW",
+        "message": "The provider reached its output limit.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "a602f8bb-add0-454c-b92e-fc0502378d07"
+      },
+      "actualProviderPurposes": [
+        "REVIEW",
+        "BLUEPRINT",
+        "BLUEPRINT",
+        "REVIEW"
+      ],
+      "actualExecution": {
+        "quests": 0,
+        "goals": 0
+      },
+      "actualApply": null
+    },
+    {
+      "id": "mastery-open",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The actual structured blueprint or independent review failed within unchanged limits; zero execution is safe rejection, not educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "f2023fc6-d17a-4892-80cf-5a19ba68d2d2"
+      },
+      "actualProviderPurposes": [
+        "BLUEPRINT",
+        "BLUEPRINT"
+      ],
+      "actualExecution": {
+        "quests": 0,
+        "goals": 0
+      },
+      "actualApply": null
+    },
+    {
+      "id": "general-homework",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The actual structured blueprint or independent review failed within unchanged limits; zero execution is safe rejection, not educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "28692c53-6d55-4dc9-8050-e81c97b86269"
+      },
+      "actualProviderPurposes": [
+        "BLUEPRINT",
+        "BLUEPRINT"
+      ],
+      "actualExecution": {
+        "quests": 0,
+        "goals": 0
+      },
+      "actualApply": null
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One loops/dictionary owner, CSV and JSON goals, and the actual HARD root edge retained. Allocation counts 135 committed minutes once and schedules the JSON build after the shared prerequisite; canonical atomic apply has two target receipts. Both shared dispositions remain INCLUDED. No duplicated prerequisite or false readiness credit. CSV beginner reading uncertainty remains explicit.",
+      "error": null,
+      "actualProviderPurposes": [
+        "REVIEW",
+        "BLUEPRINT",
+        "REVIEW"
+      ],
+      "actualExecution": {
+        "quests": 3,
+        "goals": 2
+      },
+      "actualApply": "APPLIED"
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The actual structured blueprint or independent review failed within unchanged limits; zero execution is safe rejection, not educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "e385e54e-021e-47fb-95d5-9d809a12ca38"
+      },
+      "actualProviderPurposes": [
+        "BLUEPRINT",
+        "BLUEPRINT"
+      ],
+      "actualExecution": {
+        "quests": 0,
+        "goals": 0
+      },
+      "actualApply": null
+    },
+    {
+      "id": "roadmap-large",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The actual structured blueprint or independent review failed within unchanged limits; zero execution is safe rejection, not educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "OUTPUT_TRUNCATED",
+        "stage": "BLUEPRINT",
+        "message": "The provider reached its output limit.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "7e6b25f3-1065-4e34-86f5-aea23d5e57d7"
+      },
+      "actualProviderPurposes": [
+        "BLUEPRINT",
+        "BLUEPRINT"
+      ],
+      "actualExecution": {
+        "quests": 0,
+        "goals": 0
+      },
+      "actualApply": null
+    }
+  ]
+}

@@ -5,6 +5,7 @@ const pg_1 = require("pg");
 const database_1 = require("./server/database");
 const attempts_1 = require("./server/attempts");
 const worker_1 = require("./server/worker");
+const compiler_1 = require("./server/compiler");
 async function main() {
     if (Number(process.versions.node.split(".")[0]) !== 26)
         throw new Error("WORKER_TOOLCHAIN_MISMATCH");
@@ -13,9 +14,11 @@ async function main() {
     const pool = new pg_1.Pool({ connectionString: process.env.DATABASE_WORKER_URL, max: 4, idleTimeoutMillis: 30_000,
         connectionTimeoutMillis: 5000, options: "-c statement_timeout=10000 -c timezone=UTC" });
     pool.on("error", () => process.stderr.write('{"event":"database_pool_error"}\n'));
-    // Phase 1 deliberately has no educational compiler or research handler.
-    // A queued request cannot masquerade as a generated result in this build.
-    const worker = new worker_1.PlannerWorker(new attempts_1.AttemptService(new database_1.PlannerDatabase(pool)), {});
+    const attempts = new attempts_1.AttemptService(new database_1.PlannerDatabase(pool));
+    // Reuse the existing deployment admission flag. Step 5 supplies supervised
+    // handlers; the generation endpoint and deployment cutover remain Step 6.
+    const handlers = process.env.PLANNER_V2_DURABLE_CORE_ENABLED === "true" ? (0, compiler_1.createCompilerHandlers)(attempts) : {};
+    const worker = new worker_1.PlannerWorker(attempts, handlers);
     const health = await worker.readiness();
     if (!health.compatible)
         throw new Error("WORKER_SCHEMA_MISMATCH");

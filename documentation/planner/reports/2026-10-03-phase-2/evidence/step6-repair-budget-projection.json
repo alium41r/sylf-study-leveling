@@ -1,0 +1,14 @@
+{
+  "historicalRun": "step6-live-2026-10-05T12-54-22-902Z",
+  "historicalCase": "mastery-open",
+  "offlineReplayNotLiveRepairEvidence": true,
+  "actualConsumedInput": 13406,
+  "repairReservation": 33707,
+  "verificationHoldback": 33059,
+  "requiredInput": 80172,
+  "unchangedRootInputLimit": 80000,
+  "verificationGrowthMargin": 8192,
+  "outputReservation": 8192,
+  "verificationOutput": 4096,
+  "limitsChanged": false
+}

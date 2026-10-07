@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-07T09:00:59.712662+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T08-37-34-220Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "fb04d8841de4a7829f8e894278ea8efb40b61450e5e46b8788d76c6fe8a41070",
+  "method": "Separate inspection of actual goals, scope, criteria, provenance, allocation and apply. Model approval/apply do not establish educational acceptance.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      "triage",
+      "infeasible-zero-capacity",
+      "indivisible-checkpoint",
+      "roadmap-large"
+    ],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 41,
+  "usage": {
+    "reportedInputTokens": 311657,
+    "reportedOutputTokens": 43693,
+    "settledCalls": 41,
+    "unknownSpendCalls": 0
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 5364,
+    "p90Ms": 10646,
+    "maximumMs": 17505
+  },
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 40-minute task ends at correct independent changed-circuit application and explanation; no ritual stages.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Equivalent single 30-minute task with the same stopping point despite four times the daily capacity; no additional committed scope.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One bounded diagnostic permits clean success or honest failure, without self-report CREDITED mastery. Its 45-minute estimate is a proportion limitation, not proof of compulsory added scope.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "zero-new-work",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "All requested scope explicitly deferred with reasons, zero activities and zero canonical Quests.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 0
+    },
+    {
+      "id": "concept-foundation",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated conservation-based explanation/application/changed-circuit check. Inspected 12V series/parallel worked quantities are mathematically correct; conceptual need is not replaced by timed papers.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "method-weakness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Taught-method choice, valid selection reasons and correct solutions on unfamiliar circuits, with an explicit independent capability stopping point. Two further applications after a cue reference provide transfer rather than a logs-only completion. The 90-minute estimate and repeated application are retained proportion limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "triage",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 25-minute integrated circuit diagnostic covers all four requested nodes with depth/repetition sacrifices stated; no invented weights. Actual gaps trigger unbooked correction. No success claimed from failure evidence.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One cumulative CSV artifact with initial and changed-data checks; correctly parses valid quoted commas and explains genuinely malformed rows. Genuine declared milestones and final gate survive splitting.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Frequency reasoning/Bayes explanation and changed application, with correct conditional quantity roles. The 2%/90%/95% example implies about 26.9% posterior; no unconditional base-rate-dominance requirement. Time/confidence do not establish mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "After all three assigned equations are already correct and substitution-checked, a second committed explanation activity requires rechecking all expansions and re-solving one assigned equation. Unsupported mandatory repetition extends the accepted stopping point despite successful apply.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Reviewer demands the JSON deliverable again under the CSV owner and duplicates a root HARD edge inside local hardDependencies, despite the actual sibling deliverable and enforced allocation graph. These are spurious findings, not genuine repair; conservative reservation blocks dispatch.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "PERSISTENCE",
+        "message": "This call would consume capacity reserved for review or verification.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "06a50d89-f23c-4d02-855a-72454ee487cf"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Required learning stays committed and honestly infeasible against zero hard availability; one bounded adaptation and decision, no execution.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Required 45-minute uninterrupted authentic check retained against 30-minute days; no invented split or shortened substitute, explicit decision after bounded adaptation.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual 419-character owned note/hash/excerpts/course claims verify and adopt without official-assessment authority. Cumulative split instructions preserve one artifact and the final changed-data gate through reviewed publication and canonical apply.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Self-reported four-of-five failures contradict confident mastery; correct changed-circuit performance or honestly unresolved gap governs the integrated check. Error-triggered correction remains unbooked.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "roadmap-large",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "All forty strategic nodes survive valid bounded-reference output, but a resumable 180-minute committed artifact lacks declared milestones for known 120-minute slots. Adaptation plus mandatory review cannot fit the unchanged root budget; no publication or execution.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "PERSISTENCE",
+        "message": "This call would consume capacity reserved for review or verification.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "7e743a6f-7c34-406c-9eb6-d601dfb4c74d"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual public retrieval/excerpts retained, but applicable complete requested assessed scope remains unverified. Server-authoritative coverage decision prevents unsupported publication.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    }
+  ]
+}

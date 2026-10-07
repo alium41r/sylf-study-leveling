@@ -421,6 +421,8 @@ model PlannerPlan {
   contractVersion       Int @default(1)
   workingIntentVersionId String? @unique @db.Uuid
   conversationVersion   Int @default(0)
+  conversation          Json?
+  researchDocuments     Json?
   reservedGoalId        Int? @unique
   migrationEvidence     Json?
   intentVersions        PlannerIntentVersion[] @relation("IntentPlan")

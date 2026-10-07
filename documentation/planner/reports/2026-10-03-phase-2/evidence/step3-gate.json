@@ -1,0 +1,260 @@
+{
+  "gate": "PLANNER_V2_PHASE_2_STEP_3",
+  "startedAt": "2026-10-04T11:54:04.671Z",
+  "status": "PASSED",
+  "checks": [
+    {
+      "name": "frozen contracts and governing design",
+      "status": "PASSED",
+      "evidence": {
+        "frozenContracts": 12,
+        "governingUnchanged": 8
+      }
+    },
+    {
+      "name": "Step 1/2, Step 3 and changed legacy owner unit regressions",
+      "status": "PASSED",
+      "evidence": {
+        "files": 36,
+        "passed": 457,
+        "requiredSkipped": 0
+      }
+    },
+    {
+      "name": "isolated intelligence, worker and whole source TypeScript",
+      "status": "PASSED",
+      "evidence": {
+        "source": "PASSED",
+        "generatedNextTypesExcluded": true
+      }
+    },
+    {
+      "name": "whole repository typecheck classified against unchanged owners",
+      "status": "PASSED",
+      "evidence": {
+        "status": "PRE_EXISTING_GENERATED_FAILURES_UNCHANGED",
+        "errors": [
+          ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/api/subjects/[id]/compile/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/forge-apex/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/nodes/route.ts(53,7): error TS2344: Type '{ __tag__: \"GET\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/restore/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/route.ts(53,7): error TS2344: Type '{ __tag__: \"GET\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/route.ts(248,7): error TS2344: Type '{ __tag__: \"DELETE\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/route.ts(287,7): error TS2344: Type '{ __tag__: \"PATCH\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/user/focus-backgrounds/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/user/focus-backgrounds/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/goals/page.ts(37,13): error TS2344: Type 'OmitWithTag<GoalsScreenProps, keyof PageProps, \"default\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/goals/page.ts(37,29): error TS2559: Type 'GoalsScreenProps' has no properties in common with type 'PageProps'."
+        ],
+        "verifiedUnchangedSources": {
+          "app/api/acoustics/route.ts": "3f06009afed35607669fc6bd8352404e939999004caf316cb228c311767b196f",
+          "app/api/quests/route.ts": "798049a3efcd3d8a8c8eb059093292c29d94ee4f5a31362a79f62bc55d001467",
+          "app/api/subjects/[id]/compile/route.ts": "8f13a94d4228ddd5d1e11792d97ef0f2e63693099e374b1d3f5f59f1cc447735",
+          "app/api/subjects/[id]/forge-apex/route.ts": "1c9ac939603a3809843d2dd3696dd810714bbf3432629a382dacf19c591d4bbf",
+          "app/api/subjects/[id]/nodes/route.ts": "07ea82de35cad14d3d8d1a606dce4bfc2d1434a329fcb73e7c53a37905e57454",
+          "app/api/subjects/[id]/restore/route.ts": "ec06a0ad2938bfd5800edf7ef322118e65af0dda7a2caa902327993465e43514",
+          "app/api/subjects/[id]/route.ts": "f1fd037c284040246515ee9576fb245be39756c728477acc0077ff57fd34d4c7",
+          "app/api/user/focus-backgrounds/route.ts": "20cd314abad83ca1525ec9d9bb325ff0338bfd972ba429779b1868c4c99b8776",
+          "app/goals/page.tsx": "e0646c9be0fa7fcf008c6f6d1d4838c3bbdc8ec091dde2908b1210c82315b52d"
+        },
+        "generatedFilesModified": false
+      }
+    },
+    {
+      "name": "changed source lint",
+      "status": "PASSED",
+      "evidence": {
+        "newErrors": 0,
+        "newWarnings": 0
+      }
+    },
+    {
+      "name": "compiled normal Node research and assistant imports",
+      "status": "PASSED",
+      "evidence": {
+        "node": "v26.7.0",
+        "modules": 10,
+        "providerCredentials": false
+      }
+    },
+    {
+      "name": "actual bounded PDF rasterization",
+      "status": "PASSED",
+      "evidence": {
+        "pages": [
+          1
+        ],
+        "jpegBytes": 13945,
+        "reservedInput": 16777,
+        "modelCalls": 0
+      }
+    },
+    {
+      "name": "genuine PostgreSQL and compiled supervised research correspondence",
+      "status": "PASSED",
+      "evidence": {
+        "results": [
+          {
+            "label": "phase1",
+            "files": 9,
+            "passed": 113,
+            "failed": 0,
+            "requiredSkipped": 0,
+            "optionalProviderExcluded": 0,
+            "failures": []
+          },
+          {
+            "label": "current",
+            "files": 17,
+            "passed": 225,
+            "failed": 0,
+            "requiredSkipped": 0,
+            "optionalProviderExcluded": 1,
+            "failures": []
+          }
+        ],
+        "newServiceCases": 27,
+        "pinnedSources": 469,
+        "hostedDataTouched": false,
+        "cleanup": "Disposable server stopped; cluster/container removed."
+      }
+    },
+    {
+      "name": "isolated production web build qualification",
+      "status": "PASSED",
+      "evidence": {
+        "startedAt": "2026-10-04T11:49:02.002Z",
+        "finishedAt": "2026-10-04T11:50:04.866Z",
+        "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
+        "code": 1,
+        "command": "next build --webpack (private source copy)",
+        "credentialsLoaded": false,
+        "baselineRouteErrors": [
+          ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'."
+        ],
+        "sharedGeneratedFilesModified": false
+      }
+    },
+    {
+      "name": "completion documentation, references and scoped whitespace",
+      "status": "PASSED",
+      "evidence": {
+        "requirements": [
+          "P2-02",
+          "P2-07",
+          "P2-08",
+          "P2-09",
+          "P2-10"
+        ],
+        "brokenReferences": 0,
+        "newWhitespaceFindings": 0
+      }
+    },
+    {
+      "name": "baseline preservation and unrelated concurrency",
+      "status": "PASSED",
+      "evidence": {
+        "status": "PASSED",
+        "baselineEntries": 2496,
+        "baselineCoverage": "Git-listed files excluding secret-like paths and Phase 2 evidence; not a full filesystem snapshot.",
+        "step3ExistingEdits": [
+          "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts",
+          "app/api/planner/[id]/operations/[key]/route.ts",
+          "documentation/planner/README.md",
+          "documentation/planner/reports/2026-10-03-phase-2/README.md",
+          "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json",
+          "lib/planner/import/pdf.ts",
+          "lib/planner/research/authority.ts",
+          "lib/planner/research/evidence.ts",
+          "lib/planner/research/search/contracts.ts",
+          "lib/planner/research/search/fetch.ts",
+          "lib/planner/research/search/provider.ts",
+          "lib/planner/v2/intelligence/context.ts",
+          "lib/planner/v2/intelligence/provider.ts",
+          "lib/planner/v2/server/accounting.ts",
+          "lib/planner/v2/server/attempts.ts",
+          "lib/planner/v2/server/intents.ts",
+          "lib/planner/v2/server/revisions.ts",
+          "lib/planner/v2/server/web.ts",
+          "lib/planner/v2/server/worker.ts",
+          "lib/prisma.ts",
+          "prisma/schema.prisma",
+          "scripts/test-planner-v2-phase1-postgres.mjs"
+        ],
+        "derivedWorkerChanges": [
+          "dist/planner-worker/planner/v2/intelligence/context.js",
+          "dist/planner-worker/planner/v2/intelligence/provider.js",
+          "dist/planner-worker/planner/v2/server/accounting.js",
+          "dist/planner-worker/planner/v2/server/attempts.js",
+          "dist/planner-worker/planner/v2/server/intents.js",
+          "dist/planner-worker/planner/v2/server/revisions.js",
+          "dist/planner-worker/planner/v2/server/worker.js"
+        ],
+        "unrelatedConcurrentChanges": [],
+        "unrelatedNewFiles": [],
+        "unrelatedLandingUnchanged": true
+      }
+    }
+  ],
+  "scope": "Assistant and research/document verification; Step 4 compiler/allocation and Step 5 production handler activation remain pending.",
+  "sourceSha256": {
+    "__tests__/planner-v2/intelligence/assistant.test.ts": "9b14ca26099de2d43cf2a8786b3f9c4b81add30a30a4ef83247efec38dd38940",
+    "__tests__/planner-v2/intelligence/documents-cache.test.ts": "6246de95db4870b1e9ed25ead0cc3a820d4e26a2eb854a85ebc4284591e64337",
+    "__tests__/planner-v2/intelligence/research-fixtures.ts": "9534fc69562dfb6590a92c18ffbc974a1ca2657f101db4af1edb0126aee82195",
+    "__tests__/planner-v2/intelligence/research-transport.test.ts": "77b92f9bea93938426ebff2c1c2e1e4b5805b1a8c0918d7b84ddd47223468810",
+    "__tests__/planner-v2/intelligence/research-verification.test.ts": "75649a59311c824ba80c7700e9f0dc4895c403461961a3a7ba96ffe76b9e72be",
+    "__tests__/planner-v2/intelligence/targeted-pdf.test.ts": "4b32004dfc3f22683fe4aa0ac75e55821eb05bc516396d05a5756f5c4eba31ad",
+    "__tests__/planner-v2/postgres/assistant-research.postgres.ts": "00a7000b7ac231aec5864fd10d8fd6a3b2cdb5d7a78f5d72815fdfc7b852944a",
+    "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts": "e9d5fc21e6d0e9ded0b74c91d6df8da1de53d5b3e44c445a6ffdd75d5bacfc30",
+    "__tests__/planner-v2/postgres/research-process-fixture.cjs": "4b283882a80bc5fdf4987e8157b1cc6bbe6c6adfc3aeeef3ea468244ab8976c6",
+    "app/api/planner/[id]/assistant/route.ts": "bbb7a02806c169c52b88bfbf08189123a456fec54cb5c6d8e024cceef90fc732",
+    "app/api/planner/[id]/documents/route.ts": "eb6b7132759655107f4b2cbd2a40718277b696cfebab1dd9bc6ce38ec06ce20a",
+    "app/api/planner/[id]/operations/[key]/route.ts": "327c7527b9a1e171a140e5ff282262a12f44f52c230600f28fbf73e765fa54cb",
+    "documentation/planner/README.md": "9769e12df6433fe88c76a322906c05cea8c88683fc135514705781d5c8d86f92",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md": "bc2ca98058ec1f91b42bcd9c08e8e6fb0b7d4b7a72af825ce7c89529896d724f",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json": "4f5906a3bed90f106c86367afcf9bcb54a122bad419282e15529f617cabf7013",
+    "documentation/planner/reports/2026-10-03-phase-2/STEP_3.md": "8e70a7d5d67b1fe289a42df4b00ff488f9eb6a43a92e92123d7506b866f8afff",
+    "lib/planner/import/pdf-runtime.ts": "d4a61a539359ddc8240cd8de163fefc8fd2b0e71ef5e19a9033f0527fdab8baf",
+    "lib/planner/import/pdf.ts": "7a9859712d76ec67cd207b778359557a01b312c638d7cd5ab129cbb008d6530a",
+    "lib/planner/research/authority.ts": "14496cb1a7ea1573a5f87e2458bdc734ec3cbef38b007a2d737743c6e1414695",
+    "lib/planner/research/evidence-runtime.ts": "6d9af46d5d9def4567f171aa82f0f1c3513e67e7e5adafcfc981696a4369355d",
+    "lib/planner/research/evidence.ts": "35a9a3fd94b832781ff30d8502fdeb32192164a4be617470c297888246855cd5",
+    "lib/planner/research/search/contracts.ts": "e25e015c794372e90ff6e0102f1fa2e4980200f09c9723f2a2efcac159287b25",
+    "lib/planner/research/search/fetch-runtime.ts": "74d7fdcbe2207306c3879f39753ac8eb44794775d932d187ac1f43709d9f9155",
+    "lib/planner/research/search/fetch.ts": "debefd44d79cbfeb5d330e99309adf45645337a167efdc5b566a38b5b4c574a4",
+    "lib/planner/research/search/provider-runtime.ts": "17f980a1e302e13c2e524759eb79ca89d7fcd5a2d29c6fbba75de372f557ac33",
+    "lib/planner/research/search/provider.ts": "b1212f3920ef5dbe8abc6a432155b7e152ca1427629526b99eaebf71e1f6db48",
+    "lib/planner/v2/intelligence/assistant.ts": "44aad7f7e764ff67e96f787dd6b8670d8bfbf20b12100142794747d5a7781ef4",
+    "lib/planner/v2/intelligence/context.ts": "53a0588e00590d8e5f8ef95283dca8565798ed1290d22386fee88b9c1707a86e",
+    "lib/planner/v2/intelligence/ocr.ts": "050856144f969fd26b8e2bec882b517c600d161f0c8cab89b00e52bb43f89c6e",
+    "lib/planner/v2/intelligence/provider.ts": "75404a96f3630538aacac667997ac8702f2271f010cb90d00153c9a3a9beb948",
+    "lib/planner/v2/intelligence/research-cache.ts": "336ab64c803035ae9694c5263db7b3d3e83d6d8be708ab8d1fd2a3b5947e0b20",
+    "lib/planner/v2/intelligence/research-reader.ts": "f01ddfc0dd4ae0cfd8b69a5bba8b7ba4a6dc563dd8c1f7b96cb25702cba128a2",
+    "lib/planner/v2/intelligence/research-verification.ts": "56aa34ee5c55c687eae20ee8bcb00daa6d5652a1f4a0935a1caa84784bb414f2",
+    "lib/planner/v2/intelligence/schemas/assistant-intake.ts": "2b40c7936df0b6e04f843168ab348738dae160cfa8fbd10ed058dffa6f40a3c4",
+    "lib/planner/v2/intelligence/schemas/conversation.ts": "9dcc0c8023913a06ea689a811bc50971b46f2faf9efc28be81b04db22b92914a",
+    "lib/planner/v2/intelligence/schemas/documents.ts": "928162c66506cdca42eb167d13489182d687acc843523b5d067f861d44c608e7",
+    "lib/planner/v2/intelligence/schemas/research-model.ts": "02ccbb99f42630849308c223fde1072369d850c4f604b3d43e859188775aff50",
+    "lib/planner/v2/server/accounting.ts": "23645a46cfa7acd0d4a5deaaf79fda500094ef19f9bde0ec7ad4f39229dc9f57",
+    "lib/planner/v2/server/assistant.ts": "e1969ed65e3b411cbaa00555bd5856f74826bfda056f47efba41231f7e1344c9",
+    "lib/planner/v2/server/attempts.ts": "abc332a686fef4322f5e5e0e684184d2b38fd9a37d8a39822725a85e12388736",
+    "lib/planner/v2/server/documents.ts": "2ea76a272034a5d5a9687fac63abf229f3ac0276e89f6b2c54a323b24d9d84cf",
+    "lib/planner/v2/server/intents.ts": "09e7b969a9a63a323d5b3f0201ea5e949784152995ab86d41d9c5f821765ed6a",
+    "lib/planner/v2/server/research.ts": "c1e8e7ba2c6213b1e6c4ec740d54877366e8f3b221c2c0dd6e9987cf939d2689",
+    "lib/planner/v2/server/revisions.ts": "5c814442513b3ed152a788c07c48581a98ed6d5d62366523ec9b7c22f80a8e86",
+    "lib/planner/v2/server/web.ts": "e399ebf42c29259c437f1e11c276e02a50b1f0b572b1821179c659a2f5ceaed4",
+    "lib/planner/v2/server/worker.ts": "de60caaefca2a7ff7d11f685308a04f391a6f44c1b9c9ec3406d2008cf9311cb",
+    "lib/prisma.ts": "7106282a7a3a8409bfd277c17969227e7af17df0f141aa6a144bd4b9cbd01e3b",
+    "prisma/migrations/20261004000000_planner_v2_assistant_documents/migration.sql": "fdf44d5ee6e1424319736051f89e6a7afce75fdfea21cc990dd7e4214cbb0711",
+    "prisma/schema.prisma": "4f5753252e806f7ab2dd894b8c4ab64e3b0863b63999580f11514b764da678fb",
+    "scripts/test-planner-v2-phase1-postgres.mjs": "4e484a30bf19a92d71074f13c6fcba4d6e0051ff5b4b82c2b4cb3ada3864c05c",
+    "scripts/test-planner-v2-phase2-step3-postgres.mjs": "6520651190200bd0386bca2315999df2c64539d734e9c4595cdf41bd6480f52c",
+    "scripts/verify-planner-v2-phase2-step3-build.mjs": "d1ab70b506de0a42ca025ad003fccccea7849255a4b47991318ed7473f4f04df",
+    "scripts/verify-planner-v2-phase2-step3.mjs": "c60bb5d13dd30bc62e99fcd57d7b46f12023272dd90a041f252347e83d31aee6"
+  },
+  "finishedAt": "2026-10-04T11:55:44.915Z"
+}

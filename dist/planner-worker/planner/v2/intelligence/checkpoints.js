@@ -42,5 +42,7 @@ function readCompilerCheckpoint(value, attempt, expected) {
         return value.report.evidenceDigest !== target.qualityEvidenceDigest || value.report.educationalContentDigest !== (0, database_1.hash)("educational-content", { blueprint, externalDependencies: target.context.externalActivityDependencies });
     }))
         return { ok: false, reason: "ARTIFACT_DIGEST_MISMATCH" };
+    if ('reviewSupport' in payload && payload.reviewSupport?.acceptedRepair && (0, database_1.hash)('accepted-repair', payload.reviewSupport.acceptedRepair) !== payload.reviewSupport.acceptedRepairDigest)
+        return { ok: false, reason: 'ARTIFACT_DIGEST_MISMATCH' };
     return { ok: true, checkpoint };
 }

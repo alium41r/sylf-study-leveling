@@ -3,8 +3,12 @@ import { describe, expect, it, vi } from "vitest";
 import { dispatchMeteredProvider, type ProviderMeter, type MeteredProviderRequest } from "@/lib/planner/v2/intelligence/provider";
 import { reserveProviderCapacity, providerCategory } from "@/lib/planner/v2/intelligence/provider-policy";
 import { pricedProviderUsage } from "@/lib/ai/usage-pricing";
+import { WORKLOAD_ROUTING_TABLE } from "@/lib/ai/agent-router";
 import { DurablePlannerError } from "@/lib/planner/v2/server/database";
 import type { LLMResponse } from "@/lib/ai/providers/types";
+import { z } from "zod";
+import { JsonExtractionError } from "@/lib/ai/json-extractor";
+import { boundedProviderInput } from "@/lib/planner/v2/intelligence/provider";
 import { budgetFixture } from "../contracts/fixtures";
 
 const response = (): LLMResponse => ({ text: '{"ok":true}', finishReason: "STOP", usage: { promptTokens: 100, completionTokens: 20, totalTokens: 120 } });
@@ -26,7 +30,7 @@ describe("shared metered provider dispatch", () => {
   it("commits each dispatch before exactly one upstream attempt and charges fallback independently", async () => {
     const m = fakeMeter(); let n = 0;
     const generate = vi.fn(async (_messages, _system, _tools, options) => {
-      expect(m.events.at(-1)).toContain("dispatch:"); expect(options).toMatchObject({ singleAttempt: true, maxTokens: 100, responseFormat: "json_object" });
+      expect(m.events.at(-1)).toContain("dispatch:"); expect(options).toMatchObject({ singleAttempt: true, maxTokens: 100, responseFormat: "json_object", thinking: WORKLOAD_ROUTING_TABLE.syllabus.thinking });
       if (++n === 1) throw new Error("Private provider key/message"); return response();
     });
     const result = await dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: generate }) });
@@ -41,11 +45,129 @@ describe("shared metered provider dispatch", () => {
     } }) });
     expect(m.settled).toHaveLength(3); expect(result.attempts.map(a => a.code)).toEqual(["OUTPUT_TRUNCATED", "INVALID_OUTPUT", undefined]);
     expect(m.closed[0]).toMatchObject({ result: { finishReason: "MAX_TOKENS" } });
-    await expect(dispatchMeteredProvider(fakeMeter().meter, request(), { adapter: () => ({ generateResponse: async () => ({ ...response(), finishReason: undefined }) }) })).rejects.toMatchObject({ detail: { code: "INVALID_OUTPUT" } });
+    await expect(dispatchMeteredProvider(fakeMeter().meter, request(), { adapter: () => ({ generateResponse: async () => ({ ...response(), finishReason: undefined }) }) })).rejects.toMatchObject({ detail: { code: "INVALID_OUTPUT", stage: "BLUEPRINT" } });
   });
   it("retains unknown usage and does not fabricate a settlement", async () => {
-    const m = fakeMeter(); await expect(dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: async () => ({ ...response(), usage: undefined }) }) })).rejects.toMatchObject({ detail: { code: "PROVIDER_FAILURE" } });
+    const m = fakeMeter(); await expect(dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: async () => ({ ...response(), usage: undefined }) }) })).rejects.toMatchObject({ detail: { code: "PROVIDER_FAILURE", stage: "BLUEPRINT" } });
     expect(m.settled).toHaveLength(0); expect(m.closed).toHaveLength(2);
+  });
+  it("sends bounded deterministic schema feedback only to the existing fallback and reserves its complete input", async () => {
+    const m = fakeMeter(), inputs: number[] = [], original = request(), before = structuredClone(original.messages);
+    const schema = z.strictObject({ ok: z.boolean(), sharedDependencies: z.array(z.string()) });
+    let n = 0;
+    const generate = vi.fn(async (messages) => {
+      if (++n === 1) { expect(messages).toEqual(before); return { ...response(), text: '{"ok":true}' }; }
+      expect(messages.slice(0, -1)).toEqual(before);
+      const feedback = JSON.parse(messages.at(-1).content);
+      expect(feedback).toMatchObject({ kind: "DETERMINISTIC_VALIDATION_FEEDBACK", feedback: {
+        code: "SCHEMA_MISMATCH", issues: [{ code: "invalid_type", path: ["sharedDependencies"] }], omittedIssues: 0 } });
+      expect(inputs.at(-1)).toBe(boundedProviderInput({ ...original, messages }));
+      return { ...response(), text: '{"ok":true,"sharedDependencies":[]}' };
+    });
+    const result = await dispatchMeteredProvider({ ...m.meter, reserve: async (...args) => {
+      inputs.push(args[1]); return m.meter.reserve(...args);
+    } }, { ...original, validate: r => schema.parse(JSON.parse(r.text!)) }, { adapter: () => ({ generateResponse: generate }) });
+    expect(result.value.sharedDependencies).toEqual([]); expect(inputs[1]).toBeGreaterThan(inputs[0]);
+    expect(generate).toHaveBeenCalledTimes(2); expect(m.settled).toHaveLength(2);
+    expect(result.attempts[0].code).toBe("INVALID_OUTPUT"); expect(original.messages).toEqual(before);
+  });
+  it("never leaks rejected output, validator messages or provider diagnostics in fallback feedback", async () => {
+    for (const error of [new JsonExtractionError("parse", "PRIVATE rejected content"), new Error("PRIVATE semantic detail"),
+      new z.ZodError(Array.from({ length: 20 }, () => ({ code: "custom", path: ["plans", 0, "review"], message: "PRIVATE detail" })))]) {
+      const m = fakeMeter(); let n = 0; const generate = vi.fn(async messages => {
+        if (n++) {
+          const feedback = JSON.parse(messages.at(-1).content).feedback;
+          expect(JSON.stringify(feedback)).not.toContain("PRIVATE"); expect(JSON.stringify(feedback).length).toBeLessThan(2000);
+          if (error instanceof z.ZodError) { expect(feedback.issues).toHaveLength(8); expect(feedback.omittedIssues).toBe(12); }
+        }
+        return response();
+      });
+      let validations = 0;
+      await dispatchMeteredProvider(m.meter, { ...request(), validate: () => { if (!validations++) throw error; return { ok: true }; } },
+        { adapter: () => ({ generateResponse: generate }) });
+      expect(generate).toHaveBeenCalledTimes(2);
+    }
+  });
+  it("cannot dispatch feedback fallback when its augmented input exceeds the root allowance", async () => {
+    const m = fakeMeter(), original = request(), limit = boundedProviderInput(original);
+    const generate = vi.fn(async () => ({ ...response(), text: "{malformed" }));
+    await expect(dispatchMeteredProvider({ ...m.meter, reserve: async (...args) => {
+      if (args[1] > limit) throw new DurablePlannerError("BUDGET_EXHAUSTED", "No feedback capacity", "BLUEPRINT");
+      return m.meter.reserve(...args);
+    } }, original, { adapter: () => ({ generateResponse: generate }) })).rejects.toMatchObject({ detail: { code: "BUDGET_EXHAUSTED" } });
+    expect(generate).toHaveBeenCalledTimes(1); expect(m.settled).toHaveLength(1); expect(m.closed).toHaveLength(1);
+  });
+  it("discloses only the frozen detail-day enumeration, never arbitrary union values", async () => {
+    for (const field of ["detail", "privateUnion"]) {
+      const m = fakeMeter(); let n = 0;
+      const schema = field === "detail" ? z.strictObject({ detail: z.strictObject({ days: z.union([z.literal(14), z.literal(28)]) }) }) :
+        z.strictObject({ privateUnion: z.union([z.literal("PRIVATE_ONE"), z.literal("PRIVATE_TWO")]) });
+      const valid = field === "detail" ? { detail: { days: 14 } } : { privateUnion: "PRIVATE_ONE" };
+      const generate = vi.fn(async messages => {
+        if (!n++) return { ...response(), text: JSON.stringify(field === "detail" ? { detail: { days: 2 } } : { privateUnion: 2 }) };
+        const feedback = JSON.parse(messages.at(-1).content).feedback;
+        expect(JSON.stringify(feedback)).not.toContain("PRIVATE");
+        expect(feedback.issues[0].allowedValues).toEqual(field === "detail" ? [14, 28] : undefined);
+        return { ...response(), text: JSON.stringify(valid) };
+      });
+      const result = await dispatchMeteredProvider(m.meter, { ...request(), validate: r => schema.parse(JSON.parse(r.text!)) }, { adapter: () => ({ generateResponse: generate }) });
+      expect(result.value).toEqual(valid); expect(generate).toHaveBeenCalledTimes(2); expect(m.settled).toHaveLength(2);
+    }
+  });
+  it("discloses deterministic schema bounds without forwarding rejected values", async () => {
+    const m = fakeMeter(), schema = z.strictObject({ scopeRefs: z.array(z.string()).max(24), timeboxMinutes: z.number().min(5) });
+    let n = 0; const generate = vi.fn(async messages => {
+      if (!n++) return { ...response(), text: JSON.stringify({ scopeRefs: Array(25).fill("PRIVATE"), timeboxMinutes: 4 }) };
+      const feedback = JSON.parse(messages.at(-1).content).feedback;
+      expect(feedback.issues).toEqual(expect.arrayContaining([
+        expect.objectContaining({ code: "too_big", path: ["scopeRefs"], maximum: 24, inclusive: true }),
+        expect.objectContaining({ code: "too_small", path: ["timeboxMinutes"], minimum: 5, inclusive: true }),
+      ]));
+      expect(JSON.stringify(feedback)).not.toContain("PRIVATE");
+      return { ...response(), text: '{"scopeRefs":[],"timeboxMinutes":5}' };
+    });
+    await dispatchMeteredProvider(m.meter, { ...request(), validate: r => schema.parse(JSON.parse(r.text!)) }, { adapter: () => ({ generateResponse: generate }) });
+    expect(generate).toHaveBeenCalledTimes(2); expect(m.settled).toHaveLength(2);
+  });
+  it("does not turn cancellation during invalid validation into a feedback retry", async () => {
+    const m = fakeMeter(), controller = new AbortController(), generate = vi.fn(async () => response());
+    await expect(dispatchMeteredProvider(m.meter, { ...request(), signal: controller.signal, validate: () => {
+      controller.abort(); throw new SyntaxError("PRIVATE invalid JSON");
+    } }, { adapter: () => ({ generateResponse: generate }) })).rejects.toMatchObject({ detail: { code: "CANCELLED" } });
+    expect(generate).toHaveBeenCalledTimes(1); expect(m.settled).toHaveLength(1);
+  });
+  it("reports only mismatched JSON delimiters, ignoring escaped quotes and braces in private strings", async () => {
+    const text = '{"plans":[{"note":"PRIVATE } ] \\" words","blueprint":{"decisions":{"stoppingConditions":[]}}}}]}';
+    const m = fakeMeter(); let n = 0;
+    const generate = vi.fn(async messages => {
+      if (!n++) return { ...response(), text };
+      const feedback = JSON.parse(messages.at(-1).content).feedback;
+      expect(feedback).toEqual({ code: "INVALID_JSON", delimiter: {
+        code: "MISMATCHED_CLOSING_DELIMITER", offset: text.length - 3, expected: "]", received: "}",
+      } });
+      expect(JSON.stringify(feedback)).not.toContain("PRIVATE");
+      return response();
+    });
+    await dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: generate }) });
+    expect(m.settled).toHaveLength(2); expect(generate).toHaveBeenCalledTimes(2);
+  });
+  it("returns fixed owned grounding constraints without echoing durable semantic error details", async () => {
+    for (const [message, constraint] of [
+      ["A blocker needs a concrete accepted requirement/evidence and offending proposal.", "BLOCKER_REQUIRES_REQUIREMENT_OR_OBSERVATION_AND_PROPOSAL_GROUNDS"],
+      ["Quality evidence is not quoted from the actual owned review input.", "GROUNDS_REQUIRE_EXACT_SUPPLIED_REF_AND_LITERAL_EXCERPT"],
+      ["PRIVATE owned semantic detail", undefined],
+      ["__proto__", undefined],
+    ]) {
+      const m = fakeMeter(); let n = 0, validations = 0;
+      const generate = vi.fn(async messages => {
+        if (n++) expect(JSON.parse(messages.at(-1).content).feedback).toEqual({ code: "VALIDATION_REJECTED", ...(constraint ? { constraint } : {}) });
+        return response();
+      });
+      await dispatchMeteredProvider(m.meter, { ...request(), validate: () => {
+        if (!validations++) throw new DurablePlannerError("INVALID_OUTPUT", message!, "REVIEW"); return { ok: true };
+      } }, { adapter: () => ({ generateResponse: generate }) });
+      expect(m.settled).toHaveLength(2);
+    }
   });
   it("awaits structured validation within cancellation/deadline bounds before accepting or releasing a review hold", async () => {
     const m = fakeMeter(); const controller = new AbortController(); const generate = vi.fn(async () => response());

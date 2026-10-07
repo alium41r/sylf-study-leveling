@@ -1,6 +1,6 @@
 {
-  "startedAt": "2026-10-03T18:22:11.506Z",
-  "finishedAt": "2026-10-03T18:23:07.098Z",
+  "startedAt": "2026-10-04T09:08:05.773Z",
+  "finishedAt": "2026-10-04T09:09:04.660Z",
   "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
   "code": 1,
   "command": "next build --webpack (private source copy)",

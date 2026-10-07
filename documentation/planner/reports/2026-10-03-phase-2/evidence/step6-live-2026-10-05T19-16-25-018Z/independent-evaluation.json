@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-05T19:32:31.169Z",
+  "selectedRunDirectory": "step6-live-2026-10-05T19-16-25-018Z",
+  "liveCorpusSha256": "f8ee0765582723fdc4c335c2e71865eb307b40cb71da6a8d7e18f36603fe2b65",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "method": "Separate inspection of actual goals/output/checkpoints/allocation and ApplyService receipts; model self-review is not acceptance.",
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "FAILED",
+      "assessment": "70 committed minutes and two mandatory stages versus 30 minutes for the identical tiny goal; extra unchanged-circuit rehearsal precedes the changed check without new learner evidence. Model approval did not detect the inflation.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "zero-new-work",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "concept-foundation",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "method-weakness",
+      "status": "PASSED",
+      "assessment": "Taught-method scope and no-error diagnostic path preserved; no advanced techniques required, full application to new circuits with checked answers. Guide/repetition and unaided-transfer clarity remain concerns; no fixed count/duration acceptance rule is applied.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "triage",
+      "status": "PASSED",
+      "assessment": "Valid 25+25-minute integrated core/application and quiz check across all four scope nodes; depth/repetition sacrifices disclosed without topic weights. Unknown readiness and answer-source availability retain warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "general-homework",
+      "status": "PASSED",
+      "assessment": "Only the three assigned equations are committed, with explicit sign expansion/correction/substitution checks. A concrete assigned-error follow-up stays contingent and unbooked.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "FAILED",
+      "assessment": "First generation emitted a foreign new local ID in same-Plan hardDependencies. The valid fallback reached allocation, but both reviewers incorrectly called the actual enforced shared edge missing, supported only by generator claims; strict grounding rejected those findings. No candidate/apply.",
+      "actualOutcome": "FAILED",
+      "applied": false,
+      "repairs": 0
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "FAILED",
+      "assessment": "Both replies close blueprint before decisions; no validated positive blueprint or deterministic infeasibility receipt survives. Safe rejection is not qualification.",
+      "actualOutcome": "FAILED",
+      "applied": false,
+      "repairs": 0
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "NEEDS_DECISION",
+      "applied": false,
+      "repairs": 0
+    },
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "SUCCEEDED",
+      "applied": true,
+      "repairs": 0
+    },
+    {
+      "id": "roadmap-large",
+      "status": "FAILED",
+      "assessment": "First malformed JSON and second Plan-level decisions instead of blueprint decisions prevent validated full-scope publication.",
+      "actualOutcome": "FAILED",
+      "applied": false,
+      "repairs": 0
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "PASSED",
+      "assessment": "Original registered expectation checked against actual persisted output; current accepted result retains recorded uncertainty/quality warnings.",
+      "actualOutcome": "NEEDS_DECISION",
+      "applied": false,
+      "repairs": 0
+    }
+  ],
+  "remainingGates": [
+    "Four failed cases",
+    "Genuine named compiler repair → exact independent verification → canonical apply",
+    "Stable-source full technical refresh"
+  ]
+}

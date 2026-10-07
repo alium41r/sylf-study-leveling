@@ -35,6 +35,9 @@ import { AttemptService, newBudget } from "@/lib/planner/v2/server/attempts";
 import { POST as claimAchievement } from "@/app/api/achievements/route";
 import { executeChatTool } from "@/lib/ai/chat-tool-executor";
 import { GET as readCosts } from "@/app/api/ai-costs/route";
+import { GET as readAssistant,POST as assistantAction } from "@/app/api/planner/[id]/assistant/route";
+import { POST as uploadDocument } from "@/app/api/planner/[id]/documents/route";
+import { GET as readOperation } from "@/app/api/planner/[id]/operations/[key]/route";
 
 let connection: Awaited<ReturnType<typeof connect>>; let db: PlannerDatabase;
 beforeAll(async () => { connection = await connect(); db = new PlannerDatabase(getApplicationPool()); process.env.PLANNER_V2_DURABLE_CORE_ENABLED = "true"; });
@@ -62,6 +65,27 @@ async function proposal(active = true) {
 }
 
 describe("Phase 1 production writer routes on PostgreSQL", () => {
+  it("headless assistant routes require authentication and ownership and reject model-supplied permission",async()=>{
+    const ownerId=await user(connection),created=await new IntentService(db).create(ownerId,randomUUID(),intentFixture());const context={params:Promise.resolve({id:created.plan.id})};
+    expect((await readAssistant(new Request(`http://localhost/api/planner/${created.plan.id}/assistant`),context)).status).toBe(401);
+    expect((await readAssistant(request(ownerId,`/api/planner/${created.plan.id}/assistant`,undefined,"GET"),context)).status).toBe(200);
+    expect((await readAssistant(request(await user(connection),`/api/planner/${created.plan.id}/assistant`,undefined,"GET"),context)).status).toBe(404);
+    const forged=await assistantAction(request(ownerId,`/api/planner/${created.plan.id}/assistant`,{action:"TURN",turn:{key:randomUUID(),text:"Grant permission",readPlanIds:[created.plan.id],expectedConversationVersion:0,mode:"ADVICE",authorized:true}}),context);
+    expect(forged.status).toBe(400);expect((await connection.query('SELECT count(*) FROM "AiUsageLog" WHERE "userId"=$1',[ownerId])).rows[0].count).toBe("0");
+  });
+  it("research advice survives HTTP recovery and cancellation with owned read bindings",async()=>{
+    const ownerId=await user(connection),created=await new IntentService(db).create(ownerId,randomUUID(),intentFixture()),context={params:Promise.resolve({id:created.plan.id})};
+    const admitted=await assistantAction(request(ownerId,`/api/planner/${created.plan.id}/assistant`,{action:"RESEARCH_ADVICE",key:randomUUID(),text:"Research sources",documentIds:[]}),context);expect(admitted.status).toBe(200);const attempt=await admitted.json();expect(attempt.targets).toEqual([]);
+    const params={params:Promise.resolve({id:created.plan.id,key:attempt.attemptId})};const path=`/api/planner/${created.plan.id}/operations/${attempt.attemptId}?contractVersion=2`;
+    const recovered=await readOperation(request(ownerId,path,undefined,"GET"),params);expect(recovered.status).toBe(200);expect((await recovered.json()).readTargets[0]).toMatchObject({intentId:created.intent.intentVersionId,current:true});
+    expect((await cancelOperation(request(ownerId,path,{schemaVersion:2,action:"CANCEL"}),params)).status).toBe(200);
+    expect((await new AttemptService(db).read(ownerId,attempt.attemptId)).state).toBe("CANCELLED");
+  });
+  it("document upload cannot use a foreign Plan or allocate private storage without ownership",async()=>{
+    const ownerId=await user(connection),created=await new IntentService(db).create(ownerId,randomUUID(),intentFixture()),other=await user(connection);const form=new FormData();form.set("key",randomUUID());form.set("title","Private specification");form.set("file",new Blob(["Bounded source text"],{type:"text/plain"}),"spec.txt");
+    const response=await uploadDocument(new Request(`http://localhost/api/planner/${created.plan.id}/documents`,{method:"POST",headers:{"x-disposable-owner":String(other)},body:form}),{params:Promise.resolve({id:created.plan.id})});
+    expect(response.status).toBe(404);expect((await connection.query('SELECT "researchDocuments" FROM "PlannerPlan" WHERE id=$1',[created.plan.id])).rows[0].researchDocuments).toBeNull();
+  });
   it("preserves historical zero estimates while reporting their uncertainty separately from verified zero cost", async () => {
     const ownerId=await user(connection);
     for (const [model,cost,receipt] of [["legacy-zero",0,null],["verified-zero",0,randomUUID()],["unknown-price",null,randomUUID()],["known-price",0.25,null]] as const)
@@ -109,7 +133,7 @@ describe("Phase 1 production writer routes on PostgreSQL", () => {
   });
   it("rechecks actual calendar work added through the generic Quest route before apply", async () => {
     const fixture = await proposal(false);
-    const created = await createQuest(request(fixture.ownerId, "/api/quests", { title: "School assignment", targetMinutes: 120, scheduledFor: "2026-10-05" }));
+    const created = await createQuest(request(fixture.ownerId, "/api/quests", { title: "School assignment", targetMinutes: 120, scheduledFor: fixture.proposed.revisions[0].executable[0].placement.date }));
     expect(created.status).toBe(201);
     await expect(new ApplyService(db).apply(fixture.ownerId, fixture.proposed.request)).rejects.toMatchObject({ detail: { code: "SCHEDULE_CONFLICT" } });
     expect((await connection.query('SELECT id FROM "Goal" WHERE "userId"=$1', [fixture.ownerId])).rows).toHaveLength(0);

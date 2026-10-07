@@ -1,1 +1,248 @@
-{"status":"PENDING"}
+{
+  "status": "PASSED",
+  "baselineFiles": 3783,
+  "nonFileEntries": {
+    ".claude/skills/sylf-ui-implementation": {
+      "before": {
+        "kind": "other"
+      },
+      "observed": {
+        "kind": "other"
+      }
+    },
+    ".dsh-presets/secret-guard/node_modules/.bin/cordis": {
+      "before": {
+        "kind": "other"
+      },
+      "observed": {
+        "kind": "other"
+      }
+    },
+    ".dsh-presets/secret-guard/node_modules/.bin/tsc": {
+      "before": {
+        "kind": "other"
+      },
+      "observed": {
+        "kind": "other"
+      }
+    },
+    ".dsh-presets/secret-guard/node_modules/.bin/tsserver": {
+      "before": {
+        "kind": "other"
+      },
+      "observed": {
+        "kind": "other"
+      }
+    },
+    "antigravity project template": {
+      "before": {
+        "kind": "other"
+      },
+      "observed": {
+        "kind": "other"
+      }
+    }
+  },
+  "step2ExistingEdits": [
+    "documentation/planner/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json",
+    "lib/ai/providers/deepseek.ts",
+    "lib/ai/providers/groq.ts",
+    "lib/planner/v2/server/accounting.ts",
+    "lib/planner/v2/server/apply.ts",
+    "lib/planner/v2/server/attempts.ts",
+    "lib/planner/v2/server/context.ts",
+    "lib/planner/v2/server/revisions.ts",
+    "lib/planner/v2/server/workspace.ts",
+    "scripts/test-planner-v2-phase1-postgres.mjs",
+    "tsconfig.planner-worker.json"
+  ],
+  "unrelatedConcurrentChanges": [
+    {
+      "path": ".node-version",
+      "before": "068a0a6e1f02416d0c46e50a46a679eff53f1b748c8c3e559a2c64ef950cc781",
+      "observed": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+    },
+    {
+      "path": "README.md",
+      "before": "7de9f85c7fda5f3d927cc2877b7882be459aeab9c3d8ba2a0e3ca0ca8ea95a76",
+      "observed": "77f653ec6c5339e30e00d01c7b277f004b3f37802d63862b129452f02bf45949"
+    },
+    {
+      "path": "__tests__/auth/middleware.test.ts",
+      "before": "5bbf322fb96e920cf5b661df1bdb587dba30b48f32088ec1277128bb3a829c2f",
+      "observed": "3572c04ad463bb0ee56f7f6fd89d94a0cace0492d73a5419a98e27b26944007e"
+    },
+    {
+      "path": "__tests__/landing/journey.test.tsx",
+      "before": "5aaaabd067c8988ebe0fdb654f6957a3455d744393a8a2cff5c69067d273e887",
+      "observed": "1593a0eca7a37f642bc8652c6a345b7d5a340a382309eda17b415e758ba00dd1"
+    },
+    {
+      "path": "__tests__/waitlist/waitlist-api.test.ts",
+      "before": "da2a0dab6fd853c2adcbd003e32879d04c2fbe2491565aae48f11e074dc5da11",
+      "observed": "cca95a64169402196b40581e515e5fd058747abfc2176535aba4a22907acf81a"
+    },
+    {
+      "path": "app/api/waitlist/route.ts",
+      "before": "abfddcbf2652025e0531bfd600173e2bad34407012330c071d9b7ffd7eba2eea",
+      "observed": "b46e03973ecb658d5ec8bf77b626ff03020106b433a716fd55720e6a0a72a9c8"
+    },
+    {
+      "path": "app/components/landing/LandingFooter.tsx",
+      "before": "2e6a616fa45e38ae703af752a30369a0f1beef5634aef020c4297ccccd323cf4",
+      "observed": "c21edcb0f2f79c374ed9af906ae11ebeaa98c544b496be9a033f070d66ddbe37"
+    },
+    {
+      "path": "app/components/landing/journey/CelestialDecor.module.css",
+      "before": "aaa006d897e96623c12730618b039fc999e605a8391b2e5f77c9751e466290b6",
+      "observed": "b3eeda8fdb83f57228e475ee4e61120fdc6f786ced9d278e2e2be0c964aa40d7"
+    },
+    {
+      "path": "app/components/landing/journey/CelestialMotifs.tsx",
+      "before": "609af8090a69f4e2df28a1cc1f9d114e4a8b76d927da8a1692baba2d7c5c827d",
+      "observed": "708f0c5de9c1164d3d6337cbf9536e296348168a057f44ea7520a3c15b3a1e82"
+    },
+    {
+      "path": "app/components/landing/journey/Journey.module.css",
+      "before": "3d2bf7e497fc6969f14ff5b6b226f725e619a2fa9f457a6e35c3651dc8c995f5",
+      "observed": "9675a9e4a66c836b1868414cf58ffcd5bb9e693046c23844e6b2c98e20ae348f"
+    },
+    {
+      "path": "app/components/landing/journey/JourneyLanding.tsx",
+      "before": "dac24821fd6401bbb2ac689eb64cf18e6ad2be1a19595c3dc1a0e5a7f7ab7ed0",
+      "observed": "cb331ee8939864f3ab327c4f0004fdd426a744e751003834ac11c2d7ecb07ed8"
+    },
+    {
+      "path": "dist/planner-worker/planner/v2/server/accounting.js",
+      "before": "e1b17ef621d91301108f4933daef3b8cdc3c2ed4286d489ea68230ecf85d7bdb",
+      "observed": "39a09fa182381130177e2ac4162820ed3070fc72e744f6dd107ff97c7da3fdbf"
+    },
+    {
+      "path": "dist/planner-worker/planner/v2/server/apply.js",
+      "before": "eb3923c51470264adb85b22dddcb9f5ea573796ebc92fea522a3d5f2778b0fec",
+      "observed": "dddfe64fb52270ee6f305be8b1277c592917afe84226e057131a1262b02052bf"
+    },
+    {
+      "path": "dist/planner-worker/planner/v2/server/attempts.js",
+      "before": "6b685b59e2245e1bc29f2b4e00ad8eb99527836e53e389fed387c7a92a46f322",
+      "observed": "f982a70dd85f8250ab5c9578a55bc9a8996f12800e8809ce496357cdffbcacd3"
+    },
+    {
+      "path": "dist/planner-worker/planner/v2/server/context.js",
+      "before": "edf95a06641d1d6405ce919170cf6dfa89fabd6036832b7e8ce37645f3c89fab",
+      "observed": "602e84058829e6d0f973af7053953c0408c2d608574ada8c65e46fbe84a60b4c"
+    },
+    {
+      "path": "dist/planner-worker/planner/v2/server/revisions.js",
+      "before": "89c6c136dcfe7b050924992c5bd865158dbb4bfc952a32d75d245b12de333fa1",
+      "observed": "619ddad00431e3900f2c9b62eab9d059b85aa86e05b99b954b9409f262528764"
+    },
+    {
+      "path": "dist/planner-worker/planner/v2/server/workspace.js",
+      "before": "ba524b80da67e681357d54174830a15d743509dc2cad2fce0fd6cbfc60d2b1e9",
+      "observed": "9a8274d5eb49e50b277f62127324b3b024d183992c5c558529aad070ea167b79"
+    },
+    {
+      "path": "documentation/landing-companion/README.md",
+      "before": "29b71e16966cd1d47062ba04675dfb9e1cc1e39ff96d257920f95102d76c6cc0",
+      "observed": "abeda94d9a1f7909bd9ec97f40923ab6bfa722b96bde03b077ec91474b8d38de"
+    },
+    {
+      "path": "documentation/runbooks/LAUNCH-CHECKLIST.md",
+      "before": "6ca240b43b9fe391aa4be6fb45ae31549d0b584953947507a036a1a339ee4537",
+      "observed": "358ef2199bd438ad3d0ea25ad619747570d35dcf72af623e30ae773e30717544"
+    },
+    {
+      "path": "lib/email.ts",
+      "before": "6e27d52b77c7d1ff0d01cf6754344d3f1a1b3d97ec64bc101eda2b5f411c43d9",
+      "observed": "9fdb0f06e630092e74e3c83a53e5b5e3203362efd12101f00c70c6fe78b46f12"
+    },
+    {
+      "path": "lib/prelaunch.ts",
+      "before": "3b146a9e5f4d8449ed18ec0e1d2f3e002680ad4293680542d74449a3a98be5b5",
+      "observed": "5376c12dc556a6d84c094d21818392d74a3e3c908195865063e3fb074854458d"
+    },
+    {
+      "path": "package-lock.json",
+      "before": "1fc92ee354bc392251efc15ebc0565d544e1facaead458d5b511774ece819a5d",
+      "observed": "1e1ce363400b4c112a1a779f1e7ffe42a93516213b5e37cadf3839c397b8488e"
+    },
+    {
+      "path": "package.json",
+      "before": "b66ec55d305cad6f772189e9ff95e4a73fe2311a42c8b8ad285b3875d42e1357",
+      "observed": "7cf98a1e08b4eb721a0c717b466f7ce2d485bf057245c45f49872e6c0ffaa37a"
+    },
+    {
+      "path": "proxy.ts",
+      "before": "fbd2e7fe2896aa913c7bc850a610163755a6681097aa61679d63e665e689481c",
+      "observed": "eed12d20924f28374886752f462149cc2b3722ddc14c0c713e36597429e1e6a5"
+    }
+  ],
+  "unrelatedNewFiles": [
+    "__tests__/landing/celestial-appearance.test.tsx",
+    "__tests__/landing/celestial-palette-qa.ts",
+    "__tests__/landing/fixtures/celestial-dark/CelestialBooks.svg",
+    "__tests__/landing/fixtures/celestial-dark/CelestialLantern.svg",
+    "__tests__/landing/fixtures/celestial-dark/CelestialLeaf.svg",
+    "__tests__/landing/fixtures/celestial-dark/CelestialStar.svg",
+    "__tests__/waitlist/waitlist-email.test.ts",
+    "dist/planner-worker/ai/agent-router.js",
+    "dist/planner-worker/ai/message-intent.js",
+    "dist/planner-worker/ai/providers/deepseek.js",
+    "dist/planner-worker/ai/providers/factory.js",
+    "dist/planner-worker/ai/providers/gemini.js",
+    "dist/planner-worker/ai/providers/groq.js",
+    "dist/planner-worker/ai/providers/types.js",
+    "dist/planner-worker/ai/usage-pricing.js",
+    "dist/planner-worker/planner/v2/intelligence/checkpoints.js",
+    "dist/planner-worker/planner/v2/intelligence/context.js",
+    "dist/planner-worker/planner/v2/intelligence/provider-policy.js",
+    "dist/planner-worker/planner/v2/intelligence/provider.js",
+    "dist/planner-worker/planner/v2/intelligence/schemas/assistant.js",
+    "dist/planner-worker/planner/v2/intelligence/schemas/checkpoint.js",
+    "dist/planner-worker/planner/v2/intelligence/schemas/research.js",
+    "dist/planner-worker/planner/v2/intelligence/schemas/scheduling.js",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-dark.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-dark.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light-before.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light-before.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-dark.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-dark.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light-before.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light-before.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-dark.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-dark.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light-before.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light-before.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-dark.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-dark.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light-before.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light-before.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/material-comparison.png",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/material-comparison.svg",
+    "documentation/landing-companion/reports/light-mode-decorations/evidence/resolved-light-palette.json",
+    "documentation/landing-companion/reports/light-mode-decorations/report.md",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/320-dark.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/320-light.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/390-dark.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/390-light.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/900-dark.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/900-light.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/desktop-light.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/long-fields-320.png",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/preview.html",
+    "documentation/landing-companion/reports/waitlist-email-2026-10-03/report.md",
+    "documentation/runbooks/WAITLIST-EMAIL.md",
+    "lib/emails/waitlist-welcome.ts"
+  ]
+}

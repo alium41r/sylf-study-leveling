@@ -1,0 +1,18 @@
+{
+  "boundary": "Pure serialization and frozen correspondence; no database publish/read/apply transaction executed.",
+  "plans": 2,
+  "storedActivitiesPerPlan": 200,
+  "scopeNodesPerPlan": 500,
+  "phasesPerPlan": 100,
+  "newActivities": 60,
+  "researchClaims": 200,
+  "checkpointBytes": 2351701,
+  "attemptTransportBytes": 2998945,
+  "blueprintBytes": 834361,
+  "revisionBytes": [
+    1656459,
+    1656459
+  ],
+  "changeSetBytes": 297006,
+  "envelopeBytes": 4194304
+}

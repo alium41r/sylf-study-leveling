@@ -1,4 +1,4 @@
-import { ACADEMIC_LEVELS, EXAM_BOARDS } from "@/lib/study-systems";
+import { ACADEMIC_LEVELS, EXAM_BOARDS } from "../../study-systems";
 
 /**
  * Who is allowed to be called "official" for a given target.
@@ -147,7 +147,8 @@ export function resolveAuthorities(target: AuthorityTarget): AuthorityMatch {
   const hosts: string[] = [];
   const recognised: AuthorityMatch["recognised"] = [];
 
-  const board = target.board?.trim();
+  const requestedBoard = target.board?.trim();
+  const board = requestedBoard ? Object.entries(BOARD_AUTHORITIES).find(([value, authority]) => [value, authority.name, EXAM_BOARDS.find(entry=>entry.value===value)?.label].some(name=>name?.toLowerCase()===requestedBoard?.toLowerCase()))?.[0] ?? requestedBoard : undefined;
   const known = board && (EXAM_BOARDS.some((entry) => entry.value === board) || BOARD_AUTHORITIES[board]);
   const boardAuthority = board ? BOARD_AUTHORITIES[board] : undefined;
   if (known && boardAuthority) {

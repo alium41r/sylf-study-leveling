@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-07T08:22:18.638Z",
+  "status": "FAILED",
+  "database": "generated disposable loopback database",
+  "runtime": null,
+  "requiredSkippedTests": 0,
+  "requiredResults": [],
+  "migrations": [],
+  "limitations": [
+    "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+    "Phase 1 actual services/SQL are exercised; no hosted data is touched."
+  ],
+  "error": "Command failed: /private/tmp/sylf-planner-phase2-runtime-18-4/package/native/bin/initdb -D /var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-v2-pg-gJEHs2/data -U postgres --auth-host=scram-sha-256 --auth-local=trust --pwfile /var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-v2-pg-gJEHs2/password\ndyld[58302]: Library not loaded: @loader_path/../lib/libicudata.77.dylib\n  Referenced from: <18FD2F6C-AB2C-3E76-A746-DBD509B1D964> /private/tmp/sylf-planner-phase2-runtime-18-4/package/native/lib/libicuuc.77.1.dylib\n  Reason: tried: '/private/tmp/sylf-planner-phase2-runtime-18-4/package/native/lib/../lib/libicudata.77.dylib' (no such file)\n",
+  "cleanup": "No server started.",
+  "finishedAt": "2026-10-07T08:22:32.506Z"
+}

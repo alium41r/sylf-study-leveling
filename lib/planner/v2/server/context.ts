@@ -64,6 +64,10 @@ export interface ExecutionContext {
 export interface SavedLearningCheck {
   id: string; planId: string; itemKey: string; revisionId: string; result: string; createdAt: Date; updatedAt: Date;
 }
+/** Owned snapshot order defines the same local aliases for projection and sealing. */
+export function savedCheckReferences(context:Pick<ExecutionContext,"checks">,planId:string){
+  return (context.checks??[]).filter(check=>check.planId===planId).map((check,i)=>({check,ref:`saved_check_${i+1}`}));
+}
 export function questDependency(quest: QuestRow) {
   return { questId: quest.id, contentDigest: quest.plannerSpec ? contentDigest(ExecutionTaskSpecV2Schema.parse(quest.plannerSpec)) : hash("legacy-quest", {
     title: quest.title, description: quest.description, requiredMinutes: quest.requiredMinutes, goalId: quest.goalId, subjectId: quest.subjectId,

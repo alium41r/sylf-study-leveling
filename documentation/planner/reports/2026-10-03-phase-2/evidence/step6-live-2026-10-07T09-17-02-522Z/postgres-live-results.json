@@ -1,0 +1,83 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 14,
+  "failed": 1,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "live development qualification: secure-topic trial 3",
+      "messages": [
+        "AssertionError: expected 'SAVE_FAILED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:89:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: secure-topic trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: secure-topic trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: secure-topic trial 3",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: method-weakness trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: method-weakness trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: method-weakness trial 3",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: mastery-open trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: mastery-open trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: mastery-open trial 3",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: general-homework trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: general-homework trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: general-homework trial 3",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: contradictory-readiness trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: contradictory-readiness trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: contradictory-readiness trial 3",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

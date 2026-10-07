@@ -84,6 +84,8 @@ export interface LLMGenerateOptions {
    * also supports disabled thinking; unsupported adapters/models ignore it.
    */
   thinking?: "enabled" | "disabled";
+  /** Optional DeepSeek effort control; omission preserves the provider default. */
+  reasoningEffort?: "low" | "high" | "max";
   /** Aborts the upstream HTTP request immediately when signalled. */
   signal?: AbortSignal;
   /** Caller owns the bounded repair/fallback budget. */
@@ -98,4 +100,3 @@ export interface LLMAdapter {
     options?: LLMGenerateOptions
   ): Promise<LLMResponse>;
 }
-

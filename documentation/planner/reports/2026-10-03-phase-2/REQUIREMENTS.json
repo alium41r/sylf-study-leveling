@@ -80,7 +80,7 @@
         "server/attempts.ts"
       ],
       "completionGate": "Advice and suggestions cannot enqueue, adopt, apply or create execution; authorized proposal targets exactly match the selected plans.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_3_COMPLETE",
       "evidence": {
         "requiredTests": [
           "advice/action authorization and owned target aliases",
@@ -91,7 +91,22 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_3.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/step3-source-pins.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-native-ocr.log"
+        ],
+        "step3Suites": [
+          "__tests__/planner-v2/intelligence/assistant.test.ts",
+          "__tests__/planner-v2/intelligence/research-verification.test.ts",
+          "__tests__/planner-v2/intelligence/research-transport.test.ts",
+          "__tests__/planner-v2/intelligence/targeted-pdf.test.ts",
+          "__tests__/planner-v2/intelligence/documents-cache.test.ts",
+          "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+          "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts"
+        ]
       }
     },
     {
@@ -287,7 +302,7 @@
         "server/adoption.ts"
       ],
       "completionGate": "Issuer authority and applicable component/cycle/subset are independently verified; no synthetic official curriculum; only supported applicable claims adopted.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_3_COMPLETE",
       "evidence": {
         "requiredTests": [
           "advice/action authorization and owned target aliases",
@@ -298,7 +313,22 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_3.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/step3-source-pins.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-native-ocr.log"
+        ],
+        "step3Suites": [
+          "__tests__/planner-v2/intelligence/assistant.test.ts",
+          "__tests__/planner-v2/intelligence/research-verification.test.ts",
+          "__tests__/planner-v2/intelligence/research-transport.test.ts",
+          "__tests__/planner-v2/intelligence/targeted-pdf.test.ts",
+          "__tests__/planner-v2/intelligence/documents-cache.test.ts",
+          "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+          "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts"
+        ]
       }
     },
     {
@@ -325,7 +355,7 @@
         "existing owned-document repository"
       ],
       "completionGate": "Index/select relevant pages before extraction; aggregate limits across sources; require owned-document proof before replacing Phase 1 rejection.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_3_COMPLETE",
       "evidence": {
         "requiredTests": [
           "advice/action authorization and owned target aliases",
@@ -336,7 +366,22 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_3.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/step3-source-pins.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-native-ocr.log"
+        ],
+        "step3Suites": [
+          "__tests__/planner-v2/intelligence/assistant.test.ts",
+          "__tests__/planner-v2/intelligence/research-verification.test.ts",
+          "__tests__/planner-v2/intelligence/research-transport.test.ts",
+          "__tests__/planner-v2/intelligence/targeted-pdf.test.ts",
+          "__tests__/planner-v2/intelligence/documents-cache.test.ts",
+          "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+          "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts"
+        ]
       }
     },
     {
@@ -365,7 +410,7 @@
         "server/revisions.ts"
       ],
       "completionGate": "Requested/resolved intent correspondence and existing protected constraints survive CAS adoption; research advice creates no Plan/revision/Quest.",
-      "status": "PENDING",
+      "status": "STEP_3_COMPLETE",
       "evidence": {
         "requiredTests": [
           "advice/action authorization and owned target aliases",
@@ -373,7 +418,22 @@
           "PostgreSQL atomic adoption, conversation CAS and zero-target advice"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_3.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/step3-source-pins.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-native-ocr.log"
+        ],
+        "step3Suites": [
+          "__tests__/planner-v2/intelligence/assistant.test.ts",
+          "__tests__/planner-v2/intelligence/research-verification.test.ts",
+          "__tests__/planner-v2/intelligence/research-transport.test.ts",
+          "__tests__/planner-v2/intelligence/targeted-pdf.test.ts",
+          "__tests__/planner-v2/intelligence/documents-cache.test.ts",
+          "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+          "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts"
+        ]
       }
     },
     {
@@ -400,7 +460,7 @@
         "headless assistant service/API"
       ],
       "completionGate": "Zero to three contextualized consequential questions; canonical intent can change only through authorized server operations; no Phase 3 UI.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_3_COMPLETE",
       "evidence": {
         "requiredTests": [
           "advice/action authorization and owned target aliases",
@@ -411,7 +471,22 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_3.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-postgres/step3-source-pins.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step3-native-ocr.log"
+        ],
+        "step3Suites": [
+          "__tests__/planner-v2/intelligence/assistant.test.ts",
+          "__tests__/planner-v2/intelligence/research-verification.test.ts",
+          "__tests__/planner-v2/intelligence/research-transport.test.ts",
+          "__tests__/planner-v2/intelligence/targeted-pdf.test.ts",
+          "__tests__/planner-v2/intelligence/documents-cache.test.ts",
+          "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+          "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts"
+        ]
       }
     },
     {
@@ -439,7 +514,7 @@
         "intelligence compiler"
       ],
       "completionGate": "Specific instructions/criteria survive; every supplied scope has a disposition; no lexical substitutions, ritual phase counts, duration floors or durable/model mutation IDs.",
-      "status": "PENDING",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -448,7 +523,24 @@
           "joint scope ownership/shared dependency and one adaptation"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/intelligence/blueprint.ts",
+          "lib/planner/v2/server/learning.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass."
       }
     },
     {
@@ -475,7 +567,7 @@
         "compact compiler policy inputs"
       ],
       "completionGate": "Tiny/secure topics can finish early; unknown scope, triage, large scope and no-deadline learning produce meaningful distinct strategies without filling capacity.",
-      "status": "PENDING",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -484,7 +576,23 @@
           "joint scope ownership/shared dependency and one adaptation"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/intelligence/blueprint.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass."
       }
     },
     {
@@ -511,7 +619,7 @@
         "compiler segment generation"
       ],
       "completionGate": "Only committed work is booked; contingent triggers remain recommendations. Normal detail about 14 days, suitable detail about 28; full strategic scope/forecast retained; no fabricated deadline.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -523,7 +631,25 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/intelligence/blueprint.ts",
+          "lib/planner/v2/intelligence/forecast.ts",
+          "lib/planner/v2/intelligence/schemas/planning.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass."
       }
     },
     {
@@ -554,7 +680,7 @@
         "schedule/timezone owners"
       ],
       "completionGate": "Use daily, weekly, global and per-goal limits, rest/exclusions/deadlines, actual plus remaining work and pins; apply the soft reserve once.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -566,7 +692,25 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/intelligence/capacity.ts",
+          "lib/planner/v2/intelligence/allocator.ts",
+          "lib/planner/v2/server/learning.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass."
       }
     },
     {
@@ -595,7 +739,7 @@
         "server placement validation"
       ],
       "completionGate": "Stable topological placement/local improvement preserve hard windows and prerequisites; split only declared meaningful chunks with explicit reviewed criteria/DAG; otherwise request adaptation.",
-      "status": "PENDING",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -604,7 +748,24 @@
           "joint scope ownership/shared dependency and one adaptation"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/intelligence/allocator.ts",
+          "lib/planner/v2/intelligence/blueprint.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass."
       }
     },
     {
@@ -632,7 +793,7 @@
         "deterministic allocator"
       ],
       "completionGate": "Mathematical bounds prove shortfall; heuristic failure remains ALLOCATION_UNRESOLVED; report density, switching, finish, estimate risk and compromises.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -644,7 +805,23 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/intelligence/allocator.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass."
       }
     },
     {
@@ -670,7 +847,7 @@
         "compiler allocation/adaptation stages"
       ],
       "completionGate": "At most one adaptation for shortfall or consequential poor placement; unresolved trade-offs lead to a decision or recoverable failure.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -682,7 +859,24 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/server/learning.ts",
+          "lib/planner/v2/intelligence/blueprint.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass."
       }
     },
     {
@@ -710,7 +904,7 @@
         "shared apply owner"
       ],
       "completionGate": "Two selected plans share one request, capacity envelope, DAG, prerequisite owner and change set; no duplicate shared work or partial publication/apply.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_4_COMPLETE",
       "evidence": {
         "requiredTests": [
           "four educational policies with tiny/secure/triage/large/no-deadline fixtures",
@@ -722,7 +916,26 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": [
+          "documentation/planner/reports/2026-10-03-phase-2/STEP_4.md",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-gate.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-03-phase-2/evidence/step4-postgres/step4-source-pins.json"
+        ],
+        "implementationPaths": [
+          "lib/planner/v2/intelligence/blueprint.ts",
+          "lib/planner/v2/intelligence/allocator.ts",
+          "lib/planner/v2/server/learning.ts"
+        ],
+        "step4Suites": [
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/allocator-oracle.test.ts",
+          "__tests__/planner-v2/intelligence/forecast.test.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts"
+        ],
+        "qualification": "Implemented through durable ALLOCATION with 39 new unit tests (including 500 exhaustive oracle fixtures) and 17 real PostgreSQL service cases. Frozen Phase 1 publication/apply regressions remain green. Independent split/semantic review and compiler publication integration remain Steps 5/6; no Step 4 artifact is a candidate or quality pass.",
+        "integrationBoundary": "Two selected plans share one owned Attempt/root, capacity and DAG with one prerequisite owner. Existing Phase 1 all-or-none ChangeSet publication/apply authority is preserved and regression-tested; publishing these new compiler artifacts remains Steps 5/6."
       }
     },
     {
@@ -749,7 +962,7 @@
         "QualityReportV2"
       ],
       "completionGate": "Reviewer sees original goal, raw evidence/research, constraints and actual schedule; identified findings have evidence and consequence; vague more-practice preferences do not block.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_5_COMPLETE",
       "evidence": {
         "requiredTests": [
           "fresh review grounding and exact repair verification",
@@ -760,7 +973,25 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_5.md; evidence/step5-gate.json; evidence/step5-postgres/postgres-harness-run.json; evidence/step5-units.json",
+        "implementedSystems": [
+          "lib/planner/v2/intelligence/quality.ts",
+          "lib/planner/v2/intelligence/schemas/quality.ts",
+          "lib/planner/v2/intelligence/checkpoints.ts",
+          "lib/planner/v2/server/compiler.ts",
+          "lib/planner/v2/server/compilation.ts",
+          "lib/planner/v2/server/learning.ts",
+          "lib/planner/v2/server/research.ts",
+          "lib/planner/v2/server/revisions.ts",
+          "lib/planner/v2/main.ts"
+        ],
+        "runtimeSuites": [
+          "__tests__/planner-v2/intelligence/quality.test.ts",
+          "__tests__/planner-v2/intelligence/compilation.test.ts",
+          "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+          "__tests__/planner-v2/postgres/compiler-process-fixture.cjs"
+        ],
+        "qualification": "Independent grounded review, one durable repair and exact verification, full research-to-candidate orchestration and actual compiled supervised handlers are implemented. 27 new real PostgreSQL cases cover publication, root budgets, takeover/crash, cancellation/expiry/stale context, linked retries, protected execution, joint work and unconfirmable failures. Fixture adapters establish lifecycle/content integrity; Step 6 API activation, full compiler-to-ApplyService and live educational qualification remain pending."
       }
     },
     {
@@ -788,7 +1019,7 @@
         "quality report"
       ],
       "completionGate": "At most one repair; rerun deterministic allocation and verify exact issue IDs; no outage/budget/blocker becomes confirmable; preserve resumable artifact.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_5_COMPLETE",
       "evidence": {
         "requiredTests": [
           "fresh review grounding and exact repair verification",
@@ -799,7 +1030,25 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_5.md; evidence/step5-gate.json; evidence/step5-postgres/postgres-harness-run.json; evidence/step5-units.json",
+        "implementedSystems": [
+          "lib/planner/v2/intelligence/quality.ts",
+          "lib/planner/v2/intelligence/schemas/quality.ts",
+          "lib/planner/v2/intelligence/checkpoints.ts",
+          "lib/planner/v2/server/compiler.ts",
+          "lib/planner/v2/server/compilation.ts",
+          "lib/planner/v2/server/learning.ts",
+          "lib/planner/v2/server/research.ts",
+          "lib/planner/v2/server/revisions.ts",
+          "lib/planner/v2/main.ts"
+        ],
+        "runtimeSuites": [
+          "__tests__/planner-v2/intelligence/quality.test.ts",
+          "__tests__/planner-v2/intelligence/compilation.test.ts",
+          "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+          "__tests__/planner-v2/postgres/compiler-process-fixture.cjs"
+        ],
+        "qualification": "Independent grounded review, one durable repair and exact verification, full research-to-candidate orchestration and actual compiled supervised handlers are implemented. 27 new real PostgreSQL cases cover publication, root budgets, takeover/crash, cancellation/expiry/stale context, linked retries, protected execution, joint work and unconfirmable failures. Fixture adapters establish lifecycle/content integrity; Step 6 API activation, full compiler-to-ApplyService and live educational qualification remain pending."
       }
     },
     {
@@ -829,7 +1078,7 @@
         "repositories"
       ],
       "completionGate": "Match request, owner, root, authorization, targets/intents/bases/versions/context, sources, envelope, blueprint, allocation and quality digests before reuse; lifecycle fences remain Phase 1 authority.",
-      "status": "SCHEMA_ONLY",
+      "status": "STEP_5_COMPLETE",
       "evidence": {
         "requiredTests": [
           "fresh review grounding and exact repair verification",
@@ -840,7 +1089,25 @@
           "__tests__/planner-v2/intelligence/supporting-schemas.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts"
         ],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_5.md; evidence/step5-gate.json; evidence/step5-postgres/postgres-harness-run.json; evidence/step5-units.json",
+        "implementedSystems": [
+          "lib/planner/v2/intelligence/quality.ts",
+          "lib/planner/v2/intelligence/schemas/quality.ts",
+          "lib/planner/v2/intelligence/checkpoints.ts",
+          "lib/planner/v2/server/compiler.ts",
+          "lib/planner/v2/server/compilation.ts",
+          "lib/planner/v2/server/learning.ts",
+          "lib/planner/v2/server/research.ts",
+          "lib/planner/v2/server/revisions.ts",
+          "lib/planner/v2/main.ts"
+        ],
+        "runtimeSuites": [
+          "__tests__/planner-v2/intelligence/quality.test.ts",
+          "__tests__/planner-v2/intelligence/compilation.test.ts",
+          "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+          "__tests__/planner-v2/postgres/compiler-process-fixture.cjs"
+        ],
+        "qualification": "Independent grounded review, one durable repair and exact verification, full research-to-candidate orchestration and actual compiled supervised handlers are implemented. 27 new real PostgreSQL cases cover publication, root budgets, takeover/crash, cancellation/expiry/stale context, linked retries, protected execution, joint work and unconfirmable failures. Fixture adapters establish lifecycle/content integrity; Step 6 API activation, full compiler-to-ApplyService and live educational qualification remain pending."
       }
     },
     {
@@ -908,7 +1175,7 @@
         "tsconfig.planner-worker.json"
       ],
       "completionGate": "Normal Node worker imports runtime-safe primitives, never Next-only/alias modules; actual handlers recover/cancel/fence/check deadlines and atomically publish.",
-      "status": "PENDING",
+      "status": "STEP_5_COMPLETE",
       "evidence": {
         "requiredTests": [
           "fresh review grounding and exact repair verification",
@@ -916,7 +1183,25 @@
           "actual compiled worker and PostgreSQL takeover/fence/cancel/publish/recovery"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_5.md; evidence/step5-gate.json; evidence/step5-postgres/postgres-harness-run.json; evidence/step5-units.json",
+        "implementedSystems": [
+          "lib/planner/v2/intelligence/quality.ts",
+          "lib/planner/v2/intelligence/schemas/quality.ts",
+          "lib/planner/v2/intelligence/checkpoints.ts",
+          "lib/planner/v2/server/compiler.ts",
+          "lib/planner/v2/server/compilation.ts",
+          "lib/planner/v2/server/learning.ts",
+          "lib/planner/v2/server/research.ts",
+          "lib/planner/v2/server/revisions.ts",
+          "lib/planner/v2/main.ts"
+        ],
+        "runtimeSuites": [
+          "__tests__/planner-v2/intelligence/quality.test.ts",
+          "__tests__/planner-v2/intelligence/compilation.test.ts",
+          "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+          "__tests__/planner-v2/postgres/compiler-process-fixture.cjs"
+        ],
+        "qualification": "Independent grounded review, one durable repair and exact verification, full research-to-candidate orchestration and actual compiled supervised handlers are implemented. 27 new real PostgreSQL cases cover publication, root budgets, takeover/crash, cancellation/expiry/stale context, linked retries, protected execution, joint work and unconfirmable failures. Fixture adapters establish lifecycle/content integrity; Step 6 API activation, full compiler-to-ApplyService and live educational qualification remain pending."
       }
     },
     {
@@ -945,7 +1230,7 @@
         "intent/attempt repositories"
       ],
       "completionGate": "V2 opt-in path persists exact intent and enqueues atomically; ownership/auth/idempotency/server-client boundaries hold; worker unavailability is truthful.",
-      "status": "PENDING",
+      "status": "STEP_6_COMPLETE",
       "evidence": {
         "requiredTests": [
           "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
@@ -954,7 +1239,7 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
       }
     },
     {
@@ -983,7 +1268,7 @@
         "mutation guards"
       ],
       "completionGate": "Compile and seal the reviewed content exactly; successful candidate never auto-applies; Phase 1 all-or-none execution/link/pointer/receipt guarantees and started history remain unchanged.",
-      "status": "PENDING",
+      "status": "STEP_6_COMPLETE",
       "evidence": {
         "requiredTests": [
           "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
@@ -992,7 +1277,7 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
       }
     },
     {
@@ -1020,7 +1305,7 @@
         "provider usage and development evidence"
       ],
       "completionGate": "Record bounded stage timings/calls/tokens/finish reasons/recovery codes; no private reasoning, source document content or credentials in operational logs; distinguish measured targets from promises.",
-      "status": "PENDING",
+      "status": "STEP_6_COMPLETE",
       "evidence": {
         "requiredTests": [
           "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
@@ -1029,7 +1314,7 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
       }
     },
     {
@@ -1060,7 +1345,7 @@
         "phase report"
       ],
       "completionGate": "All four policies plus tiny/secure/triage/large/open deadline/joint cases, oracle/seeded allocator, actual provider output versus fixture expectations, worker/apply integration and no required skipped gates. Phase 5 held-out/human benchmark is separate.",
-      "status": "PENDING",
+      "status": "LIVE_QUALIFICATION_FAILED",
       "evidence": {
         "requiredTests": [
           "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
@@ -1069,7 +1354,7 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "LIVE_QUALIFICATION.md; evidence/step6-live-evaluation.json (FAILED: 14/17 separately assessed cases pass; actual owned adoption/public decision and two REVISE/re-allocation decisions, but no successful live compiler repair/verification); evidence/step6-live-observations.json; COMPLETION.md remains INCOMPLETE."
       }
     },
     {
@@ -1096,7 +1381,7 @@
         "existing V2 lifecycle and feature flags"
       ],
       "completionGate": "No Phase 3 UI, Phase 4 selective adaptation/continuation journey or Phase 5 release benchmark; preserve existing calendar-only education and all Phase 0/1 guarantees rather than reimplementing them.",
-      "status": "PENDING",
+      "status": "STEP_6_COMPLETE",
       "evidence": {
         "requiredTests": [
           "V2 endpoint auth/ownership/idempotency and atomic intent enqueue",
@@ -1105,7 +1390,7 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "Required before this requirement is marked implemented; evidence belongs alongside its workstream."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
       }
     }
   ]

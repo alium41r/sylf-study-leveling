@@ -1,0 +1,1 @@
+{"extends":"/Users/aliumair/Desktop/sylf/tsconfig.json","compilerOptions":{"incremental":false,"noEmit":true},"exclude":["/Users/aliumair/Desktop/sylf/node_modules","/Users/aliumair/Desktop/sylf/ai-agent","/Users/aliumair/Desktop/sylf/archive","/Users/aliumair/Desktop/sylf/scratch","/Users/aliumair/Desktop/sylf/.next"]}

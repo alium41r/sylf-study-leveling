@@ -162,6 +162,8 @@ class DeepSeekAdapter {
         if (options?.thinking) {
             payload.thinking = { type: options.thinking };
         }
+        if (options?.reasoningEffort)
+            payload.reasoning_effort = options.reasoningEffort;
         const doRequest = async (reqPayload) => {
             const endpoint = `${this.baseURL}/chat/completions`;
             const response = await fetch(endpoint, {

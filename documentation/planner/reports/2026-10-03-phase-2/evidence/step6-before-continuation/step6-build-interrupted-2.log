@@ -1,0 +1,5 @@
+▲ Next.js 16.2.9 (webpack)
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...

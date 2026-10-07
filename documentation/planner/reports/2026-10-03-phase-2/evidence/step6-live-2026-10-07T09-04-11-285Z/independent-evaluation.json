@@ -1,0 +1,259 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-07T09:18:48.137134+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T09-04-11-285Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "3584d01e9be491f4b0c192d955be7a59ab3898b0f153cc8365a70cfb14f8d7f7",
+  "method": "Separate inspection of actual goals, scope, criteria, provenance, allocation and apply; model approval/apply are not educational acceptance.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      "joint-prerequisite",
+      "indivisible-checkpoint"
+    ],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 37,
+  "usage": {
+    "reportedInputTokens": 239728,
+    "reportedOutputTokens": 39654,
+    "settledCalls": 34,
+    "unknownSpendCalls": 3
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 6551,
+    "p90Ms": 11400,
+    "maximumMs": 18154
+  },
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both counted upstream attempts fail with SDK network_error and no response/usage; not quota. No educational output/candidate or apply.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "PROVIDER_FAILURE",
+        "stage": "BLUEPRINT",
+        "message": "The model request failed.",
+        "retryable": true,
+        "resumable": true,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "RETRY_STAGE",
+        "traceId": "de5b1a2e-4fc5-464d-b683-07eb66d36430"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 45-minute rule/explanation/correct changed-circuit task despite extra capacity. Worked and changed answers are correct; no additional stages. Failed tiny comparator means this run alone does not qualify paired capacity behavior.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 30-minute diagnostic on four simple circuits with actual checking/correction, no confidence-based CREDITED readiness or additional booked teaching. Requiring all corrected answers is a retained diagnostic-completion limitation, not automatic mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "zero-new-work",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "All requested scope explicitly deferred with reasons, zero activities and zero canonical Quests.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 0
+    },
+    {
+      "id": "concept-foundation",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Conservation-based conceptual distinction followed by an independently worked changed circuit; specific error-triggered correction is unbooked. No timed-paper substitution.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "method-weakness",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The first committed activity already requires three unfamiliar circuits correct without a worked example, yet the second books another three unaided with the same choice/reason/solution criterion and claims the first cannot supply that evidence. No distinct accepted need is identified for that repeated gate. Criterion correctness is improved, but proportion/rationale remains unacceptable despite model approval/apply.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "triage",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both actual outputs parse as valid JSON but use detail.days 2, outside the frozen 14/28 enumeration. Safe fallback reports invalid_union/detail.days without allowed values and repeats the invalid choice; no validated allocation/publication.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "85248175-a3fd-4b36-a1b4-7f685744bb38"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Cumulative CSV artifact with genuine 60/50/40 milestones retains original instructions and correct final independent changed-data/totals/malformed-row gate. Time estimate and scaffolding are limitations, not invented deadlines or scope loss.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct labeled base-rate/sensitivity reasoning at 1% and 20%, Bayes application and independent changed case. Conditional low-prevalence explanation is applicable; remediation remains unbooked.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "general-homework",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One activity completes/explains/substitution-checks the three assigned equations; only actual unresolved sign errors trigger unbooked extra work. No unnecessary committed re-solve or invented homework.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Loops/dictionaries have one CSV owner, JSON reuses actual root HARD edge; three distinct build pieces after one real bounded adaptation, no duplicated prerequisite or CREDITED planned mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both blueprint outputs parse but use detail.days 1 instead of frozen 14/28. Honest required learning and zero capacity are described, but no validated allocation/adaptation decision reaches the lifecycle.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "559bcd40-e297-4401-aeb4-c85cddcf98fa"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Required 45-minute uninterrupted authentic check retained against 30-minute days; no invented split or shortened substitute, explicit decision after bounded adaptation.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual owned hash/excerpts/course claims verify/adopt with UNKNOWN issuer authority. One 60-minute correct CSV artifact plus independent changed-data/malformed-row gate publishes/applies. Unnecessary follow-up about an explicitly stated demonstration remains a research limitation.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Blueprint allocates and saves REVIEW_PENDING, then generic SAVE_FAILED before any review dispatch. Internal cause was not recorded; no speculative model/quota/budget diagnosis, no candidate or repair witness.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "SAVE_FAILED",
+        "stage": "PREFLIGHT",
+        "message": "This stage could not finish; its checkpoint is retained.",
+        "retryable": true,
+        "resumable": true,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "RETRY_STAGE",
+        "traceId": "88eae260-d187-42a6-9086-e8d1148ccb38"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "roadmap-large",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Full forty-node strategy retained, but broad nine-piece beginner/course-to-project checkpoint cannot reserve full independent review under unchanged 80k input budget. Safe explicit BUDGET_EXHAUSTED, no publication or execution.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "REVIEW",
+        "message": "The root call/token allowance is exhausted.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "e1548336-db85-4adc-a0e7-f613534c0b1c"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual public retrieval/excerpts retained, but applicable complete requested assessed scope remains unverified. Server-authoritative coverage decision prevents unsupported publication.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    }
+  ]
+}

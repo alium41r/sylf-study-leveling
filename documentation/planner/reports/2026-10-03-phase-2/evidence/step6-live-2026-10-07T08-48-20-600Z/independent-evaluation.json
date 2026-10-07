@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-07T09:00:59.719901+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T08-48-20-600Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "4f5b74b4b235010725357dd5a3ec4a257bcab6b00bdc3eb4d84e76432a801b5c",
+  "method": "Separate inspection of actual goals, scope, criteria, provenance, allocation and apply. Model approval/apply do not establish educational acceptance.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 15,
+  "usage": {
+    "reportedInputTokens": 106528,
+    "reportedOutputTokens": 15285,
+    "settledCalls": 15,
+    "unknownSpendCalls": 0
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 7045,
+    "p90Ms": 10494,
+    "maximumMs": 11734
+  },
+  "cases": [
+    {
+      "id": "method-weakness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Three taught-course diagnostic cases with corrected selection reasons and two distinct unaided changed circuits. Final capability explicitly requires correct method, valid reason and correct answer; clean diagnosis is allowed. Further practice is error-triggered and unbooked. Ninety minutes remains an estimate/proportion limitation.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "triage",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both counted blueprint outputs are malformed. Primary closes strategy early and both contain excess object closure; existing bounded delimiter feedback does not produce valid replacement. Strict rejection before allocation/publication.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "e84e1e96-6436-4851-904e-29a4bbbd098a"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct base-rate/sensitivity mapping, frequency-table derivation, low-prevalence explanation and correct independent changed case; remediation genuinely contingent. No unconditional dominance or time-based mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "general-homework",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One task solves, explains negative distribution and substitution-checks exactly the three assigned equations. Sign errors are corrected or their absence recorded; only unresolved actual sign/explanation gaps trigger unbooked further work.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual owned content and provenance verify/adopt; primary blueprint fails JSON, existing counted fallback produces one cumulative build with meaningful boundaries and correct sample/changed data and malformed-row criteria. Reviewed seal and canonical apply, no official-authority claim.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Grounded reviewer finding incorrectly reads phase readiness into a supported diagnostic: diagnose_repair permits comparison/correction, while transfer_check supplies distinct unassisted evidence. It is not a genuine duplicate-demonstration defect or repair witness. Fixed-budget proof rejects repair reservation before dispatch.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "PERSISTENCE",
+        "message": "This call would consume capacity reserved for review or verification.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "7bd8cc59-6eec-4396-b9b5-7e22c73bb85f"
+      },
+      "applied": false,
+      "actualQuests": 0
+    }
+  ]
+}

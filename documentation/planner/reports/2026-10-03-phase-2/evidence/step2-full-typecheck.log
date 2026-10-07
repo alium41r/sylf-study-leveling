@@ -4,3 +4,45 @@
 .next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import("/Users/aliumair/Desktop/sylf/app/api/quests/route"), "GET" | "PATCH" | "POST" | "HEAD" | "DELETE" | "revalidate" | "PUT" | "config" | "generateStaticParams" | "unstable_instant" | ... 7 more ... | "OPTIONS", "">' does not satisfy the constraint '{ [x: string]: never; }'.
   Property 'calculateScopeWeight' is incompatible with index signature.
     Type '(node: { title: string; description: string; tier: number; }, quest: { title: string; description?: string | null | undefined; targetMinutes: number; }) => number' is not assignable to type 'never'.
+.next/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import("/Users/aliumair/Desktop/sylf/app/api/acoustics/route"), "GET" | "PATCH" | "POST" | "HEAD" | "DELETE" | "revalidate" | "PUT" | "config" | "generateStaticParams" | ... 8 more ... | "OPTIONS", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'CURATED_SOUNDSCAPES' is incompatible with index signature.
+    Type '{ id: number; title: string; category: string; frequency: string; audioUrl: string; duration: number; defaultVolume: number; description: string; tags: string[]; isPreset: boolean; orderIndex: number; }[]' is not assignable to type 'never'.
+.next/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import("/Users/aliumair/Desktop/sylf/app/api/quests/route"), "GET" | "PATCH" | "POST" | "HEAD" | "DELETE" | "revalidate" | "PUT" | "config" | "generateStaticParams" | "unstable_instant" | ... 7 more ... | "OPTIONS", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'calculateScopeWeight' is incompatible with index signature.
+    Type '(node: { title: string; description: string; tier: number; }, quest: { title: string; description?: string | null | undefined; targetMinutes: number; }) => number' is not assignable to type 'never'.
+.next/types/app/api/subjects/[id]/compile/route.ts(170,7): error TS2344: Type '{ __tag__: "POST"; __param_position__: "second"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type 'Promise<{ id: string; }> | { id: string; }' is not assignable to type 'Promise<any>'.
+      Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/api/subjects/[id]/forge-apex/route.ts(170,7): error TS2344: Type '{ __tag__: "POST"; __param_position__: "second"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type 'Promise<{ id: string; }> | { id: string; }' is not assignable to type 'Promise<any>'.
+      Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/api/subjects/[id]/nodes/route.ts(53,7): error TS2344: Type '{ __tag__: "GET"; __param_position__: "second"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type 'Promise<{ id: string; }> | { id: string; }' is not assignable to type 'Promise<any>'.
+      Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/api/subjects/[id]/restore/route.ts(170,7): error TS2344: Type '{ __tag__: "POST"; __param_position__: "second"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type 'Promise<{ id: string; }> | { id: string; }' is not assignable to type 'Promise<any>'.
+      Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/api/subjects/[id]/route.ts(53,7): error TS2344: Type '{ __tag__: "GET"; __param_position__: "second"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type 'Promise<{ id: string; }> | { id: string; }' is not assignable to type 'Promise<any>'.
+      Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/api/subjects/[id]/route.ts(248,7): error TS2344: Type '{ __tag__: "DELETE"; __param_position__: "second"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type 'Promise<{ id: string; }> | { id: string; }' is not assignable to type 'Promise<any>'.
+      Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/api/subjects/[id]/route.ts(287,7): error TS2344: Type '{ __tag__: "PATCH"; __param_position__: "second"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.
+  The types of '__param_type__.params' are incompatible between these types.
+    Type 'Promise<{ id: string; }> | { id: string; }' is not assignable to type 'Promise<any>'.
+      Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/api/user/focus-backgrounds/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import("/Users/aliumair/Desktop/sylf/app/api/user/focus-backgrounds/route"), "GET" | "PATCH" | "POST" | "HEAD" | "DELETE" | "revalidate" | "PUT" | "config" | "generateStaticParams" | ... 8 more ... | "OPTIONS", "">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'MAX_USER_BACKGROUNDS_QUOTA' is incompatible with index signature.
+    Type '10' is not assignable to type 'never'.
+.next/types/app/goals/page.ts(37,13): error TS2344: Type 'OmitWithTag<GoalsScreenProps, keyof PageProps, "default">' does not satisfy the constraint '{ [x: string]: never; }'.
+  Property 'initialTab' is incompatible with index signature.
+    Type 'ActiveTab' is not assignable to type 'never'.
+      Type '"goals"' is not assignable to type 'never'.
+.next/types/app/goals/page.ts(37,29): error TS2559: Type 'GoalsScreenProps' has no properties in common with type 'PageProps'.

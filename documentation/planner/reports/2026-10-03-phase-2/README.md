@@ -1,10 +1,17 @@
 # Planner V2 Phase 2 progress
 
-**3 October 2026. Steps 1 and 2 are complete. Phase 2 remains in progress.**
+**Started 3 October 2026; Steps 1–5 are complete. Step 6 integration is implemented; actual live qualification failed on 5 October 2026. Phase 2 remains incomplete. DeepSeek has usable quota; output reliability, educational defects and repair/verification coverage remain acceptance blockers.**
 
 The approved [execution roadmap](IMPLEMENTATION_PLAN.md) follows the repository's [V2 architecture](../../PLANNER_TARGET_ARCHITECTURE.md) and completed Phase 0/1 owners. The [requirement map](REQUIREMENTS.json) records 28 requirements, governing sections, audit findings, affected systems, required evidence and completion gates across the six ordered steps. A supporting schema is explicitly distinguished from a working runtime service.
 
 [Step 2 completion and integration contract](STEP_2.md) records bounded execution/learning context, provenance seals, capacity projection and shared foreground/worker dispatch with durable accounting, cancellation, deadlines and review holdbacks. Its [gate](evidence/step2-gate.json) and [PostgreSQL evidence](evidence/step2-postgres/postgres-harness-run.json) are separate from Step 1's historical evidence.
+
+[Step 3 completion and integration contract](STEP_3.md) records headless assistant authorization, bounded research/source verification, private documents and atomic adoption. Its [gate](evidence/step3-gate.json) and [PostgreSQL evidence](evidence/step3-postgres/postgres-harness-run.json) qualify 457 unit and 338 database tests, ordinary Node supervision and bounded native PDF rendering. Live-provider/deployment limits and unrelated build blockers are recorded separately. Production compiler handlers were pending at that step; Step 5 now supplies their supervised composition.
+
+[Step 4 completion and integration contract](STEP_4.md) records one policy-aware LearningBlueprint generator, deterministic allocation, declared splits, aggregate unbooked forecasts and at most one educational adaptation. Its [gate](evidence/step4-gate.json) and [PostgreSQL evidence](evidence/step4-postgres/postgres-harness-run.json) qualify 496 unit and 355 database tests, including 500 independent exhaustive allocation fixtures and seventeen new durable learning-service cases. Phase 1 owners and frozen contracts remain intact. That step stops at ALLOCATION; Step 5 now composes independent quality and candidate publication.
+
+
+[Step 5 completion and integration contract](STEP_5.md) records independent grounded quality review, one repair and exact verification, stable identity sealing and supervised research → blueprint → allocation → review → candidate orchestration. Its [gate](evidence/step5-gate.json) and [PostgreSQL evidence](evidence/step5-postgres/postgres-harness-run.json) qualify 515 unit tests and 382 database tests, including 27 new compiler lifecycle cases and an actual compiled ordinary Node supervisor. Candidates publish only through RevisionService; no compiler execution is applied. Step 6 now supplies API activation and compiler-to-ApplyService integration. Its live corpus qualification remains an acceptance gate; Step 5 historical evidence does not qualify the new API or live model behavior.
 
 ## Step 1 evidence
 
@@ -26,4 +33,4 @@ The new tests exercise malformed/stale checkpoints, exact attempt and artifact b
 
 Limits of this step are deliberate: no model/provider calls or PostgreSQL transactions execute, no actual generation/publish/apply integration is newly claimed, and no Planner UI or Phase 4/5 feature work begins. Phase 1 remains the authoritative owner for those existing lifecycle guarantees. Actual compiler handlers, ownership/source verification, feasible scheduling, independent semantic review and recovery/API/ApplyService integration remain required Steps 2–6. No architectural deviation has been introduced.
 
-The next workstream is Step 3: the headless assistant and bounded research services, using Step 2's context and provider owners. Phase 2 completion requires every remaining roadmap gate and a final completion report; neither supporting schemas nor the Step 2 provider foundation completes the compiler.
+[Step 6 integration and qualification](STEP_6.md) records the existing generation branch, atomic final-intent admission, canonical apply integration and maximum-envelope witnesses. [Live qualification](LIVE_QUALIFICATION.md) retains actual provider failures separately from fixtures. The [completion record](COMPLETION.md) states the remaining acceptance blockers and exact Phase 3 handoff; it must not certify completion prematurely. No deployment flag or hosted system was changed.

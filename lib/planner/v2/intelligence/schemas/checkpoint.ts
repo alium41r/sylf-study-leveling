@@ -9,6 +9,8 @@ import {
 } from "../../contracts/primitives";
 import { ResearchProcessingSchema } from "./research";
 import { AllocationReportSchema, SchedulingEnvelopeSchema } from "./scheduling";
+import { PlanningSupportSchema } from "./planning";
+import { QualitySupportSchema } from "./quality";
 
 export const CompilerBindingSchema = z.strictObject({
   attemptId: DurableIdV2Schema, ownerId: EntityIdV2Schema, requestHash: DigestV2Schema,
@@ -51,6 +53,7 @@ export const BlueprintSnapshotSchema = z.strictObject({
     id: `${plan.planRef}/${activity.localId}`,
     dependencies: [
       ...activity.hardDependencies.map(id => `${plan.planRef}/${id}`),
+      ...(activity.learningWindow?.strength === "HARD" ? [`${plan.planRef}/${activity.learningWindow.anchorActivityId}`] : []),
       ...snapshot.sharedDependencies.filter(dependency => dependency.strength === "HARD" &&
         dependency.dependent.planRef === plan.planRef && dependency.dependent.activityId === activity.localId)
         .map(dependency => `${dependency.prerequisite.planRef}/${dependency.prerequisite.activityId}`),
@@ -61,11 +64,13 @@ export const BlueprintSnapshotSchema = z.strictObject({
 const education = {
   research: ResearchProcessingSchema.nullable(), envelope: SchedulingEnvelopeSchema,
   blueprints: BlueprintSnapshotSchema,
+  planning: PlanningSupportSchema.optional(),
 };
 const allocated = { ...education, allocation: z.strictObject({ report: AllocationReportSchema, digest: DigestV2Schema }) };
 const reviewed = {
   ...allocated, reviewedAllocationDigest: DigestV2Schema,
   quality: z.array(z.strictObject({ planRef: LocalIdV2Schema, report: QualityReportV2Schema })).min(1).max(E.targets),
+  reviewSupport: QualitySupportSchema.optional(),
 };
 
 /** Supporting worker data in Attempt.payload; this is not a new lifecycle contract. */
@@ -98,6 +103,17 @@ export const CompilerCheckpointSchema = withPlannerEnvelope(z.strictObject({
   if ("blueprints" in payload) {
     if (payload.blueprints.plans.length !== plans.size || payload.blueprints.plans.some(plan => !plans.has(plan.planRef))) issue(ctx, ["payload", "blueprints"], "BLUEPRINT_TARGET_MISMATCH");
   }
+  if ("planning" in payload && payload.planning) {
+    const metadata=payload.planning;
+    const expectedEnd=new Date(Date.parse(payload.envelope.window.start)+(metadata.detail.days-1)*86400000).toISOString().slice(0,10);
+    if(payload.envelope.window.end!==expectedEnd)issue(ctx,["payload","planning","detail"],"DETAILED_WINDOW_MISMATCH");
+    unique((metadata.unreviewedPhaseRefs??[]).map(p=>`${p.planRef}/${p.phaseRef}`),ctx,["payload","planning","unreviewedPhaseRefs"]);
+    for(const ref of metadata.unreviewedPhaseRefs??[])if(!payload.blueprints.plans.find(p=>p.planRef===ref.planRef)?.blueprint.strategy.phases.some(p=>p.localId===ref.phaseRef))issue(ctx,["payload","planning","unreviewedPhaseRefs"],"UNKNOWN_HISTORICAL_PHASE");
+    if((checkpoint.adaptations===0)!==(metadata.adaptation==="NOT_REQUESTED"))issue(ctx,["payload","planning"],"ADAPTATION_RECEIPT_MISMATCH");
+    if(metadata.recoveryAdjustment && (checkpoint.adaptations!==1 || metadata.recoveryAdjustment.percent!==payload.envelope.recoveryPercent))issue(ctx,["payload","planning"],"RECOVERY_ADAPTATION_MISMATCH");
+    for(const forecast of metadata.forecasts){const plan=payload.blueprints.plans.find(p=>p.planRef===forecast.planRef);if(!plan||forecast.phases.some(f=>!plan.blueprint.strategy.phases.some(p=>p.localId===f.phaseRef)))issue(ctx,["payload","planning","forecasts"],"UNKNOWN_FORECAST_PHASE");}
+    for(const split of metadata.splits){const plan=payload.blueprints.plans.find(p=>p.planRef===split.planRef);if(!plan||split.originalActivity.localId!==split.originalRef||plan.blueprint.activities.some(a=>a.localId===split.originalRef)||split.pieceRefs.some(ref=>!plan.blueprint.activities.some(a=>a.localId===ref)))issue(ctx,["payload","planning","splits"],"UNKNOWN_DECLARED_PIECE");}
+  }
   if ("allocation" in payload) {
     const activities = new Map(payload.blueprints.plans.flatMap(plan => plan.blueprint.activities.map(activity => [`${plan.planRef}/${activity.localId}`, activity] as const)));
     const tasks = [...payload.allocation.report.placements, ...payload.allocation.report.unscheduled];
@@ -107,8 +123,10 @@ export const CompilerCheckpointSchema = withPlannerEnvelope(z.strictObject({
       if (!activity || activity.commitment.category !== "COMMITTED" || activity.timeboxMinutes !== task.minutes) issue(ctx, ["payload", "allocation", i], "ALLOCATION_EDUCATIONAL_CONTENT_MISMATCH");
     });
     if ([...activities].some(([key, activity]) => activity.commitment.category === "COMMITTED" && !taskKeys.has(key))) issue(ctx, ["payload", "allocation"], "COMMITTED_ACTIVITY_DROPPED");
+    if(payload.allocation.report.placements.some(task=>payload.envelope.protectedExecution.some(pin=>pin.planRef===task.planRef&&pin.activityRef===task.activityRef&&pin.date!==task.date)))issue(ctx,["payload","allocation"],"PROTECTED_PLACEMENT_CHANGED");
     const dates = new Set(payload.envelope.days.map(day => day.date));
-    if (payload.allocation.report.placements.some(task => !dates.has(task.date))) issue(ctx, ["payload", "allocation"], "PLACEMENT_OUTSIDE_ENVELOPE");
+    if (payload.allocation.report.placements.some(task => !dates.has(task.date) && !payload.envelope.protectedExecution.some(pin=>
+      pin.planRef===task.planRef && pin.activityRef===task.activityRef && pin.state==="COMPLETED" && pin.date===task.date))) issue(ctx, ["payload", "allocation"], "PLACEMENT_OUTSIDE_ENVELOPE");
   }
   if ("quality" in payload) {
     unique(payload.quality.map(value => value.planRef), ctx, ["payload", "quality"]);
@@ -126,6 +144,14 @@ export const CompilerCheckpointSchema = withPlannerEnvelope(z.strictObject({
         issue(ctx, ["payload", "quality", i], "NAMED_REPAIR_NOT_VERIFIED");
       }
     });
+    if (payload.reviewSupport) {
+      const support = payload.reviewSupport;
+      unique(support.findings.map(f => f.finding.issueId), ctx, ["payload", "reviewSupport", "findings"]);
+      if (support.findings.some(f => !plans.has(f.planRef) || !payload.quality.find(q => q.planRef === f.planRef)?.report.issues.some(i => i.issueId === f.finding.issueId))) issue(ctx, ["payload", "reviewSupport"], "UNKNOWN_GROUNDED_FINDING");
+      const pending = ["REVIEW_PENDING", "REPAIR_PENDING", "REPAIR_ACCEPTED", "REPAIRED", "VERIFICATION_PENDING"].includes(support.phase);
+      if (pending && payload.quality.some(q => q.report.status === "PASSED")) issue(ctx, ["payload", "reviewSupport"], "PENDING_QUALITY_CANNOT_PASS");
+      if (support.phase.startsWith("REPAIR") && payload.stage !== "REPAIR" || support.phase.startsWith("VERIF") && payload.stage !== "VERIFICATION" || support.phase.startsWith("REVIEW") && payload.stage !== "REVIEW") issue(ctx, ["payload", "reviewSupport"], "QUALITY_STAGE_RECEIPT_MISMATCH");
+    }
   }
   if (payload.stage === "ADAPTATION" && checkpoint.adaptations !== 1) issue(ctx, ["adaptations"], "ADAPTATION_COUNT_MISMATCH");
   if ((payload.stage === "REPAIR" || payload.stage === "VERIFICATION") && checkpoint.repairs !== 1) issue(ctx, ["repairs"], "REPAIR_COUNT_MISMATCH");

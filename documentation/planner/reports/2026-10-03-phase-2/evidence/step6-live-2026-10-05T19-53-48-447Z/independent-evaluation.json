@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-05T20:07:27.148605+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-05T19-53-48-447Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "b4e64c0787be6c601acb60d596f1bfd136ed1db118eeb53c9a3f1c722ff11fde",
+  "method": "Separate inspection of real provider outputs, criteria, scope, raw provenance, allocation and canonical execution. Historical run, not current-source certification.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "repairAndVerification": []
+  },
+  "externalAttempts": 37,
+  "usage": {
+    "reportedInputTokens": 251635,
+    "reportedOutputTokens": 33004,
+    "settledCalls": 37,
+    "unknownSpendCalls": 0
+  },
+  "latency": {
+    "medianMs": 11134,
+    "p90Ms": 19122,
+    "maximumMs": 28067
+  },
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 45,
+      "actualQuests": 1,
+      "applied": true
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 30-minute integrated demonstration versus one 45-minute task at lower capacity; same useful outcome/shape, no increased workload or added stage due spare capacity. Independent correct reasoning/solution criterion retained.",
+      "error": null,
+      "committedMinutes": 30,
+      "actualQuests": 1,
+      "applied": true
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 30,
+      "actualQuests": 1,
+      "applied": true
+    },
+    {
+      "id": "zero-new-work",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 0,
+      "actualQuests": 0,
+      "applied": true
+    },
+    {
+      "id": "concept-foundation",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 90,
+      "actualQuests": 2,
+      "applied": true
+    },
+    {
+      "id": "method-weakness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct method, valid reason and correct unaided changed-circuit solution now required. Three contrasting course circuits plus one changed circuit and a second differently shaped unseen check reduce the previous repeated sets; no assumed advanced repertoire, error quota or additional set booked for future failures. The separate confirmation may be more than necessary and remains a warning; this broad method-selection goal has no one-example limit. This is educational inspection, not acceptance from the apply receipt.",
+      "error": null,
+      "committedMinutes": 90,
+      "actualQuests": 2,
+      "applied": true
+    },
+    {
+      "id": "triage",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both reviewers ground their blocker solely in the generated strategy and activity, never accepted requirements/observations. Strict evidence validation rejects them; no candidate. Valid blueprint bytes do not qualify review/publication.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "REVIEW",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "63e093b4-a1ae-44c3-a882-7ace668ac8be"
+      },
+      "committedMinutes": 50,
+      "actualQuests": 0,
+      "applied": false
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 75,
+      "actualQuests": 2,
+      "applied": true
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 60,
+      "actualQuests": 1,
+      "applied": true
+    },
+    {
+      "id": "general-homework",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Only the three assigned equations are committed, with sign explanations and successful solutions/checks. Actual-error contingent rework uses the assigned items; no invented mandatory homework.",
+      "error": null,
+      "committedMinutes": 45,
+      "actualQuests": 1,
+      "applied": true
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 160,
+      "actualQuests": 2,
+      "applied": true
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 60,
+      "actualQuests": 0,
+      "applied": false
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 65,
+      "actualQuests": 0,
+      "applied": false
+    },
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 90,
+      "actualQuests": 2,
+      "applied": true
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Named grounded review is retained, but it treats an honest diagnostic/remediation pathway as required successful mastery. Separate semantics need scrutiny, and repair reservation fails the unchanged ceiling before dispatch. No repair/verification/apply occurred. This is not a genuine repaired educational witness.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "PERSISTENCE",
+        "message": "This call would consume capacity reserved for review or verification.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "9adc54c6-053c-4dce-95bb-bd322d3a2bb5"
+      },
+      "committedMinutes": 75,
+      "actualQuests": 0,
+      "applied": false
+    },
+    {
+      "id": "roadmap-large",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual instructions and completion criteria were separately inspected against the registered goal; full scope and actual scheduling/apply correspondence remain. Warnings/uncertainty remain, and activity completion is not verified mastery.",
+      "error": null,
+      "committedMinutes": 195,
+      "actualQuests": 3,
+      "applied": true
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Initial sources empty, actual focused follow-up reads new sources. Independent verification adds new-source identity fields to the original empty extraction identity list; strict list correspondence rejects it and the existing two-synthesis cap prevents fallback. Unconfirmable failure, not successful consequential-decision qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "RESEARCH",
+        "message": "The root call/token allowance is exhausted.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "993b471a-5f9e-459c-8ce5-e574fc732bb0"
+      },
+      "committedMinutes": null,
+      "actualQuests": 0,
+      "applied": false
+    }
+  ]
+}

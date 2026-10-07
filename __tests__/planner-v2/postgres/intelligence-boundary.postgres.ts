@@ -14,6 +14,7 @@ import { loadPlannerModelContext } from "@/lib/planner/v2/intelligence/context";
 import { dispatchMeteredProvider, workerProviderMeter, foregroundProviderMeter, type MeteredProviderRequest } from "@/lib/planner/v2/intelligence/provider";
 import { intentFixture } from "../contracts/fixtures";
 import type { LLMResponse } from "@/lib/ai/providers/types";
+import { TimezoneService } from "@/lib/timezone-service";
 
 let connection: pg.Client; let pool: pg.Pool; let db: PlannerDatabase; let attempts: AttemptService;
 beforeAll(async () => { connection = await connect(); pool = new pg.Pool({ connectionString: process.env.PLANNER_TEST_DATABASE_URL, max: 6 }); db = new PlannerDatabase(pool); attempts = new AttemptService(db); });
@@ -21,6 +22,7 @@ afterAll(async () => { await pool.end(); await connection.end(); });
 const policy = { purpose: "BLUEPRINT" as const, reviewReserve: { inputTokens: 4096, outputTokens: 2048 } };
 const request = (): MeteredProviderRequest<{ ok: boolean }> => ({ messages: [{ role: "user", content: "Use the owned Planner context" }], systemInstruction: "Return JSON", outputTokens: 512, policy, validate: r => JSON.parse(r.text!) });
 const response = (): LLMResponse => ({ text: '{"ok":true}', finishReason: "STOP", usage: { promptTokens: 100, completionTokens: 30, totalTokens: 130 } });
+const twoDays = (today: string) => ({ start: today, end: new Date(Date.parse(today) + 86400000).toISOString().slice(0, 10) });
 async function fixture(claim = true, budget = newBudget("EDUCATIONAL")) {
   const ownerId = await user(connection); const created = await new IntentService(db).create(ownerId, randomUUID(), intentFixture());
   const enqueue = { key: randomUUID(), text: "Step 2 boundary fixture", kind: "PLAN" as const, budget,
@@ -45,11 +47,11 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     const f = await fixture(false); const intent = { ...f.created.intent.intent, availability: { timezone: "UTC", dailyCeilingMinutes: [120,120,120,120,120,120,120], restWeekdays: [], blockedDates: [], recoveryPercent: 15, basis: "CONFIRMED_AVAILABILITY" as const } };
     await db.coordinated(f.ownerId, async sql => {
       await sql.query('INSERT INTO "Quest" ("userId",title,status,"scheduledFor","targetMinutes","requiredMinutes","completedAt","remainingDisposition") SELECT $1,\'Historical work\',\'COMPLETED\',\'2026-10-01\',30,30,now(),\'COMPLETED\' FROM generate_series(1,1500)', [f.ownerId]);
-      await sql.query('INSERT INTO "Quest" ("userId",title,status,"scheduledFor","targetMinutes","requiredMinutes") VALUES ($1,\'Other open work\',\'PENDING\',\'2026-10-05\',20,20)', [f.ownerId]);
+      await sql.query('INSERT INTO "Quest" ("userId",title,status,"scheduledFor","targetMinutes","requiredMinutes") VALUES ($1,\'Other open work\',\'PENDING\',$2::date,20,20)', [f.ownerId, TimezoneService.getUserLocalDate("UTC")]);
     });
     const c = await db.coordinated(f.ownerId, sql => loadExecutionContext(sql, f.ownerId, [f.created.plan], intent));
     expect(c.quests).toHaveLength(1501); expect(c.dependencies.quests).toHaveLength(1);
-    const p = projectPlannerContext(c, [{ planId: f.created.plan.id, planRef: "physics", intent, activeActivityKeys: [] }], { start: "2026-10-05", end: "2026-10-06" }, { provisionalAvailability: { ...intent.availability, basis: "DISCLOSED_PROVISIONAL_CEILING" } });
+    const p = projectPlannerContext(c, [{ planId: f.created.plan.id, planRef: "physics", intent, activeActivityKeys: [] }], twoDays(c.today), { provisionalAvailability: { ...intent.availability, basis: "DISCLOSED_PROVISIONAL_CEILING" } });
     expect(p.view.envelope.days[0]).toMatchObject({ otherCommittedMinutes: 20, recoveryMinutes: 18, availableMinutes: 82 });
     expect(p.view.history.unattributedOrOtherCompletedCount).toBe(1500);
   });
@@ -73,11 +75,12 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     const second = await new IntentService(db).create(f.ownerId, randomUUID(), intent);
     const provisional = { timezone: "UTC", dailyCeilingMinutes: [120,120,120,120,120,120,120], restWeekdays: [], blockedDates: [], recoveryPercent: 15, basis: "DISCLOSED_PROVISIONAL_CEILING" as const };
     const requested = [{ planId: f.created.plan.id, planRef: "first", intentId: f.created.intent.intentVersionId }, { planId: second.plan.id, planRef: "second", intentId: second.intent.intentVersionId }];
-    const p = await db.coordinated(f.ownerId, sql => loadPlannerModelContext(sql, f.ownerId, requested, { start: "2026-10-05", end: "2026-10-06" }, { provisionalAvailability: provisional }));
+    const window = twoDays(TimezoneService.getUserLocalDate("UTC"));
+    const p = await db.coordinated(f.ownerId, sql => loadPlannerModelContext(sql, f.ownerId, requested, window, { provisionalAvailability: provisional }));
     expect(p.view.plans[1].learning[0]).toMatchObject({ evidenceId: "weak_method", observedAt: "2026-10-01T10:00:00Z", scopeRefs: ["scope_electricity"] });
     expect(p.contexts.map(c => c.context.dependencies.evidence.length)).toEqual([1,2]);
     const foreign = await fixture(false);
-    await expect(db.coordinated(f.ownerId, sql => loadPlannerModelContext(sql, f.ownerId, [{ ...requested[0], intentId: foreign.created.intent.intentVersionId }], { start: "2026-10-05", end: "2026-10-06" }, { provisionalAvailability: provisional }))).rejects.toMatchObject({ detail: { code: "REFERENCE_NOT_OWNED" } });
+    await expect(db.coordinated(f.ownerId, sql => loadPlannerModelContext(sql, f.ownerId, [{ ...requested[0], intentId: foreign.created.intent.intentVersionId }], window, { provisionalAvailability: provisional }))).rejects.toMatchObject({ detail: { code: "REFERENCE_NOT_OWNED" } });
   });
   it("preserves owned legacy observations and pins check provenance changes without relabeling the older result seal", async () => {
     const ownerId = await user(connection);
@@ -93,7 +96,7 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
       await sql.query('INSERT INTO "PlannerCheckResult" (id,"planId","userId","revisionId","itemKey",result,"updatedAt") VALUES ($1,$2,$3,$4,$5,\'READY_TO_MOVE_ON\',now())', [checkId, created.plan.id, ownerId, randomUUID(), randomUUID()]);
     });
     const before = await db.coordinated(ownerId, sql => loadExecutionContext(sql, ownerId, [created.plan], intent));
-    const p = projectPlannerContext(before, [{ planId: created.plan.id, planRef: "physics", intent, goalId, activeActivityKeys: [] }], { start: "2026-10-05", end: "2026-10-06" },
+    const p = projectPlannerContext(before, [{ planId: created.plan.id, planRef: "physics", intent, goalId, activeActivityKeys: [] }], twoDays(before.today),
       { provisionalAvailability: { timezone: before.timezone, dailyCeilingMinutes: [120,120,120,120,120,120,120], restWeekdays: [], blockedDates: [], recoveryPercent: 15, basis: "DISCLOSED_PROVISIONAL_CEILING" } });
     expect(p.view.legacyHistory.byPlan[0]).toMatchObject({ completedCount: 1, acceptedSeconds: 900 });
     expect(p.view.plans[0].savedChecks[0]).toMatchObject({ scopeResolution: "UNRESOLVED", demonstratesReadiness: false });

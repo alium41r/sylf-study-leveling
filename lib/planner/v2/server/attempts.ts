@@ -10,18 +10,26 @@ import { ownedPlan } from "./intents";
 import { reserveAttemptQuota, finalizeAttemptQuota, recordDispatch, recordUnknown, recordActualUsage, transferForegroundAccounting, type ProviderUsage } from "./accounting";
 import type { QuotaReservationReceipt } from "../../../ai/quota-accounting";
 import { reserveProviderCapacity, providerCategory, type ProviderGuard, type ProviderPolicy } from "../intelligence/provider-policy";
+import type { CompilerIdentity, CompilerRetry } from "../intelligence/schemas/quality";
 
 export interface AttemptPayload {
+  generationRequestDigest?: string;
   quotaReceipt?: QuotaReservationReceipt;
   checkpoint?: unknown;
+  learningFactsDigest?: string;
+  compilerIdentities?: CompilerIdentity[];
+  compilerRetry?: CompilerRetry;
   calls?: ReturnType<typeof ProviderCallReservationV2Schema.parse>[];
   changeSet?: unknown;
   callCategories?: Record<string, "PLANNING" | "RESEARCH" | "OTHER">;
   profileEscalations?: { profile: RuntimeBudgetV2["profile"]; reason: string }[];
   researchEvidence?: unknown;
   researchAdoptionDigest?: string;
+  assistantAdmissionDigest?: string;
+  researchRequest?: unknown;
+  researchCheckpoint?: unknown;
   providerGuard?: ProviderGuard;
-  providerCalls?: Record<string, { purpose: ProviderPolicy["purpose"]; finishReason?: "STOP" | "MAX_TOKENS" | "OTHER"; errorCode?: string }>;
+  providerCalls?: Record<string, { purpose: ProviderPolicy["purpose"]; reservedAt?: string; dispatchedAt?: string; completedAt?: string; finishReason?: "STOP" | "MAX_TOKENS" | "OTHER"; errorCode?: string }>;
 }
 export interface LeaseToken { ownerId: number; attemptId: string; workerId: string; fence: number }
 export async function loadAttempt(sql: Sql, ownerId: number, attemptId: string, lock = true): Promise<{ attempt: PlannerAttemptV2; payload: AttemptPayload }> {
@@ -89,7 +97,7 @@ export async function supersedePlanAttempts(sql: Sql, ownerId: number, planIds: 
     await persistAttempt(sql, attempt, { ...attempt, state: "SUPERSEDED", lease: null, question: null, budget: stopped.budget }, stopped.payload);
   }
 }
-export function newBudget(profile: RuntimeBudgetV2["profile"], rootRequestId = randomUUID()): RuntimeBudgetV2 {
+export function newBudget(profile: RuntimeBudgetV2["profile"], rootRequestId:string = randomUUID()): RuntimeBudgetV2 {
   return RuntimeBudgetV2Schema.parse({ rootRequestId, profile, foregroundProcessingMs: 0, processingStartedAt: null, executionDeadlineAt: null,
     consumed: { modelCalls: 0, inputTokens: 0, outputTokens: 0, planningCalls: 0, researchSynthesisCalls: 0, researchQueries: 0, fetchAttempts: 0, selectedSourceCharacters: 0, extractedPages: 0, ocrPages: 0, followUps: 0 },
     reserved: { modelCalls: 0, inputTokens: 0, outputTokens: 0 } });
@@ -100,8 +108,11 @@ export class AttemptService {
     key: string; text: string; kind: PlannerAttemptV2["kind"]; targets: { planId: string; intentId: string; planningVersion: number; baseRevisionId: string | null; sourceCandidateId?: string }[];
     budget: RuntimeBudgetV2; parentAttemptId?: string;
   }): Promise<PlannerAttemptV2> {
+    return this.db.coordinated(ownerId, sql => this.enqueueAccepted(sql, ownerId, request));
+  }
+  /** Compose admission and enqueue under the same existing owner transaction. */
+  async enqueueAccepted(sql: Sql, ownerId: number, request: Parameters<AttemptService["enqueue"]>[1]): Promise<PlannerAttemptV2> {
     const requestHash = hash("accepted-request", request);
-    return this.db.coordinated(ownerId, async sql => {
       const existing = (await rows<{ artifact: unknown }>(sql, 'SELECT artifact FROM "PlannerAttempt" WHERE "userId"=$1 AND "requestKey"=$2', [ownerId, request.key]))[0];
       if (existing) {
         const attempt = PlannerAttemptV2Schema.parse(existing.artifact);
@@ -135,7 +146,6 @@ export class AttemptService {
       await sql.query('INSERT INTO "PlannerAttempt" (id,"userId",kind,state,"requestKey","requestHash",artifact,payload,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,clock_timestamp())',
         [attempt.attemptId, ownerId, attempt.kind, attempt.state, attempt.idempotencyKey, requestHash, attempt, foreground]);
       return attempt;
-    });
   }
   async read(ownerId: number, attemptId: string): Promise<PlannerAttemptV2> {
     return this.db.coordinated(ownerId, async sql => (await loadAttempt(sql, ownerId, attemptId)).attempt);
@@ -275,12 +285,12 @@ export class AttemptService {
       const quotaReceipt = payload.quotaReceipt ?? await reserveAttemptQuota(sql, attempt.ownerId,
         attempt.kind === "RESEARCH_ADVICE" ? "chat" : attempt.kind === "EXPAND" ? "plannerExpansion" : ["REPLAN", "JOINT"].includes(attempt.kind) ? "plannerRebalance" : "planner", await clock(sql));
       await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, quotaReceipt, calls: [...calls, call], callCategories: { ...payload.callCategories, [callId]: input.category },
-        ...(providerGuard ? { providerGuard } : {}), ...(input.policy ? { providerCalls: { ...payload.providerCalls, [callId]: { purpose: input.policy.purpose } } } : {}) });
+        ...(providerGuard ? { providerGuard } : {}), ...(input.policy ? { providerCalls: { ...payload.providerCalls, [callId]: { purpose: input.policy.purpose, reservedAt: now.toISOString() } } } : {}) });
       return callId;
     });
   }
   async dispatchCall(token: LeaseToken, callId: string, category: "PLANNING" | "RESEARCH" | "OTHER"): Promise<void> {
-    await this.mutate(token, async (sql, attempt, payload) => {
+    await this.mutate(token, async (sql, attempt, payload, now) => {
       const calls = structuredClone(payload.calls ?? []); const call = calls.find(call => call.callId === callId);
       if (!call || call.fence !== token.fence) reject("LEASE_EXPIRED", "Call reservation belongs to another lease.", attempt.stage);
       if (payload.callCategories?.[callId] !== category) reject("IDEMPOTENCY_MISMATCH", "The call category cannot change after reservation.");
@@ -293,7 +303,7 @@ export class AttemptService {
       budget.reserved.modelCalls--; budget.consumed.modelCalls++;
       if (category === "PLANNING") budget.consumed.planningCalls++;
       if (category === "RESEARCH") budget.consumed.researchSynthesisCalls++;
-      await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, quotaReceipt, calls });
+      await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, quotaReceipt, calls, ...(payload.providerCalls?.[callId] ? { providerCalls: { ...payload.providerCalls, [callId]: { ...payload.providerCalls[callId], dispatchedAt: now.toISOString() } } } : {}) });
     });
   }
   async settleCall(token: LeaseToken, callId: string, usage: ProviderUsage): Promise<void> {
@@ -358,13 +368,28 @@ export class AttemptService {
         if (metadata.purpose === "VERIFICATION") delete providerGuard.verificationReserve;
       }
       await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, calls, providerGuard,
-        providerCalls: { ...payload.providerCalls, [callId]: { ...metadata, ...(result.finishReason ? { finishReason: result.finishReason } : {}),
+        providerCalls: { ...payload.providerCalls, [callId]: { ...metadata, completedAt: metadata.completedAt ?? now.toISOString(), ...(result.finishReason ? { finishReason: result.finishReason } : {}),
           ...(result.errorCode ? { errorCode: result.errorCode.slice(0,80) } : {}) } } });
     });
   }
   async providerWindow(token: LeaseToken, purpose: ProviderPolicy["purpose"]) {
     return this.mutate(token, async (_sql, attempt, payload, now) => ({ now: now.getTime(), deadline: Math.min(Date.parse(attempt.budget.executionDeadlineAt!),
       ["RESEARCH", "OCR"].includes(purpose) && payload.providerGuard?.researchDeadlineAt ? Date.parse(payload.providerGuard.researchDeadlineAt) : Infinity) }));
+  }
+  /** Charge each search/fetch hop and extraction before work; failures and lease
+   * takeover never refund or reset root research counters. */
+  async consumeResearch(token: LeaseToken, delta: Partial<Pick<RuntimeBudgetV2["consumed"], "researchQueries"|"fetchAttempts"|"selectedSourceCharacters"|"extractedPages"|"ocrPages"|"followUps">>) {
+    return this.mutate(token, async (sql, attempt, payload, now) => {
+      if (attempt.budget.profile !== "RESEARCH" || !payload.providerGuard?.researchDeadlineAt || Date.parse(payload.providerGuard.researchDeadlineAt) <= now.getTime()) reject("BUDGET_EXHAUSTED","Research processing is not authorized or its window expired.","RESEARCH");
+      const allowed = ["researchQueries","fetchAttempts","selectedSourceCharacters","extractedPages","ocrPages","followUps"];
+      const budget = structuredClone(attempt.budget);
+      for (const [key, amount] of Object.entries(delta)) {
+        if (!allowed.includes(key) || !Number.isSafeInteger(amount) || amount < 0) reject("INVALID_OUTPUT","Invalid research charge.","RESEARCH");
+        const field = key as keyof typeof delta; budget.consumed[field] += amount;
+      }
+      if (!RuntimeBudgetV2Schema.safeParse(budget).success) reject("BUDGET_EXHAUSTED","The shared research processing allowance is exhausted.","RESEARCH");
+      await persistAttempt(sql,attempt,{...attempt,budget},payload); return budget;
+    });
   }
   async startResearchWindow(token: LeaseToken) {
     return this.mutate(token, async (sql, attempt, payload, now) => {

@@ -286,9 +286,9 @@ export default function JourneyLanding() {
           <em>A different you.</em>
         </h1>
         <p className={styles.heroDescription}>
-          Turn the hours you put in into the person you’re becoming.
-          <br className={styles.desktopBreak} /> A calmer place to study, level
-          up, and grow together.
+          A study workspace that brings planning, focus sessions, progress
+          tracking, and an AI companion into one place—turning the time you
+          study into visible progress.
         </p>
         <div className={styles.heroActions}>
           <a className={styles.primaryButton} href="#early-access">

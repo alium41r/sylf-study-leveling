@@ -1,0 +1,811 @@
+{
+  "label": "phase1",
+  "files": 13,
+  "passed": 176,
+  "failed": 3,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration pins an owned cross-plan prerequisite, materializes it once and protects reverse dependencies",
+      "messages": [
+        "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.\n    at reject (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:24:9)\n    at verifyPlacement (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/context.ts:238:147)\n    at /Users/aliumair/Desktop/sylf/lib/planner/v2/server/revisions.ts:159:7\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at PlannerDatabase.coordinated (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:75:24)\n    at prepareProposal (/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/proposal-fixture.ts:68:3)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts:236:23\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration withdraws stopped unfinished work into a distinct continuation without duplicating completion rewards",
+      "messages": [
+        "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.\n    at reject (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:24:9)\n    at verifyPlacement (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/context.ts:238:147)\n    at /Users/aliumair/Desktop/sylf/lib/planner/v2/server/revisions.ts:159:7\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at PlannerDatabase.coordinated (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:75:24)\n    at prepareProposal (/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/proposal-fixture.ts:68:3)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts:264:26\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration applies new cross-plan prerequisites in one joint transaction without requiring pre-existing Quests",
+      "messages": [
+        "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.\n    at reject (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:24:9)\n    at verifyPlacement (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/context.ts:238:147)\n    at /Users/aliumair/Desktop/sylf/lib/planner/v2/server/revisions.ts:159:7\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at PlannerDatabase.coordinated (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:75:24)\n    at prepareProposal (/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/proposal-fixture.ts:68:3)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts:283:22\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/accounting.postgres.ts",
+      "cases": [
+        {
+          "name": "durable quota and provider accounting on PostgreSQL reserves one quota unit for parallel calls and refunds once in the original bucket before dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "durable quota and provider accounting on PostgreSQL accounts repeated dispatch/settlement exactly once and keeps unknown pricing explicit",
+          "status": "passed"
+        },
+        {
+          "name": "durable quota and provider accounting on PostgreSQL reconciles late financial usage after cancellation without altering a terminal artifact or refunding spend",
+          "status": "passed"
+        },
+        {
+          "name": "durable quota and provider accounting on PostgreSQL preserves the existing unlimited entitlement without minting or refunding a quota row",
+          "status": "passed"
+        },
+        {
+          "name": "durable quota and provider accounting on PostgreSQL transfers owned foreground call/quota receipts into one root without resetting budget or charging twice",
+          "status": "passed"
+        },
+        {
+          "name": "durable quota and provider accounting on PostgreSQL rejects invented foreground counters and foreign request roots without leaking or transferring spend",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+      "cases": [
+        {
+          "name": "advice demotes model proposals and changes only conversation plus durable usage",
+          "status": "passed"
+        },
+        {
+          "name": "replays advice/recommendations without another external call and rejects a changed identity",
+          "status": "passed"
+        },
+        {
+          "name": "transfers the foreground root, counters, usage and quota once on explicit preparation",
+          "status": "passed"
+        },
+        {
+          "name": "rejects forged or stale recommendation targets before enqueue",
+          "status": "passed"
+        },
+        {
+          "name": "stale conversation CAS does not make another model call",
+          "status": "passed"
+        },
+        {
+          "name": "intake notes remain self-reported without mastery or consent; accepting exact fields is separate",
+          "status": "passed"
+        },
+        {
+          "name": "foreign Plan reads fail before provider dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "owned private documents require genuine owned metadata and unchanged content",
+          "status": "passed"
+        },
+        {
+          "name": "upload retries do not duplicate blobs or alter planning state",
+          "status": "passed"
+        },
+        {
+          "name": "caller-provided documents and research attestations remain rejected",
+          "status": "passed"
+        },
+        {
+          "name": "verified research binds a derived intent once and preserves the immutable request",
+          "status": "passed"
+        },
+        {
+          "name": "private course verification receives accepted policy/outcome and adopts quoted outcomes without an exam identity",
+          "status": "passed"
+        },
+        {
+          "name": "joint research adopts both bindings atomically without replacing explicit exclusions",
+          "status": "passed"
+        },
+        {
+          "name": "research conflicts stop for a decision and an explicit linked request retains the prior checkpoint",
+          "status": "passed"
+        },
+        {
+          "name": "read-only research uses the existing supervisor and publishes no intent, candidate or Quest",
+          "status": "passed"
+        },
+        {
+          "name": "a superseding edit and a cancellation fence verified research before adoption",
+          "status": "passed"
+        },
+        {
+          "name": "research counters and immutable deadlines survive release/takeover and reject excessive work",
+          "status": "passed"
+        },
+        {
+          "name": "conversation and document SQL guards enforce CAS and immutable receipts",
+          "status": "passed"
+        },
+        {
+          "name": "executes the compiled research handler in ordinary Node with genuine accounting",
+          "status": "passed"
+        },
+        {
+          "name": "transfers research-authorized advice receipts without granting planning permission",
+          "status": "passed"
+        },
+        {
+          "name": "two ordinary advice turns share chat entitlements without consuming the weekly planning allowance",
+          "status": "passed"
+        },
+        {
+          "name": "a supplemental lookup and fallback share the assistant's two-call allowance",
+          "status": "passed"
+        },
+        {
+          "name": "a research fallback cannot add an unmetered third synthesis or bypass verification",
+          "status": "passed"
+        },
+        {
+          "name": "research answers remain tied to the original read intent after a later edit",
+          "status": "passed"
+        },
+        {
+          "name": "failed assistant retries cannot reset or repeat a dispatched root",
+          "status": "passed"
+        },
+        {
+          "name": "bounded conversation pruning discloses omitted turns and leaves accepted state unchanged",
+          "status": "passed"
+        },
+        {
+          "name": "owned content is reverified after synthesis before research adoption",
+          "status": "passed"
+        },
+        {
+          "name": "targeted scan OCR shares the root ledger, uses batches of three, and discloses unread pages",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+      "cases": [
+        {
+          "name": "seals a known-scope candidate after independent review with two calls and no execution writes",
+          "status": "passed"
+        },
+        {
+          "name": "one named repair is independently verified on its actual new allocation before sealing",
+          "status": "passed"
+        },
+        {
+          "name": "vague more-practice preference cannot add workload, trigger repair or block a candidate",
+          "status": "passed"
+        },
+        {
+          "name": "an unresolved exact verification remains unconfirmable with no second repair",
+          "status": "passed"
+        },
+        {
+          "name": "a review outage preserves a readable pending review and never silently publishes",
+          "status": "passed"
+        },
+        {
+          "name": "insufficient repair plus verification allowance leaves the blocked review intact",
+          "status": "passed"
+        },
+        {
+          "name": "takeover resumes a cleared review without model calls or deadline renewal",
+          "status": "passed"
+        },
+        {
+          "name": "takeover uses an accepted saved repair instead of repeating the repair call",
+          "status": "passed"
+        },
+        {
+          "name": "takeover cannot repeat a dispatched repair whose accepted response was lost",
+          "status": "passed"
+        },
+        {
+          "name": "cancellation and changed calendar reject a late review before sealing",
+          "status": "passed"
+        },
+        {
+          "name": "joint publication seals both reviewed targets atomically and duplicates no prerequisite",
+          "status": "passed"
+        },
+        {
+          "name": "tampered reviewed allocation/checkpoint cannot publish",
+          "status": "passed"
+        },
+        {
+          "name": "an explicit linked retry resumes a failed review on a new root without regenerating education",
+          "status": "passed"
+        },
+        {
+          "name": "an explicit linked new root can retry a lost repair while ordinary takeover cannot",
+          "status": "passed"
+        },
+        {
+          "name": "takeover meters a repeated review when the accepted response was lost before its checkpoint",
+          "status": "passed"
+        },
+        {
+          "name": "takeover reestablishes verification hold and meters verification whose response was lost",
+          "status": "passed"
+        },
+        {
+          "name": "repair infeasibility retains its accepted education and feedback without another adaptation",
+          "status": "passed"
+        },
+        {
+          "name": "new concrete verification blockers cannot publish even when original issues resolve",
+          "status": "passed"
+        },
+        {
+          "name": "publication rejects changes to the reviewed execution date and durable activity identity",
+          "status": "passed"
+        },
+        {
+          "name": "actual supervised compiler failure retains stage and review artifact with zero candidates",
+          "status": "passed"
+        },
+        {
+          "name": "compiled ordinary Node supervised handlers produce a reviewed sealed candidate",
+          "status": "passed"
+        },
+        {
+          "name": "protected running education is reviewed and sealed unchanged without execution writes or double counting",
+          "status": "passed"
+        },
+        {
+          "name": "one supervised compiler root researches verifies adopts reviews and seals with raw source provenance",
+          "status": "passed"
+        },
+        {
+          "name": "keeps Exam research unconfirmable when no assessed scope is verified despite an empty model conflict list",
+          "status": "passed"
+        },
+        {
+          "name": "seals an owned saved-check reference without treating that check as verified readiness",
+          "status": "passed"
+        },
+        {
+          "name": "research adoption crash resumes its verified receipt without renewing the expired research window",
+          "status": "passed"
+        },
+        {
+          "name": "root deadline expiry and a superseded intent fence a late independent review",
+          "status": "passed"
+        },
+        {
+          "name": "review checkpoint pins the execution identity registry against tampering after review",
+          "status": "passed"
+        },
+        {
+          "name": "insufficient actual verification growth retains the repaired allocation without publishing or another repair",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/coordinated-routes.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL headless assistant routes require authentication and ownership and reject model-supplied permission",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL research advice survives HTTP recovery and cancellation with owned read bindings",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL document upload cannot use a foreign Plan or allocate private storage without ownership",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL preserves historical zero estimates while reporting their uncertainty separately from verified zero cost",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL blocks old-client edits, completion and deletion of adopted work without side effects",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL settles explicit generic Quest completion once across duplicate requests",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL makes duplicate desired rest-day writes harmless without moving sealed Planner work",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL rechecks actual calendar work added through the generic Quest route before apply",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL blocks a reset of linked execution without consuming its security code",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL returns derived remaining work to the shared Focus client without rewriting the approved timebox",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL resets ordinary legacy progression atomically, including mirrors and ledger, and consumes the OTP once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL uses fresh coordinated achievement eligibility and credits duplicate claims only once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL erases historical party participation and Planner state through the actual account route",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL keeps owned recovery reads, cancellation and execution protection available when admission is disabled",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/current-sql-invariants.postgres.ts",
+      "cases": [
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) installs the actual final timer/reward RPCs and Planner trigger functions",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) keeps Planner records RLS-enabled and inaccessible to browser roles",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rejects foreign Subject and Goal references at the actual SQL boundary",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rejects an active revision from a different Plan at deferred commit",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) prevents mutation of sealed input, educational output and operation identity",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) allows exactly one immutable confirmation receipt",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) blocks generic structural Quest edits without review capability",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) protects a zero-second started Quest through the actual Focus RPC",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rejects foreign execution references through the actual start RPC",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) preserves a permanent user-release tombstone",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rolls back ordinary execution writes and Plan pointers together on an injected SQL failure",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) retires unused historical progression, forge and integer-skill reward bypasses",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/durable-core.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 1 actual durable repositories creates one owned immutable intent and returns an identical retry",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories binds one lease, survives cancellation and rejects its late checkpoint",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories never retargets an attempt after accepted intent changes",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories recovers an expired lease without resetting budget or accepting the previous fence",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories admits one planning and one read-only research job per user across workers",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories applies an exact proposal once under concurrent confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories rolls back every materialization boundary without a partial receipt",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories protects zero-second starts, acknowledged pause/resume and receipt replays",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories settles the weekly mission atomically and only once across competing protocols",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/generation-integration.postgres.ts",
+      "cases": [
+        {
+          "name": "existing generation requires authentication and enabled V2 admission before writes",
+          "status": "passed"
+        },
+        {
+          "name": "strict server admission rejects client budget and permission and forged mastery before writes",
+          "status": "passed"
+        },
+        {
+          "name": "queues without execution and durable operation/workspace reads recover the accepted target",
+          "status": "passed"
+        },
+        {
+          "name": "replays exact canonical input without duplicate creation and rejects changed-key reuse",
+          "status": "passed"
+        },
+        {
+          "name": "existing foreign target returns ownership failure without creating a first new joint target",
+          "status": "passed"
+        },
+        {
+          "name": "joint final-intent saving and enqueue roll back together on a late enqueue failure",
+          "status": "passed"
+        },
+        {
+          "name": "new plan and reserved intent roll back when enqueue is unavailable",
+          "status": "passed"
+        },
+        {
+          "name": "checks both current baselines before editing and rejects duplicate targets",
+          "status": "passed"
+        },
+        {
+          "name": "abort after final intent saving rolls the whole admission back",
+          "status": "passed"
+        },
+        {
+          "name": "the HTTP supervised compiler produces a sealed candidate that canonical confirmation applies exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "final edited intent enqueues and replay survives the version increment",
+          "status": "passed"
+        },
+        {
+          "name": "joint compiled candidates apply all or none and the canonical route recovers after transaction rollback",
+          "status": "passed"
+        },
+        {
+          "name": "zero-new-work reviewed candidate confirms without manufacturing a Quest",
+          "status": "passed"
+        },
+        {
+          "name": "actual started execution is KEPT across compiler and canonical apply",
+          "status": "passed"
+        },
+        {
+          "name": "capacity changes after actual compiler publication block canonical apply without execution writes",
+          "status": "passed"
+        },
+        {
+          "name": "maximum HTTP transport and over-count targets fail explicitly with no partial admission",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL executes the compiled provider boundary in ordinary Node with actual durable accounting",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL loads 1500 historical rows without losing authoritative history/capacity or overflowing the dependency registry",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL meters fallback before each upstream dispatch and settles one quota unit for the root",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL loads each joint target's owned dated evidence and rejects another student's intent",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL preserves owned legacy observations and pins check provenance changes without relabeling the older result seal",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL keeps known overrun spend in the financial ledger when another fallback's spend remains unknown",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL retains mandatory review capacity under parallel reservations and refunds rejected/undispatched calls",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL starts the research sub-window before search/fetch and never renews it through a fenced takeover",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL persists review and repair-verification holdbacks, then meters the verification separately",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL aborts on cancellation from a separate PostgreSQL connection and reconciles a late reply without changing the terminal attempt",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL enforces the database root deadline even when the adapter ignores abort",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 2 context and metered boundary on genuine PostgreSQL transfers actual metered foreground time, quota and review holds exactly once into worker processing",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/learning-allocation.postgres.ts",
+      "cases": [
+        {
+          "name": "persists preflight, complete scoped blueprint and allocated education without candidate/Quest writes",
+          "status": "passed"
+        },
+        {
+          "name": "reuses the exact allocated checkpoint after fenced takeover without a model call or deadline renewal",
+          "status": "passed"
+        },
+        {
+          "name": "adapts once with declared useful chunks, reschedules and retains the review hold",
+          "status": "passed"
+        },
+        {
+          "name": "can explicitly reduce only the soft recovery margin without shrinking required work",
+          "status": "passed"
+        },
+        {
+          "name": "retains an unconfirmable artifact and asks for an explicit tradeoff after unresolved adaptation",
+          "status": "passed"
+        },
+        {
+          "name": "does not repeat a dispatched adaptation when recovery lacks its durable accepted response",
+          "status": "passed"
+        },
+        {
+          "name": "meters malformed blueprint fallback separately and uses the same accepted context",
+          "status": "passed"
+        },
+        {
+          "name": "durable cancellation fences a late blueprint and prevents further adaptation/publication",
+          "status": "passed"
+        },
+        {
+          "name": "rejects changed execution/capacity before persisting returned education",
+          "status": "passed"
+        },
+        {
+          "name": "preserves protected running content/placement and reserves its remaining effort exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "creates one joint DAG/request/capacity allocation with one shared prerequisite owner",
+          "status": "passed"
+        },
+        {
+          "name": "rejects incomplete/unauthorized research resolution before any learning dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "runs the compiled learning service in ordinary Node against the durable disposable database",
+          "status": "passed"
+        },
+        {
+          "name": "detects tampered owned checkpoint artifacts before resuming without another call",
+          "status": "passed"
+        },
+        {
+          "name": "continues from verified Step 3 research adoption with exact source, requested/resolved intent and evidence pins",
+          "status": "passed"
+        },
+        {
+          "name": "selects retained content from the exact active execution seal rather than a newer unapplied candidate",
+          "status": "passed"
+        },
+        {
+          "name": "uses accepted actual seconds and the paused remaining estimate once through the real timer owner",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration keeps initial retry correspondence after editing and archives without erasing execution",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration preserves deadline and accounting during explicit profile escalation",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration adopts research atomically for both targets and never changes hard facts",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration publishes long research as a durable read-only answer with no Plan side effects",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration uses accepted global availability even while preparing another Plan",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration reviews and atomically applies a joint proposal once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration retains an unstarted identity across semantic edits and rejects a racing Focus start",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration rolls back both targets of a joint apply at every durable boundary and retries exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration adopts Classic once, preserving actual history and conflicting original aliases",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration blocks open timers and rolls back adoption without rewriting ledgers",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration replans an adopted live baseline repeatedly without reverting edited content or lineage",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration shows live remaining work and keeps active intent separate from a later working edit",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration does not renew timing tolerance through repeated acknowledged pause/resume",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration erases owned durable artifacts through the explicit account cascade while fencing old workers",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration pins an owned cross-plan prerequisite, materializes it once and protects reverse dependencies",
+          "status": "failed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration keeps unchanged Quest identity, content and execution rows byte-for-byte stable",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration withdraws stopped unfinished work into a distinct continuation without duplicating completion rewards",
+          "status": "failed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration applies new cross-plan prerequisites in one joint transaction without requiring pre-existing Quests",
+          "status": "failed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration anchors hard learning intervals to accepted completion date rather than the old calendar slot",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration imports Roadmap expansions from live execution and retains strategic revisions, tombstones and large UTF-8 baselines",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration fails closed on independent context/economic SQL writers while allowing coordinated mutations",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration coordinates direct SQL shop/equipment writers with apply and preserves their economic math",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration changes strategy only through a new owned canonical intent and supersedes the old candidate",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration rejects client-minted verified research and readiness while retaining honest self reports",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration preserves invalid completed legacy history as an exception while rejecting invalid unfinished adoption",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/research-limits.postgres.ts",
+      "cases": [
+        {
+          "name": "retains read evidence and discloses the fetch ceiling before synthesis",
+          "status": "passed"
+        },
+        {
+          "name": "retains read evidence and discloses the redirect ceiling before synthesis",
+          "status": "passed"
+        },
+        {
+          "name": "retains read evidence and discloses the query ceiling before synthesis",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/separate-connection-concurrency.postgres.ts",
+      "cases": [
+        {
+          "name": "REQUIRED: genuine separate PostgreSQL connections and current execution race uses three independent backend processes, not a single-user emulation",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: genuine separate PostgreSQL connections and current execution race observes cross-connection advisory locking and release at transaction end",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: genuine separate PostgreSQL connections and current execution race makes a racing authorized reschedule wait, then protects the zero-second Focus start",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/worker-runtime.postgres.ts",
+      "cases": [
+        {
+          "name": "compiled worker process recovery against genuine PostgreSQL recovers SIGKILL through the real 45-second lease without resetting the root",
+          "status": "passed"
+        },
+        {
+          "name": "compiled worker process recovery against genuine PostgreSQL retires an SDK that ignores abort at the absolute root deadline",
+          "status": "passed"
+        },
+        {
+          "name": "compiled worker process recovery against genuine PostgreSQL releases a hanging call on graceful shutdown and preserves its uncertainty",
+          "status": "passed"
+        },
+        {
+          "name": "compiled worker process recovery against genuine PostgreSQL runs the packaged main entrypoint and reports liveness separately from unregistered intelligence readiness",
+          "status": "passed"
+        },
+        {
+          "name": "compiled worker process recovery against genuine PostgreSQL fails readiness and claiming when an execution backstop is absent, then recovers after restoration",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

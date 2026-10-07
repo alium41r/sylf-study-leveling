@@ -165,7 +165,7 @@ export interface SearchResult {
 }
 export interface SearchProvider {
   readonly id: SearchProviderId;
-  search(input: { query: string; limit: number; signal?: AbortSignal }): Promise<SearchResult[]>;
+  search(input: { query: string; limit: number; signal?: AbortSignal; beforeRequest?: () => Promise<void> }): Promise<SearchResult[]>;
 }
 
 /**

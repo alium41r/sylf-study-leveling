@@ -1,6 +1,10 @@
 import "server-only";
 import { getApplicationPool } from "../../../prisma";
 import { PlannerDatabase } from "./database";
+import { AssistantService } from "./assistant";
+import { GenerationService } from "./generation";
+import { ResearchService } from "./research";
+import { DocumentRepository } from "./documents";
 import { IntentService } from "./intents";
 import { AttemptService } from "./attempts";
 import { RevisionService } from "./revisions";
@@ -22,6 +26,6 @@ export function requireDurablePlannerAdmission(): void {
 export function durablePlanner() {
   const db = new PlannerDatabase(getApplicationPool());
   const attempts = new AttemptService(db);
-  return { db, intents: new IntentService(db), attempts, revisions: new RevisionService(attempts), apply: new ApplyService(db), sessions: new SessionService(db), workspace: new WorkspaceService(db),
+  return { db, generation:new GenerationService(db),assistant:new AssistantService(db),research:new ResearchService(attempts),documents:new DocumentRepository(db),intents: new IntentService(db), attempts, revisions: new RevisionService(attempts), apply: new ApplyService(db), sessions: new SessionService(db), workspace: new WorkspaceService(db),
     adoption: new AdoptionService(db, process.env.PLANNER_V2_DURABLE_CORE_ENABLED === "true") };
 }

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-07T08:20:07.154Z",
+  "status": "FAILED",
+  "database": "generated disposable loopback database",
+  "runtime": null,
+  "requiredSkippedTests": 0,
+  "requiredResults": [],
+  "migrations": [],
+  "limitations": [
+    "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+    "Phase 1 actual services/SQL are exercised; no hosted data is touched."
+  ],
+  "error": "Command failed: /private/tmp/sylf-planner-phase0-runtime/package/native/bin/initdb -D /var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-v2-pg-P5g4iw/data -U postgres --auth-host=scram-sha-256 --auth-local=trust --pwfile /var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-v2-pg-P5g4iw/password\ninitdb: error: file \"/private/tmp/sylf-planner-phase0-runtime/package/native/share/postgresql/postgres.bki\" does not exist\ninitdb: hint: This might mean you have a corrupted installation or identified the wrong directory with the invocation option -L.\n",
+  "cleanup": "No server started.",
+  "finishedAt": "2026-10-07T08:20:09.344Z"
+}

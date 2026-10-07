@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-07T09:53:40.913814+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T09-43-17-479Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "c0b96952949a8303566c974cebc8103d9ca4601ea4d44f8e94c02054ccbe3bc7",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      {
+        "id": "infeasible-zero-capacity",
+        "trial": 1,
+        "attemptId": "04631246-8fd0-4ff3-8e56-645a075152ef"
+      },
+      {
+        "id": "indivisible-checkpoint",
+        "trial": 1,
+        "attemptId": "38a77cfd-3dfa-4562-bd41-8e074102eaed"
+      }
+    ],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 37,
+  "usage": {
+    "reportedInputTokens": 252113,
+    "reportedOutputTokens": 36701,
+    "settledCalls": 36,
+    "unknownSpendCalls": 37
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 4863,
+    "p90Ms": 10559,
+    "maximumMs": 15318
+  },
+  "passed": 15,
+  "total": 17,
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "trial": 1,
+      "attemptId": "2ba6ff14-a0c9-44a7-bd66-bb0a415d555b",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 40-minute integrated correct Ohm/series explanation and independently solved changed circuit; actual malformed primary is retained and existing metered fallback validates. No repeated check or ritual stages.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "trial": 1,
+      "attemptId": "400c03da-49af-43a5-9087-306364e7bb30",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One35-minute integrated changed-circuit explanation/check, versus40 ordinary-capacity minutes; extra capacity does not inflate scope. Further remediation is concrete and unbooked.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "trial": 1,
+      "attemptId": "c52ac82b-cf63-495c-a05a-fa48f12aa30c",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One30-minute three-series-example diagnostic with correct rules, reverse resistance and voltage-sum checking, no self-report CREDITED. Completion requires correct answers but does not independently certify mastery; additional teaching is unbooked contingent.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "zero-new-work",
+      "trial": 1,
+      "attemptId": "2f67ed63-e4f9-41e7-a694-0e50c51f041d",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Explicit opted-out strategy has deferred scope/reason, zero activities/optional work and zero canonical Quests.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 0
+    },
+    {
+      "id": "concept-foundation",
+      "trial": 1,
+      "attemptId": "14d1ade7-2153-48a5-918d-1e0fbbe44908",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Current/potential distinction and conservation feed a changed application with correct method/solution criterion; one90-minute commitment, no timed-paper substitution. Specific examples/scaffolding and independence phrasing are limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "method-weakness",
+      "trial": 1,
+      "attemptId": "d5166cfa-b1fb-4d7a-b6da-5dafccee88db",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute task has a correct final independent choice/reason/solution gate and permits valid alternative methods. However assumptions claim the accepted repertoire includes node/mesh/superposition/Thevenin/Norton although it was not supplied; the learner-facing guide directs those methods, with restriction to confirmed taught methods only in uncertainty. Model approval misses this unsupported scope claim. Retain failure pending explicit instructional restriction; minutes alone are not the rejection basis.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "triage",
+      "trial": 1,
+      "attemptId": "568c9174-81cd-4274-9cb6-6f9d204d56b4",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Two25-minute rule/series/parallel then mixed-reduction activities fit the two actual study days and exclude quiz day. Every scope node has a contribution; depth/extra practice/timed work sacrificed explicitly, no invented weights. Correct concrete mixed topology/results; no parsing or grounded-review failure.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "roadmap-open",
+      "trial": 1,
+      "attemptId": "1a7cf6f8-176b-4897-a6c1-42c6d103d07b",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Genuine40/50 cumulative CSV read/group/report milestones preserve the entire original text/criterion and hard continuation dependency. Correct field-count/numeric validation and checked hand totals; later work unbooked and no deadline invented.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "trial": 1,
+      "attemptId": "6bebb863-dd80-471f-a851-092f10eca39f",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Correct labeled Bayes example0.009/0.0585=15.38%, independent changed example0.016/0.114=14.035%, appropriate conditional explanation rather than universal base-rate dominance. One60-minute commitment, no time/confidence mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 1,
+      "attemptId": "6ea9e5c2-1d6f-4907-a2fb-13c429b010e7",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Only three assigned equations committed45minutes with concrete negative-expansion explanation, correct solution and substitution. Extra expressions optional and repeated actual sign failures trigger unbooked remediation; no unnecessary committed homework.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "joint-prerequisite",
+      "trial": 1,
+      "attemptId": "fbcf9ca6-0e9e-4c3f-b2e9-9252c20883c8",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute loops/dictionaries owner, distinct30-minute CSV and30-minute JSON deliverables. Actual cross-Plan HARD edge names existing owned activities, prerequisite effort counts once; no CREDITED planned readiness.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "trial": 1,
+      "attemptId": "04631246-8fd0-4ff3-8e56-645a075152ef",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Necessary positive30-minute method learning retained despite hard zero capacity; one adaptation preserves requirement, deterministic reallocation ends NEEDS_DECISION with zero execution and no readiness promise.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "trial": 1,
+      "attemptId": "38a77cfd-3dfa-4562-bd41-8e074102eaed",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Authentic45-minute uninterrupted check survives30-minute day ceilings; one bounded adaptation preserves conflict, no fabricated split or shorter substitute, zero execution.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 1,
+      "attemptId": "219069bd-cf49-45f5-81e3-ea54febd4fc3",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual owned hash/excerpt verification/adopted private-course claims plus correctly parsed quoted commas and changed-data totals/malformed-row demonstration. Cumulative60/60 split retains final criterion and canonical apply; no official issuer claim.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 1,
+      "attemptId": "f1b93c4c-9b2d-4c4c-ba24-3658f227cc9a",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Self-reported4/5 failure contradicts confidence and prevents mastery credit; diagnostic permits failure evidence, targeted supported repair and independent3-circuit success criterion address the gap. Unknown repertoire and clean-path95-minute booked estimate remain proportion/contingency limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "roadmap-large",
+      "trial": 1,
+      "attemptId": "86973c76-4470-47a4-9e7d-28685347e9cf",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Primary attaches forty scopeRefs to one activity (frozen maximum24) and crams whole strategic techniques into first beginner task. Fallback preserves forty dispositions but omits contribution for DEFERRED entries. Strict validators reject both; no trim/substitute/candidate/apply, so full matrix fails.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "1d1b1bf9-ed84-474f-9fa4-04dbe7946add"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "public-assessment-research",
+      "trial": 1,
+      "attemptId": "1f852bff-9b8f-4cb4-b6a9-aa248703a239",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual public provenance retained; missing applicable complete assessed-scope support yields an authoritative consequential decision before blueprint/publication. Honest unconfirmability meets registered expectation.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    }
+  ]
+}

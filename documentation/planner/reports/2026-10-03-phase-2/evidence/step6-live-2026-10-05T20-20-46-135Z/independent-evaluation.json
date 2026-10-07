@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-06T01:23:10.142695+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-05T20-20-46-135Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "ee19a5f4fd67729d62be9d6816ee4329f5af502a676719abd9c9ff833115838f",
+  "method": "Separate inspection of actual goals, scope, criteria, research/provenance, allocation and apply; historical run, not current-source certification. Model self-review and successful apply are not educational acceptance.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      "infeasible-zero-capacity",
+      "indivisible-checkpoint"
+    ],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 38,
+  "usage": {
+    "reportedInputTokens": 260536,
+    "reportedOutputTokens": 35541,
+    "settledCalls": 38,
+    "unknownSpendCalls": 0
+  },
+  "latency": {
+    "medianMs": 5653.5,
+    "p90Ms": 9233,
+    "maximumMs": 16886
+  },
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 45-minute integrated Ohm task with correct independently explained changed circuit; gap work unbooked.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Same one 45-minute integrated demonstration despite more capacity; no workload inflation.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 20-minute series diagnostic permits a clean result, without false CREDITED mastery. Correction stays unbooked and actually error-triggered.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "zero-new-work",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Explicitly deferred strategy-only outcome, zero activities/quests and canonical apply.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 0
+    },
+    {
+      "id": "concept-foundation",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Conceptual conservation-based explanations then correct independent changed-circuit application. Unbooked gap repair rather than automatic repeated sets.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "method-weakness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 30-minute activity: two changed course-appropriate circuits, correct method choice, valid reasons and correct unaided solutions. No assumed advanced repertoire, repeated committed set or error quota.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "triage",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 25-minute integrated changed mixed-circuit rehearsal, with each scope node retained and explicit sacrifice of separate stages/breadth. Method choice/reason/solution required; no invented assessment weights. A malformed review is metered and its existing feedback fallback returns valid grounded review.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Build then changed-CSV demonstration, 90 committed minutes; concrete correct totals/malformed-row criteria, no semester ceremony or deadline. Valid JSON fallback remains counted.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Integrated Bayes explanation and correct independently changed probability example; errors trigger unbooked remediation, no current mastery from time or confidence.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "45-minute task completes/explains/substitution-checks the three assigned equations. Two extra equations occur only in unbooked contingent response to a repeated observed sign error.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "CSV report owns integrated loops/dictionary education once, JSON applies it through the actual root HARD edge. Different reports and same prerequisite ownership retained; no readiness credit merely from planned work.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Required 45-minute authentic learning remains against zero capacity; one adaptation at most, consequential decision, zero execution.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Required uninterrupted 45-minute lab stays intact against 30-minute capacity; explicit scheduling decision, no invented split or execution.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual 419-character upload, hashes/section-only quotations and course-outcome adoption; private note never official. Complete program plus independent changed-data correctness. Declared 120-minute build split 60/40/20 respects hard daily capacity; repeated full instructions across split parts remain an acknowledged semantic warning, not three intended builds. Extra 20-minute learner note confirmation may be unnecessary and remains a limitation.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 4
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual wrong changed-circuit evidence overrides self-reported mastery: rework the five original items and two correct fresh unaided demonstrations; unbooked failure-triggered correction. Ninety committed minutes; no manufactured mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "roadmap-large",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Both outputs now parse as valid JSON, but the first omits deferred-node contributions, exceeds the 24-reference activity cap and places splits outside its 60-minute timebox. Feedback paths repair contributions, but the replacement labels one activity with all forty scope refs and still violates the frozen cap. Strict rejection retains an unconfirmable failure.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "72a12be9-9bd8-4576-ba6c-fa647d6a0ea4"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Research verifier now returns valid nested correspondence. Real fetched excerpts fail to establish both requested assessed nodes and exact applicable coverage, so the server returns a consequential decision before candidate/execution. This is acceptable honest research handling, not fabricated assessed scope.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    }
+  ]
+}

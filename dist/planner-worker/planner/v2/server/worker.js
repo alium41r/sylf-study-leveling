@@ -24,14 +24,14 @@ class PlannerWorker {
       (SELECT count(*) FROM information_schema.columns WHERE table_schema='public' AND
         (table_name,column_name) IN (('StudySession','executionContext'),('StudySession','executionState'),('StudySession','runningSince'),
           ('StudySession','acceptedFocusAtResume'),('StudySession','acceptedBreakAtResume'),('Quest','plannerSpec'),('Quest','remainingDisposition'),
-          ('PlannerPlan','contractVersion'),('PlannerIntentVersion','artifact'),('PlannerAttempt','artifact'),('PlannerAttempt','payload'),
-          ('AiUsageLog','requestId'),('AiUsageLog','attemptId'),('AiUsageLog','accountingState'),('AiUsageLog','rootRequestId'),('AiUsageLog','reservation'))) = 16
+          ('PlannerPlan','contractVersion'),('PlannerPlan','conversation'),('PlannerPlan','researchDocuments'),('PlannerIntentVersion','artifact'),('PlannerAttempt','artifact'),('PlannerAttempt','payload'),
+          ('AiUsageLog','requestId'),('AiUsageLog','attemptId'),('AiUsageLog','accountingState'),('AiUsageLog','rootRequestId'),('AiUsageLog','reservation'))) = 18
       AND (SELECT count(*) FROM pg_trigger WHERE NOT tgisinternal AND tgenabled IN ('O','A') AND tgname IN
         ('planner_v2_intent_guard','planner_v2_attempt_guard','planner_v2_revision_guard','planner_v2_core_plan','planner_v2_core_link','planner_v2_core_revision',
         'planner_v2_execution_quest','planner_v2_execution_session','planner_v2_goal_guard','planner_v2_user_source','planner_v2_subject_source','planner_v2_node_source',
-        'planner_v2_rest_source','planner_v2_stats_source','planner_v2_inventory_source','planner_v2_owned_inventory_source')) = 16
+        'planner_v2_rest_source','planner_v2_stats_source','planner_v2_inventory_source','planner_v2_owned_inventory_source','planner_v2_conversation_guard')) = 17
       AND (SELECT count(*) FROM pg_constraint WHERE convalidated AND conname IN ('planner_working_intent_membership','planner_intent_parent_membership',
-        'planner_requested_intent_membership','planner_resolved_intent_membership','planner_v2_duration_bounds','planner_v2_session_bounds')) = 6
+        'planner_requested_intent_membership','planner_resolved_intent_membership','planner_v2_duration_bounds','planner_v2_session_bounds','planner_v2_conversation_envelope','planner_v2_documents_envelope')) = 8
       AND (SELECT count(*) FROM pg_class WHERE relname IN ('PlannerPlan','PlannerRevision','PlannerQuestLink','PlannerIntentVersion','PlannerAttempt') AND relrowsecurity) = 5 AS compatible`);
         this.compatible = compatibility[0].compatible;
         const age = this.compatible ? (await (0, database_1.rows)(this.attempts.db.pool, 'SELECT EXTRACT(EPOCH FROM (clock_timestamp()-(MIN("createdAt") AT TIME ZONE \'UTC\')))::int AS seconds FROM "PlannerAttempt" WHERE state=\'QUEUED\''))[0].seconds ?? 0 : 0;

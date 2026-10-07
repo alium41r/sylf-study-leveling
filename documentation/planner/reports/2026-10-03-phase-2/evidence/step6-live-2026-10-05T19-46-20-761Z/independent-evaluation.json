@@ -1,0 +1,373 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-05T19:54:54.322634+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-05T19-46-20-761Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "6f430bc0892440a82f96d538a11da89c6d24c94062bd30bf9d5f28df8b018402",
+  "method": "Separate Codex inspection of original goals, actual outputs, full dispositions, allocation, research provenance, quality findings and canonical receipts. Not model self-approval, an external human panel or Phase 5 held-out evidence.",
+  "sourceCorrespondence": {
+    "changedDuringRun": [],
+    "sourcePinnedRunStatus": "PASSED",
+    "historicalRunNotCurrentAcceptance": true
+  },
+  "productionPolicyQualified": false,
+  "temporaryRoute": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      "infeasible-zero-capacity",
+      "indivisible-checkpoint"
+    ],
+    "repairAndVerification": []
+  },
+  "operationalFailures": [],
+  "externalAttempts": 39,
+  "fallbackAttempts": 3,
+  "latency": {
+    "cases": 17,
+    "medianMs": 11861,
+    "p90Ms": 20249,
+    "maximumMs": 29073
+  },
+  "usage": {
+    "reportedInputTokens": 282404,
+    "reportedOutputTokens": 37561,
+    "usageMissingResponses": 0,
+    "settledCalls": 39,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 39,
+    "estimatedCostComplete": false
+  },
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 45-minute explain/work/independent changed-series-circuit task. Specific correct values and reasoning form the stopping criterion; later practice is unbooked and error-triggered. No ritual sequence or extra circuits after success.",
+      "evidence": {
+        "caseId": "tiny-exam",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 45,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The same goal with 480 rather than 120 available daily minutes still books one 45-minute integrated demonstration. No extra mandatory set or phase work. Stopping wording about correcting a failed idea remains a caveat; the actual completion criterion still requires the correctly solved/explained changed circuit.",
+      "evidence": {
+        "caseId": "tiny-roomy-exam",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 45,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "secure-topic",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Only one 30-minute four-part diagnostic is committed; specific failed-step correction is unbooked contingent work. No CREDITED disposition or verified mastery is inferred from confidence. Diagnostic attempts/errors can be recorded as evidence.",
+      "evidence": {
+        "caseId": "secure-topic",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 30,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "zero-new-work",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Explicit DEFERRED scope with the learner reason, no activities of any category, zero-minute strategy and zero executable Quests after canonical apply.",
+      "evidence": {
+        "caseId": "zero-new-work",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 0,
+        "actualQuests": 0,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "concept-foundation",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Current/potential-difference distinction and four conservation rules are explicitly derived, then two unseen mixed circuits require correct values with per-step reasoning. All three scope nodes survive; no timed-paper substitute. 150 minutes spans two distinct supported/independent contributions, with unbooked gap-triggered practice and honest arithmetic uncertainty.",
+      "evidence": {
+        "caseId": "concept-foundation",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 150,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "method-weakness",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "FAILED despite apply: 6\u20138 course circuits followed by another 3\u20134 create repeated mandatory application, and the final criterion only requires a log with recorded correctness. Every answer could be wrong while that criterion is satisfied, so accepted independent application is not evidenced. Zero-error logging and known-course method scope are improved but do not cure this criterion. The reviewer leaves repetition as WARNING and misses the final-capability defect.",
+      "evidence": {
+        "caseId": "method-weakness",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 90,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "triage",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Valid first blueprint and review, two actual 25-minute placements before the learner-local fixed quiz. All four scope dispositions/contributions survive; priority is explicitly prerequisite/integration value, not invented topic weights. Deeper variants, topic-specific volume and timed conditions are explicitly sacrificed. Capacity is not a promise of readiness.",
+      "evidence": {
+        "caseId": "triage",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 50,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "roadmap-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "A concrete CSV-reading/grouping/bad-row build precedes a changed-file run, with full four-node scope and no deadline. The changed-file run tests hidden assumptions rather than mere time spent. Reviewer repetition and unknown basic-Python/likely-effort warnings remain; the 30-minute build timebox is not evidence that its 70-minute likely task is complete.",
+      "evidence": {
+        "caseId": "roadmap-open",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 60,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT",
+          "REVIEW"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "mastery-open",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated labeled Bayes/base-rate/sensitivity worked example plus independent changed example, correct posteriors and explanation as criterion; actual confusion triggers unbooked correction. No readiness credit or deadline. 60-minute allocation versus 70/110 effort retains a completion/estimate warning; time spent is never the mastery criterion.",
+      "evidence": {
+        "caseId": "mastery-open",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 60,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "general-homework",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One 40-minute activity only for the three assigned equations, explicit negative distribution reasoning and substitution checks. No committed invented expressions/equations. The contingent response uses only the exact assigned equation that failed; a clean assignment stops all work.",
+      "evidence": {
+        "caseId": "general-homework",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 40,
+        "actualQuests": 1,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "BLUEPRINT",
+          "REVIEW"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "joint-prerequisite",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Two distinct CSV/JSON report goals, one loops/dictionary prerequisite owned by Plan 1, one actual root HARD edge, 165 total committed minutes counted once. The dependent Plan stays INCLUDED rather than falsely CREDITED. Actual allocation and atomic two-target ApplyService receipt preserve the graph. Estimate risk and basic-syntax uncertainty remain.",
+      "evidence": {
+        "caseId": "joint-prerequisite",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 165,
+        "actualQuests": 3,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "BLUEPRINT"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Positive required 30-minute method work retained under confirmed zero capacity, explicit CAPACITY_SHORTFALL with necessary upper bound zero. One actual KEEP adaptation preserves the original allocation/conflict and ends NEEDS_DECISION, zero Quests and no achievable-readiness claim. No REVISE/reallocation is falsely claimed for KEEP.",
+      "evidence": {
+        "caseId": "infeasible-zero-capacity",
+        "checkpointStage": "ALLOCATION",
+        "committedMinutes": 30,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "ADAPTATION",
+          "BLUEPRINT"
+        ],
+        "adaptation": "KEPT"
+      }
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "The authentic 45-minute uninterrupted measurement remains committed/unsplit against 30-minute daily capacity. One actual adaptation retains the duration and conflict; NEEDS_DECISION creates zero execution and does not substitute preparation or shrink the check.",
+      "evidence": {
+        "caseId": "indivisible-checkpoint",
+        "checkpointStage": "ALLOCATION",
+        "committedMinutes": 45,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "ADAPTATION",
+          "BLUEPRINT"
+        ],
+        "adaptation": "REVISED"
+      }
+    },
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual owned 419-character content/hash and literal Document-section excerpts support four adopted COURSE_OUTCOME claims, UNKNOWN issuer authority and non-assessment applicability. Independent verification rejects the extracted Sylf institution inference. Resolved adoption, owned claim/source references, original declared split receipts (40+30+20), grounded review and canonical apply complete. The note expressly requires a changed-data example. Unnecessary identity follow-up and orientation wording remain limitations.",
+      "evidence": {
+        "caseId": "owned-course-research",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 110,
+        "actualQuests": 4,
+        "applied": true,
+        "providerPurposes": [
+          "RESEARCH",
+          "REVIEW",
+          "RESEARCH",
+          "BLUEPRINT"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "contradictory-readiness",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Self-reported four-of-five errors are reconciled with the mastery claim. Diagnostic records honest failure/zero-error possibilities, actual failed methods trigger unbooked targeted correction, and a later fresh unaided check requires correct selection/reasons/results. No current CREDITED readiness. Contingent-remediation sequencing warning remains; its future activation does not happen automatically.",
+      "evidence": {
+        "caseId": "contradictory-readiness",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 60,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "BLUEPRINT",
+          "REVIEW"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "roadmap-large",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "All forty strategic scope contributions/dispositions and five meaningful later phases survive. Two integrated report-program tasks detail a next artifact checkpoint and later strategic effort stays forecast, not executable work. No deadline. Significant beginner support and 150/240-minute estimates versus 60-minute timeboxes remain explicit warnings; two booked blocks are not a completion promise or full-course qualification.",
+      "evidence": {
+        "caseId": "roadmap-large",
+        "checkpointStage": "REVIEW",
+        "committedMinutes": 120,
+        "actualQuests": 2,
+        "applied": true,
+        "providerPurposes": [
+          "REVIEW",
+          "REVIEW",
+          "BLUEPRINT"
+        ],
+        "adaptation": "NOT_REQUESTED"
+      }
+    },
+    {
+      "id": "public-assessment-research",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual public search/fetch/excerpts do not establish adopted applicable assessed scope for either requested Exam node. The authoritative verifier returns a consequential decision before blueprint/adoption/candidate/apply. Original provenance, uncertainty and retrieval limits remain; zero execution meets the registered acceptable unconfirmable outcome.",
+      "evidence": {
+        "caseId": "public-assessment-research",
+        "checkpointStage": "RESEARCH",
+        "committedMinutes": null,
+        "actualQuests": 0,
+        "applied": false,
+        "providerPurposes": [
+          "RESEARCH",
+          "RESEARCH"
+        ],
+        "adaptation": null
+      }
+    }
+  ],
+  "remainingGates": [
+    "Method-selection criterion/proportion",
+    "Actual named repair, exact independent verification and canonical apply",
+    "Fresh current-source complete corpus after correction"
+  ]
+}

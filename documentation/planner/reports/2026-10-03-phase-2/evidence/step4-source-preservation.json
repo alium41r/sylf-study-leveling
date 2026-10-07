@@ -1,0 +1,18 @@
+{
+  "status": "PASSED",
+  "baselineEntries": 2552,
+  "baselineCoverage": "Git-listed files excluding secret-like paths and Phase 2 evidence; not a full filesystem snapshot.",
+  "step4ExistingEdits": [
+    "documentation/planner/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json",
+    "lib/planner/v2/intelligence/schemas/checkpoint.ts",
+    "lib/planner/v2/server/attempts.ts"
+  ],
+  "derivedWorkerChanges": [
+    "dist/planner-worker/planner/v2/intelligence/schemas/checkpoint.js"
+  ],
+  "unrelatedConcurrentChanges": [],
+  "unrelatedNewFiles": [],
+  "unrelatedLandingUnchanged": true
+}

@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.projectPlannerInterviewContext = void 0;
 exports.projectPlannerContext = projectPlannerContext;
 exports.loadPlannerModelContext = loadPlannerModelContext;
+exports.loadPlannerInterviewContext = loadPlannerInterviewContext;
 const contracts_1 = require("../contracts");
 const database_1 = require("../server/database");
 const intents_1 = require("../server/intents");
@@ -10,7 +12,7 @@ const context_1 = require("../server/context");
 const scheduling_1 = require("./schemas/scheduling");
 /** Call only with the owned snapshot loaded by the V2 context owner. The
  * registry stays server-side: models refer to local aliases, never mint IDs. */
-function projectPlannerContext(context, targets, window, options = {}) {
+function projectContext(context, targets, window, options = {}, interview = false) {
     if (!targets.length || targets.length > 2 || new Set(targets.map(t => t.planId)).size !== targets.length ||
         new Set(targets.map(t => t.planRef)).size !== targets.length || targets.some(t => !/^[a-zA-Z][a-zA-Z0-9_]{0,79}$/.test(t.planRef)))
         (0, database_1.reject)("INVALID_OUTPUT", "Context targets need distinct owned plans and local references.", "PREFLIGHT");
@@ -25,9 +27,9 @@ function projectPlannerContext(context, targets, window, options = {}) {
     if (!Number.isSafeInteger(maxBytes) || maxBytes < 1024 || maxBytes > 4 * 1024 * 1024)
         (0, database_1.reject)("INVALID_OUTPUT", "Invalid model context byte allowance.", "PREFLIGHT");
     const availability = context.globalAvailability ?? options.provisionalAvailability;
-    if (!availability || availability.timezone !== context.timezone || !context.globalAvailability && availability.basis !== "DISCLOSED_PROVISIONAL_CEILING")
+    if ((!availability && !interview) || availability && (availability.timezone !== context.timezone || !context.globalAvailability && availability.basis !== "DISCLOSED_PROVISIONAL_CEILING"))
         (0, database_1.reject)("CAPACITY_SHORTFALL", "Context needs confirmed availability or an explicitly disclosed provisional ceiling in the student's timezone.", "PREFLIGHT");
-    if (context.legacyExceptions.length)
+    if (context.legacyExceptions.length && !interview)
         (0, database_1.reject)("CAPACITY_SHORTFALL", "Resolve unknown legacy commitments before projecting capacity.", "PREFLIGHT");
     const targetById = new Map(targets.map(t => [t.planId, t]));
     const specs = new Map(context.quests.filter(q => q.plannerSpec).map(q => [q.id, contracts_1.ExecutionTaskSpecV2Schema.parse(q.plannerSpec)]));
@@ -36,11 +38,11 @@ function projectPlannerContext(context, targets, window, options = {}) {
     const byQuest = new Map(registry.map(r => [r.questId, r.ref]));
     const byActivity = new Map(registry.filter(r => r.activityKey).map(r => [r.activityKey, r.ref]));
     const liveSessions = context.sessions.filter(s => !s.endedAt || s.executionState === "RUNNING" || s.executionState === "PAUSED");
-    if (liveSessions.some(s => !s.executionState))
+    if (liveSessions.some(s => !s.executionState) && !interview)
         (0, database_1.reject)("PROTECTED_EXECUTION", "An older timer must be explicitly stopped before this context can be used.", "PREFLIGHT");
     const sessionRegistry = liveSessions.map((s, i) => ({ ref: `session_${i + 1}`, sessionId: s.id }));
     const runningSessions = liveSessions.map((s, i) => ({ ref: sessionRegistry[i].ref, executionRef: s.questId === null ? null : byQuest.get(s.questId) ?? null,
-        state: s.executionState, executionVersion: s.executionVersion, acceptedFocusSeconds: s.durationSeconds, acceptedBreakSeconds: s.breakSeconds,
+        state: s.executionState ?? "UNKNOWN_LEGACY_TIMER", executionVersion: s.executionVersion, acceptedFocusSeconds: s.durationSeconds, acceptedBreakSeconds: s.breakSeconds,
         actualCivilDate: s.executionContext?.actualCivilDate ?? (0, context_1.civilDate)(s.startedAt, context.timezone),
         startedAt: s.startedAt.toISOString(), runningSince: s.runningSince?.toISOString() ?? null,
         accounting: "ALREADY_INCLUDED_IN_ACCEPTED_ACTUALS" }));
@@ -52,7 +54,7 @@ function projectPlannerContext(context, targets, window, options = {}) {
                 own.some(s => s.executionState === "PAUSED") ? "PAUSED" : q.elapsedSeconds > 0 || own.length > 0 || q.status === "IN_PROGRESS" ? "ENDED_INCOMPLETE" : "UNSTARTED";
             return { ref: byQuest.get(q.id), planRef: null, source: "LEGACY_EXECUTION",
                 title: q.title, instructions: q.description, state, protected: state !== "UNSTARTED" || q.executionVersion > 0, actualSeconds: q.elapsedSeconds,
-                remainingMinutes: q.remainingDisposition === "OPEN" ? Math.max(1, Math.ceil(q.requiredMinutes - q.elapsedSeconds / 60)) : 0,
+                remainingMinutes: q.remainingDisposition === "OPEN" ? Number.isSafeInteger(q.requiredMinutes) && q.requiredMinutes > 0 ? Math.max(1, Math.ceil(q.requiredMinutes - q.elapsedSeconds / 60)) : null : 0,
                 date: q.scheduledFor, remainingDisposition: q.remainingDisposition, executionVersion: q.executionVersion };
         }
         const live = (0, context_1.liveExecution)(q, context.sessions);
@@ -80,22 +82,22 @@ function projectPlannerContext(context, targets, window, options = {}) {
     const days = Array.from({ length: span }, (_, i) => {
         const date = new Date(Date.parse(window.start) + i * 86400000).toISOString().slice(0, 10);
         const index = (0, context_1.mondayIndex)(date);
-        const ceilingMinutes = availability.dailyCeilingMinutes[index];
+        const ceilingMinutes = availability?.dailyCeilingMinutes[index] ?? 0;
         const excluded = context.restDays.includes((index + 1) % 7) || context.floatingDates.includes(date) ||
-            availability.restWeekdays.includes(index) || availability.blockedDates.includes(date) ||
+            availability?.restWeekdays.includes(index) || availability?.blockedDates.includes(date) ||
             targets.every(t => t.intent.deadline.kind === "FIXED" && (date > t.intent.deadline.date || date === t.intent.deadline.date && !t.intent.deadline.examDayStudyAllowed));
         const otherCommittedMinutes = (ledger.otherRemaining.get(date) ?? 0) + Math.ceil((ledger.actualSeconds.get(date) ?? 0) / 60);
         const protectedTargetMinutes = protectedExecution.filter(e => e.date === date).reduce((n, e) => n + e.remainingMinutes, 0);
-        const recoveryMinutes = Math.ceil(ceilingMinutes * availability.recoveryPercent / 100);
+        const recoveryMinutes = Math.ceil(ceilingMinutes * (availability?.recoveryPercent ?? 0) / 100);
         return { date, ceilingMinutes, otherCommittedMinutes, protectedTargetMinutes, recoveryMinutes,
             availableMinutes: excluded ? 0 : Math.max(0, ceilingMinutes - otherCommittedMinutes - protectedTargetMinutes - recoveryMinutes), excluded };
     });
-    const envelope = scheduling_1.SchedulingEnvelopeSchema.parse({ schemaVersion: 2, timezone: context.timezone, today: context.today, window,
+    const envelope = availability && !context.legacyExceptions.length ? scheduling_1.SchedulingEnvelopeSchema.parse({ schemaVersion: 2, timezone: context.timezone, today: context.today, window,
         capacityDigest: context.dependencies.capacityDigest, basis: availability.basis,
         weeklyCeilingMinutes: availability.weeklyCeilingMinutes ?? availability.dailyCeilingMinutes.reduce((a, b) => a + b, 0),
         recoveryPercent: availability.recoveryPercent, targets: targets.map(t => ({ planRef: t.planRef, deadline: t.intent.deadline,
             perGoalWeeklyCeilingMinutes: t.intent.availability?.perGoalWeeklyCeilingMinutes ?? null })), days, protectedExecution,
-        timeboxRange: { minMinutes: 5, maxMinutes: 240 } });
+        timeboxRange: { minMinutes: 5, maxMinutes: 240 } }) : null;
     const plans = targets.map(t => {
         const { scope, evidence, research, ...intent } = t.intent;
         delete intent.subjectId;
@@ -104,9 +106,9 @@ function projectPlannerContext(context, targets, window, options = {}) {
         const learning = evidence.map(e => ({ ...e, scopeKeys: undefined, scopeRefs: e.scopeKeys.map(key => scopeRef.get(key)) }));
         // Legacy check item keys cannot be assumed to be V2 activity/scope keys.
         // Keep unresolved provenance visible rather than inventing a scope match.
-        const savedChecks = (context.checks ?? []).filter(c => c.planId === t.planId).map((c, i) => {
+        const savedChecks = (0, context_1.savedCheckReferences)(context, t.planId).map(({ check: c, ref }) => {
             const matches = context.quests.filter(q => { const s = specs.get(q.id); return s?.planId === t.planId && s.activityKey === c.itemKey; });
-            return { ref: `saved_check_${i + 1}`, source: "CHECK_RESULT", reliability: "SELF_REPORTED", result: c.result,
+            return { ref, source: "CHECK_RESULT", reliability: "SELF_REPORTED", result: c.result,
                 observedAt: c.updatedAt.toISOString(), recordedAt: c.createdAt.toISOString(),
                 sourceRevisionDigest: (0, database_1.hash)("check-revision", c.revisionId), sourceItemDigest: (0, database_1.hash)("check-item", c.itemKey),
                 scopeRefs: matches.length === 1 ? specs.get(matches[0].id).content.scopeRefs : [],
@@ -145,6 +147,9 @@ function projectPlannerContext(context, targets, window, options = {}) {
         protectedTargetMinutes: protectedExecution.filter(e => (0, context_1.weekKey)(e.date) === week).reduce((sum, e) => sum + e.remainingMinutes, 0),
         perGoalCommittedMinutes: targets.map(t => { const goalId = t.goalId ?? t.intent.goalId; return { planRef: t.planRef, minutes: goalId ? ledger.perGoal.get(`${goalId}/${week}`) ?? 0 : 0 }; }) }));
     const view = { schemaVersion: 2, projectedAt: context.now.toISOString(), authority: "EXECUTION_CONTEXT", envelope, weeks, plans, execution, runningSessions,
+        ...(interview ? { capacityStatus: envelope ? "ACCEPTED_CEILING" : "UNRESOLVED_CAPACITY", timezone: context.timezone,
+            restDays: context.restDays, floatingDates: context.floatingDates,
+            unresolvedCommitments: context.legacyExceptions.map(e => ({ ref: byQuest.get(e.questId) ?? null, reason: e.reason })) } : {}),
         actuals: days.map(d => ({ date: d.date, acceptedSeconds: ledger.actualSeconds.get(d.date) ?? 0 })),
         academicSources: (options.academicSources ?? (context.academicSource ? [{ planId: targets[0].planId, source: context.academicSource }] : [])).map(({ planId, source }) => {
             const target = targetById.get(planId);
@@ -192,9 +197,17 @@ function projectPlannerContext(context, targets, window, options = {}) {
         (0, database_1.reject)("PAYLOAD_TOO_LARGE", "Required execution and learning evidence exceed the model context allowance; narrow the request.", "PREFLIGHT");
     return { view, registry, sessionRegistry, bytes, digest: (0, database_1.hash)("model-context", { ...view, projectedAt: null }) };
 }
+function projectPlannerContext(context, targets, window, options = {}) {
+    const projection = projectContext(context, targets, window, options);
+    if (!projection.view.envelope)
+        (0, database_1.reject)("CAPACITY_SHORTFALL", "An accepted capacity envelope is required.", "PREFLIGHT");
+    return { ...projection, view: { ...projection.view, envelope: projection.view.envelope } };
+}
+const projectPlannerInterviewContext = (context, targets, window, options = {}) => projectContext(context, targets, window, options, true);
+exports.projectPlannerInterviewContext = projectPlannerInterviewContext;
 /** Use within the existing owner-coordinated transaction. Each target keeps its
  * own evidence/dependency seal; joint requests share complete execution facts. */
-async function loadPlannerModelContext(sql, ownerId, requested, window, options = {}) {
+async function loadContextSnapshot(sql, ownerId, requested, window, options = {}) {
     if (!requested.length || requested.length > 2 || new Set(requested.map(t => t.planId)).size !== requested.length)
         (0, database_1.reject)("INVALID_OUTPUT", "Select one or two distinct context targets.", "PREFLIGHT");
     const plans = [];
@@ -221,5 +234,13 @@ async function loadPlannerModelContext(sql, ownerId, requested, window, options 
         if (context.academicSource)
             academicSources.push({ planId: plan.id, source: context.academicSource });
     }
-    return { ...projectPlannerContext(contexts[0].context, targets, window, { ...options, academicSources }), contexts };
+    return { targets, contexts, academicSources, options };
+}
+async function loadPlannerModelContext(sql, ownerId, requested, window, options = {}) {
+    const snapshot = await loadContextSnapshot(sql, ownerId, requested, window, options);
+    return { ...projectPlannerContext(snapshot.contexts[0].context, snapshot.targets, window, { ...options, academicSources: snapshot.academicSources }), contexts: snapshot.contexts };
+}
+async function loadPlannerInterviewContext(sql, ownerId, requested, window, options = {}) {
+    const snapshot = await loadContextSnapshot(sql, ownerId, requested, window, options);
+    return { ...(0, exports.projectPlannerInterviewContext)(snapshot.contexts[0].context, snapshot.targets, window, { ...options, academicSources: snapshot.academicSources }), contexts: snapshot.contexts };
 }

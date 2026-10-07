@@ -19,6 +19,8 @@ export interface DeepSeekAdapterOptions {
    * rejects the param, the request retries automatically without it.
    */
   thinking?: "enabled" | "disabled";
+  /** Omission preserves existing routing/provider defaults. */
+  reasoningEffort?: "low" | "high" | "max";
   /** Aborts the upstream HTTP request immediately when signalled. */
   signal?: AbortSignal;
   /** Caller owns the bounded repair/fallback budget. */
@@ -212,6 +214,7 @@ export class DeepSeekAdapter implements LLMAdapter {
     if (options?.thinking) {
       payload.thinking = { type: options.thinking };
     }
+    if (options?.reasoningEffort) payload.reasoning_effort = options.reasoningEffort;
 
     const doRequest = async (reqPayload: Record<string, any>): Promise<any> => {
       const endpoint = `${this.baseURL}/chat/completions`;

@@ -24,6 +24,20 @@ const arguments_ = process.argv.slice(2);
 const browserRequested = arguments_.includes("--browser");
 if (browserRequested) arguments_.splice(arguments_.indexOf("--browser"), 1);
 let nativeBin;
+const liveQualification = arguments_.includes("--live-qualification");
+if(liveQualification)arguments_.splice(arguments_.indexOf("--live-qualification"),1);
+const liveNonGemini=arguments_.includes("--live-non-gemini");
+if(liveNonGemini){if(!liveQualification)throw new Error("Non-Gemini override is qualification-only");arguments_.splice(arguments_.indexOf("--live-non-gemini"),1);}
+const liveLowReasoning=arguments_.includes("--live-low-reasoning");
+if(liveLowReasoning){if(!liveQualification||!liveNonGemini)throw new Error("Low-reasoning trial requires explicit non-Gemini live qualification");arguments_.splice(arguments_.indexOf("--live-low-reasoning"),1);}
+let liveTemperature;
+if(arguments_.includes("--live-temperature")){const i=arguments_.indexOf("--live-temperature");liveTemperature=arguments_[i+1];if(!liveQualification||!liveNonGemini||liveLowReasoning||!['0.2','0.7'].includes(liveTemperature))throw new Error("Only explicit recorded non-thinking qualification sampling trials are permitted");arguments_.splice(i,2);}
+let liveReviewTemperature;
+if(arguments_.includes("--live-review-temperature")){const i=arguments_.indexOf("--live-review-temperature");liveReviewTemperature=arguments_[i+1];if(!liveQualification||!liveNonGemini||liveLowReasoning||liveTemperature!=="0.7"||liveReviewTemperature!=="0.2")throw new Error("Review sampling requires explicit non-thinking 0.7 generation and 0.2 review");arguments_.splice(i,2);}
+let liveCases;
+if(arguments_.includes("--live-cases")){const i=arguments_.indexOf("--live-cases");liveCases=arguments_[i+1];if(!liveQualification||!liveCases||!/^[-a-z0-9]+(?:,[-a-z0-9]+)*$/.test(liveCases))throw new Error("Explicit live case IDs required");arguments_.splice(i,2);}
+let liveRepetitions;
+if(arguments_.includes("--live-repetitions")){const i=arguments_.indexOf("--live-repetitions");liveRepetitions=arguments_[i+1];if(!liveQualification||!liveCases||!['1','2','3'].includes(liveRepetitions))throw new Error("Repeated qualification requires selected cases and one to three fresh-root trials");arguments_.splice(i,2);}
 const extraSuites = [];
 while (arguments_.length) {
   const flag = arguments_.shift(); const value = arguments_.shift();
@@ -102,6 +116,7 @@ const migrationNames = [
   "20260927090000_planner_user_released_disposition",
   "20260927100000_planner_reoffer_state",
   "20261002000000_planner_v2_durable_core",
+  "20261004000000_planner_v2_assistant_documents",
 ];
 const currentRequired = [
   "database.test.ts", "database-check-result.test.ts", "database-intake-session.test.ts",
@@ -132,7 +147,10 @@ function checkReport(label, reportPath, expectedFiles, commandError) {
     failures: failed.map(test => ({ name: test.fullName, messages: test.failureMessages?.map(safe) })),
   };
   outcome.requiredResults.push(summary); outcome.requiredSkippedTests += forbidden.length;
-  writeFileSync(join(evidence, `postgres-${label}-results.json`), JSON.stringify(summary, null, 2) + "\n");
+  const suites = files.map(file => ({ name: safe(file.name),
+    cases: (file.assertionResults ?? []).map(test => ({ name: safe(test.fullName), status: test.status })),
+  }));
+  writeFileSync(join(evidence, `postgres-${label}-results.json`), JSON.stringify({ ...summary, suites }, null, 2) + "\n");
   if (!passed.length || forbidden.length || failed.length || commandError || files.some(file => file.status === "failed")) {
     // Preserve actionable diagnostics before removing the disposable cluster.
     // Runtime URLs/passwords and the marker are scrubbed by the same boundary.
@@ -222,13 +240,20 @@ CREATE PUBLICATION supabase_realtime;\n`;
   let newError;
   run(process.execPath, ["scripts/build-planner-worker.mjs"]);
   const newReport = join(temporary, "phase1-report.json");
-  try { run(join(root, "node_modules/.bin/vitest"), ["run", "--config", "vitest.planner-v2-postgres.config.ts", "--reporter=json", "--outputFile", newReport], { env: childEnvironment, timeout: 180_000 }); }
+  try { run(join(root, "node_modules/.bin/vitest"), ["run", "--config", "vitest.planner-v2-postgres.config.ts",...(liveQualification?["--exclude","__tests__/planner-v2/postgres/maximum-envelope.postgres.ts"]:[]), "--reporter=json", "--outputFile", newReport], { env: childEnvironment, timeout: 600_000 }); }
   catch (error) { newError = error; }
+  if(newError)writeFileSync(join(evidence,"postgres-phase1-command-error.json"),JSON.stringify({code:newError.code,signal:newError.signal,killed:newError.killed,stderr:safe(String(newError.stderr??"")),stdoutTail:safe(String(newError.stdout??"").slice(-16000))},null,2)+"\n");
   checkReport("phase1", newReport, ["__tests__/planner-v2/postgres/durable-core.postgres.ts", "__tests__/planner-v2/postgres/accounting.postgres.ts", "__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts", "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts", "__tests__/planner-v2/postgres/worker-runtime.postgres.ts", "__tests__/planner-v2/postgres/current-sql-invariants.postgres.ts", "__tests__/planner-v2/postgres/separate-connection-concurrency.postgres.ts", ...extraSuites], newError);
   const currentReport = join(temporary, "current-report.json"); let currentError;
   try { run(join(root, "node_modules/.bin/vitest"), ["run", "--no-file-parallelism", "--exclude", "scratch/**", "--reporter=json", "--outputFile", currentReport, ...currentRequired], { env: childEnvironment, timeout: 240_000 }); }
   catch (error) { currentError = error; }
   checkReport("current", currentReport, currentRequired, currentError);
+  if(liveQualification){
+    const liveReport=join(temporary,"live-report.json");let liveError;
+    try { run(join(root,"node_modules/.bin/vitest"),["run","--config","vitest.planner-v2-live.config.ts","--reporter=json","--outputFile",liveReport],{env:{...childEnvironment,PLANNER_PHASE2_LIVE_REQUIRED:"true",PLANNER_PHASE2_LIVE_EVIDENCE:evidence,...(liveCases?{PLANNER_PHASE2_LIVE_CASES:liveCases}:{}),...(liveRepetitions?{PLANNER_PHASE2_LIVE_REPETITIONS:liveRepetitions}:{}),...(liveNonGemini?{PLANNER_PHASE2_LIVE_NON_GEMINI:"true"}:{}),...(liveLowReasoning?{PLANNER_PHASE2_LIVE_LOW_REASONING:"true"}:{}),...(liveTemperature?{PLANNER_PHASE2_LIVE_TEMPERATURE:liveTemperature}:{}),...(liveReviewTemperature?{PLANNER_PHASE2_LIVE_REVIEW_TEMPERATURE:liveReviewTemperature}:{})},timeout:1800000}); }
+    catch(error){liveError=error;}
+    checkReport("live",liveReport,["__tests__/planner-v2/postgres/compiler-qualification.live.ts"],liveError);
+  }
   if (browserRequested) {
     if (!existsSync(browserFixture)) throw new Error("Browser fixture missing; qualification cannot be skipped.");
     const fixture = JSON.parse(readFileSync(browserFixture, "utf8"));

@@ -8,6 +8,7 @@ exports.appendIntent = appendIntent;
 const node_crypto_1 = require("node:crypto");
 const contracts_1 = require("../contracts");
 const database_1 = require("./database");
+const documents_1 = require("./documents");
 const attempts_1 = require("./attempts");
 async function ownedPlan(sql, ownerId, planId) {
     const plan = (await (0, database_1.rows)(sql, 'SELECT * FROM "PlannerPlan" WHERE id=$1::uuid AND "userId"=$2 FOR UPDATE', [planId, ownerId]))[0];
@@ -29,12 +30,8 @@ async function verifyIntentReferences(sql, ownerId, intent) {
         if (id && !(await (0, database_1.rows)(sql, `SELECT id FROM "${table}" WHERE id=$1 AND "userId"=$2`, [id, ownerId])).length)
             (0, database_1.reject)("REFERENCE_NOT_OWNED", "A selected reference is unavailable.");
     }
-    for (const source of intent.research?.sources ?? []) {
-        // Upload storage is a later research boundary. A number supplied in JSON is
-        // not proof that a document exists or belongs to this student.
-        if (source.location.kind === "OWNED_DOCUMENT")
-            (0, database_1.reject)("REFERENCE_NOT_OWNED", "Document adoption requires the verified upload repository; caller-supplied ownership is insufficient.", "RESEARCH");
-    }
+    if (intent.research)
+        await (0, documents_1.verifyOwnedResearchDocuments)(sql, ownerId, intent.research);
 }
 /** Public intent input can report preferences/knowledge, but cannot mint
  * verified research or observed execution. Trusted fenced adoption has its own
@@ -65,28 +62,30 @@ class IntentService {
         this.db = db;
     }
     async create(ownerId, key, raw) {
+        return this.db.coordinated(ownerId, sql => this.createAccepted(sql, ownerId, key, raw));
+    }
+    /** Called only inside the existing coordinated owner transaction. */
+    async createAccepted(sql, ownerId, key, raw) {
         const intent = contracts_1.CanonicalIntentV2Schema.parse(raw);
         if (!/^[A-Za-z0-9_-]{8,100}$/.test(key))
             (0, database_1.reject)("INVALID_OUTPUT", "Invalid request identity.");
         const requestHash = (0, database_1.hash)("create-plan", intent);
-        return this.db.coordinated(ownerId, async (sql) => {
-            const existing = (await (0, database_1.rows)(sql, 'SELECT * FROM "PlannerPlan" WHERE "userId"=$1 AND "creationKey"=$2 FOR UPDATE', [ownerId, key]))[0];
-            if (existing) {
-                if (existing.creationHash !== requestHash || existing.contractVersion !== 2)
-                    (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "This request key belongs to different input.");
-                const initial = (await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerIntentVersion" WHERE "planId"=$1 AND version=1', [existing.id]))[0];
-                return { plan: existing, intent: await loadIntent(sql, ownerId, initial.id) };
-            }
-            verifyClientIntentFacts(intent);
-            await verifyIntentReferences(sql, ownerId, intent);
-            const reserved = intent.goalId ?? Number((await (0, database_1.rows)(sql, `SELECT nextval(pg_get_serial_sequence('"Goal"','id')) AS id`))[0].id);
-            if (intent.goalId && (await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerPlan" WHERE "userId"=$1 AND ("goalId"=$2 OR "reservedGoalId"=$2)', [ownerId, reserved])).length)
-                (0, database_1.reject)("INTENT_CONFLICT", "This goal already belongs to a plan.");
-            const id = (0, node_crypto_1.randomUUID)();
-            await sql.query('INSERT INTO "PlannerPlan" (id,"userId",mode,title,state,"subjectId","goalId",version,"creationKey","creationHash","contractVersion","reservedGoalId","updatedAt") VALUES ($1,$2,$3,$4,\'DRAFT\',$5,$6,0,$7,$8,2,$9,clock_timestamp())', [id, ownerId, intent.policy, intent.title, intent.subjectId ?? null, intent.goalId ?? null, key, requestHash, reserved]);
-            const artifact = await appendIntent(sql, await ownedPlan(sql, ownerId, id), intent, "INITIAL");
-            return { plan: await ownedPlan(sql, ownerId, id), intent: artifact };
-        });
+        const existing = (await (0, database_1.rows)(sql, 'SELECT * FROM "PlannerPlan" WHERE "userId"=$1 AND "creationKey"=$2 FOR UPDATE', [ownerId, key]))[0];
+        if (existing) {
+            if (existing.creationHash !== requestHash || existing.contractVersion !== 2)
+                (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "This request key belongs to different input.");
+            const initial = (await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerIntentVersion" WHERE "planId"=$1 AND version=1', [existing.id]))[0];
+            return { plan: existing, intent: await loadIntent(sql, ownerId, initial.id) };
+        }
+        verifyClientIntentFacts(intent);
+        await verifyIntentReferences(sql, ownerId, intent);
+        const reserved = intent.goalId ?? Number((await (0, database_1.rows)(sql, `SELECT nextval(pg_get_serial_sequence('"Goal"','id')) AS id`))[0].id);
+        if (intent.goalId && (await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerPlan" WHERE "userId"=$1 AND ("goalId"=$2 OR "reservedGoalId"=$2)', [ownerId, reserved])).length)
+            (0, database_1.reject)("INTENT_CONFLICT", "This goal already belongs to a plan.");
+        const id = (0, node_crypto_1.randomUUID)();
+        await sql.query('INSERT INTO "PlannerPlan" (id,"userId",mode,title,state,"subjectId","goalId",version,"creationKey","creationHash","contractVersion","reservedGoalId","updatedAt") VALUES ($1,$2,$3,$4,\'DRAFT\',$5,$6,0,$7,$8,2,$9,clock_timestamp())', [id, ownerId, intent.policy, intent.title, intent.subjectId ?? null, intent.goalId ?? null, key, requestHash, reserved]);
+        const artifact = await appendIntent(sql, await ownedPlan(sql, ownerId, id), intent, "INITIAL");
+        return { plan: await ownedPlan(sql, ownerId, id), intent: artifact };
     }
     async archive(ownerId, planId, expectedVersion) {
         return this.db.coordinated(ownerId, async (sql) => {
@@ -103,22 +102,24 @@ class IntentService {
         });
     }
     async edit(ownerId, planId, expectedVersion, expectedIntentId, raw) {
+        return this.db.coordinated(ownerId, sql => this.editAccepted(sql, ownerId, planId, expectedVersion, expectedIntentId, raw));
+    }
+    /** Final accepted intent and generation admission share this same transaction. */
+    async editAccepted(sql, ownerId, planId, expectedVersion, expectedIntentId, raw) {
         const intent = contracts_1.CanonicalIntentV2Schema.parse(raw);
-        return this.db.coordinated(ownerId, async (sql) => {
-            const plan = await ownedPlan(sql, ownerId, planId);
-            if (plan.contractVersion !== 2 || plan.state === "ARCHIVED" || plan.version !== expectedVersion || plan.workingIntentVersionId !== expectedIntentId)
-                (0, database_1.reject)("INTENT_CONFLICT", "The plan changed. Reload its current intent.");
-            if ((intent.goalId ?? null) !== plan.goalId && intent.goalId !== undefined)
-                (0, database_1.reject)("INTENT_CONFLICT", "A plan cannot silently change its execution goal.");
-            const previous = await loadIntent(sql, ownerId, expectedIntentId);
-            verifyClientIntentFacts(intent, previous.intent);
-            if ((0, database_1.hash)("canonical-intent", previous.intent) === (0, database_1.hash)("canonical-intent", intent))
-                return previous;
-            const artifact = await appendIntent(sql, plan, intent, "USER_EDIT");
-            await sql.query('UPDATE "PlannerPlan" SET version=version+1 WHERE id=$1', [planId]);
-            await (0, attempts_1.supersedePlanAttempts)(sql, ownerId, [planId]);
-            return artifact;
-        });
+        const plan = await ownedPlan(sql, ownerId, planId);
+        if (plan.contractVersion !== 2 || plan.state === "ARCHIVED" || plan.version !== expectedVersion || plan.workingIntentVersionId !== expectedIntentId)
+            (0, database_1.reject)("INTENT_CONFLICT", "The plan changed. Reload its current intent.");
+        if ((intent.goalId ?? null) !== plan.goalId && intent.goalId !== undefined)
+            (0, database_1.reject)("INTENT_CONFLICT", "A plan cannot silently change its execution goal.");
+        const previous = await loadIntent(sql, ownerId, expectedIntentId);
+        verifyClientIntentFacts(intent, previous.intent);
+        if ((0, database_1.hash)("canonical-intent", previous.intent) === (0, database_1.hash)("canonical-intent", intent))
+            return previous;
+        const artifact = await appendIntent(sql, plan, intent, "USER_EDIT");
+        await sql.query('UPDATE "PlannerPlan" SET version=version+1 WHERE id=$1', [planId]);
+        await (0, attempts_1.supersedePlanAttempts)(sql, ownerId, [planId]);
+        return artifact;
     }
 }
 exports.IntentService = IntentService;

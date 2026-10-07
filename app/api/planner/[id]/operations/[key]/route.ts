@@ -12,6 +12,7 @@ export function GET(req: Request, ctx: Context) {
     const { id, key } = await ctx.params;
     if (isDurablePlannerRequest(req)) {
       const attempt = await durablePlanner().attempts.read(userId, DurableIdV2Schema.parse(key));
+      if(attempt.kind==="RESEARCH_ADVICE")return durablePlanner().research.readAdvice(userId,id,key);
       if (!attempt.targets.some(target => target.planId === id)) reject("REFERENCE_NOT_OWNED", "This operation does not belong to the selected plan.");
       return attempt;
     }
@@ -25,6 +26,7 @@ export function POST(req: Request, ctx: Context) {
       z.strictObject({ schemaVersion: z.literal(2), action: z.literal("CANCEL") }).parse(await readBody(req, PLANNER_V2_ENVELOPE.serializedBytes));
       const { id, key } = await ctx.params; const core = durablePlanner();
       const attempt = await core.attempts.read(userId, DurableIdV2Schema.parse(key));
+      if(attempt.kind==="RESEARCH_ADVICE") {await core.research.readAdvice(userId,id,key);return core.attempts.cancel(userId,key);}
       if (!attempt.targets.some(target => target.planId === id)) reject("REFERENCE_NOT_OWNED", "This operation does not belong to the selected plan.");
       return core.attempts.cancel(userId, key);
     }

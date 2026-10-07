@@ -1,0 +1,41 @@
+{
+  "status": "PASSED",
+  "baselineEntries": 2496,
+  "baselineCoverage": "Git-listed files excluding secret-like paths and Phase 2 evidence; not a full filesystem snapshot.",
+  "step3ExistingEdits": [
+    "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts",
+    "app/api/planner/[id]/operations/[key]/route.ts",
+    "documentation/planner/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json",
+    "lib/planner/import/pdf.ts",
+    "lib/planner/research/authority.ts",
+    "lib/planner/research/evidence.ts",
+    "lib/planner/research/search/contracts.ts",
+    "lib/planner/research/search/fetch.ts",
+    "lib/planner/research/search/provider.ts",
+    "lib/planner/v2/intelligence/context.ts",
+    "lib/planner/v2/intelligence/provider.ts",
+    "lib/planner/v2/server/accounting.ts",
+    "lib/planner/v2/server/attempts.ts",
+    "lib/planner/v2/server/intents.ts",
+    "lib/planner/v2/server/revisions.ts",
+    "lib/planner/v2/server/web.ts",
+    "lib/planner/v2/server/worker.ts",
+    "lib/prisma.ts",
+    "prisma/schema.prisma",
+    "scripts/test-planner-v2-phase1-postgres.mjs"
+  ],
+  "derivedWorkerChanges": [
+    "dist/planner-worker/planner/v2/intelligence/context.js",
+    "dist/planner-worker/planner/v2/intelligence/provider.js",
+    "dist/planner-worker/planner/v2/server/accounting.js",
+    "dist/planner-worker/planner/v2/server/attempts.js",
+    "dist/planner-worker/planner/v2/server/intents.js",
+    "dist/planner-worker/planner/v2/server/revisions.js",
+    "dist/planner-worker/planner/v2/server/worker.js"
+  ],
+  "unrelatedConcurrentChanges": [],
+  "unrelatedNewFiles": [],
+  "unrelatedLandingUnchanged": true
+}

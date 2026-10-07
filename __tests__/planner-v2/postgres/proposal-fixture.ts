@@ -5,12 +5,12 @@ import { AttemptService, newBudget } from "@/lib/planner/v2/server/attempts";
 import { RevisionService, revisionDigest, educationalDigest, qualityEvidenceDigest, loadRevision } from "@/lib/planner/v2/server/revisions";
 import { loadExecutionContext, specDigest, contentDigest } from "@/lib/planner/v2/server/context";
 import { PlannerDatabase } from "@/lib/planner/v2/server/database";
-import { compareExecutionSpecs, ExecutionTaskSpecV2Schema, type PlannerRevisionV2, type ExecutionTaskSpecV2, type SealedSemanticDiffEntryV2 } from "@/lib/planner/v2/contracts";
+import { compareExecutionSpecs, ExecutionTaskSpecV2Schema, type PlannerRevisionV2, type ExecutionTaskSpecV2, type PlanChangeSetV2, type SealedSemanticDiffEntryV2 } from "@/lib/planner/v2/contracts";
 import { rows } from "@/lib/planner/v2/server/database";
 
 /** Contract-valid trusted compiler stand-in, no AI/provider/prompt. Exercises
  * the real repositories, publication, apply and state correspondence. */
-export async function prepareProposal(db: PlannerDatabase, ownerId: number, planIds: string[], mutate?: (specs: ExecutionTaskSpecV2[], planIndex: number) => void, mutateRevision?: (revision: PlannerRevisionV2, planIndex: number) => void) {
+export async function prepareProposal(db: PlannerDatabase, ownerId: number, planIds: string[], mutate?: (specs: ExecutionTaskSpecV2[], planIndex: number) => void, mutateRevision?: (revision: PlannerRevisionV2, planIndex: number) => void, mutateChangeSet?: (changeSet: PlanChangeSetV2) => void) {
   const attempts = new AttemptService(db); const service = new RevisionService(attempts);
   const plans = await db.coordinated(ownerId, async sql => {
     const owned: PlanRow[] = [];
@@ -35,7 +35,8 @@ export async function prepareProposal(db: PlannerDatabase, ownerId: number, plan
     Object.assign(revision, { revisionId: randomUUID(), planId: plan.id, ownerId, attemptId: attempt.attemptId, requestedIntentVersionId: intent.intentVersionId, resolvedIntentVersionId: intent.intentVersionId,
       baseActiveRevisionId: plan.activeRevisionId, sealedAt: new Date().toISOString(), context: context.dependencies });
     if (old.length) revision.executable = structuredClone(old);
-    else Object.assign(revision.executable[0], { activityKey: randomUUID(), planId: plan.id, goalId: plan.goalId ?? plan.reservedGoalId! });
+    else Object.assign(revision.executable[0], { activityKey: randomUUID(), planId: plan.id, goalId: plan.goalId ?? plan.reservedGoalId!,
+      placement: { date: context.today, timezone: context.timezone } });
     mutate?.(revision.executable, index);
     const external = revision.executable.flatMap(spec => spec.content.hardDependencies.filter(key => !revision.executable.some(task => task.activityKey === key)).map(key => {
       const source = context.quests.map(quest => quest.plannerSpec).find(raw => raw && (raw as ExecutionTaskSpecV2).activityKey === key) ?? revisions.flatMap(revision => revision.executable).find(spec => spec.activityKey === key);
@@ -63,6 +64,7 @@ export async function prepareProposal(db: PlannerDatabase, ownerId: number, plan
   changeSet.targets = revisions.map((revision, i) => ({ planId: revision.planId, requestedIntentVersionId: revision.requestedIntentVersionId, resolvedIntentVersionId: revision.resolvedIntentVersionId,
     baseActiveRevisionId: plans[i].activeRevisionId, planningVersion: plans[i].version, resolvedPlanningVersion: plans[i].version, revisionId: revision.revisionId, revisionDigest: revision.digest }));
   changeSet.aggregate.committedTargetMinutes = revisions.reduce((sum, revision) => sum + revision.executable.reduce((n, spec) => n + spec.effort.remainingMinutesEstimate, 0), 0);
+  mutateChangeSet?.(changeSet);
   await service.publish(token, revisions, changeSet);
   return { attempt, token, revisions, changeSet, request: { attemptId: attempt.attemptId, changeSetId: changeSet.changeSetId, acknowledgements: [] } };
 }

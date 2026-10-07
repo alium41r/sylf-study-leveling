@@ -64,6 +64,9 @@ function foregroundBudget(raw: RuntimeBudgetV2, receipts: readonly ForegroundRec
     receipts.reduce((sum, r) => sum + (r.boundary?.completedAt ? Math.max(0, Date.parse(r.boundary.completedAt) - Date.parse(r.boundary.startedAt)) : 0), 0));
   return RuntimeBudgetV2Schema.parse(budget);
 }
+export async function restoreForegroundBudget(sql:Sql,ownerId:number,budget:RuntimeBudgetV2) {
+  return foregroundBudget(budget,(await foregroundReceipts(sql,ownerId,budget.rootRequestId)).map(log=>log.receipt));
+}
 /** Durable foreground interpretation accounting, without an interview/provider
  * implementation. The same owned receipt transfers to the queue exactly once.
  * Record this dispatch BEFORE calling the provider; a crash retains real spend. */
@@ -75,6 +78,7 @@ export class ForegroundAccountingService {
     return this.db.coordinated(ownerId, async sql => {
       if ((await rows(sql, 'SELECT id FROM "PlannerAttempt" WHERE artifact->\'budget\'->>\'rootRequestId\'=$1', [budget.rootRequestId])).length) reject("IDEMPOTENCY_MISMATCH", "This foreground root already belongs to durable work.");
       const existing = await foregroundReceipts(sql, ownerId, budget.rootRequestId);
+      if(input.policy?.purpose==="INTERPRETATION" && existing.length>=2 && !existing.some(log=>log.requestId===input.callId)) reject("BUDGET_EXHAUSTED","The assistant shares two external attempts, including fallback.","INTERPRETATION");
       const now = await clock(sql);
       if (input.policy && input.policy.purpose !== "INTERPRETATION") reject("INVALID_OUTPUT", "Foreground model calls are bounded interpretation only.");
       const priorBoundary = existing.at(-1)?.receipt.boundary;
@@ -117,12 +121,13 @@ export class ForegroundAccountingService {
       return foregroundBudget(budget, logs.map(log => log.receipt));
     });
   }
-  async window(ownerId: number, budget: RuntimeBudgetV2) {
+  async window(ownerId: number, budget: RuntimeBudgetV2, maximumMs?:number) {
     return this.db.coordinated(ownerId, async sql => {
       const logs = await foregroundReceipts(sql, ownerId, budget.rootRequestId); const now = await clock(sql);
       const boundary = logs.at(-1)?.receipt.boundary;
       if (logs.length && (!boundary || boundary.profile !== budget.profile)) reject("IDEMPOTENCY_MISMATCH", "Foreground root profile changed.");
-      return { now: now.getTime(), deadline: Date.parse(boundary?.rootStartedAt ?? now.toISOString()) + PLANNER_V2_BUDGETS[budget.profile].executionSeconds * 1000 };
+      if(maximumMs!==undefined && (!Number.isSafeInteger(maximumMs)||maximumMs<=0))reject("INVALID_OUTPUT","Invalid foreground sub-window.");
+      return { now: now.getTime(), deadline: Date.parse(boundary?.rootStartedAt ?? now.toISOString()) + Math.min(PLANNER_V2_BUDGETS[budget.profile].executionSeconds * 1000,maximumMs??Infinity) };
     });
   }
   async close(ownerId: number, budget: RuntimeBudgetV2, callId: string) {

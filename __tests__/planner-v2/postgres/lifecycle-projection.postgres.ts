@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import pg from "pg";
 import { connect, user, linked, waitForLock } from "./database";
 import { intentFixture } from "../contracts/fixtures";
-import { PlannerDatabase } from "@/lib/planner/v2/server/database";
+import { PlannerDatabase, rows } from "@/lib/planner/v2/server/database";
+import { TimezoneService } from "@/lib/timezone-service";
 import { IntentService, ownedPlan } from "@/lib/planner/v2/server/intents";
 import { AttemptService, newBudget } from "@/lib/planner/v2/server/attempts";
 import { RevisionService } from "@/lib/planner/v2/server/revisions";
@@ -27,6 +28,10 @@ const availability = (minutes = 120) => ({ timezone: "Asia/Karachi", dailyCeilin
 async function student() { const ownerId = await user(connection); owners.add(ownerId); await connection.query('UPDATE "User" SET timezone=\'Asia/Karachi\',"restDays"=\'{}\' WHERE id=$1', [ownerId]); return ownerId; }
 async function plan(ownerId: number, minutes = 120) { return intents.create(ownerId, randomUUID(), { ...intentFixture(), availability: availability(minutes) }); }
 const research = () => ({ schemaVersion: 2, assessment: {}, sources: [], claims: [], completeAssessedScope: false, unresolvedGaps: ["No verified assessed scope was found"] });
+function dayAfter(date: string) {
+  const day = new Date(`${date}T00:00:00Z`); day.setUTCDate(day.getUTCDate() + 1);
+  return day.toISOString().slice(0, 10);
+}
 
 describe("Phase 1 correspondence, projection and reviewed migration", () => {
   it("keeps initial retry correspondence after editing and archives without erasing execution", async () => {
@@ -97,11 +102,13 @@ describe("Phase 1 correspondence, projection and reviewed migration", () => {
     expect(changed.changeSet.entries[0].changes).toContain("CHANGED"); await apply.apply(ownerId, changed.request);
     const context = await db.coordinated(ownerId, async sql => loadExecutionContext(sql, ownerId, [await ownedPlan(sql, ownerId, created.plan.id)], created.intent.intent));
     expect(liveExecution(context.quests[0], context.sessions).state).toBe("UNSTARTED");
-    const move = await prepareProposal(db, ownerId, [created.plan.id], specs => { specs[0].placement.date = "2026-10-06"; });
+    const originalDate = changed.revisions[0].executable[0].placement.date;
+    const movedDate = TimezoneService.getUserLocalDateOffset("Asia/Karachi", 1);
+    const move = await prepareProposal(db, ownerId, [created.plan.id], specs => { specs[0].placement.date = movedDate; });
     const results = await Promise.allSettled([new SessionService(db).start(ownerId, context.quests[0].id), apply.apply(ownerId, move.request)]);
     expect(results[0].status).toBe("fulfilled");
     const current = (await connection.query('SELECT "scheduledFor",status FROM "Quest" WHERE id=$1', [context.quests[0].id])).rows[0];
-    if (results[1].status === "rejected") expect(current.scheduledFor).toBe("2026-10-05"); else expect(current.scheduledFor).toBe("2026-10-06");
+    if (results[1].status === "rejected") expect(current.scheduledFor).toBe(originalDate); else expect(current.scheduledFor).toBe(movedDate);
     expect(current.status).toBe("IN_PROGRESS");
   });
   it("rolls back both targets of a joint apply at every durable boundary and retries exactly once", async () => {
@@ -154,7 +161,7 @@ describe("Phase 1 correspondence, projection and reviewed migration", () => {
   it("replans an adopted live baseline repeatedly without reverting edited content or lineage", async () => {
     const ownerId = await student();
     const goalId = (await connection.query('INSERT INTO "Goal" ("userId",title,"targetWeeks") VALUES ($1,\'Physics\',3) RETURNING id', [ownerId])).rows[0].id;
-    const questId = (await connection.query('INSERT INTO "Quest" ("userId","goalId",title,description,"scheduledFor","requiredMinutes","targetMinutes","xpReward","sylphReward") VALUES ($1,$2,\'Electricity\',\'Original instructions\',\'2026-10-05\',30,30,77,19) RETURNING id', [ownerId, goalId])).rows[0].id;
+    const questId = (await connection.query('INSERT INTO "Quest" ("userId","goalId",title,description,"scheduledFor","requiredMinutes","targetMinutes","xpReward","sylphReward") VALUES ($1,$2,\'Electricity\',\'Original instructions\',$3,30,30,77,19) RETURNING id', [ownerId, goalId, TimezoneService.getUserLocalDate("Asia/Karachi")])).rows[0].id;
     const adoption = new AdoptionService(db, true); const inspection = await adoption.inspect(ownerId, { goalId });
     const adopted = await adoption.adopt(ownerId, { key: randomUUID(), goalId, expectedLiveDigest: inspection.liveDigest, intent: { ...intentFixture(), availability: availability() },
       review: [{ questId, purpose: "Preserve useful work", completionCriterion: "Explain the circuit and correct every error" }] });
@@ -168,7 +175,7 @@ describe("Phase 1 correspondence, projection and reviewed migration", () => {
     const sessions = new SessionService(db); const started = await sessions.start(ownerId, questId);
     await sessions.transition(ownerId, { schemaVersion: 2, sessionId: started.sessionId, expectedExecutionVersion: started.executionVersion,
       idempotencyKey: randomUUID(), action: "PAUSE", cumulativeFocusSeconds: 0, cumulativeBreakSeconds: 0 });
-    const moved = await prepareProposal(db, ownerId, [adopted.planId], specs => { specs[0].placement.date = "2026-10-06"; });
+    const moved = await prepareProposal(db, ownerId, [adopted.planId], specs => { specs[0].placement.date = TimezoneService.getUserLocalDateOffset("Asia/Karachi", 1); });
     await new ApplyService(db).apply(ownerId, moved.request);
     expect((await connection.query('SELECT description FROM "Quest" WHERE id=$1', [questId])).rows[0].description).toBe(acceptedDescription);
     expect((await connection.query('SELECT id,baseline,"baselineSpecDigest" FROM "PlannerQuestLink" WHERE "questId"=$1', [questId])).rows[0]).toEqual(originalLink);
@@ -230,7 +237,7 @@ describe("Phase 1 correspondence, projection and reviewed migration", () => {
     const ownerId = await student(); const first = await plan(ownerId); const second = await plan(ownerId);
     const prerequisite = await prepareProposal(db, ownerId, [first.plan.id]); await new ApplyService(db).apply(ownerId, prerequisite.request);
     const key = prerequisite.revisions[0].executable[0].activityKey;
-    const dependent = await prepareProposal(db, ownerId, [second.plan.id], specs => { specs[0].content.hardDependencies = [key]; specs[0].placement.date = "2026-10-06"; });
+    const dependent = await prepareProposal(db, ownerId, [second.plan.id], specs => { specs[0].content.hardDependencies = [key]; specs[0].placement.date = dayAfter(prerequisite.revisions[0].executable[0].placement.date); });
     expect(dependent.revisions[0].context.externalActivityDependencies).toHaveLength(1);
     await new ApplyService(db).apply(ownerId, dependent.request);
     expect((await connection.query('SELECT id FROM "Quest" WHERE "userId"=$1', [ownerId])).rows).toHaveLength(2);
@@ -260,7 +267,7 @@ describe("Phase 1 correspondence, projection and reviewed migration", () => {
     const before = (await connection.query('SELECT * FROM "StudySession" WHERE id=$1', [paused.sessionId])).rows[0];
     const continuation = await prepareProposal(db, ownerId, [created.plan.id], specs => {
       specs[0] = { ...structuredClone(original), activityKey:randomUUID(), blueprintActivityId:"continuation01", continuesActivityKey:original.activityKey,
-        effort:{ plannedMinutes:20,remainingMinutesEstimate:20,remainingEstimateBasisActualSeconds:0 },placement:{...original.placement,date:"2026-10-06"} };
+        effort:{ plannedMinutes:20,remainingMinutesEstimate:20,remainingEstimateBasisActualSeconds:0 },placement:{...original.placement,date:dayAfter(original.placement.date)} };
     });
     await new ApplyService(db).apply(ownerId, continuation.request);
     const withdrawn = (await connection.query('SELECT * FROM "Quest" WHERE id=$1', [questId])).rows[0];
@@ -276,9 +283,9 @@ describe("Phase 1 correspondence, projection and reviewed migration", () => {
     expect((await connection.query('SELECT id FROM "XpLedger" WHERE "userId"=$1 AND source=\'QUEST\'', [ownerId])).rows).toHaveLength(1);
   });
   it("applies new cross-plan prerequisites in one joint transaction without requiring pre-existing Quests", async () => {
-    const ownerId = await student(); const first = await plan(ownerId); const second = await plan(ownerId); let key = "";
+    const ownerId = await student(); const first = await plan(ownerId); const second = await plan(ownerId); let key = "", prerequisiteDate = "";
     const proposal = await prepareProposal(db, ownerId, [first.plan.id,second.plan.id], (specs,index) => {
-      if(index===0) key=specs[0].activityKey; else { specs[0].content.hardDependencies=[key];specs[0].placement.date="2026-10-06"; }
+      if(index===0) { key=specs[0].activityKey; prerequisiteDate=specs[0].placement.date; } else { specs[0].content.hardDependencies=[key];specs[0].placement.date=dayAfter(prerequisiteDate); }
     });
     expect(proposal.revisions[1].context.externalActivityDependencies[0].activityKey).toBe(key);
     await new ApplyService(db).apply(ownerId,proposal.request);
@@ -286,11 +293,12 @@ describe("Phase 1 correspondence, projection and reviewed migration", () => {
   });
   it("anchors hard learning intervals to accepted completion date rather than the old calendar slot", async () => {
     const ownerId = await student(); const first = await plan(ownerId); const second = await plan(ownerId);
-    const initial = await prepareProposal(db,ownerId,[first.plan.id]); await new ApplyService(db).apply(ownerId,initial.request);
+    const initial = await prepareProposal(db,ownerId,[first.plan.id],specs=>{specs[0].placement.date=TimezoneService.getUserLocalDateOffset("Asia/Karachi",3);}); await new ApplyService(db).apply(ownerId,initial.request);
     const quest = (await connection.query('SELECT id,"executionVersion" FROM "Quest" WHERE "userId"=$1',[ownerId])).rows[0];
     await new SessionService(db).complete(ownerId,quest.id,quest.executionVersion);
-    // The executable slot is 5 October; accepted completion is 3 October.
-    const completedAt = (await connection.query('SELECT "completedAt" FROM "Quest" WHERE id=$1',[quest.id])).rows[0].completedAt;
+    // The executable slot is three days ahead; completion is accepted now.
+    // Read UTC timestamp-without-zone through the same repository parser.
+    const completedAt = await db.coordinated(ownerId,async sql=>(await rows<{completedAt:Date}>(sql,'SELECT "completedAt" FROM "Quest" WHERE id=$1',[quest.id]))[0].completedAt);
     const date = new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Karachi",year:"numeric",month:"2-digit",day:"2-digit"}).format(completedAt);
     const dependentDate = new Date(date+"T00:00:00Z"); dependentDate.setUTCDate(dependentDate.getUTCDate()+1);
     const key=initial.revisions[0].executable[0].activityKey;

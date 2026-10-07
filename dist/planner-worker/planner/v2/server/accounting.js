@@ -6,6 +6,7 @@ exports.finalizeAttemptQuota = finalizeAttemptQuota;
 exports.recordDispatch = recordDispatch;
 exports.recordUnknown = recordUnknown;
 exports.recordActualUsage = recordActualUsage;
+exports.restoreForegroundBudget = restoreForegroundBudget;
 exports.transferForegroundAccounting = transferForegroundAccounting;
 const contracts_1 = require("../contracts");
 const quota_accounting_1 = require("../../../ai/quota-accounting");
@@ -67,6 +68,9 @@ function foregroundBudget(raw, receipts) {
         budget.foregroundProcessingMs = Math.min(contracts_1.PLANNER_V2_BUDGETS[budget.profile].executionSeconds * 1000, receipts.reduce((sum, r) => sum + (r.boundary?.completedAt ? Math.max(0, Date.parse(r.boundary.completedAt) - Date.parse(r.boundary.startedAt)) : 0), 0));
     return contracts_1.RuntimeBudgetV2Schema.parse(budget);
 }
+async function restoreForegroundBudget(sql, ownerId, budget) {
+    return foregroundBudget(budget, (await foregroundReceipts(sql, ownerId, budget.rootRequestId)).map(log => log.receipt));
+}
 /** Durable foreground interpretation accounting, without an interview/provider
  * implementation. The same owned receipt transfers to the queue exactly once.
  * Record this dispatch BEFORE calling the provider; a crash retains real spend. */
@@ -81,6 +85,8 @@ class ForegroundAccountingService {
             if ((await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerAttempt" WHERE artifact->\'budget\'->>\'rootRequestId\'=$1', [budget.rootRequestId])).length)
                 (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "This foreground root already belongs to durable work.");
             const existing = await foregroundReceipts(sql, ownerId, budget.rootRequestId);
+            if (input.policy?.purpose === "INTERPRETATION" && existing.length >= 2 && !existing.some(log => log.requestId === input.callId))
+                (0, database_1.reject)("BUDGET_EXHAUSTED", "The assistant shares two external attempts, including fallback.", "INTERPRETATION");
             const now = await (0, database_1.clock)(sql);
             if (input.policy && input.policy.purpose !== "INTERPRETATION")
                 (0, database_1.reject)("INVALID_OUTPUT", "Foreground model calls are bounded interpretation only.");
@@ -130,14 +136,16 @@ class ForegroundAccountingService {
             return foregroundBudget(budget, logs.map(log => log.receipt));
         });
     }
-    async window(ownerId, budget) {
+    async window(ownerId, budget, maximumMs) {
         return this.db.coordinated(ownerId, async (sql) => {
             const logs = await foregroundReceipts(sql, ownerId, budget.rootRequestId);
             const now = await (0, database_1.clock)(sql);
             const boundary = logs.at(-1)?.receipt.boundary;
             if (logs.length && (!boundary || boundary.profile !== budget.profile))
                 (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "Foreground root profile changed.");
-            return { now: now.getTime(), deadline: Date.parse(boundary?.rootStartedAt ?? now.toISOString()) + contracts_1.PLANNER_V2_BUDGETS[budget.profile].executionSeconds * 1000 };
+            if (maximumMs !== undefined && (!Number.isSafeInteger(maximumMs) || maximumMs <= 0))
+                (0, database_1.reject)("INVALID_OUTPUT", "Invalid foreground sub-window.");
+            return { now: now.getTime(), deadline: Date.parse(boundary?.rootStartedAt ?? now.toISOString()) + Math.min(contracts_1.PLANNER_V2_BUDGETS[budget.profile].executionSeconds * 1000, maximumMs ?? Infinity) };
         });
     }
     async close(ownerId, budget, callId) {

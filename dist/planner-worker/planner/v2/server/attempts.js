@@ -98,46 +98,48 @@ class AttemptService {
         this.db = db;
     }
     async enqueue(ownerId, request) {
+        return this.db.coordinated(ownerId, sql => this.enqueueAccepted(sql, ownerId, request));
+    }
+    /** Compose admission and enqueue under the same existing owner transaction. */
+    async enqueueAccepted(sql, ownerId, request) {
         const requestHash = (0, database_1.hash)("accepted-request", request);
-        return this.db.coordinated(ownerId, async (sql) => {
-            const existing = (await (0, database_1.rows)(sql, 'SELECT artifact FROM "PlannerAttempt" WHERE "userId"=$1 AND "requestKey"=$2', [ownerId, request.key]))[0];
-            if (existing) {
-                const attempt = contracts_1.PlannerAttemptV2Schema.parse(existing.artifact);
-                if (attempt.requestHash !== requestHash)
-                    (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "This request identity belongs to different input.");
-                return attempt;
-            }
-            if ((await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerAttempt" WHERE artifact->\'budget\'->>\'rootRequestId\'=$1', [request.budget.rootRequestId])).length)
-                (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "A request budget cannot be transferred into two attempts.");
-            if (request.parentAttemptId) {
-                const parent = await loadAttempt(sql, ownerId, request.parentAttemptId);
-                if (!["FAILED", "CANCELLED", "SUPERSEDED", "NEEDS_DECISION"].includes(parent.attempt.state))
-                    (0, database_1.reject)("INTENT_CONFLICT", "Only a stopped operation can be explicitly retried.");
-            }
-            const attempt = contracts_1.PlannerAttemptV2Schema.parse({ schemaVersion: 2, attemptId: (0, node_crypto_1.randomUUID)(), ownerId, kind: request.kind, state: "QUEUED", stage: "QUEUED",
-                idempotencyKey: request.key, requestHash, requestedAt: (await (0, database_1.clock)(sql)).toISOString(), parentAttemptId: request.parentAttemptId ?? null,
-                acceptedRequest: { text: request.text, authorization: request.kind === "RESEARCH_ADVICE" ? "RESEARCH_ONLY" : "PLAN_ACTION", researchRequested: request.budget.profile === "RESEARCH", targetAuthorizationDigest: (0, database_1.hash)("authorized-targets", request.targets) },
-                targets: request.targets.map(target => ({ planId: target.planId, requestedIntentVersionId: target.intentId, resolvedIntentVersionId: null, resolution: null,
-                    baseActiveRevisionId: target.baseRevisionId, sourceCandidateRevisionId: target.sourceCandidateId ?? null, planningVersion: target.planningVersion, resolvedPlanningVersion: null, contextDigest: null })),
-                budget: request.budget, fence: 0, lease: null, checkpoint: null, question: null, error: null, result: null, applyReceipt: null });
-            await assertAttemptCurrent(sql, attempt);
-            for (const target of attempt.targets) {
-                const plan = await (0, intents_1.ownedPlan)(sql, ownerId, target.planId);
-                if (target.sourceCandidateRevisionId && target.sourceCandidateRevisionId !== plan.latestDraftRevisionId)
-                    (0, database_1.reject)("STALE_CONTEXT", "The candidate being regenerated is no longer current.");
-                if (target.sourceCandidateRevisionId && !(await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerRevision" WHERE id=$1 AND "planId"=$2 AND "schemaVersion"=2 AND "resolvedIntentVersionId"=$3', [target.sourceCandidateRevisionId, target.planId, target.requestedIntentVersionId])).length)
-                    (0, database_1.reject)("REFERENCE_NOT_OWNED", "The candidate does not belong to this accepted intent.");
-            }
-            // An initial root may transfer foreground accounting, but never another root's worker deadline.
-            if (attempt.budget.processingStartedAt !== null)
-                (0, database_1.reject)("INVALID_OUTPUT", "Enqueue requires unbound worker processing time.");
-            const foreground = await (0, accounting_1.transferForegroundAccounting)(sql, ownerId, attempt.attemptId, attempt.budget);
-            await supersedePlanAttempts(sql, ownerId, attempt.targets.map(target => target.planId));
-            for (const target of attempt.targets)
-                await sql.query('UPDATE "PlannerPlan" SET "latestDraftRevisionId"=NULL,"updatedAt"=clock_timestamp() WHERE id=$1', [target.planId]);
-            await sql.query('INSERT INTO "PlannerAttempt" (id,"userId",kind,state,"requestKey","requestHash",artifact,payload,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,clock_timestamp())', [attempt.attemptId, ownerId, attempt.kind, attempt.state, attempt.idempotencyKey, requestHash, attempt, foreground]);
+        const existing = (await (0, database_1.rows)(sql, 'SELECT artifact FROM "PlannerAttempt" WHERE "userId"=$1 AND "requestKey"=$2', [ownerId, request.key]))[0];
+        if (existing) {
+            const attempt = contracts_1.PlannerAttemptV2Schema.parse(existing.artifact);
+            if (attempt.requestHash !== requestHash)
+                (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "This request identity belongs to different input.");
             return attempt;
-        });
+        }
+        if ((await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerAttempt" WHERE artifact->\'budget\'->>\'rootRequestId\'=$1', [request.budget.rootRequestId])).length)
+            (0, database_1.reject)("IDEMPOTENCY_MISMATCH", "A request budget cannot be transferred into two attempts.");
+        if (request.parentAttemptId) {
+            const parent = await loadAttempt(sql, ownerId, request.parentAttemptId);
+            if (!["FAILED", "CANCELLED", "SUPERSEDED", "NEEDS_DECISION"].includes(parent.attempt.state))
+                (0, database_1.reject)("INTENT_CONFLICT", "Only a stopped operation can be explicitly retried.");
+        }
+        const attempt = contracts_1.PlannerAttemptV2Schema.parse({ schemaVersion: 2, attemptId: (0, node_crypto_1.randomUUID)(), ownerId, kind: request.kind, state: "QUEUED", stage: "QUEUED",
+            idempotencyKey: request.key, requestHash, requestedAt: (await (0, database_1.clock)(sql)).toISOString(), parentAttemptId: request.parentAttemptId ?? null,
+            acceptedRequest: { text: request.text, authorization: request.kind === "RESEARCH_ADVICE" ? "RESEARCH_ONLY" : "PLAN_ACTION", researchRequested: request.budget.profile === "RESEARCH", targetAuthorizationDigest: (0, database_1.hash)("authorized-targets", request.targets) },
+            targets: request.targets.map(target => ({ planId: target.planId, requestedIntentVersionId: target.intentId, resolvedIntentVersionId: null, resolution: null,
+                baseActiveRevisionId: target.baseRevisionId, sourceCandidateRevisionId: target.sourceCandidateId ?? null, planningVersion: target.planningVersion, resolvedPlanningVersion: null, contextDigest: null })),
+            budget: request.budget, fence: 0, lease: null, checkpoint: null, question: null, error: null, result: null, applyReceipt: null });
+        await assertAttemptCurrent(sql, attempt);
+        for (const target of attempt.targets) {
+            const plan = await (0, intents_1.ownedPlan)(sql, ownerId, target.planId);
+            if (target.sourceCandidateRevisionId && target.sourceCandidateRevisionId !== plan.latestDraftRevisionId)
+                (0, database_1.reject)("STALE_CONTEXT", "The candidate being regenerated is no longer current.");
+            if (target.sourceCandidateRevisionId && !(await (0, database_1.rows)(sql, 'SELECT id FROM "PlannerRevision" WHERE id=$1 AND "planId"=$2 AND "schemaVersion"=2 AND "resolvedIntentVersionId"=$3', [target.sourceCandidateRevisionId, target.planId, target.requestedIntentVersionId])).length)
+                (0, database_1.reject)("REFERENCE_NOT_OWNED", "The candidate does not belong to this accepted intent.");
+        }
+        // An initial root may transfer foreground accounting, but never another root's worker deadline.
+        if (attempt.budget.processingStartedAt !== null)
+            (0, database_1.reject)("INVALID_OUTPUT", "Enqueue requires unbound worker processing time.");
+        const foreground = await (0, accounting_1.transferForegroundAccounting)(sql, ownerId, attempt.attemptId, attempt.budget);
+        await supersedePlanAttempts(sql, ownerId, attempt.targets.map(target => target.planId));
+        for (const target of attempt.targets)
+            await sql.query('UPDATE "PlannerPlan" SET "latestDraftRevisionId"=NULL,"updatedAt"=clock_timestamp() WHERE id=$1', [target.planId]);
+        await sql.query('INSERT INTO "PlannerAttempt" (id,"userId",kind,state,"requestKey","requestHash",artifact,payload,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,clock_timestamp())', [attempt.attemptId, ownerId, attempt.kind, attempt.state, attempt.idempotencyKey, requestHash, attempt, foreground]);
+        return attempt;
     }
     async read(ownerId, attemptId) {
         return this.db.coordinated(ownerId, async (sql) => (await loadAttempt(sql, ownerId, attemptId)).attempt);
@@ -301,12 +303,12 @@ class AttemptService {
             // Specialized counters are consumed on dispatch; category is retained in the immutable checkpoint metadata.
             const quotaReceipt = payload.quotaReceipt ?? await (0, accounting_1.reserveAttemptQuota)(sql, attempt.ownerId, attempt.kind === "RESEARCH_ADVICE" ? "chat" : attempt.kind === "EXPAND" ? "plannerExpansion" : ["REPLAN", "JOINT"].includes(attempt.kind) ? "plannerRebalance" : "planner", await (0, database_1.clock)(sql));
             await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, quotaReceipt, calls: [...calls, call], callCategories: { ...payload.callCategories, [callId]: input.category },
-                ...(providerGuard ? { providerGuard } : {}), ...(input.policy ? { providerCalls: { ...payload.providerCalls, [callId]: { purpose: input.policy.purpose } } } : {}) });
+                ...(providerGuard ? { providerGuard } : {}), ...(input.policy ? { providerCalls: { ...payload.providerCalls, [callId]: { purpose: input.policy.purpose, reservedAt: now.toISOString() } } } : {}) });
             return callId;
         });
     }
     async dispatchCall(token, callId, category) {
-        await this.mutate(token, async (sql, attempt, payload) => {
+        await this.mutate(token, async (sql, attempt, payload, now) => {
             const calls = structuredClone(payload.calls ?? []);
             const call = calls.find(call => call.callId === callId);
             if (!call || call.fence !== token.fence)
@@ -327,7 +329,7 @@ class AttemptService {
                 budget.consumed.planningCalls++;
             if (category === "RESEARCH")
                 budget.consumed.researchSynthesisCalls++;
-            await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, quotaReceipt, calls });
+            await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, quotaReceipt, calls, ...(payload.providerCalls?.[callId] ? { providerCalls: { ...payload.providerCalls, [callId]: { ...payload.providerCalls[callId], dispatchedAt: now.toISOString() } } } : {}) });
         });
     }
     async settleCall(token, callId, usage) {
@@ -407,12 +409,32 @@ class AttemptService {
                     delete providerGuard.verificationReserve;
             }
             await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, calls, providerGuard,
-                providerCalls: { ...payload.providerCalls, [callId]: { ...metadata, ...(result.finishReason ? { finishReason: result.finishReason } : {}),
+                providerCalls: { ...payload.providerCalls, [callId]: { ...metadata, completedAt: metadata.completedAt ?? now.toISOString(), ...(result.finishReason ? { finishReason: result.finishReason } : {}),
                         ...(result.errorCode ? { errorCode: result.errorCode.slice(0, 80) } : {}) } } });
         });
     }
     async providerWindow(token, purpose) {
         return this.mutate(token, async (_sql, attempt, payload, now) => ({ now: now.getTime(), deadline: Math.min(Date.parse(attempt.budget.executionDeadlineAt), ["RESEARCH", "OCR"].includes(purpose) && payload.providerGuard?.researchDeadlineAt ? Date.parse(payload.providerGuard.researchDeadlineAt) : Infinity) }));
+    }
+    /** Charge each search/fetch hop and extraction before work; failures and lease
+     * takeover never refund or reset root research counters. */
+    async consumeResearch(token, delta) {
+        return this.mutate(token, async (sql, attempt, payload, now) => {
+            if (attempt.budget.profile !== "RESEARCH" || !payload.providerGuard?.researchDeadlineAt || Date.parse(payload.providerGuard.researchDeadlineAt) <= now.getTime())
+                (0, database_1.reject)("BUDGET_EXHAUSTED", "Research processing is not authorized or its window expired.", "RESEARCH");
+            const allowed = ["researchQueries", "fetchAttempts", "selectedSourceCharacters", "extractedPages", "ocrPages", "followUps"];
+            const budget = structuredClone(attempt.budget);
+            for (const [key, amount] of Object.entries(delta)) {
+                if (!allowed.includes(key) || !Number.isSafeInteger(amount) || amount < 0)
+                    (0, database_1.reject)("INVALID_OUTPUT", "Invalid research charge.", "RESEARCH");
+                const field = key;
+                budget.consumed[field] += amount;
+            }
+            if (!contracts_1.RuntimeBudgetV2Schema.safeParse(budget).success)
+                (0, database_1.reject)("BUDGET_EXHAUSTED", "The shared research processing allowance is exhausted.", "RESEARCH");
+            await persistAttempt(sql, attempt, { ...attempt, budget }, payload);
+            return budget;
+        });
     }
     async startResearchWindow(token) {
         return this.mutate(token, async (sql, attempt, payload, now) => {

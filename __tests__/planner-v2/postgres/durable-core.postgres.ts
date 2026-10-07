@@ -43,7 +43,8 @@ async function proposal() {
   const revision = revisionFixture();
   Object.assign(revision, { revisionId: randomUUID(), planId: created.plan.id, ownerId, attemptId: attempt.attemptId,
     requestedIntentVersionId: created.intent.intentVersionId, resolvedIntentVersionId: created.intent.intentVersionId, context: context.dependencies });
-  Object.assign(revision.executable[0], { activityKey: randomUUID(), planId: created.plan.id, goalId: created.plan.reservedGoalId! });
+  Object.assign(revision.executable[0], { activityKey: randomUUID(), planId: created.plan.id, goalId: created.plan.reservedGoalId!,
+    placement: { date: context.today, timezone: context.timezone } });
   revision.quality.educationalContentDigest = educationalDigest(revision); revision.quality.evidenceDigest = qualityEvidenceDigest(created.intent.intent);
   revision.digest = revisionDigest(revision);
   const changeSet = changeSetFixture(); Object.assign(changeSet, { changeSetId: randomUUID(), attemptId: attempt.attemptId, requestDigest: attempt.requestHash, quality: revision.quality });

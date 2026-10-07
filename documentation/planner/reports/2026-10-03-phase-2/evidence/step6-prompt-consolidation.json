@@ -1,0 +1,23 @@
+{
+  "recordedAt": "2026-10-07T09:03:29.669557+00:00",
+  "prompts": [
+    {
+      "file": "lib/planner/v2/intelligence/blueprint.ts",
+      "beforeStaticBytes": 16966,
+      "afterStaticBytes": 10721,
+      "saving": 6245
+    },
+    {
+      "file": "lib/planner/v2/intelligence/quality.ts",
+      "beforeStaticBytes": 11356,
+      "afterStaticBytes": 7096,
+      "saving": 4260
+    }
+  ],
+  "comparison": "All unique authority, educational, assignment, readiness, technical-example, scope/forecast, kept-work, split, joint-owner, calendar, output/reference and adaptation requirements remain. Only repeated wording is consolidated; the valid example is indented. Review explicitly distinguishes supported diagnostics from independent phase readiness.",
+  "rawOutputsRewritten": false,
+  "budgetsChanged": false,
+  "holdbacksChanged": false,
+  "modelContextFactsRemoved": false,
+  "validatorsChanged": false
+}

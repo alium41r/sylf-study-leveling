@@ -159,7 +159,8 @@ export class GeminiAdapter implements LLMAdapter {
           rawCandidateParts: candidateParts.length > 0 ? candidateParts : undefined,
           usage: response.usageMetadata ? {
             promptTokens: response.usageMetadata.promptTokenCount || 0,
-            completionTokens: response.usageMetadata.candidatesTokenCount || 0,
+            // The SDK reports reasoning separately; both are generated output.
+            completionTokens: (response.usageMetadata.candidatesTokenCount || 0) + (response.usageMetadata.thoughtsTokenCount || 0),
             totalTokens: response.usageMetadata.totalTokenCount || 0,
           } : undefined,
         };

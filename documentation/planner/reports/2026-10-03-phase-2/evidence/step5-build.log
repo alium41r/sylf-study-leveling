@@ -1,0 +1,14 @@
+▲ Next.js 16.2.9 (webpack)
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 35.1s
+  Running TypeScript ...
+Failed to type check.
+
+app/api/acoustics/route.ts
+Type error: Route "app/api/acoustics/route.ts" does not match the required types of a Next.js Route.
+  "CURATED_SOUNDSCAPES" is not a valid Route export field.
+
+Next.js build worker exited with code: 1 and signal: null

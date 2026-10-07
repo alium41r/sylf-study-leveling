@@ -1,0 +1,18 @@
+{
+  "historicalRun": "step6-live-2026-10-05T20-06-14-871Z",
+  "historicalCase": "roadmap-large",
+  "offlineReplayNotLiveRepairEvidence": true,
+  "namedIssues": [
+    "issue_plan1_scope_expansion_engineering"
+  ],
+  "actualConsumedInput": 24431,
+  "repairReservation": 71780,
+  "verificationHoldback": 67489,
+  "requiredInput": 163700,
+  "unchangedRootInputLimit": 80000,
+  "verificationGrowthMargin": 8192,
+  "outputReservation": 8192,
+  "verificationOutput": 4096,
+  "limitsChanged": false,
+  "conclusion": "Full-scope repair and independent verification cannot fit this root. Retain explicit unconfirmable failure; corpus acceptance requires correct initial checkpoint scope and a separately observed genuine live repair."
+}

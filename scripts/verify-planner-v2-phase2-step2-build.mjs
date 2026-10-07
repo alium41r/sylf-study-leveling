@@ -17,7 +17,7 @@ try {
     cwd: temporary, env: { ...environment, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1" }, stdio: ["ignore", "pipe", "pipe"],
   });
   let output = ""; child.stdout.on("data", chunk => { output += chunk; }); child.stderr.on("data", chunk => { output += chunk; });
-  const timeout = setTimeout(() => child.kill("SIGTERM"), 120000);
+  const timeout = setTimeout(() => child.kill("SIGTERM"), 300000);
   const code = await new Promise((resolve_, reject) => { child.once("error", reject); child.once("exit", resolve_); }); clearTimeout(timeout);
   output = output.replaceAll(temporary, "[isolated build workspace]");
   writeFileSync(join(evidence, "step2-build.log"), output);

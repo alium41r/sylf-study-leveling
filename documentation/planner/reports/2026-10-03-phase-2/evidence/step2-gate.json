@@ -1,7 +1,7 @@
 {
   "gate": "PLANNER_V2_PHASE_2_STEP_2",
-  "startedAt": "2026-10-03T18:25:47.675Z",
-  "status": "FAILED",
+  "startedAt": "2026-10-04T09:16:30.366Z",
+  "status": "PASSED",
   "checks": [
     {
       "name": "frozen contracts",
@@ -15,7 +15,7 @@
       "status": "PASSED",
       "evidence": {
         "files": 15,
-        "passed": 153,
+        "passed": 154,
         "requiredSkipped": 0
       }
     },
@@ -31,11 +31,39 @@
       "name": "whole repository typecheck baseline correspondence",
       "status": "PASSED",
       "evidence": {
-        "status": "PRE_EXISTING_FAILURE_UNCHANGED",
-        "errors": [
+        "status": "UNCHANGED_SOURCE_WITH_ADDITIONAL_GENERATED_FAILURES",
+        "baselineErrors": [
           ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
           ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'."
-        ]
+        ],
+        "errors": [
+          ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/api/subjects/[id]/compile/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/forge-apex/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/nodes/route.ts(53,7): error TS2344: Type '{ __tag__: \"GET\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/restore/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/route.ts(53,7): error TS2344: Type '{ __tag__: \"GET\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/route.ts(248,7): error TS2344: Type '{ __tag__: \"DELETE\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/subjects/[id]/route.ts(287,7): error TS2344: Type '{ __tag__: \"PATCH\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
+          ".next/types/app/api/user/focus-backgrounds/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/user/focus-backgrounds/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/goals/page.ts(37,13): error TS2344: Type 'OmitWithTag<GoalsScreenProps, keyof PageProps, \"default\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/types/app/goals/page.ts(37,29): error TS2559: Type 'GoalsScreenProps' has no properties in common with type 'PageProps'."
+        ],
+        "verifiedUnchangedSources": {
+          "app/api/acoustics/route.ts": "3f06009afed35607669fc6bd8352404e939999004caf316cb228c311767b196f",
+          "app/api/quests/route.ts": "798049a3efcd3d8a8c8eb059093292c29d94ee4f5a31362a79f62bc55d001467",
+          "app/api/subjects/[id]/compile/route.ts": "8f13a94d4228ddd5d1e11792d97ef0f2e63693099e374b1d3f5f59f1cc447735",
+          "app/api/subjects/[id]/forge-apex/route.ts": "1c9ac939603a3809843d2dd3696dd810714bbf3432629a382dacf19c591d4bbf",
+          "app/api/subjects/[id]/nodes/route.ts": "07ea82de35cad14d3d8d1a606dce4bfc2d1434a329fcb73e7c53a37905e57454",
+          "app/api/subjects/[id]/restore/route.ts": "ec06a0ad2938bfd5800edf7ef322118e65af0dda7a2caa902327993465e43514",
+          "app/api/subjects/[id]/route.ts": "f1fd037c284040246515ee9576fb245be39756c728477acc0077ff57fd34d4c7",
+          "app/api/user/focus-backgrounds/route.ts": "20cd314abad83ca1525ec9d9bb325ff0338bfd972ba429779b1868c4c99b8776",
+          "app/goals/page.tsx": "e0646c9be0fa7fcf008c6f6d1d4838c3bbdc8ec091dde2908b1210c82315b52d"
+        },
+        "generatedFilesModifiedByThisGate": false
       }
     },
     {
@@ -56,9 +84,348 @@
         "modules": 4,
         "providerCredentials": false
       }
+    },
+    {
+      "name": "genuine PostgreSQL, compiled provider and existing required service regressions",
+      "status": "PASSED",
+      "evidence": {
+        "results": [
+          {
+            "label": "phase1",
+            "files": 8,
+            "passed": 83,
+            "failed": 0,
+            "requiredSkipped": 0,
+            "optionalProviderExcluded": 0,
+            "failures": []
+          },
+          {
+            "label": "current",
+            "files": 17,
+            "passed": 225,
+            "failed": 0,
+            "requiredSkipped": 0,
+            "optionalProviderExcluded": 1,
+            "failures": []
+          }
+        ],
+        "newStep2Cases": 12,
+        "hostedDataTouched": false,
+        "cleanup": "Disposable server stopped; cluster/container removed."
+      }
+    },
+    {
+      "name": "isolated web build qualification",
+      "status": "PASSED",
+      "evidence": {
+        "startedAt": "2026-10-04T09:08:05.773Z",
+        "finishedAt": "2026-10-04T09:09:04.660Z",
+        "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
+        "code": 1,
+        "command": "next build --webpack (private source copy)",
+        "credentialsLoaded": false,
+        "baselineRouteErrors": [
+          ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
+          ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'."
+        ],
+        "sharedGeneratedFilesModified": false
+      }
+    },
+    {
+      "name": "documentation links, changed whitespace and requirement evidence",
+      "status": "PASSED",
+      "evidence": {
+        "newWhitespaceFindings": 0,
+        "preExistingGroqWhitespaceLines": 2,
+        "requirements": [
+          "P2-03",
+          "P2-04",
+          "P2-05",
+          "P2-06"
+        ]
+      }
+    },
+    {
+      "name": "pre-existing source preservation and unrelated concurrency",
+      "status": "PASSED",
+      "evidence": {
+        "status": "PASSED",
+        "baselineFiles": 3783,
+        "nonFileEntries": {
+          ".claude/skills/sylf-ui-implementation": {
+            "before": {
+              "kind": "other"
+            },
+            "observed": {
+              "kind": "other"
+            }
+          },
+          ".dsh-presets/secret-guard/node_modules/.bin/cordis": {
+            "before": {
+              "kind": "other"
+            },
+            "observed": {
+              "kind": "other"
+            }
+          },
+          ".dsh-presets/secret-guard/node_modules/.bin/tsc": {
+            "before": {
+              "kind": "other"
+            },
+            "observed": {
+              "kind": "other"
+            }
+          },
+          ".dsh-presets/secret-guard/node_modules/.bin/tsserver": {
+            "before": {
+              "kind": "other"
+            },
+            "observed": {
+              "kind": "other"
+            }
+          },
+          "antigravity project template": {
+            "before": {
+              "kind": "other"
+            },
+            "observed": {
+              "kind": "other"
+            }
+          }
+        },
+        "step2ExistingEdits": [
+          "documentation/planner/README.md",
+          "documentation/planner/reports/2026-10-03-phase-2/README.md",
+          "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json",
+          "lib/ai/providers/deepseek.ts",
+          "lib/ai/providers/groq.ts",
+          "lib/planner/v2/server/accounting.ts",
+          "lib/planner/v2/server/apply.ts",
+          "lib/planner/v2/server/attempts.ts",
+          "lib/planner/v2/server/context.ts",
+          "lib/planner/v2/server/revisions.ts",
+          "lib/planner/v2/server/workspace.ts",
+          "scripts/test-planner-v2-phase1-postgres.mjs",
+          "tsconfig.planner-worker.json"
+        ],
+        "unrelatedConcurrentChanges": [
+          {
+            "path": ".node-version",
+            "before": "068a0a6e1f02416d0c46e50a46a679eff53f1b748c8c3e559a2c64ef950cc781",
+            "observed": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f"
+          },
+          {
+            "path": "README.md",
+            "before": "7de9f85c7fda5f3d927cc2877b7882be459aeab9c3d8ba2a0e3ca0ca8ea95a76",
+            "observed": "77f653ec6c5339e30e00d01c7b277f004b3f37802d63862b129452f02bf45949"
+          },
+          {
+            "path": "__tests__/auth/middleware.test.ts",
+            "before": "5bbf322fb96e920cf5b661df1bdb587dba30b48f32088ec1277128bb3a829c2f",
+            "observed": "3572c04ad463bb0ee56f7f6fd89d94a0cace0492d73a5419a98e27b26944007e"
+          },
+          {
+            "path": "__tests__/landing/journey.test.tsx",
+            "before": "5aaaabd067c8988ebe0fdb654f6957a3455d744393a8a2cff5c69067d273e887",
+            "observed": "1593a0eca7a37f642bc8652c6a345b7d5a340a382309eda17b415e758ba00dd1"
+          },
+          {
+            "path": "__tests__/waitlist/waitlist-api.test.ts",
+            "before": "da2a0dab6fd853c2adcbd003e32879d04c2fbe2491565aae48f11e074dc5da11",
+            "observed": "cca95a64169402196b40581e515e5fd058747abfc2176535aba4a22907acf81a"
+          },
+          {
+            "path": "app/api/waitlist/route.ts",
+            "before": "abfddcbf2652025e0531bfd600173e2bad34407012330c071d9b7ffd7eba2eea",
+            "observed": "b46e03973ecb658d5ec8bf77b626ff03020106b433a716fd55720e6a0a72a9c8"
+          },
+          {
+            "path": "app/components/landing/LandingFooter.tsx",
+            "before": "2e6a616fa45e38ae703af752a30369a0f1beef5634aef020c4297ccccd323cf4",
+            "observed": "c21edcb0f2f79c374ed9af906ae11ebeaa98c544b496be9a033f070d66ddbe37"
+          },
+          {
+            "path": "app/components/landing/journey/CelestialDecor.module.css",
+            "before": "aaa006d897e96623c12730618b039fc999e605a8391b2e5f77c9751e466290b6",
+            "observed": "b3eeda8fdb83f57228e475ee4e61120fdc6f786ced9d278e2e2be0c964aa40d7"
+          },
+          {
+            "path": "app/components/landing/journey/CelestialMotifs.tsx",
+            "before": "609af8090a69f4e2df28a1cc1f9d114e4a8b76d927da8a1692baba2d7c5c827d",
+            "observed": "708f0c5de9c1164d3d6337cbf9536e296348168a057f44ea7520a3c15b3a1e82"
+          },
+          {
+            "path": "app/components/landing/journey/Journey.module.css",
+            "before": "3d2bf7e497fc6969f14ff5b6b226f725e619a2fa9f457a6e35c3651dc8c995f5",
+            "observed": "9675a9e4a66c836b1868414cf58ffcd5bb9e693046c23844e6b2c98e20ae348f"
+          },
+          {
+            "path": "app/components/landing/journey/JourneyLanding.tsx",
+            "before": "dac24821fd6401bbb2ac689eb64cf18e6ad2be1a19595c3dc1a0e5a7f7ab7ed0",
+            "observed": "cb331ee8939864f3ab327c4f0004fdd426a744e751003834ac11c2d7ecb07ed8"
+          },
+          {
+            "path": "dist/planner-worker/planner/v2/server/accounting.js",
+            "before": "e1b17ef621d91301108f4933daef3b8cdc3c2ed4286d489ea68230ecf85d7bdb",
+            "observed": "39a09fa182381130177e2ac4162820ed3070fc72e744f6dd107ff97c7da3fdbf"
+          },
+          {
+            "path": "dist/planner-worker/planner/v2/server/apply.js",
+            "before": "eb3923c51470264adb85b22dddcb9f5ea573796ebc92fea522a3d5f2778b0fec",
+            "observed": "dddfe64fb52270ee6f305be8b1277c592917afe84226e057131a1262b02052bf"
+          },
+          {
+            "path": "dist/planner-worker/planner/v2/server/attempts.js",
+            "before": "6b685b59e2245e1bc29f2b4e00ad8eb99527836e53e389fed387c7a92a46f322",
+            "observed": "f982a70dd85f8250ab5c9578a55bc9a8996f12800e8809ce496357cdffbcacd3"
+          },
+          {
+            "path": "dist/planner-worker/planner/v2/server/context.js",
+            "before": "edf95a06641d1d6405ce919170cf6dfa89fabd6036832b7e8ce37645f3c89fab",
+            "observed": "602e84058829e6d0f973af7053953c0408c2d608574ada8c65e46fbe84a60b4c"
+          },
+          {
+            "path": "dist/planner-worker/planner/v2/server/revisions.js",
+            "before": "89c6c136dcfe7b050924992c5bd865158dbb4bfc952a32d75d245b12de333fa1",
+            "observed": "619ddad00431e3900f2c9b62eab9d059b85aa86e05b99b954b9409f262528764"
+          },
+          {
+            "path": "dist/planner-worker/planner/v2/server/workspace.js",
+            "before": "ba524b80da67e681357d54174830a15d743509dc2cad2fce0fd6cbfc60d2b1e9",
+            "observed": "9a8274d5eb49e50b277f62127324b3b024d183992c5c558529aad070ea167b79"
+          },
+          {
+            "path": "documentation/landing-companion/README.md",
+            "before": "29b71e16966cd1d47062ba04675dfb9e1cc1e39ff96d257920f95102d76c6cc0",
+            "observed": "abeda94d9a1f7909bd9ec97f40923ab6bfa722b96bde03b077ec91474b8d38de"
+          },
+          {
+            "path": "documentation/runbooks/LAUNCH-CHECKLIST.md",
+            "before": "6ca240b43b9fe391aa4be6fb45ae31549d0b584953947507a036a1a339ee4537",
+            "observed": "358ef2199bd438ad3d0ea25ad619747570d35dcf72af623e30ae773e30717544"
+          },
+          {
+            "path": "lib/email.ts",
+            "before": "6e27d52b77c7d1ff0d01cf6754344d3f1a1b3d97ec64bc101eda2b5f411c43d9",
+            "observed": "9fdb0f06e630092e74e3c83a53e5b5e3203362efd12101f00c70c6fe78b46f12"
+          },
+          {
+            "path": "lib/prelaunch.ts",
+            "before": "3b146a9e5f4d8449ed18ec0e1d2f3e002680ad4293680542d74449a3a98be5b5",
+            "observed": "5376c12dc556a6d84c094d21818392d74a3e3c908195865063e3fb074854458d"
+          },
+          {
+            "path": "package-lock.json",
+            "before": "1fc92ee354bc392251efc15ebc0565d544e1facaead458d5b511774ece819a5d",
+            "observed": "1e1ce363400b4c112a1a779f1e7ffe42a93516213b5e37cadf3839c397b8488e"
+          },
+          {
+            "path": "package.json",
+            "before": "b66ec55d305cad6f772189e9ff95e4a73fe2311a42c8b8ad285b3875d42e1357",
+            "observed": "7cf98a1e08b4eb721a0c717b466f7ce2d485bf057245c45f49872e6c0ffaa37a"
+          },
+          {
+            "path": "proxy.ts",
+            "before": "fbd2e7fe2896aa913c7bc850a610163755a6681097aa61679d63e665e689481c",
+            "observed": "eed12d20924f28374886752f462149cc2b3722ddc14c0c713e36597429e1e6a5"
+          }
+        ],
+        "unrelatedNewFiles": [
+          "__tests__/landing/celestial-appearance.test.tsx",
+          "__tests__/landing/celestial-palette-qa.ts",
+          "__tests__/landing/fixtures/celestial-dark/CelestialBooks.svg",
+          "__tests__/landing/fixtures/celestial-dark/CelestialLantern.svg",
+          "__tests__/landing/fixtures/celestial-dark/CelestialLeaf.svg",
+          "__tests__/landing/fixtures/celestial-dark/CelestialStar.svg",
+          "__tests__/waitlist/waitlist-email.test.ts",
+          "dist/planner-worker/ai/agent-router.js",
+          "dist/planner-worker/ai/message-intent.js",
+          "dist/planner-worker/ai/providers/deepseek.js",
+          "dist/planner-worker/ai/providers/factory.js",
+          "dist/planner-worker/ai/providers/gemini.js",
+          "dist/planner-worker/ai/providers/groq.js",
+          "dist/planner-worker/ai/providers/types.js",
+          "dist/planner-worker/ai/usage-pricing.js",
+          "dist/planner-worker/planner/v2/intelligence/checkpoints.js",
+          "dist/planner-worker/planner/v2/intelligence/context.js",
+          "dist/planner-worker/planner/v2/intelligence/provider-policy.js",
+          "dist/planner-worker/planner/v2/intelligence/provider.js",
+          "dist/planner-worker/planner/v2/intelligence/schemas/assistant.js",
+          "dist/planner-worker/planner/v2/intelligence/schemas/checkpoint.js",
+          "dist/planner-worker/planner/v2/intelligence/schemas/research.js",
+          "dist/planner-worker/planner/v2/intelligence/schemas/scheduling.js",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-dark.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-dark.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light-before.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light-before.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialBooks-light.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-dark.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-dark.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light-before.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light-before.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLantern-light.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-dark.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-dark.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light-before.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light-before.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialLeaf-light.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-dark.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-dark.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light-before.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light-before.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/CelestialStar-light.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/material-comparison.png",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/material-comparison.svg",
+          "documentation/landing-companion/reports/light-mode-decorations/evidence/resolved-light-palette.json",
+          "documentation/landing-companion/reports/light-mode-decorations/report.md",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/320-dark.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/320-light.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/390-dark.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/390-light.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/900-dark.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/900-light.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/desktop-light.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/long-fields-320.png",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/evidence/preview.html",
+          "documentation/landing-companion/reports/waitlist-email-2026-10-03/report.md",
+          "documentation/runbooks/WAITLIST-EMAIL.md",
+          "lib/emails/waitlist-welcome.ts"
+        ]
+      }
     }
   ],
   "scope": "Bounded context and shared metered provider boundary; assistant/research/compiler handlers remain later roadmap steps.",
-  "error": "Required PostgreSQL gate failed, noncanonical or incomplete",
-  "finishedAt": "2026-10-03T18:26:49.814Z"
+  "sourceSha256": {
+    "__tests__/planner-v2/intelligence/context.test.ts": "51753d6d2b9f61e591ff5cf0de68309a5c5479de985dff29cdfc78bbd011be0f",
+    "__tests__/planner-v2/intelligence/provider-adapters.test.ts": "738ddf00acb352636a337453d60cf09a0a6a8c68e8dee71b901d131330d66cfc",
+    "__tests__/planner-v2/intelligence/provider.test.ts": "a5c0612b38d74976cd111de1100ffbeac1a2ff8dd37bd1e9e47b3429293f8d77",
+    "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts": "0707719255f7f63cf07eee1abb43b50d3744340666bb6f6930bd49fcd40d9889",
+    "__tests__/planner-v2/postgres/intelligence-process-fixture.cjs": "7c8cbc8466a2db62d976f354ea4b5954e6f644e6e22bfe51b76a5e33db65a2f7",
+    "documentation/planner/README.md": "4aeb92eb44d3978f18311bfd0cdd2d9ffc1018a44524d22f7337d94bd2e508e9",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md": "431dfe461517497310aca16c07359297ce023c847cedc1bb3e916e74c822a4f1",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json": "69f4bc3b8cd284857cd2d1c27bc94ac9afcfed5fb586e12fb74f04c5373ac086",
+    "documentation/planner/reports/2026-10-03-phase-2/STEP_2.md": "7f30dd622af43bf0a4824e1f4e447a0b5b24de3a152f6972bdb46e1536814281",
+    "lib/ai/providers/deepseek.ts": "c079f411d70102b987836bb94db61c9d413169b9bb099d248f1738b798f8f9b9",
+    "lib/ai/providers/groq.ts": "9f335759037ef118f1b8e19b4d7a0b449f4cdaaea04ea8c7a63eec80a2bee37d",
+    "lib/ai/usage-pricing.ts": "32d8f8ef17c7ed70b5b843c3c5b24a05496f62ca523066369a20f11621d485ec",
+    "lib/planner/v2/intelligence/context.ts": "31bc00b5ab8feeb365aa9889ef5e93c3d17f434e72c3941135e5547d235fb045",
+    "lib/planner/v2/intelligence/provider-policy.ts": "2a91cef9945f74eedaeb48bfd0e4e60422ff512dfe711cbff4650a15a6cb2f0b",
+    "lib/planner/v2/intelligence/provider.ts": "6646b1ac5599f574552032842c17994173603587209a22ed43d74679e632f936",
+    "lib/planner/v2/server/accounting.ts": "ec77847b6e9f3363b5df5c0b6cfefde8136c347fbbcc718ebbeed77b5778cb4e",
+    "lib/planner/v2/server/apply.ts": "7c264f096499bf543379b9ce82ad9b55898bf40341638a86968bad6636430357",
+    "lib/planner/v2/server/attempts.ts": "ba0c2bc8df28009ee0156d3a88be5be1535ef87e6ff942845f15731fa969ac20",
+    "lib/planner/v2/server/context.ts": "f2919e7f2f39c53adada3ea38a3869356ecc6bee6207b0848378723fd0332544",
+    "lib/planner/v2/server/revisions.ts": "f5450bf2596423b7f32323c24ca376dc031269a5ea82cd262ef88e4dd7261bce",
+    "lib/planner/v2/server/workspace.ts": "ba58a464b04919cb7cb63c7cad0d549601231fbf557461577c6b13dc36ac2f9b",
+    "scripts/test-planner-v2-phase1-postgres.mjs": "26aec45ef0d96a0db841bdb9e739ea4a69ff8aa2f422f483d65bd0a33b580b88",
+    "scripts/test-planner-v2-phase2-step2-postgres.mjs": "5db2cffc5e215cb9d77c9acd9fc4c97d8c943dac8f5051d9dc976bce756252ac",
+    "scripts/verify-planner-v2-phase2-step2-build.mjs": "b6a6eb2d3abc93c4a69c81b8db20a06218e9aeb57e07e0402bcf3f98b5ac4995",
+    "scripts/verify-planner-v2-phase2-step2.mjs": "31ecc38f59bee9819b84b3a81ffc4a47a10b953ca85a6fe570b70892739db7f8",
+    "tsconfig.planner-worker.json": "1a6fd09b2f79837d8a72042779436e528137e848820897fd7a7ee486e5b65ab4"
+  },
+  "finishedAt": "2026-10-04T09:17:40.260Z"
 }

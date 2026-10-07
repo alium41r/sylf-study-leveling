@@ -1,0 +1,95 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 2,
+  "failed": 7,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "live development qualification: tiny-exam",
+      "messages": [
+        "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:77:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: tiny-roomy-exam",
+      "messages": [
+        "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:77:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: triage",
+      "messages": [
+        "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:77:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: mastery-open",
+      "messages": [
+        "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:77:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: general-homework",
+      "messages": [
+        "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:77:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: infeasible-zero-capacity",
+      "messages": [
+        "AssertionError: expected false to be true // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:75:429\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: roadmap-large",
+      "messages": [
+        "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:77:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: tiny-exam",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: tiny-roomy-exam",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: method-weakness",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: triage",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: mastery-open",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: general-homework",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: joint-prerequisite",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: infeasible-zero-capacity",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: roadmap-large",
+          "status": "failed"
+        }
+      ]
+    }
+  ]
+}

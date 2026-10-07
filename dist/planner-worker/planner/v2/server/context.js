@@ -4,6 +4,7 @@ exports.mondayIndex = exports.externalActivityAlias = exports.contextInputDigest
 exports.liveExecution = liveExecution;
 exports.civilDate = civilDate;
 exports.weekKey = weekKey;
+exports.savedCheckReferences = savedCheckReferences;
 exports.questDependency = questDependency;
 exports.relevantDependencyQuests = relevantDependencyQuests;
 exports.loadExecutionContext = loadExecutionContext;
@@ -49,6 +50,10 @@ function weekKey(date) {
     const d = new Date(date + "T12:00:00Z");
     d.setUTCDate(d.getUTCDate() - (0, exports.mondayIndex)(date));
     return d.toISOString().slice(0, 10);
+}
+/** Owned snapshot order defines the same local aliases for projection and sealing. */
+function savedCheckReferences(context, planId) {
+    return (context.checks ?? []).filter(check => check.planId === planId).map((check, i) => ({ check, ref: `saved_check_${i + 1}` }));
 }
 function questDependency(quest) {
     return { questId: quest.id, contentDigest: quest.plannerSpec ? (0, exports.contentDigest)(contracts_1.ExecutionTaskSpecV2Schema.parse(quest.plannerSpec)) : (0, database_1.hash)("legacy-quest", {

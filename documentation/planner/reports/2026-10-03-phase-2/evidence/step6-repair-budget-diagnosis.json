@@ -1,0 +1,19 @@
+{
+  "case": "mastery-open",
+  "historicalRun": "step6-live-2026-10-05T12-54-22-902Z",
+  "currentInstructionReplay": true,
+  "before": {
+    "actualConsumedInput": 13406,
+    "repairReservation": 38313,
+    "verificationHoldback": 38893,
+    "total": 90612
+  },
+  "proposedLosslessDayTable": {
+    "actualConsumedInput": 13406,
+    "repairReservation": 32963,
+    "verificationHoldback": 33543,
+    "total": 79912
+  },
+  "unchangedRootInputLimit": 80000,
+  "excludesFutureActualSettlement": true
+}

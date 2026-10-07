@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-03T18:22:10.462Z",
-  "status": "FAILED",
+  "startedAt": "2026-10-04T09:11:35.907Z",
+  "status": "PASSED",
   "database": "generated disposable loopback database",
   "runtime": "native",
   "requiredSkippedTests": 0,
@@ -9,18 +9,20 @@
     {
       "label": "phase1",
       "files": 8,
-      "passed": 82,
-      "failed": 1,
+      "passed": 83,
+      "failed": 0,
       "requiredSkipped": 0,
       "optionalProviderExcluded": 0,
-      "failures": [
-        {
-          "name": "Phase 2 context and metered boundary on genuine PostgreSQL preserves owned legacy observations and pins check provenance changes without relabeling the older result seal",
-          "messages": [
-            "error: PLANNER_APPLY_REQUIRED\n    at /Users/aliumair/Desktop/sylf/node_modules/pg/lib/client.js:652:17\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts:88:7\n    at PlannerDatabase.coordinated (/Users/aliumair/Desktop/sylf/lib/planner/v2/server/database.ts:75:24)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts:87:5\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
-          ]
-        }
-      ]
+      "failures": []
+    },
+    {
+      "label": "current",
+      "files": 17,
+      "passed": 225,
+      "failed": 0,
+      "requiredSkipped": 0,
+      "optionalProviderExcluded": 1,
+      "failures": []
     }
   ],
   "migrations": [
@@ -134,7 +136,6 @@
     "version": 180004
   },
   "postgresVersion": 180004,
-  "error": "phase1: required PostgreSQL gate failed (1 failures, 0 required skips).",
   "cleanup": "Disposable server stopped; cluster/container removed.",
-  "finishedAt": "2026-10-03T18:23:16.142Z"
+  "finishedAt": "2026-10-04T09:13:02.690Z"
 }

@@ -1,0 +1,15 @@
+{
+  "historicalRun": "step6-live-2026-10-05T19-53-48-447Z",
+  "historicalCase": "contradictory-readiness",
+  "offlineReplayNotLiveRepairEvidence": true,
+  "actualConsumedInput": 13092,
+  "repairReservation": 36113,
+  "verificationHoldback": 30434,
+  "requiredInput": 79639,
+  "unchangedRootInputLimit": 80000,
+  "verificationGrowthMargin": 8192,
+  "outputReservation": 8192,
+  "verificationOutput": 4096,
+  "losslessGoalReferences": true,
+  "limitsChanged": false
+}

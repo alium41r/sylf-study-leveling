@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "classification": "Development corpus; synthetic learner inputs, real provider outputs. Not the Phase 5 held-out human release benchmark.",
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "policy": "EXAM",
+      "outcome": "Explain and use Ohm\u2019s law for one simple series circuit. Stop once I can solve and explain one changed circuit independently.",
+      "scope": [
+        "Ohm\u2019s law in simple series circuits"
+      ],
+      "expectation": "No ritual revision stages; one small activity or bounded check; finish early.",
+      "dailyMinutes": 120,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "policy": "EXAM",
+      "outcome": "Explain and use Ohm\u2019s law for one simple series circuit. Stop once I can solve and explain one changed circuit independently.",
+      "scope": [
+        "Ohm\u2019s law in simple series circuits"
+      ],
+      "expectation": "Additional capacity alone must not inflate useful work versus tiny-exam.",
+      "dailyMinutes": 480,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "secure-topic",
+      "policy": "EXAM",
+      "outcome": "I usually solve simple series circuits correctly; give only a short diagnostic if useful. Do not certify mastery from confidence.",
+      "scope": [
+        "Simple series circuits"
+      ],
+      "expectation": "At most a small readiness check; no false CREDITED disposition from self report.",
+      "dailyMinutes": 120,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "zero-new-work",
+      "policy": "GENERAL",
+      "outcome": "I explicitly want a strategy-only plan with zero new booked or optional activities. Defer the scope with the reason that I have chosen no new work today.",
+      "scope": [
+        "Circuit methods"
+      ],
+      "expectation": "Zero activities and zero executable Quests; no manufactured workload.",
+      "dailyMinutes": 120,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "concept-foundation",
+      "policy": "EXAM",
+      "outcome": "I confuse current with potential difference and cannot explain why circuit rules hold. Prepare for independent problem solving.",
+      "scope": [
+        "Current and potential difference",
+        "Conservation in circuits",
+        "Circuit problem solving"
+      ],
+      "expectation": "Address the conceptual prerequisite and application; do not prescribe timed papers as a substitute.",
+      "dailyMinutes": 120,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "method-weakness",
+      "policy": "EXAM",
+      "outcome": "I can explain voltage and current but choose the wrong law on unfamiliar circuits. Focus on selecting and applying the method.",
+      "scope": [
+        "Circuit method selection"
+      ],
+      "expectation": "Target method selection and independent transfer, not generic rereading.",
+      "dailyMinutes": 120,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "triage",
+      "policy": "EXAM",
+      "outcome": "My teacher-written circuit quiz is in two days. I need a defensible short plan; explicitly explain anything sacrificed. There are no verified topic weights.",
+      "scope": [
+        "Current and voltage",
+        "Series circuits",
+        "Parallel circuits",
+        "Mixed circuits"
+      ],
+      "expectation": "Explicit prioritization and deferred scope; no invented weighting or disappearance.",
+      "dailyMinutes": 25,
+      "deadlineDays": 2,
+      "research": false
+    },
+    {
+      "id": "roadmap-open",
+      "policy": "ROADMAP",
+      "outcome": "Build a small CSV expenses report in Python that groups by category, reports totals, and checks malformed rows. I have never read a CSV in Python.",
+      "scope": [
+        "Python CSV reading",
+        "Grouping totals",
+        "Malformed-row handling",
+        "Small expenses report"
+      ],
+      "expectation": "Prerequisite milestones and a useful next checkpoint; no invented deadline or semester-length ceremony.",
+      "dailyMinutes": 60,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "mastery-open",
+      "policy": "MASTERY",
+      "outcome": "Develop the ability to explain Bayes\u2019 rule and apply it to a changed medical-test probability example. I confuse the base rate with sensitivity.",
+      "scope": [
+        "Base rates and conditional probability",
+        "Bayes\u2019 rule",
+        "Transfer to an unfamiliar example"
+      ],
+      "expectation": "Capability checks and conceptual/application work; time spent is not mastery.",
+      "dailyMinutes": 60,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "general-homework",
+      "policy": "GENERAL",
+      "outcome": "Complete and understand a short homework set of three linear equations with parentheses. I make sign errors when expanding negatives.",
+      "scope": [
+        "Negative signs and parentheses",
+        "Linear equations"
+      ],
+      "expectation": "Specific sign-error repair and bounded homework stopping point; no forced exam policy.",
+      "dailyMinutes": 60,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "joint-prerequisite",
+      "policy": "ROADMAP",
+      "outcome": "Prepare both a CSV report and a JSON report. I am new to Python loops and dictionaries. A shared loops/dictionary prerequisite should have one owner and count once.",
+      "scope": [
+        "Loops and dictionaries",
+        "CSV totals report"
+      ],
+      "expectation": "Two targets with one shared prerequisite owner, distinct report goals and explicit shared dependencies.",
+      "dailyMinutes": 120,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "policy": "EXAM",
+      "outcome": "I need to learn a circuit method before tomorrow\u2019s teacher quiz but I have confirmed zero available study time. Do not claim readiness or silently remove the required learning to make the schedule pass.",
+      "scope": [
+        "Circuit method selection"
+      ],
+      "expectation": "Honest infeasibility/decision and no candidate that promises achievable readiness. At most one adaptation.",
+      "dailyMinutes": 0,
+      "deadlineDays": 1,
+      "research": false
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "policy": "GENERAL",
+      "outcome": "I need to complete a 45-minute uninterrupted authentic circuit lab check. Interrupting the measurement invalidates the check. Availability is only 30 minutes a day; disclose the conflict rather than silently turning it into a shorter check.",
+      "scope": [
+        "Uninterrupted authentic lab check"
+      ],
+      "expectation": "Explicit scheduling failure or grounded adaptation retaining requirements; no invented split.",
+      "dailyMinutes": 30,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "owned-course-research",
+      "policy": "ROADMAP",
+      "outcome": "Use my uploaded course note to build a small CSV expenses-report project. Verify quotations and course applicability; it is my development course note, not an official public syllabus.",
+      "scope": [
+        "Read CSV rows",
+        "Group expense totals",
+        "Handle malformed rows"
+      ],
+      "expectation": "Actual owned upload/hash, excerpt-backed course outcomes, no official-assessment claim, research then reviewed plan.",
+      "dailyMinutes": 60,
+      "deadlineDays": 0,
+      "research": true
+    },
+    {
+      "id": "contradictory-readiness",
+      "policy": "MASTERY",
+      "outcome": "I say I have mastered circuit methods, but in my self-reported last check I got four of five changed circuits wrong. Do not ignore this contradiction or certify mastery from my claim; choose proportionate education and a meaningful check.",
+      "scope": [
+        "Independent circuit method selection"
+      ],
+      "expectation": "Reconcile contradictory evidence, meaningful criterion, and independent review. Record any actual repair/verification.",
+      "dailyMinutes": 60,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "roadmap-large",
+      "policy": "ROADMAP",
+      "outcome": "Learn enough Python to build reliable small data-processing programs. I am a beginner. Keep the full strategic scope, but detail only the useful next checkpoint and forecast later work separately. No deadline has been requested.",
+      "scope": [
+        "Expressions and variables",
+        "Numeric types",
+        "Strings",
+        "String formatting",
+        "Boolean expressions",
+        "Conditional branches",
+        "While loops",
+        "For loops",
+        "Lists",
+        "List slicing",
+        "Tuples",
+        "Dictionaries",
+        "Sets",
+        "Nested collections",
+        "Functions",
+        "Parameters and return values",
+        "Local scope",
+        "Exceptions",
+        "File reading",
+        "File writing",
+        "Text encodings",
+        "CSV parsing",
+        "JSON parsing",
+        "Data validation",
+        "Grouping and aggregation",
+        "Sorting records",
+        "Date parsing",
+        "Modules",
+        "Package environments",
+        "Testing simple functions",
+        "Boundary cases",
+        "Logging errors",
+        "Command-line arguments",
+        "Program decomposition",
+        "Readable names",
+        "Basic debugging",
+        "Reusable transformations",
+        "Input contracts",
+        "Output reports",
+        "Small data-processing project"
+      ],
+      "expectation": "Every strategic scope node has a disposition. Start with justified beginner prerequisites and a concrete next checkpoint; later topics remain strategic/unbooked. No whole-course booking or generic substitution.",
+      "dailyMinutes": 120,
+      "deadlineDays": 0,
+      "research": false
+    },
+    {
+      "id": "public-assessment-research",
+      "policy": "EXAM",
+      "outcome": "Research the actual Cambridge International AS & A Level Physics 9702 syllabus for 2026, AS theory Paper 2, restricted to current of electricity and DC circuits. Verify applicability and exact quotations before planning; if the actual source cannot establish this scope or identity, ask a consequential decision and remain unconfirmable.",
+      "scope": [
+        "Current of electricity",
+        "DC circuits"
+      ],
+      "expectation": "Real search/fetch provenance; server verified authority and quoted support. A plan may publish only from applicable verified findings; an honest research decision is acceptable when source identity/coverage cannot be established.",
+      "dailyMinutes": 60,
+      "deadlineDays": 21,
+      "research": true
+    }
+  ]
+}

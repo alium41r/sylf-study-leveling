@@ -102,7 +102,7 @@ describe("shared artifact transport envelope", () => {
       blueprintBytes: plannerSerializedBytes(blueprint), revisionBytes: revisions.map(plannerSerializedBytes), changeSetBytes: plannerSerializedBytes(changeSet), envelopeBytes: E.serializedBytes };
     const directory = "documentation/planner/reports/2026-10-03-phase-2/evidence";
     mkdirSync(directory, { recursive: true });
-    writeFileSync(`${directory}/step1-serialization.json`, `${JSON.stringify(evidence, null, 2)}\n`);
+    writeFileSync(process.env.PLANNER_SERIALIZATION_EVIDENCE ?? `${directory}/step1-serialization.json`, `${JSON.stringify(evidence, null, 2)}\n`);
   });
 
   it("keeps the new-generation bound separate from retained detailed work", () => {

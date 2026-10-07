@@ -1,0 +1,25 @@
+{
+  "evaluatedAt": "2026-10-06T01:23:10.147460+00:00",
+  "purpose": "Evidence resolving automatic review concern before retrying the same explicitly authorized live qualification command.",
+  "destination": "https://api.deepseek.com (existing configured DeepSeek adapter); public web search/fetch for synthetic assessment request",
+  "payload": "Registered synthetic development corpus inputs, disposable synthetic execution context and the literal locally authored 419-character test course note in compiler-qualification.live.ts. No user-owned uploaded content, real learner history or hosted records.",
+  "isolation": [
+    "Child environment excludes inherited database settings.",
+    "Harness initializes fresh PostgreSQL cluster and supplies only generated loopback DATABASE_URL/DIRECT_URL/PLANNER_TEST_DATABASE_URL.",
+    "Database.ts enforces loopback random database name plus harness identity marker.",
+    "Every live owner is freshly inserted with a random @planner-phase0.invalid email.",
+    "Document bytes are a literal test note held only in a per-case in-memory map; DocumentRepository uses those overridden read/write methods.",
+    "Only allowlisted provider/search configuration is read from dotenv; no hosted database/storage/auth data.",
+    "Automatic test assertions and separate educational inspection remain required."
+  ],
+  "authorization": "User explicitly requested real-provider outputs across the approved corpus and instructed using existing DeepSeek credits without permanently changing policy.",
+  "sources": {
+    "scripts/test-planner-v2-phase1-postgres.mjs": "f08bcd7ee00bc863824840b0795bd020e7729468f318fcd13057fb47d8b8431a",
+    "scripts/test-planner-v2-phase2-live.mjs": "da05e6daaf8208d062b626c513900a0a724e16282ce7e02278c5943fb80fe29d",
+    "__tests__/planner-v2/postgres/compiler-qualification.live.ts": "81c91a0040c8f75251fd87df89ec1e609de2ba4aee45d70349122323e3c954a5",
+    "__tests__/planner-v2/postgres/database.ts": "7c45b37f2b8fb71550985c8d1c39228a0c09e48982ccb4f23c2cc6e5eb3fe6c6",
+    "documentation/planner/reports/2026-10-03-phase-2/DEVELOPMENT_CORPUS.json": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+    "lib/ai/providers/deepseek.ts": "55490d78e56e3fa3e8f30c90ea5cc8d923f41259da12b7a64d4d52f0d91095ad"
+  },
+  "conclusion": "The suspected private payload is synthetic test content. Same live command may be retried with this evidence; no bypass or substitute execution path."
+}

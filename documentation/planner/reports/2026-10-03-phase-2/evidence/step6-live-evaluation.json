@@ -1,22 +1,19 @@
 {
   "schemaVersion": 1,
   "status": "FAILED",
-  "evaluatedAt": "2026-10-05T16:27:39.657Z",
-  "selectedRunDirectory": "step6-live-2026-10-05T16-17-34-836Z",
-  "liveCorpusSha256": "4d4625b9ab7dc29927edc37979993379082e1377aeb9788a7271c5e89a4934dc",
+  "classification": "Current-source independent inspection of actual provider outputs, durable call metadata/checkpoints and execution; no model approval or successful apply counted as educational acceptance",
+  "run": "step6-live-2026-10-08T17-16-24-282Z",
   "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
-  "sourceCorrespondence": {
-    "productionSourcesUnchangedSinceRun": true,
-    "changedDuringRun": [],
-    "rawHarnessStatus": "FAILED because one required live assertion failed, not source drift"
-  },
-  "method": "Codex separately inspected original goals, actual provider answers, persisted checkpoints, allocation, quality issues, sealed content and actual apply receipts. This is independent of the model self-review, but not an external human panel or the Phase 5 held-out benchmark.",
-  "quotaFinding": "DeepSeek was usable. All final responses supplied usage; no final SDK quota/rate-limit failure. Gemini quota remains unavailable and Groq trial quota failed earlier. Final acceptance failures are output reliability, semantic quality and root-budget fit, not unavailable DeepSeek credits.",
-  "productionPolicyQualified": false,
-  "temporaryRoute": {
+  "rawSha256": "0c69361aed8f312e68a13e7432b94bb79ce2e105fab44dc5f7a3d25af02122fc",
+  "routeConfiguration": {
     "temporaryNonGemini": true,
-    "thinking": "disabled",
-    "temperature": 0.2,
+    "productionPrimaryOptions": true,
+    "temporaryExistingGroq": false,
+    "reasoningEffort": null,
+    "temperature": null,
+    "reviewTemperature": null,
+    "reviewThinking": null,
+    "reviewReasoningEffort": null,
     "primary": {
       "provider": "deepseek",
       "model": "deepseek-flash"
@@ -27,383 +24,88 @@
     },
     "productionConfigurationChanged": false
   },
-  "coverage": {
-    "policiesAttempted": [
-      "EXAM",
-      "ROADMAP",
-      "MASTERY",
-      "GENERAL"
-    ],
-    "policiesWithSeparatelyAcceptableOutputs": [
-      "EXAM",
-      "ROADMAP",
-      "MASTERY",
-      "GENERAL"
-    ],
-    "adaptation": [
-      "infeasible-zero-capacity",
-      "indivisible-checkpoint"
-    ],
-    "successfulRevisedAdaptationAndReallocation": [
-      "infeasible-zero-capacity",
-      "indivisible-checkpoint"
-    ],
-    "feasibleCandidateAfterAdaptation": [],
-    "repairAndVerification": []
+  "acceptedCases": 0,
+  "totalCases": 3,
+  "metrics": {
+    "externalCalls": 7,
+    "settledCalls": 6,
+    "unknownSpendCalls": 1,
+    "unknownPricingCalls": 7,
+    "actualInputTokens": 33640,
+    "actualOutputTokens": 32734,
+    "truncatedCalls": 4,
+    "fallbacks": 3,
+    "caseLatencyMs": {
+      "median": 89663,
+      "p90": 233762,
+      "max": 233762
+    },
+    "providerLatencyMs": {
+      "median": 24086,
+      "p90": 233368,
+      "max": 233368
+    },
+    "upstreamFailureCategories": [
+      "network_error"
+    ]
   },
-  "operationalFailures": [
-    {
-      "id": "triage",
-      "error": {
-        "schemaVersion": 2,
-        "code": "INVALID_OUTPUT",
-        "stage": "BLUEPRINT",
-        "message": "The provider result failed structured validation.",
-        "retryable": false,
-        "resumable": false,
-        "fieldRefs": [],
-        "activityRefs": [],
-        "dates": [],
-        "recoveryAction": "NONE",
-        "traceId": "4df72165-454f-4552-aee7-5a656936fd17"
-      }
-    }
-  ],
-  "latency": {
-    "cases": 17,
-    "medianMs": 13932,
-    "p90Ms": 24794,
-    "maximumMs": 32187
-  },
-  "usage": {
-    "reportedInputTokens": 283503,
-    "reportedOutputTokens": 45183,
-    "usageMissingResponses": 0,
-    "settledCalls": 40,
-    "unknownSpendCalls": 0,
-    "knownPricedCostUsd": 0,
-    "unknownPricedCalls": 40,
-    "estimatedCostComplete": false
-  },
-  "externalAttempts": 40,
-  "fallbackAttempts": 5,
   "cases": [
     {
-      "id": "tiny-exam",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "One integrated 30-minute learning/changed-circuit activity, no ritual sequence, preserved specific independent criterion and early stopping point.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "tiny-exam",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 30,
-        "actualQuests": 1,
-        "applied": true,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "REVIEW"
-        ]
-      }
-    },
-    {
       "id": "tiny-roomy-exam",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "The same goal at 480 rather than 120 available daily minutes still books one 30-minute integrated activity. Extra capacity alone did not inflate work.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "tiny-roomy-exam",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 30,
-        "actualQuests": 1,
-        "applied": true,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "REVIEW"
-        ]
-      }
-    },
-    {
-      "id": "secure-topic",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "One 20-minute three-part diagnostic; only an unbooked contingent targeted fix. No current CREDITED or verified mastery is inferred from confidence. Confidence wording remains a warning, not verified evidence.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "secure-topic",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 20,
-        "actualQuests": 1,
-        "applied": true,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "REVIEW"
-        ]
-      }
-    },
-    {
-      "id": "zero-new-work",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "A reviewed strategy explicitly DEFERRED the scope at the learner request, with its own reason and zero activities. Canonical apply created zero Quests.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "zero-new-work",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 0,
-        "actualQuests": 0,
-        "applied": true,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "REVIEW"
-        ]
-      }
-    },
-    {
-      "id": "concept-foundation",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "The complete three-node scope is retained. Current versus potential difference, charge/energy conservation and application have concrete instructions and criteria; no timed-paper substitution. The 165 committed minutes and duplicated final explanation merit the retained repetition warning. The final unseen check does provide independent evidence beyond the earlier guided set; no exact-duration rule or compulsory stage rule is used to score this case.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "concept-foundation",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 165,
-        "actualQuests": 5,
-        "applied": true,
-        "providerPurposes": [
-          "REVIEW",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "method-weakness",
-      "status": "FAILED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "Although applied, the diagnostic/guide require a traps section drawn from actual errors without allowing a diagnostic with no errors. They also introduce dependent-source/multiple-source features despite an unspecified method repertoire, and add repeated five-circuit sets. These are concrete achievable-criterion and scope/proportion issues; minutes alone are not the rejection basis. The model self-review left them uncorrected.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "method-weakness",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 165,
-        "actualQuests": 4,
-        "applied": true,
-        "providerPurposes": [
-          "REVIEW",
-          "BLUEPRINT"
-        ]
-      }
+      "expected": "Additional capacity alone must not inflate useful work versus tiny-exam.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "OUTPUT_TRUNCATED",
+      "inspection": "Primary generation completes, but strict validation rejects undeclared scopeRefsNote:null. Existing metered fallback returns a complete accepted blueprint. The actual independent reviews both exhaust4096output tokens with zero final content. A generated50-minute teaching/application/demonstration strategy alone is not independent acceptance, and its optional learner-chosen parameters still need achievable matching criteria. No candidate/apply or repair/verification exists.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "status": "FAILED"
     },
     {
       "id": "triage",
-      "status": "FAILED",
+      "expected": "Explicit prioritization and deferred scope; no invented weighting or disappearance.",
+      "accepted": false,
       "observedOutcome": "FAILED",
-      "assessment": "Both blueprint responses failed structured validation; no reviewed short-deadline plan or explicit scope trade-off was published. Safe rejection is not educational triage success.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "triage",
-        "checkpointStage": "PREFLIGHT",
-        "committedMinutes": null,
-        "actualQuests": 0,
-        "applied": false,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "roadmap-open",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "A useful CSV-reading prerequisite precedes a concrete category-total/bad-row report. No deadline is invented. The unverified dictionary-fluency assumption remains an explicit estimate/readiness warning.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "roadmap-open",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 90,
-        "actualQuests": 2,
-        "applied": true,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "REVIEW",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "mastery-open",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "A labeled base-rate/sensitivity explanation and worked example precede an independently solved changed medical-test scenario. The contingent correction is unbooked. Observable capability rather than time is the criterion; no current mastery credit is minted.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "mastery-open",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 90,
-        "actualQuests": 2,
-        "applied": true,
-        "providerPurposes": [
-          "REVIEW",
-          "REVIEW",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "general-homework",
-      "status": "FAILED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "Applied 40 minutes for the three assigned equations plus a compulsory 20-minute fresh equation. The assigned work already requires explicit sign expansion and successful substitution checks; the extra committed activity extends the bounded homework stopping point without diagnostic evidence. The reviewer reported this concrete extra work as a warning, and no repair occurred.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "general-homework",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 60,
-        "actualQuests": 2,
-        "applied": true,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "REVIEW"
-        ]
-      }
-    },
-    {
-      "id": "joint-prerequisite",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "Two goals apply atomically with one loops/dictionary owner and one actual compiled HARD shared dependency, with 240 total minutes counted once across three distinct artifacts. Both shared scope dispositions remain INCLUDED rather than falsely CREDITED. Some model warnings incorrectly claim the separate shared edge is absent or that CREDITED is required; actual compiled dependencies and owned execution contradict those warnings.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "joint-prerequisite",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 240,
-        "actualQuests": 3,
-        "applied": true,
-        "providerPurposes": [
-          "REVIEW",
-          "REVIEW",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "infeasible-zero-capacity",
-      "status": "PASSED",
-      "observedOutcome": "NEEDS_DECISION",
-      "assessment": "Required positive 45-minute learning and proved zero-capacity shortfall survive one real REVISE adaptation and re-allocation. The attempt ends NEEDS_DECISION with zero Quests and no achievable-readiness promise.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "infeasible-zero-capacity",
-        "checkpointStage": "ALLOCATION",
-        "committedMinutes": 45,
-        "actualQuests": 0,
-        "applied": false,
-        "providerPurposes": [
-          "ADAPTATION",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "indivisible-checkpoint",
-      "status": "PASSED",
-      "observedOutcome": "NEEDS_DECISION",
-      "assessment": "The 45-minute uninterrupted authentic check is preserved against a 30-minute day bound. One real REVISE adaptation and re-allocation retain that duration/indivisibility and end NEEDS_DECISION with zero Quests; suggestions to change availability do not mutate accepted facts.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "indivisible-checkpoint",
-        "checkpointStage": "ALLOCATION",
-        "committedMinutes": 45,
-        "actualQuests": 0,
-        "applied": false,
-        "providerPurposes": [
-          "BLUEPRINT",
-          "ADAPTATION"
-        ]
-      }
+      "blocker": "OUTPUT_TRUNCATED",
+      "inspection": "Both generation attempts exhaust8192output tokens (first has5767characters of partial JSON, fallback has no final content). Nothing is parsed or reviewed; no scheduling/education/apply acceptance exists.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "status": "FAILED"
     },
     {
       "id": "owned-course-research",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "Actual owned upload/hash and section-only quotations support four independently verified COURSE_OUTCOME claims; UNKNOWN issuer authority and non-assessment applicability remain explicit. Derived intent adoption, original/resolved lineage, owned source/claim references, grounded review and canonical apply complete. The changed-data check is explicitly required by the actual note. An unnecessary identity follow-up and soft-effort/authority wording remain limitations, not official certification.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "owned-course-research",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 90,
-        "actualQuests": 2,
-        "applied": true,
-        "providerPurposes": [
-          "RESEARCH",
-          "BLUEPRINT",
-          "RESEARCH",
-          "REVIEW"
-        ]
-      }
-    },
-    {
-      "id": "contradictory-readiness",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "The four-of-five self-reported errors are reconciled with the claim of mastery; diagnosis/correction plus an unseen check carry concrete justifications without demanding manufactured errors. No current CREDITED readiness or mutation consent is inferred. Planned mastery language and all-or-nothing criterion retain reviewer warnings; a learner task named correction is not compiler repair.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "contradictory-readiness",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 90,
-        "actualQuests": 2,
-        "applied": true,
-        "providerPurposes": [
-          "REVIEW",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "roadmap-large",
-      "status": "PASSED",
-      "observedOutcome": "SUCCEEDED",
-      "assessment": "All 40 scope nodes have validated dispositions/contributions and strategic phases remain present. Five specific beginner activities detail a 240-minute foundations checkpoint; later phases stay unbooked/projected and no deadline is invented. Beginner empty-input handling and forecast precision remain warnings; this is an inspected provider output, not raw malformed prose or a whole-course booking.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "roadmap-large",
-        "checkpointStage": "REVIEW",
-        "committedMinutes": 240,
-        "actualQuests": 5,
-        "applied": true,
-        "providerPurposes": [
-          "REVIEW",
-          "BLUEPRINT",
-          "BLUEPRINT"
-        ]
-      }
-    },
-    {
-      "id": "public-assessment-research",
-      "status": "PASSED",
-      "observedOutcome": "NEEDS_DECISION",
-      "assessment": "Real search/fetch and source provenance are retained. Applicability/quote verification does not establish issuer-applicable assessed scope for either requested node; the new server guard returns a consequential decision before any planning call/adoption/candidate/Quest. This meets the registered acceptable unconfirmable outcome and corrects the historical publication bypass.",
-      "evidence": {
-        "liveCorpus": "step6-live-2026-10-05T16-17-34-836Z/live-corpus.json",
-        "caseId": "public-assessment-research",
-        "checkpointStage": "RESEARCH",
-        "committedMinutes": null,
-        "actualQuests": 0,
-        "applied": false,
-        "providerPurposes": [
-          "RESEARCH",
-          "RESEARCH"
-        ]
-      }
+      "expected": "Actual owned upload/hash, excerpt-backed course outcomes, no official-assessment claim, research then reviewed plan.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "BUDGET_EXHAUSTED",
+      "inspection": "One dispatched research call fails with network_error after233.368s; durable metadata closes it earlier as BUDGET_EXHAUSTED with UNKNOWN_SPEND and retains4729input/8192output reserved tokens, without actual usage. No fallback/verification/adoption/blueprint/candidate/apply occurs. The calling turn was interrupted while this call was pending; this is retained failure evidence, not a clean educational result or proof normal owned-document research cannot complete.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "status": "FAILED"
     }
   ],
-  "remainingGates": [
-    "Current-source full-corpus acceptance: triage structured-output reliability and proportionate/achievable method/homework education remain failed.",
-    "One actual named compiler REPAIR followed by exact independent VERIFICATION and canonical apply under the unchanged root budgets; none was observed.",
-    "Default production provider policy is not qualified by the temporary thinking/sampling trial."
-  ]
+  "full17Corpus": "NOT_RUN: conditional subset acceptance gate fails",
+  "naturalRepairVerificationApply": "NOT_OBSERVED",
+  "limitsChanged": false,
+  "defectsOrFindingsInjected": false,
+  "interruptionDuringOwnedCall": true,
+  "selectedRunDirectory": "step6-live-2026-10-08T17-16-24-282Z",
+  "liveCorpusSha256": "0c69361aed8f312e68a13e7432b94bb79ce2e105fab44dc5f7a3d25af02122fc",
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "operationalFailures": 3
 }

@@ -1,0 +1,23 @@
+{
+  "status": "PASSED",
+  "boundary": "Actual RevisionService publication, owned loadRevision and canonical ApplyService. Trusted fixtures; no educational-quality claim.",
+  "targets": 2,
+  "activitiesPerTarget": 200,
+  "scopeNodesPerTarget": 500,
+  "phasesPerTarget": 100,
+  "newActivitiesAtFinalPublish": 60,
+  "retainedActivitiesAtFinalPublish": 340,
+  "quests": 400,
+  "links": 400,
+  "revisionBytes": [
+    1691676,
+    1691676
+  ],
+  "changeSetBytes": 292886,
+  "maximumCompilerContext": {
+    "outcome": "PAYLOAD_TOO_LARGE",
+    "upstreamAttempts": 0,
+    "consequentialFactsTrimmed": false
+  },
+  "envelopeBytes": 4194304
+}

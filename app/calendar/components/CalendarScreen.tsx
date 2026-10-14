@@ -34,15 +34,11 @@ export default function CalendarScreen() {
       <div className={styles.topGlow} aria-hidden="true" />
 
       <div className="w-full min-w-0 max-w-6xl mx-auto px-4 sm:px-8 py-6 pb-20 relative z-10 animate-fade-in">
-        {/* Header Strip with Eyebrow and Accent Highlight */}
+        {/* Page Heading */}
         <div className="flex flex-col justify-between items-start mb-8 gap-2 mt-2 w-full min-w-0">
-          <div className={styles.eyebrow}>
-            <span className={styles.eyebrowDot} />
-            <span>Scholar Dashboard</span>
-          </div>
           <h1 className={styles.title}>
             <Calendar size={28} className="text-accent-primary shrink-0" />
-            <span>Study <em>Calendar</em></span>
+            <span>Calendar</span>
           </h1>
         </div>
 

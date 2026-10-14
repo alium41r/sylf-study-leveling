@@ -3,6 +3,7 @@ import { it,expect } from "vitest";
 import { sourceAuthority,verifyResearch,extractedClaims } from "@/lib/planner/v2/intelligence/research-verification";
 import { readResearchSource } from "@/lib/planner/v2/intelligence/research-reader";
 import { boundedProviderInput } from "@/lib/planner/v2/intelligence/provider";
+import { ResearchReviewSchema } from "@/lib/planner/v2/intelligence/schemas/research-model";
 import { pdfFixture } from "./research-fixtures";
 import { assessment,text,researchFixture } from "./research-fixtures";
 
@@ -21,3 +22,31 @@ it("asks for consequential unselected assessment selectors without inventing the
 it("general learning research can support resources without an institution interview ritual",()=>{const f=researchFixture("https://learning.example.test/circuits");f.extraction.claims[0].kind="RESOURCE";f.review.claims[0].claimId=extractedClaims([f.read],f.extraction)[0].claimId;const result=verifyResearch([f.read],{},f.extraction,f.review,undefined,"GENERAL");expect(result.decision).toBeNull();expect(result.evidence.claims[0].status).toBe("ADOPTED");expect(result.evidence.completeAssessedScope).toBe(false);});
 it("requires an Exam decision when no applicable assessed claim exists even with no model conflicts",()=>{const f=researchFixture();f.extraction.claims[0].kind="RESOURCE";f.review.claims[0].claimId=extractedClaims([f.read],f.extraction)[0].claimId;f.review.conflicts=[];const result=verifyResearch([f.read],assessment,f.extraction,f.review,undefined,"EXAM");expect(result.evidence.claims[0].status).toBe("ADOPTED");expect(result.evidence.claims[0].kind).toBe("RESOURCE");expect(result.decision).toContain("before planning");});
 it("requires covered requested Exam scope while preserving partial subset evidence and prerequisite/exclusion boundaries",()=>{const f=researchFixture();const node={scopeKey:"00000001-0000-4000-8000-000000000000",modelRef:"circuits",title:"Circuits",parentKey:null,inclusion:"REQUESTED" as const,sourceClaimIds:[]};f.review.scopeBindings=[{claimId:f.review.claims[0].claimId,scopeRefs:["circuits"],disposition:"ANNOTATE_SCOPE"}];f.read.source.extraction={...f.read.source.extraction,status:"PARTIAL",gaps:["Later sections unread"]};const selected=verifyResearch([f.read],assessment,f.extraction,f.review,[node],"EXAM");expect(selected.evidence.completeAssessedScope).toBe(false);expect(selected.decision).toBeNull();const other={...node,scopeKey:"00000002-0000-4000-8000-000000000000",modelRef:"uncovered"};expect(verifyResearch([f.read],assessment,f.extraction,f.review,[node,other],"EXAM").decision).toContain("1 requested");expect(verifyResearch([f.read],assessment,f.extraction,f.review,[node,{...other,inclusion:"SUPPORTING_PREREQUISITE"}],"EXAM").decision).toBeNull();expect(verifyResearch([f.read],assessment,f.extraction,f.review,[node,{...other,inclusion:"EXCLUDED"}],"EXAM").decision).toBeNull();});
+
+it("accepts an honest partial research decision only in the frozen string conflict shape",()=>{
+ const f=researchFixture();const raw={...f.review,conflicts:[{description:"Only the cover page was read.",consequence:"Provide the component scope before planning."}]};
+ const invalid=ResearchReviewSchema.safeParse(raw);expect(invalid.success).toBe(false);
+ if(!invalid.success)expect(invalid.error.issues[0]).toMatchObject({code:"invalid_type",path:["conflicts",0],expected:"string"});
+ const review=ResearchReviewSchema.parse({...raw,conflicts:["Only the cover page was read. Provide the component scope before planning."]});
+ const result=verifyResearch([f.read],assessment,f.extraction,review);expect(result.decision).toBe(review.conflicts[0]);expect(result.evidence.completeAssessedScope).toBe(false);
+});
+
+it("rejects unsupported private-title identity without blocking otherwise applicable course outcomes",()=>{
+ const f=researchFixture();f.read.source.authority="UNKNOWN";f.extraction.claims[0].kind="COURSE_OUTCOME";
+ f.extraction.identities=[{sourceId:f.read.source.sourceId,fields:[{field:"institution",value:"Private note title",excerpt:f.extraction.claims[0].excerpt,anchor:f.extraction.claims[0].anchor}]}];
+ f.review.identities=[{sourceId:f.read.source.sourceId,fields:[{field:"institution",supported:false}]}];
+ f.review.claims[0].claimId=extractedClaims([f.read],f.extraction)[0].claimId;
+ const result=verifyResearch([f.read],{},f.extraction,f.review,undefined,"ROADMAP");
+ expect(result.evidence.sources[0].applicability).toEqual({});expect(result.evidence.sources[0].authority).toBe("UNKNOWN");
+ expect(result.evidence.claims[0].status).toBe("ADOPTED");expect(result.evidence.completeAssessedScope).toBe(false);expect(result.decision).toBeNull();
+});
+
+it("new scope binding uses server allocation rather than invented future aliases",()=>{
+ const f=researchFixture(),scope=[{scopeKey:"00000001-0000-4000-8000-000000000000",modelRef:"accepted_parent",title:"Existing scope",parentKey:null,inclusion:"REQUESTED" as const,sourceClaimIds:[]}];
+ f.review.scopeBindings=[{claimId:f.review.claims[0].claimId,scopeRefs:[],disposition:"ADD_SCOPE"}];
+ expect(verifyResearch([f.read],assessment,f.extraction,f.review,scope).scopeBindings).toEqual(f.review.scopeBindings);
+ f.review.scopeBindings[0].scopeRefs=["new_future_scope"];
+ expect(()=>verifyResearch([f.read],assessment,f.extraction,f.review,scope)).toThrow();
+ f.review.scopeBindings[0].scopeRefs=["accepted_parent"];
+ expect(verifyResearch([f.read],assessment,f.extraction,f.review,scope).scopeBindings[0].scopeRefs).toEqual(["accepted_parent"]);
+});

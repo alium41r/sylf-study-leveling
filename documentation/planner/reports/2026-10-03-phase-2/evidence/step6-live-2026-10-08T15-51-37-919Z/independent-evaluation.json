@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-08T15:57:23.471954+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-08T15-51-37-919Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "776e92ce9f35348b971a759fd0f04194e64a79cff9bca34b64c68bff1178ba9d",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "temporaryExistingGroq": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "reviewTemperature": 0.2,
+    "reviewThinking": null,
+    "reviewReasoningEffort": null,
+    "primary": {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 3,
+  "usage": {
+    "reportedInputTokens": 10666,
+    "reportedOutputTokens": 1827,
+    "settledCalls": 2,
+    "unknownSpendCalls": 1,
+    "unknownPricedCalls": 3
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 3592,
+    "p90Ms": 4104,
+    "maximumMs": 4104
+  },
+  "passed": 0,
+  "total": 1,
+  "cases": [
+    {
+      "id": "method-weakness",
+      "trial": 1,
+      "attemptId": "a2916488-f7e0-4f22-8e16-d98a7c13771a",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "FAILED: actual configured Groq generation returns a valid structured blueprint, but forces Kirchhoff Voltage Law with node analysis as the only correct method for a series-parallel network where equivalent resistance and Ohm are valid. Groq independent review fails QUOTA_OR_RATE_LIMIT. Metered DeepSeek fallback identifies that genuine discrepancy but supplies only PROPOSAL grounds; strict requirement/evidence grounding rejects it. No accepted review, repair, candidate or apply. Both successful calls settle actual usage; the failed review retains UNKNOWN_SPEND reservation, not free budget.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "REVIEW",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "01be0284-a82a-4d90-b7a4-ce0b87513055"
+      },
+      "applied": false,
+      "actualQuests": 0
+    }
+  ],
+  "operationalFailures": 1,
+  "sourceCurrentAtAssessment": true
+}

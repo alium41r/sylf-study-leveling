@@ -45,3 +45,8 @@ it("returns the canonical final settlement without adding a second reward path",
   expect(await response.json()).toMatchObject({ weeklyAwarded: true, questCompletedNow: false });
   expect(mocks.query).not.toHaveBeenCalled();
 });
+it("refuses a queued start after the authenticated account changes", async () => {
+  const response = await POST(request("POST", { executionProtocol: 2, expectedOwnerId: 8,
+    clientSessionKey: "71c48d7a-882d-4a80-a841-9df01457c091", startedAt: "2026-10-14T09:00:00Z" }));
+  expect(response.status).toBe(409); expect(mocks.query).not.toHaveBeenCalled();
+});

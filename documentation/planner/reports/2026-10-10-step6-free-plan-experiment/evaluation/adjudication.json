@@ -1,0 +1,33 @@
+{
+  "recordedAt": "2026-10-10T17:31:40.357663+00:00",
+  "status": "STOPPED_COMPARISON_UNASSESSABLE",
+  "primaryAssessment": {
+    "path": "evaluation/locked-primary-root.json",
+    "sha256": "4cb26cb4bbecd0c9003408781776ebc94fdb0e71b9dfdb73ace2ef86ccfcf0bc",
+    "lockedBeforeIndependentResult": true
+  },
+  "independentAssessment": {
+    "path": "evaluator/independent-stopped-run-assessment.md",
+    "sha256": "071aa857e3eaa345a79ab7b0d67679b1af0c43dec91703300b8345b06a1ded8c",
+    "assessor": "/root/independent_label_signoff",
+    "independentAI": true,
+    "humanEducationalReview": false
+  },
+  "agreement": {
+    "educationalQuality": "UNASSESSABLE",
+    "technicalValidity": "NOT_EVALUATED_NO_RESPONSE",
+    "causalInterfaceConclusion": "NOT_IDENTIFIABLE",
+    "actualUsage": null,
+    "usageBasedCost": null,
+    "retainedReservationUsd": 0.0421074,
+    "futureDispatchUnderStoppedApproval": false
+  },
+  "materialDisagreements": [],
+  "sleepCleanupProvenance": {
+    "independentReviewerLivePidCheck": "UNAVAILABLE",
+    "primaryReadOnlyAssertionReceipt": "evidence/post-run-sleep.json",
+    "ownedAssertionsReleased": true
+  },
+  "noAdditionalModelCalls": true,
+  "productionChanges": false
+}

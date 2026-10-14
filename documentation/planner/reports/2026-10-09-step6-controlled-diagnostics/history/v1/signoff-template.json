@@ -1,0 +1,21 @@
+{
+  "status": "PENDING",
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v1",
+  "protocolManifestSha256": null,
+  "caseLabelsSha256": null,
+  "reviewedAt": null,
+  "independentLabelAssessor": null,
+  "labelAuthor": "Codex preparation; independent of the tested Flash model, not a human signoff",
+  "allEightGenerationRubricsChecked": false,
+  "allTwelveCandidateLabelsChecked": false,
+  "allFourOriginalRepairFindingsChecked": false,
+  "bothCapacityComparisonsChecked": false,
+  "primaryAssessor": null,
+  "secondAssessor": null,
+  "paidAuthorization": null,
+  "executionMockPreflightEvidence": null,
+  "approvedMaximumDispatches": 0,
+  "approvedMaximumRecoveries": 0,
+  "approvedMaximumSpendUsd": 0,
+  "notes": []
+}

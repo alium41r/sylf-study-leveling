@@ -20,7 +20,7 @@ import {
 import {
   LevelInsigniaIcon,
   StreakFlameIcon,
-  SystemApertureIcon,
+  SylvieIcon,
   QuestEmblemIcon,
 } from "@/app/components/icons";
 import {
@@ -395,7 +395,7 @@ export function NotificationsSettingsScreen() {
                 id="aiStudyPlans"
                 title="AI Study Plan Generation"
                 description="Notifications when an adaptive study syllabus and quest roadmap are generated."
-                icon={<SystemApertureIcon size={16} />}
+                icon={<SylvieIcon size={16} />}
                 checked={preferences.aiStudyPlans}
                 disabled={!isMasterOn || isLoading}
                 onChange={handleToggle}

@@ -1,0 +1,76 @@
+{
+  "currency": "USD",
+  "ratesChecked": "2026-10-09",
+  "cacheDiscountAssumed": false,
+  "rateSources": {
+    "deepseek": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "gemini": "https://ai.google.dev/gemini-api/docs/pricing#gemini-2.5-flash"
+  },
+  "ratesPerMillion": {
+    "flashOffPeak": {
+      "input": 0.15,
+      "output": 0.6
+    },
+    "flashPeak": {
+      "input": 0.3,
+      "output": 1.2
+    },
+    "geminiPaidStandard": {
+      "input": 0.3,
+      "output": 2.5
+    }
+  },
+  "counts": {
+    "REASONING": {
+      "calls": 8,
+      "inputReservationUnits": 36508,
+      "outputTokenCapSum": 65536
+    },
+    "REVIEW": {
+      "calls": 12,
+      "inputReservationUnits": 152528,
+      "outputTokenCapSum": 49152
+    },
+    "STRUCTURE": {
+      "calls": 16,
+      "inputReservationUnits": 268868,
+      "outputTokenCapSum": 131072
+    },
+    "REPAIR": {
+      "calls": 4,
+      "inputReservationUnits": 89676,
+      "outputTokenCapSum": 32768
+    },
+    "VERIFICATION": {
+      "calls": 4,
+      "inputReservationUnits": 94282,
+      "outputTokenCapSum": 16384
+    },
+    "CAPACITY": {
+      "calls": 8,
+      "inputReservationUnits": 116456,
+      "outputTokenCapSum": 65536
+    }
+  },
+  "totalPrimaryInputReservationUnits": 758318,
+  "totalPrimaryOutputCap": 360448,
+  "primaryPlanningRange": {
+    "assumptions": "Actual input provisionally 25–50% of reserved UTF-8 units; output 40–100% of cap including thinking. These are planning scenarios, not a measured tokenizer estimate.",
+    "lowUsd": 0.114944445,
+    "highUsd": 0.5462853
+  },
+  "primaryConservativeAllowance": {
+    "method": "Treat each reservation unit, including dynamic verification holdbacks, as one billed input token; all output caps consumed; no cache or off-peak discount.",
+    "usd": 0.660033
+  },
+  "recoveryAllowance": {
+    "calls": 12,
+    "inputPlanningAllowancePerCall": 80000,
+    "configuredOutputCapPerCall": 8192,
+    "billedOutputPlanningAllowancePerCall": 32768,
+    "geminiUsd": 1.27104,
+    "notes": "Spending allowance, not raised token caps: charge a full root input allowance plus 32768 output tokens per fallback to leave room for separate Gemini thought counters. This is an estimate, not a provider hard bound. Actual requests must fit remaining root budget. Stop if actual billing exceeds a reserved spending allowance. No search, grounding, audio or retrying tools allowed."
+  },
+  "proposedApprovalCeilingUsd": 3,
+  "unknownSpendPolicy": "Debit the full predispatch published-rate allowance until reconciled; never treat missing ledger prices or unknown usage as zero."
+}

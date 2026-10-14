@@ -9,9 +9,9 @@ import AiAssistantTool from "./tools/AiAssistantTool";
 import AudioMixerTool from "./tools/AudioMixerTool";
 import ScratchpadTool from "./tools/ScratchpadTool";
 import FormulasTool from "./tools/FormulasTool";
+import { SylvieIcon } from "@/app/components/icons";
 import {
   Calculator,
-  Sparkles,
   Headphones,
   FileText,
   BookOpen,
@@ -28,7 +28,7 @@ export const TOOL_CONFIG: Record<
   { title: string; icon: React.ComponentType<{ className?: string }>; color: string }
 > = {
   calculator: { title: "SYSTEM CALCULATOR", icon: Calculator, color: "text-blue-400" },
-  ai: { title: "AI STUDY ASSISTANT", icon: Sparkles, color: "text-purple-400" },
+  ai: { title: "SYLVIE", icon: SylvieIcon, color: "text-purple-400" },
   audio: { title: "ACOUSTICS MIXER", icon: Headphones, color: "text-emerald-400" },
   notes: { title: "FOCUS SCRATCHPAD", icon: FileText, color: "text-amber-400" },
   formulas: { title: "FORMULAS & REFERENCE", icon: BookOpen, color: "text-cyan-400" },
@@ -84,7 +84,7 @@ function FloatingWindowItem({
 }: FloatingWindowItemProps) {
   const { toolId, rect, isFocused, isMinimized, isMaximized } = windowData;
   const currentConfig = TOOL_CONFIG[toolId];
-  const Icon = currentConfig?.icon || Sparkles;
+  const Icon = currentConfig?.icon || SylvieIcon;
 
   // ── Refs ──────────────────────────────────────────────────────
   // positionerRef: the outer <div> that owns translate3d(x,y,0).

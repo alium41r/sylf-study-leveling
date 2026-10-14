@@ -1,0 +1,575 @@
+{
+  "numTotalTestSuites": 5,
+  "numPassedTestSuites": 3,
+  "numFailedTestSuites": 2,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 52,
+  "numPassedTests": 0,
+  "numFailedTests": 1,
+  "numPendingTests": 51,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1791483291152,
+  "success": false,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [],
+          "fullName": "seals a known-scope candidate after independent review with two calls and no execution writes",
+          "status": "skipped",
+          "title": "seals a known-scope candidate after independent review with two calls and no execution writes",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "one named repair is independently verified on its actual new allocation before sealing",
+          "status": "skipped",
+          "title": "one named repair is independently verified on its actual new allocation before sealing",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "vague more-practice preference cannot add workload, trigger repair or block a candidate",
+          "status": "skipped",
+          "title": "vague more-practice preference cannot add workload, trigger repair or block a candidate",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "an unresolved exact verification remains unconfirmable with no second repair",
+          "status": "skipped",
+          "title": "an unresolved exact verification remains unconfirmable with no second repair",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "a review outage preserves a readable pending review and never silently publishes",
+          "status": "skipped",
+          "title": "a review outage preserves a readable pending review and never silently publishes",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "insufficient repair plus verification allowance leaves the blocked review intact",
+          "status": "skipped",
+          "title": "insufficient repair plus verification allowance leaves the blocked review intact",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "takeover resumes a cleared review without model calls or deadline renewal",
+          "status": "skipped",
+          "title": "takeover resumes a cleared review without model calls or deadline renewal",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "takeover uses an accepted saved repair instead of repeating the repair call",
+          "status": "skipped",
+          "title": "takeover uses an accepted saved repair instead of repeating the repair call",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "takeover cannot repeat a dispatched repair whose accepted response was lost",
+          "status": "skipped",
+          "title": "takeover cannot repeat a dispatched repair whose accepted response was lost",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "cancellation and changed calendar reject a late review before sealing",
+          "status": "skipped",
+          "title": "cancellation and changed calendar reject a late review before sealing",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "joint publication seals both reviewed targets atomically and duplicates no prerequisite",
+          "status": "skipped",
+          "title": "joint publication seals both reviewed targets atomically and duplicates no prerequisite",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "tampered reviewed allocation/checkpoint cannot publish",
+          "status": "skipped",
+          "title": "tampered reviewed allocation/checkpoint cannot publish",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "an explicit linked retry resumes a failed review on a new root without regenerating education",
+          "status": "skipped",
+          "title": "an explicit linked retry resumes a failed review on a new root without regenerating education",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "an explicit linked new root can retry a lost repair while ordinary takeover cannot",
+          "status": "skipped",
+          "title": "an explicit linked new root can retry a lost repair while ordinary takeover cannot",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "takeover meters a repeated review when the accepted response was lost before its checkpoint",
+          "status": "skipped",
+          "title": "takeover meters a repeated review when the accepted response was lost before its checkpoint",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "takeover reestablishes verification hold and meters verification whose response was lost",
+          "status": "skipped",
+          "title": "takeover reestablishes verification hold and meters verification whose response was lost",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "repair infeasibility retains its accepted education and feedback without another adaptation",
+          "status": "skipped",
+          "title": "repair infeasibility retains its accepted education and feedback without another adaptation",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "new concrete verification blockers cannot publish even when original issues resolve",
+          "status": "skipped",
+          "title": "new concrete verification blockers cannot publish even when original issues resolve",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "publication rejects changes to the reviewed execution date and durable activity identity",
+          "status": "skipped",
+          "title": "publication rejects changes to the reviewed execution date and durable activity identity",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "actual supervised compiler failure retains stage and review artifact with zero candidates",
+          "status": "skipped",
+          "title": "actual supervised compiler failure retains stage and review artifact with zero candidates",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "compiled ordinary Node supervised handlers produce a reviewed sealed candidate",
+          "status": "skipped",
+          "title": "compiled ordinary Node supervised handlers produce a reviewed sealed candidate",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "protected running education is reviewed and sealed unchanged without execution writes or double counting",
+          "status": "skipped",
+          "title": "protected running education is reviewed and sealed unchanged without execution writes or double counting",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "one supervised compiler root researches verifies adopts reviews and seals with raw source provenance",
+          "status": "skipped",
+          "title": "one supervised compiler root researches verifies adopts reviews and seals with raw source provenance",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "keeps Exam research unconfirmable when no assessed scope is verified despite an empty model conflict list",
+          "status": "skipped",
+          "title": "keeps Exam research unconfirmable when no assessed scope is verified despite an empty model conflict list",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "seals an owned saved-check reference without treating that check as verified readiness",
+          "status": "skipped",
+          "title": "seals an owned saved-check reference without treating that check as verified readiness",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "research adoption crash resumes its verified receipt without renewing the expired research window",
+          "status": "skipped",
+          "title": "research adoption crash resumes its verified receipt without renewing the expired research window",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "root deadline expiry and a superseded intent fence a late independent review",
+          "status": "skipped",
+          "title": "root deadline expiry and a superseded intent fence a late independent review",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "review checkpoint pins the execution identity registry against tampering after review",
+          "status": "skipped",
+          "title": "review checkpoint pins the execution identity registry against tampering after review",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [],
+          "fullName": "insufficient actual verification growth retains the repaired allocation without publishing or another repair",
+          "status": "skipped",
+          "title": "insufficient actual verification growth retains the repaired allocation without publishing or another repair",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1791483291152,
+      "endTime": 1791483291152,
+      "status": "passed",
+      "message": "",
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-quality.postgres.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories creates one owned immutable intent and returns an identical retry",
+          "status": "skipped",
+          "title": "creates one owned immutable intent and returns an identical retry",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories binds one lease, survives cancellation and rejects its late checkpoint",
+          "status": "skipped",
+          "title": "binds one lease, survives cancellation and rejects its late checkpoint",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories never retargets an attempt after accepted intent changes",
+          "status": "skipped",
+          "title": "never retargets an attempt after accepted intent changes",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories recovers an expired lease without resetting budget or accepting the previous fence",
+          "status": "skipped",
+          "title": "recovers an expired lease without resetting budget or accepting the previous fence",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories admits one planning and one read-only research job per user across workers",
+          "status": "skipped",
+          "title": "admits one planning and one read-only research job per user across workers",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories applies an exact proposal once under concurrent confirmation",
+          "status": "skipped",
+          "title": "applies an exact proposal once under concurrent confirmation",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories rolls back every materialization boundary without a partial receipt",
+          "status": "skipped",
+          "title": "rolls back every materialization boundary without a partial receipt",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories protects zero-second starts, acknowledged pause/resume and receipt replays",
+          "status": "skipped",
+          "title": "protects zero-second starts, acknowledged pause/resume and receipt replays",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories settles the weekly mission atomically and only once across competing protocols",
+          "status": "skipped",
+          "title": "settles the weekly mission atomically and only once across competing protocols",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 1 actual durable repositories"
+          ],
+          "fullName": "Phase 1 actual durable repositories settles legacy timer history without V2 columns and preserves accepted V2 civil dates",
+          "status": "skipped",
+          "title": "settles legacy timer history without V2 columns and preserves accepted V2 civil dates",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1791483291152,
+      "endTime": 1791483291152,
+      "status": "passed",
+      "message": "",
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/durable-core.postgres.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL executes the compiled provider boundary in ordinary Node with actual durable accounting",
+          "status": "skipped",
+          "title": "executes the compiled provider boundary in ordinary Node with actual durable accounting",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL loads 1500 historical rows without losing authoritative history/capacity or overflowing the dependency registry",
+          "status": "skipped",
+          "title": "loads 1500 historical rows without losing authoritative history/capacity or overflowing the dependency registry",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL meters fallback before each upstream dispatch and settles one quota unit for the root",
+          "status": "skipped",
+          "title": "meters fallback before each upstream dispatch and settles one quota unit for the root",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL loads each joint target's owned dated evidence and rejects another student's intent",
+          "status": "skipped",
+          "title": "loads each joint target's owned dated evidence and rejects another student's intent",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL preserves owned legacy observations and pins check provenance changes without relabeling the older result seal",
+          "status": "skipped",
+          "title": "preserves owned legacy observations and pins check provenance changes without relabeling the older result seal",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL keeps known overrun spend in the financial ledger when another fallback's spend remains unknown",
+          "status": "skipped",
+          "title": "keeps known overrun spend in the financial ledger when another fallback's spend remains unknown",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL retains mandatory review capacity under parallel reservations and refunds rejected/undispatched calls",
+          "status": "skipped",
+          "title": "retains mandatory review capacity under parallel reservations and refunds rejected/undispatched calls",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL bounds five reservations waiting on the same owner without exhausting serialization retries",
+          "status": "failed",
+          "title": "bounds five reservations waiting on the same owner without exhausting serialization retries",
+          "duration": 163.552416,
+          "failureMessages": [
+            "ReferenceError: DurablePlannerError is not defined\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts:148:50\n    at Array.map (<anonymous>)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts:148:21\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL starts the research sub-window before search/fetch and never renews it through a fenced takeover",
+          "status": "skipped",
+          "title": "starts the research sub-window before search/fetch and never renews it through a fenced takeover",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL persists review and repair-verification holdbacks, then meters the verification separately",
+          "status": "skipped",
+          "title": "persists review and repair-verification holdbacks, then meters the verification separately",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL aborts on cancellation from a separate PostgreSQL connection and reconciles a late reply without changing the terminal attempt",
+          "status": "skipped",
+          "title": "aborts on cancellation from a separate PostgreSQL connection and reconciles a late reply without changing the terminal attempt",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL enforces the database root deadline even when the adapter ignores abort",
+          "status": "skipped",
+          "title": "enforces the database root deadline even when the adapter ignores abort",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "Phase 2 context and metered boundary on genuine PostgreSQL"
+          ],
+          "fullName": "Phase 2 context and metered boundary on genuine PostgreSQL transfers actual metered foreground time, quota and review holds exactly once into worker processing",
+          "status": "skipped",
+          "title": "transfers actual metered foreground time, quota and review holds exactly once into worker processing",
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1791483292606,
+      "endTime": 1791483292769.5525,
+      "status": "failed",
+      "message": "",
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts"
+    }
+  ]
+}

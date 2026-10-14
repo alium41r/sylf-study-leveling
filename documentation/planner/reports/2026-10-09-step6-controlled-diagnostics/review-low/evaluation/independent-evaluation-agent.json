@@ -1,0 +1,957 @@
+{
+  "schemaVersion": 1,
+  "status": "INDEPENDENT_AI_AGENT_LOW_PAIR_EVALUATION_COMPLETE_PAIR_GATE_FAILED",
+  "finalizedAtUtc": "2026-10-10T15:33:50.517192+00:00",
+  "reviewer": "Independent AI-agent /root/independent_label_signoff",
+  "humanEvaluation": false,
+  "independentOfCaseAuthor": true,
+  "independentOfTestedProvider": true,
+  "providerCallsMadeByReviewer": 0,
+  "externalJudgeCalls": 0,
+  "subagentsSpawned": 0,
+  "furtherDiagnosticsAuthorized": false,
+  "frozenArtifactsChanged": false,
+  "method": {
+    "primaryLockedAtUtc": "2026-10-09T14:03:32.168936+00:00",
+    "lockedPrimaryPath": "review-low/evaluation/locked-primary-agent.json",
+    "lockedPrimarySha256": "cf0b0114ba3e3de98c91d123165ef91396e2bf34ec55c1881fac8ca3c68f448a",
+    "sequence": "Read only reviews-blind.json and frozen evaluator/RUBRIC.md before locking; prior signoff knowledge permitted. After lock, inspect mapping, execution receipts, original High receipts, frozen protocol/signoff and root assessment. Replay the exact frozen review validator locally on the completed output only, with no provider call or repair.",
+    "blindingLimitations": "Neutral IDs and execution/configuration mapping were withheld. The task title explicitly names the Low experiment, and prior signoff knowledge recognizes these two scenarios and their gold mixture. This is not full configuration or task blinding.",
+    "scoreBoundaries": "Judge delivered educational meaning and literal grounding separately from schema and delivery. Blank/capped output is not an educational verdict and is excluded from semantic denominators. No scores averaged or reconstructed."
+  },
+  "summary": {
+    "scheduledCases": 2,
+    "paidExecutionCalls": 2,
+    "deliveredCompleteStopReviews": 1,
+    "strictAcceptedCorrectReviews": 1,
+    "blankCappedReviews": 1,
+    "pairGate": "FAIL_OPERATIONAL_DELIVERY",
+    "semanticAccuracyAcrossPair": "UNASSESSABLE_AS_TWO_CASE_CLASSIFICATION",
+    "assessableCaseCorrectness": {
+      "correct": 1,
+      "assessable": 1,
+      "claimScope": "Only the one delivered defective-case review; not population accuracy or a qualified pair."
+    },
+    "soundCaseFalseBlockerPerformance": "UNASSESSABLE",
+    "extraFalseBlockersOnAssessableReview": 0,
+    "rawParseableInvalidConcernsObserved": 0,
+    "broadPrecisionSensitivityReliability": "NOT_QUALIFIED",
+    "blankIncludedInAccuracyDenominator": false,
+    "originalInitialBlockQualificationRestored": false,
+    "furtherExecutionAuthorized": false
+  },
+  "assessments": [
+    {
+      "assessmentId": "B01",
+      "caseId": "v04",
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "packet": "model/packets/d_6de45b407ca18e60.json",
+      "lockedPrimaryAssessment": {
+        "assessmentId": "B01",
+        "reviewInputSha256": "c3ffc8c90add2dbf5edc4c7fd0b0f118c43de85122df5a0e896cfa1f578f8c67",
+        "suppliedModelMessageBodySha256": "7a6dacfe86a54e043760c30fa015316757d91b4f553a0554d2883d123f8a7bf6",
+        "rawFinalTextSha256": "99f1210be7ce3e6adcf96d723c804372ef8c4b49e648e7727c3e67e0abd5240f",
+        "verbatimRawFinalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_work2_stop_violation\",\"category\":\"STRUCTURAL\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_2\",\"strategy\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/accepted\",\"excerpt\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"All twelve rewrites are done even after checked success.\"},{\"ref\":\"plan_1/uncertainty\",\"excerpt\":\"Meet the accepted criterion or record the specific unresolved gap.\"}],\"evidence\":\"The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.\",\"consequence\":\"The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.\",\"requestedResolution\":\"Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.\",\"requiresAcknowledgement\":false}]}]}",
+        "finishReason": "stop",
+        "contentComplete": true,
+        "acceptedOutcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+        "completeCandidateInspected": true,
+        "effortAndStructure": {
+          "recommendedEffort": {
+            "lowMinutes": 40,
+            "likelyMinutes": 40,
+            "highMinutes": 40
+          },
+          "workloadAudit": [
+            {
+              "planRef": "plan_1",
+              "bookedTimeboxMinutes": 40,
+              "unprotectedTimeboxMinutes": 40,
+              "protectedRemainingMinutes": 0,
+              "remainingCommittedMinutes": 40,
+              "recommendedEffort": {
+                "lowMinutes": 40,
+                "likelyMinutes": 40,
+                "highMinutes": 40
+              },
+              "remainingAboveStrategyHigh": false,
+              "committedRefs": [
+                "work_1",
+                "work_2"
+              ]
+            }
+          ],
+          "allocation": {
+            "schemaVersion": 2,
+            "status": "FEASIBLE",
+            "placements": [
+              {
+                "planRef": "plan_1",
+                "activityRef": "work_1",
+                "minutes": 10,
+                "date": "2026-10-12"
+              },
+              {
+                "planRef": "plan_1",
+                "activityRef": "work_2",
+                "minutes": 30,
+                "date": "2026-10-12"
+              }
+            ],
+            "unscheduled": [],
+            "committedMinutes": 40,
+            "capacityProof": null,
+            "findings": [
+              {
+                "findingId": "finding_ed329fe5b20f4d190a99",
+                "category": "FINISH",
+                "consequential": false,
+                "planRefs": [
+                  "plan_1"
+                ],
+                "activityRefs": [],
+                "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+                "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+              }
+            ]
+          },
+          "sharedDependencies": [],
+          "splits": [],
+          "protectedExecution": []
+        },
+        "formalStrictValidatorOutcome": "NOT_CONSULTED_BEFORE_LOCK; VERIFY_AFTER_LOCK",
+        "candidateIndependentJudgment": "SERIOUS_CONCRETE_DEFECT",
+        "candidateSeriousness": "SERIOUS",
+        "candidateRationale": "The accepted stopping point is one correct checked citation. work_1 produces it correctly; work_2 then compulsorily requires twelve identical rewrites after success. Its committed 30-minute estimate is beyond that stopping gate without a supported educational purpose. Daily feasibility and matching 40-minute strategy/booked effort do not cure the contradiction.",
+        "candidateGrounds": {
+          "requirementQuote": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+          "proposalInstructionsQuote": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+          "proposalCriterionQuote": "All twelve rewrites are done even after checked success.",
+          "consequence": "The candidate mandates twelve redundant rewrites and a further booked 30 minutes after the explicit accepted success gate. It requires substantive removal or withdrawal of that compulsory work."
+        },
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "operationalDelivery": "COMPLETE_JSON_DELIVERED",
+        "manualOutputValidity": "ONE_PLAN_ONE_ISSUE_WITH_EXPECTED_FIELDS; CANONICAL_VALIDATOR_PENDING",
+        "semanticJudgment": "PASS",
+        "consequentialDefectCorrectlyDetected": true,
+        "rawIdentifiedIssues": [
+          {
+            "issueId": "issue_work2_stop_violation",
+            "category": "STRUCTURAL",
+            "severity": "BLOCKING",
+            "affectedRefs": [
+              "work_2",
+              "strategy"
+            ],
+            "basis": "CONCRETE_VIOLATION",
+            "grounds": [
+              {
+                "ref": "plan_1/accepted",
+                "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+              },
+              {
+                "ref": "plan_1/activity/work_2",
+                "excerpt": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily."
+              },
+              {
+                "ref": "plan_1/activity/work_2",
+                "excerpt": "All twelve rewrites are done even after checked success."
+              },
+              {
+                "ref": "plan_1/uncertainty",
+                "excerpt": "Meet the accepted criterion or record the specific unresolved gap."
+              }
+            ],
+            "evidence": "The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.",
+            "consequence": "The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.",
+            "requestedResolution": "Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.",
+            "requiresAcknowledgement": false
+          }
+        ],
+        "identifiedIssueCount": 1,
+        "groundingChecks": [
+          {
+            "ref": "plan_1/accepted",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].resolved",
+            "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+            "literalMatch": true
+          },
+          {
+            "ref": "plan_1/activity/work_2",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[1]",
+            "excerpt": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+            "literalMatch": true
+          },
+          {
+            "ref": "plan_1/activity/work_2",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[1]",
+            "excerpt": "All twelve rewrites are done even after checked success.",
+            "literalMatch": true
+          },
+          {
+            "ref": "plan_1/uncertainty",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.decisions",
+            "excerpt": "Meet the accepted criterion or record the specific unresolved gap.",
+            "literalMatch": true
+          }
+        ],
+        "groundingValidity": "PASS_LITERAL_AND_SUBSTANTIVE",
+        "extraFalseBlockerCount": 0,
+        "missedConsequentialDefect": false,
+        "correctVerdict": true,
+        "seriousReviewerDefect": false,
+        "reviewerIssues": [],
+        "rationale": "The sole issue identifies the actual compulsory post-success work, quotes both the accepted outcome and original offending instructions/criterion, and explains its unnecessary booked work and stopping-rule consequence. Its request to remove work_2 plus related effort/allocation/dependency entries preserves the valid first citation check. STRUCTURAL is a defensible category for the conflicting compulsory plan structure; exact authored category wording is not required. No unsupported blocker, stylistic preference or duration floor is introduced.",
+        "reviewOutputQuotes": {
+          "evidence": "The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.",
+          "consequence": "The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.",
+          "requestedResolution": "Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop."
+        },
+        "admissibleAlternatives": "Any independently checked single citation matching the actual pattern is valid; remediation can be conditional on an actual failure. Compulsory twelve post-success copies are not justified by capacity or a preferred practice method."
+      },
+      "rootPrimaryAssessment": {
+        "assessmentId": "B01",
+        "operationalDelivery": "COMPLETE_STOP",
+        "schemaAndGroundingAssessment": "STRICT_CANONICAL_VALIDATOR_PASSED_IN_EXECUTION",
+        "independentEducationalAssessment": "CORRECT_GROUNDED_BLOCKING_FINDING",
+        "seriousDefectCorrectlyDetected": true,
+        "groundedRequirementQuote": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+        "groundedOffendingProposalQuotes": [
+          "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+          "All twelve rewrites are done even after checked success.",
+          "Meet the accepted criterion or record the specific unresolved gap."
+        ],
+        "consequence": "Thirty compulsory minutes of twelve identical rewrites after the single citation already satisfies the accepted stopping requirement defeat that explicit stopping point. Available capacity and internally matching effort totals do not justify that extra work.",
+        "findingCategory": "STRUCTURAL",
+        "findingSeverity": "BLOCKING",
+        "extraFalseBlockers": 0,
+        "requestedResolutionAssessment": "Remove the unnecessary activity and associated effort/allocation/dependency entries, preserving the valid citation and its success gate. This is appropriately focused; no actual repair is performed.",
+        "semanticJudgment": "CORRECT_ON_DELIVERED_DEFECTIVE_CASE",
+        "concerns": []
+      },
+      "lowMetrics": {
+        "promptTokens": 2860,
+        "inputCacheHitTokens": 768,
+        "inputCacheMissTokens": 2092,
+        "completionTokensIncludingReasoning": 2848,
+        "reasoningTokensSubset": 2531,
+        "nonReasoningCompletionTokens": 317,
+        "finishReason": "stop",
+        "latencyMs": 14480,
+        "estimatedOffPeakCacheAdjustedUsd": "0.002024904",
+        "guardPeakUncachedUpperEstimateUsd": "0.0042756",
+        "retainedReservationUsd": "0.0084969"
+      },
+      "packetSha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "candidateSha256": "042331d15688d7f2c89cb85cfb82aed1868e88003af78734f51aee02508db7ed",
+      "lowWireVerification": {
+        "actualJournaledRequestBodySha256": "d8fb60d90280461efd573e7e1ad478b1ae67f414b9295ce7adafdf808a41ae63",
+        "independentlyReconstructedRequestBodySha256": "d8fb60d90280461efd573e7e1ad478b1ae67f414b9295ce7adafdf808a41ae63",
+        "reconstructedHighDefaultRequestBodySha256": "ae0477ac85a8ed2982ce6e30325a7ce0157b6c27785761856f8da16a3799de75",
+        "soleWireDifference": {
+          "reasoning_effort": "low"
+        },
+        "thinkingOmitted": true,
+        "promptAndInputUnchanged": true,
+        "outputTokenCapUnchanged": 4096
+      },
+      "canonicalAccounting": {
+        "state": "CANCELLED",
+        "providerCallState": "SETTLED",
+        "actualInputTokens": 2860,
+        "actualOutputTokens": 2848,
+        "pricing": "UNKNOWN",
+        "costUsd": null,
+        "applyReceipt": null
+      },
+      "finalJudgment": "CORRECT_GROUNDED_BLOCKER",
+      "operationalDelivery": "PASS_COMPLETE_STOP",
+      "formalStrictValidation": "PASS",
+      "validatorIndependentReplay": "PASS_EXACT_FROZEN_VALIDATOR; findings and report semantics matched execution receipt",
+      "strictAcceptedFindings": [
+        {
+          "planRef": "plan_1",
+          "finding": {
+            "issueId": "issue_work2_stop_violation",
+            "category": "STRUCTURAL",
+            "severity": "BLOCKING",
+            "affectedRefs": [
+              "work_2",
+              "strategy"
+            ],
+            "basis": "CONCRETE_VIOLATION",
+            "grounds": [
+              {
+                "ref": "plan_1/accepted",
+                "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+              },
+              {
+                "ref": "plan_1/activity/work_2",
+                "excerpt": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily."
+              },
+              {
+                "ref": "plan_1/activity/work_2",
+                "excerpt": "All twelve rewrites are done even after checked success."
+              },
+              {
+                "ref": "plan_1/uncertainty",
+                "excerpt": "Meet the accepted criterion or record the specific unresolved gap."
+              }
+            ],
+            "evidence": "The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.",
+            "consequence": "The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.",
+            "requestedResolution": "Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.",
+            "requiresAcknowledgement": false
+          }
+        }
+      ],
+      "strictReportStatus": "BLOCKED",
+      "issueResolution": "OPEN",
+      "consequentialDefectCorrectlyDetected": true,
+      "extraFalseBlockerCount": 0,
+      "correctVerdict": true,
+      "seriousReviewerDefect": false,
+      "adjudication": {
+        "status": "AGREE",
+        "rationale": "Independent primary and case-author-side primary both identify the genuine compulsory post-success work; literal grounds and exact unchanged validator independently confirm acceptance. No label/category wording match was required and no output correction or repair was made."
+      }
+    },
+    {
+      "assessmentId": "B02",
+      "caseId": "v09",
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "packet": "model/packets/d_21da0ca3d648bd22.json",
+      "lockedPrimaryAssessment": {
+        "assessmentId": "B02",
+        "reviewInputSha256": "65763614f7c36bd6f606ce1df6e81ca37e68333a9250c14f9c38ad3f258b5c2b",
+        "suppliedModelMessageBodySha256": "be9d76545fde6151fe2c0e1960e6c613be60f6553f1ace1fdb2ea5572de5e271",
+        "rawFinalTextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "verbatimRawFinalText": "",
+        "finishReason": "length",
+        "contentComplete": false,
+        "acceptedOutcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+        "completeCandidateInspected": true,
+        "effortAndStructure": {
+          "recommendedEffort": {
+            "lowMinutes": 10,
+            "likelyMinutes": 10,
+            "highMinutes": 10
+          },
+          "workloadAudit": [
+            {
+              "planRef": "plan_1",
+              "bookedTimeboxMinutes": 10,
+              "unprotectedTimeboxMinutes": 10,
+              "protectedRemainingMinutes": 0,
+              "remainingCommittedMinutes": 10,
+              "recommendedEffort": {
+                "lowMinutes": 10,
+                "likelyMinutes": 10,
+                "highMinutes": 10
+              },
+              "remainingAboveStrategyHigh": false,
+              "committedRefs": [
+                "work_1"
+              ]
+            }
+          ],
+          "allocation": {
+            "schemaVersion": 2,
+            "status": "FEASIBLE",
+            "placements": [
+              {
+                "planRef": "plan_1",
+                "activityRef": "work_1",
+                "minutes": 10,
+                "date": "2026-10-12"
+              }
+            ],
+            "unscheduled": [],
+            "committedMinutes": 10,
+            "capacityProof": null,
+            "findings": [
+              {
+                "findingId": "finding_ed329fe5b20f4d190a99",
+                "category": "FINISH",
+                "consequential": false,
+                "planRefs": [
+                  "plan_1"
+                ],
+                "activityRefs": [],
+                "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+                "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+              }
+            ]
+          },
+          "sharedDependencies": [],
+          "splits": [],
+          "protectedExecution": []
+        },
+        "formalStrictValidatorOutcome": "NOT_CONSULTED_BEFORE_LOCK; VERIFY_AFTER_LOCK",
+        "candidateIndependentJudgment": "NO_CONCRETE_BLOCKER",
+        "candidateSeriousness": "NONE",
+        "candidateRationale": "The written task uses the supplied morning/evening greetings, covers the key, chooses on fresh stated-time prompts and explains the time match. The instructions require the accepted explanation even though the abbreviated criterion names written choices only. No pronunciation requirement, extra curriculum or unavailable resource is needed. The 10-minute bounded check fits the 30-minute daily capacity and has no shared, split or protected-work complication.",
+        "candidateGrounds": {
+          "requirementQuote": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+          "proposalInstructionsQuote": "For morning choose おはよう; for evening choose こんばんは. Cover the key, choose for two new morning/evening prompts and explain the time match.",
+          "proposalCriterionQuote": "Written choices match the supplied time categories.",
+          "consequence": "A nonblocking clarification could repeat the explanation in the criterion; the full instruction already requires it. Pronunciation preference alone cannot justify a blocker."
+        },
+        "assessability": "UNASSESSABLE_BLANK_CAPPED",
+        "operationalDelivery": "FAIL_BLANK_CAPPED",
+        "manualOutputValidity": "NO_COMPLETE_OUTPUT_TO_VALIDATE",
+        "semanticJudgment": "UNASSESSABLE",
+        "consequentialDefectCorrectlyDetected": null,
+        "rawIdentifiedIssues": null,
+        "identifiedIssueCount": null,
+        "groundingChecks": null,
+        "groundingValidity": null,
+        "extraFalseBlockerCount": null,
+        "missedConsequentialDefect": null,
+        "correctVerdict": null,
+        "seriousReviewerDefect": null,
+        "reviewerIssues": null,
+        "rationale": "The final text is exactly empty and finish is length. No educational verdict, preference note, grounding evidence or issue can be inferred. A blank result is an operational failure, not a sound judgment or true negative.",
+        "admissibleAlternatives": "Written choice/explanation is sufficient; an optional pronunciation suggestion or explicit-explanation criterion advisory may be legitimate but is not required. Empty completed findings could be valid; this receipt is not a completed empty-findings verdict."
+      },
+      "rootPrimaryAssessment": {
+        "assessmentId": "B02",
+        "operationalDelivery": "BLANK_OUTPUT_CAPPED",
+        "schemaAndGroundingAssessment": "NOT_REACHED_ON_USABLE_OUTPUT",
+        "independentEducationalAssessment": "UNASSESSABLE_NO_VERDICT",
+        "seriousDefectCorrectlyDetected": null,
+        "extraFalseBlockers": null,
+        "semanticJudgment": "UNASSESSABLE",
+        "consequence": "No educational review is available; cannot publish an accepted review or infer whether the sound candidate would be blocked or accepted.",
+        "concerns": []
+      },
+      "lowMetrics": {
+        "promptTokens": 2689,
+        "inputCacheHitTokens": 0,
+        "inputCacheMissTokens": 2689,
+        "completionTokensIncludingReasoning": 4096,
+        "reasoningTokensSubset": 4096,
+        "nonReasoningCompletionTokens": 0,
+        "finishReason": "length",
+        "latencyMs": 21069,
+        "estimatedOffPeakCacheAdjustedUsd": "0.00286095",
+        "guardPeakUncachedUpperEstimateUsd": "0.0057219",
+        "retainedReservationUsd": "0.0083061"
+      },
+      "packetSha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "candidateSha256": "f89020597a86caebf906175445dd3bd418874287bddfe445ee02e5c7bd178a5d",
+      "lowWireVerification": {
+        "actualJournaledRequestBodySha256": "e9f9ad123bd979b7662843fbb3d00672b6e6398b2c84c11284416470d6c66a01",
+        "independentlyReconstructedRequestBodySha256": "e9f9ad123bd979b7662843fbb3d00672b6e6398b2c84c11284416470d6c66a01",
+        "reconstructedHighDefaultRequestBodySha256": "79b2b0e049009dcfbc868fbd9335704a65a7d9cb88bcca42f6bcbb3cb2806591",
+        "soleWireDifference": {
+          "reasoning_effort": "low"
+        },
+        "thinkingOmitted": true,
+        "promptAndInputUnchanged": true,
+        "outputTokenCapUnchanged": 4096
+      },
+      "canonicalAccounting": {
+        "state": "CANCELLED",
+        "providerCallState": "SETTLED",
+        "actualInputTokens": 2689,
+        "actualOutputTokens": 4096,
+        "pricing": "UNKNOWN",
+        "costUsd": null,
+        "applyReceipt": null
+      },
+      "finalJudgment": "UNASSESSABLE_BLANK_CAPPED",
+      "operationalDelivery": "FAIL",
+      "formalStrictValidation": "NOT_REACHED_NO_COMPLETE_REVIEW",
+      "validatorIndependentReplay": "NOT_RUN_NO_COMPLETE_OUTPUT; no clipped content salvaged",
+      "strictAcceptedFindings": null,
+      "strictReportStatus": null,
+      "issueResolution": null,
+      "consequentialDefectCorrectlyDetected": null,
+      "extraFalseBlockerCount": null,
+      "correctVerdict": null,
+      "seriousReviewerDefect": null,
+      "adjudication": {
+        "status": "AGREE",
+        "rationale": "Both assessors classify delivery failure and explicitly infer no semantic verdict, false blocker or true negative from the blank response."
+      }
+    }
+  ],
+  "highComparison": [
+    {
+      "caseId": "v04",
+      "trialId": "d_6de45b407ca18e60",
+      "Low": {
+        "promptTokens": 2860,
+        "inputCacheHitTokens": 768,
+        "inputCacheMissTokens": 2092,
+        "completionTokensIncludingReasoning": 2848,
+        "reasoningTokensSubset": 2531,
+        "nonReasoningCompletionTokens": 317,
+        "finishReason": "stop",
+        "latencyMs": 14480,
+        "estimatedOffPeakCacheAdjustedUsd": "0.002024904",
+        "guardPeakUncachedUpperEstimateUsd": "0.0042756",
+        "retainedReservationUsd": "0.0084969"
+      },
+      "HighDefault": {
+        "promptTokens": 2860,
+        "inputCacheHitTokens": 768,
+        "inputCacheMissTokens": 2092,
+        "completionTokensIncludingReasoning": 4096,
+        "reasoningTokensSubset": 4096,
+        "nonReasoningCompletionTokens": 0,
+        "finishReason": "length",
+        "latencyMs": 20975,
+        "estimatedOffPeakCacheAdjustedUsd": "0.002773704",
+        "guardPeakUncachedUpperEstimateUsd": "0.0057732",
+        "retainedReservationUsd": "0.0084969"
+      },
+      "lowMinusHigh": {
+        "completionTokens": -1248,
+        "reasoningTokens": -1565,
+        "nonReasoningCompletionTokens": 317,
+        "latencyMs": -6495,
+        "estimatedCostUsd": "-0.000748800"
+      },
+      "inputCacheCountersMatch": true,
+      "returnedAliasAndFingerprintMatch": true,
+      "comparisonLimit": "One historical observation per case/effort, not randomized replication or proof of causality. High is omitted/default high according to the pinned metadata; Low is explicit on the wire. High wire hash is reconstructed from frozen request content/source, not a separately journaled High request-body hash."
+    },
+    {
+      "caseId": "v09",
+      "trialId": "d_21da0ca3d648bd22",
+      "Low": {
+        "promptTokens": 2689,
+        "inputCacheHitTokens": 0,
+        "inputCacheMissTokens": 2689,
+        "completionTokensIncludingReasoning": 4096,
+        "reasoningTokensSubset": 4096,
+        "nonReasoningCompletionTokens": 0,
+        "finishReason": "length",
+        "latencyMs": 21069,
+        "estimatedOffPeakCacheAdjustedUsd": "0.00286095",
+        "guardPeakUncachedUpperEstimateUsd": "0.0057219",
+        "retainedReservationUsd": "0.0083061"
+      },
+      "HighDefault": {
+        "promptTokens": 2689,
+        "inputCacheHitTokens": 0,
+        "inputCacheMissTokens": 2689,
+        "completionTokensIncludingReasoning": 4096,
+        "reasoningTokensSubset": 4096,
+        "nonReasoningCompletionTokens": 0,
+        "finishReason": "length",
+        "latencyMs": 20487,
+        "estimatedOffPeakCacheAdjustedUsd": "0.00286095",
+        "guardPeakUncachedUpperEstimateUsd": "0.0057219",
+        "retainedReservationUsd": "0.0083061"
+      },
+      "lowMinusHigh": {
+        "completionTokens": 0,
+        "reasoningTokens": 0,
+        "nonReasoningCompletionTokens": 0,
+        "latencyMs": 582,
+        "estimatedCostUsd": "0E-8"
+      },
+      "inputCacheCountersMatch": true,
+      "returnedAliasAndFingerprintMatch": true,
+      "comparisonLimit": "One historical observation per case/effort, not randomized replication or proof of causality. High is omitted/default high according to the pinned metadata; Low is explicit on the wire. High wire hash is reconstructed from frozen request content/source, not a separately journaled High request-body hash."
+    }
+  ],
+  "metrics": {
+    "Low": {
+      "calls": 2,
+      "inputTokens": 5549,
+      "inputCacheHitTokens": 768,
+      "inputCacheMissTokens": 4781,
+      "completionTokensIncludingReasoning": 6944,
+      "reasoningTokensSubset": 6627,
+      "nonReasoningCompletionTokens": 317,
+      "networkLatencyMs": {
+        "sum": 35549,
+        "min": 14480,
+        "median": 17774.5,
+        "max": 21069
+      },
+      "estimatedOffPeakCacheAdjustedUsd": "0.004885854",
+      "guardPeakUncachedUpperEstimateUsd": "0.0099975",
+      "retainedReservationsUsd": "0.016803"
+    },
+    "HighDefaultSameTwoCases": {
+      "calls": 2,
+      "inputTokens": 5549,
+      "inputCacheHitTokens": 768,
+      "inputCacheMissTokens": 4781,
+      "completionTokensIncludingReasoning": 8192,
+      "reasoningTokensSubset": 8192,
+      "nonReasoningCompletionTokens": 0,
+      "networkLatencyMs": {
+        "sum": 41462,
+        "min": 20487,
+        "median": 20731.0,
+        "max": 20975
+      },
+      "estimatedOffPeakCacheAdjustedUsd": "0.005634654",
+      "guardPeakUncachedUpperEstimateUsd": "0.0114951",
+      "retainedReservationsUsd": "0.016803"
+    }
+  },
+  "costVerification": {
+    "pinnedPublicMetadataCheckedAtUtc": "2026-10-09T13:50:25.360288+00:00",
+    "freshRecheckAtUtc": "2026-10-09T13:59:06.271775+00:00",
+    "sources": [
+      "https://api-docs.deepseek.com/api/create-chat-completion/",
+      "https://api-docs.deepseek.com/quick_start/pricing/"
+    ],
+    "offPeakUsdPerMillion": {
+      "cacheHitInput": 0.003,
+      "cacheMissInput": 0.15,
+      "completionIncludingReasoning": 0.6
+    },
+    "formula": "(4781×0.15 + 768×0.003 + 6944×0.60)/1000000 = 0.004885854 USD",
+    "reasoningIncludedOnceInCompletion": true,
+    "dispatchesOutsideRecordedPeakUtcWindows": true,
+    "conservativePeakUncachedUpperEstimateUsd": "0.0099975",
+    "retainedFullPeakReservationsUsd": "0.016803",
+    "authorizedCeilingUsd": "0.02",
+    "invoiceVerified": false,
+    "canonicalPricing": "UNKNOWN",
+    "canonicalCostUsd": null,
+    "unusedHeadroomAuthorizesContinuation": false
+  },
+  "verification": {
+    "localStrictValidatorReplay": {
+      "B01": "PASS; exactly one finding, four literal grounds, BLOCKED report with OPEN issue and no acknowledgements; accepted findings and report semantics matched execution receipt",
+      "B02": "NOT_RUN; no complete review to validate"
+    },
+    "actualLowWireHashesMatchFrozenReconstruction": true,
+    "soleWireChange": "reasoning_effort=low",
+    "thinkingOmittedEnabledDefault": true,
+    "packetCandidatePromptsSchemaCapAndAccountingUnchanged": true,
+    "rawAndCanonicalUsageMatch": true,
+    "allCallsOneWireSettledAndSequential": true,
+    "canonicalRootsCancelled": 2,
+    "applyReceipts": 0,
+    "spendingJournalHardStop": null,
+    "productionPublication": "FORBIDDEN",
+    "baselineArtifactPinsMatch": 46,
+    "variantArtifactPinsMatch": 9,
+    "originalProtocolArtifactPinsMatch": 40,
+    "implementationRuntimePinsMatch": 207,
+    "preparedPacketPinsMatch": 48,
+    "allTwelveSignoffCandidatePinsMatch": true,
+    "lockedPrimaryUnchanged": true,
+    "parentMetricsIndependentlyRecomputedAndMatch": true,
+    "disposablePostgresTechnicalHarness": "PASSED one test, zero required skips; audited schema bootstrap, not full historical migration replay; cleanup recorded",
+    "sleepAssertions": {
+      "launcher": {
+        "pid": 95847,
+        "ownerPid": 95846,
+        "assertions": [
+          "pid 95847(caffeinate): [0x000e3b320001a30d] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+          "pid 95847(caffeinate): [0x000e3b320005a30e] 00:00:00 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+          "pid 95847(caffeinate): [0x000e3b320007a30f] 00:00:00 PreventSystemSleep named: \"caffeinate command-line tool\""
+        ],
+        "verifiedAt": "2026-10-09T13:59:09.378Z"
+      },
+      "executor": {
+        "start": {
+          "pid": 95919,
+          "ownerPid": 95918,
+          "assertions": [
+            "pid 95919(caffeinate): [0x000e3b3b0001a310] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+            "pid 95919(caffeinate): [0x000e3b3b0005a311] 00:00:00 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+            "pid 95919(caffeinate): [0x000e3b3b0007a312] 00:00:00 PreventSystemSleep named: \"caffeinate command-line tool\""
+          ],
+          "verifiedAt": "2026-10-09T13:59:18.083Z"
+        },
+        "end": {
+          "pid": 95919,
+          "ownerPid": 95918,
+          "assertions": [
+            "pid 95919(caffeinate): [0x000e3b3b0001a310] 00:00:36 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+            "pid 95919(caffeinate): [0x000e3b3b0005a311] 00:00:36 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+            "pid 95919(caffeinate): [0x000e3b3b0007a312] 00:00:36 PreventSystemSleep named: \"caffeinate command-line tool\""
+          ],
+          "verifiedAt": "2026-10-09T13:59:54.466Z"
+        }
+      },
+      "perWireSourceCheck": "Original guard checks assertAwake before dispatch; pair reuses it. Per-wire independent receipts are not retained.",
+      "releaseEvidence": "Source finally blocks release owned assertions; completion/cleanup recorded. No additional process inspection performed."
+    }
+  },
+  "parentAssessmentComparison": {
+    "status": "AGREE_ON_BOTH_CASES",
+    "disagreements": [],
+    "parentDraftReport": "review-low/EXECUTION_REPORT.md",
+    "parentReportReview": "Agree with mixed result, failed pair gate, verified counters/cost and recommendation against continuing unchanged configuration. No claim of broad reviewer accuracy or unique cause of cap exhaustion is justified."
+  },
+  "decision": "Do not continue the ten remaining cases on this unchanged configuration based on this failed pair. No additional paid or unpaid diagnostic/interface work is undertaken or authorized by this evaluation.",
+  "limitations": [
+    "Independent AI-agent assessment, not human educational review. Root assessor is case-author-side; prior scenario/configuration knowledge prevents full blinding.",
+    "Only one observation per case/configuration, with historical High comparisons rather than randomized replication. Differences in delivery, latency and token use do not establish causality or population rates.",
+    "v09 supplies no final verdict at either effort. No true negative, false blocker, semantic score or accuracy denominator may be inferred from its blank capped receipts.",
+    "One delivered correct serious-defect finding establishes correctness on that case only; sound-case precision, remaining defects and shared/split/protected work remain unqualified.",
+    "Raw reasoning text is not retained. Token counts show cap usage but do not prove the internal semantic judgment or uniquely identify model versus interface budget fit as the cause.",
+    "317 non-reasoning completion tokens is completion minus recorded reasoning subset; reasoning is never billed a second time.",
+    "Cost is an independently recomputed estimate using pinned public metadata and raw counters, not an invoice or balance inspection. Canonical pricing remains unknown.",
+    "Transport latency excludes reservation/bootstrap, durable finishing and evaluation; retained sleep receipts and source checks do not constitute separately saved per-wire assertion receipts.",
+    "No repair, publication, model/prompt/schema/budget change, production edit, additional agent or external judge was performed. Original signoff, original evaluation and all frozen artifacts remain preserved."
+  ],
+  "hashAlgorithm": "SHA256",
+  "sourceHashes": [
+    {
+      "path": "review-low/evaluation/reviews-blind.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "200e872009a18b642eb39374306ee3abbb9bdb0fbe4abebf614487e0b97ac338",
+      "bytes": 63040
+    },
+    {
+      "path": "review-low/evaluation/mapping-private.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "d90f83b6d229fa15c5f044b51d71e338de06da7c58d6ec21ac14ba05c3bff498",
+      "bytes": 311
+    },
+    {
+      "path": "review-low/evaluation/locked-primary-agent.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "cf0b0114ba3e3de98c91d123165ef91396e2bf34ec55c1881fac8ca3c68f448a",
+      "bytes": 17752
+    },
+    {
+      "path": "review-low/evaluation/locked-primary-root.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "e6d5e1079cf7b6039f51be6539166e556c1ffe0689db160c33ce02adb4c35a0a",
+      "bytes": 2513
+    },
+    {
+      "path": "review-low/freeze-low.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "79e1036e6557a2491df994d9110644b276922345208c1976e6c774f3b3b466d0",
+      "bytes": 5962
+    },
+    {
+      "path": "review-low/run-manifest.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "75283ae84dca1c855e05475cdf1f218367a83e85cd1cd62b8a0ace3b51ce3351",
+      "bytes": 1158
+    },
+    {
+      "path": "review-low/approved-execution.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "449b3005767ad06d7bd34ebe73ad9de6e6cfaae49238b3b3de02e7a4e582badf",
+      "bytes": 1989
+    },
+    {
+      "path": "review-low/evidence/public-metadata.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "ebc0faa4f9a2f70e3f0a767c0b47adf1a532166e2258bf66e3f5abf946137bce",
+      "bytes": 883
+    },
+    {
+      "path": "review-low/evidence/public-recheck-before-paid.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "56d32d20f5e55f3fb56dc0f7f1c6db3a97accef25b46fb19b26715e147de4ff3",
+      "bytes": 667
+    },
+    {
+      "path": "review-low/evidence/preflight.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "9897d5c2be48465c38d5a184b9c9b38f129f9e25abffe8c9ca0cf0798fa4245a",
+      "bytes": 1030
+    },
+    {
+      "path": "review-low/evidence/execution-metrics.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "6586488a1b62619f6813ef203c75f1546edb5977249c970aec2ebc0bee35e6d6",
+      "bytes": 4924
+    },
+    {
+      "path": "review-low/EXECUTION_REPORT.md",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "505158e6f444274609f70cb0a157e81811d7a802b473686184dec07a81031e58",
+      "bytes": 6853
+    },
+    {
+      "path": "review-low/guard.cjs",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "79a87824c0d97b04d0a6a218ae98b208dbaa68c6bdf73f85c2e6928fe2653cd6",
+      "bytes": 4877
+    },
+    {
+      "path": "review-low/block.cjs",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "4e3286c4b08f12c8cb95477435c0dd0804d65454e35d9c41f17f1867d967d13f",
+      "bytes": 5462
+    },
+    {
+      "path": "review-low/evidence/paid-run/spending.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "d6a8487ebdfd5aa6f533acc4e5c1d0157f9483c9b1cf78feaa1c560d35221fdc",
+      "bytes": 2792
+    },
+    {
+      "path": "review-low/evidence/paid-run/results.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "8e011c84e966bd384f9a096fbe2e0cce7e7570e709b74cc194ce19d3640bd0f0",
+      "bytes": 6491
+    },
+    {
+      "path": "review-low/evidence/paid-run/summary.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "ece4f1aea099087f564a2387b6f146dcb2db0e997017e7479878c1bd08dc7aab",
+      "bytes": 1347
+    },
+    {
+      "path": "review-low/evidence/paid-run/canonical-d_21da0ca3d648bd22.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "95d216dee680412c8427524d40fae637c7b5ed01c9825a4423f068526794289d",
+      "bytes": 3546
+    },
+    {
+      "path": "review-low/evidence/paid-run/canonical-d_6de45b407ca18e60.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "7287c8bb7dec3e2219f7b27c56ee3e498ce7832a10cca012a386436427deb828",
+      "bytes": 3530
+    },
+    {
+      "path": "review-low/evidence/paid-run/postgres-diagnostic-results.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "555f217a5d669f8749f211edcff7308fd867eefa6efa3bc40594a108899e32c3",
+      "bytes": 490
+    },
+    {
+      "path": "review-low/evidence/paid-run/postgres-harness-run.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "1f82de083f4fc28cd687830bdeb14126ae2383f2168e40db4895675461433e57",
+      "bytes": 4864
+    },
+    {
+      "path": "review-low/evidence/paid-run/launcher-sleep.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "5beed8facf084e97e8d2775a9cdd666bf561ff8d01a27f0dcc82e5d27b0c315f",
+      "bytes": 480
+    },
+    {
+      "path": "initial-block/evidence/paid-run/spending.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "5772766b6f36a6a2ebfdc50f3c7380ceea75de8155344b0945bdc1e1020d7469",
+      "bytes": 12414
+    },
+    {
+      "path": "initial-block/evidence/paid-run/results.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "daaa16bf3ff10170c42ee28741413fa03212eb107c1c69b49f13e63127edf3e6",
+      "bytes": 36461
+    },
+    {
+      "path": "initial-block/evidence/paid-run/summary.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "2b9781ea3435a6f199960a1ce6269131f909855621dbadbcaa1a32223fcc2ca6",
+      "bytes": 1095
+    },
+    {
+      "path": "initial-block/independent-review-agent.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "1bc8bddf6156599aea3436ba42aadef66f678bb1f09e1f30dfab47346c0251a4",
+      "bytes": 98200
+    },
+    {
+      "path": "initial-block/independent-review-agent.md",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "5ead1d744db51c994bf2d7552c1eb950bef37c16719eab6e02552a7e9178e04f",
+      "bytes": 40843
+    },
+    {
+      "path": "initial-block/SIGNOFF_RESOLUTION.md",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "1c8c05763ccc686e236871cfe89a33d9b0a855860d9df4c269db6d035de9e638",
+      "bytes": 4838
+    },
+    {
+      "path": "initial-block/label-signoff.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "e88d1ed961881b9994311631b0b0f66a8cf8e6f5a96eed7560eebb26eb900f30",
+      "bytes": 10844
+    },
+    {
+      "path": "initial-block/evaluation/locked-primary-agent.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "b10caed9057114caab7b9289787a13f6e01919bbcfec369ec5f8e00acaa790c3",
+      "bytes": 35974
+    },
+    {
+      "path": "initial-block/evaluation/independent-evaluation-agent.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "d487f245217213c89577dbf9a6c70191edde1b1c094deacb9c5cfcf2a1929a89",
+      "bytes": 150192
+    },
+    {
+      "path": "initial-block/evaluation/independent-evaluation-agent.md",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "d7110c0c9f635d07ff7e19bc39a249ac988901e66ea404cbf40028dea7788f75",
+      "bytes": 22073
+    },
+    {
+      "path": "evaluator/RUBRIC.md",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "8dd0ad4d74a1deb7e165972a3b4635cf271a831310200838bbf07ad1a4b13c7d",
+      "bytes": 6999
+    },
+    {
+      "path": "evaluator/candidates/v04.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "042331d15688d7f2c89cb85cfb82aed1868e88003af78734f51aee02508db7ed",
+      "bytes": 24196
+    },
+    {
+      "path": "evaluator/candidates/v09.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "f89020597a86caebf906175445dd3bd418874287bddfe445ee02e5c7bd178a5d",
+      "bytes": 21403
+    },
+    {
+      "path": "model/packets/d_6de45b407ca18e60.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "bytes": 11962
+    },
+    {
+      "path": "model/packets/d_21da0ca3d648bd22.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "bytes": 11326
+    },
+    {
+      "path": "freeze.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "e7f97f119ab19b684948e7d9a70fac82f000b92088915fa08f81657c90fc6c7f",
+      "bytes": 35064
+    },
+    {
+      "path": "protocol-manifest.json",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "500a7bc44741b43d12d6953ab122198e2f114d838b88edf42b9d1848e039b291",
+      "bytes": 5592
+    },
+    {
+      "path": "initial-block/block.cjs",
+      "pathBase": "REPORT_DIRECTORY",
+      "sha256": "ce598c29653ecad3332b8b7aed52c7b1cf86a51b0823e6d0ff2d3396e9181f12",
+      "bytes": 7437
+    },
+    {
+      "path": "dist/planner-worker/planner/v2/intelligence/quality.js",
+      "pathBase": "REPOSITORY",
+      "sha256": "2f7848466511f7ba412b26aae4027982e286aef64f117c9467176550afbafe4f",
+      "bytes": 29855
+    }
+  ]
+}

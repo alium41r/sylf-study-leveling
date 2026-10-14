@@ -1,0 +1,10 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/dashboard/pixel-modular-character.ts app/dashboard/pixel-cosmetic-registry.ts app/dashboard/components/PixelCompanionCard.tsx app/components/companion app/locker/components/identity/PixelCustomizer.tsx app/locker/components/identity/StudioHubView.tsx app/locker/components/identity/pixel-customizer-options.ts app/components/landing/companion/Companion.tsx app/components/landing/companion/CompanionReview.tsx lib/pixel-display/content lib/character-traits.ts lib/pixel-creation-service.ts lib/archive-catalog.ts app/dev/pixel-display/page.tsx app/companion-prototype/page.tsx
+
+/Users/aliumair/Desktop/sylf/lib/pixel-display/content/asset/creation.ts
+  35:3  warning  'PIXEL_ASSET_VERSION' is defined but never used  @typescript-eslint/no-unused-vars
+  36:8  warning  'PixelAsset' is defined but never used           @typescript-eslint/no-unused-vars
+  37:8  warning  'PixelPalette' is defined but never used         @typescript-eslint/no-unused-vars
+
+✖ 3 problems (0 errors, 3 warnings)
+

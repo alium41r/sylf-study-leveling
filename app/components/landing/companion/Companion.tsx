@@ -13,9 +13,6 @@ import {
 } from "./model";
 import { useCompanionState } from "./useCompanionState";
 import styles from "./Companion.module.css";
-import PixelCompanion from "./PixelCompanion";
-import pixelStyles from "./PixelCompanion.module.css";
-import { usePixelCompanionVariant, usePixelEyePreview } from "./pixel-preview";
 
 export type SvgSequenceBeat = "idle" | "blink" | "notice" | "happy" | "return";
 
@@ -51,13 +48,10 @@ export const Companion = memo(function Companion({
   motion = "full",
   motionProfile,
   className = "",
-  allowPixelPreview = true,
   preview,
   svgSequenceBeat,
 }: CompanionProps) {
-  const pixelVariant = usePixelCompanionVariant();
-  const pixelEyeState = usePixelEyePreview();
-  const pixelPreview = pixelVariant !== "svg" && allowPixelPreview;
+  const pixelPreview = false;
   const sequence =
     process.env.NODE_ENV === "development" && !pixelPreview
       ? svgSequenceBeat
@@ -110,15 +104,9 @@ export const Companion = memo(function Companion({
       data-motion-profile={motionProfile}
       data-svg-sequence={sequence}
       data-compact={pixels <= 64}
-      className={`${styles.companion} ${className} ${pixelPreview ? pixelStyles.host : ""}`}
+      className={`${styles.companion} ${className} `}
       style={{ "--companion-size": `${pixels}px` } as CSSProperties}
     >
-      {pixelPreview ? (
-        <PixelCompanion
-          layered={pixelVariant === "pixel-layered"}
-          eyeState={pixelEyeState}
-        />
-      ) : (
         <CompanionArt
           id={id}
           expression={expression}
@@ -127,7 +115,6 @@ export const Companion = memo(function Companion({
           blink={sequence ? sequence === "blink" : undefined}
           jointSeams={motionProfile === "journey"}
         />
-      )}
     </span>
   );
 });

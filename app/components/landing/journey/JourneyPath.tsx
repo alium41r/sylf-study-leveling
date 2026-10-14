@@ -6,7 +6,6 @@ import {
   journeyYForScroll,
   pointAtJourneyY,
   journeyDistanceAtY,
-  snapPixelPosition,
   type JourneyPoint,
   type JourneyDistance,
 } from "./journey-geometry";
@@ -15,7 +14,6 @@ import JourneyCompanion, {
 } from "../companion/JourneyCompanion";
 import { JourneyMovement, stateForWaypoint } from "../companion/journey-motion";
 import type { CompanionState } from "../companion/model";
-import { usePixelCompanionVariant } from "../companion/pixel-preview";
 import styles from "./Journey.module.css";
 import botanical from "./BotanicalTrail.module.css";
 
@@ -61,7 +59,6 @@ export default function JourneyPath({
   paused: boolean;
 }) {
   const symbolId = useId();
-  const pixelVariant = usePixelCompanionVariant();
   const svg = useRef<SVGSVGElement>(null);
   const track = useRef<SVGPathElement>(null);
   const marks = useRef<SVGGElement>(null);
@@ -82,9 +79,7 @@ export default function JourneyPath({
     let frame = 0,
       total = 0,
       origin = 0,
-      originX = 0,
       lastTime = 0;
-    let pixelOffset: JourneyPoint | null = null;
     let stops: JourneyStop[] = [];
     let points: JourneyPoint[] = [];
     let distances: JourneyDistance[] = [];
@@ -132,19 +127,7 @@ export default function JourneyPath({
         (paused ||
           reduced.matches ||
           (viewportY > -30 && viewportY < window.innerHeight + 180));
-      // The trajectory and its physics remain continuous. Only the pixel
-      // presentation rounds the final canvas origin; SVG keeps the original point.
-      const displayed = pixelOffset
-        ? snapPixelPosition(
-            point,
-            {
-              x: originX + pixelOffset.x,
-              y: origin - window.scrollY + pixelOffset.y,
-            },
-            window.devicePixelRatio
-          )
-        : point;
-      walker.style.transform = `translate3d(${displayed.x}px, ${displayed.y}px, 0)`;
+      walker.style.transform = `translate3d(${point.x}px, ${point.y}px, 0)`;
       const visibility = visible ? "visible" : "hidden";
       if (walker.style.visibility !== visibility)
         walker.style.visibility = visibility;
@@ -153,14 +136,7 @@ export default function JourneyPath({
       const hero = String(heroExitY !== undefined && movement.y < heroExitY);
       if (walker.dataset.hero !== hero) walker.dataset.hero = hero;
       const nearby = nearestStop(movement.y);
-      // SVG holds the nearby chapter's expression while traveling through its
-      // range. The frozen raster comparison keeps its original idle-on-travel behavior.
-      const state =
-        pixelVariant !== "svg" && movement.active
-          ? "IDLE"
-          : window.scrollY < 24
-            ? "GREETING"
-            : nearby.state;
+      const state = window.scrollY < 24 ? "GREETING" : nearby.state;
       if (walker.dataset.motionState !== state)
         walker.dataset.motionState = state;
       const settling =
@@ -169,14 +145,11 @@ export default function JourneyPath({
           visible && !paused && !reduced.matches,
           velocity,
           dt,
-          pixelVariant === "svg" && !paused && !reduced.matches
+          !paused && !reduced.matches
         ) ?? false;
       if (walker.dataset.stage !== nearby.stage)
         walker.dataset.stage = nearby.stage;
-      const nextMessage =
-        pixelVariant !== "svg" && movement.active
-          ? "One step at a time."
-          : nearby.message;
+      const nextMessage = nearby.message;
       if (message && message.textContent !== nextMessage)
         message.textContent = nextMessage;
       for (const mark of growthMarks) {
@@ -216,33 +189,7 @@ export default function JourneyPath({
     const measure = () => {
       const bounds = container.getBoundingClientRect();
       origin = bounds.top + window.scrollY;
-      originX = bounds.left;
-      pixelOffset = null;
-      if (pixelVariant !== "svg") {
-        const pixel = walker.querySelector<HTMLElement>(
-          '[data-sylf-companion="pixel"]'
-        );
-        if (pixel) {
-          const canvas = pixel.querySelector<HTMLElement>(
-            "[data-pixel-canvas]"
-          );
-          const raster = (canvas ?? pixel).getBoundingClientRect();
-          const travelerBounds = walker.getBoundingClientRect();
-          // Cache geometry at layout/variant changes, avoiding frame-by-frame
-          // layout reads. The Phase 1 full image is contained in the same square.
-          const side = Math.min(raster.width, raster.height);
-          pixelOffset = {
-            x:
-              raster.left -
-              travelerBounds.left +
-              (canvas ? 0 : (raster.width - side) / 2),
-            y:
-              raster.top -
-              travelerBounds.top +
-              (canvas ? 0 : (raster.height - side) / 2),
-          };
-        }
-      }
+
       const anchors = [
         ...container.querySelectorAll<HTMLElement>("[data-journey-stop]"),
       ]
@@ -345,7 +292,7 @@ export default function JourneyPath({
       reduced.removeEventListener("change", measure);
       document.removeEventListener("visibilitychange", visibilityChanged);
     };
-  }, [root, paused, symbolId, pixelVariant]);
+  }, [root, paused, symbolId]);
 
   return (
     <div className={styles.journeyLayer} aria-hidden="true">

@@ -1,0 +1,1454 @@
+{
+  "schemaVersion": 1,
+  "createdAtUtc": "2026-10-09T14:00:50.257378+00:00",
+  "testedModelConfigurationHiddenForPrimaryAssessment": true,
+  "parentAssessmentHidden": true,
+  "labelsNotIncluded": true,
+  "assessments": [
+    {
+      "assessmentId": "B01",
+      "reviewInput": {
+        "stage": "REVIEW",
+        "goals": [
+          {
+            "planRef": "plan_1",
+            "requested": {
+              "title": "Citation punctuation",
+              "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "resolved": {
+              "title": "Citation punctuation",
+              "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            }
+          }
+        ],
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Citation punctuation",
+                "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Citation punctuation",
+                "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "Pattern: Author. Title. Year. Supplied item: Lee; River Walk; 2020. One accurate checked citation meets the requested goal."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "proposal": {
+          "stage": "ALLOCATION",
+          "research": null,
+          "envelope": {
+            "schemaVersion": 2,
+            "timezone": "Asia/Karachi",
+            "today": "2026-10-12",
+            "window": {
+              "start": "2026-10-12",
+              "end": "2026-10-14"
+            },
+            "capacityDigest": "fd6273d728a983eab9dd89f9c7f7ac7eba35762014fdbb7633e2aeb6240a86a4",
+            "basis": "CONFIRMED_AVAILABILITY",
+            "weeklyCeilingMinutes": 840,
+            "recoveryPercent": 0,
+            "targets": [
+              {
+                "planRef": "plan_1",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "perGoalWeeklyCeilingMinutes": null
+              }
+            ],
+            "days": [
+              {
+                "date": "2026-10-12",
+                "ceilingMinutes": 120,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 120,
+                "excluded": false
+              },
+              {
+                "date": "2026-10-13",
+                "ceilingMinutes": 120,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 120,
+                "excluded": false
+              },
+              {
+                "date": "2026-10-14",
+                "ceilingMinutes": 120,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 120,
+                "excluded": false
+              }
+            ],
+            "protectedExecution": [],
+            "timeboxRange": {
+              "minMinutes": 5,
+              "maxMinutes": 240
+            }
+          },
+          "blueprints": {
+            "plans": [
+              {
+                "planRef": "plan_1",
+                "blueprint": {
+                  "schemaVersion": 2,
+                  "strategy": {
+                    "policy": "MASTERY",
+                    "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+                    "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                    "recommendedEffort": {
+                      "lowMinutes": 40,
+                      "likelyMinutes": 40,
+                      "highMinutes": 40
+                    },
+                    "phases": []
+                  },
+                  "scope": [
+                    {
+                      "scopeRef": "scope_1",
+                      "disposition": "INCLUDED",
+                      "contribution": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+                    }
+                  ],
+                  "activities": [
+                    {
+                      "localId": "work_1",
+                      "outcomeRefs": [],
+                      "scopeRefs": [
+                        "scope_1"
+                      ],
+                      "title": "Write and check the citation",
+                      "activityType": "PRACTICE",
+                      "purpose": "Write and check the citation",
+                      "instructions": "Write “Lee. River Walk. 2020.” and check the three fields and punctuation against the supplied pattern.",
+                      "completionCriterion": "One citation has all fields and punctuation correct.",
+                      "effort": {
+                        "lowMinutes": 10,
+                        "likelyMinutes": 10,
+                        "highMinutes": 10
+                      },
+                      "timeboxMinutes": 10,
+                      "commitment": {
+                        "category": "COMMITTED"
+                      },
+                      "hardDependencies": []
+                    },
+                    {
+                      "localId": "work_2",
+                      "outcomeRefs": [],
+                      "scopeRefs": [
+                        "scope_1"
+                      ],
+                      "title": "Rewrite after success",
+                      "activityType": "PRACTICE",
+                      "purpose": "Rewrite after success",
+                      "instructions": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+                      "completionCriterion": "All twelve rewrites are done even after checked success.",
+                      "effort": {
+                        "lowMinutes": 30,
+                        "likelyMinutes": 30,
+                        "highMinutes": 30
+                      },
+                      "timeboxMinutes": 30,
+                      "commitment": {
+                        "category": "COMMITTED"
+                      },
+                      "hardDependencies": [
+                        "work_1"
+                      ]
+                    }
+                  ],
+                  "decisions": {
+                    "assumptions": [],
+                    "tradeOffs": [],
+                    "unresolvedUncertainty": [],
+                    "stoppingConditions": [
+                      "Meet the accepted criterion or record the specific unresolved gap."
+                    ]
+                  }
+                },
+                "digest": "5d0222c7e771a44aca6618d7aa55cbabd325bf9c0193dcb3218e1ca5827236d9"
+              }
+            ],
+            "sharedDependencies": []
+          },
+          "allocation": {
+            "report": {
+              "schemaVersion": 2,
+              "status": "FEASIBLE",
+              "placements": [
+                {
+                  "planRef": "plan_1",
+                  "activityRef": "work_1",
+                  "minutes": 10,
+                  "date": "2026-10-12"
+                },
+                {
+                  "planRef": "plan_1",
+                  "activityRef": "work_2",
+                  "minutes": 30,
+                  "date": "2026-10-12"
+                }
+              ],
+              "unscheduled": [],
+              "committedMinutes": 40,
+              "capacityProof": null,
+              "findings": [
+                {
+                  "findingId": "finding_ed329fe5b20f4d190a99",
+                  "category": "FINISH",
+                  "consequential": false,
+                  "planRefs": [
+                    "plan_1"
+                  ],
+                  "activityRefs": [],
+                  "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+                  "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+                }
+              ]
+            },
+            "digest": "b3f3caa108a79947449e4bc3b57e061a1b0f8eb93c458f24fc2d266696ff45cb"
+          },
+          "planning": {
+            "detail": {
+              "days": 14,
+              "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+            },
+            "tradeOffExplanation": "Only the accepted next work is detailed.",
+            "splits": [],
+            "forecasts": [],
+            "adaptation": "NOT_REQUESTED",
+            "unreviewedPhaseRefs": []
+          }
+        },
+        "grounding": [
+          {
+            "ref": "accepted_request",
+            "kind": "REQUIREMENT",
+            "path": "acceptedRequest.text",
+            "text": "\"Prepare the accepted educational outcome using the supplied facts and constraints.\""
+          },
+          {
+            "ref": "plan_1/goal",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].requested",
+            "text": "{\"title\":\"Citation punctuation\",\"outcome\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\",\"policy\":\"MASTERY\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+          },
+          {
+            "ref": "plan_1/accepted",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].resolved",
+            "text": "{\"title\":\"Citation punctuation\",\"outcome\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\",\"policy\":\"MASTERY\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+          },
+          {
+            "ref": "plan_1/strategy",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.strategy",
+            "text": "{\"policy\":\"MASTERY\",\"outcome\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\",\"explanation\":\"Use the supplied facts and the named learner action; evaluate the actual content independently.\",\"recommendedEffort\":{\"lowMinutes\":40,\"likelyMinutes\":40,\"highMinutes\":40},\"phases\":[]}"
+          },
+          {
+            "ref": "plan_1/scope/scope_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.scope[0]",
+            "text": "{\"scopeRef\":\"scope_1\",\"disposition\":\"INCLUDED\",\"contribution\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\"}"
+          },
+          {
+            "ref": "plan_1/activity/work_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[0]",
+            "text": "{\"localId\":\"work_1\",\"outcomeRefs\":[],\"scopeRefs\":[\"scope_1\"],\"title\":\"Write and check the citation\",\"activityType\":\"PRACTICE\",\"purpose\":\"Write and check the citation\",\"instructions\":\"Write “Lee. River Walk. 2020.” and check the three fields and punctuation against the supplied pattern.\",\"completionCriterion\":\"One citation has all fields and punctuation correct.\",\"effort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"timeboxMinutes\":10,\"commitment\":{\"category\":\"COMMITTED\"},\"hardDependencies\":[]}"
+          },
+          {
+            "ref": "plan_1/activity/work_2",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[1]",
+            "text": "{\"localId\":\"work_2\",\"outcomeRefs\":[],\"scopeRefs\":[\"scope_1\"],\"title\":\"Rewrite after success\",\"activityType\":\"PRACTICE\",\"purpose\":\"Rewrite after success\",\"instructions\":\"After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.\",\"completionCriterion\":\"All twelve rewrites are done even after checked success.\",\"effort\":{\"lowMinutes\":30,\"likelyMinutes\":30,\"highMinutes\":30},\"timeboxMinutes\":30,\"commitment\":{\"category\":\"COMMITTED\"},\"hardDependencies\":[\"work_1\"]}"
+          },
+          {
+            "ref": "plan_1/uncertainty",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.decisions",
+            "text": "{\"assumptions\":[],\"tradeOffs\":[],\"unresolvedUncertainty\":[],\"stoppingConditions\":[\"Meet the accepted criterion or record the specific unresolved gap.\"]}"
+          },
+          {
+            "ref": "plan_1/workload",
+            "kind": "PROPOSAL",
+            "path": "workloadAudit[0]",
+            "text": "{\"planRef\":\"plan_1\",\"bookedTimeboxMinutes\":40,\"unprotectedTimeboxMinutes\":40,\"protectedRemainingMinutes\":0,\"remainingCommittedMinutes\":40,\"recommendedEffort\":{\"lowMinutes\":40,\"likelyMinutes\":40,\"highMinutes\":40},\"remainingAboveStrategyHigh\":false,\"committedRefs\":[\"work_1\",\"work_2\"]}"
+          },
+          {
+            "ref": "allocation",
+            "kind": "PROPOSAL",
+            "path": "proposal.allocation.report",
+            "text": "{\"schemaVersion\":2,\"status\":\"FEASIBLE\",\"placements\":[{\"planRef\":\"plan_1\",\"activityRef\":\"work_1\",\"minutes\":10,\"date\":\"2026-10-12\"},{\"planRef\":\"plan_1\",\"activityRef\":\"work_2\",\"minutes\":30,\"date\":\"2026-10-12\"}],\"unscheduled\":[],\"committedMinutes\":40,\"capacityProof\":null,\"findings\":[{\"findingId\":\"finding_ed329fe5b20f4d190a99\",\"category\":\"FINISH\",\"consequential\":false,\"planRefs\":[\"plan_1\"],\"activityRefs\":[],\"evidence\":\"Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.\",\"consequence\":\"This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases.\"}]}"
+          },
+          {
+            "ref": "constraints",
+            "kind": "REQUIREMENT",
+            "path": "proposal.envelope",
+            "text": "{\"schemaVersion\":2,\"timezone\":\"Asia/Karachi\",\"today\":\"2026-10-12\",\"window\":{\"start\":\"2026-10-12\",\"end\":\"2026-10-14\"},\"capacityDigest\":\"fd6273d728a983eab9dd89f9c7f7ac7eba35762014fdbb7633e2aeb6240a86a4\",\"basis\":\"CONFIRMED_AVAILABILITY\",\"weeklyCeilingMinutes\":840,\"recoveryPercent\":0,\"targets\":[{\"planRef\":\"plan_1\",\"deadline\":{\"kind\":\"NONE\"},\"perGoalWeeklyCeilingMinutes\":null}],\"days\":[{\"date\":\"2026-10-12\",\"ceilingMinutes\":120,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":120,\"excluded\":false},{\"date\":\"2026-10-13\",\"ceilingMinutes\":120,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":120,\"excluded\":false},{\"date\":\"2026-10-14\",\"ceilingMinutes\":120,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":120,\"excluded\":false}],\"protectedExecution\":[],\"timeboxRange\":{\"minMinutes\":5,\"maxMinutes\":240}}"
+          }
+        ],
+        "workloadAudit": [
+          {
+            "planRef": "plan_1",
+            "bookedTimeboxMinutes": 40,
+            "unprotectedTimeboxMinutes": 40,
+            "protectedRemainingMinutes": 0,
+            "remainingCommittedMinutes": 40,
+            "recommendedEffort": {
+              "lowMinutes": 40,
+              "likelyMinutes": 40,
+              "highMinutes": 40
+            },
+            "remainingAboveStrategyHigh": false,
+            "committedRefs": [
+              "work_1",
+              "work_2"
+            ]
+          }
+        ],
+        "acceptedRequest": {
+          "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+          "authorization": "PLAN_ACTION"
+        }
+      },
+      "suppliedModelMessageBody": {
+        "stage": "REVIEW",
+        "goals": [
+          {
+            "planRef": "plan_1",
+            "requested": {
+              "title": "Citation punctuation",
+              "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "resolved": {
+              "sameAsPath": "goals[0].requested"
+            }
+          }
+        ],
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Citation punctuation",
+                "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Citation punctuation",
+                "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "Pattern: Author. Title. Year. Supplied item: Lee; River Walk; 2020. One accurate checked citation meets the requested goal."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "proposal": {
+          "stage": "ALLOCATION",
+          "research": null,
+          "envelope": {
+            "schemaVersion": 2,
+            "timezone": "Asia/Karachi",
+            "today": "2026-10-12",
+            "window": {
+              "start": "2026-10-12",
+              "end": "2026-10-14"
+            },
+            "capacityDigest": "fd6273d728a983eab9dd89f9c7f7ac7eba35762014fdbb7633e2aeb6240a86a4",
+            "basis": "CONFIRMED_AVAILABILITY",
+            "weeklyCeilingMinutes": 840,
+            "recoveryPercent": 0,
+            "targets": [
+              {
+                "planRef": "plan_1",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "perGoalWeeklyCeilingMinutes": null
+              }
+            ],
+            "days": {
+              "constantFields": {
+                "ceilingMinutes": 120,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 120,
+                "excluded": false
+              },
+              "columns": [
+                "date"
+              ],
+              "rows": [
+                [
+                  "2026-10-12"
+                ],
+                [
+                  "2026-10-13"
+                ],
+                [
+                  "2026-10-14"
+                ]
+              ]
+            },
+            "protectedExecution": [],
+            "timeboxRange": {
+              "minMinutes": 5,
+              "maxMinutes": 240
+            }
+          },
+          "blueprints": {
+            "plans": [
+              {
+                "planRef": "plan_1",
+                "blueprint": {
+                  "schemaVersion": 2,
+                  "strategy": {
+                    "policy": "MASTERY",
+                    "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+                    "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                    "recommendedEffort": {
+                      "lowMinutes": 40,
+                      "likelyMinutes": 40,
+                      "highMinutes": 40
+                    },
+                    "phases": []
+                  },
+                  "scope": [
+                    {
+                      "scopeRef": "scope_1",
+                      "disposition": "INCLUDED",
+                      "contribution": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+                    }
+                  ],
+                  "activities": [
+                    {
+                      "localId": "work_1",
+                      "outcomeRefs": [],
+                      "scopeRefs": [
+                        "scope_1"
+                      ],
+                      "title": "Write and check the citation",
+                      "activityType": "PRACTICE",
+                      "purpose": "Write and check the citation",
+                      "instructions": "Write “Lee. River Walk. 2020.” and check the three fields and punctuation against the supplied pattern.",
+                      "completionCriterion": "One citation has all fields and punctuation correct.",
+                      "effort": {
+                        "lowMinutes": 10,
+                        "likelyMinutes": 10,
+                        "highMinutes": 10
+                      },
+                      "timeboxMinutes": 10,
+                      "commitment": {
+                        "category": "COMMITTED"
+                      },
+                      "hardDependencies": []
+                    },
+                    {
+                      "localId": "work_2",
+                      "outcomeRefs": [],
+                      "scopeRefs": [
+                        "scope_1"
+                      ],
+                      "title": "Rewrite after success",
+                      "activityType": "PRACTICE",
+                      "purpose": "Rewrite after success",
+                      "instructions": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+                      "completionCriterion": "All twelve rewrites are done even after checked success.",
+                      "effort": {
+                        "lowMinutes": 30,
+                        "likelyMinutes": 30,
+                        "highMinutes": 30
+                      },
+                      "timeboxMinutes": 30,
+                      "commitment": {
+                        "category": "COMMITTED"
+                      },
+                      "hardDependencies": [
+                        "work_1"
+                      ]
+                    }
+                  ],
+                  "decisions": {
+                    "assumptions": [],
+                    "tradeOffs": [],
+                    "unresolvedUncertainty": [],
+                    "stoppingConditions": [
+                      "Meet the accepted criterion or record the specific unresolved gap."
+                    ]
+                  }
+                },
+                "digest": "5d0222c7e771a44aca6618d7aa55cbabd325bf9c0193dcb3218e1ca5827236d9"
+              }
+            ],
+            "sharedDependencies": []
+          },
+          "allocation": {
+            "report": {
+              "schemaVersion": 2,
+              "status": "FEASIBLE",
+              "placements": [
+                {
+                  "planRef": "plan_1",
+                  "activityRef": "work_1",
+                  "minutes": 10,
+                  "date": "2026-10-12"
+                },
+                {
+                  "planRef": "plan_1",
+                  "activityRef": "work_2",
+                  "minutes": 30,
+                  "date": "2026-10-12"
+                }
+              ],
+              "unscheduled": [],
+              "committedMinutes": 40,
+              "capacityProof": null,
+              "findings": [
+                {
+                  "findingId": "finding_ed329fe5b20f4d190a99",
+                  "category": "FINISH",
+                  "consequential": false,
+                  "planRefs": [
+                    "plan_1"
+                  ],
+                  "activityRefs": [],
+                  "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+                  "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+                }
+              ]
+            },
+            "digest": "b3f3caa108a79947449e4bc3b57e061a1b0f8eb93c458f24fc2d266696ff45cb"
+          },
+          "planning": {
+            "detail": {
+              "days": 14,
+              "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+            },
+            "tradeOffExplanation": "Only the accepted next work is detailed.",
+            "splits": [],
+            "forecasts": [],
+            "adaptation": "NOT_REQUESTED",
+            "unreviewedPhaseRefs": []
+          }
+        },
+        "grounding": [
+          {
+            "ref": "accepted_request",
+            "kind": "REQUIREMENT",
+            "path": "acceptedRequest.text"
+          },
+          {
+            "ref": "plan_1/goal",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].requested"
+          },
+          {
+            "ref": "plan_1/accepted",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].resolved"
+          },
+          {
+            "ref": "plan_1/strategy",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.strategy"
+          },
+          {
+            "ref": "plan_1/scope/scope_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.scope[0]"
+          },
+          {
+            "ref": "plan_1/activity/work_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[0]"
+          },
+          {
+            "ref": "plan_1/activity/work_2",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[1]"
+          },
+          {
+            "ref": "plan_1/uncertainty",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.decisions"
+          },
+          {
+            "ref": "plan_1/workload",
+            "kind": "PROPOSAL",
+            "path": "workloadAudit[0]"
+          },
+          {
+            "ref": "allocation",
+            "kind": "PROPOSAL",
+            "path": "proposal.allocation.report"
+          },
+          {
+            "ref": "constraints",
+            "kind": "REQUIREMENT",
+            "path": "proposal.envelope"
+          }
+        ],
+        "workloadAudit": [
+          {
+            "planRef": "plan_1",
+            "bookedTimeboxMinutes": 40,
+            "unprotectedTimeboxMinutes": 40,
+            "protectedRemainingMinutes": 0,
+            "remainingCommittedMinutes": 40,
+            "recommendedEffort": {
+              "lowMinutes": 40,
+              "likelyMinutes": 40,
+              "highMinutes": 40
+            },
+            "remainingAboveStrategyHigh": false,
+            "committedRefs": [
+              "work_1",
+              "work_2"
+            ]
+          }
+        ],
+        "acceptedRequest": {
+          "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+          "authorization": "PLAN_ACTION"
+        }
+      },
+      "rawFinalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_work2_stop_violation\",\"category\":\"STRUCTURAL\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_2\",\"strategy\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/accepted\",\"excerpt\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"All twelve rewrites are done even after checked success.\"},{\"ref\":\"plan_1/uncertainty\",\"excerpt\":\"Meet the accepted criterion or record the specific unresolved gap.\"}],\"evidence\":\"The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.\",\"consequence\":\"The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.\",\"requestedResolution\":\"Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.\",\"requiresAcknowledgement\":false}]}]}",
+      "finishReason": "stop",
+      "contentComplete": true,
+      "instruction": "Assess the complete accepted facts and candidate independently. Blank/capped content is an operational failure; infer no missing verdict. Do not invent missing output or relax canonical validation. Configuration, parent verdict and usage are withheld until primary judgment is locked."
+    },
+    {
+      "assessmentId": "B02",
+      "reviewInput": {
+        "stage": "REVIEW",
+        "goals": [
+          {
+            "planRef": "plan_1",
+            "requested": {
+              "title": "Japanese greeting choice",
+              "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "resolved": {
+              "title": "Japanese greeting choice",
+              "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            }
+          }
+        ],
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Japanese greeting choice",
+                "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Japanese greeting choice",
+                "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "For this bounded task, おはよう is the morning greeting and こんばんは the evening greeting. The accepted goal requires written choice, not pronunciation."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "proposal": {
+          "stage": "ALLOCATION",
+          "research": null,
+          "envelope": {
+            "schemaVersion": 2,
+            "timezone": "Asia/Karachi",
+            "today": "2026-10-12",
+            "window": {
+              "start": "2026-10-12",
+              "end": "2026-10-14"
+            },
+            "capacityDigest": "c69778e9730639da54e2d25fafe190dbe721f51a9665f7564179a5cae01ddb45",
+            "basis": "CONFIRMED_AVAILABILITY",
+            "weeklyCeilingMinutes": 210,
+            "recoveryPercent": 0,
+            "targets": [
+              {
+                "planRef": "plan_1",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "perGoalWeeklyCeilingMinutes": null
+              }
+            ],
+            "days": [
+              {
+                "date": "2026-10-12",
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 30,
+                "excluded": false
+              },
+              {
+                "date": "2026-10-13",
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 30,
+                "excluded": false
+              },
+              {
+                "date": "2026-10-14",
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 30,
+                "excluded": false
+              }
+            ],
+            "protectedExecution": [],
+            "timeboxRange": {
+              "minMinutes": 5,
+              "maxMinutes": 240
+            }
+          },
+          "blueprints": {
+            "plans": [
+              {
+                "planRef": "plan_1",
+                "blueprint": {
+                  "schemaVersion": 2,
+                  "strategy": {
+                    "policy": "MASTERY",
+                    "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+                    "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                    "recommendedEffort": {
+                      "lowMinutes": 10,
+                      "likelyMinutes": 10,
+                      "highMinutes": 10
+                    },
+                    "phases": []
+                  },
+                  "scope": [
+                    {
+                      "scopeRef": "scope_1",
+                      "disposition": "INCLUDED",
+                      "contribution": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing."
+                    }
+                  ],
+                  "activities": [
+                    {
+                      "localId": "work_1",
+                      "outcomeRefs": [],
+                      "scopeRefs": [
+                        "scope_1"
+                      ],
+                      "title": "Choose and explain the greetings",
+                      "activityType": "PRACTICE",
+                      "purpose": "Choose and explain the greetings",
+                      "instructions": "For morning choose おはよう; for evening choose こんばんは. Cover the key, choose for two new morning/evening prompts and explain the time match.",
+                      "completionCriterion": "Written choices match the supplied time categories.",
+                      "effort": {
+                        "lowMinutes": 10,
+                        "likelyMinutes": 10,
+                        "highMinutes": 10
+                      },
+                      "timeboxMinutes": 10,
+                      "commitment": {
+                        "category": "COMMITTED"
+                      },
+                      "hardDependencies": []
+                    }
+                  ],
+                  "decisions": {
+                    "assumptions": [],
+                    "tradeOffs": [],
+                    "unresolvedUncertainty": [],
+                    "stoppingConditions": [
+                      "Meet the accepted criterion or record the specific unresolved gap."
+                    ]
+                  }
+                },
+                "digest": "6b57e04371baed2293e5c82fe3ecfcf1ea741a5d167302486e471847b3832f6d"
+              }
+            ],
+            "sharedDependencies": []
+          },
+          "allocation": {
+            "report": {
+              "schemaVersion": 2,
+              "status": "FEASIBLE",
+              "placements": [
+                {
+                  "planRef": "plan_1",
+                  "activityRef": "work_1",
+                  "minutes": 10,
+                  "date": "2026-10-12"
+                }
+              ],
+              "unscheduled": [],
+              "committedMinutes": 10,
+              "capacityProof": null,
+              "findings": [
+                {
+                  "findingId": "finding_ed329fe5b20f4d190a99",
+                  "category": "FINISH",
+                  "consequential": false,
+                  "planRefs": [
+                    "plan_1"
+                  ],
+                  "activityRefs": [],
+                  "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+                  "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+                }
+              ]
+            },
+            "digest": "f8e5f89c6342edefcb17f995219c09896ada507d61ec26e44e40031a23be7b0e"
+          },
+          "planning": {
+            "detail": {
+              "days": 14,
+              "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+            },
+            "tradeOffExplanation": "Only the accepted next work is detailed.",
+            "splits": [],
+            "forecasts": [],
+            "adaptation": "NOT_REQUESTED",
+            "unreviewedPhaseRefs": []
+          }
+        },
+        "grounding": [
+          {
+            "ref": "accepted_request",
+            "kind": "REQUIREMENT",
+            "path": "acceptedRequest.text",
+            "text": "\"Prepare the accepted educational outcome using the supplied facts and constraints.\""
+          },
+          {
+            "ref": "plan_1/goal",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].requested",
+            "text": "{\"title\":\"Japanese greeting choice\",\"outcome\":\"Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.\",\"policy\":\"MASTERY\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+          },
+          {
+            "ref": "plan_1/accepted",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].resolved",
+            "text": "{\"title\":\"Japanese greeting choice\",\"outcome\":\"Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.\",\"policy\":\"MASTERY\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+          },
+          {
+            "ref": "plan_1/strategy",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.strategy",
+            "text": "{\"policy\":\"MASTERY\",\"outcome\":\"Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.\",\"explanation\":\"Use the supplied facts and the named learner action; evaluate the actual content independently.\",\"recommendedEffort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"phases\":[]}"
+          },
+          {
+            "ref": "plan_1/scope/scope_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.scope[0]",
+            "text": "{\"scopeRef\":\"scope_1\",\"disposition\":\"INCLUDED\",\"contribution\":\"Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.\"}"
+          },
+          {
+            "ref": "plan_1/activity/work_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[0]",
+            "text": "{\"localId\":\"work_1\",\"outcomeRefs\":[],\"scopeRefs\":[\"scope_1\"],\"title\":\"Choose and explain the greetings\",\"activityType\":\"PRACTICE\",\"purpose\":\"Choose and explain the greetings\",\"instructions\":\"For morning choose おはよう; for evening choose こんばんは. Cover the key, choose for two new morning/evening prompts and explain the time match.\",\"completionCriterion\":\"Written choices match the supplied time categories.\",\"effort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"timeboxMinutes\":10,\"commitment\":{\"category\":\"COMMITTED\"},\"hardDependencies\":[]}"
+          },
+          {
+            "ref": "plan_1/uncertainty",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.decisions",
+            "text": "{\"assumptions\":[],\"tradeOffs\":[],\"unresolvedUncertainty\":[],\"stoppingConditions\":[\"Meet the accepted criterion or record the specific unresolved gap.\"]}"
+          },
+          {
+            "ref": "plan_1/workload",
+            "kind": "PROPOSAL",
+            "path": "workloadAudit[0]",
+            "text": "{\"planRef\":\"plan_1\",\"bookedTimeboxMinutes\":10,\"unprotectedTimeboxMinutes\":10,\"protectedRemainingMinutes\":0,\"remainingCommittedMinutes\":10,\"recommendedEffort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"remainingAboveStrategyHigh\":false,\"committedRefs\":[\"work_1\"]}"
+          },
+          {
+            "ref": "allocation",
+            "kind": "PROPOSAL",
+            "path": "proposal.allocation.report",
+            "text": "{\"schemaVersion\":2,\"status\":\"FEASIBLE\",\"placements\":[{\"planRef\":\"plan_1\",\"activityRef\":\"work_1\",\"minutes\":10,\"date\":\"2026-10-12\"}],\"unscheduled\":[],\"committedMinutes\":10,\"capacityProof\":null,\"findings\":[{\"findingId\":\"finding_ed329fe5b20f4d190a99\",\"category\":\"FINISH\",\"consequential\":false,\"planRefs\":[\"plan_1\"],\"activityRefs\":[],\"evidence\":\"Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.\",\"consequence\":\"This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases.\"}]}"
+          },
+          {
+            "ref": "constraints",
+            "kind": "REQUIREMENT",
+            "path": "proposal.envelope",
+            "text": "{\"schemaVersion\":2,\"timezone\":\"Asia/Karachi\",\"today\":\"2026-10-12\",\"window\":{\"start\":\"2026-10-12\",\"end\":\"2026-10-14\"},\"capacityDigest\":\"c69778e9730639da54e2d25fafe190dbe721f51a9665f7564179a5cae01ddb45\",\"basis\":\"CONFIRMED_AVAILABILITY\",\"weeklyCeilingMinutes\":210,\"recoveryPercent\":0,\"targets\":[{\"planRef\":\"plan_1\",\"deadline\":{\"kind\":\"NONE\"},\"perGoalWeeklyCeilingMinutes\":null}],\"days\":[{\"date\":\"2026-10-12\",\"ceilingMinutes\":30,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":30,\"excluded\":false},{\"date\":\"2026-10-13\",\"ceilingMinutes\":30,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":30,\"excluded\":false},{\"date\":\"2026-10-14\",\"ceilingMinutes\":30,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":30,\"excluded\":false}],\"protectedExecution\":[],\"timeboxRange\":{\"minMinutes\":5,\"maxMinutes\":240}}"
+          }
+        ],
+        "workloadAudit": [
+          {
+            "planRef": "plan_1",
+            "bookedTimeboxMinutes": 10,
+            "unprotectedTimeboxMinutes": 10,
+            "protectedRemainingMinutes": 0,
+            "remainingCommittedMinutes": 10,
+            "recommendedEffort": {
+              "lowMinutes": 10,
+              "likelyMinutes": 10,
+              "highMinutes": 10
+            },
+            "remainingAboveStrategyHigh": false,
+            "committedRefs": [
+              "work_1"
+            ]
+          }
+        ],
+        "acceptedRequest": {
+          "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+          "authorization": "PLAN_ACTION"
+        }
+      },
+      "suppliedModelMessageBody": {
+        "stage": "REVIEW",
+        "goals": [
+          {
+            "planRef": "plan_1",
+            "requested": {
+              "title": "Japanese greeting choice",
+              "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "resolved": {
+              "sameAsPath": "goals[0].requested"
+            }
+          }
+        ],
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Japanese greeting choice",
+                "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Japanese greeting choice",
+                "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Accepted outcome",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "For this bounded task, おはよう is the morning greeting and こんばんは the evening greeting. The accepted goal requires written choice, not pronunciation."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "proposal": {
+          "stage": "ALLOCATION",
+          "research": null,
+          "envelope": {
+            "schemaVersion": 2,
+            "timezone": "Asia/Karachi",
+            "today": "2026-10-12",
+            "window": {
+              "start": "2026-10-12",
+              "end": "2026-10-14"
+            },
+            "capacityDigest": "c69778e9730639da54e2d25fafe190dbe721f51a9665f7564179a5cae01ddb45",
+            "basis": "CONFIRMED_AVAILABILITY",
+            "weeklyCeilingMinutes": 210,
+            "recoveryPercent": 0,
+            "targets": [
+              {
+                "planRef": "plan_1",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "perGoalWeeklyCeilingMinutes": null
+              }
+            ],
+            "days": {
+              "constantFields": {
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "protectedTargetMinutes": 0,
+                "recoveryMinutes": 0,
+                "availableMinutes": 30,
+                "excluded": false
+              },
+              "columns": [
+                "date"
+              ],
+              "rows": [
+                [
+                  "2026-10-12"
+                ],
+                [
+                  "2026-10-13"
+                ],
+                [
+                  "2026-10-14"
+                ]
+              ]
+            },
+            "protectedExecution": [],
+            "timeboxRange": {
+              "minMinutes": 5,
+              "maxMinutes": 240
+            }
+          },
+          "blueprints": {
+            "plans": [
+              {
+                "planRef": "plan_1",
+                "blueprint": {
+                  "schemaVersion": 2,
+                  "strategy": {
+                    "policy": "MASTERY",
+                    "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+                    "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                    "recommendedEffort": {
+                      "lowMinutes": 10,
+                      "likelyMinutes": 10,
+                      "highMinutes": 10
+                    },
+                    "phases": []
+                  },
+                  "scope": [
+                    {
+                      "scopeRef": "scope_1",
+                      "disposition": "INCLUDED",
+                      "contribution": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing."
+                    }
+                  ],
+                  "activities": [
+                    {
+                      "localId": "work_1",
+                      "outcomeRefs": [],
+                      "scopeRefs": [
+                        "scope_1"
+                      ],
+                      "title": "Choose and explain the greetings",
+                      "activityType": "PRACTICE",
+                      "purpose": "Choose and explain the greetings",
+                      "instructions": "For morning choose おはよう; for evening choose こんばんは. Cover the key, choose for two new morning/evening prompts and explain the time match.",
+                      "completionCriterion": "Written choices match the supplied time categories.",
+                      "effort": {
+                        "lowMinutes": 10,
+                        "likelyMinutes": 10,
+                        "highMinutes": 10
+                      },
+                      "timeboxMinutes": 10,
+                      "commitment": {
+                        "category": "COMMITTED"
+                      },
+                      "hardDependencies": []
+                    }
+                  ],
+                  "decisions": {
+                    "assumptions": [],
+                    "tradeOffs": [],
+                    "unresolvedUncertainty": [],
+                    "stoppingConditions": [
+                      "Meet the accepted criterion or record the specific unresolved gap."
+                    ]
+                  }
+                },
+                "digest": "6b57e04371baed2293e5c82fe3ecfcf1ea741a5d167302486e471847b3832f6d"
+              }
+            ],
+            "sharedDependencies": []
+          },
+          "allocation": {
+            "report": {
+              "schemaVersion": 2,
+              "status": "FEASIBLE",
+              "placements": [
+                {
+                  "planRef": "plan_1",
+                  "activityRef": "work_1",
+                  "minutes": 10,
+                  "date": "2026-10-12"
+                }
+              ],
+              "unscheduled": [],
+              "committedMinutes": 10,
+              "capacityProof": null,
+              "findings": [
+                {
+                  "findingId": "finding_ed329fe5b20f4d190a99",
+                  "category": "FINISH",
+                  "consequential": false,
+                  "planRefs": [
+                    "plan_1"
+                  ],
+                  "activityRefs": [],
+                  "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+                  "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+                }
+              ]
+            },
+            "digest": "f8e5f89c6342edefcb17f995219c09896ada507d61ec26e44e40031a23be7b0e"
+          },
+          "planning": {
+            "detail": {
+              "days": 14,
+              "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+            },
+            "tradeOffExplanation": "Only the accepted next work is detailed.",
+            "splits": [],
+            "forecasts": [],
+            "adaptation": "NOT_REQUESTED",
+            "unreviewedPhaseRefs": []
+          }
+        },
+        "grounding": [
+          {
+            "ref": "accepted_request",
+            "kind": "REQUIREMENT",
+            "path": "acceptedRequest.text"
+          },
+          {
+            "ref": "plan_1/goal",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].requested"
+          },
+          {
+            "ref": "plan_1/accepted",
+            "kind": "REQUIREMENT",
+            "path": "goals[0].resolved"
+          },
+          {
+            "ref": "plan_1/strategy",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.strategy"
+          },
+          {
+            "ref": "plan_1/scope/scope_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.scope[0]"
+          },
+          {
+            "ref": "plan_1/activity/work_1",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.activities[0]"
+          },
+          {
+            "ref": "plan_1/uncertainty",
+            "kind": "PROPOSAL",
+            "path": "proposal.blueprints.plans[0].blueprint.decisions"
+          },
+          {
+            "ref": "plan_1/workload",
+            "kind": "PROPOSAL",
+            "path": "workloadAudit[0]"
+          },
+          {
+            "ref": "allocation",
+            "kind": "PROPOSAL",
+            "path": "proposal.allocation.report"
+          },
+          {
+            "ref": "constraints",
+            "kind": "REQUIREMENT",
+            "path": "proposal.envelope"
+          }
+        ],
+        "workloadAudit": [
+          {
+            "planRef": "plan_1",
+            "bookedTimeboxMinutes": 10,
+            "unprotectedTimeboxMinutes": 10,
+            "protectedRemainingMinutes": 0,
+            "remainingCommittedMinutes": 10,
+            "recommendedEffort": {
+              "lowMinutes": 10,
+              "likelyMinutes": 10,
+              "highMinutes": 10
+            },
+            "remainingAboveStrategyHigh": false,
+            "committedRefs": [
+              "work_1"
+            ]
+          }
+        ],
+        "acceptedRequest": {
+          "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+          "authorization": "PLAN_ACTION"
+        }
+      },
+      "rawFinalText": "",
+      "finishReason": "length",
+      "contentComplete": false,
+      "instruction": "Assess the complete accepted facts and candidate independently. Blank/capped content is an operational failure; infer no missing verdict. Do not invent missing output or relax canonical validation. Configuration, parent verdict and usage are withheld until primary judgment is locked."
+    }
+  ]
+}

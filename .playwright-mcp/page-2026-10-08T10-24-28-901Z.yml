@@ -1,0 +1,15 @@
+- generic [ref=f4e3]:
+  - banner [ref=f4e4]:
+    - generic [ref=f4e5]:
+      - button "Open navigation menu" [ref=f4e6]
+      - button "View Profile Card" [ref=f4e9] [cursor=pointer]:
+        - generic "Scholar" [ref=f4e11]: S
+        - generic [ref=f4e13]:
+          - paragraph [ref=f4e14]: The System
+          - paragraph [ref=f4e15]: E-Rank • Lv. 1
+    - generic [ref=f4e16]:
+      - 'generic "Weekly Streak: 0 weeks" [ref=f4e17]': "0"
+      - 'generic "HP: 0/100" [ref=f4e21]': 0/100
+      - 'generic "Sylph: 0" [ref=f4e25]': "0"
+  - main [ref=f4e29]:
+    - paragraph [ref=f4e33]: Entering the Sanctuary...

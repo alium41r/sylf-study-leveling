@@ -2,7 +2,7 @@
 
 import React from "react";
 import { MessageSquare } from "lucide-react";
-import { QuestEmblemIcon, ObjectiveTargetIcon, FocusClockIcon, SystemApertureIcon } from "@/app/components/icons";
+import { QuestEmblemIcon, ObjectiveTargetIcon, FocusClockIcon, SylvieIcon } from "@/app/components/icons";
 
 interface ChatEmptyStateProps {
   isGroup: boolean;
@@ -11,7 +11,7 @@ interface ChatEmptyStateProps {
 }
 
 const STARTER_PROMPTS = [
-  { text: "Hey! Ready to study?", icon: SystemApertureIcon },
+  { text: "Hey! Ready to study?", icon: SylvieIcon },
   { text: "Starting a deep focus session now.", icon: FocusClockIcon },
   { text: "What goals are you working on today?", icon: ObjectiveTargetIcon },
   { text: "Let's crush today's quests!", icon: QuestEmblemIcon },

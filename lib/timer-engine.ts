@@ -65,12 +65,14 @@ export function createInitialSnapshot(nowMs: number = Date.now()): TimerSnapshot
 
 export function deriveTimer(s: TimerSnapshot, nowMs: number): DerivedTimer {
   const running = !s.isPaused && s.phase !== "done" && s.runningSinceMs !== null;
-  const liveMs = running && s.runningSinceMs !== null ? Math.max(0, nowMs - s.runningSinceMs) : 0;
+  const elapsedMs = running && s.runningSinceMs !== null ? Math.max(0, nowMs - s.runningSinceMs) : 0;
+  // A suspended tab cannot credit an expired focus/break countdown forever.
+  const liveMs = s.remainingMs === null ? elapsedMs : Math.min(elapsedMs, s.remainingMs);
 
   const focusSec = Math.floor((s.focusMs + (s.phase === "focus" ? liveMs : 0)) / 1000);
   const breakSec = Math.floor((s.breakMs + (isBreakPhase(s.phase) ? liveMs : 0)) / 1000);
 
-  const remainingRawMs = s.remainingMs === null ? null : s.remainingMs - liveMs;
+  const remainingRawMs = s.remainingMs === null ? null : s.remainingMs - elapsedMs;
   const remainingSec =
     remainingRawMs === null ? null : Math.max(0, Math.ceil(remainingRawMs / 1000));
 

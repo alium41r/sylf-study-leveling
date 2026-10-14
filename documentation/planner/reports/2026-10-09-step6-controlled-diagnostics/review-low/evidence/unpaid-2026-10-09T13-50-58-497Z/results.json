@@ -1,0 +1,124 @@
+{
+  "mode": "UNPAID_PREFLIGHT",
+  "educationalJudgment": "UNASSESSED",
+  "records": [
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "packetSha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "rootRequestId": "db2f30ee-80cf-4a18-934e-a8bd5225baba",
+      "attemptId": "12484bbd-ed35-45bc-b117-f976d84c71c8",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "71bbeb05-0473-499d-95d2-8a4d7bc9e4b3",
+                "status": "PASSED",
+                "evidenceDigest": "3cb85a76a8badd1f7942d6664ba52f05d830b499f452f956c52457cc871b3552",
+                "educationalContentDigest": "1ed7d8acd0ebfba0d4084be6e10588355ec1b2211402817544c6ce63adec6153",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "25f40da5-9007-4f7b-806c-f2482b244774",
+        "attempts": [
+          {
+            "callId": "25f40da5-9007-4f7b-806c-f2482b244774",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "packetSha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "rootRequestId": "7e34f633-0390-476c-9dc2-d7691f4f1846",
+      "attemptId": "ddd4ef59-f90c-4adb-b4cf-e57cc9145ec8",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "fea7c0de-83d1-4cbb-b208-84e9c9317d66",
+                "status": "BLOCKED",
+                "evidenceDigest": "59f675978bd39c41caab02584bd6eb5d596f2ed5ce0f35d4693d43a7d4e0c12b",
+                "educationalContentDigest": "2f266baedd400893e844de8e44cde7255ac900ef861dfa6cabae4b8731c8dc66",
+                "issues": [
+                  {
+                    "issueId": "issue_1",
+                    "category": "UNREALISTIC_WORKLOAD",
+                    "severity": "BLOCKING",
+                    "affectedRefs": [
+                      "work_2"
+                    ],
+                    "evidence": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+                    "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                    "resolution": "OPEN",
+                    "verification": null
+                  }
+                ],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": [
+            {
+              "planRef": "plan_1",
+              "finding": {
+                "issueId": "issue_1",
+                "category": "UNREALISTIC_WORKLOAD",
+                "severity": "BLOCKING",
+                "affectedRefs": [
+                  "work_2"
+                ],
+                "basis": "CONCRETE_VIOLATION",
+                "grounds": [
+                  {
+                    "ref": "plan_1/goal",
+                    "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+                  },
+                  {
+                    "ref": "plan_1/activity/work_2",
+                    "excerpt": "All twelve rewrites are done even after checked success."
+                  }
+                ],
+                "evidence": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+                "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                "requestedResolution": "Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check.",
+                "requiresAcknowledgement": false
+              }
+            }
+          ]
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "1ecb31c9-7cd7-44b7-8191-b4987da6b534",
+        "attempts": [
+          {
+            "callId": "1ecb31c9-7cd7-44b7-8191-b4987da6b534",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_1\",\"category\":\"UNREALISTIC_WORKLOAD\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_2\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/goal\",\"excerpt\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"All twelve rewrites are done even after checked success.\"}],\"evidence\":\"Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.\",\"consequence\":\"The accepted educational outcome cannot be met correctly as proposed.\",\"requestedResolution\":\"Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check.\",\"requiresAcknowledgement\":false}]}]}",
+      "latencyMs": 0
+    }
+  ]
+}

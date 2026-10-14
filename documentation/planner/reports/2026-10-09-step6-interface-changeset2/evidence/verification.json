@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "completedAt": "2026-10-09T08:48:43.537590+00:00",
+  "status": "PASSED_TECHNICAL",
+  "changeset": 2,
+  "phase2EducationalQualification": "NOT_COMPLETE",
+  "paidModelCalls": 0,
+  "implemented": [
+    "Exact source-value grounding for quotations, newlines, literal backslashes and Unicode",
+    "Bounded deterministic validation feedback plus explicitly untrusted actual rejected output",
+    "Exact correction or grounded withdrawal of every retained rejected concern",
+    "Durable pending-concern continuity and validated recovery receipts",
+    "Shorter independent rubric retaining complete consequential evidence",
+    "Explicitly accepted recommendation handoff to generation and review"
+  ],
+  "units": {
+    "passed": 621,
+    "failed": 0,
+    "requiredSkipped": 0,
+    "files": 45,
+    "command": "unit-command.json",
+    "results": "units.json"
+  },
+  "postgres": {
+    "passed": 414,
+    "failed": 0,
+    "requiredSkipped": 0,
+    "files": 31,
+    "results": "postgres/postgres-harness-run.json",
+    "limitations": [
+      "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+      "Phase 1 actual services/SQL are exercised; no hosted data is touched."
+    ],
+    "testedSource": "postgres-source-snapshot.json",
+    "finalTestTypeCorrespondence": "postgres-test-type-correspondence.json"
+  },
+  "staticChecks": [
+    {
+      "name": "isolated-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.planner-v2-phase2.json",
+        "--incremental",
+        "false"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "full-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--incremental",
+        "false"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "lint",
+      "command": [
+        "node",
+        "node_modules/eslint/bin/eslint.js",
+        "lib/planner/v2/intelligence/quality.ts",
+        "lib/planner/v2/intelligence/provider.ts",
+        "lib/planner/v2/intelligence/blueprint.ts",
+        "lib/planner/v2/intelligence/schemas/quality.ts",
+        "lib/planner/v2/server/learning.ts",
+        "lib/planner/v2/server/compiler.ts",
+        "__tests__/planner-v2/intelligence/provider.test.ts",
+        "__tests__/planner-v2/intelligence/quality.test.ts",
+        "__tests__/planner-v2/intelligence/review-recovery.test.ts",
+        "__tests__/planner-v2/intelligence/review-fixtures.ts",
+        "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+        "--max-warnings",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "worker-build",
+      "command": [
+        "npm",
+        "run",
+        "planner:worker:build"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "productionBuild": {
+    "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
+    "exitCode": 1,
+    "bundleCompiled": true,
+    "limitation": "Unchanged app/api/acoustics/route.ts CURATED_SOUNDSCAPES export fails Next route validation. Full production build is not passing.",
+    "evidence": "step6-build.json"
+  },
+  "reviewDiagnostics": {
+    "cases": 12,
+    "method": "Twelve separately labelled deterministic candidates; labels are hidden from the request. Scripted adapters exercise the review boundary, not live model reasoning accuracy. No paid calls.",
+    "labels": "Four defects, four sound plans, two preferences, two reasonable uncertainties.",
+    "evidence": "review-diagnostics.json",
+    "liveModelAccuracyEstablished": false
+  },
+  "instructionMetrics": [
+    {
+      "name": "qualityInstruction",
+      "beforeUtf8Bytes": 7142,
+      "afterUtf8Bytes": 4071,
+      "reductionPercent": 42.9991598991879
+    },
+    {
+      "name": "verificationInstruction",
+      "beforeUtf8Bytes": 7935,
+      "afterUtf8Bytes": 4609,
+      "reductionPercent": 41.91556395715186
+    }
+  ],
+  "preserved": {
+    "frozenCanonicalContractCount": 12,
+    "phase1LifecycleAndExecution": true,
+    "providerRoutesBudgetsReasoningAndCallCaps": true,
+    "unrelatedStartingChanges": true,
+    "evidence": "source-preservation.json"
+  },
+  "callCounts": {
+    "normalGenerationAndReview": 2,
+    "oneRepairAndVerification": 4,
+    "headlessAcceptedRecommendationIncludingTransferredForegroundCall": 3,
+    "additionalMandatoryCallsIntroduced": 0
+  },
+  "sourceSha256": {
+    "lib/planner/v2/intelligence/blueprint.ts": "76753456d03e749b7946d51dc6b86ee7e37cbd2f3e5b5c04ceb163f7844af359",
+    "lib/planner/v2/intelligence/provider.ts": "4709a27a95a7369b2d1d6611bc5e5fbe49a880634bbb6ccd61bb5638214ba03b",
+    "lib/planner/v2/intelligence/quality.ts": "b037ea8b85d3d40511ff9525d9c9a5717ad3bf61243cdacdac3d3254528d5c0a",
+    "lib/planner/v2/intelligence/schemas/quality.ts": "997c30858c179b799fad2e112c3b544fbf3b29f9a51bf610d63568cdb487ec8b",
+    "lib/planner/v2/server/compiler.ts": "2a33c1ac3e0fc570ab7c08355dbfe5913ef4dbd4d196527f1828c1d3b3be22aa",
+    "lib/planner/v2/server/learning.ts": "22387116207eeaa81629f4687129088fcf28886d1305bf8b73016662a36ed702",
+    "__tests__/planner-v2/intelligence/provider.test.ts": "4e766d538fed5b715e53b29603bc685d477e2d36ecd6424e8e4d086077cd6de6",
+    "__tests__/planner-v2/intelligence/quality.test.ts": "664f45df98cf147cf376a43aaeb23c6e3e785a00fa40706d95470365dc17c937",
+    "__tests__/planner-v2/intelligence/review-recovery.test.ts": "44156dd553984138c259ea6c4c2927c0119ec70c0627cfaa789e3c3fd0d8c654",
+    "__tests__/planner-v2/intelligence/review-fixtures.ts": "18371f3fefa06858f8a0bd9859206daf26a2a2b7d9f664b475a3461bf1bf38d7",
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts": "6f1858bf924bfe76f63aca84a446f7ad321be6149e1d036c017d4f35a971ff45"
+  },
+  "notStarted": [
+    "Changeset 3 implementation",
+    "Paid/live qualification",
+    "Phase 3 UI"
+  ],
+  "handoff": "../README.md#changeset-3-handoff"
+}

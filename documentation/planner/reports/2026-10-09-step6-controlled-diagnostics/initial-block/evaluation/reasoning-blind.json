@@ -1,0 +1,1284 @@
+{
+  "schemaVersion": 1,
+  "createdAtUtc": "2026-10-09T12:45:18.852613+00:00",
+  "purpose": "Primary educational scoring before tested review verdicts, neutral IDs with complete accepted input. Provider/config/interface labels and execution mapping withheld until scores lock; format remains visible.",
+  "assessments": [
+    {
+      "assessmentId": "A01",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Weather graph interpretation",
+                "outcome": "Prepare to read monthly rainfall totals and explain what the data can and cannot establish about a longer-term trend.",
+                "policy": "EXAM",
+                "deadline": {
+                  "kind": "FIXED",
+                  "date": "2026-10-13",
+                  "examDayStudyAllowed": true
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Graph units and comparisons",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Limits of trend inference",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Weather graph interpretation",
+                "outcome": "Prepare to read monthly rainfall totals and explain what the data can and cannot establish about a longer-term trend.",
+                "policy": "EXAM",
+                "deadline": {
+                  "kind": "FIXED",
+                  "date": "2026-10-13",
+                  "examDayStudyAllowed": true
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Graph units and comparisons",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Limits of trend inference",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "Teacher scope: read totals in millimetres, compare months, and distinguish a single-year pattern from a climate trend. No official weighting is supplied.",
+                "Available data: January 40 mm, February 70 mm, March 50 mm, from one year at one station.",
+                "The learner reads values correctly but writes “the climate is getting wetter” from these three values.",
+                "All practice data can be supplied or explicitly created; no historical weather archive is available."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Keep the focus on justified interpretation; do not require fetching a climate archive or learning meteorological forecasting.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-13"
+          },
+          "capacityDigest": "4a85799be85249d63820480670eadc90addd402e17dddabedc6b7eaec5eb2163",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 245,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "FIXED",
+                "date": "2026-10-13",
+                "examDayStudyAllowed": true
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 35,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 35,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Work backwards from the accepted applicable assessment and deadline. Use verified assessment importance where known, weaknesses, conceptual prerequisites and confidence/recent evidence. Choose conceptual relearning, method selection, deliberate problems, timed technique or paper/error analysis only when useful. Secure topics may need one check or no work. Explain sacrificed/deferred scope under triage. Never invent assessment weights or cycle. Prerequisite usefulness is not evidence of quiz marks, frequency or relative assessment return; when importance is unknown, justify priority from actual dependencies/readiness and state the uncertainty, without typical-mark claims."
+      },
+      "finalText": "{\"strategy\":\"Work backward from the accepted outcome: justified interpretation of monthly rainfall data, and the fixed deadline. Because the learner already reads values correctly, do not spend primary effort on basic value reading. First, briefly verify graph units and comparisons: confirm the unit is millimetres and make the supplied comparisons from January 40 mm, February 70 mm and March 50 mm (February highest; March between January and February). Then make limits of trend inference the main effort: have the learner write one claim that the three one-year, one-station values do support ('this year at this station, February was the wettest of these three months') and one they do not support ('the climate is getting wetter'). Require an explicit reason: a climate trend requires multi-year data, appropriate comparison across years and stations, and separation of short-term variation from longer-term change. Correctness checks: units and labels; correct month order and differences; claim wording limited to the data; identification of the missing evidence; no archive fetching or meteorological forecasting. Use supplied or explicitly created practice values for one near-transfer item with a different pattern and ask for one justified and one overclaim. Dependencies: accurate reading and comparison precede the limits-of-inference work; do not move on if comparisons are wrong. Effort: no official weighting is supplied, so priority rests on the observed overclaim and its direct link to the outcome; use about the preferred 15 minutes, not a broad climate project. Uncertainty: exam importance and mark weight are unknown; do not claim typical frequency or marks. Stop when the learner independently gives a defensible interpretation, correctly labels the overclaim as unsupported, states the missing evidence, and passes one transfer item. Defer historical archive retrieval, forecasting, and broad climate science.\"}",
+      "finishReason": "stop"
+    },
+    {
+      "assessmentId": "A02",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Oral history project",
+                "outcome": "Eventually produce an accurate three-minute oral history recording. Detail only the next checkpoint: a consent-aware question outline that can elicit one specific remembered event.",
+                "policy": "ROADMAP",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Consent and question design",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Recording an interview",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_3",
+                    "title": "Selecting and editing audio",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_4",
+                    "title": "Checking the account with the speaker",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Oral history project",
+                "outcome": "Eventually produce an accurate three-minute oral history recording. Detail only the next checkpoint: a consent-aware question outline that can elicit one specific remembered event.",
+                "policy": "ROADMAP",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Consent and question design",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Recording an interview",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_3",
+                    "title": "Selecting and editing audio",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_4",
+                    "title": "Checking the account with the speaker",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "The learner has never designed an interview.",
+                "A willing interviewee is identified but no interview date or recording exists.",
+                "The supplied project brief requires permission to record, an open question, a follow-up about a concrete event, and a chance for the speaker to correct the account.",
+                "A question outline can be checked against those four requirements without buying software or recording the final interview."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Book only the question-outline checkpoint; keep recording and editing as later strategic scope.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-25"
+          },
+          "capacityDigest": "5792ab3a9d33c6b3c640eceba6d0a86105924b1804e5c2624f7db853616764cc",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 280,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 40,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 40,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ],
+              [
+                "2026-10-14"
+              ],
+              [
+                "2026-10-15"
+              ],
+              [
+                "2026-10-16"
+              ],
+              [
+                "2026-10-17"
+              ],
+              [
+                "2026-10-18"
+              ],
+              [
+                "2026-10-19"
+              ],
+              [
+                "2026-10-20"
+              ],
+              [
+                "2026-10-21"
+              ],
+              [
+                "2026-10-22"
+              ],
+              [
+                "2026-10-23"
+              ],
+              [
+                "2026-10-24"
+              ],
+              [
+                "2026-10-25"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Define concrete course/project outcomes and prerequisite milestones. Keep full strategic scope and effort uncertainty; detail only a useful next educational checkpoint. For a beginner this may demonstrate a first useful prerequisite, not the entire eventual project. Small work should finish promptly, even when the horizon is long. INCLUDED strategic scope does not require a committed activity now. Once the named checkpoint works and is independently demonstrated, later engineering, tooling or further project milestones remain strategic/unbooked unless necessary for that checkpoint. Forecast is separate from booked work. Later expansion requires fresh evidence and an explicit request."
+      },
+      "finalText": "{\"strategy\":\"Treat this as a beginner, consent-first question-design checkpoint, not the whole oral history project. Use a short, comfortable work period, ideally around the preferred 15 minutes: briefly model oral-history ethics and question types, then have the learner draft and self-check a one-page outline aimed at eliciting one specific remembered event. Prioritize permission language, one non-leading open lead question, at least one follow-up asking for a concrete time, place, action, or sensory detail, and an explicit invitation for the speaker to correct or clarify the account. Correctness checks should verify the outline against the brief's four requirements, screen for leading or compound questions, and confirm wording stays speaker-centered. If the outline fails, revise once; if it passes, stop. Dependencies: a willing interviewee is identified but no date or recording exists, so no recording, editing, or software is needed now. Recording, selecting/editing audio, and full account-checking remain later strategic scope, unbooked unless fresh evidence and an explicit request justify them. Uncertainty: the learner has never designed an interview and the chosen event may need calibration, so keep the outline simple and optionally test it verbally. Meaningful stopping point: a checked question outline that can elicit one concrete remembered event and includes consent and correction. Do not schedule the interview or begin recording or editing at this checkpoint.\"}",
+      "finishReason": "stop"
+    },
+    {
+      "assessmentId": "A03",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Reading evidence assessment",
+                "outcome": "Prepare to distinguish a stated fact, a defensible inference and an unsupported claim in unfamiliar short passages, and justify each choice from the text.",
+                "policy": "EXAM",
+                "deadline": {
+                  "kind": "FIXED",
+                  "date": "2026-10-14",
+                  "examDayStudyAllowed": true
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Literal reading",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Inference with evidence",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_3",
+                    "title": "Unsupported claims",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Reading evidence assessment",
+                "outcome": "Prepare to distinguish a stated fact, a defensible inference and an unsupported claim in unfamiliar short passages, and justify each choice from the text.",
+                "policy": "EXAM",
+                "deadline": {
+                  "kind": "FIXED",
+                  "date": "2026-10-14",
+                  "examDayStudyAllowed": true
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Literal reading",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Inference with evidence",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_3",
+                    "title": "Unsupported claims",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "The teacher has confirmed these three skills, but no relative marks or topic weights.",
+                "Practice passage: At noon the library door was locked. A sign said, “Open at 2 pm.” Mina returned at 2:10 and entered.",
+                "“The door was locked at noon” is stated; “Mina waited elsewhere” is unsupported; “the library was accessible at 2:10” follows from her entry.",
+                "The learner can find a direct quotation but treats plausible background stories as established facts."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Use a passage-based distinction and explanation check; exclude grammar drills and predictions of exam marks.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-14"
+          },
+          "capacityDigest": "a65ac3b843cda9fd67ac6bf6bbae0c54a973392e4122b2bf928f6b9e2d146acb",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 315,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "FIXED",
+                "date": "2026-10-14",
+                "examDayStudyAllowed": true
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 45,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 45,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ],
+              [
+                "2026-10-14"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Work backwards from the accepted applicable assessment and deadline. Use verified assessment importance where known, weaknesses, conceptual prerequisites and confidence/recent evidence. Choose conceptual relearning, method selection, deliberate problems, timed technique or paper/error analysis only when useful. Secure topics may need one check or no work. Explain sacrificed/deferred scope under triage. Never invent assessment weights or cycle. Prerequisite usefulness is not evidence of quiz marks, frequency or relative assessment return; when importance is unknown, justify priority from actual dependencies/readiness and state the uncertainty, without typical-mark claims."
+      },
+      "finalText": "{\"strategy\":\"Work backwards from the fixed 2026-10-14 assessment and the accepted task (passage-based distinction and explanation checks, no grammar drills, no mark predictions). Because assessment weights are unknown, do not rank topics by assumed marks; rank by actual readiness and dependency. Evidence shows literal quotation is already partly secure, inferential reading is demonstrated in the sample passage, but unsupported claims are conflated with background assumptions — that is the priority. Plan roughly two 15-minute timeboxes on 12–13 Oct (comfortable-early, moderate), leaving exam day for a short confidence warm-up only if the learner wants it; this stays well under available capacity, since nothing justifies saturation. Session shape: use the supplied library passage first, then one or two unfamiliar short passages. For each candidate statement, the learner must (a) label it stated, defensible inference, or unsupported, and (b) justify with a quoted or paraphrased line, or state what the passage would need to say to support it. Literal reading gets only one quick verification check rather than re-teaching. Inference practice focuses on the evidence-to-conclusion link already partly performed. Unsupported claims get the most repetitions, especially plausible-sounding additions such as invented waiting, motives, or timelines. Correctness check: require text-anchored justification every time, and correct any label justified only by plausibility. Stop when the learner independently classifies and justifies all three categories across two unseen passages with no overreach into background assumptions — then stop rather than adding volume. Uncertainty to state plainly: skill importance and relative weighting are unverified, so time is allocated by dependency and observed weakness, not by predicted exam return.\"}",
+      "finishReason": "stop"
+    },
+    {
+      "assessmentId": "A04",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Testing an argument",
+                "outcome": "Independently decide whether a simple if-then argument is valid and justify the decision with a counterexample or the given truth conditions.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "If-then truth conditions",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Valid inference versus converse",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Testing an argument",
+                "outcome": "Independently decide whether a simple if-then argument is valid and justify the decision with a counterexample or the given truth conditions.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "If-then truth conditions",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Valid inference versus converse",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "For this exercise P implies Q is false only when P is true and Q is false.",
+                "From P implies Q and P, Q follows; from P implies Q and Q, P need not follow.",
+                "The learner knows these words but has not evaluated an unfamiliar argument.",
+                "No formal proof notation is required. A four-row truth table or an explicit P=false, Q=true counterexample can check the invalid converse."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Accept any correct bounded justification; do not require symbolic proof machinery.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-25"
+          },
+          "capacityDigest": "39a403324c7911d1350ed54e2a5ea878c84b5135278933f6edf510f125fbf4f4",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 315,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 45,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 45,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ],
+              [
+                "2026-10-14"
+              ],
+              [
+                "2026-10-15"
+              ],
+              [
+                "2026-10-16"
+              ],
+              [
+                "2026-10-17"
+              ],
+              [
+                "2026-10-18"
+              ],
+              [
+                "2026-10-19"
+              ],
+              [
+                "2026-10-20"
+              ],
+              [
+                "2026-10-21"
+              ],
+              [
+                "2026-10-22"
+              ],
+              [
+                "2026-10-23"
+              ],
+              [
+                "2026-10-24"
+              ],
+              [
+                "2026-10-25"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Pursue demonstrated capability, distinguishing explanation, transfer/application and retained competence. Use checkpoints and concrete conditional remediation where useful. No forced deadline, fixed stage ceremony or practice quota. Self-report/timers/checks do not certify mastery; acknowledge contradictions."
+      },
+      "finalText": "{\"strategy\":\"Treat this as a short mastery-oriented reasoning task. Begin with a brief diagnostic using a concrete if-then statement to surface the learner’s current rule, then restate the operative truth condition: P implies Q is false only when P is true and Q is false. Prioritize two linked capabilities: applying truth conditions to test when a conditional is false, and distinguishing valid inference (from P implies Q and P, conclude Q) from the invalid converse (from P implies Q and Q, infer P). Learner actions: for each unfamiliar simple argument, identify P and Q, state the premises, then try to make the premises true and the conclusion false; for the converse, give the explicit counterexample P=false, Q=true; for the valid form, explain why no counterexample exists under the truth conditions. Accept any correct bounded justification; do not require symbols or formal proof machinery. Correctness checks: the learner independently decides at least one fresh valid item and one fresh invalid or converse item, compares justifications to the truth conditions, and resolves any contradiction. Proportionate effort: fit within the preferred 15-minute window at moderate intensity, comfortable early; stop when the learner can independently transfer the method to a new mixed item and explain the decision, with no fixed practice quota or stage ceremony. Dependencies: truth conditions before converse analysis, with a four-row table or P=false, Q=true example as concrete remediation if the converse error persists. Uncertainty: no prior learning evidence and no formal assessment exist, so treat explanations as evidence and do not let timers or self-report certify mastery. A meaningful stopping point is an independent correct decision plus bounded justification on a new item, with a brief retention check when the topic is revisited.\"}",
+      "finishReason": "stop"
+    },
+    {
+      "assessmentId": "A05",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Small museum web exhibit",
+                "outcome": "Eventually build an accessible three-object web exhibit. First demonstrate one readable HTML object card with a heading, supplied description and meaningful image alternative text.",
+                "policy": "ROADMAP",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "One semantic HTML card",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Three-object navigation",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_3",
+                    "title": "Visual layout",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_4",
+                    "title": "Publication",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Small museum web exhibit",
+                "outcome": "Eventually build an accessible three-object web exhibit. First demonstrate one readable HTML object card with a heading, supplied description and meaningful image alternative text.",
+                "policy": "ROADMAP",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "One semantic HTML card",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Three-object navigation",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_3",
+                    "title": "Visual layout",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_4",
+                    "title": "Publication",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "The learner can edit a text file but has never written HTML.",
+                "Supplied object: a blue ceramic bowl; the description is “Blue bowl with a chipped rim.”",
+                "No object image file is supplied. The first card may use a text placeholder and explain the alternative text that an actual image would need.",
+                "The project brief does not require JavaScript, a framework, animation, accounts or hosting at the first checkpoint."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Explain and demonstrate the first card locally; defer navigation, styling polish and publication.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-25"
+          },
+          "capacityDigest": "c9ac75336b46c1d8e555413b7e621ebc098bb973f0a89542c22d13f5e99b4abe",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 350,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 50,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 50,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ],
+              [
+                "2026-10-14"
+              ],
+              [
+                "2026-10-15"
+              ],
+              [
+                "2026-10-16"
+              ],
+              [
+                "2026-10-17"
+              ],
+              [
+                "2026-10-18"
+              ],
+              [
+                "2026-10-19"
+              ],
+              [
+                "2026-10-20"
+              ],
+              [
+                "2026-10-21"
+              ],
+              [
+                "2026-10-22"
+              ],
+              [
+                "2026-10-23"
+              ],
+              [
+                "2026-10-24"
+              ],
+              [
+                "2026-10-25"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Define concrete course/project outcomes and prerequisite milestones. Keep full strategic scope and effort uncertainty; detail only a useful next educational checkpoint. For a beginner this may demonstrate a first useful prerequisite, not the entire eventual project. Small work should finish promptly, even when the horizon is long. INCLUDED strategic scope does not require a committed activity now. Once the named checkpoint works and is independently demonstrated, later engineering, tooling or further project milestones remain strategic/unbooked unless necessary for that checkpoint. Forecast is separate from booked work. Later expansion requires fresh evidence and an explicit request."
+      },
+      "finalText": "{\"strategy\":\"Treat the accepted request as a single learn-by-doing prerequisite checkpoint, not the exhibit itself: producing one locally opened HTML file that renders an accessible object card for the blue ceramic bowl. Approach: brief worked demonstration of the minimum semantic skeleton, then guided practice where the learner types and adjusts it themselves and reopens the file in a browser to see the effect. Priorities in order: (1) a valid HTML document container that opens locally by double-click; (2) one card region (article or section) with a single correct heading; (3) the supplied description reproduced faithfully as body text (\\\"Blue bowl with a chipped rim.\\\"); (4) an image element — or an explicit placeholder — carrying a meaningful alt attribute, with a short explanation of why alt text must describe the object rather than repeat the caption or filename. Because no image file is supplied, teach the placeholder route and have the learner write the exact alt sentence a real photo would need (e.g. a blue ceramic bowl with a chipped rim). Defer navigation, visual/CSS polish, and publication: these are included strategic scope but unbooked and require no activity now, so record them as later milestones only. Correctness checks: file opens without error in a browser; exactly one heading for the card; description matches source wording; alt attribute is present and descriptive, not empty or decorative; learner can state, unaided, what would break for a screen-reader user if alt were missing. Effort is small and should finish promptly — one comfortable session of about 15 minutes within the ample daily capacity — with the stopping point being the learner independently rebuilding the card without copying and explaining the alt-text choice. If time runs short, stop at a coherent smaller artifact (document plus heading and description) and resume there. Dependencies: a plain text editor and any browser; no framework, JavaScript, hosting, account or image asset. Uncertainty is low about scope and mechanics but higher about transfer to the next object, so later expansion (second/third card, navigation, styling, publication) should wait for fresh evidence and an explicit request.\"}",
+      "finishReason": "stop"
+    },
+    {
+      "assessmentId": "A06",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Spanish descriptions",
+                "outcome": "Choose and explain ser versus estar for occupation and temporary tiredness in new simple Spanish sentences.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Occupation with ser",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Temporary condition with estar",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Spanish descriptions",
+                "outcome": "Choose and explain ser versus estar for occupation and temporary tiredness in new simple Spanish sentences.",
+                "policy": "MASTERY",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Occupation with ser",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Temporary condition with estar",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "Teacher rule for this bounded task: occupation uses ser; current tiredness uses estar. Other ser/estar uses are outside this goal.",
+                "Models: “Ana es profesora.” and “Ana está cansada.”",
+                "The learner recognizes the two model sentences but has not produced new sentences independently.",
+                "Names and occupations may be learner-chosen; use supplied forms es/está. No external tutor or exercise key is available."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Use a meaningful changed-sentence production and explanation check. Preserve “está”.\nOffer bounded help only if the distinction fails.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-25"
+          },
+          "capacityDigest": "3f01cbed9b3d8e2b75a33b8ba151e5d9808ed5b3c6873b0128b67add4346612d",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 245,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 35,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 35,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ],
+              [
+                "2026-10-14"
+              ],
+              [
+                "2026-10-15"
+              ],
+              [
+                "2026-10-16"
+              ],
+              [
+                "2026-10-17"
+              ],
+              [
+                "2026-10-18"
+              ],
+              [
+                "2026-10-19"
+              ],
+              [
+                "2026-10-20"
+              ],
+              [
+                "2026-10-21"
+              ],
+              [
+                "2026-10-22"
+              ],
+              [
+                "2026-10-23"
+              ],
+              [
+                "2026-10-24"
+              ],
+              [
+                "2026-10-25"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Pursue demonstrated capability, distinguishing explanation, transfer/application and retained competence. Use checkpoints and concrete conditional remediation where useful. No forced deadline, fixed stage ceremony or practice quota. Self-report/timers/checks do not certify mastery; acknowledge contradictions."
+      },
+      "finalText": "{\"strategy\":\"Target demonstrated mastery of only the two bounded items — occupation with \\\"es\\\" and current tiredness with \\\"está\\\" — within the learner's stated comfortable-early, moderate, ~15-minute preference, not coverage of other ser/estar uses. Spend the first minutes on a quick recall of the two supplied models, then move almost all time to the core evidence: the learner independently produces changed sentences, using self-chosen names, occupations and tiredness statements, and must not reuse \\\"Ana es profesora\\\" or \\\"Ana está cansada.\\\" Treat three things as separate evidence rather than one: (1) changed production with the correct verb and preserved \\\"está\\\"; (2) an accurate rule explanation (occupation → ser; current state/tiredness → estar); (3) transfer, i.e., a couple of fresh contexts such as different people, pronouns, or a person who is both a teacher and currently tired. A correct verb with a wrong explanation, a right explanation over a recycled sentence, or a correct sentence on the known models only does not count as mastery. Apply bounded remediation only if the distinction actually fails: restate the supplied rule, show one minimal contrast pair built from the learner's own chosen name, then ask for one new sentence plus re-explanation. Cap this at a single cycle; if it still fails, stop and record the distinction as not yet mastered instead of drilling. Because no external tutor or exercise key exists, every check is self-checked against the stated rule and the accented \\\"está\\\"; record self-report as evidence but acknowledge it is unverified and cannot certify readiness. Keep effort proportionate: one or two short sittings across the available window only if needed, no stage ceremony and no practice quota. Meaningful stopping point: the learner has produced several independent, novel correct sentences covering both scope items, explained each choice accurately, and passed one transfer item — then stop, optionally noting that a brief retention re-check on a later day would be informative, without fixing a date. Priorities if time is short: changed production first, explanation second, transfer third. Known uncertainties: the learner currently only recognizes the models; retention and durability beyond the session are unknown.\"}",
+      "finishReason": "stop"
+    },
+    {
+      "assessmentId": "A07",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Counting a rhythm worksheet",
+                "outcome": "Complete and explain the three assigned 4/4 rhythm bars by counting beats and checking each bar totals four.",
+                "policy": "GENERAL",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Quarter/eighth beat counting",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Assigned bars",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Counting a rhythm worksheet",
+                "outcome": "Complete and explain the three assigned 4/4 rhythm bars by counting beats and checking each bar totals four.",
+                "policy": "GENERAL",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Quarter/eighth beat counting",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  },
+                  {
+                    "ref": "scope_2",
+                    "title": "Assigned bars",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "Teacher key: q is one beat; e is half a beat. A 4/4 bar totals four beats.",
+                "Actual bars: A = q q q q; B = q e e q q; C = e e e e q q.",
+                "The learner treats two eighth notes as two whole beats.",
+                "A written count, spoken count or clapped count is acceptable; no recording or teacher attendance is required."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Explain and check the assigned bars using the supplied note values, then stop.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-14"
+          },
+          "capacityDigest": "c69778e9730639da54e2d25fafe190dbe721f51a9665f7564179a5cae01ddb45",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 210,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 30,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 30,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ],
+              [
+                "2026-10-14"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Address the actual homework, catch-up, exploration or broad-study outcome with a useful bounded stopping point. For a specified assignment, completing, explaining and checking the assigned work can meet that stopping point. Missing assignment text does not authorize invented replacement questions or a claim that the assignment is finished. Do not commit additional invented exercises merely to prove transfer; use an optional suggestion or concrete error-triggered contingent response unless the accepted goal/evidence independently requires them. No forced Exam/Mastery label, date or generic substitution. Choose education from the evidence rather than filling capacity."
+      },
+      "finalText": "{\"strategy\":\"Use brief direct instruction plus guided practice: confirm the supplied note values (q = one beat; e = half a beat) and that a 4/4 bar totals four, then have the learner count aloud, write, or clap each assigned bar and explain each note's contribution. Priority is correcting the known misconception that two eighth notes are two whole beats; prompt the learner to group each e-e pair as one beat. Check correctness by summing each bar: A = q q q q = 4; B = q e e q q = 1 + 1/2 + 1/2 + 1 + 1 = 4; C = e e e e q q = 1/2+1/2+1/2+1/2+1+1 = 4, and by asking the learner to re-explain any bar that does not total four. Proportionate effort: use about 10–15 minutes, comfortable early, with no recording or teacher attendance required; do not invent extra exercises or claim broader mastery. If the learner still treats eighths as whole beats, give one concrete correction and re-count that bar; otherwise stop. Dependencies are the supplied note values and the three assigned bars only. Stopping point: after the learner explains the three bars using the supplied note values and each bar checks as four beats; add no more unless an error triggers the single corrective re-count.\"}",
+      "finishReason": "stop"
+    },
+    {
+      "assessmentId": "A08",
+      "acceptedInput": {
+        "context": {
+          "plans": [
+            {
+              "planRef": "plan_1",
+              "requested": {
+                "title": "Annotating a historical source",
+                "outcome": "Finish the assigned annotation: distinguish the author’s observation from a claim about everyone’s opinion, quote the evidence, and state one limit of this source.",
+                "policy": "GENERAL",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Assigned source annotation",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "resolved": {
+                "title": "Annotating a historical source",
+                "outcome": "Finish the assigned annotation: distinguish the author’s observation from a claim about everyone’s opinion, quote the evidence, and state one limit of this source.",
+                "policy": "GENERAL",
+                "deadline": {
+                  "kind": "NONE"
+                },
+                "preferences": {
+                  "pacing": "COMFORTABLE_EARLY",
+                  "desiredIntensity": "MODERATE",
+                  "preferredTimeboxMinutes": 15
+                },
+                "scope": [
+                  {
+                    "ref": "scope_1",
+                    "title": "Assigned source annotation",
+                    "inclusion": "REQUESTED",
+                    "sourceClaimIds": []
+                  }
+                ]
+              },
+              "learningEvidence": [],
+              "facts": [
+                "Complete assigned source: “I saw six people leave the meeting before the vote. I think everyone disliked the proposal.” It is a participant’s diary entry; no other source is supplied.",
+                "Assignment: identify an observed event, identify an interpretation, cite the supporting words, and state one evidential limit.",
+                "The learner tends to treat the author’s interpretation as a count of all attendees’ opinions.",
+                "The task does not ask for a full historical essay, additional sources or invented attendees."
+              ],
+              "provenance": {
+                "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+                "asOf": "2026-10-12",
+                "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+              }
+            }
+          ]
+        },
+        "acceptedRequest": {
+          "text": "Complete and check the actual annotation; stop when all four assigned requirements are satisfied.",
+          "authorization": "PLAN_ACTION"
+        },
+        "envelope": {
+          "schemaVersion": 2,
+          "timezone": "Asia/Karachi",
+          "today": "2026-10-12",
+          "window": {
+            "start": "2026-10-12",
+            "end": "2026-10-14"
+          },
+          "capacityDigest": "c69778e9730639da54e2d25fafe190dbe721f51a9665f7564179a5cae01ddb45",
+          "basis": "CONFIRMED_AVAILABILITY",
+          "weeklyCeilingMinutes": 210,
+          "recoveryPercent": 0,
+          "targets": [
+            {
+              "planRef": "plan_1",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "perGoalWeeklyCeilingMinutes": null
+            }
+          ],
+          "days": {
+            "constantFields": {
+              "ceilingMinutes": 30,
+              "otherCommittedMinutes": 0,
+              "protectedTargetMinutes": 0,
+              "recoveryMinutes": 0,
+              "availableMinutes": 30,
+              "excluded": false
+            },
+            "columns": [
+              "date"
+            ],
+            "rows": [
+              [
+                "2026-10-12"
+              ],
+              [
+                "2026-10-13"
+              ],
+              [
+                "2026-10-14"
+              ]
+            ]
+          },
+          "protectedExecution": [],
+          "timeboxRange": {
+            "minMinutes": 5,
+            "maxMinutes": 240
+          }
+        },
+        "policyGuidance": "Address the actual homework, catch-up, exploration or broad-study outcome with a useful bounded stopping point. For a specified assignment, completing, explaining and checking the assigned work can meet that stopping point. Missing assignment text does not authorize invented replacement questions or a claim that the assignment is finished. Do not commit additional invented exercises merely to prove transfer; use an optional suggestion or concrete error-triggered contingent response unless the accepted goal/evidence independently requires them. No forced Exam/Mastery label, date or generic substitution. Choose education from the evidence rather than filling capacity."
+      },
+      "finalText": "{\"strategy\":\"Treat this as bounded homework completion, not a study project: work directly on the four assigned moves and stop as soon as all four are present and checked. Sequence them in the order given — (1) name the observed event (six people leaving before the vote), (2) name the interpretation ('I think everyone disliked the proposal'), (3) quote the supporting words verbatim from the diary, (4) state one evidential limit — because each move depends on the one before it. The critical correctness risk is the learner's habit of reading the author's inference as a headcount of all attendees' opinions; pre-empt this by having the learner keep two labelled lines, 'what the author saw' versus 'what the author concluded', and check that the second line still says 'thinks' or 'believes' rather than stating a fact about every attendee. Verify quotes character-for-character against the supplied sentence, and verify the limit is genuinely about this source (single participant's diary, no other source supplied, so it cannot establish what all attendees felt) rather than a generic disclaimer. If the learner collapses the distinction, do not add new sources or invented attendees; re-ask only which words are observation and which are inference, then let them revise. Effort is proportionate to a 15-minute comfortable-early block at moderate intensity: one pass to draft all four elements, one pass to check quotes and the observation/interpretation split. Uncertainty is limited to whether the learner can hold the distinction unaided and whether a stated limit is specific enough; both are resolved by the checking pass itself. Stop when the annotation contains all four requirements, the quote matches the source, and the interpretation is worded as the author's view, not a count of everyone's opinion.\"}",
+      "finishReason": "stop"
+    }
+  ]
+}

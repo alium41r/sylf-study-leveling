@@ -1,0 +1,85 @@
+{
+  "status": "UNPAID_EXECUTION_LOOP_PASS",
+  "checkedAt": "2026-10-10T16:10:32.078Z",
+  "externalCalls": 0,
+  "paidCalls": 0,
+  "simulatedApprovalOnlyInDisposableVm": true,
+  "modes": 15,
+  "results": [
+    {
+      "mode": "success",
+      "unpaidMockDispatches": 4,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "malformed_structure",
+      "unpaidMockDispatches": 4,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "no_approval",
+      "unpaidMockDispatches": 0,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "stale",
+      "unpaidMockDispatches": 0,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "changed_hash",
+      "unpaidMockDispatches": 0,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "raised_ceiling",
+      "unpaidMockDispatches": 0,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "changed_rate",
+      "unpaidMockDispatches": 0,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "length",
+      "unpaidMockDispatches": 1,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "blank",
+      "unpaidMockDispatches": 1,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "unknown_usage",
+      "unpaidMockDispatches": 1,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "http_failure",
+      "unpaidMockDispatches": 1,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "lost_sleep",
+      "unpaidMockDispatches": 0,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "fingerprint_drift",
+      "unpaidMockDispatches": 2,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "fingerprint_disappears",
+      "unpaidMockDispatches": 2,
+      "noExternalTransport": true
+    },
+    {
+      "mode": "fingerprint_appears",
+      "unpaidMockDispatches": 2,
+      "noExternalTransport": true
+    }
+  ]
+}

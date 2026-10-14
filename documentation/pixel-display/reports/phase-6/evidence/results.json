@@ -1,0 +1,218 @@
+{
+  "description": "Phase 6 evidence: modular character composition from Pixel Assets, resolved from persisted cosmetic keys, with safe fallback verified against a real configuration.",
+  "date": "2026-10-07T15:45:58.409Z",
+  "phase": 6,
+  "proof": "A character composes from pedestal + character + wearable + aura + held item, resolved from persisted cosmetic keys, at every density, with no application knowledge inside the display.",
+  "contractExtension": {
+    "newKinds": [
+      "pedestal",
+      "aura"
+    ],
+    "reason": "CharacterConfig has an equipped pedestal slot and an equipped aura slot. A pedestal is under the character and an aura surrounds it; forcing either into wearable would have meant an anchor that lied about what it attached to.",
+    "newAnchors": [
+      "ground",
+      "core"
+    ],
+    "socketLibraryCreated": false,
+    "newValidationRule": "grid-larger-than-host — a composed asset shares its host reference grid."
+  },
+  "o19GroundOwnership": {
+    "resolved": true,
+    "change": "The grass moved from the character asset to the pedestal asset. It did not move a pixel: same row, same tufts, same colours.",
+    "evidence": "CharacterConfig.pedestal is an equipped slot with its own identifier, so the ground is chosen and can change. A ground welded into the character would double up or need hiding.",
+    "sparklesStayed": true,
+    "sparklesReason": "No equipped slot selects them and they are specific to this character. Moving them would have been change for its own sake."
+  },
+  "o20NestedComposition": {
+    "triggered": false,
+    "model": "One host plus a flat list of parts, one level deep. A part is an asset, and an asset has no slot list, so recursion and cycles are impossible.",
+    "enforcement": "A test asserts no reference asset has a parts or children property; declaring a slot twice paints it once."
+  },
+  "registry": {
+    "path": "app/dashboard/pixel-cosmetic-registry.ts",
+    "rule": "Persisted keys are the authority. Nothing renames a key, invents one, or asks a scholar to re-equip.",
+    "outcomes": [
+      "asset",
+      "unequipped",
+      "unknown"
+    ],
+    "doesNotDo": [
+      "price",
+      "unlock",
+      "rank-gate",
+      "own"
+    ],
+    "migrated": {
+      "form": {
+        "keys": 8,
+        "status": "supported, all resolve to the base figure",
+        "note": "16 forms exist in the catalogue; one character is authored"
+      },
+      "pedestal": {
+        "keys": 1,
+        "status": "supported"
+      },
+      "aura": {
+        "keys": 3,
+        "status": "supported"
+      },
+      "relic": {
+        "keys": 3,
+        "status": "supported"
+      },
+      "accessory": {
+        "keys": 2,
+        "status": "mechanism supported, content deferred"
+      }
+    },
+    "deferredWithEvidence": [
+      "15 of 16 forms exist as 90x90 PNGs; migrating them is artwork, not architecture.",
+      "AURA_PRESETS contains only none; the reference ember aura proves the mechanism, the real aura art does not exist.",
+      "RELIC_OPTIONS contains only the unequipped relic; no scholar can equip a held item yet.",
+      "ACCESSORY_STYLES offers only No Headgear."
+    ]
+  },
+  "realConfigurationFallback": {
+    "source": "Read from the live database.",
+    "config": {
+      "aura": "aura_obsidian",
+      "outfit": "form_deadpool",
+      "accessory": "circlet_heroic",
+      "skin": "olive",
+      "hairStyle": "3"
+    },
+    "outcomes": [
+      {
+        "slot": "form",
+        "key": "form_deadpool",
+        "result": "unknown -> base figure, notice raised"
+      },
+      {
+        "slot": "accessory",
+        "key": "circlet_heroic",
+        "result": "unknown -> omitted, notice raised"
+      },
+      {
+        "slot": "aura",
+        "key": "aura_obsidian",
+        "result": "unknown -> omitted, notice raised"
+      }
+    ],
+    "paintedCells": 438,
+    "litCells": 381,
+    "placementProblems": 0,
+    "conclusion": "A valid, populated character. Not a blank card."
+  },
+  "densityIndependence": {
+    "densitiesTested": [
+      24,
+      32,
+      40,
+      48,
+      64
+    ],
+    "placementProblems": 0,
+    "referenceSpaceOffsetsIdenticalAtEveryDensity": true,
+    "enforcement": "Asserted as new Set(offsets).size === 1"
+  },
+  "persistence": {
+    "schemaChange": false,
+    "migration": false,
+    "schemaBuildVersionBump": false,
+    "fieldsRead": [
+      "characterConfig.outfit",
+      "characterConfig.pedestal",
+      "characterConfig.pedestalKey",
+      "characterConfig.aura",
+      "characterConfig.relic",
+      "characterConfig.weapon",
+      "characterConfig.accessory",
+      "activeAura"
+    ],
+    "newFields": [],
+    "pixelStudioPersistenceIntroduced": false
+  },
+  "surfaceMigration": {
+    "migrated": [
+      "production dashboard card"
+    ],
+    "unchanged": [
+      "CharacterRenderer and all 11 of its other consumers"
+    ],
+    "dataFlow": "characterConfig -> registry -> asset ids -> composition -> SylfCharacterContent; every arrow one-way"
+  },
+  "gates": {
+    "pixelDisplayAndDashboard": {
+      "files": 15,
+      "tests": 356,
+      "failed": 0
+    },
+    "newCompositionTests": 33,
+    "shopLockerCompanionRegression": {
+      "files": 24,
+      "tests": 202,
+      "failed": 0
+    },
+    "typecheck": {
+      "errors": 0
+    },
+    "engineBoundaryTypecheck": {
+      "errors": 0
+    },
+    "lint": "clean",
+    "build": "succeeds",
+    "mobile": {
+      "build": "succeeds",
+      "verify": "PASSED"
+    },
+    "productionInaccessibility": {
+      "/dev/pixel-display": 404,
+      "/dev": 404,
+      "/": 200,
+      "/dashboard": 307,
+      "devMarkers": 0
+    }
+  },
+  "boundaryChanges": [
+    {
+      "change": "Display-path allowlist widened from content$ to content(/|$)",
+      "why": "Phase 6 reaches the asset contract one level down. Reaching the content is the point of an integration surface."
+    },
+    {
+      "change": "Dual-vocabulary list now names two modules: the adapter and the dev review panel",
+      "why": "The panel must show the same resolution a scholar would get, so it cannot be handed a hand-made composition. Written as an exact list so widening it requires editing the test."
+    },
+    {
+      "change": "Added: display layer may not import character-traits, shop, locker or asset-manifest",
+      "why": "The reverse direction, which is what keeps application knowledge out of the display."
+    },
+    {
+      "change": "Added: content layer may not import the cosmetic registry",
+      "why": "If a content module imported it, the content layer would have learned what a cosmetic key is."
+    },
+    {
+      "change": "Added: nothing outside app/dev may import the dev surface",
+      "why": "The dev route is 404 in production; this stops anything shipping from pulling it in."
+    }
+  ],
+  "findings": [
+    "Ambience and ground are genuinely different and Phase 5 grouping them was a simplification. Ground is equipped; ambience is character-specific. O19 was one question that turned out to be two with different answers.",
+    "The kind vocabulary was the right size at three until real slots demanded more. The extension cost one union member, one validator constant and two anchors.",
+    "A registry with three distinguishable outcomes beats one with two: collapsing unequipped into unknown would have made aura none - the default for every scholar - raise a notice on almost every dashboard load."
+  ],
+  "openDecisions": {
+    "closed": [],
+    "O19": "Resolved for ground, still open for ambience.",
+    "O20": "Still open, still not needed.",
+    "O21": "New: authoring the remaining fifteen forms as pixel assets. Architecture accepts them; artwork does not exist.",
+    "O22": "New and genuinely undecided: whether form variants are separate assets, states of one asset, or a base plus part swap. Evidence does not exist because the artwork does not.",
+    "O23": "New: migrating the remaining ten CharacterRenderer consumers, each on its own evidence.",
+    "O24": "New: the aura and relic catalogues are effectively empty while live configurations already carry keys nothing defines. Worth surfacing to whoever owns them."
+  },
+  "limits": [
+    "Fifteen of sixteen form keys map to one authored figure, so the migration is proven for the mechanism rather than for the artwork.",
+    "No scholar can currently equip a held item or an aura, because the Shop offers no such keys. The held path is driven by a persisted identifier but not by a real equipped scholar.",
+    "Live high-DPI rendering remains unobserved (O13).",
+    "Only the dashboard surface was migrated, so the composition path is exercised in one production context."
+  ]
+}

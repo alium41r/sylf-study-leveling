@@ -1,0 +1,35 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 2,
+  "failed": 1,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "live development qualification: tiny-exam",
+      "messages": [
+        "AssertionError: expected 'PROVIDER_FAILURE' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:106:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: tiny-exam",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: tiny-roomy-exam",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: triage",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

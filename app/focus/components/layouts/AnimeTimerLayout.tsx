@@ -393,6 +393,7 @@ export const AnimeTimerDock = memo(function AnimeTimerDock({
 export const AnimeTimerLayout = memo(function AnimeTimerLayout({
   formattedDisplayTime,
   elapsedSeconds,
+  todayElapsedSeconds = elapsedSeconds,
   breakSeconds,
   remainingSeconds,
   isCountdown,
@@ -400,7 +401,6 @@ export const AnimeTimerLayout = memo(function AnimeTimerLayout({
   phase,
   phaseColor,
   phaseLabel,
-  modeDisplayName,
   subjectName,
   questData,
   initialSubjectSeconds,
@@ -482,49 +482,6 @@ export const AnimeTimerLayout = memo(function AnimeTimerLayout({
 
   return (
     <div className="w-full flex-1 flex flex-col justify-between pt-4 pb-4 sm:pb-6 px-4 md:px-8 z-10 select-none">
-      {/* ─── Top Accessory: Unified Focus Status Container ───────────── */}
-      <div className="w-full flex items-center justify-between px-2 pt-0 pointer-events-none">
-        {/* Single Combined Status Container */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <div
-            className="h-8 flex items-center gap-2 sm:gap-2.5 px-3.5 rounded-full text-xs backdrop-blur-md border border-white/12 bg-black/40 shadow-lg max-w-[calc(100vw-200px)] sm:max-w-none overflow-hidden"
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0"
-              style={{ backgroundColor: phaseColor, boxShadow: `0 0 8px ${phaseColor}` }}
-            />
-            <span
-              className="font-bold tracking-[0.16em] uppercase shrink-0"
-              style={{ color: phaseColor }}
-            >
-              {phaseLabel}
-            </span>
-            {modeDisplayName.toUpperCase() !== phaseLabel.toUpperCase() && (
-              <>
-                <span className="text-white/20 shrink-0">•</span>
-                <span className="text-white/60 font-medium tracking-wider uppercase shrink-0">
-                  {modeDisplayName}
-                </span>
-              </>
-            )}
-            {(questData || subjectName) && (
-              <>
-                <span className="text-white/20 shrink-0">|</span>
-                <span className="text-white/40 font-mono text-[11px] shrink-0 hidden sm:inline">
-                  focusing on:
-                </span>
-                <span className="text-white font-medium truncate max-w-[160px] sm:max-w-[260px] font-mono text-xs">
-                  {questData ? questData.title : subjectName}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* ─── Center / Docking Zone: Asymmetric Glass Pod ─────────────── */}
       <div className={`w-full flex flex-col my-auto py-2 ${dockClasses.dockAlignment} ${dockClasses.margin}`}>
         <AnimeTimerDock
@@ -543,7 +500,7 @@ export const AnimeTimerLayout = memo(function AnimeTimerLayout({
           }
           elapsedFormatted={formatTime(elapsedSeconds)}
           breakFormatted={breakSeconds > 0 ? formatTime(breakSeconds) : null}
-          dailyTotalFormatted={formatTime(initialTotalSeconds + elapsedSeconds)}
+          dailyTotalFormatted={formatTime(initialTotalSeconds + todayElapsedSeconds)}
           progressPercent={progressPercent}
           sessionDots={showSessionDots ? { current: currentSession, total: totalSessions } : null}
           stretchNudge={

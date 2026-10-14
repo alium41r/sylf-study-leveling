@@ -1,0 +1,2030 @@
+{
+  "schemaVersion": 1,
+  "reviewer": {
+    "identity": "Independent AI-agent reviewer /root/independent_label_signoff",
+    "humanSignoff": false,
+    "independentFromCaseAuthor": true,
+    "independentFromTestedFlashModel": true,
+    "paidCallsMade": 0,
+    "subagentsSpawned": 0
+  },
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v2",
+  "status": "SIGNED_OFF",
+  "initialJudgmentsRecordedAtUtc": "2026-10-09T12:11:45.370771+00:00",
+  "method": {
+    "sequence": "All 20 active packets and all 12 canonical candidates were inspected, then initial judgments were recorded at 2026-10-09T12:11:45.370771+00:00, before evaluator/cases.cjs, evaluator/labels.json or evaluator/RUBRIC.md content was read. Authored expectations and rubric were then inspected and compared; initial fields remain unchanged.",
+    "blindnessLimit": "The protocol and review brief disclose the intended class mixture and tasks. This is answer-key-limited first-pass review, not fully blinded review.",
+    "readOnlyScope": "No production, frozen packet, case-bank, label, rubric or protocol modifications; only the two designated reviewer outputs."
+  },
+  "checks": [
+    {
+      "caseId": "g01",
+      "category": "REASONING",
+      "packet": "model/packets/d_4455ae843acc1082.json",
+      "initialJudgment": "FACT_GROUNDED_REASONING_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "Classify noon locked as stated, accessibility at 2:10 as inferred from entry, and waiting elsewhere as unsupported. The learner already quotes but confuses plausibility with evidence; prioritize that distinction without invented exam weights. A short independent unfamiliar passage/application and quoted justification are relevant to the explicit unfamiliar-passages outcome.",
+      "admissibleAlternatives": "Any correct passage classification and justification method; supplied passage plus explicitly created practice, oral/written explanation; no mandatory terminology ceremony or number of passages.",
+      "effortAndDependencies": "15-minute preference within 45/day, 3 days; bounded learning/check rather than fill 135 minutes; no shared, split or protected objects.",
+      "initialAmbiguity": "The text gives the model answers. A strategy need not turn into a complete worksheet or insist on only one definition of inference where the supplied examples are treated correctly.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "EXAM",
+        "expectations": [
+          "Practise evidence versus plausibility, rather than more literal recall alone.",
+          "Use unfamiliar or changed text with enough information to check the classification.",
+          "Priority may follow the stated weakness; it cannot follow invented assessment weights."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Unknown weights cannot ground exam-priority claims. Changed or unfamiliar text is relevant to the explicit unfamiliar-passage outcome, and a correct evidence/justification method need not follow one exercise recipe.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Reading evidence assessment",
+            "outcome": "Prepare to distinguish a stated fact, a defensible inference and an unsupported claim in unfamiliar short passages, and justify each choice from the text.",
+            "policy": "EXAM",
+            "deadline": {
+              "kind": "FIXED",
+              "date": "2026-10-14",
+              "examDayStudyAllowed": true
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Literal reading",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Inference with evidence",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_3",
+                "title": "Unsupported claims",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "The teacher has confirmed these three skills, but no relative marks or topic weights.",
+            "Practice passage: At noon the library door was locked. A sign said, “Open at 2 pm.” Mina returned at 2:10 and entered.",
+            "“The door was locked at noon” is stated; “Mina waited elsewhere” is unsupported; “the library was accessible at 2:10” follows from her entry.",
+            "The learner can find a direct quotation but treats plausible background stories as established facts."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Use a passage-based distinction and explanation check; exclude grammar drills and predictions of exam marks.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "g02",
+      "category": "REASONING",
+      "packet": "model/packets/d_d5011475b34a9da1.json",
+      "initialJudgment": "BOUNDED_DATA_INTERPRETATION_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "Read 40/70/50 mm accurately: Feb highest, Jan lowest, Feb-Jan 30, Mar-Feb decrease 20 if used. One station/year and three months cannot establish long-term climate change. Prioritize correcting the known unsupported wetter-climate inference. Do not claim assessment weights or require an archive.",
+      "admissibleAlternatives": "Any valid comparison/check, rewritten claim, counterclaim or learner explanation; created practice clearly marked as synthetic; no fixed comparison list necessary.",
+      "effortAndDependencies": "15-minute preference, 35/day, 2 days; no reason to fill 70 minutes; no shared, split or protected work.",
+      "initialAmbiguity": "Valid alternatives may correct the existing claim rather than require a new dataset; independent explanation can use supplied data.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "EXAM",
+        "expectations": [
+          "Check comparisons and the limitation of a single-year sample.",
+          "Do not claim a climate trend or require unavailable observations.",
+          "Avoid making correct value reading the main remediation."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. The supplied interpretation error, rather than already-correct reading, deserves attention; valid checking can use the original data and need not invent an archive or a particular comparison quota.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Weather graph interpretation",
+            "outcome": "Prepare to read monthly rainfall totals and explain what the data can and cannot establish about a longer-term trend.",
+            "policy": "EXAM",
+            "deadline": {
+              "kind": "FIXED",
+              "date": "2026-10-13",
+              "examDayStudyAllowed": true
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Graph units and comparisons",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Limits of trend inference",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Teacher scope: read totals in millimetres, compare months, and distinguish a single-year pattern from a climate trend. No official weighting is supplied.",
+            "Available data: January 40 mm, February 70 mm, March 50 mm, from one year at one station.",
+            "The learner reads values correctly but writes “the climate is getting wetter” from these three values.",
+            "All practice data can be supplied or explicitly created; no historical weather archive is available."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Keep the focus on justified interpretation; do not require fetching a climate archive or learning meteorological forecasting.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "g03",
+      "category": "REASONING",
+      "packet": "model/packets/d_63ea398f0b23e2f0.json",
+      "initialJudgment": "CONSENT_AWARE_NEXT_CHECKPOINT_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "Beginner needs a question outline incorporating permission to record, an open question, a concrete-event follow-up and an opportunity to correct the account. The willing interviewee does not establish a date, consent to recording or an existing recording. Demonstrate/check the outline and keep later recording, editing and checking with speaker in strategic scope.",
+      "admissibleAlternatives": "Any suitable open question and neutral concrete-event follow-up, read-through/role-play/self-audit; outline can describe later correction without doing final interview now.",
+      "effortAndDependencies": "15-minute preference, 40/day for 14-day horizon; first outline should finish promptly with uncertainty. No purchase, full interview, editing or repeated future-booking gate; no shared/split/protected work.",
+      "initialAmbiguity": "Current checkpoint includes planning for correction, while actual speaker correction remains later. Do not require an interviewee meeting for outline signoff.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "ROADMAP",
+        "expectations": [
+          "First useful checkpoint is an executable outline, not completion of the future recording.",
+          "Later scope remains represented and unbooked.",
+          "No invented date, recording, software prerequisite or completed consent."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. An executable outline can incorporate all four brief requirements and explain later consent/correction without claiming completed consent, a scheduled interview or a recording.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Oral history project",
+            "outcome": "Eventually produce an accurate three-minute oral history recording. Detail only the next checkpoint: a consent-aware question outline that can elicit one specific remembered event.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Consent and question design",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Recording an interview",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_3",
+                "title": "Selecting and editing audio",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_4",
+                "title": "Checking the account with the speaker",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "The learner has never designed an interview.",
+            "A willing interviewee is identified but no interview date or recording exists.",
+            "The supplied project brief requires permission to record, an open question, a follow-up about a concrete event, and a chance for the speaker to correct the account.",
+            "A question outline can be checked against those four requirements without buying software or recording the final interview."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Book only the question-outline checkpoint; keep recording and editing as later strategic scope.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "g04",
+      "category": "REASONING",
+      "packet": "model/packets/d_28b1cf3e53f64ddf.json",
+      "initialJudgment": "BEGINNER_LOCAL_CARD_CHECKPOINT_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "Make one readable semantic HTML card with heading and supplied description Blue bowl with a chipped rim. No image exists; text placeholder and an explanation of meaningful alternative text are explicitly acceptable. Demonstrate locally and keep navigation, layout polish and publication for later.",
+      "admissibleAlternatives": "Any appropriate semantic heading/card structure, local browser inspection and explanation of alternative text; placeholder is allowed; no specific HTML tag recipe, JavaScript/framework/toolchain or hosting requirement.",
+      "effortAndDependencies": "15-minute preference, 50/day, 14-day horizon; bounded first-card learning/check, later strategic effort uncertain; no shared/split/protected objects.",
+      "initialAmbiguity": "A planned creation/demonstration strategy is the requested output, not necessarily literal HTML code. Missing image must not become a blocker.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "ROADMAP",
+        "expectations": [
+          "Teach only the needed HTML constructs and check the actual first card.",
+          "Do not attribute a nonexistent image or force deployment/tooling.",
+          "Full future scope survives without booking every milestone."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. The missing image is explicitly accommodated. Necessary semantic HTML and a local card check are enough; full future scope remains strategic. No exact tag recipe or literal code-output requirement follows from the prose-strategy request.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Small museum web exhibit",
+            "outcome": "Eventually build an accessible three-object web exhibit. First demonstrate one readable HTML object card with a heading, supplied description and meaningful image alternative text.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "One semantic HTML card",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Three-object navigation",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_3",
+                "title": "Visual layout",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_4",
+                "title": "Publication",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "The learner can edit a text file but has never written HTML.",
+            "Supplied object: a blue ceramic bowl; the description is “Blue bowl with a chipped rim.”",
+            "No object image file is supplied. The first card may use a text placeholder and explain the alternative text that an actual image would need.",
+            "The project brief does not require JavaScript, a framework, animation, accounts or hosting at the first checkpoint."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Explain and demonstrate the first card locally; defer navigation, styling polish and publication.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "g05",
+      "category": "REASONING",
+      "packet": "model/packets/d_3284c39bab869cee.json",
+      "initialJudgment": "BOUNDED_PRODUCTION_AND_REASON_CHECK_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "The task is only occupation with es and current tiredness with está. Recognizing examples is not independent new production. Ask changed sentences and reason for each choice, check against supplied bounded rule, and give concrete conditional help only if distinction fails. Preserve accented está when using it.",
+      "admissibleAlternatives": "Learner-selected names/occupations using supplied forms, prompts or contrast pairs; no mandatory quotas, all-purpose permanence rule, external tutor/key, or expansion to other ser/estar meanings.",
+      "effortAndDependencies": "15-minute preference, 35/day, 14-day horizon; short demonstration, stop on bounded success; retained competence can remain uncertain; no shared/split/protected objects.",
+      "initialAmbiguity": "The accepted request includes an actual newline. Lossless accepted-request preservation matters at input/grounding level, but verbatim re-emission of the request or its newline is not an educational strategy requirement.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Recognition alone does not meet production and explanation.",
+          "Preserve accents and the bounded two-use distinction.",
+          "No universal permanent-versus-temporary rule or forced study of every tense."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Independent changed-sentence production/explanation follows accepted outcome and evidence. Accented Spanish supplied forms must remain correct. A literal newline or verbatim request re-emission is not a separate educational pass requirement.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Spanish descriptions",
+            "outcome": "Choose and explain ser versus estar for occupation and temporary tiredness in new simple Spanish sentences.",
+            "policy": "MASTERY",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Occupation with ser",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Temporary condition with estar",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Teacher rule for this bounded task: occupation uses ser; current tiredness uses estar. Other ser/estar uses are outside this goal.",
+            "Models: “Ana es profesora.” and “Ana está cansada.”",
+            "The learner recognizes the two model sentences but has not produced new sentences independently.",
+            "Names and occupations may be learner-chosen; use supplied forms es/está. No external tutor or exercise key is available."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Use a meaningful changed-sentence production and explanation check. Preserve “está”.\nOffer bounded help only if the distinction fails.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "g06",
+      "category": "REASONING",
+      "packet": "model/packets/d_ac6e119faa6748a5.json",
+      "initialJudgment": "CORRECT_ARGUMENT_TRANSFER_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "P→Q and P entails Q; P→Q and Q does not entail P. P=false,Q=true satisfies premises but defeats conclusion. Learner needs an unfamiliar argument and bounded independent justification beyond repeating words, with a check based on truth conditions.",
+      "admissibleAlternatives": "Four-row truth table OR an explicit counterexample OR a correct concrete argument justified from supplied conditions; no required symbolic proof machinery or truth-table quota.",
+      "effortAndDependencies": "15-minute preference, 45/day, 14-day horizon; brief targeted conditional remediation if misunderstanding appears; no shared/split/protected work.",
+      "initialAmbiguity": "Do not classify a correct counterexample as inadequate merely because a truth table was omitted.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Check new argument evaluation, not memorization alone.",
+          "Allow a valid truth-table or concrete counterexample.",
+          "Do not reverse the implication or demand unnecessary formal logic."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Counterexample and truth conditions are alternatives. No compulsory formalism, exact truth-table format, practice quota or retention certification is justified.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Testing an argument",
+            "outcome": "Independently decide whether a simple if-then argument is valid and justify the decision with a counterexample or the given truth conditions.",
+            "policy": "MASTERY",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "If-then truth conditions",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Valid inference versus converse",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "For this exercise P implies Q is false only when P is true and Q is false.",
+            "From P implies Q and P, Q follows; from P implies Q and Q, P need not follow.",
+            "The learner knows these words but has not evaluated an unfamiliar argument.",
+            "No formal proof notation is required. A four-row truth table or an explicit P=false, Q=true counterexample can check the invalid converse."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Accept any correct bounded justification; do not require symbolic proof machinery.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "g07",
+      "category": "REASONING",
+      "packet": "model/packets/d_2f5488d294f95e29.json",
+      "initialJudgment": "ACTUAL_ASSIGNMENT_COMPLETION_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "Diary observation is six people left before vote; everyone disliked proposal is interpretation, not universal opinion evidence. Actual annotation must identify both, quote supporting words and state a justified source limit. Task ends when these four requirements are checked; no essay, extra sources or invented attendees.",
+      "admissibleAlternatives": "Any defensible limit: single participant perspective, inability to know everyone's opinions, unknown motives; short written or discussed annotation with evidence.",
+      "effortAndDependencies": "15-minute preference, 30/day for 3-day horizon; actual assignment plus check, no compulsory transfer exercises; no shared/split/protected work.",
+      "initialAmbiguity": "An alternative limit must remain admissible if grounded; no unique favored wording or compulsory source-bias taxonomy.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "GENERAL",
+        "expectations": [
+          "The observation is six departures, not proof of everyone’s opinion.",
+          "Quote the actual text and preserve the single-source limitation.",
+          "Do not replace the assignment with a generic essay or mandatory extra annotations."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE with the general rubric: quote the actual source and acknowledge a grounded evidence limit. Any defensible limit is admissible; the phrase single-source limitation is not an exclusive required wording or second limit.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N03",
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Annotating a historical source",
+            "outcome": "Finish the assigned annotation: distinguish the author’s observation from a claim about everyone’s opinion, quote the evidence, and state one limit of this source.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Assigned source annotation",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Complete assigned source: “I saw six people leave the meeting before the vote. I think everyone disliked the proposal.” It is a participant’s diary entry; no other source is supplied.",
+            "Assignment: identify an observed event, identify an interpretation, cite the supporting words, and state one evidential limit.",
+            "The learner tends to treat the author’s interpretation as a count of all attendees’ opinions.",
+            "The task does not ask for a full historical essay, additional sources or invented attendees."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Complete and check the actual annotation; stop when all four assigned requirements are satisfied.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "g08",
+      "category": "REASONING",
+      "packet": "model/packets/d_0f51cb688400b89c.json",
+      "initialJudgment": "ACTUAL_RHYTHM_COMPLETION_REQUIRED",
+      "initialSeverity": "NONE",
+      "initialRationale": "q=1 and e=0.5; A 1+1+1+1=4, B 1+.5+.5+1+1=4, C .5+.5+.5+.5+1+1=4. Explicitly repair the known two-eighths-as-two-beats error, count/check actual bars then stop.",
+      "admissibleAlternatives": "Written sums or suitable spoken/clapped counts; no recording, attendance, additional bars or performance-technique requirement.",
+      "effortAndDependencies": "15-minute preference, 30/day, 3 days; bounded worksheet explanation/check, no shared/split/protected work.",
+      "initialAmbiguity": "Concrete count notation may vary; correct beat totals with meaningful counting should be accepted.",
+      "authoredJudgment": {
+        "label": "REASONING_ORACLE",
+        "policy": "GENERAL",
+        "expectations": [
+          "Repair the eighth-note misconception while completing all actual bars.",
+          "All three supplied bars total four under the given key.",
+          "No invented replacement worksheet or compulsory recording/practice quota."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. All actual bars must be explained/checked, and their totals are four. Written, spoken or clapped counting are expressly equivalent; no recording or compulsory extra bars.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Counting a rhythm worksheet",
+            "outcome": "Complete and explain the three assigned 4/4 rhythm bars by counting beats and checking each bar totals four.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Quarter/eighth beat counting",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Assigned bars",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Teacher key: q is one beat; e is half a beat. A 4/4 bar totals four beats.",
+            "Actual bars: A = q q q q; B = q e e q q; C = e e e e q q.",
+            "The learner treats two eighth notes as two whole beats.",
+            "A written count, spoken count or clapped count is acceptable; no recording or teacher attendance is required."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Explain and check the assigned bars using the supplied note values, then stop.",
+        "authorization": "PLAN_ACTION"
+      },
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "authoringAcceptedRequestMatchesPacket": true
+      }
+    },
+    {
+      "caseId": "v01",
+      "category": "REVIEW",
+      "packet": "model/packets/d_162f3a5840b6d145.json",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "initialRationale": "Goal and teacher rule require mean of middle two; (4+6)/2=5. work_1 instead teaches upper middle 6 and makes that wrong rule the pass criterion, so it certifies an incorrect method and answer.",
+      "admissibleAlternatives": "Any correct mean-of-middle calculation and explanatory check; no extra mastery quota.",
+      "effortAndDependencies": "10 minutes booked on Oct 12 fits 60/day but feasibility cannot cure factual error; no dependencies/splits/protection.",
+      "initialAmbiguity": "",
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Grounded blocker for the wrong rule/result; not merely a formatting preference.",
+          "Repair must change both instructions and criterion if needed."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_1",
+            "category": "WEAK_CRITERION",
+            "requirement": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+            "excerpt": "Pass only if the median is 6 and the learner says the upper middle rule is correct.",
+            "reason": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+            "resolution": "Correct the rule, worked result and observable correctness check."
+          }
+        ]
+      },
+      "comparison": "AGREE. A serious wrong-result/wrong-method blocker is warranted. WEAK_CRITERION is an admissible author category; a well-grounded PEDAGOGICAL formulation finding the same wrong rule also remains admissible under the rubric.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Median of an even sample",
+            "outcome": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+            "policy": "MASTERY",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Teacher rule: for four ordered values, average positions two and three. The assigned values are 2, 4, 6, 12."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v01.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v02",
+      "category": "REVIEW",
+      "packet": "model/packets/d_39bd912910b6cdc4.json",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "initialRationale": "Actual letter scan and contents are absent. work_1 instructs inventing a nineteenth-century letter and submitting it as the authentic transcription, then marks the real assignment complete. This directly defeats authenticity and uncertainty preservation.",
+      "admissibleAlternatives": "Honest prerequisite/gap path: obtain actual scan before transcription; invented text may only be explicitly optional/preparatory practice, never authentic completion.",
+      "effortAndDependencies": "10 minutes within 60/day; no missing sibling source, split or protected work.",
+      "initialAmbiguity": "Missing scan alone permits preparation; the blocker is false authentic substitution/completion.",
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "GENERAL",
+        "expectations": [
+          "Block the dishonest authentic completion.",
+          "A repair may honestly defer or request the actual scan, rather than invent a substitute."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_1",
+            "category": "MISSING_PREREQUISITE",
+            "requirement": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+            "excerpt": "Mark the authentic assigned transcription complete once the invented text is written.",
+            "reason": "Invented content cannot transcribe the unavailable authentic document.",
+            "resolution": "Represent the unavailable dependency honestly; do not claim invented content completes the assignment."
+          }
+        ]
+      },
+      "comparison": "AGREE. A serious authenticity/prerequisite blocker is warranted, specifically against representing invented text as the unavailable actual assignment. The missing document does not forbid honest preparation or deferral.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "An archive transcription assignment",
+            "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "The assignment requires the actual letter; its contents and image have not been provided. The learner has no copy."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v02.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v03",
+      "category": "REVIEW",
+      "packet": "model/packets/d_e9c5b907ca74eaa2.json",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "initialRationale": "Catalogue says maker unknown and circa 1900. Original work_1 and last split gate require Elena Ruiz and exact 1900. This contaminates the single source check supporting both English and Spanish label goals. First split criterion merely copies bowl/place; later last criterion is false. Preserve the paused accent-copy exercise, which is neither changed nor mastery evidence.",
+      "admissibleAlternatives": "Correct source uncertainty in owned shared prerequisite and final gate; English and Spanish downstream labels must use unknown/approximate facts. No duplicate source check or new accent mastery test needed.",
+      "effortAndDependencies": "20-minute original check split into 10+10 preserves effort under 15-minute maximum; plan_1 35 includes protected 5 plus new 30, plan_2 10, total 45 within 90/day. Shared hard edge to plan_2 exists.",
+      "initialAmbiguity": "One well-grounded source-owner blocker that explicitly explains both goals can suffice; separate downstream blocker under plan_2 is permissible if owned and grounded, but not mechanically necessary just to duplicate the same discrepancy.",
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "ROADMAP",
+        "expectations": [
+          "Detect the fabricated catalogue claims even though the strategy describes source checking.",
+          "Repair complete split parent; rebind shared dependency and retain the paused work identically.",
+          "Both labels must preserve unknown/approximate information."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_1",
+            "category": "PEDAGOGICAL",
+            "requirement": "Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date.",
+            "excerpt": "Checked facts must name Elena Ruiz and exact 1900.",
+            "reason": "The prerequisite fabricates a maker and converts an approximate date to exact; both labels depend on it.",
+            "resolution": "Correct the complete shared prerequisite and any necessary dependent wording while preserving the protected exercise."
+          }
+        ]
+      },
+      "comparison": "AGREE. A serious source-fabrication blocker is warranted at the owned split parent or offending split piece. The bad prerequisite affects both goals; one grounded source-owner issue that explains shared impact can suffice. Existing validator permits the split originalRef work_1. Preserve kept_1 and valid split/shared lineage. Repair execution is deferred; the active reviewer need only request a specific correction.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Museum labels",
+            "outcome": "Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15,
+              "maximumTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Catalogue facts: blue ceramic bowl; maker unknown; date circa 1900; place Córdoba.",
+            "For this task the supplied Spanish phrases are cuenco azul, autor desconocido, hacia 1900, Córdoba.",
+            "A separate paused accent-copy exercise already exists and must remain unchanged. It is not evidence of mastery."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        },
+        {
+          "planRef": "plan_2",
+          "resolvedGoal": {
+            "title": "Museum labels",
+            "outcome": "Prepare a Spanish label from the same checked catalogue facts; preserve unknown maker and approximate date.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15,
+              "maximumTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Catalogue facts: blue ceramic bowl; maker unknown; date circa 1900; place Córdoba.",
+            "For this task the supplied Spanish phrases are cuenco azul, autor desconocido, hacia 1900, Córdoba.",
+            "A separate paused accent-copy exercise already exists and must remain unchanged. It is not evidence of mastery."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v03.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v04",
+      "category": "REVIEW",
+      "packet": "model/packets/d_6de45b407ca18e60.json",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "initialRationale": "Explicit goal says one matching citation then stop. work_1 correctly writes/checks Lee. River Walk. 2020.; work_2 compels twelve identical rewrites after success for another 30 minutes. This contradicts the accepted stopping point, regardless of 120/day availability or matching 40-minute recommendation.",
+      "admissibleAlternatives": "Delete/unbook compulsory post-success rewrites or make targeted correction contingent on an actual error; no need to forbid all repetition categorically.",
+      "effortAndDependencies": "10+30=40 on Oct 12 fits capacity but educational necessity fails; dependency makes rewrites occur only after successful first task; no splits/protected work.",
+      "initialAmbiguity": "",
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Block unsupported compulsory repetition; preserve the valid first task."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_2",
+            "category": "UNREALISTIC_WORKLOAD",
+            "requirement": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+            "excerpt": "All twelve rewrites are done even after checked success.",
+            "reason": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+            "resolution": "Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check."
+          }
+        ]
+      },
+      "comparison": "AGREE. A serious unnecessary compulsory-work blocker is warranted. It follows the explicit stop-after-one-success requirement, not a made-up maximum-minute rule. Keep the valid first task.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Citation punctuation",
+            "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+            "policy": "MASTERY",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Pattern: Author. Title. Year. Supplied item: Lee; River Walk; 2020. One accurate checked citation meets the requested goal."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v04.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v05",
+      "category": "REVIEW",
+      "packet": "model/packets/d_ea74e8dff125fb1c.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "initialRationale": "Supplied atom rule and solution are available. Learner covers solution, balances real H2+O2→H2O and counts H/O on both sides. Criterion checks equality and explanation rather than merely timer attendance. Correct 2:1:2 yields 4 H,2 O each side.",
+      "admissibleAlternatives": "Any correct nonzero balancing coefficients with atom check; no requirement to add unrelated equations, examinations or chemistry topics.",
+      "effortAndDependencies": "10 minutes within 45/day; task includes instruction and independent check; no missing prerequisite/sibling/split/protected work.",
+      "initialAmbiguity": "Do not invent an advanced chemistry or long-term-retention requirement from the MASTERY label alone.",
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "MASTERY",
+        "expectations": [
+          "The supplied equation and atom-count check suffice; no external answer key or advanced chemistry is necessary."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Sound against this bounded balancing goal; a separate unfamiliar equation, external key or retained-mastery demonstration is not a consequential accepted requirement.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Balancing a supplied equation",
+            "outcome": "Balance the supplied hydrogen/oxygen equation and verify equal atoms on each side.",
+            "policy": "MASTERY",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Equation H2 + O2 → H2O. A coefficient multiplies all atoms in its formula. Solution 2 H2 + 1 O2 → 2 H2O gives four H and two O on each side."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v05.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v06",
+      "category": "REVIEW",
+      "packet": "model/packets/d_d4791a8b4cdede65.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "initialRationale": "Actual A/B accounts both say speech began noon; full vs seats empty disagrees. Task quotes both, explains evidence limit, and criterion forbids unsupported truth verdict. This meets bounded actual assignment without needing novel sources/transfer.",
+      "admissibleAlternatives": "Equivalent accurate quotations/comparison; no requirement for oral debate, essay or witness credibility ranking.",
+      "effortAndDependencies": "10 minutes within 45/day; no dependencies/splits/protection.",
+      "initialAmbiguity": "Treat the stated hall descriptions as the intended contrasting claims; no demand to resolve possible semantic nuances beyond assignment.",
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "GENERAL",
+        "expectations": [
+          "This meets the actual limited assignment; independent invented sources or a longer essay are unnecessary."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Sound against this actual limited assignment. A respondent may note that full is colloquial, but that does not invalidate the intended disagreement comparison or warrant a blocker; no independent truth verdict is justified.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Comparing two eyewitness accounts",
+            "outcome": "Complete the assigned comparison: identify one agreement and one disagreement between the two supplied accounts without deciding who is truthful.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Account A: “The hall was full. The speech began at noon.” Account B: “Several seats were empty. The speech began at noon.”",
+            "Assignment asks only for agreement and disagreement, with quotations. No other evidence is available."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v06.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v07",
+      "category": "REVIEW",
+      "packet": "model/packets/d_aa0fdce6c965934e.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "initialRationale": "One supplied relationship/convention check supports chain diagram and possible fewer-rabbit effects via explicit shared hard dependency. Grass→rabbit→fox is correct food-to-consumer direction; possible less fox food and less grazing are qualified, no magnitudes or whole-ecosystem certainty claimed.",
+      "admissibleAlternatives": "Either suitable qualitative effect meets the one-effect outcome; supporting source check need not repeat in plan_2.",
+      "effortAndDependencies": "Plan_1 5+10=15, plan_2 10, total25 within60/day; no splits/protected work; shared dependency explicitly exists.",
+      "initialAmbiguity": "Instructions mention two short possible effects although accepted outcome requires one. That is modest explanatory breadth, not evidence of a serious workload defect or forced unrelated scope.",
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "ROADMAP",
+        "expectations": [
+          "One owned prerequisite supports both goals; it must not be duplicated or objected to for being sibling-owned.",
+          "Appropriately qualified possible effects are sound."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Sound with a real owned shared prerequisite. Qualified possible effects and modest explanation meet goals; duplicated preparation in plan_2 is unnecessary. One requested possible effect need not become a quota of ecosystem analysis.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "A shared food-web source check",
+            "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Supplied relationships: rabbits eat grass; foxes eat rabbits. Arrows in this task point from food to consumer.",
+            "Other species and population counts are unknown. The effect’s size cannot be predicted."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        },
+        {
+          "planRef": "plan_2",
+          "resolvedGoal": {
+            "title": "A shared food-web source check",
+            "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Supplied relationships: rabbits eat grass; foxes eat rabbits. Arrows in this task point from food to consumer.",
+            "Other species and population counts are unknown. The effect’s size cannot be predicted."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v07.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v08",
+      "category": "REVIEW",
+      "packet": "model/packets/d_23cb1deab0819ac1.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "initialRationale": "=SUM(A1:A3) gives15 for2,5,8; changingA2 to6 gives16. Supplied syntax, manual total and changed-cell check support formula understanding; criterion checks both totals and changed cell. No charts/macros/pivots added.",
+      "admissibleAlternatives": "Write/simulate formula and manual check if no spreadsheet app is specified; no mandated external resource or particular software.",
+      "effortAndDependencies": "10 minutes within45/day; one small changed-value check is proportionate to formula understanding; no dependencies/splits/protection.",
+      "initialAmbiguity": "The changed prompt discloses total16 but still asks independent manual verification; the accepted goal does not independently require unseen formula transfer or retention proof.",
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "MASTERY",
+        "expectations": [
+          "Supported learning followed by a changed-input independent check is appropriate; no larger spreadsheet curriculum is required."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Sound for formula plus manual verification. The supplied changed answer 16 means this is not evidence of unseen transfer merely because the oracle calls the check independent; independent recomputation is still useful and meets the accepted goal.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N02",
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Using a spreadsheet sum",
+            "outcome": "Write a SUM formula for three supplied cells and verify it against a manual total.",
+            "policy": "MASTERY",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "A1=2, A2=5, A3=8. Teacher syntax: =SUM(A1:A3). The expected total is 15. This goal does not require charts, macros or pivot tables."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v08.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v09",
+      "category": "REVIEW",
+      "packet": "model/packets/d_21da0ca3d648bd22.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_PREFERENCE_ALLOWED",
+      "initialSeverity": "NONE",
+      "initialRationale": "Written morning/evening greeting selection and explanation are the explicit outcome. Supplied Japanese terms and covered-key new prompts provide the requested bounded work. Pronunciation or conversation drills would expand the accepted goal.",
+      "admissibleAlternatives": "Written check or optional oral suggestion; never blocker for omitted pronunciation.",
+      "effortAndDependencies": "10 minutes within30/day; no dependency/split/protected objects.",
+      "initialAmbiguity": "Criterion mentions matching written choices but does not explicitly re-state explanation; instruction does require explanation. Nonblocking wording-strengthening suggestion is possible, not a serious defect absent an explicit waiver of explanation.",
+      "authoredJudgment": {
+        "label": "PREFERENCE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Preferring an audio/pronunciation exercise does not justify blocking the accepted written outcome."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Nondefective written task; pronunciation preference may be advisory, and empty issues are acceptable. Instructions require explanation although the short criterion mentions matching choices. This abbreviation supports an optional wording clarification, not a serious defect.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N01",
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Japanese greeting choice",
+            "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+            "policy": "MASTERY",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "For this bounded task, おはよう is the morning greeting and こんばんは the evening greeting. The accepted goal requires written choice, not pronunciation."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v09.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v10",
+      "category": "REVIEW",
+      "packet": "model/packets/d_2c793f9cde3e05f1.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_PREFERENCE_ALLOWED",
+      "initialSeverity": "NONE",
+      "initialRationale": "Instructions give gate→two north→one east→museum and check order/distances; criterion covers directions/distances/destination. Written description is explicitly accepted and colored drawing optional.",
+      "admissibleAlternatives": "Equivalent written route or optional drawing; no mandatory map-art artifact.",
+      "effortAndDependencies": "10 minutes within30/day; no dependency/split/protected work.",
+      "initialAmbiguity": "Arrow-separated words are a written description consistent with the supplied goal, not a requirement to produce prose sentences.",
+      "authoredJudgment": {
+        "label": "PREFERENCE",
+        "policy": "GENERAL",
+        "expectations": [
+          "A preferred colored diagram can be advisory, never a blocker for the correct accepted verbal route."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Nondefective correct written route; colored drawing is optional, not a missing deliverable. Empty issues are acceptable; no advisory concern must be invented.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Describing a map route",
+            "outcome": "Describe the given route in words using the supplied north/east directions.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Route: start at the gate, go two blocks north, then one block east to the museum. A written description is explicitly acceptable; a colored drawing is optional."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v10.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v11",
+      "category": "REVIEW",
+      "packet": "model/packets/d_b949be4c907cfe4b.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_REASONABLE_UNCERTAINTY",
+      "initialSeverity": "NONE",
+      "initialRationale": "Classifies supplied standalone/dependent examples, creates a because version and checks standalone test. Actual gap may be recorded honestly; unknown weight/prior accuracy are disclosed and do not make a bounded first check infeasible. No unsupported exam marks/readiness certainty claimed.",
+      "admissibleAlternatives": "Success demonstration or specific honest gap record; no blocker merely because assessment weights/prior accuracy unknown.",
+      "effortAndDependencies": "10 minutes booked before Oct14 deadline within30/day; no extra committed remediation quota, shared/split/protected work.",
+      "initialAmbiguity": "A gap path completes this bounded check, not the exam-readiness claim; the allocation finding expressly distinguishes booked finish from readiness.",
+      "authoredJudgment": {
+        "label": "UNCERTAINTY",
+        "policy": "EXAM",
+        "expectations": [
+          "Unknown importance/readiness remains nonblocking uncertainty; it is not evidence of compulsory extensive remediation."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Unknown weights/readiness are nonblocking here. Bounded demonstration or honest gap record is useful; a gap record does not certify overall exam readiness.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Identifying sentence clauses",
+            "outcome": "Prepare to identify one independent and one dependent clause using the supplied classroom definitions.",
+            "policy": "EXAM",
+            "deadline": {
+              "kind": "FIXED",
+              "date": "2026-10-14",
+              "examDayStudyAllowed": true
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "Independent clause: can stand alone as a complete sentence. Dependent clause: cannot stand alone. Examples: “The bell rang.” and “Because the bell rang”.",
+            "Assessment weight and the learner’s prior accuracy are unknown."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v11.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    },
+    {
+      "caseId": "v12",
+      "category": "REVIEW",
+      "packet": "model/packets/d_edc200cbc63de947.json",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_REASONABLE_UNCERTAINTY",
+      "initialSeverity": "NONE",
+      "initialRationale": "Blank date/observation/uncertainty columns can be created before specimen exists. Criterion requires all three and forbids invented data. Specimen selection/observations remain later; growth unknown is honest future uncertainty, not a dependency of log design.",
+      "admissibleAlternatives": "Paper/text/spreadsheet blank log equally valid; no specimen acquisition or actual growth measurement needed now.",
+      "effortAndDependencies": "10 minutes within30/day; no dependencies/splits/protected work.",
+      "initialAmbiguity": "Do not require publication or a populated log to pass the explicitly blank-log checkpoint.",
+      "authoredJudgment": {
+        "label": "UNCERTAINTY",
+        "policy": "ROADMAP",
+        "expectations": [
+          "A future specimen is not a missing prerequisite for the accepted blank-log checkpoint.",
+          "Do not block the usable first checkpoint or require fabricated observations."
+        ],
+        "blockingIssues": []
+      },
+      "comparison": "AGREE. Specimen/growth uncertainty concerns later execution, not blank-log construction. The current product, criterion and no-fabrication check are feasible now.",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "oracleSeverity": "NONE",
+      "proposedMandatoryChanges": [],
+      "optionalNoteIds": [
+        "N04"
+      ],
+      "acceptedFacts": [
+        {
+          "planRef": "plan_1",
+          "resolvedGoal": {
+            "title": "Planning a plant observation log",
+            "outcome": "Prepare the first checkpoint of a future plant observation project: a blank log with date, observation and uncertainty fields.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "facts": [
+            "No plant specimen has been obtained and its growth rate is unknown. A blank observation-log design is possible now.",
+            "The later project must record actual observations; it cannot promise a particular amount of growth."
+          ],
+          "learningEvidence": [],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ],
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "candidate": "evaluator/candidates/v12.json",
+      "contentIntegrityChecks": {
+        "authoringFactsMatchPacket": true,
+        "authoringOutcomeMatchesPacket": true,
+        "completeLosslessPacketMatchesCanonicalInput": true,
+        "completeCanonicalProposalMatchesInput": true,
+        "allSuppliedGroundsTextMatchesOriginalPath": true
+      }
+    }
+  ],
+  "signedOffAtUtc": "2026-10-09T12:17:30.281074+00:00",
+  "scope": "Only revision-2 active eight reasoning oracles and twelve fixed-review labels, bound to the 35 files listed in hashes.",
+  "verdict": "No material oracle/label/rubric error found. Four serious fixed-candidate defects and eight nondefective fixed candidates are supported by the supplied complete content. All eight reasoning expectations are fair under the rubric's explicit valid-alternative rule.",
+  "summary": {
+    "individualChecks": 20,
+    "reasoningChecks": 8,
+    "fixedReviewChecks": 12,
+    "seriousCandidateDefects": [
+      "v01",
+      "v02",
+      "v03",
+      "v04"
+    ],
+    "nondefectiveCandidates": [
+      "v05",
+      "v06",
+      "v07",
+      "v08",
+      "v09",
+      "v10",
+      "v11",
+      "v12"
+    ],
+    "materialOracleFindings": 0,
+    "mandatoryCorrections": 0,
+    "optionalRefinements": 4
+  },
+  "initialRecordHashes": {
+    "initialJsonSha256": "5de2037f65c16d40f757f77ba9da7826984de09f90e1d745eb05d80386b635ba",
+    "initialMarkdownSha256": "0eca931c999c3870b5543c8741a7bb0ee3b1e2d5f55af2201ecc30ffc16468e7",
+    "meaning": "Hashes of the first-pass records before oracle comparison was appended; initial fields remain preserved in this final record."
+  },
+  "notes": [
+    {
+      "id": "N01",
+      "caseIds": [
+        "v09"
+      ],
+      "severity": "MINOR",
+      "material": false,
+      "mandatory": false,
+      "finding": "The completion criterion says only Written choices match the supplied time categories, while the goal and instructions also require written explanation.",
+      "rationale": "The full instructions explicitly say explain the time match. Nothing waives that requirement; this is an abbreviation and the strategy remains useful without substantive correction. A blocker demanding pronunciation remains false.",
+      "proposedChange": "Optional evaluator note: assess explanation from the whole task, and in a later fixture version make the criterion explicitly include the written explanation. Preserve the frozen candidate for this run."
+    },
+    {
+      "id": "N02",
+      "caseIds": [
+        "v08"
+      ],
+      "severity": "MINOR",
+      "material": false,
+      "mandatory": false,
+      "finding": "The oracle calls the changed-input check independent although the changed total 16 is supplied in the instructions.",
+      "rationale": "Covering/recomputing or explaining the manual addition can still be independent checking. The accepted goal is one SUM formula verified against a manual total; unseen transfer or retained competence is not required.",
+      "proposedChange": "Limit any diagnostic success claim to independent manual/changed-value checking of this bounded formula. Do not claim unseen transfer, long-term mastery or readiness from this fixture."
+    },
+    {
+      "id": "N03",
+      "caseIds": [
+        "g07"
+      ],
+      "severity": "MINOR",
+      "material": false,
+      "mandatory": false,
+      "finding": "The oracle phrase preserve the single-source limitation could be read too narrowly if separated from the full accepted one-limit requirement and alternative-method rule.",
+      "rationale": "A limit about unknowable attendee opinions, unexplained departures or the participant perspective can be correct and grounded without the literal phrase single source. The overarching rubric expressly admits useful alternatives.",
+      "proposedChange": "Treat the oracle as illustrative and admit any defensible evidential limit grounded in the supplied source; do not require one favorite phrase or an extra second limit."
+    },
+    {
+      "id": "N04",
+      "caseIds": [
+        "g01",
+        "g02",
+        "g03",
+        "g04",
+        "g05",
+        "g06",
+        "g07",
+        "g08",
+        "v01",
+        "v02",
+        "v03",
+        "v04",
+        "v05",
+        "v06",
+        "v07",
+        "v08",
+        "v09",
+        "v10",
+        "v11",
+        "v12"
+      ],
+      "severity": "MINOR",
+      "material": false,
+      "mandatory": false,
+      "finding": "Illustrative authored issue categories, excerpts and repair wording must not become exact-output requirements.",
+      "rationale": "The rubric says an answer key is not an exact-output template and requires the consequential defect with valid grounding. Multiple allowed categories can describe wrong instruction/criterion or dishonest substitution; owned original/piece split refs are valid where supplied.",
+      "proposedChange": "Judge semantic discrepancy, consequences and specific resolution while keeping the unchanged strict schema, allowed categories, ownership, literal grounds, basis and severity rules. Do not demand exact author category/wording, duplicated shared blockers, or deferred repair execution."
+    }
+  ],
+  "mandatoryChanges": [],
+  "hashAlgorithm": "SHA-256",
+  "hashes": [
+    {
+      "path": "evaluator/cases.cjs",
+      "sha256": "21345bd78e1dd784c36df402ba16a44a2ad067b694b60ef03173e730ab9faed6",
+      "bytes": 24802
+    },
+    {
+      "path": "evaluator/labels.json",
+      "sha256": "e5c949fad59e7ba3d5bea2b2244b772bec5df4176a6812e8d456f52304a322ec",
+      "bytes": 18970
+    },
+    {
+      "path": "evaluator/RUBRIC.md",
+      "sha256": "8dd0ad4d74a1deb7e165972a3b4635cf271a831310200838bbf07ad1a4b13c7d",
+      "bytes": 6999
+    },
+    {
+      "path": "evaluator/candidates/v01.json",
+      "sha256": "fb1fa1644815755cee2a8a9a6d1e69ac3095885956728522fe273bdda2cb4486",
+      "bytes": 20973
+    },
+    {
+      "path": "evaluator/candidates/v02.json",
+      "sha256": "0ee3ebc8bba39bfde3b93e100493f23ca9d0442d9981fcb5b8af6808b80b5390",
+      "bytes": 21582
+    },
+    {
+      "path": "evaluator/candidates/v03.json",
+      "sha256": "031e35636fbda59de395fa97384f42c17af44aec883949f52e49215dd9877636",
+      "bytes": 54065
+    },
+    {
+      "path": "evaluator/candidates/v04.json",
+      "sha256": "042331d15688d7f2c89cb85cfb82aed1868e88003af78734f51aee02508db7ed",
+      "bytes": 24196
+    },
+    {
+      "path": "evaluator/candidates/v05.json",
+      "sha256": "04c1e7e3f7f5c35e319d8fe769a55e683f8c19a39dfeca236a171394062ca110",
+      "bytes": 21072
+    },
+    {
+      "path": "evaluator/candidates/v06.json",
+      "sha256": "2e205fa22e3628eb011dc036194214f805abce483c4c1d965e7eaf5d438669cf",
+      "bytes": 22192
+    },
+    {
+      "path": "evaluator/candidates/v07.json",
+      "sha256": "524a5bf48630c0e3a3c6ac7c9bd6ea2493dc200af97e2749a9faea914d1e6a7e",
+      "bytes": 40223
+    },
+    {
+      "path": "evaluator/candidates/v08.json",
+      "sha256": "3e4a9151e1cbec3981f2be5ef5af7cc2a56a33721f56a4ed5c71cc990290fcd6",
+      "bytes": 21044
+    },
+    {
+      "path": "evaluator/candidates/v09.json",
+      "sha256": "f89020597a86caebf906175445dd3bd418874287bddfe445ee02e5c7bd178a5d",
+      "bytes": 21403
+    },
+    {
+      "path": "evaluator/candidates/v10.json",
+      "sha256": "914fe738addb60696bde92927516beb0679b565ab2aae7d57505dde374036d64",
+      "bytes": 20848
+    },
+    {
+      "path": "evaluator/candidates/v11.json",
+      "sha256": "c515206a003f387000fea534564b3b020119083321a86174822b4d212e1d108f",
+      "bytes": 22587
+    },
+    {
+      "path": "evaluator/candidates/v12.json",
+      "sha256": "3ca67a5f6c8e1880de9c09a2578b11e16007ea684993d3297ad7e276672d99a3",
+      "bytes": 22014
+    },
+    {
+      "path": "model/packets/d_4455ae843acc1082.json",
+      "sha256": "dcc02ea0ced4a7eadadd2b65674b9a314e5fd6897110b16e08653deec34dcf8e",
+      "bytes": 4977
+    },
+    {
+      "path": "model/packets/d_d5011475b34a9da1.json",
+      "sha256": "9b88ab43dd7c9e35d29cce2f38d8df0452e367df05937f50f3274e966f920f2f",
+      "bytes": 4710
+    },
+    {
+      "path": "model/packets/d_63ea398f0b23e2f0.json",
+      "sha256": "cc1a9477590972458031fce41534c83b2dba50e40fe0f80d286410f45723af84",
+      "bytes": 5282
+    },
+    {
+      "path": "model/packets/d_28b1cf3e53f64ddf.json",
+      "sha256": "80432668033ed9ec240edfe93940e2554fdf67cb705f5d241555a8b37c5c6cdc",
+      "bytes": 5203
+    },
+    {
+      "path": "model/packets/d_3284c39bab869cee.json",
+      "sha256": "e0c6dcaf4aa0c75467cf4e83e6fc53c843756674b000bc04aa377500d725f07f",
+      "bytes": 4322
+    },
+    {
+      "path": "model/packets/d_ac6e119faa6748a5.json",
+      "sha256": "4ac1a1ab2fc41689ec1d6acb9ee4091fda7febf50c62d6bae4fd15ecb1e86344",
+      "bytes": 4298
+    },
+    {
+      "path": "model/packets/d_2f5488d294f95e29.json",
+      "sha256": "bd3bf65747f52c03f8c90076c23851c0b86121959bc42b229089fc2bad5125a5",
+      "bytes": 4472
+    },
+    {
+      "path": "model/packets/d_0f51cb688400b89c.json",
+      "sha256": "e7e003aee91b5b5d429640b36b391342839b487fd0cfc8a3b2f19d4f2ff5cfed",
+      "bytes": 4324
+    },
+    {
+      "path": "model/packets/d_162f3a5840b6d145.json",
+      "sha256": "82d737934947194602386660a434ff32e0442c991b6c6cf4d20e80aca9810e27",
+      "bytes": 11133
+    },
+    {
+      "path": "model/packets/d_39bd912910b6cdc4.json",
+      "sha256": "4e94bb8b47cdfde922865fbdeb7dab33a5248c581e7645aefc00b115c2a60c07",
+      "bytes": 11375
+    },
+    {
+      "path": "model/packets/d_e9c5b907ca74eaa2.json",
+      "sha256": "e250b2d07ae8f70fee5bb41752a12fa0101d788bf792f66b74489f39a1f7662b",
+      "bytes": 21090
+    },
+    {
+      "path": "model/packets/d_6de45b407ca18e60.json",
+      "sha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "bytes": 11962
+    },
+    {
+      "path": "model/packets/d_ea74e8dff125fb1c.json",
+      "sha256": "79145a4b225630aa4c44eefb511fe9ef7e853e849c28bbfe4ecaf97e3190306d",
+      "bytes": 11181
+    },
+    {
+      "path": "model/packets/d_d4791a8b4cdede65.json",
+      "sha256": "f21771d2444166d245cbbcc8b59e85f416d3253f17ce63a1338fe40ea077cf51",
+      "bytes": 11679
+    },
+    {
+      "path": "model/packets/d_aa0fdce6c965934e.json",
+      "sha256": "da7d98966b3e63950a6d442e4a0e33e5ec9d1ab199b11e458284290a114f9ca6",
+      "bytes": 17490
+    },
+    {
+      "path": "model/packets/d_23cb1deab0819ac1.json",
+      "sha256": "2ccea2aa936e8967f5363a694a8c5c4d391cb6083a1b1408a91be5378d4cd1d0",
+      "bytes": 11157
+    },
+    {
+      "path": "model/packets/d_21da0ca3d648bd22.json",
+      "sha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "bytes": 11326
+    },
+    {
+      "path": "model/packets/d_2c793f9cde3e05f1.json",
+      "sha256": "59e5cef794a763f6eb20bfffab4cf9990cab475eac27680d626d2aa04feb7bb1",
+      "bytes": 11103
+    },
+    {
+      "path": "model/packets/d_b949be4c907cfe4b.json",
+      "sha256": "c0948231682d81d299578c41f4335c9da4bdee5f5f3252c5993b9cfca49c6de1",
+      "bytes": 11741
+    },
+    {
+      "path": "model/packets/d_edc200cbc63de947.json",
+      "sha256": "cb1fb320cdea149f3b80466c0b19857a55bb0a33b429d15f6efff833ce10afc8",
+      "bytes": 11567
+    }
+  ],
+  "rubricFairness": {
+    "decision": "ACCEPTABLE",
+    "dimensions": "Goal correspondence, educational usefulness/proportion, and evidence/uncertainty are separate and all must reach 4/5. Serious defects cannot be averaged away. This is a reasonable all-case gate for this limited block, not a calibrated population-quality estimate.",
+    "alternatives": "Useful alternative methods, check modalities, grounded evidential limits and stopping gates remain admissible. No exact wording, task count, minute floor, preferred method or advanced curriculum is required.",
+    "effort": "Timeboxes and recommendations are estimates; arithmetic is not an educational need. The v04 excess follows a specific accepted stopping requirement, not minute prejudice.",
+    "review": "At least the real consequential defect must be identified with valid original requirement/proposal grounds in each defective case. Extra false blockers fail precision. Zero blockers in eight nondefective candidates is fair; empty findings need not manufacture advisories.",
+    "operations": "Malformed-but-complete reasoning may be assessed verbatim with separate envelope failure; reviews retain strict schema, ownership and literal-grounding validation. No salvage/recovery or paid judge is allowed in active block.",
+    "adjudication": "Future severe output failures and disputed blockers still require the protocol's second assessor/adjudication. This pre-run label review does not adjudicate nonexistent provider outputs."
+  },
+  "limitations": [
+    "This is independent AI-agent review, not human review, human signoff, paid authorization or authorization to dispatch a provider request.",
+    "The reviewer did not author these cases and is separate from the tested DeepSeek Flash model. It is still an AI agent working in the same environment; no external human educational expert reviewed the labels here.",
+    "Answer-key-limited ordering reduces anchoring but is not full blinding: the protocol disclosed task descriptions and intended class mixture. The initial judgments were written before reading cases/labels/rubric content.",
+    "Synthetic self-contained bounded tasks, four conspicuous seeded defects and twelve fixed candidates cannot establish general educational accuracy, subtle-defect sensitivity, long-term mastery, retention, or population-level reviewer performance.",
+    "No tested-model output, paid run, deferred structured-output/recovery/repair/verification/capacity case, full planning lifecycle or ApplyService publication was reviewed or executed.",
+    "All optional notes are interpretations/refinements under the existing rubric, not mandatory edits, relaxed thresholds or grounds to alter the frozen bank.",
+    "The frozen labels retain historical PENDING_HUMAN_REVIEW metadata; this separate dated AI-agent signoff does not turn that metadata into a claim of human review. Human paid approval remains a separate gate."
+  ],
+  "verification": {
+    "countAndUniqueIds": true,
+    "requiredHashCount": 35,
+    "allContentIntegrityChecksPass": true,
+    "sourceModification": "Only the two designated reviewer output files were written by this agent."
+  },
+  "dispositionReview": {
+    "path": "initial-block/SIGNOFF_RESOLUTION.md",
+    "sha256": "1c8c05763ccc686e236871cfe89a33d9b0a855860d9df4c269db6d035de9e638",
+    "reviewedAtUtc": "2026-10-09T12:18:16.103299+00:00",
+    "agreement": true,
+    "disagreements": [],
+    "rationale": "The case author's disposition accurately preserves the optional notes, permits defensible advisory observations and valid educational alternatives, retains all pass/blocker/grounding standards, limits v08 transfer claims and the diagnostic bank's coverage, and separates this AI-agent review from human paid authorization. It makes no required change to the frozen evaluator bank."
+  },
+  "finalizedAtUtc": "2026-10-09T12:18:16.103299+00:00"
+}

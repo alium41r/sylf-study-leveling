@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { revalidateTag } from "next/cache";
+import { lockCompanionOwner, validateCompanionSelection, PixelCreationError } from "@/lib/pixel-creation-service";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -64,7 +65,10 @@ async function handleCustomizationUpdate(req: NextRequest) {
     if (data.characterConfig !== undefined) updateData.characterConfig = data.characterConfig;
     if (data.socialLinks !== undefined) updateData.socialLinks = data.socialLinks;
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.$transaction(async tx => {
+      await lockCompanionOwner(tx, userId);
+      await validateCompanionSelection(tx, userId, data.characterConfig);
+      return tx.user.update({
       where: { id: userId },
       data: updateData,
       select: {
@@ -88,6 +92,8 @@ async function handleCustomizationUpdate(req: NextRequest) {
       },
     });
 
+    });
+
     try {
       if (updatedUser.username) {
         revalidateTag(`user-${updatedUser.username.toLowerCase()}`, "max");
@@ -104,6 +110,7 @@ async function handleCustomizationUpdate(req: NextRequest) {
       user: updatedUser,
     });
   } catch (error: any) {
+    if (error instanceof PixelCreationError) return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
     console.error("Customization Route Error:", error);
     return NextResponse.json({ error: "Failed to update profile customization." }, { status: 500 });
   }

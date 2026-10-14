@@ -77,12 +77,6 @@ describe("Focus Backgrounds — ClassicTimerLayout Docking & Negative Space", ()
       const props = createMockProps({ background: null });
       const { container } = render(<ClassicTimerLayout {...props} />);
 
-      // Header should be centered
-      const header = container.querySelector(".max-w-2xl");
-      expect(header?.className).toContain("items-center");
-      expect(header?.className).toContain("text-center");
-      expect(header?.className).toContain("md:self-center");
-
       // Center core should be centered
       const centerCore = container.querySelector(".max-w-4xl");
       expect(centerCore).toBeTruthy();
@@ -96,22 +90,16 @@ describe("Focus Backgrounds — ClassicTimerLayout Docking & Negative Space", ()
   });
 
   describe("2. Right Docking Placement (User Request Fix)", () => {
-    it("docks header, center card pod, and controls to the right margin on desktop", () => {
+    it("docks center card pod and controls to the right margin on desktop", () => {
       const props = createMockProps({
         background: { ...mockCustomBackground, timerPosition: "right" },
       });
       const { container } = render(<ClassicTimerLayout {...props} />);
 
-      // Header should align to right on md:
-      const header = container.querySelector(".max-w-2xl");
-      expect(header?.className).toContain("md:self-end");
-      expect(header?.className).toContain("text-center");
-      expect(header?.className).not.toContain("md:text-right");
-      expect(header?.className).toContain("md:mr-8");
-
-      // Center core should dock to right and contain atmospheric frosted pod
+      // The timer keeps its docking placement; the router owns the shared bar.
       const centerCore = container.querySelector(".max-w-2xl");
-      expect(centerCore).toBeTruthy();
+      expect(centerCore?.className).toContain("md:self-end");
+      expect(centerCore?.className).toContain("md:mr-8");
 
       // Frosted glass pod should be present
       const pod = container.querySelector(".backdrop-blur-xl");
@@ -133,7 +121,7 @@ describe("Focus Backgrounds — ClassicTimerLayout Docking & Negative Space", ()
   });
 
   describe("3. Left Docking Placement", () => {
-    it("docks header, center card pod, and controls to the left margin on desktop", () => {
+    it("docks center card pod and controls to the left margin on desktop", () => {
       const props = createMockProps({
         background: { ...mockCustomBackground, timerPosition: "left" },
         onTakeFlowBreak: vi.fn(),
@@ -141,12 +129,9 @@ describe("Focus Backgrounds — ClassicTimerLayout Docking & Negative Space", ()
       });
       const { container } = render(<ClassicTimerLayout {...props} />);
 
-      // Header should align to left on md:
-      const header = container.querySelector(".max-w-2xl");
-      expect(header?.className).toContain("md:self-start");
-      expect(header?.className).toContain("text-center");
-      expect(header?.className).not.toContain("md:text-left");
-      expect(header?.className).toContain("md:ml-8");
+      const centerCore = container.querySelector(".max-w-2xl");
+      expect(centerCore?.className).toContain("md:self-start");
+      expect(centerCore?.className).toContain("md:ml-8");
 
       // Pod digits should remain centered on desktop (no left-skew)
       const timerDigits = screen.getByText("25:00");
@@ -173,10 +158,6 @@ describe("Focus Backgrounds — ClassicTimerLayout Docking & Negative Space", ()
       });
       const { container } = render(<ClassicTimerLayout {...props} />);
 
-      // Header should be centered
-      const header = container.querySelector(".max-w-2xl");
-      expect(header?.className).toContain("md:self-center");
-
       // Pod should NOT be present (retains floating text)
       const centerCore = container.querySelector(".max-w-4xl");
       expect(centerCore).toBeTruthy();
@@ -195,8 +176,8 @@ describe("Focus Backgrounds — ClassicTimerLayout Docking & Negative Space", ()
       });
       const { container } = render(<ClassicTimerLayout {...props} />);
 
-      const header = container.querySelector(".max-w-2xl");
-      expect(header?.className).toContain("md:self-end");
+      const centerCore = container.querySelector(".max-w-2xl");
+      expect(centerCore?.className).toContain("md:self-end");
     });
 
     it("docks to the left when artwork subject is on the right (focalX >= 0.55)", () => {
@@ -205,8 +186,8 @@ describe("Focus Backgrounds — ClassicTimerLayout Docking & Negative Space", ()
       });
       const { container } = render(<ClassicTimerLayout {...props} />);
 
-      const header = container.querySelector(".max-w-2xl");
-      expect(header?.className).toContain("md:self-start");
+      const centerCore = container.querySelector(".max-w-2xl");
+      expect(centerCore?.className).toContain("md:self-start");
     });
   });
 

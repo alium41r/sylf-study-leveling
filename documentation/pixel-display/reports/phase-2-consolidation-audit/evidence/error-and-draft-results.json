@@ -1,0 +1,26 @@
+[
+  {
+    "test": "creation pending save",
+    "disabled": false,
+    "text": "Save"
+  },
+  {
+    "test": "duplicate click posts",
+    "posts": 2
+  },
+  {
+    "test": "leave and reopen unsaved editor",
+    "name": "My companion",
+    "lit": 0
+  },
+  {
+    "test": "creation listing HTTP 500",
+    "libraryMessage": 1,
+    "errorCount": 0
+  },
+  {
+    "test": "identity save HTTP 500",
+    "body": "IDENTITY\nITEMS\nACOUSTICS\n← STUDIO\nCompanion\n\nChoose how your companion looks. Changes appear instantly.\n\nUNSAVED\nCHUNKY\n32 columns · same card size\nSAVE CHANGES\nReset\n\nYour companion updates as you choose. Save to keep it.\n\nCHARACTER\nPIXEL SIZE\n\nHow large each pixel is. Your companion stays the same size either way.\n\nChunky\nBiggest pixels, boldest shapes\nSelected\nBalanced\nThe default — clear at any size\nDetailed\nFiner pixels, more definition\nFinest\nSmallest pixels, softest edges\n\nPixel size is saved with your companion and appears on your dashboard.\n\n13 companion looks are still being drawn and will appear here later.",
+    "errorCount": 1
+  }
+]

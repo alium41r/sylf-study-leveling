@@ -1,0 +1,114 @@
+{
+  "status": "PASSED",
+  "method": "Exact old/new requests with identical consequential input and canonical results. Input uses existing conservative UTF-8 reservation units, not measured provider tokens. Output counts UTF-8 JSON bytes. No live calls.",
+  "observations": [
+    {
+      "activities": 1,
+      "adaptation": false,
+      "inputReservationUnits": {
+        "before": 17819,
+        "after": 14772
+      },
+      "outputUtf8Bytes": {
+        "before": 1346,
+        "after": 1192
+      },
+      "systemUtf8Bytes": {
+        "before": 12129,
+        "after": 7844
+      },
+      "inputReductionPercent": 17.1,
+      "outputReductionPercent": 11.44
+    },
+    {
+      "activities": 1,
+      "adaptation": true,
+      "inputReservationUnits": {
+        "before": 19228,
+        "after": 17591
+      },
+      "outputUtf8Bytes": {
+        "before": 1346,
+        "after": 1192
+      },
+      "systemUtf8Bytes": {
+        "before": 12129,
+        "after": 8997
+      },
+      "inputReductionPercent": 8.51,
+      "outputReductionPercent": 11.44
+    },
+    {
+      "activities": 12,
+      "adaptation": false,
+      "inputReservationUnits": {
+        "before": 17819,
+        "after": 14772
+      },
+      "outputUtf8Bytes": {
+        "before": 7035,
+        "after": 6408
+      },
+      "systemUtf8Bytes": {
+        "before": 12129,
+        "after": 7844
+      },
+      "inputReductionPercent": 17.1,
+      "outputReductionPercent": 8.91
+    },
+    {
+      "activities": 12,
+      "adaptation": true,
+      "inputReservationUnits": {
+        "before": 25467,
+        "after": 23830
+      },
+      "outputUtf8Bytes": {
+        "before": 7035,
+        "after": 6408
+      },
+      "systemUtf8Bytes": {
+        "before": 12129,
+        "after": 8997
+      },
+      "inputReductionPercent": 6.43,
+      "outputReductionPercent": 8.91
+    },
+    {
+      "activities": 60,
+      "adaptation": false,
+      "inputReservationUnits": {
+        "before": 17819,
+        "after": 14772
+      },
+      "outputUtf8Bytes": {
+        "before": 31899,
+        "after": 29208
+      },
+      "systemUtf8Bytes": {
+        "before": 12129,
+        "after": 7844
+      },
+      "inputReductionPercent": 17.1,
+      "outputReductionPercent": 8.44
+    },
+    {
+      "activities": 60,
+      "adaptation": true,
+      "inputReservationUnits": {
+        "before": 52731,
+        "after": 51094
+      },
+      "outputUtf8Bytes": {
+        "before": 31899,
+        "after": 29208
+      },
+      "systemUtf8Bytes": {
+        "before": 12129,
+        "after": 8997
+      },
+      "inputReductionPercent": 3.1,
+      "outputReductionPercent": 8.44
+    }
+  ]
+}

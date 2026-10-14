@@ -43,7 +43,7 @@ const CHAPTERS: {
   note: string;
 }[] = [
   {
-    name: "The System",
+    name: "Progression",
     numeral: "I",
     icon: Compass,
     note: "Every journey begins with understanding your own potential.",
@@ -294,7 +294,7 @@ export function ArchiveSettingsScreen() {
             <div>
               <p className={styles.eyebrow}>System Hub / The Sylf Library</p>
               <h1>
-                The System <span>Codex</span>
+                Sylf <span>Codex</span>
               </h1>
             </div>
           </div>

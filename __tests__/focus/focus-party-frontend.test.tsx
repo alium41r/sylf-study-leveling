@@ -14,11 +14,11 @@ import { FocusPartyInviteModal } from "@/app/social/components/focus-party/Focus
 import { FocusPartySection } from "@/app/social/components/focus-party/FocusPartySection";
 import * as FocusPartyContextModule from "@/app/social/components/focus-party/FocusPartyContext";
 
-// Mock CharacterRenderer to keep unit tests fast and DOM-focused
-vi.mock("@/app/components/character/CharacterRenderer", () => ({
-  CharacterRenderer: ({ seed, size, showAura }: any) => (
-    <div data-testid={`character-renderer-${seed}`} data-aura={String(showAura)}>
-      Avatar({seed})
+// Mock the explicit target-owner Pixel presenter to keep unit tests fast and DOM-focused
+vi.mock("@/app/components/companion/TargetPixelCompanion", () => ({
+  TargetPixelCompanion: ({ companion, size }: any) => (
+    <div data-testid={`pixel-companion-${companion?.ownerId ?? "unavailable"}`} data-owner={companion?.ownerId}>
+      Pixel companion ({companion?.ownerId ?? "unavailable"})
     </div>
   ),
 }));

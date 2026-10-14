@@ -1,0 +1,588 @@
+{
+  "schemaVersion": 1,
+  "ceilingNanodollars": 400000000,
+  "stopped": null,
+  "calls": [
+    {
+      "trialId": "d_4455ae843acc1082",
+      "input": 4842,
+      "output": 8192,
+      "reservedNanodollars": 11283000,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11283000,
+      "callId": "2f962aea-4069-44c5-8179-4d6e0f80aad0",
+      "rawUsage": {
+        "prompt_tokens": 4842,
+        "completion_tokens": 8192,
+        "total_tokens": 13034,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4842,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_0f51cb688400b89c",
+      "input": 4189,
+      "output": 8192,
+      "reservedNanodollars": 11087100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11087100,
+      "callId": "513b90e9-3f91-4ee6-8b10-8df2d830f6f7",
+      "rawUsage": {
+        "prompt_tokens": 4189,
+        "completion_tokens": 8192,
+        "total_tokens": 12381,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4189,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_d5011475b34a9da1",
+      "input": 4575,
+      "output": 8192,
+      "reservedNanodollars": 11202900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11202900,
+      "callId": "5c4b2eb7-50a0-47d1-84fe-762f5171d28d",
+      "rawUsage": {
+        "prompt_tokens": 4575,
+        "completion_tokens": 8192,
+        "total_tokens": 12767,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4575,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_ac6e119faa6748a5",
+      "input": 4163,
+      "output": 8192,
+      "reservedNanodollars": 11079300,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11079300,
+      "callId": "13e6c618-9782-437a-a628-27384b67dfe0",
+      "rawUsage": {
+        "prompt_tokens": 4163,
+        "completion_tokens": 8192,
+        "total_tokens": 12355,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4163,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_63ea398f0b23e2f0",
+      "input": 5147,
+      "output": 8192,
+      "reservedNanodollars": 11374500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11374500,
+      "callId": "4bc089a9-b0d2-41af-83ba-c7467f265acc",
+      "rawUsage": {
+        "prompt_tokens": 5147,
+        "completion_tokens": 8192,
+        "total_tokens": 13339,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 5147,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_28b1cf3e53f64ddf",
+      "input": 5068,
+      "output": 8192,
+      "reservedNanodollars": 11350800,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11350800,
+      "callId": "e3871ede-aa72-495f-b7f1-566e3084673f",
+      "rawUsage": {
+        "prompt_tokens": 5068,
+        "completion_tokens": 8192,
+        "total_tokens": 13260,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 5068,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_2f5488d294f95e29",
+      "input": 4337,
+      "output": 8192,
+      "reservedNanodollars": 11131500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11131500,
+      "callId": "0647c541-9efc-49a1-b813-8d37b2643150",
+      "rawUsage": {
+        "prompt_tokens": 4337,
+        "completion_tokens": 8192,
+        "total_tokens": 12529,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4337,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_3284c39bab869cee",
+      "input": 4187,
+      "output": 8192,
+      "reservedNanodollars": 11086500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11086500,
+      "callId": "13ffb32b-813a-4311-b2fe-621a63c14625",
+      "rawUsage": {
+        "prompt_tokens": 4187,
+        "completion_tokens": 8192,
+        "total_tokens": 12379,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4187,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "input": 11303,
+      "output": 4096,
+      "reservedNanodollars": 8306100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8306100,
+      "callId": "fc5a0a39-be45-4352-a168-b9cbee4188e8",
+      "rawUsage": {
+        "prompt_tokens": 11303,
+        "completion_tokens": 4096,
+        "total_tokens": 15399,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11303,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "input": 11939,
+      "output": 4096,
+      "reservedNanodollars": 8496900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8496900,
+      "callId": "2dc8eb02-4973-43d6-ba43-a221ec9b1a14",
+      "rawUsage": {
+        "prompt_tokens": 11939,
+        "completion_tokens": 4096,
+        "total_tokens": 16035,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11939,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_23cb1deab0819ac1",
+      "input": 11134,
+      "output": 4096,
+      "reservedNanodollars": 8255400,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8255400,
+      "callId": "b661bb53-70e1-42fc-99d9-3eefa696f205",
+      "rawUsage": {
+        "prompt_tokens": 11134,
+        "completion_tokens": 4096,
+        "total_tokens": 15230,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11134,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_39bd912910b6cdc4",
+      "input": 11352,
+      "output": 4096,
+      "reservedNanodollars": 8320800,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8320800,
+      "callId": "ea7aca71-6461-45a0-a60a-855f64a0de57",
+      "rawUsage": {
+        "prompt_tokens": 11352,
+        "completion_tokens": 4096,
+        "total_tokens": 15448,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 1,
+      "canonicalUsage": {
+        "inputTokens": 11352,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_aa0fdce6c965934e",
+      "input": 17467,
+      "output": 4096,
+      "reservedNanodollars": 10155300,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 10155300,
+      "callId": "e75114c2-ecfb-4a69-8f8f-1a5e51a60868",
+      "rawUsage": {
+        "prompt_tokens": 17467,
+        "completion_tokens": 4096,
+        "total_tokens": 21563,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 17467,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_edc200cbc63de947",
+      "input": 11544,
+      "output": 4096,
+      "reservedNanodollars": 8378400,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8378400,
+      "callId": "fbfd925a-ff2a-4043-84cd-4aac231e3f3f",
+      "rawUsage": {
+        "prompt_tokens": 11544,
+        "completion_tokens": 4096,
+        "total_tokens": 15640,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11544,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_162f3a5840b6d145",
+      "input": 11110,
+      "output": 4096,
+      "reservedNanodollars": 8248200,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8248200,
+      "callId": "b636cb5b-d3f9-45c4-b26f-e4df9279e5dc",
+      "rawUsage": {
+        "prompt_tokens": 11110,
+        "completion_tokens": 4096,
+        "total_tokens": 15206,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11110,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_b949be4c907cfe4b",
+      "input": 11718,
+      "output": 4096,
+      "reservedNanodollars": 8430600,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8430600,
+      "callId": "69177349-2e6b-4c37-a3a0-127864a30067",
+      "rawUsage": {
+        "prompt_tokens": 11718,
+        "completion_tokens": 4096,
+        "total_tokens": 15814,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 1,
+      "canonicalUsage": {
+        "inputTokens": 11718,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_2c793f9cde3e05f1",
+      "input": 11080,
+      "output": 4096,
+      "reservedNanodollars": 8239200,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8239200,
+      "callId": "5008284c-a7f1-482c-bab3-35f0fc08005e",
+      "rawUsage": {
+        "prompt_tokens": 11080,
+        "completion_tokens": 4096,
+        "total_tokens": 15176,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11080,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_d4791a8b4cdede65",
+      "input": 11656,
+      "output": 4096,
+      "reservedNanodollars": 8412000,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8412000,
+      "callId": "868ad318-ab10-44d7-a6c0-c7e731a2b150",
+      "rawUsage": {
+        "prompt_tokens": 11656,
+        "completion_tokens": 4096,
+        "total_tokens": 15752,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 1,
+      "canonicalUsage": {
+        "inputTokens": 11656,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_ea74e8dff125fb1c",
+      "input": 11158,
+      "output": 4096,
+      "reservedNanodollars": 8262600,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8262600,
+      "callId": "637c852e-1b1d-423a-88a9-fe0049b6686a",
+      "rawUsage": {
+        "prompt_tokens": 11158,
+        "completion_tokens": 4096,
+        "total_tokens": 15254,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 1,
+      "canonicalUsage": {
+        "inputTokens": 11158,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_e9c5b907ca74eaa2",
+      "input": 21067,
+      "output": 4096,
+      "reservedNanodollars": 11235300,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11235300,
+      "callId": "0e12e0b2-f1c7-4d2f-9672-ba5b0225d574",
+      "rawUsage": {
+        "prompt_tokens": 21067,
+        "completion_tokens": 4096,
+        "total_tokens": 25163,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 1,
+      "canonicalUsage": {
+        "inputTokens": 21067,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    }
+  ],
+  "productionPublication": "FORBIDDEN"
+}

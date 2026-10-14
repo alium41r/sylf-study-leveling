@@ -1,0 +1,720 @@
+{
+  "schemaVersion": 1,
+  "ceilingNanodollars": 400000000,
+  "stopped": null,
+  "calls": [
+    {
+      "trialId": "d_4455ae843acc1082",
+      "input": 4842,
+      "output": 8192,
+      "reservedNanodollars": 11283000,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11283000,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:32.270Z",
+      "callId": "1dccaf52-33a4-462c-b1c1-be33ac78a662",
+      "dispatchedAt": "2026-10-09T11:36:32.338Z",
+      "rawUsage": {
+        "prompt_tokens": 4842,
+        "completion_tokens": 8192,
+        "total_tokens": 13034,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4842,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_0f51cb688400b89c",
+      "input": 4189,
+      "output": 8192,
+      "reservedNanodollars": 11087100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11087100,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:32.536Z",
+      "callId": "7212718d-f03b-473a-8f62-48d5295f896d",
+      "dispatchedAt": "2026-10-09T11:36:32.602Z",
+      "rawUsage": {
+        "prompt_tokens": 4189,
+        "completion_tokens": 8192,
+        "total_tokens": 12381,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4189,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_d5011475b34a9da1",
+      "input": 4575,
+      "output": 8192,
+      "reservedNanodollars": 11202900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11202900,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:32.766Z",
+      "callId": "e748c339-856a-44ae-956e-a6705f6a3dff",
+      "dispatchedAt": "2026-10-09T11:36:32.827Z",
+      "rawUsage": {
+        "prompt_tokens": 4575,
+        "completion_tokens": 8192,
+        "total_tokens": 12767,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4575,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_ac6e119faa6748a5",
+      "input": 4163,
+      "output": 8192,
+      "reservedNanodollars": 11079300,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11079300,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:32.998Z",
+      "callId": "58de2d84-b63b-48b3-9788-52f8f48c6725",
+      "dispatchedAt": "2026-10-09T11:36:33.065Z",
+      "rawUsage": {
+        "prompt_tokens": 4163,
+        "completion_tokens": 8192,
+        "total_tokens": 12355,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4163,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_63ea398f0b23e2f0",
+      "input": 5147,
+      "output": 8192,
+      "reservedNanodollars": 11374500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11374500,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:33.219Z",
+      "callId": "51db4ec7-5293-437e-b067-1d1fdf21ed41",
+      "dispatchedAt": "2026-10-09T11:36:33.272Z",
+      "rawUsage": {
+        "prompt_tokens": 5147,
+        "completion_tokens": 8192,
+        "total_tokens": 13339,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 5147,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_28b1cf3e53f64ddf",
+      "input": 5068,
+      "output": 8192,
+      "reservedNanodollars": 11350800,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11350800,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:33.439Z",
+      "callId": "888347ee-63d5-4b32-a256-088fc6b09955",
+      "dispatchedAt": "2026-10-09T11:36:33.496Z",
+      "rawUsage": {
+        "prompt_tokens": 5068,
+        "completion_tokens": 8192,
+        "total_tokens": 13260,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 5068,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_2f5488d294f95e29",
+      "input": 4337,
+      "output": 8192,
+      "reservedNanodollars": 11131500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11131500,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:33.655Z",
+      "callId": "825e185b-cef4-4f18-8e0c-c84a30424ca1",
+      "dispatchedAt": "2026-10-09T11:36:33.713Z",
+      "rawUsage": {
+        "prompt_tokens": 4337,
+        "completion_tokens": 8192,
+        "total_tokens": 12529,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4337,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_3284c39bab869cee",
+      "input": 4187,
+      "output": 8192,
+      "reservedNanodollars": 11086500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11086500,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T11:36:33.877Z",
+      "callId": "24c5a056-c4f8-42c8-a60c-5d0eb3d016ef",
+      "dispatchedAt": "2026-10-09T11:36:33.933Z",
+      "rawUsage": {
+        "prompt_tokens": 4187,
+        "completion_tokens": 8192,
+        "total_tokens": 12379,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 4187,
+        "outputTokens": 8192,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "input": 11303,
+      "output": 4096,
+      "reservedNanodollars": 8306100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8306100,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:34.116Z",
+      "callId": "2828d721-d391-4c49-918f-c4ce922bc2c4",
+      "dispatchedAt": "2026-10-09T11:36:34.171Z",
+      "rawUsage": {
+        "prompt_tokens": 11303,
+        "completion_tokens": 4096,
+        "total_tokens": 15399,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11303,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "input": 11939,
+      "output": 4096,
+      "reservedNanodollars": 8496900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8496900,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:34.323Z",
+      "callId": "08dfccb4-550f-435e-8f29-20cb703a7ad8",
+      "dispatchedAt": "2026-10-09T11:36:34.381Z",
+      "rawUsage": {
+        "prompt_tokens": 11939,
+        "completion_tokens": 4096,
+        "total_tokens": 16035,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11939,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_23cb1deab0819ac1",
+      "input": 11134,
+      "output": 4096,
+      "reservedNanodollars": 8255400,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8255400,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:34.537Z",
+      "callId": "c3c0e65f-f5a2-438a-b392-95540210fb90",
+      "dispatchedAt": "2026-10-09T11:36:34.596Z",
+      "rawUsage": {
+        "prompt_tokens": 11134,
+        "completion_tokens": 4096,
+        "total_tokens": 15230,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11134,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_39bd912910b6cdc4",
+      "input": 11352,
+      "output": 4096,
+      "reservedNanodollars": 8320800,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8320800,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:34.752Z",
+      "callId": "62595851-1b17-442e-9a72-df62da161b2c",
+      "dispatchedAt": "2026-10-09T11:36:34.805Z",
+      "rawUsage": {
+        "prompt_tokens": 11352,
+        "completion_tokens": 4096,
+        "total_tokens": 15448,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11352,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_aa0fdce6c965934e",
+      "input": 17467,
+      "output": 4096,
+      "reservedNanodollars": 10155300,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 10155300,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:34.979Z",
+      "callId": "903eb430-f3e4-49c8-acb4-c43e8bdce348",
+      "dispatchedAt": "2026-10-09T11:36:35.045Z",
+      "rawUsage": {
+        "prompt_tokens": 17467,
+        "completion_tokens": 4096,
+        "total_tokens": 21563,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 17467,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_edc200cbc63de947",
+      "input": 11544,
+      "output": 4096,
+      "reservedNanodollars": 8378400,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8378400,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:35.208Z",
+      "callId": "a164d11c-237f-41b7-a533-646721131ff1",
+      "dispatchedAt": "2026-10-09T11:36:35.264Z",
+      "rawUsage": {
+        "prompt_tokens": 11544,
+        "completion_tokens": 4096,
+        "total_tokens": 15640,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11544,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_162f3a5840b6d145",
+      "input": 11110,
+      "output": 4096,
+      "reservedNanodollars": 8248200,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8248200,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:35.446Z",
+      "callId": "149d9555-d957-4aff-86c9-0b6087c3d3d5",
+      "dispatchedAt": "2026-10-09T11:36:35.506Z",
+      "rawUsage": {
+        "prompt_tokens": 11110,
+        "completion_tokens": 4096,
+        "total_tokens": 15206,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11110,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_b949be4c907cfe4b",
+      "input": 11718,
+      "output": 4096,
+      "reservedNanodollars": 8430600,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8430600,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:35.659Z",
+      "callId": "481a7fb0-2728-49c2-8d30-adb3d3ef4935",
+      "dispatchedAt": "2026-10-09T11:36:35.716Z",
+      "rawUsage": {
+        "prompt_tokens": 11718,
+        "completion_tokens": 4096,
+        "total_tokens": 15814,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11718,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_2c793f9cde3e05f1",
+      "input": 11080,
+      "output": 4096,
+      "reservedNanodollars": 8239200,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8239200,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:35.876Z",
+      "callId": "17b0fc53-5d52-4cba-8bd1-42189216bc60",
+      "dispatchedAt": "2026-10-09T11:36:35.937Z",
+      "rawUsage": {
+        "prompt_tokens": 11080,
+        "completion_tokens": 4096,
+        "total_tokens": 15176,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11080,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_d4791a8b4cdede65",
+      "input": 11656,
+      "output": 4096,
+      "reservedNanodollars": 8412000,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8412000,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:36.086Z",
+      "callId": "ea753e38-c03e-4193-a3f2-ef8b192987a1",
+      "dispatchedAt": "2026-10-09T11:36:36.140Z",
+      "rawUsage": {
+        "prompt_tokens": 11656,
+        "completion_tokens": 4096,
+        "total_tokens": 15752,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11656,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_ea74e8dff125fb1c",
+      "input": 11158,
+      "output": 4096,
+      "reservedNanodollars": 8262600,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8262600,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:36.304Z",
+      "callId": "d556a841-63f4-49e4-8787-5d95eed17ca6",
+      "dispatchedAt": "2026-10-09T11:36:36.359Z",
+      "rawUsage": {
+        "prompt_tokens": 11158,
+        "completion_tokens": 4096,
+        "total_tokens": 15254,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11158,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_e9c5b907ca74eaa2",
+      "input": 21067,
+      "output": 4096,
+      "reservedNanodollars": 11235300,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 11235300,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T11:36:36.537Z",
+      "callId": "78486596-18f9-452f-9686-3e4c4e0b21ff",
+      "dispatchedAt": "2026-10-09T11:36:36.600Z",
+      "rawUsage": {
+        "prompt_tokens": 21067,
+        "completion_tokens": 4096,
+        "total_tokens": 25163,
+        "prompt_cache_hit_tokens": 0
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 21067,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    }
+  ],
+  "productionPublication": "FORBIDDEN"
+}

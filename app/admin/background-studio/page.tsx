@@ -16,8 +16,6 @@ import {
   Layers,
   ArrowUp,
   ArrowDown,
-  Sparkles,
-  ShieldCheck,
   AlertTriangle,
   FolderPlus,
   Sliders,
@@ -772,22 +770,9 @@ export default function BackgroundStudioPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2.5 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3" />
-                  Phase 1 Catalog & Studio
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3" />
-                  Admin Authorized
-                </span>
-              </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary flex items-center gap-3">
-                Focus Background Studio
+                Studio
               </h1>
-              <p className="text-xs sm:text-sm text-text-secondary dark:text-text-muted mt-1 max-w-2xl">
-                Curate official timer backgrounds, configure category layout keys (<code className="text-amber-700 dark:text-amber-300 font-semibold text-xs">classic</code>, <code className="text-amber-700 dark:text-amber-300 font-semibold text-xs">anime</code>, <code className="text-amber-700 dark:text-amber-300 font-semibold text-xs">landscape</code>, <code className="text-amber-700 dark:text-amber-300 font-semibold text-xs">fantasy</code>), and manage storage assets directly from Sylf.
-              </p>
             </div>
 
             {/* Quick Actions */}

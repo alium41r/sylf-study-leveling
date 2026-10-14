@@ -26,8 +26,8 @@
   --btn-ghost-bg: rgba(255, 255, 255, 0.04);
   --btn-ghost-border: rgba(255, 255, 255, 0.1);
   --btn-ghost-hover: rgba(255, 255, 255, 0.08);
-  --tab-bar-bg: rgba(14, 21, 34, 0.85);
-  --tab-bar-border: rgba(38, 50, 71, 0.8);
+  --tab-bar-bg: var(--surface-1, #0e1522);
+  --tab-bar-border: var(--border-subtle, #263247);
   --tab-bar-shadow: 0 0 24px rgba(0, 0, 0, 0.45), 0 0 16px -4px var(--accent-dim);
   --track-bg: #080d17;
   --track-border: rgba(255, 255, 255, 0.1);
@@ -67,8 +67,8 @@
   --btn-ghost-bg: rgba(15, 23, 42, 0.04);
   --btn-ghost-border: rgba(15, 23, 42, 0.12);
   --btn-ghost-hover: rgba(15, 23, 42, 0.08);
-  --tab-bar-bg: rgba(255, 255, 255, 0.92);
-  --tab-bar-border: #cbd5e1;
+  --tab-bar-bg: var(--surface-1, #ffffff);
+  --tab-bar-border: var(--border-subtle, #cbd5e1);
   --tab-bar-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
   --track-bg: #e2e8f0;
   --track-border: #cbd5e1;
@@ -82,6 +82,28 @@
 }
 
 /* ─── Ambient Starlight Canvas Glow ────────────────────────── */
+.studioContainer {
+  height: calc(100dvh - env(safe-area-inset-bottom, 0px));
+  min-height: 0;
+  overflow: hidden;
+}
+
+.studioOutlet {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  padding: 12px;
+}
+
+@media (max-width: 767px) {
+  .studioContainer {
+    height: calc(100dvh - 3.5rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+  .studioOutlet { padding: 8px; }
+}
+
 .topGlow {
   position: absolute;
   pointer-events: none;

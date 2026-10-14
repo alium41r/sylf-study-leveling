@@ -105,6 +105,15 @@ describe("useTimerLeadership (T3 regression)", () => {
     expect(fake.isHeld(LOCK_NAME)).toBe(true);
   });
 
+  it("falls back to the existing lease when Web Locks is exposed but denied", async () => {
+    Object.defineProperty(window.navigator, "locks", { configurable: true, value: {
+      request: vi.fn(async () => { throw new DOMException("denied", "SecurityError"); }),
+    } });
+    const { result } = renderHook(() => useTimerLeadership(CACHE_KEY));
+    await waitFor(() => expect(result.current.isPrimary).toBe(true));
+    expect(localStorage.getItem(`sylf-timer-lease:${CACHE_KEY}`)).toBeTruthy();
+  });
+
   it("falls back to the localStorage lease when Web Locks is unavailable", async () => {
     vi.useFakeTimers();
     Object.defineProperty(window.navigator, "locks", {

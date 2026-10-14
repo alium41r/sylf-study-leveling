@@ -1,0 +1,14 @@
+{
+  "maximumSpendNanodollars": 200000000,
+  "calls": [
+    {
+      "trialId": "probability_exam_natural",
+      "reservedNanodollars": 42107400,
+      "status": "RESERVED",
+      "wires": 1,
+      "dispatchedAt": "2026-10-10T17:23:57.383Z"
+    }
+  ],
+  "stopped": "TRANSPORT_OR_SPEND_UNCERTAINTY",
+  "productionPublication": "FORBIDDEN"
+}

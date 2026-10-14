@@ -1,0 +1,545 @@
+{
+  "proposal": {
+    "stage": "ALLOCATION",
+    "research": null,
+    "envelope": {
+      "schemaVersion": 2,
+      "timezone": "Asia/Karachi",
+      "today": "2026-10-12",
+      "window": {
+        "start": "2026-10-12",
+        "end": "2026-10-14"
+      },
+      "capacityDigest": "fd0c4b6004a70457f72017b9ca712f6c26c3cfd110eb0bac291b63f77107c732",
+      "basis": "CONFIRMED_AVAILABILITY",
+      "weeklyCeilingMinutes": 420,
+      "recoveryPercent": 0,
+      "targets": [
+        {
+          "planRef": "plan_1",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "perGoalWeeklyCeilingMinutes": null
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-10-12",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-13",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-14",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        }
+      ],
+      "protectedExecution": [],
+      "timeboxRange": {
+        "minMinutes": 5,
+        "maxMinutes": 240
+      }
+    },
+    "blueprints": {
+      "plans": [
+        {
+          "planRef": "plan_1",
+          "blueprint": {
+            "schemaVersion": 2,
+            "strategy": {
+              "policy": "GENERAL",
+              "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+              "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+              "recommendedEffort": {
+                "lowMinutes": 10,
+                "likelyMinutes": 10,
+                "highMinutes": 10
+              },
+              "phases": []
+            },
+            "scope": [
+              {
+                "scopeRef": "scope_1",
+                "disposition": "INCLUDED",
+                "contribution": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable."
+              }
+            ],
+            "activities": [
+              {
+                "localId": "work_1",
+                "outcomeRefs": [],
+                "scopeRefs": [
+                  "scope_1"
+                ],
+                "title": "Finish the assigned transcription",
+                "activityType": "PRACTICE",
+                "purpose": "Finish the assigned transcription",
+                "instructions": "Write a plausible nineteenth-century letter of your own and submit its text as the transcription of the assigned archive letter.",
+                "completionCriterion": "Mark the authentic assigned transcription complete once the invented text is written.",
+                "effort": {
+                  "lowMinutes": 10,
+                  "likelyMinutes": 10,
+                  "highMinutes": 10
+                },
+                "timeboxMinutes": 10,
+                "commitment": {
+                  "category": "COMMITTED"
+                },
+                "hardDependencies": []
+              }
+            ],
+            "decisions": {
+              "assumptions": [],
+              "tradeOffs": [],
+              "unresolvedUncertainty": [],
+              "stoppingConditions": [
+                "Meet the accepted criterion or record the specific unresolved gap."
+              ]
+            }
+          },
+          "digest": "e8efcc0d6264c5e1ab9a862719331192747475b9994e80ac113cdc03af1a4e5b"
+        }
+      ],
+      "sharedDependencies": []
+    },
+    "allocation": {
+      "report": {
+        "schemaVersion": 2,
+        "status": "FEASIBLE",
+        "placements": [
+          {
+            "planRef": "plan_1",
+            "activityRef": "work_1",
+            "minutes": 10,
+            "date": "2026-10-12"
+          }
+        ],
+        "unscheduled": [],
+        "committedMinutes": 10,
+        "capacityProof": null,
+        "findings": [
+          {
+            "findingId": "finding_ed329fe5b20f4d190a99",
+            "category": "FINISH",
+            "consequential": false,
+            "planRefs": [
+              "plan_1"
+            ],
+            "activityRefs": [],
+            "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+            "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+          }
+        ]
+      },
+      "digest": "f8e5f89c6342edefcb17f995219c09896ada507d61ec26e44e40031a23be7b0e"
+    },
+    "planning": {
+      "detail": {
+        "days": 14,
+        "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+      },
+      "tradeOffExplanation": "Only the accepted next work is detailed.",
+      "splits": [],
+      "forecasts": [],
+      "adaptation": "NOT_REQUESTED",
+      "unreviewedPhaseRefs": []
+    }
+  },
+  "input": {
+    "stage": "REVIEW",
+    "goals": [
+      {
+        "planRef": "plan_1",
+        "requested": {
+          "title": "An archive transcription assignment",
+          "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+          "policy": "GENERAL",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 15
+          },
+          "scope": [
+            {
+              "ref": "scope_1",
+              "title": "Accepted outcome",
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ]
+        },
+        "resolved": {
+          "title": "An archive transcription assignment",
+          "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+          "policy": "GENERAL",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 15
+          },
+          "scope": [
+            {
+              "ref": "scope_1",
+              "title": "Accepted outcome",
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ]
+        }
+      }
+    ],
+    "context": {
+      "plans": [
+        {
+          "planRef": "plan_1",
+          "requested": {
+            "title": "An archive transcription assignment",
+            "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "resolved": {
+            "title": "An archive transcription assignment",
+            "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "learningEvidence": [],
+          "facts": [
+            "The assignment requires the actual letter; its contents and image have not been provided. The learner has no copy."
+          ],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ]
+    },
+    "proposal": {
+      "stage": "ALLOCATION",
+      "research": null,
+      "envelope": {
+        "schemaVersion": 2,
+        "timezone": "Asia/Karachi",
+        "today": "2026-10-12",
+        "window": {
+          "start": "2026-10-12",
+          "end": "2026-10-14"
+        },
+        "capacityDigest": "fd0c4b6004a70457f72017b9ca712f6c26c3cfd110eb0bac291b63f77107c732",
+        "basis": "CONFIRMED_AVAILABILITY",
+        "weeklyCeilingMinutes": 420,
+        "recoveryPercent": 0,
+        "targets": [
+          {
+            "planRef": "plan_1",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "perGoalWeeklyCeilingMinutes": null
+          }
+        ],
+        "days": [
+          {
+            "date": "2026-10-12",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          },
+          {
+            "date": "2026-10-13",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          },
+          {
+            "date": "2026-10-14",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          }
+        ],
+        "protectedExecution": [],
+        "timeboxRange": {
+          "minMinutes": 5,
+          "maxMinutes": 240
+        }
+      },
+      "blueprints": {
+        "plans": [
+          {
+            "planRef": "plan_1",
+            "blueprint": {
+              "schemaVersion": 2,
+              "strategy": {
+                "policy": "GENERAL",
+                "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+                "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                "recommendedEffort": {
+                  "lowMinutes": 10,
+                  "likelyMinutes": 10,
+                  "highMinutes": 10
+                },
+                "phases": []
+              },
+              "scope": [
+                {
+                  "scopeRef": "scope_1",
+                  "disposition": "INCLUDED",
+                  "contribution": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable."
+                }
+              ],
+              "activities": [
+                {
+                  "localId": "work_1",
+                  "outcomeRefs": [],
+                  "scopeRefs": [
+                    "scope_1"
+                  ],
+                  "title": "Finish the assigned transcription",
+                  "activityType": "PRACTICE",
+                  "purpose": "Finish the assigned transcription",
+                  "instructions": "Write a plausible nineteenth-century letter of your own and submit its text as the transcription of the assigned archive letter.",
+                  "completionCriterion": "Mark the authentic assigned transcription complete once the invented text is written.",
+                  "effort": {
+                    "lowMinutes": 10,
+                    "likelyMinutes": 10,
+                    "highMinutes": 10
+                  },
+                  "timeboxMinutes": 10,
+                  "commitment": {
+                    "category": "COMMITTED"
+                  },
+                  "hardDependencies": []
+                }
+              ],
+              "decisions": {
+                "assumptions": [],
+                "tradeOffs": [],
+                "unresolvedUncertainty": [],
+                "stoppingConditions": [
+                  "Meet the accepted criterion or record the specific unresolved gap."
+                ]
+              }
+            },
+            "digest": "e8efcc0d6264c5e1ab9a862719331192747475b9994e80ac113cdc03af1a4e5b"
+          }
+        ],
+        "sharedDependencies": []
+      },
+      "allocation": {
+        "report": {
+          "schemaVersion": 2,
+          "status": "FEASIBLE",
+          "placements": [
+            {
+              "planRef": "plan_1",
+              "activityRef": "work_1",
+              "minutes": 10,
+              "date": "2026-10-12"
+            }
+          ],
+          "unscheduled": [],
+          "committedMinutes": 10,
+          "capacityProof": null,
+          "findings": [
+            {
+              "findingId": "finding_ed329fe5b20f4d190a99",
+              "category": "FINISH",
+              "consequential": false,
+              "planRefs": [
+                "plan_1"
+              ],
+              "activityRefs": [],
+              "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+              "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+            }
+          ]
+        },
+        "digest": "f8e5f89c6342edefcb17f995219c09896ada507d61ec26e44e40031a23be7b0e"
+      },
+      "planning": {
+        "detail": {
+          "days": 14,
+          "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+        },
+        "tradeOffExplanation": "Only the accepted next work is detailed.",
+        "splits": [],
+        "forecasts": [],
+        "adaptation": "NOT_REQUESTED",
+        "unreviewedPhaseRefs": []
+      }
+    },
+    "grounding": [
+      {
+        "ref": "accepted_request",
+        "kind": "REQUIREMENT",
+        "path": "acceptedRequest.text",
+        "text": "\"Prepare the accepted educational outcome using the supplied facts and constraints.\""
+      },
+      {
+        "ref": "plan_1/goal",
+        "kind": "REQUIREMENT",
+        "path": "goals[0].requested",
+        "text": "{\"title\":\"An archive transcription assignment\",\"outcome\":\"Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.\",\"policy\":\"GENERAL\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+      },
+      {
+        "ref": "plan_1/accepted",
+        "kind": "REQUIREMENT",
+        "path": "goals[0].resolved",
+        "text": "{\"title\":\"An archive transcription assignment\",\"outcome\":\"Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.\",\"policy\":\"GENERAL\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+      },
+      {
+        "ref": "plan_1/strategy",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.strategy",
+        "text": "{\"policy\":\"GENERAL\",\"outcome\":\"Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.\",\"explanation\":\"Use the supplied facts and the named learner action; evaluate the actual content independently.\",\"recommendedEffort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"phases\":[]}"
+      },
+      {
+        "ref": "plan_1/scope/scope_1",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.scope[0]",
+        "text": "{\"scopeRef\":\"scope_1\",\"disposition\":\"INCLUDED\",\"contribution\":\"Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.\"}"
+      },
+      {
+        "ref": "plan_1/activity/work_1",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.activities[0]",
+        "text": "{\"localId\":\"work_1\",\"outcomeRefs\":[],\"scopeRefs\":[\"scope_1\"],\"title\":\"Finish the assigned transcription\",\"activityType\":\"PRACTICE\",\"purpose\":\"Finish the assigned transcription\",\"instructions\":\"Write a plausible nineteenth-century letter of your own and submit its text as the transcription of the assigned archive letter.\",\"completionCriterion\":\"Mark the authentic assigned transcription complete once the invented text is written.\",\"effort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"timeboxMinutes\":10,\"commitment\":{\"category\":\"COMMITTED\"},\"hardDependencies\":[]}"
+      },
+      {
+        "ref": "plan_1/uncertainty",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.decisions",
+        "text": "{\"assumptions\":[],\"tradeOffs\":[],\"unresolvedUncertainty\":[],\"stoppingConditions\":[\"Meet the accepted criterion or record the specific unresolved gap.\"]}"
+      },
+      {
+        "ref": "plan_1/workload",
+        "kind": "PROPOSAL",
+        "path": "workloadAudit[0]",
+        "text": "{\"planRef\":\"plan_1\",\"bookedTimeboxMinutes\":10,\"unprotectedTimeboxMinutes\":10,\"protectedRemainingMinutes\":0,\"remainingCommittedMinutes\":10,\"recommendedEffort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"remainingAboveStrategyHigh\":false,\"committedRefs\":[\"work_1\"]}"
+      },
+      {
+        "ref": "allocation",
+        "kind": "PROPOSAL",
+        "path": "proposal.allocation.report",
+        "text": "{\"schemaVersion\":2,\"status\":\"FEASIBLE\",\"placements\":[{\"planRef\":\"plan_1\",\"activityRef\":\"work_1\",\"minutes\":10,\"date\":\"2026-10-12\"}],\"unscheduled\":[],\"committedMinutes\":10,\"capacityProof\":null,\"findings\":[{\"findingId\":\"finding_ed329fe5b20f4d190a99\",\"category\":\"FINISH\",\"consequential\":false,\"planRefs\":[\"plan_1\"],\"activityRefs\":[],\"evidence\":\"Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.\",\"consequence\":\"This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases.\"}]}"
+      },
+      {
+        "ref": "constraints",
+        "kind": "REQUIREMENT",
+        "path": "proposal.envelope",
+        "text": "{\"schemaVersion\":2,\"timezone\":\"Asia/Karachi\",\"today\":\"2026-10-12\",\"window\":{\"start\":\"2026-10-12\",\"end\":\"2026-10-14\"},\"capacityDigest\":\"fd0c4b6004a70457f72017b9ca712f6c26c3cfd110eb0bac291b63f77107c732\",\"basis\":\"CONFIRMED_AVAILABILITY\",\"weeklyCeilingMinutes\":420,\"recoveryPercent\":0,\"targets\":[{\"planRef\":\"plan_1\",\"deadline\":{\"kind\":\"NONE\"},\"perGoalWeeklyCeilingMinutes\":null}],\"days\":[{\"date\":\"2026-10-12\",\"ceilingMinutes\":60,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":60,\"excluded\":false},{\"date\":\"2026-10-13\",\"ceilingMinutes\":60,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":60,\"excluded\":false},{\"date\":\"2026-10-14\",\"ceilingMinutes\":60,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":60,\"excluded\":false}],\"protectedExecution\":[],\"timeboxRange\":{\"minMinutes\":5,\"maxMinutes\":240}}"
+      }
+    ],
+    "workloadAudit": [
+      {
+        "planRef": "plan_1",
+        "bookedTimeboxMinutes": 10,
+        "unprotectedTimeboxMinutes": 10,
+        "protectedRemainingMinutes": 0,
+        "remainingCommittedMinutes": 10,
+        "recommendedEffort": {
+          "lowMinutes": 10,
+          "likelyMinutes": 10,
+          "highMinutes": 10
+        },
+        "remainingAboveStrategyHigh": false,
+        "committedRefs": [
+          "work_1"
+        ]
+      }
+    ],
+    "acceptedRequest": {
+      "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+      "authorization": "PLAN_ACTION"
+    }
+  },
+  "allocationFacts": {
+    "weeks": [
+      {
+        "week": "2026-10-12",
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "perGoalCommittedMinutes": [
+          {
+            "planRef": "plan_1",
+            "minutes": 0
+          }
+        ]
+      }
+    ],
+    "pins": [],
+    "externalActivities": [],
+    "preferences": [
+      {
+        "planRef": "plan_1",
+        "pacing": "COMFORTABLE_EARLY"
+      }
+    ]
+  }
+}

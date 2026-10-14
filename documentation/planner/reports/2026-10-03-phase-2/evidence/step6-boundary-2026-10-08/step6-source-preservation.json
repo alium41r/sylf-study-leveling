@@ -1,0 +1,2102 @@
+{
+  "status": "PASSED",
+  "baselineEntries": 2591,
+  "baselineCoverage": "Git-listed files excluding secret-like paths and Phase 2 evidence; not a full filesystem snapshot.",
+  "step6ExistingEdits": [
+    "__tests__/planner-v2/intelligence/allocator.test.ts",
+    "__tests__/planner-v2/intelligence/blueprint.test.ts",
+    "__tests__/planner-v2/intelligence/quality.test.ts",
+    "__tests__/planner-v2/intelligence/research-verification.test.ts",
+    "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+    "__tests__/planner-v2/postgres/learning-allocation.postgres.ts",
+    "lib/planner/v2/intelligence/allocator.ts",
+    "lib/planner/v2/intelligence/blueprint.ts",
+    "lib/planner/v2/intelligence/quality.ts",
+    "lib/planner/v2/intelligence/research-cache.ts",
+    "lib/planner/v2/intelligence/research-verification.ts",
+    "lib/planner/v2/server/learning.ts",
+    "lib/planner/v2/server/research.ts",
+    "__tests__/ai/provider-contract.test.ts",
+    "__tests__/planner-v2/intelligence/provider.test.ts",
+    "__tests__/planner-v2/intelligence/serialization.test.ts",
+    "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts",
+    "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts",
+    "__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts",
+    "__tests__/planner-v2/postgres/proposal-fixture.ts",
+    "app/api/planner/generate/route.ts",
+    "documentation/planner/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json",
+    "lib/ai/providers/deepseek.ts",
+    "lib/ai/providers/gemini.ts",
+    "lib/ai/providers/types.ts",
+    "lib/planner/v2/intelligence/context.ts",
+    "lib/planner/v2/intelligence/provider.ts",
+    "lib/planner/v2/server/attempts.ts",
+    "lib/planner/v2/server/context.ts",
+    "lib/planner/v2/server/intents.ts",
+    "lib/planner/v2/server/revisions.ts",
+    "lib/planner/v2/server/web.ts",
+    "scripts/test-planner-v2-phase1-postgres.mjs"
+  ],
+  "authorizedAdjacentTimerChanges": [
+    "__tests__/planner-v2/postgres/durable-core.postgres.ts",
+    "app/api/sessions/route.ts",
+    "lib/planner/v2/server/settlement.ts"
+  ],
+  "authorizedAdjacentTimerNewFiles": [
+    "__tests__/timer/session-route.test.ts",
+    "documentation/planner/reports/2026-10-07-timer-settlement/README.md",
+    "documentation/planner/reports/2026-10-07-timer-settlement/evidence/diagnosis.json",
+    "documentation/planner/reports/2026-10-07-timer-settlement/evidence/postgres-current-results.json",
+    "documentation/planner/reports/2026-10-07-timer-settlement/evidence/postgres-harness-run.json",
+    "documentation/planner/reports/2026-10-07-timer-settlement/evidence/postgres-phase1-results.json",
+    "documentation/planner/reports/2026-10-07-timer-settlement/evidence/timer-tests.json"
+  ],
+  "derivedWorkerChanges": [
+    "dist/planner-worker/planner/v2/intelligence/allocator.js",
+    "dist/planner-worker/planner/v2/intelligence/blueprint.js",
+    "dist/planner-worker/planner/v2/intelligence/quality.js",
+    "dist/planner-worker/planner/v2/intelligence/research-cache.js",
+    "dist/planner-worker/planner/v2/intelligence/research-verification.js",
+    "dist/planner-worker/planner/v2/server/learning.js",
+    "dist/planner-worker/planner/v2/server/research.js",
+    "dist/planner-worker/ai/providers/deepseek.js",
+    "dist/planner-worker/ai/providers/gemini.js",
+    "dist/planner-worker/planner/v2/intelligence/context.js",
+    "dist/planner-worker/planner/v2/intelligence/provider.js",
+    "dist/planner-worker/planner/v2/server/attempts.js",
+    "dist/planner-worker/planner/v2/server/context.js",
+    "dist/planner-worker/planner/v2/server/intents.js",
+    "dist/planner-worker/planner/v2/server/revisions.js",
+    "dist/planner-worker/planner/v2/server/settlement.js"
+  ],
+  "unrelatedConcurrentChanges": [
+    {
+      "path": "__tests__/focus/focus-party-background-unification.test.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 18338,
+        "sha256": "db0375706967dd1c54cf2d9f23cb24cf9314ef52945e5a6fbac996b67189d182"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "9371fdf7daf81c1951e1dd0a2de7726ce9c7cac88026471794140ee7a1b1e43b"
+      }
+    },
+    {
+      "path": "__tests__/focus/focus-party-dedicated-room.test.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 21724,
+        "sha256": "666dadeff6e9f8d08831b11ca9bc2a6a0dfb76bd4481019595757611c9fd09a6"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "a3108d0bc93daae3c0deeea7abbf79669d5db42c07216fa03ba61faa51b92fef"
+      }
+    },
+    {
+      "path": "__tests__/focus/focus-party-frontend.test.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 19117,
+        "sha256": "ddfff2e7d6765e7197c54ff0669742b30243ba45ccbf774fb80f7910f59a23e8"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "989916ae1a06049ac3b3ce5dab2b10478dad8e1155ff598068c4aa9dd3b0ea6c"
+      }
+    },
+    {
+      "path": "__tests__/landing/journey-motion.test.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 8648,
+        "sha256": "e49be307c50f115f40cdb64eb783df95570caa039ec512ff38941c899250f3d6"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "aac76c59d7a14c8d8495ab6c87abf410abdbc1cefd30e5ca931963c961acd6ab"
+      }
+    },
+    {
+      "path": "__tests__/landing/pixel-companion-layering.test.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 4463,
+        "sha256": "4704faf880a42fb380a38994c0a9d1d66db234ab9b2a65f660b4daf8627a4b14"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "c57a9cfaedc33a41925ddcbe82f4b2115f939f753ce52cacb56a3e7e10a3b07d"
+      }
+    },
+    {
+      "path": "__tests__/landing/pixel-companion-prototype.test.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 2562,
+        "sha256": "dce3656d32740c0d5743c9fe94c873d3e8217cfd74c6ff1dfdf39f334f9fa9fb"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "b3177626639c08c72154df8cf7e0bc4f09afdd78be7ad7ad7eb6b85cf955a79b"
+      }
+    },
+    {
+      "path": "__tests__/landing/svg-reaction-sequence.test.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 8369,
+        "sha256": "9d9561c75c94d2ea04f4fc875e59ad905582602a12f9a842fa3eacd66de5cf92"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "42fe4b67ff948e189400cf52922caca6d835f1a10e5a981a2b941d09a4e51416"
+      }
+    },
+    {
+      "path": "app/api/friends/requests/route.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 5025,
+        "sha256": "3af8d557b23bc50b83bf17d8cc915d7febb43a8d01ce01d76c1c71a70f69b536"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "f1d4058b9398c07bbd2d6dd5c366ff62ab63ba5e90583be8c1220acc4ec186b4"
+      }
+    },
+    {
+      "path": "app/api/friends/route.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 7045,
+        "sha256": "574a3a3b6ae10e3d0945592ae145bf6a2320c7aeafdc9259f246fc526e1d1453"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "e2091c3d0bd30622005a5f59876c739443ac51bb77fb7b2a8d6fdc1411eac7c5"
+      }
+    },
+    {
+      "path": "app/api/profile/customization/route.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 4139,
+        "sha256": "034bfdce2d7c6af467a4e460feca6a2d275c5e4f832fcf5839a4f63fd948ce1c"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "e84e6b0e167e8bc4071b03bae77e3177084809cfbb3215273386bfd25e434c00"
+      }
+    },
+    {
+      "path": "app/api/user/stats/route.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 5429,
+        "sha256": "a86122ea43d9a874fce6223eae73a1b91915b491ecb629797e132afed768263c"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "dded26e1fd049e36756b3c92a292c09b6a715f1705cff8d15741679a64c6cb4e"
+      }
+    },
+    {
+      "path": "app/companion-prototype/page.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 407,
+        "sha256": "2c209915fd228bfe800ee0e4c23556854f0240e75d99df69a57b343d1be360d4"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "b00bf353b467f0ac8e3281db392ebf2fcda79462c42aceac9e38985b9f45103d"
+      }
+    },
+    {
+      "path": "app/components/AuthProvider.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 4318,
+        "sha256": "a08efab265f365df1d924dec59fb505c925cbe86f964fadf41d18644efe94aea"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "83c331bb0fdeacf065c0e1b475ce72c0258135adaafb09e9fefcfad55f6734f8"
+      }
+    },
+    {
+      "path": "app/components/FriendRequestsModal.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 10496,
+        "sha256": "da6fe7d74ac20cb65116ef5db161ab8743e3a99bd0e0a8bd428e543e68ada4bb"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "0812cfee09c5067f4ae8a5f7053f315ac62a94e651d02d961ae67e1fd7b7c96f"
+      }
+    },
+    {
+      "path": "app/components/LevelUpProvider.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 5375,
+        "sha256": "b9207bde14f081528b7a9edc54c8ef562d36f8f4b96fddb288db3d7377f8da9e"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "a4c97537abf7bed9c6e3595ed02a379953d2bd3cb9b284c44cfb9212d9fdd419"
+      }
+    },
+    {
+      "path": "app/components/PublicProfileModal.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 85660,
+        "sha256": "bf48943dd5a2209425b1803516947aa6774c773349d83987c6c7c31bdd5573eb"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "b84ac2511051728ce43f622b7fa6be5235f79cf7ce24f1562fb91d1f674e0834"
+      }
+    },
+    {
+      "path": "app/components/character/CharacterRenderer.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 3239,
+        "sha256": "1110ad6028665dc38fa481a8752276dc8fcc01c8183ea5e057a254deb049785f"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "app/components/landing/companion/Companion.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 4305,
+        "sha256": "3d57e57c59e2af50e7a07a166c4a528452a8b5af98da1a0135812bdfb9c4400f"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "b773e86046958a751cccfd223bb1cabc4cf5624166922833ccff0ae652abadb4"
+      }
+    },
+    {
+      "path": "app/components/landing/companion/CompanionReview.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 13325,
+        "sha256": "532ffd0503cbd02cd86d65733ad1565d07674a29e68a1c0ce4ea2069600b7eb8"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "a7d9dc7523fa7cf1f8929a4714e3790798faf6b44ae1b80438c450ca52d36fc0"
+      }
+    },
+    {
+      "path": "app/components/landing/companion/PixelCompanion.module.css",
+      "before": {
+        "kind": "file",
+        "bytes": 547,
+        "sha256": "65d6c22d83af4be22bd017e02202d606c0196c702ee92594cf38155257acd581"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "app/components/landing/companion/PixelCompanion.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 1890,
+        "sha256": "e98a19bf7f31be5d03499365db7f7d5fe45ea5b6a53d9bbfd988d22fc46b682c"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "app/components/landing/companion/pixel-preview.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 2385,
+        "sha256": "0ae9ccad1d4864f1dd8c75d6818108013034c1de9a920145765f84d4bf0d33b5"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "app/components/landing/journey/JourneyPath.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 14966,
+        "sha256": "02f9e357f63297aa5cc8528ad118f68a363e7dfef4fb20aa9ebf13a22b5f862a"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "0449aa386b0db3b2b11ed4cc8827e27947e23ff3c0e3ba5508f97a3a5b57ba6c"
+      }
+    },
+    {
+      "path": "app/dashboard-design/components/DashboardDesignScreen.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 30566,
+        "sha256": "245e42b8a6b5b2ccaef40f38dc96bdc939e821ba5e99a2a908ab46244f1af6cc"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "07f490956f756fb92cf327d011f43da40f51b426ea4a3558bbfd8b9ead6519b8"
+      }
+    },
+    {
+      "path": "app/dashboard/Dashboard.module.css",
+      "before": {
+        "kind": "file",
+        "bytes": 29295,
+        "sha256": "36aeb3427654babf881cbb615710beb051af892c03e00bbc7056936bf0410ea4"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "694dc7c759333e8b9ca2dbe50310505c49f9dea6e12faf8c1bc6bf4a5ccf5682"
+      }
+    },
+    {
+      "path": "app/dashboard/components/DashboardScreen.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 30345,
+        "sha256": "31014d0c547d47bfdb5a2d81841f628ca487aa1cbf2651e94858b03d06af4b74"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "6fddab9f06e79cccd56ed141a6d3bdecb5d1b8db856d9a48aac24d0521b9bfa5"
+      }
+    },
+    {
+      "path": "app/locker/Locker.module.css",
+      "before": {
+        "kind": "file",
+        "bytes": 11824,
+        "sha256": "ea2b4317dfa41d9f578255e80d56cc56ffb77ddb70b16fe1d5379ca05cfa6d40"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "7a660a2c4d5dc993f840b5380e9d1b3fbedbc243033404ed6c6bef2093ef0b55"
+      }
+    },
+    {
+      "path": "app/locker/components/IdentityTab.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 9625,
+        "sha256": "a72f7ddfdb2cc3f69e53187f33bb28bcb5922ead6cdfc5e678c52289677af86b"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "0d6faf16b68cbd36b99e85811db86037cc8ae75d4b49bb957974ad716c1ca504"
+      }
+    },
+    {
+      "path": "app/locker/components/ItemsTab.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 35257,
+        "sha256": "79a7d675d4ef874257cadbcc0628a82e141185b9c45ec5e8586ddbc63d8dc1ea"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "954ece2a3e51940233508a81f7b46c4e01f61788f701c7d0e87497ec56ec8f97"
+      }
+    },
+    {
+      "path": "app/locker/components/LockerScreen.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 4704,
+        "sha256": "6a2631f6515286ea889aeaee7f9690a01add85b217d5b6ea63fd45d55c9d8184"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "8f70a959a87ac209f60153e7191933975afe398dfaae65ac48c620803b929ca7"
+      }
+    },
+    {
+      "path": "app/locker/components/identity/CharacterStudioView.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 28202,
+        "sha256": "d79da915ca09f3baf1282bc8688e3649341b3390f0ccd0519203b552775d47e6"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "app/locker/components/identity/StudioHubView.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 14334,
+        "sha256": "2f8adc020fd91292dbe62aed6821725786c08e56a7320140973762f8626570a2"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "f07622b080ceef2b663474edc108176d2fcae2e8aa3c1149e1e8414349bdfcb2"
+      }
+    },
+    {
+      "path": "app/settings/appearance/components/AppearanceSettingsScreen.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 18131,
+        "sha256": "ea92a000abf4fded11b047fbd4ff2e72c8f976ee383acf0d9888cef0a8a9b2ea"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "7b91809b2303d8bd6f1225f41950f7479c659e21102b7c3f2b674b37fb1a2af1"
+      }
+    },
+    {
+      "path": "app/settings/collection/components/CollectionSettingsScreen.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 28481,
+        "sha256": "644663158026c8f4a78f71eec5f9a32b92c56c61618cc236d2cbc98c1a8312a5"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "c546fe0704d47520c055adfa31fc6b6edf23fca2240017fe2e24b0f1686293be"
+      }
+    },
+    {
+      "path": "app/shop/components/ShopScreen.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 44179,
+        "sha256": "3c74cbae449ec363b06a2956448d59f739a91ce7d29a5c18e903e39ddefd9644"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "0a42fc885ee3a86a9669b0d8e1933201e2486e858e2514908ab5e61c21fa3735"
+      }
+    },
+    {
+      "path": "app/social/components/SocialScreen.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 73436,
+        "sha256": "21487297b59df234461fcf3d91c8fc265be27cc75d54cc0894e11ac347e2e026"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "5c45203bb8f704ecb829fb2a574ba06bf430a2e339b57110d55594ae6ee8d4ae"
+      }
+    },
+    {
+      "path": "app/social/components/focus-party/FocusPartyInviteModal.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 10978,
+        "sha256": "2534ae0e5ff06cb334938ba11027542a0f795c1ec21c1a81b2530919e51eca6d"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "e75ff2b44fe7a0c4b4f41a413b1cdffcf5d443a0ce36b86f91e0ed6f898676ab"
+      }
+    },
+    {
+      "path": "app/social/components/focus-party/FocusPartyLobby.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 23664,
+        "sha256": "13c9e93d41f4cf66f5eb2f9c0081f753602f4e6a524c2d8a0e328fecaab04a54"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "9f0eae7c549cdfdeb29054500e654056eff5954d81c18c134d0213bd9f27879b"
+      }
+    },
+    {
+      "path": "app/social/components/focus-party/FocusPartyMemberStage.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 8801,
+        "sha256": "a576aaa0d18b33edc437283e004ef4d204175eb5990860be4b6f14087ec05333"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "1c33e17904f3d8c6530bc5167bfaddee6cd364e5780dafd531635c0c75f1cf53"
+      }
+    },
+    {
+      "path": "app/social/components/focus-party/FocusPartyRoom.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 15341,
+        "sha256": "68bffc15f16af42a4ddba3fff25f6687e07ab1672a0c53747c41e2564c6a1cfe"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "4d6faaaa5cb0f10a7e354b36820d6b9964a669be215b56fc50d90884fb060ff4"
+      }
+    },
+    {
+      "path": "documentation/README.md",
+      "before": {
+        "kind": "file",
+        "bytes": 5858,
+        "sha256": "3d0b4c1ad5e15db8e1e19fb3f52cf3e09759ed0a234636ede4b92ecc8e2335b8"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "aa9a20b3e7b5a9b83c22f98e7b01823e5257bfdc859f185af0d128f36e7bc566"
+      }
+    },
+    {
+      "path": "documentation/landing-companion/README.md",
+      "before": {
+        "kind": "file",
+        "bytes": 4823,
+        "sha256": "abeda94d9a1f7909bd9ec97f40923ab6bfa722b96bde03b077ec91474b8d38de"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "a743a4e17d5b292ce43e3f5a3299bdb1ea10d1842867e3a713dadac75c942cbc"
+      }
+    },
+    {
+      "path": "documentation/performance/phase-0/artifacts/render-diagnostics.json",
+      "before": {
+        "kind": "file",
+        "bytes": 537,
+        "sha256": "b61197e1320146d28b3b0cfcf1ad32e17d3ddcd2bc323c010b19f7f00012f74a"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "db7c896b74c14b0b7356c42b52e8837839faa3dc170ebd3b5b99075426230695"
+      }
+    },
+    {
+      "path": "documentation/pixel-companion/README.md",
+      "before": {
+        "kind": "file",
+        "bytes": 1480,
+        "sha256": "b516c81d12c86a53d2a9e9c61927023e79bec2e48ff14e30a13edb676d68b75a"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "ec4415e6c716dc80570f9ec795960dc7527608654babe84a145d0398af6a95df"
+      }
+    },
+    {
+      "path": "lib/archive-catalog.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 28024,
+        "sha256": "6635ceda9950fce438348e9bf40de7366ce7b012b6b7f9cdeca27fc10275fd5b"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "68b518168e1c93d72726528998665619a3cb2f83f06b2e0b03048625c2071f54"
+      }
+    },
+    {
+      "path": "lib/asset-manifest.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 4268,
+        "sha256": "ffa0906f33ba55500930758ebaf06c521009dbaf45822ed59820543dc40b42b4"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "f9b8b2001708e50b47a4dc6396e923ea938e903f21723758952cab107a33b09d"
+      }
+    },
+    {
+      "path": "lib/character-traits.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 11426,
+        "sha256": "01d1cd4bd59635d754d18312c5816fef0ea9ef6b28ee1f93bbe66b859c5ef1e6"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "203f9310e6490e9f9548ab6ebaf12ea1bbf720151ee526c748dc6b2eb45d401e"
+      }
+    },
+    {
+      "path": "lib/client-data-cache.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 7499,
+        "sha256": "d1f0f79d5f71c4e8e3179350f00b8fd286406a26a14711e8dbb1f004f4d536b6"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "bca044f041b81e8127f19d2c7f44f0766d567d8c4b5772384cb3114ee33f68c9"
+      }
+    },
+    {
+      "path": "lib/focus-party-service.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 19895,
+        "sha256": "7da430ab402a53b41459f0190dd060341cb4b69869e5ee7fedf167cd11800bee"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "15320b080bda8702a198d801c3b023148afdfc82ad1e7aacf90025c83794db07"
+      }
+    },
+    {
+      "path": "lib/focus-party-types.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 5538,
+        "sha256": "1f0c63c8124aa95fc2e134ef30e8adc0c56abeb2e19379959443172e9aa9e354"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "c8c0c42850fba23335d35297bc6b0b6e762e26083b977211276772e709336373"
+      }
+    },
+    {
+      "path": "lib/prisma.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 3746,
+        "sha256": "7106282a7a3a8409bfd277c17969227e7af17df0f141aa6a144bd4b9cbd01e3b"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "b56ce3bb8168eb65842cb5a09f0210a4e4fb2870bf252ae41764e5a7ab96dc3c"
+      }
+    },
+    {
+      "path": "lib/profile-service.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 17255,
+        "sha256": "7da11a836f8ef1fb43210bfd14b940a8e48d6b26f337095d4a531a98c2625e93"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "038eb0351f0f20841e1c5eb628ff09071d376a8f3c88bad51b4111dd6765aeba"
+      }
+    },
+    {
+      "path": "lib/system-collection.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 2225,
+        "sha256": "2adc28cc70b152a7d0587109fdfce5573220b29607af912bea8a6c703171f2fc"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "0c99b1b51863f72a03479cf6d631b165d1afd5848250c2c2652fb9a4257b321a"
+      }
+    },
+    {
+      "path": "mobile/dist/.mock-manifest.json",
+      "before": {
+        "kind": "file",
+        "bytes": 100,
+        "sha256": "b3542474495d80e23c7716ac3b9b30a68340680a25561c18f30527d7747990fc"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "df1882c15f8ed2d8d0e8942fbecf03172f386c3cc5d80b750f4e1053a45fa118"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/AccountSettingsScreen-BWzK9p_7.js",
+      "before": {
+        "kind": "file",
+        "bytes": 56979,
+        "sha256": "1aa547bc4cb87c6a5bbc78f40b65828cb77edfa49d8fd91ae79e8859ca091f3e"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/AchievementsSettingsScreen-BAUH8GGj.js",
+      "before": {
+        "kind": "file",
+        "bytes": 8695,
+        "sha256": "72828109e43b877c95fb8ca10b04dbc180665e5f39107a5ea713cb3a361809a4"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/AppearanceSettingsScreen-Ko92ZCLW.js",
+      "before": {
+        "kind": "file",
+        "bytes": 35662,
+        "sha256": "3d4019b888c31952aa1d6df76c062c55ae77b8b0fe40c33986ec9f794cd338b1"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/ArchiveSettingsScreen-j0Qg3tK9.js",
+      "before": {
+        "kind": "file",
+        "bytes": 39715,
+        "sha256": "9a8efa58d02b45b3a7b5cc066eae625962f6eefaf713b8e423a05870867ca771"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/BackToSettings-DcWYvsOt.js",
+      "before": {
+        "kind": "file",
+        "bytes": 554,
+        "sha256": "203288425c0b97b6100e7a4abe4908b65ed1f938d6b98d9fa6b7c5464d78575b"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/BackgroundsSettingsScreen-BaKe49px.js",
+      "before": {
+        "kind": "file",
+        "bytes": 227,
+        "sha256": "99e999365d76c15c5ac8a1501c222b9af30cb7f395eceb8bfefc3a4f730af9f8"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/BadgesRedirectController-OFSPHpMQ.js",
+      "before": {
+        "kind": "file",
+        "bytes": 459,
+        "sha256": "5d983f7bad8529be2e862887ac730e5408a456ca379fe00e7104f268b557262d"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/CalendarScreen-U8SLnvO_.js",
+      "before": {
+        "kind": "file",
+        "bytes": 41236,
+        "sha256": "ab53b6495ea3345698e18df0fb51199d6d224d775e93055ef9a98e85a99f2dd2"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/CalendarSettingsScreen-DTVDulNg.js",
+      "before": {
+        "kind": "file",
+        "bytes": 2052,
+        "sha256": "d4bab6bf92eb97b9edfa8db53154cfb7118d40cf663efb2acfe2535176214afe"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/CollectionSettingsScreen-C3d92TRy.js",
+      "before": {
+        "kind": "file",
+        "bytes": 14567,
+        "sha256": "7452e1533dd49341c481842f524be95ba3a3a01f496e582f1188562853758ce1"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/CustomAudioTab-BXu1mbro.js",
+      "before": {
+        "kind": "file",
+        "bytes": 15551,
+        "sha256": "e46593ba2a710b18899066886bcb12963d53a40c818649c4cc1c57f7a2b5a65e"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/CustomAudioTab-VJEWvgsz.css",
+      "before": {
+        "kind": "file",
+        "bytes": 8894,
+        "sha256": "07d85270f9d60edfb8f958f35e6a007b7b86a2f891b2fc502c159bf73e1f3128"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/DashboardScreen-6QQCEjFC.js",
+      "before": {
+        "kind": "file",
+        "bytes": 24252,
+        "sha256": "3996b1b8eeb253a2700bfdc1774d2d9f255cf995c4fb26f182406526a9a07218"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/DashboardScreen-r8XZl4Kr.css",
+      "before": {
+        "kind": "file",
+        "bytes": 24155,
+        "sha256": "39f89e0056d2ad5043d0f3c5e9b62ed88345809eef1c93570d441f3738a3c224"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/FantasyTimerLayout-uH2PLLjY.js",
+      "before": {
+        "kind": "file",
+        "bytes": 58013,
+        "sha256": "61997a72e12b6c9a35249d5730421faea88088e017537f996a6e4734777376e6"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/FocusBackgroundPicker-BKDuaGtK.js",
+      "before": {
+        "kind": "file",
+        "bytes": 35217,
+        "sha256": "1f9650732ec2cecd75f40e1c5304871ca57949c3ef1175ce47e5589de611705e"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/FocusBackgroundsSettingsScreen-CZAiHa6f.js",
+      "before": {
+        "kind": "file",
+        "bytes": 33461,
+        "sha256": "19f528d545a11427f732bda434ffe109f4d74eb04fffa7e741d82e235e533972"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/FocusScreen-CJa4n_9Q.js",
+      "before": {
+        "kind": "file",
+        "bytes": 179319,
+        "sha256": "d4ae9bc6113adfe01891883ac88dfb7c7a3a7b269ee41117199c4ef5b9f7c9f4"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/FocusTimerLayoutRouter-BfaVsxMj.js",
+      "before": {
+        "kind": "file",
+        "bytes": 764,
+        "sha256": "796ecbcb6d749522976e5183131a496fbd60da450a5ed507398672ef0065a8a6"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/GoalsScreen-B8602421.js",
+      "before": {
+        "kind": "file",
+        "bytes": 36819,
+        "sha256": "cad67798be8df435029a8b12a20fae987189dd15219476180d050af2f7b06e92"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/LockerScreen-DAJNB9_U.js",
+      "before": {
+        "kind": "file",
+        "bytes": 104564,
+        "sha256": "14d548363e66ea5ec9f31750a73c3ad6b6143a170713c9252b958b6903b8f6a5"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/ModesSettingsScreen-jrsLtez0.js",
+      "before": {
+        "kind": "file",
+        "bytes": 16304,
+        "sha256": "acba1d3ee6b25c432a790bbe50a6a672ffc046068bb2298c764e29dc981828bd"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/NotificationsSettingsScreen-yaG-bMEy.js",
+      "before": {
+        "kind": "file",
+        "bytes": 11009,
+        "sha256": "53db481ff6cc1b3221bd095bba93aa0a0dab84db4846bcfdc616ed12f026d676"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/ProfileRedirectController-D0A02koZ.js",
+      "before": {
+        "kind": "file",
+        "bytes": 475,
+        "sha256": "e065ef12d757036687e47082ee429fe4228a9c2efaa527a49bc5841a2f2a01b2"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/QuestsScreen-DW2p10il.js",
+      "before": {
+        "kind": "file",
+        "bytes": 749,
+        "sha256": "9e15a4aff4608123e10076a8456deaf4597408667fa6431410b7c378db45ce6a"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/RankingsSettingsScreen-D36TMgCI.js",
+      "before": {
+        "kind": "file",
+        "bytes": 10727,
+        "sha256": "4307976f05c99abde118762c5f77476ac70d7a3f9144f5240ccc0790b7f7f689"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/SettingsIndexController-MXETdFWA.js",
+      "before": {
+        "kind": "file",
+        "bytes": 894,
+        "sha256": "298cfdd3c941d44c1cd378585632caf0df69fa8f1c8d110f43f932a638695c6f"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/ShopScreen-DAJybIoT.js",
+      "before": {
+        "kind": "file",
+        "bytes": 23085,
+        "sha256": "df082b2e32b30af5f34ec662151aa6291f975fe9340fad438e138f42aa3c0ddb"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/SocialScreen-CtOEztw3.js",
+      "before": {
+        "kind": "file",
+        "bytes": 313172,
+        "sha256": "f0bef2fc08c069f4189153a643f9e4084fcaeeb6ce68f656afd56b980d52af62"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/StatsSettingsScreen-Dnc2poCP.js",
+      "before": {
+        "kind": "file",
+        "bytes": 32389,
+        "sha256": "6c43cf4b4dce3acbb59d4f34315d735841b39ea0145819fee520646ddd70481f"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/SyncRedirectController-BtddILqW.js",
+      "before": {
+        "kind": "file",
+        "bytes": 294,
+        "sha256": "abe4f98f38427de49d75d3f3a049b65a061ffcc2e8d6578d0ee71b4303f30b8b"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/SystemIcons-C72zWRh-.js",
+      "before": {
+        "kind": "file",
+        "bytes": 5619,
+        "sha256": "3300d7820329b8a57955f8b32a5c1c596ed3121c700e80aa472326c27ef02665"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/SystemLibrary-CM4MNBN4.js",
+      "before": {
+        "kind": "file",
+        "bytes": 2710,
+        "sha256": "8dc69c11657444f0768e0fd3279b185fc7b16bff2685460d121ec3ece0ac513d"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/SystemScreen-CJ7MS6eq.js",
+      "before": {
+        "kind": "file",
+        "bytes": 349028,
+        "sha256": "219e765a1a72db94cb6a3bbaa12f181306a91eb12097df0e82080f792fb9b691"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/ThemesSettingsScreen-SJd_alGE.js",
+      "before": {
+        "kind": "file",
+        "bytes": 222,
+        "sha256": "7b6c003f9b956ea7b2639753ee0f23ee2ad8c2003e13f3ea9a64bbed6cd5ec52"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/TimerScreen-DEzKE6oT.js",
+      "before": {
+        "kind": "file",
+        "bytes": 23688,
+        "sha256": "eecf896bb4b996466959f82dbf40996d7eb16b00019d46397faf6cb6f6f688f4"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/client-data-cache-gMotkeLg.js",
+      "before": {
+        "kind": "file",
+        "bytes": 2395,
+        "sha256": "d954ca3dcf77dbfc5516e83fb981ab5a296a392c465fa46eb2cf42810faaf3e4"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/index-BCuMXoAu.js",
+      "before": {
+        "kind": "file",
+        "bytes": 730304,
+        "sha256": "9a9005d6751a2ab520a41209b7a6022faee0f765dc75c6468874b27f49c5df96"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/index-JZltZ5lf.css",
+      "before": {
+        "kind": "file",
+        "bytes": 398898,
+        "sha256": "8c6c0630f07e6e826d7cfce65ff6d49986094caacce3afbf61d20417f6d312ab"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/useSystemAppearance-Cb_IUQei.js",
+      "before": {
+        "kind": "file",
+        "bytes": 680,
+        "sha256": "8f33f4a5b84c4b813af928e712d9e02a7e23ba2feacc90ef383359f76e268799"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/vendor-icons-ClxYTyPb.js",
+      "before": {
+        "kind": "file",
+        "bytes": 46958,
+        "sha256": "457eab2a9d335b9e4b8ec1c7da7707fcd5a6d7eb9111a9eb28a07eba6eed8856"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/vendor-motion-DkukPa_c.js",
+      "before": {
+        "kind": "file",
+        "bytes": 125743,
+        "sha256": "625f98887a0f665d56618d46033f19ed25658695786f08aed3dfffcac0647e7e"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/assets/vendor-react-CBlieeui.js",
+      "before": {
+        "kind": "file",
+        "bytes": 181757,
+        "sha256": "781dc273b73ae04c204d7e2aaa94bdd6367f185ca4098b5a15c8350d7dafc283"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/index.html",
+      "before": {
+        "kind": "file",
+        "bytes": 1851,
+        "sha256": "5e2fcd046fede11fd9720526e05fed893e4c0e0a6a0060f10d07482188e9f443"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "de6694efef5305da1a4d57e3bb1fbab6cfdd788c20b60d089d2fdf816fbfa390"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/body/test_hunter_base.png",
+      "before": {
+        "kind": "file",
+        "bytes": 776,
+        "sha256": "054b31c31bd64a68a4325a7870f5efb897f780e1cf23815e489e69278b367c25"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_choso.png",
+      "before": {
+        "kind": "file",
+        "bytes": 19417,
+        "sha256": "c95ff142f6193654a2acf34c042c8407b503e8fdb2cf3b053d379919fd449ff2"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_deadpool.png",
+      "before": {
+        "kind": "file",
+        "bytes": 36949,
+        "sha256": "dd4eab5fe28a149b41d9c38143a1ad438f5aaf1643e94474a6cc6ef90604b59d"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_eren.png",
+      "before": {
+        "kind": "file",
+        "bytes": 4704,
+        "sha256": "5a8e69bd8b95501b9c991287b6f9cae7734381b7535d0c9b30f7d08e2c7b8342"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_gojo.png",
+      "before": {
+        "kind": "file",
+        "bytes": 19125,
+        "sha256": "de5d0d94ed1a7c840f8f18df939617f337de3d6ddf5d41027ccb0ac8fbe38423"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_itadori.png",
+      "before": {
+        "kind": "file",
+        "bytes": 24815,
+        "sha256": "1addacbf0eb94fa70d6f49628f8faa3c2e80a8c404dc53230e085827e4ba2211"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_megumi.png",
+      "before": {
+        "kind": "file",
+        "bytes": 17921,
+        "sha256": "a8a80395fb30c50649bf8a4691693009fa1e1663c2a2705c7345b538a148ec78"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_megumin.png",
+      "before": {
+        "kind": "file",
+        "bytes": 21775,
+        "sha256": "4c938e97886d46970e1d7c4e2bf5805cd0fde5e11ff52331007e84afecc3319b"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_mitsuri.png",
+      "before": {
+        "kind": "file",
+        "bytes": 31970,
+        "sha256": "20f433968cc13b6f9ed394ad00088057ed77c3e4a869bd166d0c881de6c5ba82"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_nezuko.png",
+      "before": {
+        "kind": "file",
+        "bytes": 30601,
+        "sha256": "ade7a5687d3614d86fd78284313fc5964434f3184d19c58d0b98e73049112d65"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_nobara.png",
+      "before": {
+        "kind": "file",
+        "bytes": 20615,
+        "sha256": "1f2683c19970764145a2f2ccc745f31bea77d044a276ea9d643ae88d487d5194"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_rengoku.png",
+      "before": {
+        "kind": "file",
+        "bytes": 30761,
+        "sha256": "f7c216add8471cb988fdd06386ffd3c0fa5ca5234150e9f3d6577d0f67f3293e"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_shinobu.png",
+      "before": {
+        "kind": "file",
+        "bytes": 19996,
+        "sha256": "fa7156ab210229e023b47d42dc324f2be9e1b2d6e839abd0d15f067a17f4bf86"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_spiderman.png",
+      "before": {
+        "kind": "file",
+        "bytes": 20759,
+        "sha256": "642f9b668c6808a0a22b625f8832271b612dbc297ed0a6afc861ba673e7dbabb"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_tanjiro.png",
+      "before": {
+        "kind": "file",
+        "bytes": 18933,
+        "sha256": "28b057554c17e7fb9aa52815f1c38c1e382d8bb568668dc2d5ed86252de8d6ff"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_uzui.png",
+      "before": {
+        "kind": "file",
+        "bytes": 30267,
+        "sha256": "6bacb17ad2bba9010f35e6bfa3c8462301224a229335e9f9513ec1db320b47fe"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/dist/sprites/character/forms/form_venom.png",
+      "before": {
+        "kind": "file",
+        "bytes": 31530,
+        "sha256": "6011b3199201354eadb124f5106a79b7f6998f241769fc4ad1be6922838539b8"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "mobile/src/MobileApp.tsx",
+      "before": {
+        "kind": "file",
+        "bytes": 1790,
+        "sha256": "66340ac41f59c6a4771b40d89f319f0133530af32b91053771c272bc083aa1c1"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "937ee905a1b159d1c0591c3d8a091a4c8d7e237daab5c02e74e92c5e13ae595e"
+      }
+    },
+    {
+      "path": "package.json",
+      "before": {
+        "kind": "file",
+        "bytes": 3117,
+        "sha256": "7cf98a1e08b4eb721a0c717b466f7ce2d485bf057245c45f49872e6c0ffaa37a"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "d5140a5f10086c5c33ae59fb6789be61760d59b8a90275cbef3a23d6cf119b3b"
+      }
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "before": {
+        "kind": "file",
+        "bytes": 46575,
+        "sha256": "4f5753252e806f7ab2dd894b8c4ab64e3b0863b63999580f11514b764da678fb"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "f5fbe318b2134a743ef35624f1b35d4b33e530e87c93fdf8ce2fe63da212d588"
+      }
+    },
+    {
+      "path": "proxy.ts",
+      "before": {
+        "kind": "file",
+        "bytes": 4136,
+        "sha256": "eed12d20924f28374886752f462149cc2b3722ddc14c0c713e36597429e1e6a5"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "a5f13969e0bd7046e21ded8bedfd085cd417da73006bdc02dac690677f6a74d7"
+      }
+    },
+    {
+      "path": "public/companions/pixel/sylf/base/body.png",
+      "before": {
+        "kind": "file",
+        "bytes": 746814,
+        "sha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/companions/pixel/sylf/eyes/blink.png",
+      "before": {
+        "kind": "file",
+        "bytes": 20353,
+        "sha256": "6f174ae289b92985b4c76d508464d62761052751e29c8ada9940e58ffff26aa0"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/companions/pixel/sylf/eyes/focused.png",
+      "before": {
+        "kind": "file",
+        "bytes": 47237,
+        "sha256": "618bbabcc9499ac226c047647cb9e40aa90f15b28677060c08e93e014478c719"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/companions/pixel/sylf/eyes/happy.png",
+      "before": {
+        "kind": "file",
+        "bytes": 59977,
+        "sha256": "0f9ef074ea6750cb5ea54147ac252a26bb7a3961a337fe7fa3b3a3cc67fe9090"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/companions/pixel/sylf/eyes/neutral.png",
+      "before": {
+        "kind": "file",
+        "bytes": 59942,
+        "sha256": "9f402b022ee0ae6decd0bea9c25791f9c2959f423af5d9e36809ce037d27a409"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/companions/pixel/sylf/eyes/sleepy.png",
+      "before": {
+        "kind": "file",
+        "bytes": 34032,
+        "sha256": "54078754998a0a77145420e72e2d9f81a56180dcbc0033c824faf7c4db95896d"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/companions/pixel/sylf/eyes/thinking.png",
+      "before": {
+        "kind": "file",
+        "bytes": 43253,
+        "sha256": "7b4a3de46930c2c9384ef39b92b23752dd16d478e1f6361e2ae3624deb442bb9"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/companions/sylf-pixel-companion.png",
+      "before": {
+        "kind": "file",
+        "bytes": 776130,
+        "sha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/body/test_hunter_base.png",
+      "before": {
+        "kind": "file",
+        "bytes": 776,
+        "sha256": "054b31c31bd64a68a4325a7870f5efb897f780e1cf23815e489e69278b367c25"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_choso.png",
+      "before": {
+        "kind": "file",
+        "bytes": 19417,
+        "sha256": "c95ff142f6193654a2acf34c042c8407b503e8fdb2cf3b053d379919fd449ff2"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_deadpool.png",
+      "before": {
+        "kind": "file",
+        "bytes": 36949,
+        "sha256": "dd4eab5fe28a149b41d9c38143a1ad438f5aaf1643e94474a6cc6ef90604b59d"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_eren.png",
+      "before": {
+        "kind": "file",
+        "bytes": 4704,
+        "sha256": "5a8e69bd8b95501b9c991287b6f9cae7734381b7535d0c9b30f7d08e2c7b8342"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_gojo.png",
+      "before": {
+        "kind": "file",
+        "bytes": 19125,
+        "sha256": "de5d0d94ed1a7c840f8f18df939617f337de3d6ddf5d41027ccb0ac8fbe38423"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_itadori.png",
+      "before": {
+        "kind": "file",
+        "bytes": 24815,
+        "sha256": "1addacbf0eb94fa70d6f49628f8faa3c2e80a8c404dc53230e085827e4ba2211"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_megumi.png",
+      "before": {
+        "kind": "file",
+        "bytes": 17921,
+        "sha256": "a8a80395fb30c50649bf8a4691693009fa1e1663c2a2705c7345b538a148ec78"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_megumin.png",
+      "before": {
+        "kind": "file",
+        "bytes": 21775,
+        "sha256": "4c938e97886d46970e1d7c4e2bf5805cd0fde5e11ff52331007e84afecc3319b"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_mitsuri.png",
+      "before": {
+        "kind": "file",
+        "bytes": 31970,
+        "sha256": "20f433968cc13b6f9ed394ad00088057ed77c3e4a869bd166d0c881de6c5ba82"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_nezuko.png",
+      "before": {
+        "kind": "file",
+        "bytes": 30601,
+        "sha256": "ade7a5687d3614d86fd78284313fc5964434f3184d19c58d0b98e73049112d65"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_nobara.png",
+      "before": {
+        "kind": "file",
+        "bytes": 20615,
+        "sha256": "1f2683c19970764145a2f2ccc745f31bea77d044a276ea9d643ae88d487d5194"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_rengoku.png",
+      "before": {
+        "kind": "file",
+        "bytes": 30761,
+        "sha256": "f7c216add8471cb988fdd06386ffd3c0fa5ca5234150e9f3d6577d0f67f3293e"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_shinobu.png",
+      "before": {
+        "kind": "file",
+        "bytes": 19996,
+        "sha256": "fa7156ab210229e023b47d42dc324f2be9e1b2d6e839abd0d15f067a17f4bf86"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_spiderman.png",
+      "before": {
+        "kind": "file",
+        "bytes": 20759,
+        "sha256": "642f9b668c6808a0a22b625f8832271b612dbc297ed0a6afc861ba673e7dbabb"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_tanjiro.png",
+      "before": {
+        "kind": "file",
+        "bytes": 18933,
+        "sha256": "28b057554c17e7fb9aa52815f1c38c1e382d8bb568668dc2d5ed86252de8d6ff"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_uzui.png",
+      "before": {
+        "kind": "file",
+        "bytes": 30267,
+        "sha256": "6bacb17ad2bba9010f35e6bfa3c8462301224a229335e9f9513ec1db320b47fe"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "public/sprites/character/forms/form_venom.png",
+      "before": {
+        "kind": "file",
+        "bytes": 31530,
+        "sha256": "6011b3199201354eadb124f5106a79b7f6998f241769fc4ad1be6922838539b8"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "scripts/download_and_normalize_canary.mjs",
+      "before": {
+        "kind": "file",
+        "bytes": 1487,
+        "sha256": "c683c3e649c99668062ccf4cae395d0b51797ec283c237c1d2c7e0d760addd8f"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    },
+    {
+      "path": "scripts/fetch_overlay_sprites.mjs",
+      "before": {
+        "kind": "file",
+        "bytes": 4383,
+        "sha256": "e26497e124e9e18e013e083a7249a3d28a9ac5bc218cd58f9f88a8df8e96da85"
+      },
+      "observed": {
+        "kind": "file",
+        "sha256": "bb891ec54e6da7cff5d24d6ae6b899caf634e35fecf47d39b34f6585f802652f"
+      }
+    },
+    {
+      "path": "scripts/normalize_base_canary.mjs",
+      "before": {
+        "kind": "file",
+        "bytes": 8150,
+        "sha256": "2cb4b6681028e37d0711d1ed1238c9eb1125af42495a4d7cdc4e7aec3c5e110e"
+      },
+      "observed": {
+        "kind": "missing"
+      }
+    }
+  ],
+  "unrelatedNewFiles": [
+    ".playwright-mcp/page-2026-10-07T17-33-18-681Z.yml",
+    ".playwright-mcp/page-2026-10-07T17-35-15-044Z.yml",
+    ".playwright-mcp/page-2026-10-07T17-35-29-183Z.yml",
+    ".playwright-mcp/page-2026-10-07T17-36-00-847Z.yml",
+    ".playwright-mcp/page-2026-10-07T17-36-05-427Z.yml",
+    ".playwright-mcp/page-2026-10-07T17-54-20-418Z.yml",
+    ".playwright-mcp/page-2026-10-08T05-20-42-148Z.yml",
+    ".playwright-mcp/page-2026-10-08T09-42-02-843Z.yml",
+    ".playwright-mcp/page-2026-10-08T10-24-28-901Z.yml",
+    ".playwright-mcp/page-2026-10-08T10-24-32-535Z.yml",
+    ".playwright-mcp/page-2026-10-08T10-35-51-027Z.yml",
+    ".playwright-mcp/page-2026-10-08T10-50-49-627Z.yml",
+    ".playwright-mcp/page-2026-10-08T13-37-16-704Z.yml",
+    ".playwright-mcp/pixel-studio-before.png",
+    "Sylf Pixel Display.md",
+    "__tests__/dashboard/dashboard-overview.test.tsx",
+    "__tests__/dashboard/pixel-auth-mutation.test.tsx",
+    "__tests__/dashboard/pixel-companion-adapter.test.tsx",
+    "__tests__/dashboard/pixel-creation-surfaces.test.tsx",
+    "__tests__/landing/fixtures/retired-pixel-preview.ts",
+    "__tests__/pixel-display/artwork-empty-state.test.tsx",
+    "__tests__/pixel-display/artwork-selection-service.test.ts",
+    "__tests__/pixel-display/audit-composition-regressions.test.ts",
+    "__tests__/pixel-display/audit-react-host-regressions.test.tsx",
+    "__tests__/pixel-display/boundaries.test.ts",
+    "__tests__/pixel-display/canvas-renderer.test.ts",
+    "__tests__/pixel-display/color.test.ts",
+    "__tests__/pixel-display/consolidation-editor.test.ts",
+    "__tests__/pixel-display/consolidation-rendering.test.ts",
+    "__tests__/pixel-display/database-consolidation.test.ts",
+    "__tests__/pixel-display/display.test.ts",
+    "__tests__/pixel-display/fixtures/retired-sylf/character.ts",
+    "__tests__/pixel-display/fixtures/retired-sylf/effects.ts",
+    "__tests__/pixel-display/fixtures/retired-sylf/frames.ts",
+    "__tests__/pixel-display/fixtures/retired-sylf/parts.ts",
+    "__tests__/pixel-display/fixtures/retired-sylf/reference-character.ts",
+    "__tests__/pixel-display/fixtures/retired-sylf/sprite.ts",
+    "__tests__/pixel-display/framebuffer.test.ts",
+    "__tests__/pixel-display/geometry.test.ts",
+    "__tests__/pixel-display/modular-character.test.ts",
+    "__tests__/pixel-display/pixel-asset.test.ts",
+    "__tests__/pixel-display/pixel-customizer.test.ts",
+    "__tests__/pixel-display/pixel-studio.test.ts",
+    "__tests__/pixel-display/renderer-contract.test.ts",
+    "__tests__/pixel-display/renderer-resize.test.ts",
+    "__tests__/pixel-display/runtime-phase.test.ts",
+    "__tests__/pixel-display/runtime.test.ts",
+    "__tests__/pixel-display/studio-workspace.test.tsx",
+    "__tests__/pixel-display/support/recording-renderer.ts",
+    "__tests__/pixel-display/sylf-composition.test.ts",
+    "__tests__/pixel-display/sylf-effects.test.ts",
+    "app/api/pixel-creations/route.ts",
+    "app/components/companion/HexColorPicker.module.css",
+    "app/components/companion/HexColorPicker.tsx",
+    "app/components/companion/OwnCompanionPreview.tsx",
+    "app/components/companion/PixelArtworkPlaceholder.module.css",
+    "app/components/companion/PixelArtworkPlaceholder.tsx",
+    "app/components/companion/PixelCompanion.tsx",
+    "app/components/companion/TargetPixelCompanion.tsx",
+    "app/dashboard/components/PixelCompanionCard.module.css",
+    "app/dashboard/components/PixelCompanionCard.tsx",
+    "app/dashboard/pixel-companion-adapter.ts",
+    "app/dashboard/pixel-cosmetic-registry.ts",
+    "app/dashboard/pixel-modular-character.ts",
+    "app/dev/pixel-display/page.tsx",
+    "app/locker/components/identity/PixelCustomizer.module.css",
+    "app/locker/components/identity/PixelCustomizer.tsx",
+    "app/locker/components/identity/StudioHubView.module.css",
+    "app/locker/components/identity/pixel-customizer-options.ts",
+    "app/locker/components/studio/EditorCanvas.tsx",
+    "app/locker/components/studio/PixelStudio.module.css",
+    "app/locker/components/studio/PixelStudio.tsx",
+    "app/locker/components/studio/pixel-studio-model.ts",
+    "app/locker/components/studio/studio-history.ts",
+    "documentation/pixel-display/README.md",
+    "documentation/pixel-display/authoring-guide.md",
+    "documentation/pixel-display/pixel-display-contract.md",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-custom-light-surface.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-dark-1024.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-dark-1920.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-dark.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-light.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-custom-dark-surface.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-dark-320.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-dark-390.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-light-390.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/tablet-dark-768.png",
+    "documentation/pixel-display/reports/dashboard-presentation/evidence/tablet-light-768.png",
+    "documentation/pixel-display/reports/dashboard-presentation/report.md",
+    "documentation/pixel-display/reports/engineering-audit/evidence/delivery-proof.md",
+    "documentation/pixel-display/reports/engineering-audit/evidence/doublecheck-report.md",
+    "documentation/pixel-display/reports/engineering-audit/evidence/measurements.json",
+    "documentation/pixel-display/reports/engineering-audit/report.md",
+    "documentation/pixel-display/reports/phase-0/evidence/phase0-1440-dark-full.png",
+    "documentation/pixel-display/reports/phase-0/evidence/phase0-390-dark-full.png",
+    "documentation/pixel-display/reports/phase-0/evidence/phase0-390-light-accent-full.png",
+    "documentation/pixel-display/reports/phase-0/evidence/phase0-820-dark-full.png",
+    "documentation/pixel-display/reports/phase-0/evidence/results.json",
+    "documentation/pixel-display/reports/phase-0/report.md",
+    "documentation/pixel-display/reports/phase-1/evidence/performance.json",
+    "documentation/pixel-display/reports/phase-1/report.md",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/README.md",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/auth-mutation-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/cross-tab-cache-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-background-desktop-customizer.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-background-mobile-customizer.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-color-customizer.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-color-mobile-customizer.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/density-flow-probes.js",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/density-flow-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-customizer-own-drawing.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-customizer-pixel-size.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-dashboard.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-editor-probes.js",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-editor-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-hub.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-balanced.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-chunky.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-detailed.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-finest.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-studio.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/error-and-draft-probes.js",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/error-and-draft-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/legacy-studio-equipped-creation.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/light-desktop-customizer.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/light-desktop-studio.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/light-mobile-studio.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-customizer.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-empty-dashboard.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-studio-full.png",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-touch-probes.js",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-touch-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/pointer-edge-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/preview-and-save-probes.js",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/preview-and-save-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/reduced-motion-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/responsive-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/save-flow-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation-audit/report.md",
+    "documentation/pixel-display/reports/phase-2-consolidation/WORKLOG.md",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/README.md",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/browser-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/collection-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/customizer-dark-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/customizer-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/customizer-mobile.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-dark-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-edge-fidelity-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-sylf-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/document-checks.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/final-flow-customizer.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/final-flow-dashboard.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/final-flow-studio.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/mobile-bundle-dashboard.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/studio-desktop-in-progress.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/studio-first-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/studio-mobile-touch.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/edge-layout-results.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/eslint-baseline.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/eslint-summary.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/eslint.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/hub-dark-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/hub-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/items-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/landing-preservation.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/legacy-removal.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/legacy-search.txt",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/mobile-bundle-dashboard-final.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/mobile-bundle-studio-final.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/mobile-display-style.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/party-room-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/production-dashboard.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/production-studio.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/save-failure-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/shop-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/simple-color-selection.json",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-dark-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-edge-fidelity-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-steering-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/evidence/target-profile-desktop.png",
+    "documentation/pixel-display/reports/phase-2-consolidation/report.md",
+    "documentation/pixel-display/reports/phase-2/evidence/phase2-card-110-dark.png",
+    "documentation/pixel-display/reports/phase-2/evidence/phase2-planes-body-leaves-only.png",
+    "documentation/pixel-display/reports/phase-2/evidence/phase2-preview-458-dark.png",
+    "documentation/pixel-display/reports/phase-2/evidence/results.json",
+    "documentation/pixel-display/reports/phase-2/report.md",
+    "documentation/pixel-display/reports/phase-3/evidence/card-canvas-final.png",
+    "documentation/pixel-display/reports/phase-3/evidence/card-desktop-dark.png",
+    "documentation/pixel-display/reports/phase-3/evidence/card-desktop-light-custom-accent.png",
+    "documentation/pixel-display/reports/phase-3/evidence/card-fill-before-mapping-fix.png",
+    "documentation/pixel-display/reports/phase-3/evidence/card-reaction-celebrating.png",
+    "documentation/pixel-display/reports/phase-3/evidence/dashboard-desktop-dark-1440.png",
+    "documentation/pixel-display/reports/phase-3/evidence/dashboard-mobile-dark-390.png",
+    "documentation/pixel-display/reports/phase-3/evidence/results.json",
+    "documentation/pixel-display/reports/phase-3/report.md",
+    "documentation/pixel-display/reports/phase-4/design-note.md",
+    "documentation/pixel-display/reports/phase-4/evidence/card-ai-thinking-loop.png",
+    "documentation/pixel-display/reports/phase-4/evidence/card-light-custom-accent.png",
+    "documentation/pixel-display/reports/phase-4/evidence/dashboard-desktop-dark.png",
+    "documentation/pixel-display/reports/phase-4/evidence/dashboard-mobile-dark-390.png",
+    "documentation/pixel-display/reports/phase-4/evidence/density-sweep-constant-physical-size.png",
+    "documentation/pixel-display/reports/phase-4/evidence/results.json",
+    "documentation/pixel-display/reports/phase-4/report.md",
+    "documentation/pixel-display/reports/phase-5/evidence/results.json",
+    "documentation/pixel-display/reports/phase-5/evidence/review-held-alone.png",
+    "documentation/pixel-display/reports/phase-5/evidence/review-held-item-attached.png",
+    "documentation/pixel-display/reports/phase-5/evidence/review-panel-full.png",
+    "documentation/pixel-display/reports/phase-5/evidence/review-wearable-alone.png",
+    "documentation/pixel-display/reports/phase-5/report.md",
+    "documentation/pixel-display/reports/phase-6/evidence/dashboard-card-real-config.png",
+    "documentation/pixel-display/reports/phase-6/evidence/dashboard-desktop-dark.png",
+    "documentation/pixel-display/reports/phase-6/evidence/loadout-all-five-slots.png",
+    "documentation/pixel-display/reports/phase-6/evidence/results.json",
+    "documentation/pixel-display/reports/phase-6/evidence/review-degraded-key.png",
+    "documentation/pixel-display/reports/phase-6/evidence/review-loadout-panel.png",
+    "documentation/pixel-display/reports/phase-6/report.md",
+    "documentation/pixel-display/reports/phase-7/evidence/customizer-desktop-character.png",
+    "documentation/pixel-display/reports/phase-7/evidence/customizer-desktop-density.png",
+    "documentation/pixel-display/reports/phase-7/evidence/customizer-mobile-density.png",
+    "documentation/pixel-display/reports/phase-7/evidence/results.json",
+    "documentation/pixel-display/reports/phase-7/report.md",
+    "documentation/pixel-display/reports/phase-8/evidence/dashboard-equipped-creation.png",
+    "documentation/pixel-display/reports/phase-8/evidence/results.json",
+    "documentation/pixel-display/reports/phase-8/evidence/studio-desktop.png",
+    "documentation/pixel-display/reports/phase-8/report.md",
+    "documentation/pixel-display/reports/studio-workspace/evidence/desktop-custom-dark-surface.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/desktop-dark.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/desktop-first.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/desktop-light.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/mobile-custom-light-surface.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/mobile-dark.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/mobile-first.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/mobile-landscape.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/mobile-settings.png",
+    "documentation/pixel-display/reports/studio-workspace/evidence/mobile-verification.txt",
+    "documentation/pixel-display/reports/studio-workspace/evidence/web-build.txt",
+    "documentation/pixel-display/reports/studio-workspace/report.md",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-custom-mobile.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-customizer-empty.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-customizer-mobile.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-empty-desktop.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-empty-mobile.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-extra-lint.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-lint.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-tests.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-typecheck.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-web-build.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-hub-mobile.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-last-lint.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-light-desktop.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-light-mobile.png",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-mobile-build.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-mobile-verify.txt",
+    "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-unavailable-desktop.png",
+    "documentation/pixel-display/reports/user-artwork-only/report.md",
+    "lib/pixel-companion-contract.ts",
+    "lib/pixel-companion-service.ts",
+    "lib/pixel-creation-service.ts",
+    "lib/pixel-creations-client.ts",
+    "lib/pixel-display-style.ts",
+    "lib/pixel-display/content/asset/attachment.ts",
+    "lib/pixel-display/content/asset/compose.ts",
+    "lib/pixel-display/content/asset/creation-asset.ts",
+    "lib/pixel-display/content/asset/creation.ts",
+    "lib/pixel-display/content/asset/empty.ts",
+    "lib/pixel-display/content/asset/identity.ts",
+    "lib/pixel-display/content/asset/index.ts",
+    "lib/pixel-display/content/asset/paint.ts",
+    "lib/pixel-display/content/asset/reference/ember-aura.ts",
+    "lib/pixel-display/content/asset/reference/index.ts",
+    "lib/pixel-display/content/asset/reference/pedestal-meadow.ts",
+    "lib/pixel-display/content/asset/reference/practice-wand.ts",
+    "lib/pixel-display/content/asset/reference/study-scarf.ts",
+    "lib/pixel-display/content/asset/resolve.ts",
+    "lib/pixel-display/content/asset/types.ts",
+    "lib/pixel-display/content/asset/validate.ts",
+    "lib/pixel-display/content/index.ts",
+    "lib/pixel-display/content/palette.ts",
+    "lib/pixel-display/content/sylf/character.ts",
+    "lib/pixel-display/content/sylf/effects.ts",
+    "lib/pixel-display/content/sylf/frames.ts",
+    "lib/pixel-display/engine/color.ts",
+    "lib/pixel-display/engine/display.ts",
+    "lib/pixel-display/engine/framebuffer.ts",
+    "lib/pixel-display/engine/geometry.ts",
+    "lib/pixel-display/engine/index.ts",
+    "lib/pixel-display/engine/pix-engine-globals.d.ts",
+    "lib/pixel-display/engine/runtime.ts",
+    "lib/pixel-display/engine/types.ts",
+    "lib/pixel-display/react/PixelDisplay.module.css",
+    "lib/pixel-display/react/PixelDisplay.tsx",
+    "lib/pixel-display/react/usePixRuntime.ts",
+    "lib/pixel-display/renderers/canvas-2d.ts",
+    "lib/pixel-display/renderers/grid-presentation.ts",
+    "mobile/dist/assets/AccountSettingsScreen-BIUW3yKZ.js",
+    "mobile/dist/assets/AchievementsSettingsScreen-g91gxVrH.js",
+    "mobile/dist/assets/AppearanceSettingsScreen-BYEqGql_.js",
+    "mobile/dist/assets/ArchiveSettingsScreen-C-_SOwIY.js",
+    "mobile/dist/assets/AuthProvider-CfChqgOW.js",
+    "mobile/dist/assets/BackToSettings-4TsoRFTt.js",
+    "mobile/dist/assets/BackgroundsSettingsScreen-v4i9sIdT.js",
+    "mobile/dist/assets/BadgesRedirectController-jVNoobB8.js",
+    "mobile/dist/assets/CalendarScreen-BKkp-5bU.js",
+    "mobile/dist/assets/CalendarSettingsScreen-BMAAETQ1.js",
+    "mobile/dist/assets/CollectionSettingsScreen-DzU0OKfj.js",
+    "mobile/dist/assets/CustomAudioTab-DXvRg2xB.css",
+    "mobile/dist/assets/CustomAudioTab-y9AOzAhp.js",
+    "mobile/dist/assets/DashboardScreen-B0xXNYs8.js",
+    "mobile/dist/assets/DashboardScreen-Cu1CYQeO.css",
+    "mobile/dist/assets/FantasyTimerLayout-DOGe7I5J.js",
+    "mobile/dist/assets/FocusBackgroundPicker-A2y_va5u.js",
+    "mobile/dist/assets/FocusBackgroundsSettingsScreen-QnnidANd.js",
+    "mobile/dist/assets/FocusScreen-rr1DFRTb.js",
+    "mobile/dist/assets/FocusTimerLayoutRouter-DvT7APf_.js",
+    "mobile/dist/assets/GoalsScreen-CsPedXjg.js",
+    "mobile/dist/assets/LockerScreen-CgGuhRNf.css",
+    "mobile/dist/assets/LockerScreen-DNLLBMdo.js",
+    "mobile/dist/assets/ModesSettingsScreen-3PM8SII9.js",
+    "mobile/dist/assets/NotificationsSettingsScreen-EbM4Mnoe.js",
+    "mobile/dist/assets/OwnCompanionPreview-BlMadczO.js",
+    "mobile/dist/assets/PixelCompanion-B8TYoe2W.js",
+    "mobile/dist/assets/PixelCompanion-gCik2SoP.css",
+    "mobile/dist/assets/ProfileRedirectController-DhgPVFO_.js",
+    "mobile/dist/assets/QuestsScreen-CUa0qkGB.js",
+    "mobile/dist/assets/RankingsSettingsScreen-C-qzr7tI.js",
+    "mobile/dist/assets/SettingsIndexController-h6q7Ew3d.js",
+    "mobile/dist/assets/ShopScreen-DltKH7c3.js",
+    "mobile/dist/assets/SocialScreen-D0HlminI.js",
+    "mobile/dist/assets/StatsSettingsScreen-DdYigXkd.js",
+    "mobile/dist/assets/SyncRedirectController-DqThO92p.js",
+    "mobile/dist/assets/SystemIcons-CyB8Ul_u.js",
+    "mobile/dist/assets/SystemLibrary-CXxzVHcV.js",
+    "mobile/dist/assets/SystemScreen-HGdteThf.js",
+    "mobile/dist/assets/ThemesSettingsScreen-DiYapaOD.js",
+    "mobile/dist/assets/TimerScreen-BuxktgzF.js",
+    "mobile/dist/assets/client-data-cache-BpHdSVLh.js",
+    "mobile/dist/assets/index-Dfsj4KuI.js",
+    "mobile/dist/assets/index-DyH0Nt9r.css",
+    "mobile/dist/assets/next-image-k9z0LVIc.js",
+    "mobile/dist/assets/useSystemAppearance-BB85psGh.js",
+    "mobile/dist/assets/vendor-icons-Cqee6HW5.js",
+    "mobile/dist/assets/vendor-motion-D-n_FYJU.js",
+    "mobile/dist/assets/vendor-react-p6Uu_7ZG.js",
+    "prisma/migrations/20261005000000_pixel_creations/migration.sql",
+    "prisma/migrations/20261007000000_pixel_companion_consolidation/migration.sql",
+    "scripts/measure-pixel-display.mjs",
+    "scripts/test-pixel-postgres.mjs",
+    "tsconfig.pixel-engine.json"
+  ],
+  "unrelatedLandingUnchanged": true
+}

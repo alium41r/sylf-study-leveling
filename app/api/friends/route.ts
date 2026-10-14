@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { TimezoneService } from "@/lib/timezone-service";
+import { selectedCompanionsForUsers } from "@/lib/pixel-companion-service";
 import { Prisma } from "@prisma/client";
 
 /**
@@ -79,29 +80,35 @@ export async function GET(req: NextRequest) {
 
     // ── Aggregate today's study seconds & active sessions for ALL friends in 2 queries ──
     const completedMap = new Map<number, number>();
+    const todayMap = new Map<number, number>();
     const activeSessionMap = new Map<number, Date>();
 
     if (friendIds.length > 0) {
       const [completedRows, activeRows] = await Promise.all([
-        prisma.$queryRaw<Array<{ userId: number; seconds: number }>>`
-          SELECT "userId", COALESCE(SUM("durationSeconds"), 0)::int AS seconds
-          FROM "StudySession"
+        prisma.$queryRaw<Array<{ userId: number; seconds: number; todaySeconds: number }>>`
+          SELECT "userId", COALESCE(SUM(CASE WHEN "endedAt" IS NOT NULL THEN "durationSeconds" ELSE 0 END), 0)::int AS seconds,
+            COALESCE(SUM("durationSeconds"), 0)::int AS "todaySeconds"
+          FROM "StudySession" AS s
           WHERE "userId" IN (${Prisma.join(friendIds)})
-            AND "startedAt" >= ${todayStart}
-            AND "endedAt" IS NOT NULL
+            AND CASE WHEN to_jsonb(s)->'executionContext'->>'actualCivilDate' IS NOT NULL
+              THEN to_jsonb(s)->'executionContext'->>'actualCivilDate' = ${TimezoneService.getUserLocalDate(timezone)}
+              ELSE "startedAt" >= ${todayStart} END
           GROUP BY "userId"
         `.catch(() => []),
         prisma.$queryRaw<Array<{ userId: number; startedAt: Date }>>`
           SELECT "userId", MAX("startedAt") AS "startedAt"
-          FROM "StudySession"
+          FROM "StudySession" AS s
           WHERE "userId" IN (${Prisma.join(friendIds)})
             AND "endedAt" IS NULL
+            AND (to_jsonb(s)->>'executionState' = 'RUNNING' OR to_jsonb(s)->>'executionState' IS NULL
+              AND ("startedAt" >= ${new Date(now.getTime() - 180_000)} OR "durationSeconds" > 0 AND "startedAt" >= ${twelveHoursAgo}))
           GROUP BY "userId"
         `.catch(() => []),
       ]);
 
       for (const row of completedRows) {
         completedMap.set(Number(row.userId), Number(row.seconds) || 0);
+        todayMap.set(Number(row.userId), Number(row.todaySeconds ?? row.seconds) || 0);
       }
       for (const row of activeRows) {
         const started = new Date(row.startedAt);
@@ -110,6 +117,8 @@ export async function GET(req: NextRequest) {
         }
       }
     }
+
+    const companions = await selectedCompanionsForUsers(friendIds, userId, "friends");
 
     const result = friends.map((f) => {
       const friendData = f.userId === userId ? f.friend : f.user;
@@ -121,16 +130,8 @@ export async function GET(req: NextRequest) {
 
       // A session is only considered "currently studying" if it started
       // within the last 12 hours (guards against zombie rows).
-      const activeSession =
-        hasActiveSession && activeSessionStarted && activeSessionStarted >= twelveHoursAgo
-          ? activeSessionStarted
-          : null;
-
-      const activeElapsed = activeSession
-        ? Math.max(0, Math.floor((now.getTime() - activeSession.getTime()) / 1000))
-        : 0;
-
-      const todaySeconds = completedTodaySeconds + activeElapsed;
+      const activeSession = activeSessionStarted ?? null;
+      const todaySeconds = todayMap.get(friendId) ?? completedTodaySeconds;
       const todayMinutes = Math.floor(todaySeconds / 60);
       const isOnline = friendData.lastSeenAt
         ? new Date(friendData.lastSeenAt) >= twoMinAgo
@@ -138,6 +139,7 @@ export async function GET(req: NextRequest) {
       const isStudying = Boolean(activeSession) || (isOnline && hasActiveSession);
 
       return {
+        companion: companions.get(friendData.id),
         friendshipId: f.id,
         id: friendData.id,
         name: friendData.name,

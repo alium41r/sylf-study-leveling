@@ -1,0 +1,1000 @@
+{
+  "label": "current",
+  "files": 17,
+  "passed": 225,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 1,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-check-result.test.ts",
+      "cases": [
+        {
+          "name": "planner PostgreSQL check-result persistence lets the owner record a check result and reads it back with its label",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL check-result persistence replaces the value on a second report instead of appending",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL check-result persistence resets a recorded result and stays a no-op once absent",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL check-result persistence rejects a foreign user on set, reset and read without revealing the plan",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL check-result persistence rejects an invalid enum value before writing anything",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL check-result persistence rejects an itemKey that is not the plan's Mastery Check",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL check-result persistence writes nothing but the check-result row: no Quest, revision, node, goal, reward or quota change",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL check-result persistence returns an owner-scoped, projected list of recorded results",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-copilot.test.ts",
+      "cases": [
+        {
+          "name": "planner Copilot against PostgreSQL applies one high-confidence reversible change directly, in a single version increment",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL proposes a multi-command change, applies it atomically, and refuses a stale token",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL persists nothing when one command of a batch is impossible",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL refuses research when the student switched it off, and never searches",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL answers a switched-off research request honestly even with no command to map",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL names the missing prerequisite instead of counting commands",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL names the missing prerequisite even when the model also proposed the fix",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL explains a genuinely mixed request as two confirmation boundaries",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL answers a question with facts, and changes nothing at all",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL asks one clarification instead of guessing, and never changes the brief",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL routes a confirmed-plan change to Phase 5 and mutates nothing",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work releases an unstarted planner-generated item, records the tombstone, and removes the Quest",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work offers a replacement for a released item only while the gap is real, and creates nothing",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work declines once and never asks again",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work accepts a replacement as distinct new work, and never revives the tombstone",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work stops offering once the plan has answered the gap on its own",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work refuses work that has started, and never touches it",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work refuses completed work and work the student has already released",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work denies a foreign account any part of the flow",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work reports an educational gap as a warning rather than a refusal",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL release of generated work does not resurrect released work when the execution snapshot is read again",
+          "status": "passed"
+        },
+        {
+          "name": "planner Copilot against PostgreSQL keeps the exam fixture's availability contract intact for these tests",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-designer.test.ts",
+      "cases": [
+        {
+          "name": "Plan Designer turns against PostgreSQL proposes a multi-fact setup from one opening message, and applies it on one confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL applies a single reversible fact directly, without a confirmation click",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL asks for confirmation when the model is not confident, even for one command",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL keeps the facts it can apply when one of them cannot be placed",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL still refuses outright when nothing in the message can be placed",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL asks only for a missing essential, and reads it from the brief rather than the model",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL asks about the scope first when the goal is named but nothing covers it",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL stops asking entirely once the four essentials are present",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL carries a server-derived summary of the setup on every turn",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL routes research behind a proposal, and runs nothing itself",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL refuses research on a plan whose owner said use only what I give you",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL refuses a research intent with no command, rather than asking a question that implies it will look",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL routes an upload request to the scope step instead of pretending chat can read a file",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL catches an upload request even when the model misreads it as a setup message",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL stays a planner assistant when asked about something else",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL answers a planner question from server facts, and changes nothing",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL refuses more changes than one message may carry",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL refuses to mix a setup change with something it has to go and look up",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL never applies a hard constraint without a confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL asks which one it is when a weekday request is genuinely ambiguous",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL designs before a plan exists, and hands the conversation to the Copilot after",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL refuses a stale, replayed or cross-user setup proposal",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL refuses an expired setup proposal",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL accepts a Copilot turn that carries a transcript",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL carries a bounded transcript and stores nothing about it",
+          "status": "passed"
+        },
+        {
+          "name": "Plan Designer turns against PostgreSQL lets a manual edit and a Designer turn edit the same brief, in both directions",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-intake-service.test.ts",
+      "cases": [
+        {
+          "name": "planner intake service creates a session and reports what is missing, not a fabricated readiness",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service computes the weekly distribution server-side and reaches readiness",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service refuses a stale writer with INTAKE_STALE and leaves the brief untouched",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service applies a typed action once, then replays it without changing anything",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service marks an unavailable day as a weekday constraint or a blocked date",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service edits the scope tree, and editing it invalidates a previous confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service hands generation the real engine contract, with unstated preparedness as null",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service carries the same compact path for ROADMAP and MASTERY into the engine contract",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service refuses generation on an incomplete brief and names what is missing",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service implements every action it advertises, and refuses comparison honestly rather than with NOT_AVAILABLE",
+          "status": "passed"
+        },
+        {
+          "name": "planner intake service keeps one student's intake invisible to another",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-intake-session.test.ts",
+      "cases": [
+        {
+          "name": "intake session expiry policy keeps sessions for the documented TTL and expires inclusively at the boundary",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence creates once, resumes idempotently on the same key, and flags (without mutating) a mode mismatch",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence scopes reads to the owner: a foreign or unknown id is NOT_FOUND",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence applies a patch at the current version, increments version, and slides expiresAt forward",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence throws INTAKE_STALE on a stale version and leaves the row byte-identical",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence rejects an oversized brief with a closed code and writes nothing",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence binds the plan it generated and rejects another user's plan",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence deletes owner-scoped and idempotently",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence deleting a session never deletes the plan or its revisions it was bound to",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence cleanup removes only expired rows, reports the count, and leaves a bound plan intact",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence has RLS enabled, zero client grants, and no Realtime publication",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL intake-session persistence rejects an invalid mode and out-of-bounds client keys at the database",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-mastery.test.ts",
+      "cases": [
+        {
+          "name": "planner PostgreSQL mastery materialization accepts a mastery plan as a real plan and seals it through the shared operation",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization refuses to confirm a subset, because a subset would drop a required stage",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization materializes ordinary Quests with no planner metadata on the Quest row",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization requires acknowledgement when a whole unit is left out, and creates no Quest for it",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization refuses an edit that drops a required stage, and a confirmation whose check lost its prerequisite",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization keeps a sealed mastery revision immutable, so no check result can be written into it",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization projects linked-Quest execution for a mastery plan without inferring anything",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization runs a mastery Quest through canonical Focus settlement, exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization completes the Mastery Check without inventing mastery or new work",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization recovers a mastery generation by key and refuses a second worker",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL mastery materialization returns an empty execution projection before the plan is confirmed",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-phase3.test.ts",
+      "cases": [
+        {
+          "name": "planner UX Phase 3 against PostgreSQL compares the background curriculum with the confirmed scope, and stores only overlap",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL reuses the stored comparison instead of paying for it twice",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL lets the student correct a unit, keeps Sylf's own record, and outranks it afterwards",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL treats a changed background as making the comparison stale rather than applying it",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL answers a whole chapter in one action and keeps the untouched units unstated",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL applies 'studied, confidence not rated' only where the comparison supports it",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL generates from a brief whose preparedness is entirely unstated, and carries only stated facts",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL never lets overlap reach the engine",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL refuses a stale writer, and keeps one account's brief invisible to another",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL flexible draft edits, end to end refuses with the findings, then seals exactly what the student accepted",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL flexible draft edits, end to end refuses an invented acknowledgement, a blocker, and a stale base",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL confirmed scope provenance survives the candidate resolves every confirmed ref after the candidate is cleared, and keeps only what is referenced",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL confirmed scope provenance survives the candidate keeps a user upload as the student's own material, with no public claim",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL confirmed scope provenance survives the candidate withdraws provenance with the confirmation, and replaces it on reconfirmation",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL confirmed scope provenance survives the candidate reads a brief stored before this field existed, without inventing sources",
+          "status": "passed"
+        },
+        {
+          "name": "planner UX Phase 3 against PostgreSQL replays a repeated action key instead of applying the bulk edit twice",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-preference-friction.test.ts",
+      "cases": [
+        {
+          "name": "planner preference learning policy keeps a single observation below the active threshold",
+          "status": "passed"
+        },
+        {
+          "name": "planner preference learning policy treats an explicit confirmation as active regardless of evidence",
+          "status": "passed"
+        },
+        {
+          "name": "planner preference learning policy treats an ignored preference as inactive regardless of evidence",
+          "status": "passed"
+        },
+        {
+          "name": "planner preference learning policy maps evidence to a 0..100 confidence that saturates at the threshold",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence creates both tables with RLS enabled and no client grants",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence rejects invalid preference types and out-of-range numbers at the database",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence rejects invalid friction reason codes and non-UUID item keys at the database",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence increments evidence on repeat observations instead of duplicating rows",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence enforces the NULL-planId partial unique index for general preferences",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence allows the same type to exist both generally and per-plan",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence never surfaces a single observation as an active preference",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence confirms explicitly, ignores for one plan, and resets idempotently",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence confirmation overrides an earlier ignore",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence rejects invalid preference values and enum types before writing",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence shuts out a foreign user on every plan-scoped preference operation",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence records friction idempotently under the unique constraint",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence keeps friction unique per item when no revision is recorded",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence allows distinct reasons for the same item",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence rejects a foreign user and an unknown revision without revealing them",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence writes nothing but the friction row: zero Quests, revisions, links or quota",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence returns a bounded, content-free summary of counts by reason code and item key",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence cascades preference and friction rows away when the plan is deleted",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL preference & friction persistence keeps general preferences independent of any plan deletion",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-rebalance-bounds.test.ts",
+      "cases": [
+        {
+          "name": "planner replan measured envelopes keeps every replan artefact inside its declared envelope",
+          "status": "passed"
+        },
+        {
+          "name": "planner replan measured envelopes measures the A2/A3 context cost and its effect on the payload",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-rebalance-modes.test.ts",
+      "cases": [
+        {
+          "name": "planner PostgreSQL replan by mode rebalances only unexpanded milestones and keeps the expanded period as an anchor",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL replan by mode revises one expanded period without touching its neighbours or the plan pointer",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL replan by mode rebalances the remaining Mastery stages while completed stages stay satisfied",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-rebalance.test.ts",
+      "cases": [
+        {
+          "name": "planner PostgreSQL replan reconciliation keeps protected work untouched and reconciles only the approved item",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL replan reconciliation replays the same confirmation without duplicating anything",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL replan reconciliation fails closed when reality changes after the proposal is sealed",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL replan reconciliation never resurrects deleted or detached work, and refuses to retain it",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL replan reconciliation reports eligibility from live state, spends the rebalance bucket, and leaves a cancelled proposal inert",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL replan reconciliation exposes the diff and the detection state through the plan detail",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-replan-context.test.ts",
+      "cases": [
+        {
+          "name": "planner PostgreSQL A3 replan context sends no A3 context for a plan with no preference or friction history",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL A3 replan context carries repeated preferences and friction reasons as SOFT context only",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL A3 replan context does not learn a preference from a single observation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-research-e2e.test.ts",
+      "cases": [
+        {
+          "name": "Phase 3 §43 — the research arc against PostgreSQL walks intake → research → coverage → confirm → provenance → generate",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 3 §43 — the research arc against PostgreSQL runs one DEEP follow-up round, and the round measurably improves coverage",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 3 §43 — the research arc against PostgreSQL performs no follow-up at STANDARD, and does not spend one on a DEEP run with nothing open",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 3 §43 — the research arc against PostgreSQL clears the candidate when asked to, without touching the confirmed scope",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 3 §43 — the research arc against PostgreSQL refuses a stale writer rather than letting two devices interleave",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 3 §43 — the research arc against PostgreSQL keeps one account's research invisible to another, as a refusal and not an empty view",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-scope-confirmation.test.ts",
+      "cases": [
+        {
+          "name": "scope candidate confirmation does not let an unconfirmed candidate be planned, and says what to do instead",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation confirms exactly what the student chose, with the source kept",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation refuses a decision about a unit that does not exist",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation applies a replayed decision once",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation refuses a stale decision and leaves the brief alone",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation keeps one student's candidate out of another student's reach",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation lets a later edit win, and never restores a removed unit from research",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation withdraws a candidate when the student turns external lookup off",
+          "status": "passed"
+        },
+        {
+          "name": "scope candidate confirmation keeps the board the student chose, because it is what makes a source official",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-stretch.test.ts",
+      "cases": [
+        {
+          "name": "planner PostgreSQL core and stretch confirms CORE only, leaving Stretch planner-owned with no Quest to fall overdue",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL core and stretch refuses to materialize Stretch by selecting it at confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL core and stretch promotes Stretch explicitly into ordinary execution, exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL core and stretch refuses to promote required work, an unknown item, or another user's plan",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL core and stretch refuses optional work the schedule cannot actually fit",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database-unlimited-entitlement.test.ts",
+      "cases": [
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL reserveQuota against the real guarded upsert permits the owner on every feature without writing a single quota row",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL reserveQuota against the real guarded upsert reports the owner's REAL usage while refusing to cap it",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL reserveQuota against the real guarded upsert never refunds a unit the owner never spent",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL reserveQuota against the real guarded upsert still charges an ordinary account, up to its limit and no further",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL reserveQuota against the real guarded upsert still refunds an ordinary account's failed generation",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL reserveQuota against the real guarded upsert gives a neighbouring account no share of the owner's entitlement",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL reserveQuota against the real guarded upsert grants nobody when the entitlement is unconfigured",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL planner operation lifecycle for the owner generates from an exhausted week, persists a BYPASSED receipt, and never charges",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL planner operation lifecycle for the owner replays an idempotent retry without a second reservation or a second revision",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL planner operation lifecycle for the owner recovers a settled operation and reports its bypassed receipt state",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL planner operation lifecycle for the owner releases a failed generation without inventing a refund",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL planner operation lifecycle for the owner expires an abandoned operation and still leaves the counter untouched",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL planner operation lifecycle for the owner permits repeated generations indefinitely",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL ordinary accounts are untouched by the same code path is refused with QUOTA_EXHAUSTED when the week is spent",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL ordinary accounts are untouched by the same code path charges and settles normally while capacity remains",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL ordinary accounts are untouched by the same code path gets its unit back when its reservation is released",
+          "status": "passed"
+        },
+        {
+          "name": "Unlimited AI entitlement on PostgreSQL ordinary accounts are untouched by the same code path is not rescued by the owner's entitlement, and the owner is not harmed by its limits",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/tmp/sylf-changeset3-pg-source/__tests__/planner/database.test.ts",
+      "cases": [
+        {
+          "name": "planner PostgreSQL transactions and routes maps owned Subjects to ordinary PENDING Quests with canonical rewards and no progress",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes does not create a Goal unless explicitly requested",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes fails closed on scheduling data errors and infeasible previews",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects foreign Subjects, plans, revisions and commits without revealing them",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes uses real cookie auth and tokenVersion revocation on the actual routes",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes writes exactly the boundaries it says it does, once each",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rolls back every write when boundary 1/5 fails",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rolls back every write when boundary 2/5 fails",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rolls back every write when boundary 3/5 fails",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rolls back every write when boundary 4/5 fails",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rolls back every write when boundary 5/5 fails",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes replays concurrent double clicks, rejects changed bodies and recovers a lost response",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes serializes two-plan capacity races",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects a stale preview after edit",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects a stale preview after delete",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects a stale preview after complete",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects a stale preview after session",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects a stale preview after rest",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects a stale preview after floating",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects a stale preview after timezone",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes retains stable keys in EDIT revisions and seals content at database level",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes preserves real Focus settlement and rejects the earlier preview after completion",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes allows intentional Goal metadata edits but blocks automatic adjustment before it changes anything",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes preserves explicit whole-account deletion including completed planner history",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes preserves the planner Goal deadline date in a timezone west of UTC",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes preserves deletion tombstones and never recreates them from an edited revision",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes allows safe explicit edits, marks the baseline detached and protects active/finished execution",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes blocks automatic/chat/Goal/cascade mutations while preserving non-planner behavior",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes reserves the final unit once and recovers a crashed operation into its original week",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes settles once with the sealed result and cannot refund successful delivery",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes uses the original daily bucket and rejects conflicting settlement",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes has private RLS/grants, membership constraints, unique lineage, and no public function execution",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes claims one Exam worker and recovers one sealed draft after a lost response",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes cancels Exam provider work and refunds once without late sealing",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes returns structured Exam infeasibility before quota or provider work",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes edits the sealed Exam draft then confirms ordinary Quests exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes seals the A1 semantic review and Definition of Done, and exposes it on ordinary Quests",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes rejects an edit that breaks the completion-condition rules",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes never seals a plan that breaks a HARD constraint, even when the provider keeps returning one",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes confirms a roadmap without creating a single Quest",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes expands one period into ordinary Quests without touching its neighbours",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes refuses to expand a milestone twice, even after its Quests were deleted",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes refuses to expand an unconfirmed roadmap edit or an already pending expansion",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes keeps roadmap planning and period expansion on separate quota buckets",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes requires cookie authentication, owned subjects and strict generation bodies",
+          "status": "passed"
+        },
+        {
+          "name": "planner PostgreSQL transactions and routes live synthetic Exam generation, recovery and confirmation on disposable PostgreSQL",
+          "status": "skipped"
+        }
+      ]
+    }
+  ]
+}

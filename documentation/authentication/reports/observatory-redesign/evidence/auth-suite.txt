@@ -1,0 +1,74 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run __tests__/auth
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+stderr | __tests__/auth/account-settings.test.ts > Phase 3: Account Settings Data Binding & Profile Management > PATCH /api/user/account > successfully updates username & name, signs fresh session token, and sets cookie
+Error updating account: TypeError: __vite_ssr_import_2__.prisma.$transaction is not a function
+    at executionTransaction (/Users/aliumair/Desktop/sylf/lib/execution-coordination.ts:12:27)
+    at Module.PATCH (/Users/aliumair/Desktop/sylf/app/api/user/account/route.ts:113:31)
+    at /Users/aliumair/Desktop/sylf/__tests__/auth/account-settings.test.ts:132:19
+    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | __tests__/auth/account-settings.test.ts > Phase 3: Account Settings Data Binding & Profile Management > PATCH /api/user/account > resets verificationStatus to UNVERIFIED when email address changes
+Error updating account: TypeError: __vite_ssr_import_2__.prisma.$transaction is not a function
+    at executionTransaction (/Users/aliumair/Desktop/sylf/lib/execution-coordination.ts:12:27)
+    at Module.PATCH (/Users/aliumair/Desktop/sylf/app/api/user/account/route.ts:113:31)
+    at /Users/aliumair/Desktop/sylf/__tests__/auth/account-settings.test.ts:188:19
+    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ❯ __tests__/auth/account-settings.test.ts (10 tests | 2 failed) 119ms
+       × successfully updates username & name, signs fresh session token, and sets cookie 28ms
+       × resets verificationStatus to UNVERIFIED when email address changes 6ms
+(node:10546) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/auth/account-settings.test.ts > Phase 3: Account Settings Data Binding & Profile Management > PATCH /api/user/account > successfully updates username & name, signs fresh session token, and sets cookie
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ __tests__/auth/account-settings.test.ts:135:26
+    133|       const data = await res.json();
+    134|
+    135|       expect(res.status).toBe(200);
+       |                          ^
+    136|       expect(data.user.username).toBe("monarch_hunter");
+    137|       expect(data.user.name).toBe("Sung Jin-Woo");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  __tests__/auth/account-settings.test.ts > Phase 3: Account Settings Data Binding & Profile Management > PATCH /api/user/account > resets verificationStatus to UNVERIFIED when email address changes
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ __tests__/auth/account-settings.test.ts:191:26
+    189|       const data = await res.json();
+    190|
+    191|       expect(res.status).toBe(200);
+       |                          ^
+    192|       expect(data.user.verificationStatus).toBe("UNVERIFIED");
+    193|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 9 passed (10)
+      Tests  2 failed | 99 passed (101)
+   Start at  13:57:11
+   Duration  8.82s (transform 2.99s, setup 3.19s, import 6.34s, tests 10.58s, environment 2.13s)
+

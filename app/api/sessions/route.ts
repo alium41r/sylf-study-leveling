@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -13,6 +13,9 @@ const startSessionSchema = z.object({
   subjectId: z.number().int().optional(),
   initialSeconds: z.number().int().min(0).optional(),
   executionProtocol: z.literal(2).optional(),
+  clientSessionKey: z.string().uuid().optional(),
+  startedAt: z.string().datetime().optional(),
+  expectedOwnerId: z.number().int().positive().optional(),
 });
 
 const endSessionSchema = z.object({
@@ -23,15 +26,33 @@ const endSessionSchema = z.object({
   questId: z.number().int().optional(),
   completeQuest: z.boolean().optional(),
   final: z.boolean().optional(),
+  endedAt: z.string().datetime().optional(),
 });
+
+function invalidateSessionViews(userId: number) {
+  invalidateRankingsCache();
+  try {
+    after(async () => {
+      try {
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { username: true } });
+        if (user?.username) {
+          revalidateTag(`user-${user.username.toLowerCase()}`, "max");
+          revalidateTag(`profile-stats-${user.username.toLowerCase()}`, "max");
+        }
+      } catch { /* Cache refresh cannot invalidate a committed settlement. */ }
+    });
+  } catch { /* Direct route tests have no Next.js request lifecycle. */ }
+}
 
 /** Restore an owned authoritative timer after refresh/client takeover. */
 export async function GET(req: NextRequest) {
   const session = await getSession(req);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const owner = req.nextUrl.searchParams.get("expectedOwnerId");
+  if (owner !== null && Number(owner) !== session.userId) return NextResponse.json({ error: "ACCOUNT_CHANGED", message: "Sign in to the original account to sync this saved session." }, { status: 409 });
   const id = Number(req.nextUrl.searchParams.get("id"));
   if (!Number.isSafeInteger(id) || id <= 0) return NextResponse.json({ error: "Invalid session" }, { status: 400 });
-  try { return NextResponse.json({ execution: await durablePlanner().sessions.read(session.userId, id) }); }
+  try { return NextResponse.json(await durablePlanner().sessions.restore(session.userId, id)); }
   catch (error) {
     if (error instanceof DurablePlannerError) return NextResponse.json({ error: error.detail.code, detail: error.detail }, { status: 404 });
     return NextResponse.json({ error: "SAVE_FAILED" }, { status: 503 });
@@ -63,7 +84,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { questId, subjectId, initialSeconds, executionProtocol } = validation.data;
+    const { questId, subjectId, initialSeconds, executionProtocol, clientSessionKey, startedAt, expectedOwnerId } = validation.data;
+    if (expectedOwnerId !== undefined && expectedOwnerId !== userId) return NextResponse.json({ error: "ACCOUNT_CHANGED", message: "Sign in to the original account to sync this saved session." }, { status: 409 });
+    if (Boolean(clientSessionKey) !== Boolean(startedAt)) return NextResponse.json({ error: "A timer identity and start time are required together." }, { status: 400 });
+    const identity = clientSessionKey && startedAt ? { clientSessionKey, startedAt } : undefined;
     if (questId) {
       // Read the V2 marker without requiring its column on an older deployment.
       // This still protects adopted work even if V2 admission is disabled.
@@ -73,12 +97,14 @@ export async function POST(req: NextRequest) {
       `;
       if (linked?.plannedMinutes !== null && linked?.plannedMinutes !== undefined) {
         if (executionProtocol !== 2) return NextResponse.json({ error: "PLANNER_EXECUTION_PROTOCOL_REQUIRED", message: "Update this client before starting this plan's work." }, { status: 409 });
-        const execution = await durablePlanner().sessions.start(userId, questId);
+        const execution = identity ? await durablePlanner().sessions.start(userId, questId, identity, subjectId) : await durablePlanner().sessions.start(userId, questId);
         return NextResponse.json({ id: execution.sessionId, userId, questId, subjectId: subjectId ?? null,
           durationMinutes: Math.floor(execution.acceptedFocusSeconds / 60), durationSeconds: execution.acceptedFocusSeconds,
           startedAt: execution.startedAt, execution }, { status: 201 });
       }
     }
+
+    if (identity) return NextResponse.json(await durablePlanner().sessions.startLegacy(userId, questId, subjectId, identity, executionProtocol === 2), { status: 201 });
 
     // Execute atomic PostgreSQL start_study_session RPC
     const rows = await prisma.$queryRaw<
@@ -125,11 +151,13 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
+    if (body?.expectedOwnerId !== undefined && body.expectedOwnerId !== session.userId)
+      return NextResponse.json({ error: "ACCOUNT_CHANGED", message: "Sign in to the original account to sync this saved session." }, { status: 409 });
     if (body?.executionTransition) {
       const transition = StudySessionTransitionV2Schema.safeParse(body.executionTransition);
       if (!transition.success) return NextResponse.json({ error: "INVALID_OUTPUT", message: "Invalid versioned timer transition." }, { status: 400 });
       const result = await durablePlanner().sessions.transition(session.userId, transition.data);
-      invalidateRankingsCache();
+      invalidateSessionViews(session.userId);
       return NextResponse.json({ ...result.settlement, execution: result.execution, durationSeconds: result.execution.acceptedFocusSeconds,
         breakSeconds: result.execution.acceptedBreakSeconds }, { status: 200 });
     }
@@ -141,14 +169,14 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const { id, durationMinutes, durationSeconds, breakSeconds, questId, completeQuest, final } = validation.data;
+    const { id, durationMinutes, durationSeconds, breakSeconds, questId, completeQuest, final, endedAt } = validation.data;
     const claimedSeconds = durationSeconds ?? durationMinutes * 60;
 
     // ─── S4: SETTLE-CYCLE FLOOD GUARD ──────────────────────────
     // The settle RPC grants a small wall-clock grace (+60s), so a rapid
     // start→settle→start→settle loop could farm XP. Cap final settlements to
     // 6 per rolling 60 seconds per user (real studying never trips this).
-    if (final === true) {
+    if (final === true && !endedAt) {
       const recentSettles = await prisma.studySession.count({
         where: {
           userId: session.userId,
@@ -166,20 +194,9 @@ export async function PATCH(req: NextRequest) {
 
     const rpcResult = await durablePlanner().sessions.settleLegacy(session.userId, {
       id, focus: claimedSeconds, breaks: breakSeconds ?? 0, questId,
-      complete: completeQuest === true, final: final === true,
+      complete: completeQuest === true, final: final === true, ...(endedAt ? { endedAt } : {}),
     });
-    // Cache invalidation is not an economic decision.
-    const userRow = await prisma.user.findUnique({ where: { id: session.userId }, select: { username: true } });
-
-    invalidateRankingsCache();
-
-    const username = userRow?.username;
-    if (username) {
-      try {
-        revalidateTag(`user-${username.toLowerCase()}`, "max");
-        revalidateTag(`profile-stats-${username.toLowerCase()}`, "max");
-      } catch {}
-    }
+    invalidateSessionViews(session.userId);
 
     // Respond immediately with the RPC result — no trailing re-read.
     return NextResponse.json(

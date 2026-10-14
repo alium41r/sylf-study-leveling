@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 2,
+  "status": "PREPARED_AWAITING_APPROVAL",
+  "seed": "sylf-diagnostic-1",
+  "primaryDispatches": 20,
+  "maximumTotalDispatches": 20,
+  "maximumRecoveryDispatches": 0,
+  "maximumSpendUsd": 0.4,
+  "publication": "FORBIDDEN",
+  "casesSignedOff": false,
+  "runs": [
+    {
+      "trialId": "d_4455ae843acc1082",
+      "category": "REASONING",
+      "caseId": "g01",
+      "variant": "prose",
+      "packet": "model/packets/d_4455ae843acc1082.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4842,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_0f51cb688400b89c",
+      "category": "REASONING",
+      "caseId": "g08",
+      "variant": "prose",
+      "packet": "model/packets/d_0f51cb688400b89c.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4189,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_d5011475b34a9da1",
+      "category": "REASONING",
+      "caseId": "g02",
+      "variant": "prose",
+      "packet": "model/packets/d_d5011475b34a9da1.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4575,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_ac6e119faa6748a5",
+      "category": "REASONING",
+      "caseId": "g06",
+      "variant": "prose",
+      "packet": "model/packets/d_ac6e119faa6748a5.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4163,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_63ea398f0b23e2f0",
+      "category": "REASONING",
+      "caseId": "g03",
+      "variant": "prose",
+      "packet": "model/packets/d_63ea398f0b23e2f0.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 5147,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_28b1cf3e53f64ddf",
+      "category": "REASONING",
+      "caseId": "g04",
+      "variant": "prose",
+      "packet": "model/packets/d_28b1cf3e53f64ddf.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 5068,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_2f5488d294f95e29",
+      "category": "REASONING",
+      "caseId": "g07",
+      "variant": "prose",
+      "packet": "model/packets/d_2f5488d294f95e29.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4337,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_3284c39bab869cee",
+      "category": "REASONING",
+      "caseId": "g05",
+      "variant": "prose",
+      "packet": "model/packets/d_3284c39bab869cee.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4187,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "caseId": "v09",
+      "variant": "fixed",
+      "packet": "model/packets/d_21da0ca3d648bd22.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11303,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "caseId": "v04",
+      "variant": "fixed",
+      "packet": "model/packets/d_6de45b407ca18e60.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11939,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_23cb1deab0819ac1",
+      "category": "REVIEW",
+      "caseId": "v08",
+      "variant": "fixed",
+      "packet": "model/packets/d_23cb1deab0819ac1.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11134,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_39bd912910b6cdc4",
+      "category": "REVIEW",
+      "caseId": "v02",
+      "variant": "fixed",
+      "packet": "model/packets/d_39bd912910b6cdc4.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11352,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_aa0fdce6c965934e",
+      "category": "REVIEW",
+      "caseId": "v07",
+      "variant": "fixed",
+      "packet": "model/packets/d_aa0fdce6c965934e.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 17467,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_edc200cbc63de947",
+      "category": "REVIEW",
+      "caseId": "v12",
+      "variant": "fixed",
+      "packet": "model/packets/d_edc200cbc63de947.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11544,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_162f3a5840b6d145",
+      "category": "REVIEW",
+      "caseId": "v01",
+      "variant": "fixed",
+      "packet": "model/packets/d_162f3a5840b6d145.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11110,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_b949be4c907cfe4b",
+      "category": "REVIEW",
+      "caseId": "v11",
+      "variant": "fixed",
+      "packet": "model/packets/d_b949be4c907cfe4b.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11718,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_2c793f9cde3e05f1",
+      "category": "REVIEW",
+      "caseId": "v10",
+      "variant": "fixed",
+      "packet": "model/packets/d_2c793f9cde3e05f1.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11080,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_d4791a8b4cdede65",
+      "category": "REVIEW",
+      "caseId": "v06",
+      "variant": "fixed",
+      "packet": "model/packets/d_d4791a8b4cdede65.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11656,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_ea74e8dff125fb1c",
+      "category": "REVIEW",
+      "caseId": "v05",
+      "variant": "fixed",
+      "packet": "model/packets/d_ea74e8dff125fb1c.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11158,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_e9c5b907ca74eaa2",
+      "category": "REVIEW",
+      "caseId": "v03",
+      "variant": "fixed",
+      "packet": "model/packets/d_e9c5b907ca74eaa2.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 21067,
+      "dependencies": []
+    }
+  ],
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v2",
+  "model": "deepseek-flash",
+  "modelVersion": "DeepSeek-V4.1-Flash",
+  "allowFallback": false,
+  "perCaseAttempts": 1,
+  "wholeBatchInputReservationUnits": 189036,
+  "wholeBatchOutputTokenCap": 114688,
+  "reservedNanodollars": 194336400
+}

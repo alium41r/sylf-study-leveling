@@ -1,0 +1,64 @@
+{
+  "assessedAt": "2026-10-08T18:36:36.457Z",
+  "method": "Manual independent inspection of actual raw outputs, final checkpoint, findings, declared expectations, workload arithmetic and canonical apply receipts; no model self-approval/apply shortcut.",
+  "status": "FAILED",
+  "accepted": 1,
+  "total": 3,
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "accepted": false,
+      "reasons": [
+        "The genuine review finding reaches a REPAIR call, but its response copies a server digest and presupposes a future tutor/key. Strict validation rejects it; fallback cannot consume held verification capacity. No verification or apply occurs."
+      ],
+      "limits": [
+        "Review also overstates external-key requirements; invalid repair is not an accepted witness."
+      ]
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "accepted": true,
+      "reasons": [
+        "Supplied 12 V/3 Ω/6 Ω and unaided 24 V/4 Ω/8 Ω examples have correct checks. Two tasks total50minutes within the declared range and below the control proposal55minutes. Optional additional work stays uncommitted and stopping follows one changed demonstration."
+      ],
+      "limits": [
+        "The control fails publication; this is one proposed-work comparison, not paired reliable acceptance. Reviewer warning demands unsupported extra complexity."
+      ]
+    },
+    {
+      "id": "triage",
+      "accepted": false,
+      "reasons": [
+        "Required contribution is missing initially and fallback reference arrays are malformed. Strict rejection prevents publication. Rejected output also claims50minutes but books65."
+      ],
+      "limits": []
+    }
+  ],
+  "metrics": {
+    "externalAttempts": 7,
+    "settledCalls": 7,
+    "unknownSpendCalls": 0,
+    "knownInputTokens": 38361,
+    "knownOutputTokens": 8079,
+    "unknownReservedInputTokens": 0,
+    "unknownReservedOutputTokens": 0,
+    "unknownPricingReceipts": 7,
+    "truncatedResponses": 0,
+    "completeSTOPReplies": 7,
+    "providerErrors": [],
+    "fallbackDispatches": 1,
+    "repairCalls": 1,
+    "verificationCalls": 0,
+    "caseLatencyMs": {
+      "median": 17233,
+      "maximum": 21085
+    },
+    "upstreamLatencyMs": {
+      "median": 7558,
+      "maximum": 11138
+    }
+  },
+  "naturalAcceptedRepairVerificationApplyWitness": false,
+  "productionConfigurationChanged": false
+}

@@ -1,0 +1,295 @@
+{
+  "status": "SIGNED_OFF",
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v2",
+  "assessor": "Independent AI-agent reviewer /root/independent_label_signoff",
+  "assessorKind": "INDEPENDENT_AI_AGENT",
+  "independentOfAuthor": true,
+  "independentOfTestedModel": true,
+  "reviewedAt": "2026-10-09T12:18:16.103299+00:00",
+  "generationRubricsChecked": 8,
+  "candidateLabelsChecked": 12,
+  "labelsSha256": "e5c949fad59e7ba3d5bea2b2244b772bec5df4176a6812e8d456f52304a322ec",
+  "casesSha256": "21345bd78e1dd784c36df402ba16a44a2ad067b694b60ef03173e730ab9faed6",
+  "rubricSha256": "8dd0ad4d74a1deb7e165972a3b4635cf271a831310200838bbf07ad1a4b13c7d",
+  "candidateSha256": {
+    "v01": "fb1fa1644815755cee2a8a9a6d1e69ac3095885956728522fe273bdda2cb4486",
+    "v02": "0ee3ebc8bba39bfde3b93e100493f23ca9d0442d9981fcb5b8af6808b80b5390",
+    "v03": "031e35636fbda59de395fa97384f42c17af44aec883949f52e49215dd9877636",
+    "v04": "042331d15688d7f2c89cb85cfb82aed1868e88003af78734f51aee02508db7ed",
+    "v05": "04c1e7e3f7f5c35e319d8fe769a55e683f8c19a39dfeca236a171394062ca110",
+    "v06": "2e205fa22e3628eb011dc036194214f805abce483c4c1d965e7eaf5d438669cf",
+    "v07": "524a5bf48630c0e3a3c6ac7c9bd6ea2493dc200af97e2749a9faea914d1e6a7e",
+    "v08": "3e4a9151e1cbec3981f2be5ef5af7cc2a56a33721f56a4ed5c71cc990290fcd6",
+    "v09": "f89020597a86caebf906175445dd3bd418874287bddfe445ee02e5c7bd178a5d",
+    "v10": "914fe738addb60696bde92927516beb0679b565ab2aae7d57505dde374036d64",
+    "v11": "c515206a003f387000fea534564b3b020119083321a86174822b4d212e1d108f",
+    "v12": "3ca67a5f6c8e1880de9c09a2578b11e16007ea684993d3297ad7e276672d99a3"
+  },
+  "notes": [
+    "One separately delegated AI agent reviewed the unchanged active bank after explicit human authorization. This is not human educational signoff or permission to spend.",
+    "Initial judgments were recorded before consulting authoring/labels/rubric; known tasks and class mixture limit blinding.",
+    "Four optional notes are retained and resolved under the existing rubric; the reviewer accepted the disposition. No frozen bank or runtime changes were required.",
+    "Historical PENDING_HUMAN_REVIEW label metadata remains unchanged. This dated AI-agent receipt is the operative independent-label gate.",
+    "Post-run severe failures and disputed findings still require independent adjudication; this review cannot prejudge absent provider outputs."
+  ],
+  "checks": [
+    {
+      "caseId": "g01",
+      "category": "REASONING",
+      "initialJudgment": "FACT_GROUNDED_REASONING_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "g02",
+      "category": "REASONING",
+      "initialJudgment": "BOUNDED_DATA_INTERPRETATION_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "g03",
+      "category": "REASONING",
+      "initialJudgment": "CONSENT_AWARE_NEXT_CHECKPOINT_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "g04",
+      "category": "REASONING",
+      "initialJudgment": "BEGINNER_LOCAL_CARD_CHECKPOINT_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "g05",
+      "category": "REASONING",
+      "initialJudgment": "BOUNDED_PRODUCTION_AND_REASON_CHECK_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "g06",
+      "category": "REASONING",
+      "initialJudgment": "CORRECT_ARGUMENT_TRANSFER_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "g07",
+      "category": "REASONING",
+      "initialJudgment": "ACTUAL_ASSIGNMENT_COMPLETION_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N03",
+        "N04"
+      ]
+    },
+    {
+      "caseId": "g08",
+      "category": "REASONING",
+      "initialJudgment": "ACTUAL_RHYTHM_COMPLETION_REQUIRED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v01",
+      "category": "REVIEW",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v02",
+      "category": "REVIEW",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v03",
+      "category": "REVIEW",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v04",
+      "category": "REVIEW",
+      "initialJudgment": "CONCRETE_VIOLATION",
+      "initialSeverity": "BLOCKING",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v05",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v06",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v07",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v08",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N02",
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v09",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_PREFERENCE_ALLOWED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N01",
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v10",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_PREFERENCE_ALLOWED",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v11",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_REASONABLE_UNCERTAINTY",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    },
+    {
+      "caseId": "v12",
+      "category": "REVIEW",
+      "initialJudgment": "NO_CONCRETE_BLOCKER_REASONABLE_UNCERTAINTY",
+      "initialSeverity": "NONE",
+      "agreement": "AGREE",
+      "materialDisagreement": false,
+      "optionalNoteIds": [
+        "N04"
+      ]
+    }
+  ],
+  "humanSignoff": false,
+  "initialJudgmentsRecordedAt": "2026-10-09T12:11:45.370771+00:00",
+  "paidCallsMade": 0,
+  "paidExecutionAuthorized": false,
+  "materialFindings": 0,
+  "unresolvedMaterialFindings": 0,
+  "mandatoryCorrections": 0,
+  "optionalNotes": 4,
+  "reviewEvidenceSha256": {
+    "initial-block/independent-review-agent.md": "5ead1d744db51c994bf2d7552c1eb950bef37c16719eab6e02552a7e9178e04f",
+    "initial-block/independent-review-agent.json": "1bc8bddf6156599aea3436ba42aadef66f678bb1f09e1f30dfab47346c0251a4",
+    "initial-block/SIGNOFF_RESOLUTION.md": "1c8c05763ccc686e236871cfe89a33d9b0a855860d9df4c269db6d035de9e638"
+  },
+  "activePacketSha256": {
+    "model/packets/d_4455ae843acc1082.json": "dcc02ea0ced4a7eadadd2b65674b9a314e5fd6897110b16e08653deec34dcf8e",
+    "model/packets/d_d5011475b34a9da1.json": "9b88ab43dd7c9e35d29cce2f38d8df0452e367df05937f50f3274e966f920f2f",
+    "model/packets/d_63ea398f0b23e2f0.json": "cc1a9477590972458031fce41534c83b2dba50e40fe0f80d286410f45723af84",
+    "model/packets/d_28b1cf3e53f64ddf.json": "80432668033ed9ec240edfe93940e2554fdf67cb705f5d241555a8b37c5c6cdc",
+    "model/packets/d_3284c39bab869cee.json": "e0c6dcaf4aa0c75467cf4e83e6fc53c843756674b000bc04aa377500d725f07f",
+    "model/packets/d_ac6e119faa6748a5.json": "4ac1a1ab2fc41689ec1d6acb9ee4091fda7febf50c62d6bae4fd15ecb1e86344",
+    "model/packets/d_2f5488d294f95e29.json": "bd3bf65747f52c03f8c90076c23851c0b86121959bc42b229089fc2bad5125a5",
+    "model/packets/d_0f51cb688400b89c.json": "e7e003aee91b5b5d429640b36b391342839b487fd0cfc8a3b2f19d4f2ff5cfed",
+    "model/packets/d_162f3a5840b6d145.json": "82d737934947194602386660a434ff32e0442c991b6c6cf4d20e80aca9810e27",
+    "model/packets/d_39bd912910b6cdc4.json": "4e94bb8b47cdfde922865fbdeb7dab33a5248c581e7645aefc00b115c2a60c07",
+    "model/packets/d_e9c5b907ca74eaa2.json": "e250b2d07ae8f70fee5bb41752a12fa0101d788bf792f66b74489f39a1f7662b",
+    "model/packets/d_6de45b407ca18e60.json": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+    "model/packets/d_ea74e8dff125fb1c.json": "79145a4b225630aa4c44eefb511fe9ef7e853e849c28bbfe4ecaf97e3190306d",
+    "model/packets/d_d4791a8b4cdede65.json": "f21771d2444166d245cbbcc8b59e85f416d3253f17ce63a1338fe40ea077cf51",
+    "model/packets/d_aa0fdce6c965934e.json": "da7d98966b3e63950a6d442e4a0e33e5ec9d1ab199b11e458284290a114f9ca6",
+    "model/packets/d_23cb1deab0819ac1.json": "2ccea2aa936e8967f5363a694a8c5c4d391cb6083a1b1408a91be5378d4cd1d0",
+    "model/packets/d_21da0ca3d648bd22.json": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+    "model/packets/d_2c793f9cde3e05f1.json": "59e5cef794a763f6eb20bfffab4cf9990cab475eac27680d626d2aa04feb7bb1",
+    "model/packets/d_b949be4c907cfe4b.json": "c0948231682d81d299578c41f4335c9da4bdee5f5f3252c5993b9cfca49c6de1",
+    "model/packets/d_edc200cbc63de947.json": "cb1fb320cdea149f3b80466c0b19857a55bb0a33b429d15f6efff833ce10afc8"
+  }
+}

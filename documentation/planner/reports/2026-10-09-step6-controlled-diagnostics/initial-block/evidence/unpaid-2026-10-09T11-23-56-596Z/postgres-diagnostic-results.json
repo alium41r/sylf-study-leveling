@@ -1,0 +1,27 @@
+{
+  "label": "diagnostic",
+  "files": 1,
+  "passed": 0,
+  "failed": 1,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "controlled first block through frozen dispatcher and genuine durable accounting",
+      "messages": [
+        "ZodError: [\n  {\n    \"code\": \"custom\",\n    \"path\": [],\n    \"message\": \"Planning requires authorized Plan targets\"\n  },\n  {\n    \"code\": \"custom\",\n    \"path\": [\n      \"targets\"\n    ],\n    \"message\": \"Use the joint operation for two targets\"\n  }\n]\n    at AttemptService.enqueueAccepted (/Users/aliumair/Desktop/sylf/dist/planner-worker/planner/v2/server/attempts.js:120:60)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at PlannerDatabase.coordinated (/Users/aliumair/Desktop/sylf/dist/planner-worker/planner/v2/server/database.js:104:32)\n    at meterFactory (/Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/postgres.test.ts:35:25)\n    at runBlock (/Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/block.cjs:73:24)\n    at /Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/postgres.test.ts:31:20\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/postgres.test.ts",
+      "cases": [
+        {
+          "name": "controlled first block through frozen dispatcher and genuine durable accounting",
+          "status": "failed"
+        }
+      ]
+    }
+  ]
+}

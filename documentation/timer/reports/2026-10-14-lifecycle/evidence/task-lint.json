@@ -1,0 +1,837 @@
+[
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/timer-lifecycle.postgres.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/timer/auth-recovery.test.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/timer/focus-lifecycle.test.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/timer/party-lifecycle.test.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/timer/session-route.test.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/timer/stats-recovery.test.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/timer/time-read-model.test.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/__tests__/timer/timer-sync.test.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/api/focus-party/[id]/session/timer/route.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/api/friends/route.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/api/sessions/route.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/api/subjects/route.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/api/user/stats/route.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/components/AuthProvider.tsx",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "message": "Unexpected any. Specify a different type.",
+        "line": 36,
+        "column": 21,
+        "nodeType": "TSAnyKeyword",
+        "messageId": "unexpectedAny",
+        "endLine": 36,
+        "endColumn": 24,
+        "suggestions": [
+          {
+            "messageId": "suggestUnknown",
+            "fix": {
+              "range": [
+                930,
+                933
+              ],
+              "text": "unknown"
+            },
+            "desc": "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+          },
+          {
+            "messageId": "suggestNever",
+            "fix": {
+              "range": [
+                930,
+                933
+              ],
+              "text": "never"
+            },
+            "desc": "Use `never` instead, this is useful when instantiating generic type parameters that you don't need to know the type of."
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "message": "Unexpected any. Specify a different type.",
+        "line": 38,
+        "column": 17,
+        "nodeType": "TSAnyKeyword",
+        "messageId": "unexpectedAny",
+        "endLine": 38,
+        "endColumn": 20,
+        "suggestions": [
+          {
+            "messageId": "suggestUnknown",
+            "fix": {
+              "range": [
+                1016,
+                1019
+              ],
+              "text": "unknown"
+            },
+            "desc": "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+          },
+          {
+            "messageId": "suggestNever",
+            "fix": {
+              "range": [
+                1016,
+                1019
+              ],
+              "text": "never"
+            },
+            "desc": "Use `never` instead, this is useful when instantiating generic type parameters that you don't need to know the type of."
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/components/GlobalSystemWrapper.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/components/TimerSyncWorker.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "message": "Unexpected any. Specify a different type.",
+        "line": 108,
+        "column": 46,
+        "nodeType": "TSAnyKeyword",
+        "messageId": "unexpectedAny",
+        "endLine": 108,
+        "endColumn": 49,
+        "suggestions": [
+          {
+            "messageId": "suggestUnknown",
+            "fix": {
+              "range": [
+                5080,
+                5083
+              ],
+              "text": "unknown"
+            },
+            "desc": "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+          },
+          {
+            "messageId": "suggestNever",
+            "fix": {
+              "range": [
+                5080,
+                5083
+              ],
+              "text": "never"
+            },
+            "desc": "Use `never` instead, this is useful when instantiating generic type parameters that you don't need to know the type of."
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/purity",
+        "severity": 2,
+        "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\n/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx:121:63\n  119 |   // by tick counters. Backgrounded tabs, throttled intervals, and sleep/\n  120 |   // wake gaps are therefore credited exactly.\n> 121 |   const snapRef = useRef<TimerSnapshot>(createInitialSnapshot(Date.now()));\n      |                                                               ^^^^^^^^^^ Cannot call impure function\n  122 |   const lastPersistRef = useRef(0);\n  123 |   const lastCheckpointRef = useRef(0);\n  124 |   const sessionStartPendingRef = useRef(false);",
+        "line": 121,
+        "column": 63,
+        "nodeType": null,
+        "endLine": 121,
+        "endColumn": 73,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "message": "Unexpected any. Specify a different type.",
+        "line": 153,
+        "column": 31,
+        "nodeType": "TSAnyKeyword",
+        "messageId": "unexpectedAny",
+        "endLine": 153,
+        "endColumn": 34,
+        "suggestions": [
+          {
+            "messageId": "suggestUnknown",
+            "fix": {
+              "range": [
+                7282,
+                7285
+              ],
+              "text": "unknown"
+            },
+            "desc": "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+          },
+          {
+            "messageId": "suggestNever",
+            "fix": {
+              "range": [
+                7282,
+                7285
+              ],
+              "text": "never"
+            },
+            "desc": "Use `never` instead, this is useful when instantiating generic type parameters that you don't need to know the type of."
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx:211:11\n  209 |         const active = parsed.modes?.find((m: ModeConfig) => m.isActive);\n  210 |         if (active) {\n> 211 |           setActiveMode(active);\n      |           ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  212 |         }\n  213 |       }\n  214 |     } catch { /* default to pomodoro/freeflow */ }",
+        "line": 211,
+        "column": 11,
+        "nodeType": null,
+        "endLine": 211,
+        "endColumn": 24,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array.",
+        "line": 373,
+        "column": 6,
+        "nodeType": "ArrayExpression",
+        "endLine": 373,
+        "endColumn": 52,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [cacheKey, legacyCacheKey, timerKey, user, user.id]",
+            "fix": {
+              "range": [
+                16364,
+                16410
+              ],
+              "text": "[cacheKey, legacyCacheKey, timerKey, user, user.id]"
+            }
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx:654:9\n  652 |       if (remaining === 0) {\n  653 |         setCountdown(null); // Already reached time, straight to overtime\n> 654 |         setPhaseLabel(\"QUEST OVERTIME\");\n      |         ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  655 |         phaseLabelRef.current = \"QUEST OVERTIME\";\n  656 |       } else {\n  657 |         setCountdown(remaining);",
+        "line": 654,
+        "column": 9,
+        "nodeType": null,
+        "endLine": 654,
+        "endColumn": 22,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx:980:12\n  978 |   useEffect(() => {\n  979 |     if (questId && isPrimary && user) {\n> 980 |       void ensureSession(); getTimerSync(user.id).wake();\n      |            ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  981 |     }\n  982 |   }, [questId, isPrimary, user, ensureSession]);\n  983 |",
+        "line": 980,
+        "column": 12,
+        "nodeType": null,
+        "endLine": 980,
+        "endColumn": 25,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/purity",
+        "severity": 2,
+        "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\n/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx:1243:54\n  1241 |     setIsEnding(true); setEndError(null);\n  1242 |     // Freeze at the click, including fractions since the last render/tick.\n> 1243 |     snapRef.current = pauseSnapshot(snapRef.current, Date.now());\n       |                                                      ^^^^^^^^^^ Cannot call impure function\n  1244 |     syncStateFromSnapshot(); setIsPaused(true); isPausedRef.current = true;\n  1245 |     try {\n  1246 |       const journal = ensureJournal();",
+        "line": 1243,
+        "column": 54,
+        "nodeType": null,
+        "endLine": 1243,
+        "endColumn": 64,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/purity",
+        "severity": 2,
+        "message": "Error: Cannot call impure function during render\n\n`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).\n\n/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx:1248:46\n  1246 |       const journal = ensureJournal();\n  1247 |       if (!user) throw new Error(\"Sign in to save your session.\");\n> 1248 |       const d = deriveTimer(snapRef.current, Date.now());\n       |                                              ^^^^^^^^^^ Cannot call impure function\n  1249 |       getTimerSync(user.id).finish(journal.clientKey, d.focusSec, d.breakSec, completeQuest);\n  1250 |       snapRef.current.phase = \"done\"; phaseRef.current = \"done\"; setPhase(\"done\");\n  1251 |       broadcastSnapshot();",
+        "line": 1248,
+        "column": 46,
+        "nodeType": null,
+        "endLine": 1248,
+        "endColumn": 56,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/aliumair/Desktop/sylf/app/focus/components/FocusScreen.tsx:1375:7\n  1373 |     if (intervalMin <= 0) return;\n  1374 |     if (elapsedSeconds > 0 && elapsedSeconds % (intervalMin * 60) === 0) {\n> 1375 |       setFlowNudge(true);\n       |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  1376 |       const timer = setTimeout(() => setFlowNudge(false), 12000);\n  1377 |       return () => clearTimeout(timer);\n  1378 |     }",
+        "line": 1375,
+        "column": 7,
+        "nodeType": null,
+        "endLine": 1375,
+        "endColumn": 19,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/focus/components/FocusTimerLayoutProps.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/focus/hooks/useTimerLeadership.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/hooks/useFocusPartyRealtime.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/social/components/focus-party/FocusPartyContext.tsx",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useMemo has an unnecessary dependency: 'exitRevision'. Either exclude it or remove the dependency array.",
+        "line": 228,
+        "column": 6,
+        "nodeType": "ArrayExpression",
+        "endLine": 228,
+        "endColumn": 44,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [currentUserId, exitKey]",
+            "fix": {
+              "range": [
+                8881,
+                8919
+              ],
+              "text": "[currentUserId, exitKey]"
+            }
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/app/timer/components/TimerScreen.tsx",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "message": "Unexpected any. Specify a different type.",
+        "line": 27,
+        "column": 40,
+        "nodeType": "TSAnyKeyword",
+        "messageId": "unexpectedAny",
+        "endLine": 27,
+        "endColumn": 43,
+        "suggestions": [
+          {
+            "messageId": "suggestUnknown",
+            "fix": {
+              "range": [
+                897,
+                900
+              ],
+              "text": "unknown"
+            },
+            "desc": "Use `unknown` instead, this will force you to explicitly, and safely assert the type is correct."
+          },
+          {
+            "messageId": "suggestNever",
+            "fix": {
+              "range": [
+                897,
+                900
+              ],
+              "text": "never"
+            },
+            "desc": "Use `never` instead, this is useful when instantiating generic type parameters that you don't need to know the type of."
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/aliumair/Desktop/sylf/app/timer/components/TimerScreen.tsx:100:5\n   98 |\n   99 |   useEffect(() => {\n> 100 |     fetchSubjectsAndQuests();\n      |     ^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  101 |     const onSync = (event: Event) => {\n  102 |       if ((event as CustomEvent<{ ownerId: number }>).detail?.ownerId === user?.id) void fetchSubjectsAndQuests();\n  103 |     };",
+        "line": 100,
+        "column": 5,
+        "nodeType": null,
+        "endLine": 100,
+        "endColumn": 27,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      },
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'fetchSubjectsAndQuests'. Either include it or remove the dependency array.",
+        "line": 108,
+        "column": 6,
+        "nodeType": "ArrayExpression",
+        "endLine": 108,
+        "endColumn": 16,
+        "suggestions": [
+          {
+            "desc": "Update the dependencies array to be: [fetchSubjectsAndQuests, user?.id]",
+            "fix": {
+              "range": [
+                3789,
+                3799
+              ],
+              "text": "[fetchSubjectsAndQuests, user?.id]"
+            }
+          }
+        ],
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/api-transport.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/focus-party-service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/focus-party-types.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/game-engine.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/planner/v2/contracts/session.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/planner/v2/server/sessions.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/planner/v2/server/settlement.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/planner/v2/session-client.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/session-math.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/timer-engine.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/timer-sync.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/scripts/test-timer-postgres.mjs",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/scripts/verify-timer-build.mjs",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "/Users/aliumair/Desktop/sylf/lib/prisma.ts",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 57,
+        "column": 29,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 57,
+        "endColumn": 54,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  }
+]

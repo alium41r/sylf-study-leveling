@@ -252,7 +252,7 @@ describe("Focus Tools Dock & Expandable Window System", () => {
 
       // Verify all tool launcher tiles appear immediately on first click
       expect(screen.getByLabelText("Calculator")).toBeDefined();
-      expect(screen.getByLabelText("AI Assistant")).toBeDefined();
+      expect(screen.getByLabelText("Sylvie")).toBeDefined();
       expect(screen.getByLabelText("Audio Mixer")).toBeDefined();
       expect(screen.getByLabelText("Scratchpad")).toBeDefined();
       expect(screen.getByLabelText("Formulas")).toBeDefined();
@@ -570,15 +570,15 @@ describe("Focus Tools Dock & Expandable Window System", () => {
       expect(screen.getByText("SYSTEM CALCULATOR")).toBeDefined();
       expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
 
-      // Open Tool 3: AI Assistant (exceeds limit 2 -> oldest inactive tool Calculator should be replaced)
+      // Open Tool 3: Sylvie (exceeds limit 2 -> oldest inactive tool Calculator should be replaced)
       act(() => {
-        fireEvent.click(screen.getByLabelText("AI Assistant"));
+        fireEvent.click(screen.getByLabelText("Sylvie"));
       });
 
-      // Max 2 containers: Calculator closed, Scratchpad and AI Assistant open!
+      // Max 2 containers: Calculator closed, Scratchpad and Sylvie open!
       expect(screen.queryByText("SYSTEM CALCULATOR")).toBeNull();
       expect(screen.getByText("FOCUS SCRATCHPAD")).toBeDefined();
-      expect(screen.getByText("AI STUDY ASSISTANT")).toBeDefined();
+      expect(screen.getByText("SYLVIE")).toBeDefined();
     });
 
     it("ensures there is only 1 multi-tool mode button rendered without duplicates in window headers", () => {
@@ -865,7 +865,7 @@ describe("Focus Tools Dock & Expandable Window System", () => {
         );
       });
 
-      const input = screen.getByPlaceholderText(/Ask AI/i) as HTMLTextAreaElement;
+      const input = screen.getByPlaceholderText(/Ask Sylvie/i) as HTMLTextAreaElement;
       fireEvent.change(input, { target: { value: "Explain Snell's law" } });
       expect(input.value).toBe("Explain Snell's law");
 

@@ -273,13 +273,20 @@ const dotSites = [
   [89, 25],
 ];
 const variants = Object.keys(compositions) as Variant[];
+// Auth borrows the landing's closing foliage, with its ornaments kept inside the island.
+const authComposition: Composition = {
+  ...compositions.finale,
+  strings: [[], []],
+  lantern: undefined,
+  stars: 0,
+};
 function vars(values: Record<string, number | string>): CSSProperties {
   return values as CSSProperties;
 }
 
-export default function CelestialDecor({ variant }: { variant: Variant }) {
-  const scene = compositions[variant];
-  const sectionIndex = variants.indexOf(variant);
+export default function CelestialDecor({ variant }: { variant: Variant | "auth" }) {
+  const scene = variant === "auth" ? authComposition : compositions[variant];
+  const sectionIndex = variant === "auth" ? variants.length : variants.indexOf(variant);
   return (
     <div
       className={styles.world}

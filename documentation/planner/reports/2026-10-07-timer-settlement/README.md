@@ -1,6 +1,6 @@
 # Timer settlement compatibility — 7 October 2026
 
-Status: **FIX IMPLEMENTED AND VERIFIED; DEPLOYMENT PENDING**.
+Status: **FIX IMPLEMENTED AND VERIFIED; LIVE-PAGE VERIFICATION PENDING**.
 
 The user reported that End repeatedly failed on the deployed site. This is an additional authorized fix alongside the ongoing Phase 2 work, not intended Planner behavior or Phase 3 work.
 
@@ -21,11 +21,11 @@ Every legacy progress/final request uses `SessionService.settleLegacy`. The sess
 - [Timer/transport tests](evidence/timer-tests.json): **62 passed**, including owned legacy start, V2 protocol protection and canonical final settlement.
 - [Disposable PostgreSQL results](evidence/postgres-harness-run.json): **407 passed, zero required skips** (182 durable service cases and 225 existing regression cases). The added database test exercises a real transaction-local legacy history table without V2 columns, a V2 history row whose accepted civil date differs from its old timestamp, and one-time weekly award replay.
 - Both compatible queries plan successfully on the configured older database. The previous statements fail with `42703`.
-- Scoped ESLint and worker TypeScript checks pass. Full repository typecheck still reports the previously documented generated Next.js route/page errors; none names the changed timer files. No unrelated owners were edited.
-- An isolated production compilation is being refreshed as part of Step 6; its final result will be recorded here.
+- Scoped ESLint and worker TypeScript checks pass. The final Step 6 full repository typecheck also passes; earlier generated Next.js route/page failures are retained as historical evidence. No unrelated owners were edited.
+- The refreshed isolated production build compiles successfully, then stops at the unchanged unrelated Acoustics `CURATED_SOUNDSCAPES` route-export blocker. [Step 6 build evidence](../2026-10-03-phase-2/evidence/step6-build.json) records the final source pins and preserved companion-file deletions.
 
 ## Deployment and remaining verification
 
-This repository change has not been deployed. The deployed site's End button must be checked after deployment; a local/unit success is not a claim that the live page has changed. No user session was ended or replayed during investigation. The fix does not require applying V2 migrations to the deployed database.
+The user committed this fix as `0edfcc0` (`timer fix`). This investigation did not deploy it or observe the current deployment. The deployed site's End button must still be checked; a local/unit success is not a claim that the live page has changed. No user session was ended or replayed during investigation. The fix does not require applying V2 migrations to the deployed database.
 
 The timer defect and its evidence are separate from the still-incomplete Phase 2 live educational acceptance gate. [Phase 2 continuation](../2026-10-03-phase-2/STEP_6_CONTINUATION.md) records that work.

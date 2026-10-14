@@ -1,0 +1,23 @@
+{
+  "status": "OFFLINE_RESERVATION_MEASUREMENT_NOT_LIVE_QUALIFICATION",
+  "recordedAt": "2026-10-08T14:49:06.868Z",
+  "sourceRun": "documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T14-33-52-329Z/live-corpus.json",
+  "sourceRunSha256": "23170bf7f43d37d7de71ffcae64633daef01493826b5d14e06ee22464bf55d9f",
+  "sourceFiles": {
+    "lib/planner/v2/intelligence/quality.ts": "e167d58d44d2fa33ba18fb08c6abb8baae989a306915b55a8da22705f743bacf"
+  },
+  "facts": "Exact original model-facing messages retained; only repeated reviewer instructions condensed. No provider/Attempt dispatched or historical output adopted.",
+  "oldInstructionBytes": 9529,
+  "currentInstructionBytes": 9024,
+  "oldReservation": 56431,
+  "currentBaseReservation": 55927,
+  "actualChargedInput": 23576,
+  "remainingRootInput": 56424,
+  "rootInputCeiling": 80000,
+  "verificationGrowthMarginUnchanged": 8192,
+  "limitations": [
+    "Bounded deterministic fallback feedback must still be reserved in full.",
+    "Any genuine repair/verification must independently fit the root and stage limits.",
+    "This offline measurement is not successful live review or educational acceptance."
+  ]
+}

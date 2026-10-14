@@ -28,12 +28,22 @@ const liveQualification = arguments_.includes("--live-qualification");
 if(liveQualification)arguments_.splice(arguments_.indexOf("--live-qualification"),1);
 const liveNonGemini=arguments_.includes("--live-non-gemini");
 if(liveNonGemini){if(!liveQualification)throw new Error("Non-Gemini override is qualification-only");arguments_.splice(arguments_.indexOf("--live-non-gemini"),1);}
+const liveExistingGroq=arguments_.includes("--live-existing-groq");
+if(liveExistingGroq){if(!liveQualification||!liveNonGemini)throw new Error("Existing Groq comparison is non-Gemini qualification-only");arguments_.splice(arguments_.indexOf("--live-existing-groq"),1);}
 const liveLowReasoning=arguments_.includes("--live-low-reasoning");
-if(liveLowReasoning){if(!liveQualification||!liveNonGemini)throw new Error("Low-reasoning trial requires explicit non-Gemini live qualification");arguments_.splice(arguments_.indexOf("--live-low-reasoning"),1);}
+if(liveLowReasoning){if(!liveQualification||!liveNonGemini||liveExistingGroq)throw new Error("Low-reasoning trial requires explicit non-Gemini live qualification");arguments_.splice(arguments_.indexOf("--live-low-reasoning"),1);}
+const liveHighReasoning=arguments_.includes("--live-high-reasoning");
+if(liveHighReasoning){if(!liveQualification||!liveNonGemini||liveExistingGroq||liveLowReasoning)throw new Error("High-reasoning trial requires exclusive non-Gemini DeepSeek qualification");arguments_.splice(arguments_.indexOf("--live-high-reasoning"),1);}
 let liveTemperature;
-if(arguments_.includes("--live-temperature")){const i=arguments_.indexOf("--live-temperature");liveTemperature=arguments_[i+1];if(!liveQualification||!liveNonGemini||liveLowReasoning||!['0.2','0.7'].includes(liveTemperature))throw new Error("Only explicit recorded non-thinking qualification sampling trials are permitted");arguments_.splice(i,2);}
+if(arguments_.includes("--live-temperature")){const i=arguments_.indexOf("--live-temperature");liveTemperature=arguments_[i+1];if(!liveQualification||!liveNonGemini||liveLowReasoning||liveHighReasoning||!['0.2','0.7'].includes(liveTemperature))throw new Error("Only explicit recorded non-thinking qualification sampling trials are permitted");arguments_.splice(i,2);}
 let liveReviewTemperature;
-if(arguments_.includes("--live-review-temperature")){const i=arguments_.indexOf("--live-review-temperature");liveReviewTemperature=arguments_[i+1];if(!liveQualification||!liveNonGemini||liveLowReasoning||liveTemperature!=="0.7"||liveReviewTemperature!=="0.2")throw new Error("Review sampling requires explicit non-thinking 0.7 generation and 0.2 review");arguments_.splice(i,2);}
+if(arguments_.includes("--live-review-temperature")){const i=arguments_.indexOf("--live-review-temperature");liveReviewTemperature=arguments_[i+1];if(!liveQualification||!liveNonGemini||liveLowReasoning||liveHighReasoning||liveTemperature!=="0.7"||liveReviewTemperature!=="0.2")throw new Error("Review sampling requires explicit non-thinking 0.7 generation and 0.2 review");arguments_.splice(i,2);}
+const liveReviewLowReasoning=arguments_.includes("--live-review-low-reasoning");
+if(liveReviewLowReasoning){if(!liveQualification||liveExistingGroq||!liveNonGemini||liveLowReasoning||liveHighReasoning||liveReviewTemperature!==undefined||liveTemperature!=="0.7")throw new Error("Review-only thinking requires explicit non-thinking0.7generation and no review sampling override");arguments_.splice(arguments_.indexOf("--live-review-low-reasoning"),1);}
+const liveProductionSettings=arguments_.includes("--live-production-settings");
+if(liveProductionSettings){if(!liveQualification||!liveNonGemini||liveExistingGroq||liveLowReasoning||liveHighReasoning||liveTemperature!==undefined||liveReviewTemperature!==undefined||liveReviewLowReasoning)throw new Error("Production options exclude every model-comparison override");arguments_.splice(arguments_.indexOf("--live-production-settings"),1);}
+const liveDisabledThinking=arguments_.includes("--live-disabled-thinking");
+if(liveDisabledThinking){if(!liveProductionSettings)throw new Error("Disabled-thinking qualification preserves every other production option");arguments_.splice(arguments_.indexOf("--live-disabled-thinking"),1);}
 let liveCases;
 if(arguments_.includes("--live-cases")){const i=arguments_.indexOf("--live-cases");liveCases=arguments_[i+1];if(!liveQualification||!liveCases||!/^[-a-z0-9]+(?:,[-a-z0-9]+)*$/.test(liveCases))throw new Error("Explicit live case IDs required");arguments_.splice(i,2);}
 let liveRepetitions;
@@ -250,7 +260,7 @@ CREATE PUBLICATION supabase_realtime;\n`;
   checkReport("current", currentReport, currentRequired, currentError);
   if(liveQualification){
     const liveReport=join(temporary,"live-report.json");let liveError;
-    try { run(join(root,"node_modules/.bin/vitest"),["run","--config","vitest.planner-v2-live.config.ts","--reporter=json","--outputFile",liveReport],{env:{...childEnvironment,PLANNER_PHASE2_LIVE_REQUIRED:"true",PLANNER_PHASE2_LIVE_EVIDENCE:evidence,...(liveCases?{PLANNER_PHASE2_LIVE_CASES:liveCases}:{}),...(liveRepetitions?{PLANNER_PHASE2_LIVE_REPETITIONS:liveRepetitions}:{}),...(liveNonGemini?{PLANNER_PHASE2_LIVE_NON_GEMINI:"true"}:{}),...(liveLowReasoning?{PLANNER_PHASE2_LIVE_LOW_REASONING:"true"}:{}),...(liveTemperature?{PLANNER_PHASE2_LIVE_TEMPERATURE:liveTemperature}:{}),...(liveReviewTemperature?{PLANNER_PHASE2_LIVE_REVIEW_TEMPERATURE:liveReviewTemperature}:{})},timeout:1800000}); }
+    try { run(join(root,"node_modules/.bin/vitest"),["run","--config","vitest.planner-v2-live.config.ts","--reporter=json","--outputFile",liveReport],{env:{...childEnvironment,PLANNER_PHASE2_LIVE_REQUIRED:"true",PLANNER_PHASE2_LIVE_EVIDENCE:evidence,...(liveCases?{PLANNER_PHASE2_LIVE_CASES:liveCases}:{}),...(liveRepetitions?{PLANNER_PHASE2_LIVE_REPETITIONS:liveRepetitions}:{}),...(liveNonGemini?{PLANNER_PHASE2_LIVE_NON_GEMINI:"true"}:{}),...(liveExistingGroq?{PLANNER_PHASE2_LIVE_EXISTING_GROQ:"true"}:{}),...(liveLowReasoning?{PLANNER_PHASE2_LIVE_LOW_REASONING:"true"}:{}),...(liveHighReasoning?{PLANNER_PHASE2_LIVE_HIGH_REASONING:"true"}:{}),...(liveProductionSettings?{PLANNER_PHASE2_LIVE_PRODUCTION_SETTINGS:"true"}:{}),...(liveDisabledThinking?{PLANNER_PHASE2_LIVE_DISABLED_THINKING:"true"}:{}),...(liveTemperature?{PLANNER_PHASE2_LIVE_TEMPERATURE:liveTemperature}:{}),...(liveReviewTemperature?{PLANNER_PHASE2_LIVE_REVIEW_TEMPERATURE:liveReviewTemperature}:{}),...(liveReviewLowReasoning?{PLANNER_PHASE2_LIVE_REVIEW_LOW_REASONING:"true"}:{})},timeout:1800000}); }
     catch(error){liveError=error;}
     checkReport("live",liveReport,["__tests__/planner-v2/postgres/compiler-qualification.live.ts"],liveError);
   }

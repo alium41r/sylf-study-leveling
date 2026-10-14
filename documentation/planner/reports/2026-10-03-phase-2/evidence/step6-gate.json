@@ -1,6 +1,6 @@
 {
   "gate": "PLANNER_V2_PHASE_2_STEP_6",
-  "startedAt": "2026-10-05T16:31:57.852Z",
+  "startedAt": "2026-10-08T17:37:46.258Z",
   "status": "FAILED",
   "checks": [
     {
@@ -15,8 +15,8 @@
       "name": "All frozen, intelligence and required Planner unit regressions",
       "status": "PASSED",
       "evidence": {
-        "files": 42,
-        "passed": 518,
+        "files": 43,
+        "passed": 549,
         "requiredSkipped": 0,
         "independentOracleFixtures": 500
       }
@@ -33,35 +33,7 @@
       "name": "whole repository typecheck classified against unchanged owners",
       "status": "PASSED",
       "evidence": {
-        "status": "PRE_EXISTING_GENERATED_FAILURES_UNCHANGED",
-        "errors": [
-          ".next/dev/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
-          ".next/dev/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
-          ".next/types/app/api/acoustics/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/acoustics/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
-          ".next/types/app/api/quests/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/quests/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | \"unstable_instant\" | ... 7 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
-          ".next/types/app/api/subjects/[id]/compile/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
-          ".next/types/app/api/subjects/[id]/forge-apex/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
-          ".next/types/app/api/subjects/[id]/nodes/route.ts(53,7): error TS2344: Type '{ __tag__: \"GET\"; __param_position__: \"second\"; __param_type__: { params: Promise<{ id: string; }> | { id: string; }; }; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
-          ".next/types/app/api/subjects/[id]/restore/route.ts(170,7): error TS2344: Type '{ __tag__: \"POST\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
-          ".next/types/app/api/subjects/[id]/route.ts(53,7): error TS2344: Type '{ __tag__: \"GET\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
-          ".next/types/app/api/subjects/[id]/route.ts(248,7): error TS2344: Type '{ __tag__: \"DELETE\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
-          ".next/types/app/api/subjects/[id]/route.ts(287,7): error TS2344: Type '{ __tag__: \"PATCH\"; __param_position__: \"second\"; __param_type__: RouteParams; }' does not satisfy the constraint 'ParamCheck<RouteContext>'.",
-          ".next/types/app/api/user/focus-backgrounds/route.ts(14,13): error TS2344: Type 'OmitWithTag<typeof import(\"/Users/aliumair/Desktop/sylf/app/api/user/focus-backgrounds/route\"), \"GET\" | \"PATCH\" | \"POST\" | \"HEAD\" | \"DELETE\" | \"revalidate\" | \"PUT\" | \"config\" | \"generateStaticParams\" | ... 8 more ... | \"OPTIONS\", \"\">' does not satisfy the constraint '{ [x: string]: never; }'.",
-          ".next/types/app/goals/page.ts(37,13): error TS2344: Type 'OmitWithTag<GoalsScreenProps, keyof PageProps, \"default\">' does not satisfy the constraint '{ [x: string]: never; }'.",
-          ".next/types/app/goals/page.ts(37,29): error TS2559: Type 'GoalsScreenProps' has no properties in common with type 'PageProps'."
-        ],
-        "verifiedUnchangedSources": {
-          "app/api/acoustics/route.ts": "3f06009afed35607669fc6bd8352404e939999004caf316cb228c311767b196f",
-          "app/api/quests/route.ts": "798049a3efcd3d8a8c8eb059093292c29d94ee4f5a31362a79f62bc55d001467",
-          "app/api/subjects/[id]/compile/route.ts": "8f13a94d4228ddd5d1e11792d97ef0f2e63693099e374b1d3f5f59f1cc447735",
-          "app/api/subjects/[id]/forge-apex/route.ts": "1c9ac939603a3809843d2dd3696dd810714bbf3432629a382dacf19c591d4bbf",
-          "app/api/subjects/[id]/nodes/route.ts": "07ea82de35cad14d3d8d1a606dce4bfc2d1434a329fcb73e7c53a37905e57454",
-          "app/api/subjects/[id]/restore/route.ts": "ec06a0ad2938bfd5800edf7ef322118e65af0dda7a2caa902327993465e43514",
-          "app/api/subjects/[id]/route.ts": "f1fd037c284040246515ee9576fb245be39756c728477acc0077ff57fd34d4c7",
-          "app/api/user/focus-backgrounds/route.ts": "20cd314abad83ca1525ec9d9bb325ff0338bfd972ba429779b1868c4c99b8776",
-          "app/goals/page.tsx": "e0646c9be0fa7fcf008c6f6d1d4838c3bbdc8ec091dde2908b1210c82315b52d"
-        },
-        "generatedFilesModified": false
+        "status": "PASSED"
       }
     },
     {
@@ -70,7 +42,7 @@
       "evidence": {
         "newErrors": 0,
         "newWarnings": 0,
-        "preExistingDiagnostics": 10
+        "preExistingDiagnostics": 30
       }
     },
     {
@@ -84,42 +56,15 @@
     },
     {
       "name": "genuine PostgreSQL and compiled ordinary Node learning correspondence",
-      "status": "PASSED",
-      "evidence": {
-        "results": [
-          {
-            "label": "phase1",
-            "files": 14,
-            "passed": 181,
-            "failed": 0,
-            "requiredSkipped": 0,
-            "optionalProviderExcluded": 0,
-            "failures": []
-          },
-          {
-            "label": "current",
-            "files": 17,
-            "passed": 225,
-            "failed": 0,
-            "requiredSkipped": 0,
-            "optionalProviderExcluded": 1,
-            "failures": []
-          }
-        ],
-        "compilerCases": 29,
-        "integrationCases": 16,
-        "maximumCases": 2,
-        "pinnedSources": 495,
-        "hostedDataTouched": false,
-        "cleanup": "Disposable server stopped; cluster/container removed."
-      }
+      "status": "FAILED",
+      "error": "Required PostgreSQL evidence incomplete"
     },
     {
       "name": "isolated production web build qualification",
       "status": "PASSED",
       "evidence": {
-        "startedAt": "2026-10-05T16:17:41.980Z",
-        "finishedAt": "2026-10-05T16:18:31.671Z",
+        "startedAt": "2026-10-08T17:19:46.824Z",
+        "finishedAt": "2026-10-08T17:20:38.332Z",
         "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
         "code": 1,
         "sourceSha256": {
@@ -171,8 +116,8 @@
           "app/api/friends/block/route.ts": "7da1293d349ef28e095483c4c75a1610b81b1b626241d56c770f8605ee73a325",
           "app/api/friends/remove/route.ts": "9708f23169eaf9a4c0999123a7e3594939b3f10fac9aa0581ba34a7491b2abda",
           "app/api/friends/requests/[id]/route.ts": "5ee9b7fb1ab02b5fa6f2e89bd6806b75e67c0069965b34f210d9593ec7dc3d29",
-          "app/api/friends/requests/route.ts": "3af8d557b23bc50b83bf17d8cc915d7febb43a8d01ce01d76c1c71a70f69b536",
-          "app/api/friends/route.ts": "574a3a3b6ae10e3d0945592ae145bf6a2320c7aeafdc9259f246fc526e1d1453",
+          "app/api/friends/requests/route.ts": "f1d4058b9398c07bbd2d6dd5c366ff62ab63ba5e90583be8c1220acc4ec186b4",
+          "app/api/friends/route.ts": "e2091c3d0bd30622005a5f59876c739443ac51bb77fb7b2a8d6fdc1411eac7c5",
           "app/api/friends/unblock/route.ts": "57526744f3193840ac11654d1d253e6a561523ee15a67d3464882477023a9154",
           "app/api/goals/[id]/adjust/route.ts": "cec4b75a1a079959f9765a2b2a16fa32cfb16e9845b8937e991667be8ec5e167",
           "app/api/goals/[id]/route.ts": "0a8a34fcd44fd07c57e967dd3b6acc5d28c576b38f15317824f2d6fd02244d4c",
@@ -184,6 +129,7 @@
           "app/api/invites/route.ts": "74e05bd57e02a5ed849fee5f710715d85b1bf364efe9c88dc810bd378af8cc29",
           "app/api/notifications/preferences/route.ts": "e1c21547d60278d7ab5222038e96d3dccf279f1fd2e2d9c799a2b1f7957a72e9",
           "app/api/notifications/route.ts": "d5c35881ae110da676d139fa7d2a47a9eba5428bc7f073d420edf77b603532cd",
+          "app/api/pixel-creations/route.ts": "8472dc2e9e5302cbd73da1aa970141293d40c68277a88da2ab2038ca8c0f555d",
           "app/api/planner/[id]/archive/route.ts": "78eda892a5bb4eb47d311e802792d425d60fc8e0ad995b7f04b4bac16da66d90",
           "app/api/planner/[id]/assistant/route.ts": "bbb7a02806c169c52b88bfbf08189123a456fec54cb5c6d8e024cceef90fc732",
           "app/api/planner/[id]/check-result/route.ts": "6b840af9df7591214f3845abf3e45a0492aa1438d0ea4050643120f5ccf08464",
@@ -211,7 +157,7 @@
           "app/api/planner/recover/[key]/route.ts": "55ad17528d53b4710f616bcfd9026e6ce6169ec03b16c747c416341e116af977",
           "app/api/planner/route.ts": "c51d21b3e99411f684d62ad8a2d01ecfe11d7f8b0d1c5003ceb88233c2a75761",
           "app/api/profile/[username]/route.ts": "7854ce1d2ab88a81090a47d45dd143e530e3d1e9023675128429971b17f1a5fc",
-          "app/api/profile/customization/route.ts": "034bfdce2d7c6af467a4e460feca6a2d275c5e4f832fcf5839a4f63fd948ce1c",
+          "app/api/profile/customization/route.ts": "e84e6b0e167e8bc4071b03bae77e3177084809cfbb3215273386bfd25e434c00",
           "app/api/profile/stats/route.ts": "0a48d7132e914fb2c625110cc73313a61d78c856d941dc43dd523c9e5f29bf8c",
           "app/api/quests/[id]/route.ts": "42f000f9d1d87aacbf7c5248a47690e291bb25a37db90be88da508cd87b42fbc",
           "app/api/quests/check-deadlines/route.ts": "7096167f0e7f87e94ec2dc7f6d71264ba185eb545b736dd2e931b034851b1c03",
@@ -219,7 +165,7 @@
           "app/api/quests/route.ts": "798049a3efcd3d8a8c8eb059093292c29d94ee4f5a31362a79f62bc55d001467",
           "app/api/quests/weekly/route.ts": "8ff3167801db21f16d275da97e82032442dc25243c3240fea55bdd6a614acb72",
           "app/api/realtime/token/route.ts": "688b269344d82c42c373f29e9579f3a1d2487462b752c63952c730bac14c5a0a",
-          "app/api/sessions/route.ts": "e1e7f86368f08237b0c72f9c793540e4b1c08176e481aa80e44cb1a68de196a1",
+          "app/api/sessions/route.ts": "e4fdb86a2ac0890e2218a69dc64413bac3c56d408526912501baf1a3334e28e3",
           "app/api/shop/purchase/route.ts": "ac2039b0eb15eb0a6073991319bfc050c884725eddc020b88f5f8ed5138afbd3",
           "app/api/shop/route.ts": "78e2313a6b85fdc10165c6691d7d2d8bf15febcaa3c274dc2a84286e8d7dd566",
           "app/api/skills/route.ts": "887c12cba64c87fe2cd64cb8362af7aaa8a2723e830751a85d77cc92a71fe0b6",
@@ -249,7 +195,7 @@
           "app/api/user/security/route.ts": "f3afb5a2f9747c32c29182340fc44221a8d872e45cfaf9a7c0c0e0572ee71d5f",
           "app/api/user/security/send-code/route.ts": "f3e67f12897437924d79b8dd34916c4a4730e187c01d207209c4f84bcc77e862",
           "app/api/user/sessions/route.ts": "2f1b7a850f7ae49d66fcbdc78763ead2cd36b1181355add0f34e1cf238dc8e03",
-          "app/api/user/stats/route.ts": "a86122ea43d9a874fce6223eae73a1b91915b491ecb629797e132afed768263c",
+          "app/api/user/stats/route.ts": "dded26e1fd049e36756b3c92a292c09b6a715f1705cff8d15741679a64c6cb4e",
           "app/api/user/study-schedule/floating-rest-day/route.ts": "acbaed4b93f4f91bebe9c5bc8a613e6f3ac53faa872c14457ca4feff0c21604c",
           "app/api/user/study-schedule/route.ts": "85046628564423bc4166477aeba2af28d5b804458b5b2b5805d4e81956de4bea",
           "app/api/users/search/route.ts": "660f5b2554504b6ae3dc76da539088bf2cf11003e86ba5878bf8497bfe3c07e9",
@@ -260,28 +206,28 @@
           "app/calendar/components/StudyScheduleModal.tsx": "0b5fe12815b16adb8b8dcb586d999c2a6dbe5953882d03ec4bba858a0fc1555b",
           "app/calendar/loading.tsx": "58d15a33b7bbcaa48c0d9ebe236b6e046b3570a1e9f52b0bdcd337a454e68321",
           "app/calendar/page.tsx": "9e237c028cb72754cb8faabdb8a979e27438e12a57b3ca9c6f0eaabf0b112e10",
-          "app/companion-prototype/page.tsx": "2c209915fd228bfe800ee0e4c23556854f0240e75d99df69a57b343d1be360d4",
+          "app/companion-prototype/page.tsx": "b00bf353b467f0ac8e3281db392ebf2fcda79462c42aceac9e38985b9f45103d",
           "app/components/AcousticsContext.tsx": "768fefe7ad76f9714fe4fcad1381d5e078ad6ea92d4584674e74b3dc1f4faad9",
           "app/components/AcousticsDynamicIsland.tsx": "bec7983819df3aaaa617078af982808d377685ab10ac1ed8f0ec490fe8e5d7fb",
           "app/components/AddFriendModal.tsx": "6d5a94d90bdcabb068aa294f5a9ac7d651208488513c60d66078091e20ee242b",
           "app/components/AiPlannerModal.tsx": "71af9a7af126eff82bc0e424b7dcc8af594075f4bf2dd43df32c425148cd318a",
           "app/components/AiPlannerPanel.tsx": "40c36fd9d7f9ab5e34c846f3bdbee6a729e9079f901308f046b736e95afe2db3",
-          "app/components/AuthProvider.tsx": "a08efab265f365df1d924dec59fb505c925cbe86f964fadf41d18644efe94aea",
+          "app/components/AuthProvider.tsx": "83c331bb0fdeacf065c0e1b475ce72c0258135adaafb09e9fefcfad55f6734f8",
           "app/components/BackToSettings.tsx": "fd6c1326e5acb3d32dc45dd54aa2b30c43ec5386ce0b0de9a6b189628ad43306",
           "app/components/Calendar/StudyCalendar.tsx": "89931697d62a93ffca2580f616fd042f98227de3fc409bdc375cb8ad8e290b99",
           "app/components/ConfirmationModal.tsx": "1f021b8966283dabca0f587f5278d05fccd41f3191127a23ecfa7756f93d7407",
           "app/components/CustomAudioContext.tsx": "ab91606e9c11b6c9c4b0d2495ab05003bec5c73fd1e1ba7c9ec9bc7f8322ca96",
           "app/components/CustomDatePicker.tsx": "acdae3db8052e4600b6827fb398d9068c399c8f55016b8014f01e361f892ab39",
-          "app/components/FriendRequestsModal.tsx": "da6fe7d74ac20cb65116ef5db161ab8743e3a99bd0e0a8bd428e543e68ada4bb",
+          "app/components/FriendRequestsModal.tsx": "0812cfee09c5067f4ae8a5f7053f315ac62a94e651d02d961ae67e1fd7b7c96f",
           "app/components/GlobalSystemWrapper.tsx": "ed60228e5c697abfc99d6ea759113375750a74b970d42e7c47a3926056e30e16",
           "app/components/LevelUpOverlay.module.css": "f5d5064e6364732760d20aeca491665c026c4b1cd70da9e8a7065f3b8cc1e9e7",
           "app/components/LevelUpOverlay.tsx": "7ebc5f9a1246d5e6f17b97c11dd8711da4a907e66666cea112c945b8ef6b726e",
-          "app/components/LevelUpProvider.tsx": "b9207bde14f081528b7a9edc54c8ef562d36f8f4b96fddb288db3d7377f8da9e",
+          "app/components/LevelUpProvider.tsx": "a4c97537abf7bed9c6e3595ed02a379953d2bd3cb9b284c44cfb9212d9fdd419",
           "app/components/MarkdownRenderer.tsx": "4795aa624716c8ac9f7ccf4eb225c5127eafd990b9c9f2c4afbc86687009f869",
           "app/components/OAuthButtons.tsx": "61c0ed350a60697ce4ee0643aab7daa21efc0a26af22031bcf7d50194143d8fa",
           "app/components/PasswordStrengthMeter.tsx": "a849abb32afeaf7e50de1328ce932e9c334849ceca66e97f725f2c61e9552102",
           "app/components/ProfileModalContext.tsx": "d6653e8fee64c9da50124e27ee339b7f273a38d3a18517623222ce191f836d45",
-          "app/components/PublicProfileModal.tsx": "bf48943dd5a2209425b1803516947aa6774c773349d83987c6c7c31bdd5573eb",
+          "app/components/PublicProfileModal.tsx": "b84ac2511051728ce43f622b7fa6be5235f79cf7ce24f1562fb91d1f674e0834",
           "app/components/RouteLoading.tsx": "86ec1be93b2bd4b89b33945660fdee37c244e5cf030b4260e8c6976f812e730d",
           "app/components/SessionEndToast.tsx": "e64bb9bfed6a4285eac2f3dbd0f22cfae1780f84ded6d5268b562092583a92b8",
           "app/components/SessionInviteToast.tsx": "00ee67a4dc04f0f6ae1e188abaa9ede997891fd6a04fc233f2f2cdb952b8005f",
@@ -312,7 +258,14 @@
           "app/components/auth/StudyIsland.module.css": "d9452283405a9ea13c014f3221391c5c9658b87bcd1d95c2a20d49e6adc733cf",
           "app/components/auth/StudyIslandScene.tsx": "0d9ac37c08849e24273f319be68580e53b5acc701545e8415f25c0908504c9ec",
           "app/components/auth/StudyTimerHUD.tsx": "427d3acc57b9109588c6aab1d981b071d3745773225648393a5671f532b99010",
-          "app/components/character/CharacterRenderer.tsx": "1110ad6028665dc38fa481a8752276dc8fcc01c8183ea5e057a254deb049785f",
+          "app/components/character/CharacterRenderer.tsx": null,
+          "app/components/companion/HexColorPicker.module.css": "43034badfba8a243e811c28ddc08a45bbcaa405a9a4314cba574d429e40a02d9",
+          "app/components/companion/HexColorPicker.tsx": "8aca0eca6681251d76c3f639040adf6de87402b8d5cd322244cc73bf6cc1b4eb",
+          "app/components/companion/OwnCompanionPreview.tsx": "c4d3e4577e3d14630e58821914ad2dd61799c3ef55467b842308877d76d62651",
+          "app/components/companion/PixelArtworkPlaceholder.module.css": "714e98f5ab4be59a64ae69a3bf9b8232116c8c53cd0859ec3d8ac393000e8c67",
+          "app/components/companion/PixelArtworkPlaceholder.tsx": "f7fefc71916206128fa2f6907f83dba914474cf52c35a8e0ee7527cbc41e31df",
+          "app/components/companion/PixelCompanion.tsx": "94367c0b98961ee9ca4e9f3655112aad9b98a78226c0e3c8f060e9d7ad7dad9a",
+          "app/components/companion/TargetPixelCompanion.tsx": "7005d28f6f96686b2892f2272ac7aa4667006533a20cdfe0a93a0f1af4b4a68e",
           "app/components/icons/SystemIcons.tsx": "b6655ab7fc29b77dda2e731b01a68d13c5df650376ffb5e4ed9f08c5ea3bbbcb",
           "app/components/icons/index.ts": "1f8812176e78050a2f9984166e30c988b130e96ff9a98df5abd5289f9c902a80",
           "app/components/landing/CoreFeatures.tsx": "b6050adb3147398258aeafb7e57270ae773617e9ed9012e235eca0300c2401d4",
@@ -332,19 +285,19 @@
           "app/components/landing/WhatIsSylf.tsx": "5d96e8b6bfcdd2ea419728cdd748f0ba372814f8d1a231fcc1339edb0507ae51",
           "app/components/landing/WhoItsFor.tsx": "7ced0ae7a9ba5369169cb4d67fd49e24e775e4f1069ed3669ce5baaf69b9796d",
           "app/components/landing/companion/Companion.module.css": "152ad8645850850f77b61c1e41cbaf2f6dd04b5f05d261237a6dc962bb7e090e",
-          "app/components/landing/companion/Companion.tsx": "3d57e57c59e2af50e7a07a166c4a528452a8b5af98da1a0135812bdfb9c4400f",
+          "app/components/landing/companion/Companion.tsx": "b773e86046958a751cccfd223bb1cabc4cf5624166922833ccff0ae652abadb4",
           "app/components/landing/companion/CompanionReview.module.css": "c581fb1fcfbe62895128f41c34a500cd7c7786f007517864df309f433d7beb02",
-          "app/components/landing/companion/CompanionReview.tsx": "532ffd0503cbd02cd86d65733ad1565d07674a29e68a1c0ce4ea2069600b7eb8",
+          "app/components/landing/companion/CompanionReview.tsx": "a7d9dc7523fa7cf1f8929a4714e3790798faf6b44ae1b80438c450ca52d36fc0",
           "app/components/landing/companion/JourneyCompanion.module.css": "ed4d4c0008ac73b70f67b3adb52a7c025b42ee380f610416cdc367fd4a4dc19f",
           "app/components/landing/companion/JourneyCompanion.tsx": "09e25f83c11c85742578fc39487f12ed9a39dc5bbab724e7c05c173f6d9f5c5c",
           "app/components/landing/companion/MagicalEyes.module.css": "a99c04bd331f9fba59fc515678be14a4f3650afa1b7c30051c5af1d50dc4890c",
           "app/components/landing/companion/MagicalEyes.tsx": "10e81070f775b17fa3af75463fd6d0e9168a74c731d0b442d8432209fb437675",
-          "app/components/landing/companion/PixelCompanion.module.css": "65d6c22d83af4be22bd017e02202d606c0196c702ee92594cf38155257acd581",
-          "app/components/landing/companion/PixelCompanion.tsx": "e98a19bf7f31be5d03499365db7f7d5fe45ea5b6a53d9bbfd988d22fc46b682c",
+          "app/components/landing/companion/PixelCompanion.module.css": null,
+          "app/components/landing/companion/PixelCompanion.tsx": null,
           "app/components/landing/companion/artwork.tsx": "b71d952f445eb3d17324bb2408ed261f9a968c2cce0f23e685291e32f2561bd1",
           "app/components/landing/companion/journey-motion.ts": "589fab9eff227e512387dc9c6bdf36db836bd2fceb83eadc1a8d9afbc2fd6836",
           "app/components/landing/companion/model.ts": "e1a9dabd8cdce8c532313e1e6e5064f62a6d0211d47f71d2c8a16598ec77b3c0",
-          "app/components/landing/companion/pixel-preview.ts": "0ae9ccad1d4864f1dd8c75d6818108013034c1de9a920145765f84d4bf0d33b5",
+          "app/components/landing/companion/pixel-preview.ts": null,
           "app/components/landing/companion/secondary-motion.ts": "70b1a8125f684f191734d0d04d2e6b85ac62061098ebe6776f40a603a9ad7386",
           "app/components/landing/companion/useCompanionState.ts": "03a55b0d4e31d7058dd82841f3b5f93520612cd243b10d938ef9a1f9d50bf475",
           "app/components/landing/journey/BotanicalTrail.module.css": "7eb3ccf87e4935a6630bdab6e5a79dadbb4ab9f913f74fb15caa6bac286537b3",
@@ -355,7 +308,7 @@
           "app/components/landing/journey/HeroJourneyAnchor.tsx": "e98e4b44f9830183da2639ae45f4f10ab65579b69ea5d09074300225aa37840c",
           "app/components/landing/journey/Journey.module.css": "9675a9e4a66c836b1868414cf58ffcd5bb9e693046c23844e6b2c98e20ae348f",
           "app/components/landing/journey/JourneyLanding.tsx": "1bfa1d2fc655fedcc9485ea3ec6263dd56f1a8e104adcb661f69bb8e6d1a6088",
-          "app/components/landing/journey/JourneyPath.tsx": "02f9e357f63297aa5cc8528ad118f68a363e7dfef4fb20aa9ebf13a22b5f862a",
+          "app/components/landing/journey/JourneyPath.tsx": "0449aa386b0db3b2b11ed4cc8827e27947e23ff3c0e3ba5508f97a3a5b57ba6c",
           "app/components/landing/journey/RealProductScreenshot.module.css": "70bc32faf20f857335c79fe5ee6926700eaa1275602ce6cf58b97b3c5b3a039a",
           "app/components/landing/journey/RealProductScreenshot.tsx": "4a0ae1b68a089c8c050b92e1f03a38975a86a363fb93a0316ec4779339d9e8c1",
           "app/components/landing/journey/WaitlistSignup.tsx": "bfa8125024fcdb7bc0ae0974d91ed533fc1aabb0203869e4aa58f8540122695b",
@@ -397,16 +350,22 @@
           "app/components/system/SystemFab.tsx": "7c9161aad53ee36e5266b5dbe3579b16ccdffc7ce2c82555a025a140fab47edd",
           "app/components/system/SystemOverlay.tsx": "7c252c427fc9d4036150150441151efeee789f309b02b4ce841a4411d399780b",
           "app/components/system/page-presence.ts": "77ae5ce4b30fe9682b3ddbeaadaf85b1e1dbbaaaee2eab303fd895384dbedd49",
-          "app/dashboard-design/components/DashboardDesignScreen.tsx": "245e42b8a6b5b2ccaef40f38dc96bdc939e821ba5e99a2a908ab46244f1af6cc",
+          "app/dashboard-design/components/DashboardDesignScreen.tsx": "07f490956f756fb92cf327d011f43da40f51b426ea4a3558bbfd8b9ead6519b8",
           "app/dashboard-design/components/DashboardIcons.tsx": "3af0d0f92fbd86d7843f971617d1860b05326d433e4f19ae9842a204d6eb6899",
           "app/dashboard-design/components/DesignLabBar.tsx": "2641e162acf530d321f61cf7538674b5705def721ed90633f28c057dde4a74b6",
           "app/dashboard-design/page.tsx": "1607c8156b9919463b2380fa1887f06b2cc1d99ab9fca51c3b73c48cc1d81e9e",
           "app/dashboard-design/styles/DashboardDesign.module.css": "fbcdacac9150ba125243aad369a6a717db803d20489e08a3de04bccaddec3515",
-          "app/dashboard/Dashboard.module.css": "36aeb3427654babf881cbb615710beb051af892c03e00bbc7056936bf0410ea4",
+          "app/dashboard/Dashboard.module.css": "694dc7c759333e8b9ca2dbe50310505c49f9dea6e12faf8c1bc6bf4a5ccf5682",
           "app/dashboard/components/DashboardIcons.tsx": "3af0d0f92fbd86d7843f971617d1860b05326d433e4f19ae9842a204d6eb6899",
-          "app/dashboard/components/DashboardScreen.tsx": "31014d0c547d47bfdb5a2d81841f628ca487aa1cbf2651e94858b03d06af4b74",
+          "app/dashboard/components/DashboardScreen.tsx": "6fddab9f06e79cccd56ed141a6d3bdecb5d1b8db856d9a48aac24d0521b9bfa5",
+          "app/dashboard/components/PixelCompanionCard.module.css": "bf1c921270ef0153e1a3c56f1f257ca4db58f77424523b57dad0832f9fb6eafb",
+          "app/dashboard/components/PixelCompanionCard.tsx": "daa034b5d24746c2ee50322e531ed792c79c5d7d131e8e10267824dafaa04093",
           "app/dashboard/loading.tsx": "98dbf2f968f20797ff689f02958a51701992b4a302739f01bbfaf4816fb3be49",
           "app/dashboard/page.tsx": "7dbb012a226b4e3e10a2e4da567408e319569fd5dcbc55a3d929f43c30848755",
+          "app/dashboard/pixel-companion-adapter.ts": "1aed5092e78a38420c9ccedf477fb739a871077dcb64a47ec64817bd00acef1c",
+          "app/dashboard/pixel-cosmetic-registry.ts": "a5bf806dc7c4422aa546bdf6986601b93527bfea2862b85b24cb714f2f487cf2",
+          "app/dashboard/pixel-modular-character.ts": "5c245e15d16837df19776179e08c62e07ff04d6f4c4719afba5530e82a88b449",
+          "app/dev/pixel-display/page.tsx": "8ce3681dc33fec993b3beaa440de2a8ce2d812e668eb22d8844df8dd39f6ba0b",
           "app/focus-party/[id]/focus/page.tsx": "df736993bb408a1e6262c38e28f11ecc27bac49b1ef5750a1889ef1de9c3997a",
           "app/focus-party/[id]/page.tsx": "953b967d0eff0259f2167af74f54dba71cdf3bcbec235160e808377abe699f78",
           "app/focus/components/FocusBackgroundPicker.tsx": "a9ef14a01bf0904505295ccab99f5c944737f5d61ad3960bdbf5f02c976ac6db",
@@ -448,21 +407,30 @@
           "app/hooks/useRealtimePresence.ts": "f2f56d01d0fcc28a30168ecf749e487dc1c5c8195e8211cecafe7550c5fcc68f",
           "app/inventory/page.tsx": "5d936239aacd186a02519cb9da2860dbb70d6e3348463d4a1b98ff5bc9bfda79",
           "app/layout.tsx": "61409adfedfab3e5e66c7adcf453fc82621222f94c8ac37d7a63fbb5f53606ac",
-          "app/locker/Locker.module.css": "ea2b4317dfa41d9f578255e80d56cc56ffb77ddb70b16fe1d5379ca05cfa6d40",
+          "app/locker/Locker.module.css": "7a660a2c4d5dc993f840b5380e9d1b3fbedbc243033404ed6c6bef2093ef0b55",
           "app/locker/components/AcousticsTab.tsx": "7fb764735fab060e92158a728c71f2f46719012559ed2df8d0ad7608a0eedd94",
           "app/locker/components/CreateNodeQuestModal.tsx": "e476c4a00db378d84a1119f346b60d92af2ab23772374b8f3ba77b59535ce704",
           "app/locker/components/CustomAudioTab.tsx": "79d696f0f812ffcd5573e2e9b72081e6e1d8d004fa6ecb193f8a9c228cd1d4a4",
-          "app/locker/components/IdentityTab.tsx": "a72f7ddfdb2cc3f69e53187f33bb28bcb5922ead6cdfc5e678c52289677af86b",
-          "app/locker/components/ItemsTab.tsx": "79a7d675d4ef874257cadbcc0628a82e141185b9c45ec5e8586ddbc63d8dc1ea",
-          "app/locker/components/LockerScreen.tsx": "6a2631f6515286ea889aeaee7f9690a01add85b217d5b6ea63fd45d55c9d8184",
+          "app/locker/components/IdentityTab.tsx": "0d6faf16b68cbd36b99e85811db86037cc8ae75d4b49bb957974ad716c1ca504",
+          "app/locker/components/ItemsTab.tsx": "954ece2a3e51940233508a81f7b46c4e01f61788f701c7d0e87497ec56ec8f97",
+          "app/locker/components/LockerScreen.tsx": "8f70a959a87ac209f60153e7191933975afe398dfaae65ac48c620803b929ca7",
           "app/locker/components/SkillInspector.tsx": "cda9b324331102b37a26d29714e9bef0b1d5d89f2e28dfbe5b3b2e70ba7cc37c",
           "app/locker/components/SkillNodeGraph.tsx": "72fc10d8b9096ddddc7130ae8a406f600a601aedad632c4e0a1aa1e7cfc6f1c6",
           "app/locker/components/SkillTreeTab.tsx": "eabc853dd453a0524ae2eefa062e86a2b9e034e218eaafbcf9a59f3727331f71",
           "app/locker/components/SubjectConstellationCanvas.tsx": "2482f58cb910092ca96f7e21df38c95a41a1d9eed375dc0cd0f35b30aba4673b",
-          "app/locker/components/identity/CharacterStudioView.tsx": "d79da915ca09f3baf1282bc8688e3649341b3390f0ccd0519203b552775d47e6",
+          "app/locker/components/identity/CharacterStudioView.tsx": null,
           "app/locker/components/identity/ImageCropModal.tsx": "91059e12a4458a8d16a0f7d9871501c7bacf98c1882e90c98d57ab2c5de419d1",
+          "app/locker/components/identity/PixelCustomizer.module.css": "b76aac43eae6279d4a42ac0dbed469256ce6e7e1f905afa183e0f8c00760ab55",
+          "app/locker/components/identity/PixelCustomizer.tsx": "6ab9c9cb395fad66dc9e46839b0ca1fe9b5fdd19d8a2cc6fd67a21b07ff52c83",
           "app/locker/components/identity/ProfileStudioView.tsx": "7aa6e25b9a1b1bd4ddf84b8052db67559c88507a708c1bf1d750b5ad07fd4be8",
-          "app/locker/components/identity/StudioHubView.tsx": "2f8adc020fd91292dbe62aed6821725786c08e56a7320140973762f8626570a2",
+          "app/locker/components/identity/StudioHubView.module.css": "e2403e5a237e682ec33c0736226a2e805c832a7f257671907715c1128f2c07aa",
+          "app/locker/components/identity/StudioHubView.tsx": "f07622b080ceef2b663474edc108176d2fcae2e8aa3c1149e1e8414349bdfcb2",
+          "app/locker/components/identity/pixel-customizer-options.ts": "6158421bbf5a497b707774c1e0e6376f796987768aa4d3cbd3e18c7372ce4a9c",
+          "app/locker/components/studio/EditorCanvas.tsx": "117e033cb4cf18f8c17e410a44de894e7d19092a09ce6cfef6ac595a332de17b",
+          "app/locker/components/studio/PixelStudio.module.css": "7f53e85eb62899f23e5f6ddd3c8bd65176971c2984b604e77fbebde40406bb9e",
+          "app/locker/components/studio/PixelStudio.tsx": "c360123bf2a671cd51ad406973175a9245ab07b8e951140b80186397b96b0268",
+          "app/locker/components/studio/pixel-studio-model.ts": "83daf2ed5a2cea5bfc2b86bdfdcf004826de00c06dac0bf73fff710e1c49ccd3",
+          "app/locker/components/studio/studio-history.ts": "df2f93908293e390be576b88f93398b5b6e28ee7ef0c56496629ef64d4c3b1c3",
           "app/locker/page.tsx": "4d686a4c82b36f416c60465aad1332648150c187be817b5c2ad6f3cd806042a1",
           "app/login/page.tsx": "6346bbf91eb57234eb167b7bf1cf71e4625389c801cc4c5b73ac3794fc6b56ea",
           "app/onboarding/Onboarding.module.css": "9e663a3f776362194433cb5f5c1625230c2cbccbf6e534d6fc489a7bf7db43a9",
@@ -492,7 +460,7 @@
           "app/settings/achievements/components/AchievementsSettingsScreen.tsx": "ca0b2efb61dfe22e26c185fe0691d7ff130b0c9803f10fb6564e4a7e1ff08b90",
           "app/settings/achievements/loading.tsx": "75a9887876700ea64024b824fd804883ab3d568e8b8dfe954ef584c5e04de9f5",
           "app/settings/achievements/page.tsx": "8f3edf7e6f9df6210729b0072317e807b4c31b16cc36a8a81b7e4308e3541d0d",
-          "app/settings/appearance/components/AppearanceSettingsScreen.tsx": "ea92a000abf4fded11b047fbd4ff2e72c8f976ee383acf0d9888cef0a8a9b2ea",
+          "app/settings/appearance/components/AppearanceSettingsScreen.tsx": "7b91809b2303d8bd6f1225f41950f7479c659e21102b7c3f2b674b37fb1a2af1",
           "app/settings/appearance/components/ColorPickerBoard.tsx": "8a694d4da60188f503869aa2a825b99b1afdb66cb875cb177bf1314aca0f56c7",
           "app/settings/appearance/components/MiniDashboardPreview.tsx": "7d700266ab28137a1a9d139367e8bd29e85e106e198d1e8d6749e3fd4f34552f",
           "app/settings/appearance/page.tsx": "f9d0864df2fccfb5bfa65defe697f6175b891fe0a5549150c82b5ef7ee048218",
@@ -509,7 +477,7 @@
           "app/settings/calendar/components/CalendarSettingsScreen.tsx": "07f494d351bad22811745bf3038bc5d339f5e496bed1b163159231b3fc2f9dc7",
           "app/settings/calendar/loading.tsx": "0db298cd8529bf6e69195e95f3ec04a7e9fe8d2cb1c05d9d3bff1e9b76c1ba26",
           "app/settings/calendar/page.tsx": "248aa66a0bf389c7cd487c392b5253dc1a08d31c683e996098cc79a5121ae6e5",
-          "app/settings/collection/components/CollectionSettingsScreen.tsx": "644663158026c8f4a78f71eec5f9a32b92c56c61618cc236d2cbc98c1a8312a5",
+          "app/settings/collection/components/CollectionSettingsScreen.tsx": "c546fe0704d47520c055adfa31fc6b6edf23fca2240017fe2e24b0f1686293be",
           "app/settings/collection/loading.tsx": "25c0f34105425d8ebd39cb2fac95b59ac3cafede69fe4e9e4707eb81ee551ef8",
           "app/settings/collection/page.tsx": "ed2555ad249ecc4ee77c35fddea9a615ac81ec612933881bc41679537b98bebe",
           "app/settings/components/SettingsIndexController.tsx": "1cc103c7416a7fdcd27f6ca2401e16fd00d31e3ba84fdc31c6c7f27e0d854ece",
@@ -546,7 +514,7 @@
           "app/settings/themes/loading.tsx": "4c8a66ba9ab851106299fda74dcd2482b569f88230f284f77f6488c517ea569f",
           "app/settings/themes/page.tsx": "411e09f8327cffdd57534cd3051f12c5f3e155ce5bdc403feba031030c386845",
           "app/shop/Shop.module.css": "df43bd6bf2080b196a5c55855f6cfda3df89fcac371fc578bb5f7253df20b77a",
-          "app/shop/components/ShopScreen.tsx": "3c74cbae449ec363b06a2956448d59f739a91ce7d29a5c18e903e39ddefd9644",
+          "app/shop/components/ShopScreen.tsx": "0a42fc885ee3a86a9669b0d8e1933201e2486e858e2514908ab5e61c21fa3735",
           "app/shop/loading.tsx": "67858a364e9b77f67f21054b6742999dad5bb48e12940e1fef93522b3669c6af",
           "app/shop/page.tsx": "357168a1a0b0431832e85307ede692d3421fea814d774fab6e39c5f49c62797a",
           "app/social/Social.module.css": "adb72d82b8bb6e94f1ebb689f389484337a0b284c4056b6a0f7c889e61b6ce28",
@@ -557,13 +525,13 @@
           "app/social/components/ChatHeader.tsx": "0d8843790d7f35e5a055377ed78f3879b43fc3efcff68e643773d169def65f03",
           "app/social/components/ChatInputBar.tsx": "bac09292b7a22534ec026ecde332f70702445af98e5edb4fc770c0b9b0f95510",
           "app/social/components/MessageItem.tsx": "b8682584b868224fd99e8e10245bfad7d8464e4b2b00ecc1ce54f3254629dd60",
-          "app/social/components/SocialScreen.tsx": "21487297b59df234461fcf3d91c8fc265be27cc75d54cc0894e11ac347e2e026",
+          "app/social/components/SocialScreen.tsx": "5c45203bb8f704ecb829fb2a574ba06bf430a2e339b57110d55594ae6ee8d4ae",
           "app/social/components/focus-party/FocusPartyContext.tsx": "1843a6b72071b259cfdf1e1baf8850966b6eef09fa60e64424c36aa4c3e25c8c",
           "app/social/components/focus-party/FocusPartyEmptyState.tsx": "cdac1788cb167b2048659a9733e44158dbf309a90a7553dc395e000926d0480e",
-          "app/social/components/focus-party/FocusPartyInviteModal.tsx": "2534ae0e5ff06cb334938ba11027542a0f795c1ec21c1a81b2530919e51eca6d",
-          "app/social/components/focus-party/FocusPartyLobby.tsx": "13c9e93d41f4cf66f5eb2f9c0081f753602f4e6a524c2d8a0e328fecaab04a54",
-          "app/social/components/focus-party/FocusPartyMemberStage.tsx": "a576aaa0d18b33edc437283e004ef4d204175eb5990860be4b6f14087ec05333",
-          "app/social/components/focus-party/FocusPartyRoom.tsx": "68bffc15f16af42a4ddba3fff25f6687e07ab1672a0c53747c41e2564c6a1cfe",
+          "app/social/components/focus-party/FocusPartyInviteModal.tsx": "e75ff2b44fe7a0c4b4f41a413b1cdffcf5d443a0ce36b86f91e0ed6f898676ab",
+          "app/social/components/focus-party/FocusPartyLobby.tsx": "9f0eae7c549cdfdeb29054500e654056eff5954d81c18c134d0213bd9f27879b",
+          "app/social/components/focus-party/FocusPartyMemberStage.tsx": "1c33e17904f3d8c6530bc5167bfaddee6cd364e5780dafd531635c0c75f1cf53",
+          "app/social/components/focus-party/FocusPartyRoom.tsx": "4d6faaaa5cb0f10a7e354b36820d6b9964a669be215b56fc50d90884fb060ff4",
           "app/social/components/focus-party/FocusPartySection.tsx": "4e859d73cb7d650cef5d1bb1f7a2f723a074dfde4658c0b666e69da5dfb778c4",
           "app/social/components/focus-party/FocusPartyTimerLayoutRouter.tsx": "6c027895683e047cabcb79859c9133a122aebf08d94d057d891398025b9be838",
           "app/social/components/focus-party/focus-party-utils.ts": "266d37ef1ce160e452c2ab3041cae92086657fa3f2d8965b9a0ca512f5a34fe4",
@@ -626,11 +594,11 @@
           "lib/ai/planner/validation-hints.ts": "34423698299a34f1fa0054611a318f13f2a78c513efe8c536458a9e10e994573",
           "lib/ai/planning-engine.ts": "cd3d197852f1198420fb5daea2a78c1784d5377b1f82436b70f8796846027153",
           "lib/ai/prompts.ts": "88cd94f7545c5d1e629568230f7b7fb8af4b2ae6409ea93e9133effd57e347d7",
-          "lib/ai/providers/deepseek.ts": "c079f411d70102b987836bb94db61c9d413169b9bb099d248f1738b798f8f9b9",
+          "lib/ai/providers/deepseek.ts": "55490d78e56e3fa3e8f30c90ea5cc8d923f41259da12b7a64d4d52f0d91095ad",
           "lib/ai/providers/factory.ts": "8c55b9e0ff53bcf45a115b5707be757100aaee7640e05a87c0242383cee06c9a",
           "lib/ai/providers/gemini.ts": "68eccabf6a67c213d4525aa01daf1dee0bb530a5d8c0f6f766aef5b4bcfef44d",
           "lib/ai/providers/groq.ts": "9f335759037ef118f1b8e19b4d7a0b449f4cdaaea04ea8c7a63eec80a2bee37d",
-          "lib/ai/providers/types.ts": "4b0aed5a0c9dcbf0865b67e5d2ef4ae5275d2191c8ec16784f322a398490289c",
+          "lib/ai/providers/types.ts": "091ac20ee77e27382dcbc6d4704eb0b96330190ebae854502295f1fdb714ccce",
           "lib/ai/quota-accounting.ts": "2d1433efb9dc247bcea7f48c25d95597d8564342ce2ab91562899a1a4512354f",
           "lib/ai/scope-evaluator.ts": "3aea02914a406a23dbfdda246685090c113992df46035878eabf371c52f25c5a",
           "lib/ai/syllabus-compiler.ts": "b46ce623576a43a759e9027f3fdd8bf0e53f954247fe101c6f87dcb442d002a3",
@@ -639,8 +607,8 @@
           "lib/ai/usage-logger.ts": "b7c225d188a56d1fb04bc149e12a0a8e2b2bb35426a2db04c3ac20f202b25b26",
           "lib/ai/usage-pricing.ts": "32d8f8ef17c7ed70b5b843c3c5b24a05496f62ca523066369a20f11621d485ec",
           "lib/api-transport.ts": "af9786b2cb9d830762406820e2b616eaf7a5cc1c62b5e55feb0af5049d7e1043",
-          "lib/archive-catalog.ts": "6635ceda9950fce438348e9bf40de7366ce7b012b6b7f9cdeca27fc10275fd5b",
-          "lib/asset-manifest.ts": "ffa0906f33ba55500930758ebaf06c521009dbaf45822ed59820543dc40b42b4",
+          "lib/archive-catalog.ts": "68b518168e1c93d72726528998665619a3cb2f83f06b2e0b03048625c2071f54",
+          "lib/asset-manifest.ts": "f9b8b2001708e50b47a4dc6396e923ea938e903f21723758952cab107a33b09d",
           "lib/auth-admin.ts": "69dd876b5bb4e425fca25d09c31dd0c2a983bf366f1e9e3e9d0ba47984a6cdc8",
           "lib/auth-server.ts": "f38b580620c248211462f165f651283ae7dc3fc8031c33907b53ca1ae00e800f",
           "lib/auth-service.ts": "97a3115de69fbede4ece3bb81165f6929f4b4abf41def95aecfc759ec9106807",
@@ -648,8 +616,8 @@
           "lib/block-service.ts": "388ac0f6f24bca7b62031d24c7d52548ca068b697ad8f91d0d227e9501b1e627",
           "lib/cache-service.ts": "4055e8557f0069d0da4045cafab809fa27ba35d7e4cda3c0ed725bc4b74e14c7",
           "lib/calculator/math-engine.ts": "4a6f74436dee4c720d0d8cd2b08c06318c00dd9f6c8d306824aeed209dbd818f",
-          "lib/character-traits.ts": "01d1cd4bd59635d754d18312c5816fef0ea9ef6b28ee1f93bbe66b859c5ef1e6",
-          "lib/client-data-cache.ts": "d1f0f79d5f71c4e8e3179350f00b8fd286406a26a14711e8dbb1f004f4d536b6",
+          "lib/character-traits.ts": "203f9310e6490e9f9548ab6ebaf12ea1bbf720151ee526c748dc6b2eb45d401e",
+          "lib/client-data-cache.ts": "bca044f041b81e8127f19d2c7f44f0766d567d8c4b5772384cb3114ee33f68c9",
           "lib/cognitive-stats.ts": "fa0ba07092f6ed54de62f429d8789f04ea9a4243f2f1abde0b5a1525bde0b809",
           "lib/color-utils.ts": "6c2ed5a08f248abc576ead462403b9c9c8f76b0258434da540d5b4d81750f529",
           "lib/concept-forge.ts": "15fbbd7df5705d956092c6ccd5aa27552154b6ae8bce0867cf0478e9e559181f",
@@ -662,8 +630,8 @@
           "lib/focus-background-client.ts": "f56eeadce4c829a8f6450ac04dca72136f2560dd244eab6e1d588bcb91fe49e1",
           "lib/focus-background-preference.ts": "a18041f33e24b37ad13f8148e4d4b9d71e0e4abdd927e72d64c646878f8b3601",
           "lib/focus-background-types.ts": "288412161d9427b1bcb2b34b616ada123f862c7c6471ad61c25447ba9256312b",
-          "lib/focus-party-service.ts": "7da430ab402a53b41459f0190dd060341cb4b69869e5ee7fedf167cd11800bee",
-          "lib/focus-party-types.ts": "1f0c63c8124aa95fc2e134ef30e8adc0c56abeb2e19379959443172e9aa9e354",
+          "lib/focus-party-service.ts": "15320b080bda8702a198d801c3b023148afdfc82ad1e7aacf90025c83794db07",
+          "lib/focus-party-types.ts": "c8c0c42850fba23335d35297bc6b0b6e762e26083b977211276772e709336373",
           "lib/game-engine.ts": "e48da06a0d4e54f6245c08724b6fcb2c04d300ca0e91bbf3906403ad15477f4c",
           "lib/goal-theme.ts": "83844182b190768abfe5641d1343e1bb62c21c0870e04cb4c9929c7020a67434",
           "lib/hp-penalty-service.ts": "f480495b72561da09ce0755fa7c98aaf9b8c198e750bb901afa24fcf6b84ed7c",
@@ -671,6 +639,45 @@
           "lib/motion.ts": "9ddcf6a38f65286ca5f98cebe7700ee2b89d48fdc2c8e3dcb21b83c90a89ea9f",
           "lib/notification-preferences.ts": "f661397eecbde0657d44c5f764b0cbd24e9209ed86ef178cef85dd439dc15485",
           "lib/oauth.ts": "ada2bc7bad72b4afe132277e9a2b8c507ea181e1301b031d2f0c03fc74070915",
+          "lib/pixel-companion-contract.ts": "72d191b9609f2a12533a3b395e164d21671ac8bcb959d6f39a555c4123beb573",
+          "lib/pixel-companion-service.ts": "d22d3fbfb61d8854a42fdd38e76e98a9c9b9e1cf4850ce9d61c5b111608787c2",
+          "lib/pixel-creation-service.ts": "816d81740c255b1c1536d03db05cc013114e1f4077f3512438ab2bf2bba343b6",
+          "lib/pixel-creations-client.ts": "ab7b21131046769322c689bcc64f306d607590256739dfb6eb38be73bfe1ca5e",
+          "lib/pixel-display-style.ts": "3cf26d1a49d757601e72b3db9b08fcfb2a48706033603131ca52c596f7489b17",
+          "lib/pixel-display/content/asset/attachment.ts": "21e59708e0ea44008fc9e02bb9b7b3482801eabebf9d0bacdbfc848cb016afff",
+          "lib/pixel-display/content/asset/compose.ts": "f88dbc814147fc40e8f7e1e522663e769b9c704cfa68cf65425a10cb377afc8e",
+          "lib/pixel-display/content/asset/creation-asset.ts": "f955f08b65af61435ef93de3b160ecf944d10b4b4d0694c1ccb8616fd3d1481f",
+          "lib/pixel-display/content/asset/creation.ts": "cb672c1756a89a03ba5143788c59a4745c7d790c18e8d54392e06c5671a11524",
+          "lib/pixel-display/content/asset/empty.ts": "cf9bf354fcf9d949396925f045e28df79ee3324d25a8e5af3f98770a4f5ee8df",
+          "lib/pixel-display/content/asset/identity.ts": "0e14ccae0ee3c5f88faff4704b1ce3934e333a1ad8fe47df47ce322b590abf34",
+          "lib/pixel-display/content/asset/index.ts": "f6a0795280e806648376de3563c5f240051a92350e5dfa6ee3c0221bb08976f2",
+          "lib/pixel-display/content/asset/paint.ts": "d97f456fd12f5d66380b1040041063d6bd3e7329ff6987a55c3a4833fc77b0be",
+          "lib/pixel-display/content/asset/reference/ember-aura.ts": "53f688ea67bd71f43f86cc11fe3b32a6ecbf43f01259e6d62954bfc0fb02c497",
+          "lib/pixel-display/content/asset/reference/index.ts": "3db85604ef95a2c4a3d7e4072dd1ef9e26bdf92a8fda9d3230e9e2af50249d2c",
+          "lib/pixel-display/content/asset/reference/pedestal-meadow.ts": "7923c25a015640d107cae11bab947f5b0f82fca3ab8aa674d21293cd6c71d4b5",
+          "lib/pixel-display/content/asset/reference/practice-wand.ts": "a2f18ecd820e1f3a87ab64b1f2de5e9ea3455429277e8413325fdc2d6f6d6423",
+          "lib/pixel-display/content/asset/reference/study-scarf.ts": "6e65295526f510a3609e474550b730cc1c9d2d2fdb7eb7604ed25b3c920ca195",
+          "lib/pixel-display/content/asset/resolve.ts": "02b2c441d8706f15a44f827a0a72eb99d8be37fbed06debbca5de1317237727f",
+          "lib/pixel-display/content/asset/types.ts": "8ebc5992946f6680d60c1ab53de77c3937e106bc6ebbc1211f2e4571e932af91",
+          "lib/pixel-display/content/asset/validate.ts": "a1f7a2e99e717bffda54619c6d2c1696c1acd692e155263ff09945c861172420",
+          "lib/pixel-display/content/index.ts": "58694a8d856ec3e02458fb806259f24f09907e5e13fb0b1b32fdbc5c499091ee",
+          "lib/pixel-display/content/palette.ts": "8486b29f5f657f6b252ccafbb7260cc4f80af1c4822f8c674762171a347a21cd",
+          "lib/pixel-display/content/sylf/character.ts": "b9cdca8602d8f24b27c9e8955b18969d636c37fbdc02146e800fe577e5807898",
+          "lib/pixel-display/content/sylf/effects.ts": "5b50dd8a3797dc3cbdcb7755281d77a3cba34f3f84de57aca8b9fade70936e1f",
+          "lib/pixel-display/content/sylf/frames.ts": "2fc0063513fd29ad3c2bceebe745c810e791a1ff886ae7c422ad903a91184814",
+          "lib/pixel-display/engine/color.ts": "e1636615febfad5c1149e86bbcb04dad69d5bdaf6bbc82325f14948415d77f23",
+          "lib/pixel-display/engine/display.ts": "952631a0261912546884432a78b8457b309c2a8851284d5e785a8fb3353b1f3f",
+          "lib/pixel-display/engine/framebuffer.ts": "e36b4efaca46008ab50e725d1c5a7ef7ea58393613c48096f153a6f17f09e649",
+          "lib/pixel-display/engine/geometry.ts": "dfbdfa2d2986057d9eeda3a6d38090ee96eaadcba1ad8ba3a421c1c290307788",
+          "lib/pixel-display/engine/index.ts": "602ab6ed87d8bd51ed6a9cb8a2c8a1e63727265aaeb13ba3fd07f6c66ef44bb5",
+          "lib/pixel-display/engine/pix-engine-globals.d.ts": "e4078397f95bbe9127aceea980ec50e4f7adfe7f68b824ae7922cccb3352ac26",
+          "lib/pixel-display/engine/runtime.ts": "aba883a32afe6ec7c3e73984d562ff305bfb3b12abf186468fa1888181a644cd",
+          "lib/pixel-display/engine/types.ts": "22960e6a83031be30a8a370041b84d10d483a48b25c90d97edfb73f74b8afa9d",
+          "lib/pixel-display/react/PixelDisplay.module.css": "e5998d1e93bd16c37408dc6b8896469a236e5ee30e6c761a876fd2986aad31ec",
+          "lib/pixel-display/react/PixelDisplay.tsx": "b1c73f584f6d950af2ff2701d74a91647492db3d73f9532f4d5b02be53e4684e",
+          "lib/pixel-display/react/usePixRuntime.ts": "6ce4ca1701bf28a3a9f666caaa3995881e9a234ad2101b35097effcdef4c58b4",
+          "lib/pixel-display/renderers/canvas-2d.ts": "17048c5214c1feeefe999567cf0bbddeff09b4e75a0d1ea47040454c2b9d3ecf",
+          "lib/pixel-display/renderers/grid-presentation.ts": "8d0dbd541858ba7afff9779b9d48e79a4be590bba903b841f3de039705979a6a",
           "lib/planner/capacity.ts": "4150d18d27c8174e76048e7b8018ef3a91250b9f3cc11f0a686f0fb7d62afc69",
           "lib/planner/client.ts": "1d284ddf618524514559f6a22dab72f6b4f09b042041e762cd3c695e198e8fba",
           "lib/planner/comparison/contracts.ts": "6f6dd16de065d45a2dd2e2fe5bc7e72d683ce76aa3d43cc49d49bf7dc1728a2b",
@@ -808,18 +815,18 @@
           "lib/planner/v2/contracts/primitives.ts": "3d26fa7a94bca8299b0de5c1d787f3c95b67d14e6bf4bc91d84ade2890244f04",
           "lib/planner/v2/contracts/session.ts": "14c2768a4c773fc33d14d4f681746f34c75952cc3363b85128084fa03b4bb4b8",
           "lib/planner/v2/contracts/workspace.ts": "2abc74a5886e51dacb3f76da3ecdd820db9925e2580d2a4dbd1a8802c80c465c",
-          "lib/planner/v2/intelligence/allocator.ts": "b6895dae2dce8658ebddef9b8cdaba9e6671305983af7948017bb0cb4a03f641",
+          "lib/planner/v2/intelligence/allocator.ts": "81bc5f691e9993f8ea3ad2f1ce798a79952622271346108f7a1eaa96d19c5499",
           "lib/planner/v2/intelligence/assistant.ts": "44aad7f7e764ff67e96f787dd6b8670d8bfbf20b12100142794747d5a7781ef4",
-          "lib/planner/v2/intelligence/blueprint.ts": "5a7067a238143c73be46c6717d1fe7044bead980caa88b116a01c728dee14d7c",
+          "lib/planner/v2/intelligence/blueprint.ts": "dd2c96ca70adc1470e380831d4d619d7ae9ddd6d8c82ef515609a21a4a27e9a8",
           "lib/planner/v2/intelligence/capacity.ts": "56989fb9d74637b6536a952dfa63b57fb4e5cdd9b19968807052de0c5cb2f4ad",
           "lib/planner/v2/intelligence/checkpoints.ts": "d81d74cac16cf9ce6c6d36b213ba42f8cd32ac3c20074a79d62e68372e9a11ee",
-          "lib/planner/v2/intelligence/context.ts": "dc402f77792559fa362a164955587dc86737de57f762d14f6cc9b87fb9c5c9ba",
+          "lib/planner/v2/intelligence/context.ts": "2dbf57c3e1d95f1040f8bd51fe46d0a3ee7d0eb612af24fb87eb96d18f096c66",
           "lib/planner/v2/intelligence/forecast.ts": "d7208b1369a2bfef69a62ed1cff9aa56f492f1a30eda97b8b6dd88be35b47bf5",
           "lib/planner/v2/intelligence/ocr.ts": "050856144f969fd26b8e2bec882b517c600d161f0c8cab89b00e52bb43f89c6e",
           "lib/planner/v2/intelligence/provider-policy.ts": "2a91cef9945f74eedaeb48bfd0e4e60422ff512dfe711cbff4650a15a6cb2f0b",
-          "lib/planner/v2/intelligence/provider.ts": "7fa721218d8c7c5b1a8bec9e5ffb732e39a6eca9dd8ad1914a8c670a3d92c576",
-          "lib/planner/v2/intelligence/quality.ts": "7282b8ffbdebbcf51ef903bb1343844f7e8caa11004722604653c15980068138",
-          "lib/planner/v2/intelligence/research-cache.ts": "336ab64c803035ae9694c5263db7b3d3e83d6d8be708ab8d1fd2a3b5947e0b20",
+          "lib/planner/v2/intelligence/provider.ts": "bdbf175e35a54e6d78e9f9894d633877f065285621186d809048ef7564f30c56",
+          "lib/planner/v2/intelligence/quality.ts": "dbbf78a054db065e37526193b5119e581be88234584c7c9eee4bcf21b610950c",
+          "lib/planner/v2/intelligence/research-cache.ts": "c28b5beee06479d9299695a32c76c9d35c24f32fb9cc9d115331832ad2b511c5",
           "lib/planner/v2/intelligence/research-reader.ts": "f01ddfc0dd4ae0cfd8b69a5bba8b7ba4a6dc563dd8c1f7b96cb25702cba128a2",
           "lib/planner/v2/intelligence/research-verification.ts": "1c5d37b519c3e4d5484341d9029689ee5a3e156176b11a6e75958589e9c12701",
           "lib/planner/v2/intelligence/schemas/assistant-intake.ts": "2b40c7936df0b6e04f843168ab348738dae160cfa8fbd10ed058dffa6f40a3c4",
@@ -847,20 +854,20 @@
           "lib/planner/v2/server/execution-validation.ts": "20eb872eb6cef347b86e37d71c978dcae98898f89e980a6776e8aab3c678214b",
           "lib/planner/v2/server/generation.ts": "16d263ff3f8139f0573ec758f53248dff245dc746a362145a7f822fa42f9d7cc",
           "lib/planner/v2/server/intents.ts": "d289fe33c2505e8a73c80c61eea02703fd66aa459f80f21c58115d5783505bf9",
-          "lib/planner/v2/server/learning.ts": "7407c14b95acb252efd88b0848c3bc99872f212d831dfbd2d280033b07506ee7",
-          "lib/planner/v2/server/research.ts": "1523620cd8601b0d5074ba9e5d58adb407a3ee8b83daf17b3b68d47c62981f4c",
+          "lib/planner/v2/server/learning.ts": "dd3bde9ef0e1fec44da71fedc38e659e32d2cc56537a065814101204f9ba3cd1",
+          "lib/planner/v2/server/research.ts": "b203a1322a42332abe6f91bbbb944d73bf6e99e6f74a3a09c7d37443252d6477",
           "lib/planner/v2/server/revisions.ts": "b4c259b1d7e22f3af7d9d2299b7bc9ae3780f420cb4400db767b1239fe3fbba0",
           "lib/planner/v2/server/sessions.ts": "6589a76b8e51d08b9d7781cf735a50060d1eab81d75cbed4770c3627312221aa",
-          "lib/planner/v2/server/settlement.ts": "4997d70934b9d17b01d215dab35e4f34b7702bcd985ce4a6b37f1e41638e94a9",
+          "lib/planner/v2/server/settlement.ts": "936913f411841ac76f8f1187ead5811c3bcc78b8bd631d9a6e05b624bdf399a9",
           "lib/planner/v2/server/web.ts": "e1c5e678471af5e9926685d42afa4a3829425b357817a6c76db05991d5a67c53",
           "lib/planner/v2/server/worker.ts": "de60caaefca2a7ff7d11f685308a04f391a6f44c1b9c9ec3406d2008cf9311cb",
           "lib/planner/v2/server/workspace.ts": "ba58a464b04919cb7cb63c7cad0d549601231fbf557461577c6b13dc36ac2f9b",
           "lib/planner/v2/session-client.ts": "1cae5318bda7ae200534df1fc60aa0144f38155cae71a8f11a14e1a7bfd0be51",
           "lib/prelaunch.ts": "5376c12dc556a6d84c094d21818392d74a3e3c908195865063e3fb074854458d",
-          "lib/prisma.ts": "7106282a7a3a8409bfd277c17969227e7af17df0f141aa6a144bd4b9cbd01e3b",
+          "lib/prisma.ts": "b56ce3bb8168eb65842cb5a09f0210a4e4fb2870bf252ae41764e5a7ab96dc3c",
           "lib/privacy-types.ts": "4d4c99dfa64b705e04ea75d31ff01bcb38691424ae537bd350185a9aa3464ee0",
           "lib/privacy.ts": "c2ca5814612a7ec49d9de9c40a982748a3ea2970e20cfe1ab0ba045b3e14348f",
-          "lib/profile-service.ts": "7da11a836f8ef1fb43210bfd14b940a8e48d6b26f337095d4a531a98c2625e93",
+          "lib/profile-service.ts": "038eb0351f0f20841e1c5eb628ff09071d376a8f3c88bad51b4111dd6765aeba",
           "lib/provider-types.ts": "861778497e8d412136a83f3495bca86cafe5998b7c87fc45e48bf0cb8f6f45b5",
           "lib/rate-limit.ts": "3058b288edbd032272afffcb7c81f61b831a79034c48112f71caec796762c3f2",
           "lib/realtime-status.ts": "3e491c8992c81043f55b6b50603d773e6e1b1d8323ee4aed91df7229306049c8",
@@ -888,7 +895,7 @@
           "lib/sylvs/renderer/MaleBase.tsx": "217490903cb85af64e8ec6629ebb1464c8bf02cfe8a3001fc78ccce9b5f48143",
           "lib/sylvs/renderer/SylvRenderer.tsx": "3d99e5d0252b1a4d494cb9cf67208edd65153319c85c8042ac9264ef5f443798",
           "lib/sylvs/types.ts": "6113144257500038f97dee5b0380e17bd517cf42d24fddfebc761169ba2f9883",
-          "lib/system-collection.ts": "2adc28cc70b152a7d0587109fdfce5573220b29607af912bea8a6c703171f2fc",
+          "lib/system-collection.ts": "0c99b1b51863f72a03479cf6d631b165d1afd5848250c2c2652fb9a4257b321a",
           "lib/timer-engine.ts": "c3c9e365cbd197c7613bd3aa2fc9591c73f057962a3b177f15b513a8a1ac7b3e",
           "lib/timer-leader.ts": "5b30672eeee660a8b8fd9c6f92689f33d7aa06730505168fb16aea811393fbf9",
           "lib/timezone-server.ts": "2fcfd293cba020dea81d6c5f06369090f45079650f7f756d71c0ec1c9a15ec0d",
@@ -896,11 +903,18 @@
           "lib/upload-security.ts": "f7895f48d97a7651aae9940dca5aae3db458796187049330a45706d7c6f63f08",
           "next.config.ts": "672f3d64b99111b3fbfcd81cb2ae87c79eb019c7644d5f508dee2470a0425af4",
           "package-lock.json": "1e1ce363400b4c112a1a779f1e7ffe42a93516213b5e37cadf3839c397b8488e",
-          "package.json": "7cf98a1e08b4eb721a0c717b466f7ce2d485bf057245c45f49872e6c0ffaa37a",
+          "package.json": "d5140a5f10086c5c33ae59fb6789be61760d59b8a90275cbef3a23d6cf119b3b",
           "postcss.config.mjs": "dfac7ac2d86d326a0e5adb024e7943c181393ed17a5fcb8f0315b24c7da6ddde",
-          "proxy.ts": "eed12d20924f28374886752f462149cc2b3722ddc14c0c713e36597429e1e6a5",
+          "proxy.ts": "a5f13969e0bd7046e21ded8bedfd085cd417da73006bdc02dac690677f6a74d7",
           "tsconfig.json": "7bbe90dc94214e3cc19fa4612fe2f4805fb8b51557af0d56f778853c0f024201"
         },
+        "deletedSources": [
+          "app/components/character/CharacterRenderer.tsx",
+          "app/components/landing/companion/PixelCompanion.module.css",
+          "app/components/landing/companion/PixelCompanion.tsx",
+          "app/components/landing/companion/pixel-preview.ts",
+          "app/locker/components/identity/CharacterStudioView.tsx"
+        ],
         "changedDuringRun": [],
         "command": "next build --webpack (private source copy)",
         "credentialsLoaded": false,
@@ -954,22 +968,34 @@
         "baselineEntries": 2591,
         "baselineCoverage": "Git-listed files excluding secret-like paths and Phase 2 evidence; not a full filesystem snapshot.",
         "step6ExistingEdits": [
+          "__tests__/planner-v2/intelligence/allocator.test.ts",
+          "__tests__/planner-v2/intelligence/blueprint.test.ts",
+          "__tests__/planner-v2/intelligence/quality.test.ts",
           "__tests__/planner-v2/intelligence/research-verification.test.ts",
           "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
           "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+          "__tests__/planner-v2/postgres/learning-allocation.postgres.ts",
+          "lib/planner/v2/intelligence/allocator.ts",
           "lib/planner/v2/intelligence/blueprint.ts",
           "lib/planner/v2/intelligence/quality.ts",
+          "lib/planner/v2/intelligence/research-cache.ts",
           "lib/planner/v2/intelligence/research-verification.ts",
+          "lib/planner/v2/server/learning.ts",
           "lib/planner/v2/server/research.ts",
           "__tests__/ai/provider-contract.test.ts",
           "__tests__/planner-v2/intelligence/provider.test.ts",
           "__tests__/planner-v2/intelligence/serialization.test.ts",
+          "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts",
+          "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts",
+          "__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts",
           "__tests__/planner-v2/postgres/proposal-fixture.ts",
           "app/api/planner/generate/route.ts",
           "documentation/planner/README.md",
           "documentation/planner/reports/2026-10-03-phase-2/README.md",
           "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json",
+          "lib/ai/providers/deepseek.ts",
           "lib/ai/providers/gemini.ts",
+          "lib/ai/providers/types.ts",
           "lib/planner/v2/intelligence/context.ts",
           "lib/planner/v2/intelligence/provider.ts",
           "lib/planner/v2/server/attempts.ts",
@@ -979,21 +1005,2064 @@
           "lib/planner/v2/server/web.ts",
           "scripts/test-planner-v2-phase1-postgres.mjs"
         ],
+        "authorizedAdjacentTimerChanges": [
+          "__tests__/planner-v2/postgres/durable-core.postgres.ts",
+          "app/api/sessions/route.ts",
+          "lib/planner/v2/server/settlement.ts"
+        ],
+        "authorizedAdjacentTimerNewFiles": [
+          "__tests__/timer/session-route.test.ts",
+          "documentation/planner/reports/2026-10-07-timer-settlement/README.md",
+          "documentation/planner/reports/2026-10-07-timer-settlement/evidence/diagnosis.json",
+          "documentation/planner/reports/2026-10-07-timer-settlement/evidence/postgres-current-results.json",
+          "documentation/planner/reports/2026-10-07-timer-settlement/evidence/postgres-harness-run.json",
+          "documentation/planner/reports/2026-10-07-timer-settlement/evidence/postgres-phase1-results.json",
+          "documentation/planner/reports/2026-10-07-timer-settlement/evidence/timer-tests.json"
+        ],
         "derivedWorkerChanges": [
+          "dist/planner-worker/planner/v2/intelligence/allocator.js",
           "dist/planner-worker/planner/v2/intelligence/blueprint.js",
           "dist/planner-worker/planner/v2/intelligence/quality.js",
+          "dist/planner-worker/planner/v2/intelligence/research-cache.js",
           "dist/planner-worker/planner/v2/intelligence/research-verification.js",
+          "dist/planner-worker/planner/v2/server/learning.js",
           "dist/planner-worker/planner/v2/server/research.js",
+          "dist/planner-worker/ai/providers/deepseek.js",
           "dist/planner-worker/ai/providers/gemini.js",
           "dist/planner-worker/planner/v2/intelligence/context.js",
           "dist/planner-worker/planner/v2/intelligence/provider.js",
           "dist/planner-worker/planner/v2/server/attempts.js",
           "dist/planner-worker/planner/v2/server/context.js",
           "dist/planner-worker/planner/v2/server/intents.js",
-          "dist/planner-worker/planner/v2/server/revisions.js"
+          "dist/planner-worker/planner/v2/server/revisions.js",
+          "dist/planner-worker/planner/v2/server/settlement.js"
         ],
-        "unrelatedConcurrentChanges": [],
-        "unrelatedNewFiles": [],
+        "unrelatedConcurrentChanges": [
+          {
+            "path": "__tests__/focus/focus-party-background-unification.test.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 18338,
+              "sha256": "db0375706967dd1c54cf2d9f23cb24cf9314ef52945e5a6fbac996b67189d182"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "9371fdf7daf81c1951e1dd0a2de7726ce9c7cac88026471794140ee7a1b1e43b"
+            }
+          },
+          {
+            "path": "__tests__/focus/focus-party-dedicated-room.test.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 21724,
+              "sha256": "666dadeff6e9f8d08831b11ca9bc2a6a0dfb76bd4481019595757611c9fd09a6"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "a3108d0bc93daae3c0deeea7abbf79669d5db42c07216fa03ba61faa51b92fef"
+            }
+          },
+          {
+            "path": "__tests__/focus/focus-party-frontend.test.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 19117,
+              "sha256": "ddfff2e7d6765e7197c54ff0669742b30243ba45ccbf774fb80f7910f59a23e8"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "989916ae1a06049ac3b3ce5dab2b10478dad8e1155ff598068c4aa9dd3b0ea6c"
+            }
+          },
+          {
+            "path": "__tests__/landing/journey-motion.test.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 8648,
+              "sha256": "e49be307c50f115f40cdb64eb783df95570caa039ec512ff38941c899250f3d6"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "aac76c59d7a14c8d8495ab6c87abf410abdbc1cefd30e5ca931963c961acd6ab"
+            }
+          },
+          {
+            "path": "__tests__/landing/pixel-companion-layering.test.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 4463,
+              "sha256": "4704faf880a42fb380a38994c0a9d1d66db234ab9b2a65f660b4daf8627a4b14"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "c57a9cfaedc33a41925ddcbe82f4b2115f939f753ce52cacb56a3e7e10a3b07d"
+            }
+          },
+          {
+            "path": "__tests__/landing/pixel-companion-prototype.test.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 2562,
+              "sha256": "dce3656d32740c0d5743c9fe94c873d3e8217cfd74c6ff1dfdf39f334f9fa9fb"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "b3177626639c08c72154df8cf7e0bc4f09afdd78be7ad7ad7eb6b85cf955a79b"
+            }
+          },
+          {
+            "path": "__tests__/landing/svg-reaction-sequence.test.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 8369,
+              "sha256": "9d9561c75c94d2ea04f4fc875e59ad905582602a12f9a842fa3eacd66de5cf92"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "42fe4b67ff948e189400cf52922caca6d835f1a10e5a981a2b941d09a4e51416"
+            }
+          },
+          {
+            "path": "app/api/friends/requests/route.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 5025,
+              "sha256": "3af8d557b23bc50b83bf17d8cc915d7febb43a8d01ce01d76c1c71a70f69b536"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "f1d4058b9398c07bbd2d6dd5c366ff62ab63ba5e90583be8c1220acc4ec186b4"
+            }
+          },
+          {
+            "path": "app/api/friends/route.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 7045,
+              "sha256": "574a3a3b6ae10e3d0945592ae145bf6a2320c7aeafdc9259f246fc526e1d1453"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "e2091c3d0bd30622005a5f59876c739443ac51bb77fb7b2a8d6fdc1411eac7c5"
+            }
+          },
+          {
+            "path": "app/api/profile/customization/route.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 4139,
+              "sha256": "034bfdce2d7c6af467a4e460feca6a2d275c5e4f832fcf5839a4f63fd948ce1c"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "e84e6b0e167e8bc4071b03bae77e3177084809cfbb3215273386bfd25e434c00"
+            }
+          },
+          {
+            "path": "app/api/user/stats/route.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 5429,
+              "sha256": "a86122ea43d9a874fce6223eae73a1b91915b491ecb629797e132afed768263c"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "dded26e1fd049e36756b3c92a292c09b6a715f1705cff8d15741679a64c6cb4e"
+            }
+          },
+          {
+            "path": "app/companion-prototype/page.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 407,
+              "sha256": "2c209915fd228bfe800ee0e4c23556854f0240e75d99df69a57b343d1be360d4"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "b00bf353b467f0ac8e3281db392ebf2fcda79462c42aceac9e38985b9f45103d"
+            }
+          },
+          {
+            "path": "app/components/AuthProvider.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 4318,
+              "sha256": "a08efab265f365df1d924dec59fb505c925cbe86f964fadf41d18644efe94aea"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "83c331bb0fdeacf065c0e1b475ce72c0258135adaafb09e9fefcfad55f6734f8"
+            }
+          },
+          {
+            "path": "app/components/FriendRequestsModal.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 10496,
+              "sha256": "da6fe7d74ac20cb65116ef5db161ab8743e3a99bd0e0a8bd428e543e68ada4bb"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "0812cfee09c5067f4ae8a5f7053f315ac62a94e651d02d961ae67e1fd7b7c96f"
+            }
+          },
+          {
+            "path": "app/components/LevelUpProvider.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 5375,
+              "sha256": "b9207bde14f081528b7a9edc54c8ef562d36f8f4b96fddb288db3d7377f8da9e"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "a4c97537abf7bed9c6e3595ed02a379953d2bd3cb9b284c44cfb9212d9fdd419"
+            }
+          },
+          {
+            "path": "app/components/PublicProfileModal.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 85660,
+              "sha256": "bf48943dd5a2209425b1803516947aa6774c773349d83987c6c7c31bdd5573eb"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "b84ac2511051728ce43f622b7fa6be5235f79cf7ce24f1562fb91d1f674e0834"
+            }
+          },
+          {
+            "path": "app/components/character/CharacterRenderer.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 3239,
+              "sha256": "1110ad6028665dc38fa481a8752276dc8fcc01c8183ea5e057a254deb049785f"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "app/components/landing/companion/Companion.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 4305,
+              "sha256": "3d57e57c59e2af50e7a07a166c4a528452a8b5af98da1a0135812bdfb9c4400f"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "b773e86046958a751cccfd223bb1cabc4cf5624166922833ccff0ae652abadb4"
+            }
+          },
+          {
+            "path": "app/components/landing/companion/CompanionReview.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 13325,
+              "sha256": "532ffd0503cbd02cd86d65733ad1565d07674a29e68a1c0ce4ea2069600b7eb8"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "a7d9dc7523fa7cf1f8929a4714e3790798faf6b44ae1b80438c450ca52d36fc0"
+            }
+          },
+          {
+            "path": "app/components/landing/companion/PixelCompanion.module.css",
+            "before": {
+              "kind": "file",
+              "bytes": 547,
+              "sha256": "65d6c22d83af4be22bd017e02202d606c0196c702ee92594cf38155257acd581"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "app/components/landing/companion/PixelCompanion.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 1890,
+              "sha256": "e98a19bf7f31be5d03499365db7f7d5fe45ea5b6a53d9bbfd988d22fc46b682c"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "app/components/landing/companion/pixel-preview.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 2385,
+              "sha256": "0ae9ccad1d4864f1dd8c75d6818108013034c1de9a920145765f84d4bf0d33b5"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "app/components/landing/journey/JourneyPath.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 14966,
+              "sha256": "02f9e357f63297aa5cc8528ad118f68a363e7dfef4fb20aa9ebf13a22b5f862a"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "0449aa386b0db3b2b11ed4cc8827e27947e23ff3c0e3ba5508f97a3a5b57ba6c"
+            }
+          },
+          {
+            "path": "app/dashboard-design/components/DashboardDesignScreen.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 30566,
+              "sha256": "245e42b8a6b5b2ccaef40f38dc96bdc939e821ba5e99a2a908ab46244f1af6cc"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "07f490956f756fb92cf327d011f43da40f51b426ea4a3558bbfd8b9ead6519b8"
+            }
+          },
+          {
+            "path": "app/dashboard/Dashboard.module.css",
+            "before": {
+              "kind": "file",
+              "bytes": 29295,
+              "sha256": "36aeb3427654babf881cbb615710beb051af892c03e00bbc7056936bf0410ea4"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "694dc7c759333e8b9ca2dbe50310505c49f9dea6e12faf8c1bc6bf4a5ccf5682"
+            }
+          },
+          {
+            "path": "app/dashboard/components/DashboardScreen.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 30345,
+              "sha256": "31014d0c547d47bfdb5a2d81841f628ca487aa1cbf2651e94858b03d06af4b74"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "6fddab9f06e79cccd56ed141a6d3bdecb5d1b8db856d9a48aac24d0521b9bfa5"
+            }
+          },
+          {
+            "path": "app/locker/Locker.module.css",
+            "before": {
+              "kind": "file",
+              "bytes": 11824,
+              "sha256": "ea2b4317dfa41d9f578255e80d56cc56ffb77ddb70b16fe1d5379ca05cfa6d40"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "7a660a2c4d5dc993f840b5380e9d1b3fbedbc243033404ed6c6bef2093ef0b55"
+            }
+          },
+          {
+            "path": "app/locker/components/IdentityTab.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 9625,
+              "sha256": "a72f7ddfdb2cc3f69e53187f33bb28bcb5922ead6cdfc5e678c52289677af86b"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "0d6faf16b68cbd36b99e85811db86037cc8ae75d4b49bb957974ad716c1ca504"
+            }
+          },
+          {
+            "path": "app/locker/components/ItemsTab.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 35257,
+              "sha256": "79a7d675d4ef874257cadbcc0628a82e141185b9c45ec5e8586ddbc63d8dc1ea"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "954ece2a3e51940233508a81f7b46c4e01f61788f701c7d0e87497ec56ec8f97"
+            }
+          },
+          {
+            "path": "app/locker/components/LockerScreen.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 4704,
+              "sha256": "6a2631f6515286ea889aeaee7f9690a01add85b217d5b6ea63fd45d55c9d8184"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "8f70a959a87ac209f60153e7191933975afe398dfaae65ac48c620803b929ca7"
+            }
+          },
+          {
+            "path": "app/locker/components/identity/CharacterStudioView.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 28202,
+              "sha256": "d79da915ca09f3baf1282bc8688e3649341b3390f0ccd0519203b552775d47e6"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "app/locker/components/identity/StudioHubView.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 14334,
+              "sha256": "2f8adc020fd91292dbe62aed6821725786c08e56a7320140973762f8626570a2"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "f07622b080ceef2b663474edc108176d2fcae2e8aa3c1149e1e8414349bdfcb2"
+            }
+          },
+          {
+            "path": "app/settings/appearance/components/AppearanceSettingsScreen.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 18131,
+              "sha256": "ea92a000abf4fded11b047fbd4ff2e72c8f976ee383acf0d9888cef0a8a9b2ea"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "7b91809b2303d8bd6f1225f41950f7479c659e21102b7c3f2b674b37fb1a2af1"
+            }
+          },
+          {
+            "path": "app/settings/collection/components/CollectionSettingsScreen.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 28481,
+              "sha256": "644663158026c8f4a78f71eec5f9a32b92c56c61618cc236d2cbc98c1a8312a5"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "c546fe0704d47520c055adfa31fc6b6edf23fca2240017fe2e24b0f1686293be"
+            }
+          },
+          {
+            "path": "app/shop/components/ShopScreen.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 44179,
+              "sha256": "3c74cbae449ec363b06a2956448d59f739a91ce7d29a5c18e903e39ddefd9644"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "0a42fc885ee3a86a9669b0d8e1933201e2486e858e2514908ab5e61c21fa3735"
+            }
+          },
+          {
+            "path": "app/social/components/SocialScreen.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 73436,
+              "sha256": "21487297b59df234461fcf3d91c8fc265be27cc75d54cc0894e11ac347e2e026"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "5c45203bb8f704ecb829fb2a574ba06bf430a2e339b57110d55594ae6ee8d4ae"
+            }
+          },
+          {
+            "path": "app/social/components/focus-party/FocusPartyInviteModal.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 10978,
+              "sha256": "2534ae0e5ff06cb334938ba11027542a0f795c1ec21c1a81b2530919e51eca6d"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "e75ff2b44fe7a0c4b4f41a413b1cdffcf5d443a0ce36b86f91e0ed6f898676ab"
+            }
+          },
+          {
+            "path": "app/social/components/focus-party/FocusPartyLobby.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 23664,
+              "sha256": "13c9e93d41f4cf66f5eb2f9c0081f753602f4e6a524c2d8a0e328fecaab04a54"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "9f0eae7c549cdfdeb29054500e654056eff5954d81c18c134d0213bd9f27879b"
+            }
+          },
+          {
+            "path": "app/social/components/focus-party/FocusPartyMemberStage.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 8801,
+              "sha256": "a576aaa0d18b33edc437283e004ef4d204175eb5990860be4b6f14087ec05333"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "1c33e17904f3d8c6530bc5167bfaddee6cd364e5780dafd531635c0c75f1cf53"
+            }
+          },
+          {
+            "path": "app/social/components/focus-party/FocusPartyRoom.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 15341,
+              "sha256": "68bffc15f16af42a4ddba3fff25f6687e07ab1672a0c53747c41e2564c6a1cfe"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "4d6faaaa5cb0f10a7e354b36820d6b9964a669be215b56fc50d90884fb060ff4"
+            }
+          },
+          {
+            "path": "documentation/README.md",
+            "before": {
+              "kind": "file",
+              "bytes": 5858,
+              "sha256": "3d0b4c1ad5e15db8e1e19fb3f52cf3e09759ed0a234636ede4b92ecc8e2335b8"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "aa9a20b3e7b5a9b83c22f98e7b01823e5257bfdc859f185af0d128f36e7bc566"
+            }
+          },
+          {
+            "path": "documentation/landing-companion/README.md",
+            "before": {
+              "kind": "file",
+              "bytes": 4823,
+              "sha256": "abeda94d9a1f7909bd9ec97f40923ab6bfa722b96bde03b077ec91474b8d38de"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "a743a4e17d5b292ce43e3f5a3299bdb1ea10d1842867e3a713dadac75c942cbc"
+            }
+          },
+          {
+            "path": "documentation/performance/phase-0/artifacts/render-diagnostics.json",
+            "before": {
+              "kind": "file",
+              "bytes": 537,
+              "sha256": "b61197e1320146d28b3b0cfcf1ad32e17d3ddcd2bc323c010b19f7f00012f74a"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "db7c896b74c14b0b7356c42b52e8837839faa3dc170ebd3b5b99075426230695"
+            }
+          },
+          {
+            "path": "documentation/pixel-companion/README.md",
+            "before": {
+              "kind": "file",
+              "bytes": 1480,
+              "sha256": "b516c81d12c86a53d2a9e9c61927023e79bec2e48ff14e30a13edb676d68b75a"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "ec4415e6c716dc80570f9ec795960dc7527608654babe84a145d0398af6a95df"
+            }
+          },
+          {
+            "path": "lib/archive-catalog.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 28024,
+              "sha256": "6635ceda9950fce438348e9bf40de7366ce7b012b6b7f9cdeca27fc10275fd5b"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "68b518168e1c93d72726528998665619a3cb2f83f06b2e0b03048625c2071f54"
+            }
+          },
+          {
+            "path": "lib/asset-manifest.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 4268,
+              "sha256": "ffa0906f33ba55500930758ebaf06c521009dbaf45822ed59820543dc40b42b4"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "f9b8b2001708e50b47a4dc6396e923ea938e903f21723758952cab107a33b09d"
+            }
+          },
+          {
+            "path": "lib/character-traits.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 11426,
+              "sha256": "01d1cd4bd59635d754d18312c5816fef0ea9ef6b28ee1f93bbe66b859c5ef1e6"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "203f9310e6490e9f9548ab6ebaf12ea1bbf720151ee526c748dc6b2eb45d401e"
+            }
+          },
+          {
+            "path": "lib/client-data-cache.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 7499,
+              "sha256": "d1f0f79d5f71c4e8e3179350f00b8fd286406a26a14711e8dbb1f004f4d536b6"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "bca044f041b81e8127f19d2c7f44f0766d567d8c4b5772384cb3114ee33f68c9"
+            }
+          },
+          {
+            "path": "lib/focus-party-service.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 19895,
+              "sha256": "7da430ab402a53b41459f0190dd060341cb4b69869e5ee7fedf167cd11800bee"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "15320b080bda8702a198d801c3b023148afdfc82ad1e7aacf90025c83794db07"
+            }
+          },
+          {
+            "path": "lib/focus-party-types.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 5538,
+              "sha256": "1f0c63c8124aa95fc2e134ef30e8adc0c56abeb2e19379959443172e9aa9e354"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "c8c0c42850fba23335d35297bc6b0b6e762e26083b977211276772e709336373"
+            }
+          },
+          {
+            "path": "lib/prisma.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 3746,
+              "sha256": "7106282a7a3a8409bfd277c17969227e7af17df0f141aa6a144bd4b9cbd01e3b"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "b56ce3bb8168eb65842cb5a09f0210a4e4fb2870bf252ae41764e5a7ab96dc3c"
+            }
+          },
+          {
+            "path": "lib/profile-service.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 17255,
+              "sha256": "7da11a836f8ef1fb43210bfd14b940a8e48d6b26f337095d4a531a98c2625e93"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "038eb0351f0f20841e1c5eb628ff09071d376a8f3c88bad51b4111dd6765aeba"
+            }
+          },
+          {
+            "path": "lib/system-collection.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 2225,
+              "sha256": "2adc28cc70b152a7d0587109fdfce5573220b29607af912bea8a6c703171f2fc"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "0c99b1b51863f72a03479cf6d631b165d1afd5848250c2c2652fb9a4257b321a"
+            }
+          },
+          {
+            "path": "mobile/dist/.mock-manifest.json",
+            "before": {
+              "kind": "file",
+              "bytes": 100,
+              "sha256": "b3542474495d80e23c7716ac3b9b30a68340680a25561c18f30527d7747990fc"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "df1882c15f8ed2d8d0e8942fbecf03172f386c3cc5d80b750f4e1053a45fa118"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/AccountSettingsScreen-BWzK9p_7.js",
+            "before": {
+              "kind": "file",
+              "bytes": 56979,
+              "sha256": "1aa547bc4cb87c6a5bbc78f40b65828cb77edfa49d8fd91ae79e8859ca091f3e"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/AchievementsSettingsScreen-BAUH8GGj.js",
+            "before": {
+              "kind": "file",
+              "bytes": 8695,
+              "sha256": "72828109e43b877c95fb8ca10b04dbc180665e5f39107a5ea713cb3a361809a4"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/AppearanceSettingsScreen-Ko92ZCLW.js",
+            "before": {
+              "kind": "file",
+              "bytes": 35662,
+              "sha256": "3d4019b888c31952aa1d6df76c062c55ae77b8b0fe40c33986ec9f794cd338b1"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/ArchiveSettingsScreen-j0Qg3tK9.js",
+            "before": {
+              "kind": "file",
+              "bytes": 39715,
+              "sha256": "9a8efa58d02b45b3a7b5cc066eae625962f6eefaf713b8e423a05870867ca771"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/BackToSettings-DcWYvsOt.js",
+            "before": {
+              "kind": "file",
+              "bytes": 554,
+              "sha256": "203288425c0b97b6100e7a4abe4908b65ed1f938d6b98d9fa6b7c5464d78575b"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/BackgroundsSettingsScreen-BaKe49px.js",
+            "before": {
+              "kind": "file",
+              "bytes": 227,
+              "sha256": "99e999365d76c15c5ac8a1501c222b9af30cb7f395eceb8bfefc3a4f730af9f8"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/BadgesRedirectController-OFSPHpMQ.js",
+            "before": {
+              "kind": "file",
+              "bytes": 459,
+              "sha256": "5d983f7bad8529be2e862887ac730e5408a456ca379fe00e7104f268b557262d"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/CalendarScreen-U8SLnvO_.js",
+            "before": {
+              "kind": "file",
+              "bytes": 41236,
+              "sha256": "ab53b6495ea3345698e18df0fb51199d6d224d775e93055ef9a98e85a99f2dd2"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/CalendarSettingsScreen-DTVDulNg.js",
+            "before": {
+              "kind": "file",
+              "bytes": 2052,
+              "sha256": "d4bab6bf92eb97b9edfa8db53154cfb7118d40cf663efb2acfe2535176214afe"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/CollectionSettingsScreen-C3d92TRy.js",
+            "before": {
+              "kind": "file",
+              "bytes": 14567,
+              "sha256": "7452e1533dd49341c481842f524be95ba3a3a01f496e582f1188562853758ce1"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/CustomAudioTab-BXu1mbro.js",
+            "before": {
+              "kind": "file",
+              "bytes": 15551,
+              "sha256": "e46593ba2a710b18899066886bcb12963d53a40c818649c4cc1c57f7a2b5a65e"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/CustomAudioTab-VJEWvgsz.css",
+            "before": {
+              "kind": "file",
+              "bytes": 8894,
+              "sha256": "07d85270f9d60edfb8f958f35e6a007b7b86a2f891b2fc502c159bf73e1f3128"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/DashboardScreen-6QQCEjFC.js",
+            "before": {
+              "kind": "file",
+              "bytes": 24252,
+              "sha256": "3996b1b8eeb253a2700bfdc1774d2d9f255cf995c4fb26f182406526a9a07218"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/DashboardScreen-r8XZl4Kr.css",
+            "before": {
+              "kind": "file",
+              "bytes": 24155,
+              "sha256": "39f89e0056d2ad5043d0f3c5e9b62ed88345809eef1c93570d441f3738a3c224"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/FantasyTimerLayout-uH2PLLjY.js",
+            "before": {
+              "kind": "file",
+              "bytes": 58013,
+              "sha256": "61997a72e12b6c9a35249d5730421faea88088e017537f996a6e4734777376e6"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/FocusBackgroundPicker-BKDuaGtK.js",
+            "before": {
+              "kind": "file",
+              "bytes": 35217,
+              "sha256": "1f9650732ec2cecd75f40e1c5304871ca57949c3ef1175ce47e5589de611705e"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/FocusBackgroundsSettingsScreen-CZAiHa6f.js",
+            "before": {
+              "kind": "file",
+              "bytes": 33461,
+              "sha256": "19f528d545a11427f732bda434ffe109f4d74eb04fffa7e741d82e235e533972"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/FocusScreen-CJa4n_9Q.js",
+            "before": {
+              "kind": "file",
+              "bytes": 179319,
+              "sha256": "d4ae9bc6113adfe01891883ac88dfb7c7a3a7b269ee41117199c4ef5b9f7c9f4"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/FocusTimerLayoutRouter-BfaVsxMj.js",
+            "before": {
+              "kind": "file",
+              "bytes": 764,
+              "sha256": "796ecbcb6d749522976e5183131a496fbd60da450a5ed507398672ef0065a8a6"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/GoalsScreen-B8602421.js",
+            "before": {
+              "kind": "file",
+              "bytes": 36819,
+              "sha256": "cad67798be8df435029a8b12a20fae987189dd15219476180d050af2f7b06e92"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/LockerScreen-DAJNB9_U.js",
+            "before": {
+              "kind": "file",
+              "bytes": 104564,
+              "sha256": "14d548363e66ea5ec9f31750a73c3ad6b6143a170713c9252b958b6903b8f6a5"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/ModesSettingsScreen-jrsLtez0.js",
+            "before": {
+              "kind": "file",
+              "bytes": 16304,
+              "sha256": "acba1d3ee6b25c432a790bbe50a6a672ffc046068bb2298c764e29dc981828bd"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/NotificationsSettingsScreen-yaG-bMEy.js",
+            "before": {
+              "kind": "file",
+              "bytes": 11009,
+              "sha256": "53db481ff6cc1b3221bd095bba93aa0a0dab84db4846bcfdc616ed12f026d676"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/ProfileRedirectController-D0A02koZ.js",
+            "before": {
+              "kind": "file",
+              "bytes": 475,
+              "sha256": "e065ef12d757036687e47082ee429fe4228a9c2efaa527a49bc5841a2f2a01b2"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/QuestsScreen-DW2p10il.js",
+            "before": {
+              "kind": "file",
+              "bytes": 749,
+              "sha256": "9e15a4aff4608123e10076a8456deaf4597408667fa6431410b7c378db45ce6a"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/RankingsSettingsScreen-D36TMgCI.js",
+            "before": {
+              "kind": "file",
+              "bytes": 10727,
+              "sha256": "4307976f05c99abde118762c5f77476ac70d7a3f9144f5240ccc0790b7f7f689"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/SettingsIndexController-MXETdFWA.js",
+            "before": {
+              "kind": "file",
+              "bytes": 894,
+              "sha256": "298cfdd3c941d44c1cd378585632caf0df69fa8f1c8d110f43f932a638695c6f"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/ShopScreen-DAJybIoT.js",
+            "before": {
+              "kind": "file",
+              "bytes": 23085,
+              "sha256": "df082b2e32b30af5f34ec662151aa6291f975fe9340fad438e138f42aa3c0ddb"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/SocialScreen-CtOEztw3.js",
+            "before": {
+              "kind": "file",
+              "bytes": 313172,
+              "sha256": "f0bef2fc08c069f4189153a643f9e4084fcaeeb6ce68f656afd56b980d52af62"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/StatsSettingsScreen-Dnc2poCP.js",
+            "before": {
+              "kind": "file",
+              "bytes": 32389,
+              "sha256": "6c43cf4b4dce3acbb59d4f34315d735841b39ea0145819fee520646ddd70481f"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/SyncRedirectController-BtddILqW.js",
+            "before": {
+              "kind": "file",
+              "bytes": 294,
+              "sha256": "abe4f98f38427de49d75d3f3a049b65a061ffcc2e8d6578d0ee71b4303f30b8b"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/SystemIcons-C72zWRh-.js",
+            "before": {
+              "kind": "file",
+              "bytes": 5619,
+              "sha256": "3300d7820329b8a57955f8b32a5c1c596ed3121c700e80aa472326c27ef02665"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/SystemLibrary-CM4MNBN4.js",
+            "before": {
+              "kind": "file",
+              "bytes": 2710,
+              "sha256": "8dc69c11657444f0768e0fd3279b185fc7b16bff2685460d121ec3ece0ac513d"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/SystemScreen-CJ7MS6eq.js",
+            "before": {
+              "kind": "file",
+              "bytes": 349028,
+              "sha256": "219e765a1a72db94cb6a3bbaa12f181306a91eb12097df0e82080f792fb9b691"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/ThemesSettingsScreen-SJd_alGE.js",
+            "before": {
+              "kind": "file",
+              "bytes": 222,
+              "sha256": "7b6c003f9b956ea7b2639753ee0f23ee2ad8c2003e13f3ea9a64bbed6cd5ec52"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/TimerScreen-DEzKE6oT.js",
+            "before": {
+              "kind": "file",
+              "bytes": 23688,
+              "sha256": "eecf896bb4b996466959f82dbf40996d7eb16b00019d46397faf6cb6f6f688f4"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/client-data-cache-gMotkeLg.js",
+            "before": {
+              "kind": "file",
+              "bytes": 2395,
+              "sha256": "d954ca3dcf77dbfc5516e83fb981ab5a296a392c465fa46eb2cf42810faaf3e4"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/index-BCuMXoAu.js",
+            "before": {
+              "kind": "file",
+              "bytes": 730304,
+              "sha256": "9a9005d6751a2ab520a41209b7a6022faee0f765dc75c6468874b27f49c5df96"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/index-JZltZ5lf.css",
+            "before": {
+              "kind": "file",
+              "bytes": 398898,
+              "sha256": "8c6c0630f07e6e826d7cfce65ff6d49986094caacce3afbf61d20417f6d312ab"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/useSystemAppearance-Cb_IUQei.js",
+            "before": {
+              "kind": "file",
+              "bytes": 680,
+              "sha256": "8f33f4a5b84c4b813af928e712d9e02a7e23ba2feacc90ef383359f76e268799"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/vendor-icons-ClxYTyPb.js",
+            "before": {
+              "kind": "file",
+              "bytes": 46958,
+              "sha256": "457eab2a9d335b9e4b8ec1c7da7707fcd5a6d7eb9111a9eb28a07eba6eed8856"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/vendor-motion-DkukPa_c.js",
+            "before": {
+              "kind": "file",
+              "bytes": 125743,
+              "sha256": "625f98887a0f665d56618d46033f19ed25658695786f08aed3dfffcac0647e7e"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/assets/vendor-react-CBlieeui.js",
+            "before": {
+              "kind": "file",
+              "bytes": 181757,
+              "sha256": "781dc273b73ae04c204d7e2aaa94bdd6367f185ca4098b5a15c8350d7dafc283"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/index.html",
+            "before": {
+              "kind": "file",
+              "bytes": 1851,
+              "sha256": "5e2fcd046fede11fd9720526e05fed893e4c0e0a6a0060f10d07482188e9f443"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "de6694efef5305da1a4d57e3bb1fbab6cfdd788c20b60d089d2fdf816fbfa390"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/body/test_hunter_base.png",
+            "before": {
+              "kind": "file",
+              "bytes": 776,
+              "sha256": "054b31c31bd64a68a4325a7870f5efb897f780e1cf23815e489e69278b367c25"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_choso.png",
+            "before": {
+              "kind": "file",
+              "bytes": 19417,
+              "sha256": "c95ff142f6193654a2acf34c042c8407b503e8fdb2cf3b053d379919fd449ff2"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_deadpool.png",
+            "before": {
+              "kind": "file",
+              "bytes": 36949,
+              "sha256": "dd4eab5fe28a149b41d9c38143a1ad438f5aaf1643e94474a6cc6ef90604b59d"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_eren.png",
+            "before": {
+              "kind": "file",
+              "bytes": 4704,
+              "sha256": "5a8e69bd8b95501b9c991287b6f9cae7734381b7535d0c9b30f7d08e2c7b8342"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_gojo.png",
+            "before": {
+              "kind": "file",
+              "bytes": 19125,
+              "sha256": "de5d0d94ed1a7c840f8f18df939617f337de3d6ddf5d41027ccb0ac8fbe38423"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_itadori.png",
+            "before": {
+              "kind": "file",
+              "bytes": 24815,
+              "sha256": "1addacbf0eb94fa70d6f49628f8faa3c2e80a8c404dc53230e085827e4ba2211"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_megumi.png",
+            "before": {
+              "kind": "file",
+              "bytes": 17921,
+              "sha256": "a8a80395fb30c50649bf8a4691693009fa1e1663c2a2705c7345b538a148ec78"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_megumin.png",
+            "before": {
+              "kind": "file",
+              "bytes": 21775,
+              "sha256": "4c938e97886d46970e1d7c4e2bf5805cd0fde5e11ff52331007e84afecc3319b"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_mitsuri.png",
+            "before": {
+              "kind": "file",
+              "bytes": 31970,
+              "sha256": "20f433968cc13b6f9ed394ad00088057ed77c3e4a869bd166d0c881de6c5ba82"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_nezuko.png",
+            "before": {
+              "kind": "file",
+              "bytes": 30601,
+              "sha256": "ade7a5687d3614d86fd78284313fc5964434f3184d19c58d0b98e73049112d65"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_nobara.png",
+            "before": {
+              "kind": "file",
+              "bytes": 20615,
+              "sha256": "1f2683c19970764145a2f2ccc745f31bea77d044a276ea9d643ae88d487d5194"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_rengoku.png",
+            "before": {
+              "kind": "file",
+              "bytes": 30761,
+              "sha256": "f7c216add8471cb988fdd06386ffd3c0fa5ca5234150e9f3d6577d0f67f3293e"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_shinobu.png",
+            "before": {
+              "kind": "file",
+              "bytes": 19996,
+              "sha256": "fa7156ab210229e023b47d42dc324f2be9e1b2d6e839abd0d15f067a17f4bf86"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_spiderman.png",
+            "before": {
+              "kind": "file",
+              "bytes": 20759,
+              "sha256": "642f9b668c6808a0a22b625f8832271b612dbc297ed0a6afc861ba673e7dbabb"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_tanjiro.png",
+            "before": {
+              "kind": "file",
+              "bytes": 18933,
+              "sha256": "28b057554c17e7fb9aa52815f1c38c1e382d8bb568668dc2d5ed86252de8d6ff"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_uzui.png",
+            "before": {
+              "kind": "file",
+              "bytes": 30267,
+              "sha256": "6bacb17ad2bba9010f35e6bfa3c8462301224a229335e9f9513ec1db320b47fe"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/dist/sprites/character/forms/form_venom.png",
+            "before": {
+              "kind": "file",
+              "bytes": 31530,
+              "sha256": "6011b3199201354eadb124f5106a79b7f6998f241769fc4ad1be6922838539b8"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "mobile/src/MobileApp.tsx",
+            "before": {
+              "kind": "file",
+              "bytes": 1790,
+              "sha256": "66340ac41f59c6a4771b40d89f319f0133530af32b91053771c272bc083aa1c1"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "937ee905a1b159d1c0591c3d8a091a4c8d7e237daab5c02e74e92c5e13ae595e"
+            }
+          },
+          {
+            "path": "package.json",
+            "before": {
+              "kind": "file",
+              "bytes": 3117,
+              "sha256": "7cf98a1e08b4eb721a0c717b466f7ce2d485bf057245c45f49872e6c0ffaa37a"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "d5140a5f10086c5c33ae59fb6789be61760d59b8a90275cbef3a23d6cf119b3b"
+            }
+          },
+          {
+            "path": "prisma/schema.prisma",
+            "before": {
+              "kind": "file",
+              "bytes": 46575,
+              "sha256": "4f5753252e806f7ab2dd894b8c4ab64e3b0863b63999580f11514b764da678fb"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "f5fbe318b2134a743ef35624f1b35d4b33e530e87c93fdf8ce2fe63da212d588"
+            }
+          },
+          {
+            "path": "proxy.ts",
+            "before": {
+              "kind": "file",
+              "bytes": 4136,
+              "sha256": "eed12d20924f28374886752f462149cc2b3722ddc14c0c713e36597429e1e6a5"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "a5f13969e0bd7046e21ded8bedfd085cd417da73006bdc02dac690677f6a74d7"
+            }
+          },
+          {
+            "path": "public/companions/pixel/sylf/base/body.png",
+            "before": {
+              "kind": "file",
+              "bytes": 746814,
+              "sha256": "306972d459fb942729d8a1bc5f6c57b4a3630915453b2e78a7b1102f86dae28a"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/companions/pixel/sylf/eyes/blink.png",
+            "before": {
+              "kind": "file",
+              "bytes": 20353,
+              "sha256": "6f174ae289b92985b4c76d508464d62761052751e29c8ada9940e58ffff26aa0"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/companions/pixel/sylf/eyes/focused.png",
+            "before": {
+              "kind": "file",
+              "bytes": 47237,
+              "sha256": "618bbabcc9499ac226c047647cb9e40aa90f15b28677060c08e93e014478c719"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/companions/pixel/sylf/eyes/happy.png",
+            "before": {
+              "kind": "file",
+              "bytes": 59977,
+              "sha256": "0f9ef074ea6750cb5ea54147ac252a26bb7a3961a337fe7fa3b3a3cc67fe9090"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/companions/pixel/sylf/eyes/neutral.png",
+            "before": {
+              "kind": "file",
+              "bytes": 59942,
+              "sha256": "9f402b022ee0ae6decd0bea9c25791f9c2959f423af5d9e36809ce037d27a409"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/companions/pixel/sylf/eyes/sleepy.png",
+            "before": {
+              "kind": "file",
+              "bytes": 34032,
+              "sha256": "54078754998a0a77145420e72e2d9f81a56180dcbc0033c824faf7c4db95896d"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/companions/pixel/sylf/eyes/thinking.png",
+            "before": {
+              "kind": "file",
+              "bytes": 43253,
+              "sha256": "7b4a3de46930c2c9384ef39b92b23752dd16d478e1f6361e2ae3624deb442bb9"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/companions/sylf-pixel-companion.png",
+            "before": {
+              "kind": "file",
+              "bytes": 776130,
+              "sha256": "f6bbebaf602a4ab81f6ee87d5333251ab53881f2e507888e913eb8d49be2d607"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/body/test_hunter_base.png",
+            "before": {
+              "kind": "file",
+              "bytes": 776,
+              "sha256": "054b31c31bd64a68a4325a7870f5efb897f780e1cf23815e489e69278b367c25"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_choso.png",
+            "before": {
+              "kind": "file",
+              "bytes": 19417,
+              "sha256": "c95ff142f6193654a2acf34c042c8407b503e8fdb2cf3b053d379919fd449ff2"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_deadpool.png",
+            "before": {
+              "kind": "file",
+              "bytes": 36949,
+              "sha256": "dd4eab5fe28a149b41d9c38143a1ad438f5aaf1643e94474a6cc6ef90604b59d"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_eren.png",
+            "before": {
+              "kind": "file",
+              "bytes": 4704,
+              "sha256": "5a8e69bd8b95501b9c991287b6f9cae7734381b7535d0c9b30f7d08e2c7b8342"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_gojo.png",
+            "before": {
+              "kind": "file",
+              "bytes": 19125,
+              "sha256": "de5d0d94ed1a7c840f8f18df939617f337de3d6ddf5d41027ccb0ac8fbe38423"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_itadori.png",
+            "before": {
+              "kind": "file",
+              "bytes": 24815,
+              "sha256": "1addacbf0eb94fa70d6f49628f8faa3c2e80a8c404dc53230e085827e4ba2211"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_megumi.png",
+            "before": {
+              "kind": "file",
+              "bytes": 17921,
+              "sha256": "a8a80395fb30c50649bf8a4691693009fa1e1663c2a2705c7345b538a148ec78"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_megumin.png",
+            "before": {
+              "kind": "file",
+              "bytes": 21775,
+              "sha256": "4c938e97886d46970e1d7c4e2bf5805cd0fde5e11ff52331007e84afecc3319b"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_mitsuri.png",
+            "before": {
+              "kind": "file",
+              "bytes": 31970,
+              "sha256": "20f433968cc13b6f9ed394ad00088057ed77c3e4a869bd166d0c881de6c5ba82"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_nezuko.png",
+            "before": {
+              "kind": "file",
+              "bytes": 30601,
+              "sha256": "ade7a5687d3614d86fd78284313fc5964434f3184d19c58d0b98e73049112d65"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_nobara.png",
+            "before": {
+              "kind": "file",
+              "bytes": 20615,
+              "sha256": "1f2683c19970764145a2f2ccc745f31bea77d044a276ea9d643ae88d487d5194"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_rengoku.png",
+            "before": {
+              "kind": "file",
+              "bytes": 30761,
+              "sha256": "f7c216add8471cb988fdd06386ffd3c0fa5ca5234150e9f3d6577d0f67f3293e"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_shinobu.png",
+            "before": {
+              "kind": "file",
+              "bytes": 19996,
+              "sha256": "fa7156ab210229e023b47d42dc324f2be9e1b2d6e839abd0d15f067a17f4bf86"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_spiderman.png",
+            "before": {
+              "kind": "file",
+              "bytes": 20759,
+              "sha256": "642f9b668c6808a0a22b625f8832271b612dbc297ed0a6afc861ba673e7dbabb"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_tanjiro.png",
+            "before": {
+              "kind": "file",
+              "bytes": 18933,
+              "sha256": "28b057554c17e7fb9aa52815f1c38c1e382d8bb568668dc2d5ed86252de8d6ff"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_uzui.png",
+            "before": {
+              "kind": "file",
+              "bytes": 30267,
+              "sha256": "6bacb17ad2bba9010f35e6bfa3c8462301224a229335e9f9513ec1db320b47fe"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "public/sprites/character/forms/form_venom.png",
+            "before": {
+              "kind": "file",
+              "bytes": 31530,
+              "sha256": "6011b3199201354eadb124f5106a79b7f6998f241769fc4ad1be6922838539b8"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "scripts/download_and_normalize_canary.mjs",
+            "before": {
+              "kind": "file",
+              "bytes": 1487,
+              "sha256": "c683c3e649c99668062ccf4cae395d0b51797ec283c237c1d2c7e0d760addd8f"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          },
+          {
+            "path": "scripts/fetch_overlay_sprites.mjs",
+            "before": {
+              "kind": "file",
+              "bytes": 4383,
+              "sha256": "e26497e124e9e18e013e083a7249a3d28a9ac5bc218cd58f9f88a8df8e96da85"
+            },
+            "observed": {
+              "kind": "file",
+              "sha256": "bb891ec54e6da7cff5d24d6ae6b899caf634e35fecf47d39b34f6585f802652f"
+            }
+          },
+          {
+            "path": "scripts/normalize_base_canary.mjs",
+            "before": {
+              "kind": "file",
+              "bytes": 8150,
+              "sha256": "2cb4b6681028e37d0711d1ed1238c9eb1125af42495a4d7cdc4e7aec3c5e110e"
+            },
+            "observed": {
+              "kind": "missing"
+            }
+          }
+        ],
+        "unrelatedNewFiles": [
+          ".playwright-mcp/page-2026-10-07T17-33-18-681Z.yml",
+          ".playwright-mcp/page-2026-10-07T17-35-15-044Z.yml",
+          ".playwright-mcp/page-2026-10-07T17-35-29-183Z.yml",
+          ".playwright-mcp/page-2026-10-07T17-36-00-847Z.yml",
+          ".playwright-mcp/page-2026-10-07T17-36-05-427Z.yml",
+          ".playwright-mcp/page-2026-10-07T17-54-20-418Z.yml",
+          ".playwright-mcp/page-2026-10-08T05-20-42-148Z.yml",
+          ".playwright-mcp/page-2026-10-08T09-42-02-843Z.yml",
+          ".playwright-mcp/page-2026-10-08T10-24-28-901Z.yml",
+          ".playwright-mcp/page-2026-10-08T10-24-32-535Z.yml",
+          ".playwright-mcp/page-2026-10-08T10-35-51-027Z.yml",
+          ".playwright-mcp/page-2026-10-08T10-50-49-627Z.yml",
+          ".playwright-mcp/page-2026-10-08T13-37-16-704Z.yml",
+          ".playwright-mcp/pixel-studio-before.png",
+          "Sylf Pixel Display.md",
+          "__tests__/dashboard/dashboard-overview.test.tsx",
+          "__tests__/dashboard/pixel-auth-mutation.test.tsx",
+          "__tests__/dashboard/pixel-companion-adapter.test.tsx",
+          "__tests__/dashboard/pixel-creation-surfaces.test.tsx",
+          "__tests__/landing/fixtures/retired-pixel-preview.ts",
+          "__tests__/pixel-display/artwork-empty-state.test.tsx",
+          "__tests__/pixel-display/artwork-selection-service.test.ts",
+          "__tests__/pixel-display/audit-composition-regressions.test.ts",
+          "__tests__/pixel-display/audit-react-host-regressions.test.tsx",
+          "__tests__/pixel-display/boundaries.test.ts",
+          "__tests__/pixel-display/canvas-renderer.test.ts",
+          "__tests__/pixel-display/color.test.ts",
+          "__tests__/pixel-display/consolidation-editor.test.ts",
+          "__tests__/pixel-display/consolidation-rendering.test.ts",
+          "__tests__/pixel-display/database-consolidation.test.ts",
+          "__tests__/pixel-display/display.test.ts",
+          "__tests__/pixel-display/fixtures/retired-sylf/character.ts",
+          "__tests__/pixel-display/fixtures/retired-sylf/effects.ts",
+          "__tests__/pixel-display/fixtures/retired-sylf/frames.ts",
+          "__tests__/pixel-display/fixtures/retired-sylf/parts.ts",
+          "__tests__/pixel-display/fixtures/retired-sylf/reference-character.ts",
+          "__tests__/pixel-display/fixtures/retired-sylf/sprite.ts",
+          "__tests__/pixel-display/framebuffer.test.ts",
+          "__tests__/pixel-display/geometry.test.ts",
+          "__tests__/pixel-display/modular-character.test.ts",
+          "__tests__/pixel-display/pixel-asset.test.ts",
+          "__tests__/pixel-display/pixel-customizer.test.ts",
+          "__tests__/pixel-display/pixel-studio.test.ts",
+          "__tests__/pixel-display/renderer-contract.test.ts",
+          "__tests__/pixel-display/renderer-resize.test.ts",
+          "__tests__/pixel-display/runtime-phase.test.ts",
+          "__tests__/pixel-display/runtime.test.ts",
+          "__tests__/pixel-display/studio-workspace.test.tsx",
+          "__tests__/pixel-display/support/recording-renderer.ts",
+          "__tests__/pixel-display/sylf-composition.test.ts",
+          "__tests__/pixel-display/sylf-effects.test.ts",
+          "app/api/pixel-creations/route.ts",
+          "app/components/companion/HexColorPicker.module.css",
+          "app/components/companion/HexColorPicker.tsx",
+          "app/components/companion/OwnCompanionPreview.tsx",
+          "app/components/companion/PixelArtworkPlaceholder.module.css",
+          "app/components/companion/PixelArtworkPlaceholder.tsx",
+          "app/components/companion/PixelCompanion.tsx",
+          "app/components/companion/TargetPixelCompanion.tsx",
+          "app/dashboard/components/PixelCompanionCard.module.css",
+          "app/dashboard/components/PixelCompanionCard.tsx",
+          "app/dashboard/pixel-companion-adapter.ts",
+          "app/dashboard/pixel-cosmetic-registry.ts",
+          "app/dashboard/pixel-modular-character.ts",
+          "app/dev/pixel-display/page.tsx",
+          "app/locker/components/identity/PixelCustomizer.module.css",
+          "app/locker/components/identity/PixelCustomizer.tsx",
+          "app/locker/components/identity/StudioHubView.module.css",
+          "app/locker/components/identity/pixel-customizer-options.ts",
+          "app/locker/components/studio/EditorCanvas.tsx",
+          "app/locker/components/studio/PixelStudio.module.css",
+          "app/locker/components/studio/PixelStudio.tsx",
+          "app/locker/components/studio/pixel-studio-model.ts",
+          "app/locker/components/studio/studio-history.ts",
+          "documentation/pixel-display/README.md",
+          "documentation/pixel-display/authoring-guide.md",
+          "documentation/pixel-display/pixel-display-contract.md",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-custom-light-surface.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-dark-1024.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-dark-1920.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-dark.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/desktop-light.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-custom-dark-surface.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-dark-320.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-dark-390.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/mobile-light-390.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/tablet-dark-768.png",
+          "documentation/pixel-display/reports/dashboard-presentation/evidence/tablet-light-768.png",
+          "documentation/pixel-display/reports/dashboard-presentation/report.md",
+          "documentation/pixel-display/reports/engineering-audit/evidence/delivery-proof.md",
+          "documentation/pixel-display/reports/engineering-audit/evidence/doublecheck-report.md",
+          "documentation/pixel-display/reports/engineering-audit/evidence/measurements.json",
+          "documentation/pixel-display/reports/engineering-audit/report.md",
+          "documentation/pixel-display/reports/phase-0/evidence/phase0-1440-dark-full.png",
+          "documentation/pixel-display/reports/phase-0/evidence/phase0-390-dark-full.png",
+          "documentation/pixel-display/reports/phase-0/evidence/phase0-390-light-accent-full.png",
+          "documentation/pixel-display/reports/phase-0/evidence/phase0-820-dark-full.png",
+          "documentation/pixel-display/reports/phase-0/evidence/results.json",
+          "documentation/pixel-display/reports/phase-0/report.md",
+          "documentation/pixel-display/reports/phase-1/evidence/performance.json",
+          "documentation/pixel-display/reports/phase-1/report.md",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/README.md",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/auth-mutation-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/cross-tab-cache-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-background-desktop-customizer.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-background-mobile-customizer.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-color-customizer.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/custom-color-mobile-customizer.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/density-flow-probes.js",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/density-flow-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-customizer-own-drawing.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-customizer-pixel-size.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-dashboard.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-editor-probes.js",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-editor-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-hub.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-balanced.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-chunky.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-detailed.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-pattern-finest.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/desktop-studio.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/error-and-draft-probes.js",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/error-and-draft-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/legacy-studio-equipped-creation.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/light-desktop-customizer.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/light-desktop-studio.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/light-mobile-studio.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-customizer.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-empty-dashboard.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-studio-full.png",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-touch-probes.js",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/mobile-touch-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/pointer-edge-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/preview-and-save-probes.js",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/preview-and-save-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/reduced-motion-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/responsive-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/evidence/save-flow-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation-audit/report.md",
+          "documentation/pixel-display/reports/phase-2-consolidation/WORKLOG.md",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/README.md",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/browser-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/collection-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/customizer-dark-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/customizer-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/customizer-mobile.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-dark-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-edge-fidelity-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/dashboard-sylf-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/document-checks.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/final-flow-customizer.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/final-flow-dashboard.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/final-flow-studio.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/mobile-bundle-dashboard.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/studio-desktop-in-progress.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/studio-first-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/earlier-qa/studio-mobile-touch.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/edge-layout-results.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/eslint-baseline.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/eslint-summary.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/eslint.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/hub-dark-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/hub-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/items-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/landing-preservation.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/legacy-removal.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/legacy-search.txt",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/mobile-bundle-dashboard-final.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/mobile-bundle-studio-final.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/mobile-display-style.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/party-room-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/production-dashboard.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/production-studio.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/save-failure-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/shop-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/simple-color-selection.json",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-dark-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-edge-fidelity-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/studio-steering-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/evidence/target-profile-desktop.png",
+          "documentation/pixel-display/reports/phase-2-consolidation/report.md",
+          "documentation/pixel-display/reports/phase-2/evidence/phase2-card-110-dark.png",
+          "documentation/pixel-display/reports/phase-2/evidence/phase2-planes-body-leaves-only.png",
+          "documentation/pixel-display/reports/phase-2/evidence/phase2-preview-458-dark.png",
+          "documentation/pixel-display/reports/phase-2/evidence/results.json",
+          "documentation/pixel-display/reports/phase-2/report.md",
+          "documentation/pixel-display/reports/phase-3/evidence/card-canvas-final.png",
+          "documentation/pixel-display/reports/phase-3/evidence/card-desktop-dark.png",
+          "documentation/pixel-display/reports/phase-3/evidence/card-desktop-light-custom-accent.png",
+          "documentation/pixel-display/reports/phase-3/evidence/card-fill-before-mapping-fix.png",
+          "documentation/pixel-display/reports/phase-3/evidence/card-reaction-celebrating.png",
+          "documentation/pixel-display/reports/phase-3/evidence/dashboard-desktop-dark-1440.png",
+          "documentation/pixel-display/reports/phase-3/evidence/dashboard-mobile-dark-390.png",
+          "documentation/pixel-display/reports/phase-3/evidence/results.json",
+          "documentation/pixel-display/reports/phase-3/report.md",
+          "documentation/pixel-display/reports/phase-4/design-note.md",
+          "documentation/pixel-display/reports/phase-4/evidence/card-ai-thinking-loop.png",
+          "documentation/pixel-display/reports/phase-4/evidence/card-light-custom-accent.png",
+          "documentation/pixel-display/reports/phase-4/evidence/dashboard-desktop-dark.png",
+          "documentation/pixel-display/reports/phase-4/evidence/dashboard-mobile-dark-390.png",
+          "documentation/pixel-display/reports/phase-4/evidence/density-sweep-constant-physical-size.png",
+          "documentation/pixel-display/reports/phase-4/evidence/results.json",
+          "documentation/pixel-display/reports/phase-4/report.md",
+          "documentation/pixel-display/reports/phase-5/evidence/results.json",
+          "documentation/pixel-display/reports/phase-5/evidence/review-held-alone.png",
+          "documentation/pixel-display/reports/phase-5/evidence/review-held-item-attached.png",
+          "documentation/pixel-display/reports/phase-5/evidence/review-panel-full.png",
+          "documentation/pixel-display/reports/phase-5/evidence/review-wearable-alone.png",
+          "documentation/pixel-display/reports/phase-5/report.md",
+          "documentation/pixel-display/reports/phase-6/evidence/dashboard-card-real-config.png",
+          "documentation/pixel-display/reports/phase-6/evidence/dashboard-desktop-dark.png",
+          "documentation/pixel-display/reports/phase-6/evidence/loadout-all-five-slots.png",
+          "documentation/pixel-display/reports/phase-6/evidence/results.json",
+          "documentation/pixel-display/reports/phase-6/evidence/review-degraded-key.png",
+          "documentation/pixel-display/reports/phase-6/evidence/review-loadout-panel.png",
+          "documentation/pixel-display/reports/phase-6/report.md",
+          "documentation/pixel-display/reports/phase-7/evidence/customizer-desktop-character.png",
+          "documentation/pixel-display/reports/phase-7/evidence/customizer-desktop-density.png",
+          "documentation/pixel-display/reports/phase-7/evidence/customizer-mobile-density.png",
+          "documentation/pixel-display/reports/phase-7/evidence/results.json",
+          "documentation/pixel-display/reports/phase-7/report.md",
+          "documentation/pixel-display/reports/phase-8/evidence/dashboard-equipped-creation.png",
+          "documentation/pixel-display/reports/phase-8/evidence/results.json",
+          "documentation/pixel-display/reports/phase-8/evidence/studio-desktop.png",
+          "documentation/pixel-display/reports/phase-8/report.md",
+          "documentation/pixel-display/reports/studio-workspace/evidence/desktop-custom-dark-surface.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/desktop-dark.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/desktop-first.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/desktop-light.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/mobile-custom-light-surface.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/mobile-dark.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/mobile-first.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/mobile-landscape.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/mobile-settings.png",
+          "documentation/pixel-display/reports/studio-workspace/evidence/mobile-verification.txt",
+          "documentation/pixel-display/reports/studio-workspace/evidence/web-build.txt",
+          "documentation/pixel-display/reports/studio-workspace/report.md",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-custom-mobile.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-customizer-empty.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-customizer-mobile.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-empty-desktop.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-empty-mobile.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-extra-lint.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-lint.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-tests.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-typecheck.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-final-web-build.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-hub-mobile.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-last-lint.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-light-desktop.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-light-mobile.png",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-mobile-build.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-mobile-verify.txt",
+          "documentation/pixel-display/reports/user-artwork-only/evidence/artwork-unavailable-desktop.png",
+          "documentation/pixel-display/reports/user-artwork-only/report.md",
+          "lib/pixel-companion-contract.ts",
+          "lib/pixel-companion-service.ts",
+          "lib/pixel-creation-service.ts",
+          "lib/pixel-creations-client.ts",
+          "lib/pixel-display-style.ts",
+          "lib/pixel-display/content/asset/attachment.ts",
+          "lib/pixel-display/content/asset/compose.ts",
+          "lib/pixel-display/content/asset/creation-asset.ts",
+          "lib/pixel-display/content/asset/creation.ts",
+          "lib/pixel-display/content/asset/empty.ts",
+          "lib/pixel-display/content/asset/identity.ts",
+          "lib/pixel-display/content/asset/index.ts",
+          "lib/pixel-display/content/asset/paint.ts",
+          "lib/pixel-display/content/asset/reference/ember-aura.ts",
+          "lib/pixel-display/content/asset/reference/index.ts",
+          "lib/pixel-display/content/asset/reference/pedestal-meadow.ts",
+          "lib/pixel-display/content/asset/reference/practice-wand.ts",
+          "lib/pixel-display/content/asset/reference/study-scarf.ts",
+          "lib/pixel-display/content/asset/resolve.ts",
+          "lib/pixel-display/content/asset/types.ts",
+          "lib/pixel-display/content/asset/validate.ts",
+          "lib/pixel-display/content/index.ts",
+          "lib/pixel-display/content/palette.ts",
+          "lib/pixel-display/content/sylf/character.ts",
+          "lib/pixel-display/content/sylf/effects.ts",
+          "lib/pixel-display/content/sylf/frames.ts",
+          "lib/pixel-display/engine/color.ts",
+          "lib/pixel-display/engine/display.ts",
+          "lib/pixel-display/engine/framebuffer.ts",
+          "lib/pixel-display/engine/geometry.ts",
+          "lib/pixel-display/engine/index.ts",
+          "lib/pixel-display/engine/pix-engine-globals.d.ts",
+          "lib/pixel-display/engine/runtime.ts",
+          "lib/pixel-display/engine/types.ts",
+          "lib/pixel-display/react/PixelDisplay.module.css",
+          "lib/pixel-display/react/PixelDisplay.tsx",
+          "lib/pixel-display/react/usePixRuntime.ts",
+          "lib/pixel-display/renderers/canvas-2d.ts",
+          "lib/pixel-display/renderers/grid-presentation.ts",
+          "mobile/dist/assets/AccountSettingsScreen-BIUW3yKZ.js",
+          "mobile/dist/assets/AchievementsSettingsScreen-g91gxVrH.js",
+          "mobile/dist/assets/AppearanceSettingsScreen-BYEqGql_.js",
+          "mobile/dist/assets/ArchiveSettingsScreen-C-_SOwIY.js",
+          "mobile/dist/assets/AuthProvider-CfChqgOW.js",
+          "mobile/dist/assets/BackToSettings-4TsoRFTt.js",
+          "mobile/dist/assets/BackgroundsSettingsScreen-v4i9sIdT.js",
+          "mobile/dist/assets/BadgesRedirectController-jVNoobB8.js",
+          "mobile/dist/assets/CalendarScreen-BKkp-5bU.js",
+          "mobile/dist/assets/CalendarSettingsScreen-BMAAETQ1.js",
+          "mobile/dist/assets/CollectionSettingsScreen-DzU0OKfj.js",
+          "mobile/dist/assets/CustomAudioTab-DXvRg2xB.css",
+          "mobile/dist/assets/CustomAudioTab-y9AOzAhp.js",
+          "mobile/dist/assets/DashboardScreen-B0xXNYs8.js",
+          "mobile/dist/assets/DashboardScreen-Cu1CYQeO.css",
+          "mobile/dist/assets/FantasyTimerLayout-DOGe7I5J.js",
+          "mobile/dist/assets/FocusBackgroundPicker-A2y_va5u.js",
+          "mobile/dist/assets/FocusBackgroundsSettingsScreen-QnnidANd.js",
+          "mobile/dist/assets/FocusScreen-rr1DFRTb.js",
+          "mobile/dist/assets/FocusTimerLayoutRouter-DvT7APf_.js",
+          "mobile/dist/assets/GoalsScreen-CsPedXjg.js",
+          "mobile/dist/assets/LockerScreen-CgGuhRNf.css",
+          "mobile/dist/assets/LockerScreen-DNLLBMdo.js",
+          "mobile/dist/assets/ModesSettingsScreen-3PM8SII9.js",
+          "mobile/dist/assets/NotificationsSettingsScreen-EbM4Mnoe.js",
+          "mobile/dist/assets/OwnCompanionPreview-BlMadczO.js",
+          "mobile/dist/assets/PixelCompanion-B8TYoe2W.js",
+          "mobile/dist/assets/PixelCompanion-gCik2SoP.css",
+          "mobile/dist/assets/ProfileRedirectController-DhgPVFO_.js",
+          "mobile/dist/assets/QuestsScreen-CUa0qkGB.js",
+          "mobile/dist/assets/RankingsSettingsScreen-C-qzr7tI.js",
+          "mobile/dist/assets/SettingsIndexController-h6q7Ew3d.js",
+          "mobile/dist/assets/ShopScreen-DltKH7c3.js",
+          "mobile/dist/assets/SocialScreen-D0HlminI.js",
+          "mobile/dist/assets/StatsSettingsScreen-DdYigXkd.js",
+          "mobile/dist/assets/SyncRedirectController-DqThO92p.js",
+          "mobile/dist/assets/SystemIcons-CyB8Ul_u.js",
+          "mobile/dist/assets/SystemLibrary-CXxzVHcV.js",
+          "mobile/dist/assets/SystemScreen-HGdteThf.js",
+          "mobile/dist/assets/ThemesSettingsScreen-DiYapaOD.js",
+          "mobile/dist/assets/TimerScreen-BuxktgzF.js",
+          "mobile/dist/assets/client-data-cache-BpHdSVLh.js",
+          "mobile/dist/assets/index-Dfsj4KuI.js",
+          "mobile/dist/assets/index-DyH0Nt9r.css",
+          "mobile/dist/assets/next-image-k9z0LVIc.js",
+          "mobile/dist/assets/useSystemAppearance-BB85psGh.js",
+          "mobile/dist/assets/vendor-icons-Cqee6HW5.js",
+          "mobile/dist/assets/vendor-motion-D-n_FYJU.js",
+          "mobile/dist/assets/vendor-react-p6Uu_7ZG.js",
+          "prisma/migrations/20261005000000_pixel_creations/migration.sql",
+          "prisma/migrations/20261007000000_pixel_companion_consolidation/migration.sql",
+          "scripts/measure-pixel-display.mjs",
+          "scripts/test-pixel-postgres.mjs",
+          "tsconfig.pixel-engine.json"
+        ],
         "unrelatedLandingUnchanged": true
       }
     },
@@ -1005,45 +3074,67 @@
   ],
   "scope": "Existing generation activation, atomic admission, supervised compiler-to-ApplyService, maximum envelopes and live development qualification. No later phase activation.",
   "sourceSha256": {
+    "__tests__/ai/deepseek-reasoning-controls.test.ts": "17978c69e92d60561208243a42d6e7e53a73ce980be67ee5da0cf1ecfac8aa76",
     "__tests__/ai/provider-contract.test.ts": "1aaf2610b1bd529ef41fb945ec23c63ae01a04001212de006f98c6cb8467cc4f",
-    "__tests__/planner-v2/intelligence/provider.test.ts": "acf14735f1150e9f02a60ac8f6c22e2e4b7d6c6e41650bb0832394a2c47fe049",
-    "__tests__/planner-v2/intelligence/research-verification.test.ts": "f5e33515d6bc100e000f2851047e50fe57e81e70170a547f8f63444145dadbeb",
+    "__tests__/planner-v2/intelligence/allocator.test.ts": "afc9402dc8b321e35796f9a8d6ef605f5f0fbcee91ea70d41037bfaad685697e",
+    "__tests__/planner-v2/intelligence/blueprint.test.ts": "e9570b245b15eb8298e6291af691e9107bf36cbf62e3676b47c3caabc3049338",
+    "__tests__/planner-v2/intelligence/provider.test.ts": "aa86ec8acba6045e80585d25f68aa4c103368bfbc4f0fed5c7a3218c4326b8db",
+    "__tests__/planner-v2/intelligence/quality.test.ts": "56216a22f4e573492845b63a2b6f983fa64cfc20a4605a2fa6abcc6f38ff3a76",
+    "__tests__/planner-v2/intelligence/research-verification.test.ts": "f65340a3734c4470c85247f4f2be844fe6553d271dd99d79ca39faba4cc1a00f",
     "__tests__/planner-v2/intelligence/serialization.test.ts": "ddf578fa3387bb74b2960cea82d7e79d51008a3d0149f3f85376e6d90d53eb17",
-    "__tests__/planner-v2/postgres/assistant-research.postgres.ts": "320181418aeccd6ea61ffcb6f4f860a43c0c5c6e9a46ace1c36d8e313cfe56b5",
-    "__tests__/planner-v2/postgres/compiler-qualification.live.ts": "73e585a4d3903a536bf781c1139a6425b3f9293259cbf568916fa918f9b26537",
+    "__tests__/planner-v2/postgres/assistant-research.postgres.ts": "aa4194595b475438008d4ef3c87cac4f85192842f6304048a8ce70b94ee78c39",
+    "__tests__/planner-v2/postgres/compiler-qualification.live.ts": "eb47cfc20bb4479bd8052f9261fc83999a6a1a1239aaba62992f0d14c9e83b28",
     "__tests__/planner-v2/postgres/compiler-quality.postgres.ts": "f1e6b83309434522d79dde839a086d4a79a1522ec8bfa1ddfbc63e03ff585e3c",
+    "__tests__/planner-v2/postgres/coordinated-routes.postgres.ts": "ca25e970d6ff41080decf93109ab15b67161da452e8c8fec968134654ae37ceb",
+    "__tests__/planner-v2/postgres/durable-core.postgres.ts": "1da7172aa13a45c44672b1d06989dd46c6c6e3f2cd1692e62a17bb68526aaa95",
     "__tests__/planner-v2/postgres/generation-integration.postgres.ts": "3852240d1e4f4d2e225a72ba06149c45281a7eafdc91f3cbc0a0c554954a7df8",
+    "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts": "492cb5a723e841016a26cf2590c333d62bc4ca1d69c54efdb51d53fcfd1a8b9f",
+    "__tests__/planner-v2/postgres/learning-allocation.postgres.ts": "6d1d84b9d55851cecae8f10f18434c845444772e323f4a37b764c8beabbe46e1",
+    "__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts": "b6e75838efd6ffd4bf3806cc2625f72544cd9f919f97b0218a01a0cce632c491",
     "__tests__/planner-v2/postgres/maximum-envelope.postgres.ts": "f04eb70454930b2a2745649e5ba5435e48098a2372771d1f3a65d5a3bfe55df2",
-    "__tests__/planner-v2/postgres/proposal-fixture.ts": "59d7cb3e9ae7c3f55ad9e964c50fe964819e89e84560205fd5c0d4615f559d9b",
+    "__tests__/planner-v2/postgres/proposal-fixture.ts": "6ddf8520b4bbe022aacf864e7a36a176a02512338c0435d1c8ff7fe71550f34c",
     "__tests__/planner-v2/postgres/research-limits.postgres.ts": "a79026233f910b0e246266b48c97ed1ba390f54ec105386c9c7f0f16103ceb30",
+    "__tests__/timer/session-route.test.ts": "c4fb1b494d4fe7e404262438a1b1cb70b4a44d2440a76aa379046eb3ffe868c6",
     "app/api/planner/generate/route.ts": "cb52a326a7663ccb565d269f1b9367c3d6cdee19b1185df19ba11198d97c6391",
+    "app/api/sessions/route.ts": "e4fdb86a2ac0890e2218a69dc64413bac3c56d408526912501baf1a3334e28e3",
     "documentation/planner/README.md": "0f87c276c4f5e4663f0ca2937942e4542d89172d45b3dc8d7dab5d653099105e",
-    "documentation/planner/reports/2026-10-03-phase-2/COMPLETION.md": "444271fc0befb02f563d421a3f2bd50a652b5e57e0ca7511f8ef5ec6accf291f",
+    "documentation/planner/reports/2026-10-03-phase-2/COMPLETION.md": "272c9ba4559ab9d2c58c2710afbb086598f63368c1d239aeeac1c42cfcb2c5c3",
     "documentation/planner/reports/2026-10-03-phase-2/DEVELOPMENT_CORPUS.json": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
-    "documentation/planner/reports/2026-10-03-phase-2/LIVE_QUALIFICATION.md": "8f72b5d80e402a59b5c2615a20c45389c90816211a887b3bda89b6178a8bc84f",
-    "documentation/planner/reports/2026-10-03-phase-2/README.md": "b88b7abea8d0607d1188135636c2ecbe1d53d4651a9bdac6d950158793c40982",
-    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json": "758e04985b2ecc20eabc74774c3cf4e41523f0cc9c7dbe1732013a4ec0066b71",
-    "documentation/planner/reports/2026-10-03-phase-2/STEP_6.md": "0241877dbbe53e319b326aa1fd626ec3c07ae269994ae5ef338cca199a07ae4a",
+    "documentation/planner/reports/2026-10-03-phase-2/HIGH_REASONING.md": "f00c0e63876ab30544d4eeee0849e6c3d5e917e8c3e90f5a8c0a219246c3e3ac",
+    "documentation/planner/reports/2026-10-03-phase-2/LIVE_QUALIFICATION.md": "66319628a634fa54cea0bdca022a54094600f1b01fb9746e3e0d52fcb640b7f3",
+    "documentation/planner/reports/2026-10-03-phase-2/README.md": "bbeb60d988b92ee006adb7636c8fb1c27c594ac94827355078328e0de27ad5cd",
+    "documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json": "d89a50d997d7a82ab4e4361676e44883f361714d5ec89d49e195ccf1f4d820be",
+    "documentation/planner/reports/2026-10-03-phase-2/STEP_6.md": "99d2256adabde390aef688bea60f1d636bd108570a9b75e17730f3e19dae46f0",
+    "documentation/planner/reports/2026-10-03-phase-2/STEP_6_BLOCKERS.md": "fac17f774eae901dea7a9b78355481f06e1d8db87c7d720dca54fadbfeabadd2",
+    "documentation/planner/reports/2026-10-03-phase-2/STEP_6_BOUNDARY_FIXES.md": "b18c626445d64c38edeac30d97ba1e18f78883dfcdbeee189f51b44a58435998",
+    "documentation/planner/reports/2026-10-03-phase-2/STEP_6_CONTINUATION.md": "b1dae3d6dd7e5458c8ee618871df3004321532c954f1a0185950792b0ea8d29b",
+    "documentation/planner/reports/2026-10-07-timer-settlement/README.md": "12590ebe482cba7774c5ad7e801ead3215a5610d677513fff868946489dfafef",
+    "lib/ai/providers/deepseek.ts": "55490d78e56e3fa3e8f30c90ea5cc8d923f41259da12b7a64d4d52f0d91095ad",
     "lib/ai/providers/gemini.ts": "68eccabf6a67c213d4525aa01daf1dee0bb530a5d8c0f6f766aef5b4bcfef44d",
-    "lib/planner/v2/intelligence/blueprint.ts": "5a7067a238143c73be46c6717d1fe7044bead980caa88b116a01c728dee14d7c",
-    "lib/planner/v2/intelligence/context.ts": "dc402f77792559fa362a164955587dc86737de57f762d14f6cc9b87fb9c5c9ba",
-    "lib/planner/v2/intelligence/provider.ts": "7fa721218d8c7c5b1a8bec9e5ffb732e39a6eca9dd8ad1914a8c670a3d92c576",
-    "lib/planner/v2/intelligence/quality.ts": "7282b8ffbdebbcf51ef903bb1343844f7e8caa11004722604653c15980068138",
+    "lib/ai/providers/types.ts": "091ac20ee77e27382dcbc6d4704eb0b96330190ebae854502295f1fdb714ccce",
+    "lib/planner/v2/intelligence/allocator.ts": "81bc5f691e9993f8ea3ad2f1ce798a79952622271346108f7a1eaa96d19c5499",
+    "lib/planner/v2/intelligence/blueprint.ts": "dd2c96ca70adc1470e380831d4d619d7ae9ddd6d8c82ef515609a21a4a27e9a8",
+    "lib/planner/v2/intelligence/context.ts": "2dbf57c3e1d95f1040f8bd51fe46d0a3ee7d0eb612af24fb87eb96d18f096c66",
+    "lib/planner/v2/intelligence/provider.ts": "bdbf175e35a54e6d78e9f9894d633877f065285621186d809048ef7564f30c56",
+    "lib/planner/v2/intelligence/quality.ts": "dbbf78a054db065e37526193b5119e581be88234584c7c9eee4bcf21b610950c",
+    "lib/planner/v2/intelligence/research-cache.ts": "c28b5beee06479d9299695a32c76c9d35c24f32fb9cc9d115331832ad2b511c5",
     "lib/planner/v2/intelligence/research-verification.ts": "1c5d37b519c3e4d5484341d9029689ee5a3e156176b11a6e75958589e9c12701",
     "lib/planner/v2/server/attempts.ts": "c33e17ddc1eec5b67d3c25e36ded7cbbf1412235380ee8438ea3a2db798c64b1",
     "lib/planner/v2/server/context.ts": "54d3e81d5ec990033cd6621954828f3859abb77991e16826a7df40e71da63305",
     "lib/planner/v2/server/generation.ts": "16d263ff3f8139f0573ec758f53248dff245dc746a362145a7f822fa42f9d7cc",
     "lib/planner/v2/server/intents.ts": "d289fe33c2505e8a73c80c61eea02703fd66aa459f80f21c58115d5783505bf9",
-    "lib/planner/v2/server/research.ts": "1523620cd8601b0d5074ba9e5d58adb407a3ee8b83daf17b3b68d47c62981f4c",
+    "lib/planner/v2/server/learning.ts": "dd3bde9ef0e1fec44da71fedc38e659e32d2cc56537a065814101204f9ba3cd1",
+    "lib/planner/v2/server/research.ts": "b203a1322a42332abe6f91bbbb944d73bf6e99e6f74a3a09c7d37443252d6477",
     "lib/planner/v2/server/revisions.ts": "b4c259b1d7e22f3af7d9d2299b7bc9ae3780f420cb4400db767b1239fe3fbba0",
+    "lib/planner/v2/server/settlement.ts": "936913f411841ac76f8f1187ead5811c3bcc78b8bd631d9a6e05b624bdf399a9",
     "lib/planner/v2/server/web.ts": "e1c5e678471af5e9926685d42afa4a3829425b357817a6c76db05991d5a67c53",
-    "scripts/test-planner-v2-phase1-postgres.mjs": "7aa40b7e3768815b6e0fec0f76ed197a0c00515fb56dc96c4e698a85812f41aa",
+    "scripts/test-planner-v2-phase1-postgres.mjs": "74f0ac6f4e62058e50c4fd9aba943e75b333fe4dfe6f2be37de951b16d0f57d6",
     "scripts/test-planner-v2-phase2-live.mjs": "da05e6daaf8208d062b626c513900a0a724e16282ce7e02278c5943fb80fe29d",
     "scripts/test-planner-v2-phase2-step6-postgres.mjs": "b1b3f835d6950d3036e6540c353cff586e5d754e5d21fcb2bc78ed2e059fb832",
-    "scripts/verify-planner-v2-phase2-step6-build.mjs": "ed581f2578b6d547deebebe153730580af96b8c61a94d5e0c3ea9ad4df9119cc",
-    "scripts/verify-planner-v2-phase2-step6.mjs": "54ff55db13706cda103a2eaea9ba98bd030f68b9fa553c1dfd891e80374c68ff",
+    "scripts/verify-planner-v2-phase2-step6-build.mjs": "b2907e02222c088ef90751a6ef1c609c14b471996f5164aecf5af1a87d5bf7e9",
+    "scripts/verify-planner-v2-phase2-step6.mjs": "5650a0a4071331a4d3586f583691ae9fc842c2b7cd9d5b63581cadf3481aab15",
     "vitest.planner-v2-live.config.ts": "0921a32648e3cd8c6a4f93d7cb52d9295f634d2bb15c84131e8e37d7507f1e6d"
   },
-  "error": "real-provider development qualification and independent educational evaluation; Phase 2 completion certification",
-  "finishedAt": "2026-10-05T16:33:32.339Z"
+  "error": "genuine PostgreSQL and compiled ordinary Node learning correspondence; real-provider development qualification and independent educational evaluation; Phase 2 completion certification",
+  "finishedAt": "2026-10-08T17:39:20.715Z"
 }

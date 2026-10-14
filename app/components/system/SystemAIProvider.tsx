@@ -22,7 +22,7 @@ import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache"
 // ============================================================
 // System AI Provider — the client-side intelligence layer.
 //
-// One shared state for both surfaces of The System:
+// One shared state for both surfaces of Sylvie:
 //   • Quick AI  — the floating trigger + conversational overlay
 //   • Workspace  — the dedicated /system experience (deep-linked)
 //
@@ -44,8 +44,11 @@ interface SystemAIContextValue {
   refreshQuotas: () => Promise<void>;
   /** Open the global Planner modal from the current context. */
   openPlanner: () => void;
-  /** Navigate to the System workspace, optionally resuming a session. */
+  /** Navigate to the Sylvie workspace, optionally resuming a session. */
   openWorkspace: (sessionId?: number | null) => void;
+  /** Per-account preference for the floating companion on this device. */
+  companionVisible: boolean;
+  toggleCompanion: () => void;
 }
 
 const SystemAIContext = createContext<SystemAIContextValue | undefined>(undefined);
@@ -66,6 +69,44 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
   const [chatQuota, setChatQuota] = useState<QuotaInfo | null>(null);
   const [plannerQuota, setPlannerQuota] = useState<QuotaInfo | null>(null);
   const [plannerOpen, setPlannerOpen] = useState(false);
+  const userId = user?.id;
+  const [companionPreference, setCompanionPreference] = useState<{
+    userId: number;
+    visible: boolean;
+  } | null>(null);
+  const companionVisible = userId !== undefined &&
+    companionPreference?.userId === userId && companionPreference.visible;
+
+  useEffect(() => {
+    if (userId === undefined) return;
+    const key = `sylf:companion-visible:${userId}`;
+    const syncPreference = () => {
+      let visible = true;
+      try {
+        visible = localStorage.getItem(key) !== "false";
+      } catch {
+        // The control still works when browser storage is unavailable.
+      }
+      setCompanionPreference({ userId, visible });
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === key || event.key === null) syncPreference();
+    };
+    syncPreference();
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [userId]);
+
+  const toggleCompanion = useCallback(() => {
+    if (userId === undefined) return;
+    const visible = !companionVisible;
+    setCompanionPreference({ userId, visible });
+    try {
+      localStorage.setItem(`sylf:companion-visible:${userId}`, String(visible));
+    } catch {
+      // Keep the in-memory choice for this visit.
+    }
+  }, [userId, companionVisible]);
 
   const refreshQuotas = useCallback(async () => {
     try {
@@ -131,6 +172,8 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
       refreshQuotas,
       openPlanner,
       openWorkspace,
+      companionVisible,
+      toggleCompanion,
     }),
     [
       presence,
@@ -144,6 +187,8 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
       refreshQuotas,
       openPlanner,
       openWorkspace,
+      companionVisible,
+      toggleCompanion,
     ]
   );
 
@@ -159,7 +204,7 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
 
       {/* ── Lightweight global access point (only where it belongs) ── */}
       <AnimatePresence>
-        {presence && !overlayOpen && (
+        {presence && companionVisible && !overlayOpen && (
           <SystemFab presence={presence} chatQuota={chatQuota} onClick={openOverlay} />
         )}
       </AnimatePresence>

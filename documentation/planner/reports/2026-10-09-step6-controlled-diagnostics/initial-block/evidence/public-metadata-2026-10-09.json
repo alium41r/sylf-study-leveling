@@ -1,0 +1,36 @@
+{
+  "checkedAtUtc": "2026-10-09T12:41:40.009469+00:00",
+  "status": "MATCHES_FROZEN_CONFIGURATION",
+  "sources": [
+    {
+      "url": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "observed": {
+        "alias": "deepseek-flash",
+        "modelVersion": "DeepSeek-V4.1-Flash",
+        "peakPerMillion": {
+          "inputCacheHitUsd": 0.006,
+          "inputCacheMissUsd": 0.3,
+          "outputUsd": 1.2
+        },
+        "offPeakPerMillion": {
+          "inputCacheHitUsd": 0.003,
+          "inputCacheMissUsd": 0.15,
+          "outputUsd": 0.6
+        },
+        "peakUtcHours": "01:00–04:00 and 06:00–10:00 Monday–Friday, excluding Chinese public holidays",
+        "baseUrl": "https://api.deepseek.com"
+      }
+    },
+    {
+      "url": "https://api-docs.deepseek.com/api/create-chat-completion/",
+      "observed": {
+        "thinkingDefault": "enabled",
+        "reasoningEffortDefault": "high",
+        "maxTokens": "limits generated completion; completion tokens include reasoning breakdown",
+        "returnedModelExample": "deepseek-flash"
+      }
+    }
+  ],
+  "reviewMethod": "Official public documentation retrieved with web tool; no provider API calls. Frozen peak/cache-miss guard rates and omitted enabled/high defaults remain appropriate.",
+  "uncertainty": "Remote weights cannot be frozen by local hashes; actual identity/usage/fingerprint are checked and recorded. Any drift/unknown accounting stops execution."
+}

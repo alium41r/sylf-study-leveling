@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-08T16:21:11.193Z",
+  "status": "FAILED",
+  "database": "generated disposable loopback database",
+  "runtime": null,
+  "requiredSkippedTests": 0,
+  "requiredResults": [],
+  "migrations": [],
+  "limitations": [
+    "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+    "Phase 1 actual services/SQL are exercised; no hosted data is touched."
+  ],
+  "error": "listen EPERM: operation not permitted 127.0.0.1",
+  "cleanup": "No server started.",
+  "finishedAt": "2026-10-08T16:21:12.003Z"
+}

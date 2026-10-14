@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "status": "OBSERVATIONS_NOT_CERTIFICATION",
-  "measuredAt": "2026-10-07T10:10:25.308Z",
+  "measuredAt": "2026-10-08T17:37:38.167Z",
   "method": {
     "caseLatency": "wall time from admission preparation through terminal worker outcome; apply is recorded separately",
     "median": "average of middle values for even counts",
@@ -9624,6 +9624,4587 @@
       "independentEvaluation": null
     },
     {
+      "directory": "step6-live-2026-10-07T10-08-44-143Z",
+      "liveCorpusSha256": "cfb014e2beebedc563487e31759e0ee50deea3a0e083ea57716d25bfae15776e",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "mastery-open",
+        "triage"
+      ],
+      "actualCases": 6,
+      "outcomes": {
+        "SUCCEEDED": 6
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 6,
+        "failed": 0,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": []
+      },
+      "preflightStatus": "PASSED",
+      "preflightError": null,
+      "latency": {
+        "cases": 6,
+        "medianMs": 11508,
+        "p90Ms": 12229,
+        "maximumMs": 12229
+      },
+      "upstreamLatency": {
+        "cases": 12,
+        "medianMs": 3780.5,
+        "p90Ms": 10060,
+        "maximumMs": 10815
+      },
+      "externalAttempts": 12,
+      "fallbackAttempts": 0,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 12,
+          "successfulResponses": 12,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 12
+          },
+          "reportedInputTokens": 86142,
+          "reportedOutputTokens": 12426
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 86142,
+        "reportedOutputTokens": 12426,
+        "usageMissingResponses": 0,
+        "settledCalls": 12,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 12,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14436,
+            "outputTokens": 2198,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14438,
+            "outputTokens": 2177,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14764,
+            "outputTokens": 2460,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14565,
+            "outputTokens": 2035,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14074,
+            "outputTokens": 2184,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13865,
+            "outputTokens": 1372,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "PASSED",
+        "passed": 6,
+        "cases": 6,
+        "sha256": "22f9ae6a2426aab8b6e2f49cef75788f8291ad8d8af7b4ed5d6a7f889539db77"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-07T10-14-12-948Z",
+      "liveCorpusSha256": "1ecc030c2cb943f524b94f9ed273a2e5f384ac5adb60481a87beb24b2ecc5d67",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-exam",
+        "tiny-roomy-exam",
+        "secure-topic",
+        "zero-new-work",
+        "concept-foundation",
+        "method-weakness",
+        "triage",
+        "roadmap-open",
+        "mastery-open",
+        "general-homework",
+        "joint-prerequisite",
+        "infeasible-zero-capacity",
+        "indivisible-checkpoint",
+        "owned-course-research",
+        "contradictory-readiness",
+        "roadmap-large",
+        "public-assessment-research"
+      ],
+      "actualCases": 17,
+      "outcomes": {
+        "SUCCEEDED": 14,
+        "NEEDS_DECISION": 3
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 17,
+        "failed": 0,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": []
+      },
+      "preflightStatus": "PASSED",
+      "preflightError": null,
+      "latency": {
+        "cases": 17,
+        "medianMs": 10996,
+        "p90Ms": 21670,
+        "maximumMs": 34648
+      },
+      "upstreamLatency": {
+        "cases": 39,
+        "medianMs": 3747,
+        "p90Ms": 9401,
+        "maximumMs": 14003
+      },
+      "externalAttempts": 39,
+      "fallbackAttempts": 3,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 39,
+          "successfulResponses": 39,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 39
+          },
+          "reportedInputTokens": 279200,
+          "reportedOutputTokens": 35007
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 279200,
+        "reportedOutputTokens": 35007,
+        "usageMissingResponses": 0,
+        "settledCalls": 39,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 39,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13121,
+            "outputTokens": 1741,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13263,
+            "outputTokens": 1956,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "secure-topic",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13057,
+            "outputTokens": 1776,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "zero-new-work",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 11749,
+            "outputTokens": 581,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "concept-foundation",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13177,
+            "outputTokens": 1498,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12896,
+            "outputTokens": 1495,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14485,
+            "outputTokens": 2252,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13350,
+            "outputTokens": 1328,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13640,
+            "outputTokens": 1914,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "general-homework",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12972,
+            "outputTokens": 1375,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "joint-prerequisite",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 22998,
+            "outputTokens": 4469,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "infeasible-zero-capacity",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14562,
+            "outputTokens": 2049,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "indivisible-checkpoint",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 22142,
+            "outputTokens": 1945,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 20306,
+            "outputTokens": 3205,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 20206,
+            "outputTokens": 2122,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-large",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 23683,
+            "outputTokens": 3954,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "public-assessment-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 23593,
+            "outputTokens": 1347,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 1,
+            "fetchAttempts": 16,
+            "selectedSourceCharacters": 24911,
+            "extractedPages": 4,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 15,
+        "cases": 17,
+        "sha256": "549a06be0fc483a61281b90085441d24c25a86ec145d0273901f3e88965cb007"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-07T10-38-37-763Z",
+      "liveCorpusSha256": "77f6dfabf381ae29dfe203c1b37751ed6a9bf750c030ed04b828f939dd92ed09",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "owned-course-research"
+      ],
+      "actualCases": 3,
+      "outcomes": {
+        "SUCCEEDED": 3
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 3,
+        "failed": 0,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": []
+      },
+      "preflightStatus": "PASSED",
+      "preflightError": null,
+      "latency": {
+        "cases": 3,
+        "medianMs": 29943,
+        "p90Ms": 42043,
+        "maximumMs": 42043
+      },
+      "upstreamLatency": {
+        "cases": 17,
+        "medianMs": 3518,
+        "p90Ms": 9611,
+        "maximumMs": 9774
+      },
+      "externalAttempts": 17,
+      "fallbackAttempts": 1,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 17,
+          "successfulResponses": 17,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 17
+          },
+          "reportedInputTokens": 114119,
+          "reportedOutputTokens": 18848
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 114119,
+        "reportedOutputTokens": 18848,
+        "usageMissingResponses": 0,
+        "settledCalls": 17,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 17,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 7,
+            "inputTokens": 53506,
+            "outputTokens": 9798,
+            "planningCalls": 5,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 6,
+            "inputTokens": 40189,
+            "outputTokens": 6263,
+            "planningCalls": 4,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 20424,
+            "outputTokens": 2787,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 0,
+        "cases": 3,
+        "sha256": "6d6d4c9ab692571b04bbed7aa993a07d77d3889e8cd652bc88de520dafd61c20"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-07T10-44-49-038Z",
+      "liveCorpusSha256": "d26478f36677e8a0206eeab2da7cfe79f16286f68902a1212c2a1a739e32dab4",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-exam",
+        "tiny-roomy-exam",
+        "secure-topic",
+        "zero-new-work",
+        "concept-foundation",
+        "method-weakness",
+        "triage",
+        "roadmap-open",
+        "mastery-open",
+        "general-homework",
+        "joint-prerequisite",
+        "infeasible-zero-capacity",
+        "indivisible-checkpoint",
+        "owned-course-research",
+        "contradictory-readiness",
+        "roadmap-large",
+        "public-assessment-research"
+      ],
+      "actualCases": 17,
+      "outcomes": {
+        "SUCCEEDED": 12,
+        "FAILED": 1,
+        "NEEDS_DECISION": 4
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 15,
+        "failed": 2,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: joint-prerequisite",
+            "messages": [
+              "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: owned-course-research",
+            "messages": [
+              "AssertionError: expected 'NEEDS_DECISION' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (2 failures, 0 required skips).",
+      "latency": {
+        "cases": 17,
+        "medianMs": 12645,
+        "p90Ms": 25579,
+        "maximumMs": 30813
+      },
+      "upstreamLatency": {
+        "cases": 37,
+        "medianMs": 5183,
+        "p90Ms": 12018,
+        "maximumMs": 13199
+      },
+      "externalAttempts": 37,
+      "fallbackAttempts": 2,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 37,
+          "successfulResponses": 37,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 37
+          },
+          "reportedInputTokens": 274233,
+          "reportedOutputTokens": 43029
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 274233,
+        "reportedOutputTokens": 43029,
+        "usageMissingResponses": 0,
+        "settledCalls": 37,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 37,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13653,
+            "outputTokens": 1980,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13062,
+            "outputTokens": 1444,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "secure-topic",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13029,
+            "outputTokens": 1493,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "zero-new-work",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12006,
+            "outputTokens": 505,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "concept-foundation",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14405,
+            "outputTokens": 2257,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 20921,
+            "outputTokens": 2761,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15143,
+            "outputTokens": 2505,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14413,
+            "outputTokens": 1368,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13964,
+            "outputTokens": 1727,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "general-homework",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13458,
+            "outputTokens": 1715,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "joint-prerequisite",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15969,
+            "outputTokens": 4881,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "infeasible-zero-capacity",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15394,
+            "outputTokens": 3006,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "indivisible-checkpoint",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14825,
+            "outputTokens": 1123,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 22012,
+            "outputTokens": 7190,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14388,
+            "outputTokens": 2960,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-large",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 23034,
+            "outputTokens": 3337,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "public-assessment-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 24557,
+            "outputTokens": 2777,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 1,
+            "fetchAttempts": 16,
+            "selectedSourceCharacters": 23256,
+            "extractedPages": 4,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": null
+    },
+    {
+      "directory": "step6-live-2026-10-08T14-13-54-426Z",
+      "liveCorpusSha256": "5903662a8b90b404bb26e4281d75caf9ada6d5b53f79b6d483a9cd1e1f0ed61b",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-exam",
+        "tiny-roomy-exam",
+        "secure-topic",
+        "zero-new-work",
+        "concept-foundation",
+        "method-weakness",
+        "triage",
+        "roadmap-open",
+        "mastery-open",
+        "general-homework",
+        "joint-prerequisite",
+        "infeasible-zero-capacity",
+        "indivisible-checkpoint",
+        "owned-course-research",
+        "contradictory-readiness",
+        "roadmap-large",
+        "public-assessment-research"
+      ],
+      "actualCases": 17,
+      "outcomes": {
+        "SUCCEEDED": 13,
+        "NEEDS_DECISION": 3,
+        "FAILED": 1
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 15,
+        "failed": 2,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: owned-course-research",
+            "messages": [
+              "AssertionError: expected 'NEEDS_DECISION' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: public-assessment-research",
+            "messages": [
+              "AssertionError: expected [ 'SUCCEEDED', 'NEEDS_DECISION' ] to include 'FAILED'\n    at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/aliumair/Desktop/sylf/node_modules/chai/index.js:1700:25)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:94:232\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (2 failures, 0 required skips).",
+      "latency": {
+        "cases": 17,
+        "medianMs": 14247,
+        "p90Ms": 38557,
+        "maximumMs": 41526
+      },
+      "upstreamLatency": {
+        "cases": 41,
+        "medianMs": 6383,
+        "p90Ms": 12350,
+        "maximumMs": 19744
+      },
+      "externalAttempts": 41,
+      "fallbackAttempts": 4,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 41,
+          "successfulResponses": 41,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 41
+          },
+          "reportedInputTokens": 318487,
+          "reportedOutputTokens": 50880
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 318487,
+        "reportedOutputTokens": 50880,
+        "usageMissingResponses": 0,
+        "settledCalls": 41,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 41,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14059,
+            "outputTokens": 2246,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13578,
+            "outputTokens": 1738,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "secure-topic",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13141,
+            "outputTokens": 1336,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "zero-new-work",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12134,
+            "outputTokens": 559,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "concept-foundation",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13796,
+            "outputTokens": 1637,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14352,
+            "outputTokens": 2158,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15114,
+            "outputTokens": 2400,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15386,
+            "outputTokens": 1767,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14151,
+            "outputTokens": 1856,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "general-homework",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13417,
+            "outputTokens": 1502,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "joint-prerequisite",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 24492,
+            "outputTokens": 4675,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "infeasible-zero-capacity",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15287,
+            "outputTokens": 1356,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "indivisible-checkpoint",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 23024,
+            "outputTokens": 2569,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 5,
+            "inputTokens": 32129,
+            "outputTokens": 7739,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 34746,
+            "outputTokens": 7464,
+            "planningCalls": 4,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-large",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 24114,
+            "outputTokens": 5218,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "public-assessment-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 25567,
+            "outputTokens": 4660,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 1,
+            "fetchAttempts": 16,
+            "selectedSourceCharacters": 23256,
+            "extractedPages": 4,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 12,
+        "cases": 17,
+        "sha256": "c1d69e4aa7949938e00dac24e8e9b915f506eedb10894bf79fe9c2d221e4455f"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T14-33-52-329Z",
+      "liveCorpusSha256": "23170bf7f43d37d7de71ffcae64633daef01493826b5d14e06ee22464bf55d9f",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.2,
+        "reviewTemperature": null,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-exam",
+        "tiny-roomy-exam",
+        "secure-topic",
+        "zero-new-work",
+        "concept-foundation",
+        "method-weakness",
+        "triage",
+        "roadmap-open",
+        "mastery-open",
+        "general-homework",
+        "joint-prerequisite",
+        "infeasible-zero-capacity",
+        "indivisible-checkpoint",
+        "owned-course-research",
+        "contradictory-readiness",
+        "roadmap-large",
+        "public-assessment-research"
+      ],
+      "actualCases": 17,
+      "outcomes": {
+        "SUCCEEDED": 11,
+        "FAILED": 2,
+        "NEEDS_DECISION": 4
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 14,
+        "failed": 3,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: joint-prerequisite",
+            "messages": [
+              "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: owned-course-research",
+            "messages": [
+              "AssertionError: expected 'NEEDS_DECISION' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: roadmap-large",
+            "messages": [
+              "AssertionError: expected 'BUDGET_EXHAUSTED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (3 failures, 0 required skips).",
+      "latency": {
+        "cases": 17,
+        "medianMs": 12863,
+        "p90Ms": 27058,
+        "maximumMs": 28819
+      },
+      "upstreamLatency": {
+        "cases": 36,
+        "medianMs": 6851.5,
+        "p90Ms": 11497,
+        "maximumMs": 17473
+      },
+      "externalAttempts": 36,
+      "fallbackAttempts": 2,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 36,
+          "successfulResponses": 36,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 36
+          },
+          "reportedInputTokens": 269597,
+          "reportedOutputTokens": 42954
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 269597,
+        "reportedOutputTokens": 42954,
+        "usageMissingResponses": 0,
+        "settledCalls": 36,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 36,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13720,
+            "outputTokens": 1916,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13623,
+            "outputTokens": 1707,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "secure-topic",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13700,
+            "outputTokens": 1855,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "zero-new-work",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12265,
+            "outputTokens": 620,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "concept-foundation",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14382,
+            "outputTokens": 1885,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13890,
+            "outputTokens": 1995,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14844,
+            "outputTokens": 2103,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-open",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 32124,
+            "outputTokens": 5156,
+            "planningCalls": 4,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14326,
+            "outputTokens": 2549,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "general-homework",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13404,
+            "outputTokens": 1401,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "joint-prerequisite",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 16465,
+            "outputTokens": 4540,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "infeasible-zero-capacity",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15502,
+            "outputTokens": 2593,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "indivisible-checkpoint",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15138,
+            "outputTokens": 1785,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 3104,
+            "outputTokens": 1354,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14584,
+            "outputTokens": 3313,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-large",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 23576,
+            "outputTokens": 4724,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "public-assessment-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 24950,
+            "outputTokens": 3458,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 1,
+            "fetchAttempts": 16,
+            "selectedSourceCharacters": 23256,
+            "extractedPages": 4,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 12,
+        "cases": 17,
+        "sha256": "d2fe50c3723e2177b6f16f960ab2e277e231056b76b14a82af9aece01ca94c9b"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T14-46-11-114Z",
+      "liveCorpusSha256": "63198c8981ace36d4bdd0c943a9b53dc25c18e38c607a7d27abb4e80dba2535b",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-exam",
+        "tiny-roomy-exam",
+        "secure-topic",
+        "zero-new-work",
+        "concept-foundation",
+        "method-weakness",
+        "triage",
+        "roadmap-open",
+        "mastery-open",
+        "general-homework",
+        "joint-prerequisite",
+        "infeasible-zero-capacity",
+        "indivisible-checkpoint",
+        "owned-course-research",
+        "contradictory-readiness",
+        "roadmap-large",
+        "public-assessment-research"
+      ],
+      "actualCases": 17,
+      "outcomes": {
+        "SUCCEEDED": 12,
+        "FAILED": 2,
+        "NEEDS_DECISION": 3
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 15,
+        "failed": 2,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: concept-foundation",
+            "messages": [
+              "AssertionError: expected 'BUDGET_EXHAUSTED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: joint-prerequisite",
+            "messages": [
+              "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:95:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (2 failures, 0 required skips).",
+      "latency": {
+        "cases": 17,
+        "medianMs": 11726,
+        "p90Ms": 20963,
+        "maximumMs": 44170
+      },
+      "upstreamLatency": {
+        "cases": 36,
+        "medianMs": 4849,
+        "p90Ms": 10490,
+        "maximumMs": 18836
+      },
+      "externalAttempts": 36,
+      "fallbackAttempts": 1,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 36,
+          "successfulResponses": 36,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 36
+          },
+          "reportedInputTokens": 273002,
+          "reportedOutputTokens": 41592
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 273002,
+        "reportedOutputTokens": 41592,
+        "usageMissingResponses": 0,
+        "settledCalls": 36,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 36,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13262,
+            "outputTokens": 1570,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13587,
+            "outputTokens": 1861,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "secure-topic",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13309,
+            "outputTokens": 1553,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "zero-new-work",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12281,
+            "outputTokens": 683,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "concept-foundation",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15329,
+            "outputTokens": 3315,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13764,
+            "outputTokens": 1951,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15153,
+            "outputTokens": 2337,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15496,
+            "outputTokens": 1944,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14302,
+            "outputTokens": 2086,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "general-homework",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13314,
+            "outputTokens": 1444,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "joint-prerequisite",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 16583,
+            "outputTokens": 4689,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "infeasible-zero-capacity",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15465,
+            "outputTokens": 1170,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "indivisible-checkpoint",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15377,
+            "outputTokens": 1899,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 21379,
+            "outputTokens": 3369,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14752,
+            "outputTokens": 3099,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-large",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 24175,
+            "outputTokens": 4616,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "public-assessment-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 25474,
+            "outputTokens": 4006,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 1,
+            "fetchAttempts": 16,
+            "selectedSourceCharacters": 23256,
+            "extractedPages": 4,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 12,
+        "cases": 17,
+        "sha256": "feed3051e3851f5a346f8986d90b20e1e1b997f805c2589b12380e2b66310d43"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T14-58-39-086Z",
+      "liveCorpusSha256": "860f3e5bfc4859eb9832349af7798eebcfd0af3bdccd0eaad6ceae380ad89b8e",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": null,
+        "reviewThinking": "enabled",
+        "reviewReasoningEffort": "low",
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "owned-course-research",
+        "method-weakness",
+        "contradictory-readiness"
+      ],
+      "actualCases": 6,
+      "outcomes": {
+        "FAILED": 4,
+        "SUCCEEDED": 1,
+        "NEEDS_DECISION": 1
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 1,
+        "failed": 5,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: method-weakness trial 1",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:97:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: method-weakness trial 2",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:97:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: owned-course-research trial 1",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:97:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: contradictory-readiness trial 1",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:97:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: contradictory-readiness trial 2",
+            "messages": [
+              "AssertionError: expected 'NEEDS_DECISION' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:97:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (5 failures, 0 required skips).",
+      "latency": {
+        "cases": 6,
+        "medianMs": 49116,
+        "p90Ms": 59787,
+        "maximumMs": 59787
+      },
+      "upstreamLatency": {
+        "cases": 20,
+        "medianMs": 10032.5,
+        "p90Ms": 20184,
+        "maximumMs": 24767
+      },
+      "externalAttempts": 20,
+      "fallbackAttempts": 4,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 20,
+          "successfulResponses": 20,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 12,
+            "MAX_TOKENS": 8
+          },
+          "reportedInputTokens": 128470,
+          "reportedOutputTokens": 51586
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 128470,
+        "reportedOutputTokens": 51586,
+        "usageMissingResponses": 0,
+        "settledCalls": 20,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 20,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 20066,
+            "outputTokens": 10071,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 19390,
+            "outputTokens": 9813,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 5,
+            "inputTokens": 28787,
+            "outputTokens": 11290,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 21138,
+            "outputTokens": 4937,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 21893,
+            "outputTokens": 10622,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 17196,
+            "outputTokens": 4853,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 1,
+        "cases": 6,
+        "sha256": "4816aad9d87c142636521384f07e03e6ee93e84955b27055114ab83ad8096ef8"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T15-17-26-249Z",
+      "liveCorpusSha256": "840dddc1cd5c3fa112972ae6d96a88b61993abc203c54ebf507a4154c6be2ce3",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "reviewThinking": null,
+        "reviewReasoningEffort": null,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-exam",
+        "tiny-roomy-exam",
+        "secure-topic",
+        "zero-new-work",
+        "concept-foundation",
+        "method-weakness",
+        "triage",
+        "roadmap-open",
+        "mastery-open",
+        "general-homework",
+        "joint-prerequisite",
+        "infeasible-zero-capacity",
+        "indivisible-checkpoint",
+        "owned-course-research",
+        "contradictory-readiness",
+        "roadmap-large",
+        "public-assessment-research"
+      ],
+      "actualCases": 17,
+      "outcomes": {
+        "SUCCEEDED": 13,
+        "NEEDS_DECISION": 3,
+        "FAILED": 1
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 16,
+        "failed": 1,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: roadmap-large",
+            "messages": [
+              "AssertionError: expected 'BUDGET_EXHAUSTED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:97:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (1 failures, 0 required skips).",
+      "latency": {
+        "cases": 17,
+        "medianMs": 12701,
+        "p90Ms": 38696,
+        "maximumMs": 44210
+      },
+      "upstreamLatency": {
+        "cases": 38,
+        "medianMs": 5639,
+        "p90Ms": 12341,
+        "maximumMs": 19906
+      },
+      "externalAttempts": 38,
+      "fallbackAttempts": 1,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 38,
+          "successfulResponses": 38,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 38
+          },
+          "reportedInputTokens": 285285,
+          "reportedOutputTokens": 45599
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 285285,
+        "reportedOutputTokens": 45599,
+        "usageMissingResponses": 0,
+        "settledCalls": 38,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 38,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13303,
+            "outputTokens": 1320,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14066,
+            "outputTokens": 2094,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "secure-topic",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13196,
+            "outputTokens": 1370,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "zero-new-work",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12441,
+            "outputTokens": 639,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "concept-foundation",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14689,
+            "outputTokens": 2200,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13369,
+            "outputTokens": 1396,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15348,
+            "outputTokens": 2238,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-open",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 23590,
+            "outputTokens": 3626,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14486,
+            "outputTokens": 2079,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "general-homework",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13329,
+            "outputTokens": 1250,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "joint-prerequisite",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 17018,
+            "outputTokens": 2772,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "infeasible-zero-capacity",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15718,
+            "outputTokens": 2273,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "indivisible-checkpoint",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 15688,
+            "outputTokens": 1924,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 21465,
+            "outputTokens": 3674,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 32215,
+            "outputTokens": 9105,
+            "planningCalls": 4,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-large",
+          "consumed": {
+            "modelCalls": 1,
+            "inputTokens": 10433,
+            "outputTokens": 4453,
+            "planningCalls": 1,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "public-assessment-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 24931,
+            "outputTokens": 3186,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 1,
+            "fetchAttempts": 16,
+            "selectedSourceCharacters": 23256,
+            "extractedPages": 4,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 15,
+        "cases": 17,
+        "sha256": "13a69b2681fcfee3e22acdfdb2dd2b0228a19b588ec02ea1f28fce5bde11249b"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T15-28-59-317Z",
+      "liveCorpusSha256": "85b27703388bd4c39928fcc7438abd8866fbecce1452c0399d52e9c6cc5f52c6",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "reviewThinking": null,
+        "reviewReasoningEffort": null,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-exam",
+        "tiny-roomy-exam",
+        "secure-topic",
+        "zero-new-work",
+        "concept-foundation",
+        "method-weakness",
+        "triage",
+        "roadmap-open",
+        "mastery-open",
+        "general-homework",
+        "joint-prerequisite",
+        "infeasible-zero-capacity",
+        "indivisible-checkpoint",
+        "owned-course-research",
+        "contradictory-readiness",
+        "roadmap-large",
+        "public-assessment-research"
+      ],
+      "actualCases": 17,
+      "outcomes": {
+        "SUCCEEDED": 13,
+        "NEEDS_DECISION": 4
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 16,
+        "failed": 1,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: owned-course-research",
+            "messages": [
+              "AssertionError: expected 'NEEDS_DECISION' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:97:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (1 failures, 0 required skips).",
+      "latency": {
+        "cases": 17,
+        "medianMs": 10981,
+        "p90Ms": 20933,
+        "maximumMs": 51928
+      },
+      "upstreamLatency": {
+        "cases": 37,
+        "medianMs": 3729,
+        "p90Ms": 9196,
+        "maximumMs": 16979
+      },
+      "externalAttempts": 37,
+      "fallbackAttempts": 0,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 37,
+          "successfulResponses": 37,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 37
+          },
+          "reportedInputTokens": 225975,
+          "reportedOutputTokens": 34504
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 225975,
+        "reportedOutputTokens": 34504,
+        "usageMissingResponses": 0,
+        "settledCalls": 37,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 37,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 11383,
+            "outputTokens": 1318,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 11412,
+            "outputTokens": 1426,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "secure-topic",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 11091,
+            "outputTokens": 1146,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "zero-new-work",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 10495,
+            "outputTokens": 605,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "concept-foundation",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12880,
+            "outputTokens": 2131,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 11840,
+            "outputTokens": 1870,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13425,
+            "outputTokens": 1667,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-open",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13056,
+            "outputTokens": 1623,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "mastery-open",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 19846,
+            "outputTokens": 3582,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "general-homework",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12088,
+            "outputTokens": 1968,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "joint-prerequisite",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 14482,
+            "outputTokens": 2287,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "infeasible-zero-capacity",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12536,
+            "outputTokens": 2118,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "indivisible-checkpoint",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12298,
+            "outputTokens": 1881,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 18485,
+            "outputTokens": 4232,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "contradictory-readiness",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 12924,
+            "outputTokens": 1891,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "roadmap-large",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 21615,
+            "outputTokens": 4002,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "public-assessment-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 6119,
+            "outputTokens": 757,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 2,
+            "fetchAttempts": 16,
+            "selectedSourceCharacters": 12895,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 1
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 14,
+        "cases": 17,
+        "sha256": "eab90f572f04e831a1761c9e3789818faa5be7c5ea3e37e284af9d3ae75fd92e"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T15-51-37-919Z",
+      "liveCorpusSha256": "776e92ce9f35348b971a759fd0f04194e64a79cff9bca34b64c68bff1178ba9d",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "temporaryExistingGroq": true,
+        "thinking": "disabled",
+        "reasoningEffort": null,
+        "temperature": 0.7,
+        "reviewTemperature": 0.2,
+        "reviewThinking": null,
+        "reviewReasoningEffort": null,
+        "primary": {
+          "provider": "groq",
+          "model": "openai/gpt-oss-120b"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "method-weakness"
+      ],
+      "actualCases": 1,
+      "outcomes": {
+        "FAILED": 1
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 0,
+        "failed": 1,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: method-weakness",
+            "messages": [
+              "AssertionError: expected 'INVALID_OUTPUT' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:99:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (1 failures, 0 required skips).",
+      "latency": {
+        "cases": 1,
+        "medianMs": 8934,
+        "p90Ms": 8934,
+        "maximumMs": 8934
+      },
+      "upstreamLatency": {
+        "cases": 3,
+        "medianMs": 3592,
+        "p90Ms": 4104,
+        "maximumMs": 4104
+      },
+      "externalAttempts": 3,
+      "fallbackAttempts": 1,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "groq/openai/gpt-oss-120b": {
+          "externalAttempts": 2,
+          "successfulResponses": 1,
+          "sdkFailures": 1,
+          "quotaOrRateLimitFailures": 1,
+          "finishReasons": {
+            "STOP": 1,
+            "UNKNOWN": 1
+          },
+          "reportedInputTokens": 5437,
+          "reportedOutputTokens": 1219
+        },
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 1,
+          "successfulResponses": 1,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 1
+          },
+          "reportedInputTokens": 5229,
+          "reportedOutputTokens": 608
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 10666,
+        "reportedOutputTokens": 1827,
+        "usageMissingResponses": 1,
+        "settledCalls": 2,
+        "unknownSpendCalls": 1,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 3,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "method-weakness",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 10666,
+            "outputTokens": 1827,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 21940,
+            "outputTokens": 4096
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 0,
+        "cases": 1,
+        "sha256": "e914632f586da8e72b5abb9e7f73845e11968582165b23d10d5372fb479a927f"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T16-21-10-915Z",
+      "liveCorpusSha256": null,
+      "corpusSha256": null,
+      "routeConfiguration": null,
+      "selectedCaseIds": [],
+      "actualCases": 0,
+      "outcomes": {},
+      "operationalTestResults": null,
+      "preflightStatus": "FAILED",
+      "preflightError": "listen EPERM: operation not permitted 127.0.0.1",
+      "latency": {
+        "cases": 0,
+        "medianMs": null,
+        "p90Ms": null,
+        "maximumMs": null
+      },
+      "upstreamLatency": {
+        "cases": 0,
+        "medianMs": null,
+        "p90Ms": null,
+        "maximumMs": null
+      },
+      "externalAttempts": 0,
+      "fallbackAttempts": 0,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {},
+      "usage": {
+        "reportedInputTokens": 0,
+        "reportedOutputTokens": 0,
+        "usageMissingResponses": 0,
+        "settledCalls": 0,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 0,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [],
+      "independentEvaluation": null
+    },
+    {
+      "directory": "step6-live-2026-10-08T16-22-12-193Z",
+      "liveCorpusSha256": "5c7b26f3c46a61aeed60a5502a51acc4cec4f0bfa15d87d8f3dd6cc1171638f9",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "temporaryExistingGroq": false,
+        "thinking": "enabled",
+        "reasoningEffort": "high",
+        "temperature": null,
+        "reviewTemperature": null,
+        "reviewThinking": null,
+        "reviewReasoningEffort": null,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-roomy-exam",
+        "triage",
+        "owned-course-research"
+      ],
+      "actualCases": 3,
+      "outcomes": {
+        "SUCCEEDED": 1,
+        "FAILED": 2
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 1,
+        "failed": 2,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: triage",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:102:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: owned-course-research",
+            "messages": [
+              "AssertionError: expected 'BUDGET_EXHAUSTED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:102:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (2 failures, 0 required skips).",
+      "latency": {
+        "cases": 3,
+        "medianMs": 45776,
+        "p90Ms": 111399,
+        "maximumMs": 111399
+      },
+      "upstreamLatency": {
+        "cases": 8,
+        "medianMs": 22588,
+        "p90Ms": 38359,
+        "maximumMs": 38359
+      },
+      "externalAttempts": 8,
+      "fallbackAttempts": 2,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 8,
+          "successfulResponses": 8,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 5,
+            "MAX_TOKENS": 3
+          },
+          "reportedInputTokens": 41527,
+          "reportedOutputTokens": 43457
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 41527,
+        "reportedOutputTokens": 43457,
+        "usageMissingResponses": 0,
+        "settledCalls": 8,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 8,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 11411,
+            "outputTokens": 9915,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 26748,
+            "outputTokens": 23050,
+            "planningCalls": 4,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 3368,
+            "outputTokens": 10492,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 1,
+        "cases": 3,
+        "sha256": "83b4efb0900171a2fdbf63e6466c2043c2a30ffe3c12b3421ddbdf112f8a9ab5"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T17-04-25-567Z",
+      "liveCorpusSha256": "db8268df394378736f8fc3b2d335e3c2bf819aa7a620d92fdc89a6b0881eae16",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "productionPrimaryOptions": true,
+        "temporaryExistingGroq": false,
+        "reasoningEffort": null,
+        "temperature": null,
+        "reviewTemperature": null,
+        "reviewThinking": null,
+        "reviewReasoningEffort": null,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-roomy-exam",
+        "triage",
+        "owned-course-research"
+      ],
+      "actualCases": 3,
+      "outcomes": {
+        "FAILED": 3
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 0,
+        "failed": 3,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: tiny-roomy-exam",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: triage",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: owned-course-research",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (3 failures, 0 required skips).",
+      "latency": {
+        "cases": 3,
+        "medianMs": 81274,
+        "p90Ms": 113860,
+        "maximumMs": 113860
+      },
+      "upstreamLatency": {
+        "cases": 9,
+        "medianMs": 32293,
+        "p90Ms": 41301,
+        "maximumMs": 41301
+      },
+      "externalAttempts": 9,
+      "fallbackAttempts": 3,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 9,
+          "successfulResponses": 9,
+          "sdkFailures": 0,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 3,
+            "MAX_TOKENS": 6
+          },
+          "reportedInputTokens": 50217,
+          "reportedOutputTokens": 55900
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 50217,
+        "reportedOutputTokens": 55900,
+        "usageMissingResponses": 0,
+        "settledCalls": 9,
+        "unknownSpendCalls": 0,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 9,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 3,
+            "inputTokens": 19092,
+            "outputTokens": 14928,
+            "planningCalls": 3,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 13204,
+            "outputTokens": 16384,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 17921,
+            "outputTokens": 24588,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 2,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 0,
+        "cases": 3,
+        "sha256": "89a752a8e234294aa0f41225b0b5b31116915bfa4b4ab96614a190756a8ece4f"
+      }
+    },
+    {
+      "directory": "step6-live-2026-10-08T17-16-24-282Z",
+      "liveCorpusSha256": "0c69361aed8f312e68a13e7432b94bb79ce2e105fab44dc5f7a3d25af02122fc",
+      "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+      "routeConfiguration": {
+        "temporaryNonGemini": true,
+        "productionPrimaryOptions": true,
+        "temporaryExistingGroq": false,
+        "reasoningEffort": null,
+        "temperature": null,
+        "reviewTemperature": null,
+        "reviewThinking": null,
+        "reviewReasoningEffort": null,
+        "primary": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "fallback": {
+          "provider": "deepseek",
+          "model": "deepseek-flash"
+        },
+        "productionConfigurationChanged": false
+      },
+      "selectedCaseIds": [
+        "tiny-roomy-exam",
+        "triage",
+        "owned-course-research"
+      ],
+      "actualCases": 3,
+      "outcomes": {
+        "FAILED": 3
+      },
+      "operationalTestResults": {
+        "label": "live",
+        "files": 1,
+        "passed": 0,
+        "failed": 3,
+        "requiredSkipped": 0,
+        "optionalProviderExcluded": 0,
+        "failures": [
+          {
+            "name": "live development qualification: tiny-roomy-exam",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: triage",
+            "messages": [
+              "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "live development qualification: owned-course-research",
+            "messages": [
+              "AssertionError: expected 'BUDGET_EXHAUSTED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      "preflightStatus": "FAILED",
+      "preflightError": "live: required PostgreSQL gate failed (3 failures, 0 required skips).",
+      "latency": {
+        "cases": 3,
+        "medianMs": 89663,
+        "p90Ms": 233762,
+        "maximumMs": 233762
+      },
+      "upstreamLatency": {
+        "cases": 7,
+        "medianMs": 24086,
+        "p90Ms": 233368,
+        "maximumMs": 233368
+      },
+      "externalAttempts": 7,
+      "fallbackAttempts": 3,
+      "fallbackRequestIdentityUnknown": 0,
+      "byProvider": {
+        "deepseek/deepseek-flash": {
+          "externalAttempts": 7,
+          "successfulResponses": 6,
+          "sdkFailures": 1,
+          "quotaOrRateLimitFailures": 0,
+          "finishReasons": {
+            "STOP": 2,
+            "MAX_TOKENS": 4,
+            "UNKNOWN": 1
+          },
+          "reportedInputTokens": 33640,
+          "reportedOutputTokens": 32734
+        }
+      },
+      "usage": {
+        "reportedInputTokens": 33640,
+        "reportedOutputTokens": 32734,
+        "usageMissingResponses": 1,
+        "settledCalls": 6,
+        "unknownSpendCalls": 1,
+        "knownPricedCostUsd": 0,
+        "unknownPricedCalls": 7,
+        "estimatedCostComplete": false
+      },
+      "rootConsumed": [
+        {
+          "id": "tiny-roomy-exam",
+          "consumed": {
+            "modelCalls": 4,
+            "inputTokens": 23346,
+            "outputTokens": 16350,
+            "planningCalls": 4,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "triage",
+          "consumed": {
+            "modelCalls": 2,
+            "inputTokens": 10294,
+            "outputTokens": 16384,
+            "planningCalls": 2,
+            "researchSynthesisCalls": 0,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 0,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 0,
+            "outputTokens": 0
+          }
+        },
+        {
+          "id": "owned-course-research",
+          "consumed": {
+            "modelCalls": 1,
+            "inputTokens": 0,
+            "outputTokens": 0,
+            "planningCalls": 0,
+            "researchSynthesisCalls": 1,
+            "researchQueries": 0,
+            "fetchAttempts": 0,
+            "selectedSourceCharacters": 419,
+            "extractedPages": 0,
+            "ocrPages": 0,
+            "followUps": 0
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 4729,
+            "outputTokens": 8192
+          }
+        }
+      ],
+      "independentEvaluation": {
+        "status": "FAILED",
+        "passed": 0,
+        "cases": 3,
+        "sha256": "e159a52fd3d52d6a66174211cf742412fc60a8b22965c1f38e2a2632d4488709"
+      }
+    },
+    {
       "directory": "step6-live-run-1",
       "liveCorpusSha256": "42b7543dba70158c547e78ec9ec4d8c4a19cd6c94341034198bea9595f823f59",
       "corpusSha256": "4a2e453d66f1220b1461af1d7db1f1fb6764856f03fc072822118cfd2a47e4e0",
@@ -11120,5 +15701,17 @@
       ],
       "independentEvaluation": null
     }
-  ]
+  ],
+  "separateSleepInvestigation": {
+    "report": "../SLEEP_INVESTIGATION.md",
+    "raw": "step6-sleep-audit-2026-10-08/owned-research-live/live-corpus.json",
+    "summary": "step6-sleep-audit-2026-10-08/SUMMARY.json",
+    "excludedFromHistoricalTopLevelRuns": true,
+    "additionalExternalAttempts": 6,
+    "additionalInputTokens": 32907,
+    "additionalOutputTokens": 26931,
+    "additionalTruncations": 2,
+    "additionalUnknownPricedCalls": 6,
+    "priorUnknownSpendUnchanged": true
+  }
 }

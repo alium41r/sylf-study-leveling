@@ -18,4 +18,5 @@ export const StudySessionTransitionV2Schema = z.strictObject({
   schemaVersion: VersionV2Schema, sessionId: EntityIdV2Schema, expectedExecutionVersion: z.number().int().positive(),
   idempotencyKey: z.string().min(8).max(100), action: z.enum(["PROGRESS", "PAUSE", "RESUME", "END", "STOP_OTHER_DEVICE"]),
   cumulativeFocusSeconds: z.number().int().nonnegative(), cumulativeBreakSeconds: z.number().int().nonnegative(),
+  occurredAt: InstantV2Schema.optional(),
 });

@@ -1,0 +1,346 @@
+{
+  "repairInput": {
+    "input": {
+      "acceptedRequest": {
+        "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+        "authorization": "PLAN_ACTION"
+      },
+      "plans": [
+        {
+          "planRef": "plan_1",
+          "intent": {
+            "schemaVersion": 2,
+            "title": "Median of an even sample",
+            "outcome": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+            "policy": "MASTERY",
+            "policySelection": "USER_OVERRIDE",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "scope": [
+              {
+                "scopeKey": "00000000-0000-4000-8000-000000000001",
+                "modelRef": "scope_1",
+                "title": "Accepted outcome",
+                "parentKey": null,
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ],
+            "evidence": [],
+            "availability": {
+              "timezone": "Asia/Karachi",
+              "dailyCeilingMinutes": [
+                60,
+                60,
+                60,
+                60,
+                60,
+                60,
+                60
+              ],
+              "weeklyCeilingMinutes": 420,
+              "restWeekdays": [],
+              "blockedDates": [],
+              "recoveryPercent": 0,
+              "basis": "CONFIRMED_AVAILABILITY"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "assumptions": [],
+            "unresolvedQuestions": []
+          },
+          "allowed": {
+            "scopeRefs": [
+              "scope_1"
+            ],
+            "excludedScopeRefs": [],
+            "evidenceRefs": [],
+            "resourceRefs": [],
+            "externalActivityRefs": []
+          },
+          "readiness": [],
+          "kept": [],
+          "keptPhases": []
+        }
+      ],
+      "context": {
+        "plans": [
+          {
+            "planRef": "plan_1",
+            "requested": {
+              "title": "Median of an even sample",
+              "outcome": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "resolved": {
+              "title": "Median of an even sample",
+              "outcome": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "learningEvidence": [],
+            "facts": [
+              "Teacher rule: for four ordered values, average positions two and three. The assigned values are 2, 4, 6, 12."
+            ],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "envelope": {
+        "schemaVersion": 2,
+        "timezone": "Asia/Karachi",
+        "today": "2026-10-12",
+        "window": {
+          "start": "2026-10-12",
+          "end": "2026-10-14"
+        },
+        "capacityDigest": "fd0c4b6004a70457f72017b9ca712f6c26c3cfd110eb0bac291b63f77107c732",
+        "basis": "CONFIRMED_AVAILABILITY",
+        "weeklyCeilingMinutes": 420,
+        "recoveryPercent": 0,
+        "targets": [
+          {
+            "planRef": "plan_1",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "perGoalWeeklyCeilingMinutes": null
+          }
+        ],
+        "days": [
+          {
+            "date": "2026-10-12",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          },
+          {
+            "date": "2026-10-13",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          },
+          {
+            "date": "2026-10-14",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          }
+        ],
+        "protectedExecution": [],
+        "timeboxRange": {
+          "minMinutes": 5,
+          "maxMinutes": 240
+        }
+      },
+      "previous": {
+        "plans": [
+          {
+            "planRef": "plan_1",
+            "blueprint": {
+              "schemaVersion": 2,
+              "strategy": {
+                "policy": "MASTERY",
+                "outcome": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+                "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                "recommendedEffort": {
+                  "lowMinutes": 10,
+                  "likelyMinutes": 10,
+                  "highMinutes": 10
+                },
+                "phases": []
+              },
+              "scope": [
+                {
+                  "scopeRef": "scope_1",
+                  "disposition": "INCLUDED",
+                  "contribution": "Find the median of four ordered numbers using the mean of the middle two, and explain the check."
+                }
+              ],
+              "activities": [
+                {
+                  "localId": "work_1",
+                  "outcomeRefs": [],
+                  "scopeRefs": [
+                    "scope_1"
+                  ],
+                  "title": "Find the median",
+                  "activityType": "PRACTICE",
+                  "purpose": "Find the median",
+                  "instructions": "Use the ordered values 2, 4, 6, 12. Choose the upper middle number 6 as the median.",
+                  "completionCriterion": "Pass only if the median is 6 and the learner says the upper middle rule is correct.",
+                  "effort": {
+                    "lowMinutes": 10,
+                    "likelyMinutes": 10,
+                    "highMinutes": 10
+                  },
+                  "timeboxMinutes": 10,
+                  "commitment": {
+                    "category": "COMMITTED"
+                  },
+                  "hardDependencies": []
+                }
+              ],
+              "decisions": {
+                "assumptions": [],
+                "tradeOffs": [],
+                "unresolvedUncertainty": [],
+                "stoppingConditions": [
+                  "Meet the accepted criterion or record the specific unresolved gap."
+                ]
+              }
+            },
+            "digest": "8daad11d0add57a0da096589bf017c454fc58d943b020704bfe54e0b8cfced75"
+          }
+        ],
+        "sharedDependencies": []
+      },
+      "feedback": {
+        "schemaVersion": 2,
+        "status": "FEASIBLE",
+        "placements": [
+          {
+            "planRef": "plan_1",
+            "activityRef": "work_1",
+            "minutes": 10,
+            "date": "2026-10-12"
+          }
+        ],
+        "unscheduled": [],
+        "committedMinutes": 10,
+        "capacityProof": null,
+        "findings": [
+          {
+            "findingId": "finding_ed329fe5b20f4d190a99",
+            "category": "FINISH",
+            "consequential": false,
+            "planRefs": [
+              "plan_1"
+            ],
+            "activityRefs": [],
+            "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+            "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+          }
+        ]
+      }
+    },
+    "planning": {
+      "detail": {
+        "days": 14,
+        "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+      },
+      "tradeOffExplanation": "Only the accepted next work is detailed.",
+      "splits": [],
+      "forecasts": [],
+      "adaptation": "NOT_REQUESTED",
+      "unreviewedPhaseRefs": []
+    },
+    "findings": [
+      {
+        "planRef": "plan_1",
+        "finding": {
+          "issueId": "issue_1",
+          "category": "WEAK_CRITERION",
+          "severity": "BLOCKING",
+          "affectedRefs": [
+            "work_1"
+          ],
+          "basis": "CONCRETE_VIOLATION",
+          "grounds": [
+            {
+              "ref": "plan_1/goal",
+              "excerpt": "Find the median of four ordered numbers using the mean of the middle two, and explain the check."
+            },
+            {
+              "ref": "plan_1/activity/work_1",
+              "excerpt": "Pass only if the median is 6 and the learner says the upper middle rule is correct."
+            }
+          ],
+          "evidence": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+          "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+          "requestedResolution": "Correct the rule, worked result and observable correctness check.",
+          "requiresAcknowledgement": false
+        }
+      }
+    ]
+  },
+  "originalReports": [
+    {
+      "planRef": "plan_1",
+      "report": {
+        "schemaVersion": 2,
+        "reportId": "00000000-0000-4000-8000-000000000900",
+        "status": "BLOCKED",
+        "evidenceDigest": "eea8c8a0fec496e174e24d9febd45be146f37cdd25eea477e8bac7d2ab8062bc",
+        "educationalContentDigest": "42c1f9d657202cc0f188889c822f814091033b5c1d3e33b213a38cff972f3a86",
+        "issues": [
+          {
+            "issueId": "issue_1",
+            "category": "WEAK_CRITERION",
+            "severity": "BLOCKING",
+            "affectedRefs": [
+              "work_1"
+            ],
+            "evidence": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+            "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+            "resolution": "OPEN",
+            "verification": null
+          }
+        ],
+        "requiredAcknowledgements": []
+      }
+    }
+  ],
+  "verificationReserve": {
+    "inputTokens": 20786,
+    "outputTokens": 4096
+  }
+}

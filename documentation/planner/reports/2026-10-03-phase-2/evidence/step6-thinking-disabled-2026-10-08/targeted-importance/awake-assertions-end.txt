@@ -1,0 +1,27 @@
+2026-10-08 23:30:49 +0500 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   0
+   PreventUserIdleDisplaySleep    1
+   SoftwareUpdateTask             0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   InternalPreventDisplaySleep    1
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 77982(caffeinate): [0x000db2460001963a] 00:00:54 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77982(caffeinate): [0x000db2460005963b] 00:00:54 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77982(caffeinate): [0x000db2460007963c] 00:00:54 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 344(powerd): [0x000da5aa0001953a] 00:54:42 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 344(powerd): [0x000db1c000108336] 00:01:46 InternalPreventDisplaySleep named: "com.apple.powermanagement.delayDisplayOff"  
+	Timeout will fire in 13 secs Action=TimeoutActionTurnOff
+   pid 75074(Google Chrome): [0x000da75500059577] 00:47:34 NoDisplaySleepAssertion named: "Blink Wake Lock"  
+No kernel assertions.

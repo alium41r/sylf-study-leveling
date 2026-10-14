@@ -1,0 +1,33 @@
+{
+  "method": "Four separately labelled deterministic repair controls with concrete corrected givens, actions and checks. Scripted verification exercises the boundary; no live model judgment or human adjudication claimed.",
+  "observations": [
+    {
+      "id": "fraction_application",
+      "namedDefectResolved": true,
+      "untouchedActivityIdentical": true,
+      "allocation": "FEASIBLE",
+      "verification": "PASSED"
+    },
+    {
+      "id": "missing_unit_data",
+      "namedDefectResolved": true,
+      "untouchedActivityIdentical": true,
+      "allocation": "FEASIBLE",
+      "verification": "PASSED"
+    },
+    {
+      "id": "unsupported_weight",
+      "namedDefectResolved": true,
+      "untouchedActivityIdentical": true,
+      "allocation": "FEASIBLE",
+      "verification": "PASSED"
+    },
+    {
+      "id": "stop_after_success",
+      "namedDefectResolved": true,
+      "untouchedActivityIdentical": true,
+      "allocation": "FEASIBLE",
+      "verification": "PASSED"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "label": "diagnostic",
+  "files": 1,
+  "passed": 1,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/postgres.test.ts",
+      "cases": [
+        {
+          "name": "controlled first block through frozen dispatcher and genuine durable accounting",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

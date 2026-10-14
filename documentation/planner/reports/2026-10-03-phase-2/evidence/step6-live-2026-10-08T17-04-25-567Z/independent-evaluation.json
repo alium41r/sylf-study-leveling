@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "classification": "Independent inspection of actual provider outputs, durable calls/checkpoints and execution counts; no model approval or apply used as educational acceptance",
+  "run": "step6-live-2026-10-08T17-04-25-567Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "rawSha256": "db8268df394378736f8fc3b2d335e3c2bf819aa7a620d92fdc89a6b0881eae16",
+  "routeConfiguration": {
+    "temporaryNonGemini": true,
+    "productionPrimaryOptions": true,
+    "temporaryExistingGroq": false,
+    "reasoningEffort": null,
+    "temperature": null,
+    "reviewTemperature": null,
+    "reviewThinking": null,
+    "reviewReasoningEffort": null,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "acceptedCases": 0,
+  "totalCases": 3,
+  "metrics": {
+    "externalCalls": 9,
+    "settledCalls": 9,
+    "unknownSpendCalls": 0,
+    "unknownPricingCalls": 9,
+    "actualInputTokens": 50217,
+    "actualOutputTokens": 55900,
+    "truncatedCalls": 6,
+    "fallbacks": 3,
+    "caseLatencyMs": {
+      "median": 81274,
+      "p90": 113860,
+      "max": 113860
+    },
+    "providerLatencyMs": {
+      "median": 32293,
+      "p90": 41301,
+      "max": 41301
+    }
+  },
+  "cases": [
+    {
+      "id": "tiny-roomy-exam",
+      "expected": "Additional capacity alone must not inflate useful work versus tiny-exam.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "OUTPUT_TRUNCATED",
+      "inspection": "Generated one 60-minute integrated series task (same booked amount as the historical ordinary case), with correct supplied 12V/100Ω/200Ω calculation and explicit learner-chosen changed givens. Further work is error-triggered and unbooked. No source-current paired ordinary run or completed independent review exists. Both 4096-output review attempts truncate with zero final content. No candidate/apply; generated education alone cannot qualify acceptance.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0
+    },
+    {
+      "id": "triage",
+      "expected": "Explicit prioritization and deferred scope; no invented weighting or disappearance.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "OUTPUT_TRUNCATED",
+      "inspection": "Both generation attempts exhaust 8192 output tokens, returning only partial JSON (358 and530characters). No parsed blueprint, allocation, independent review or educational acceptance exists. No candidate/apply.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0
+    },
+    {
+      "id": "owned-course-research",
+      "expected": "Actual owned upload/hash, excerpt-backed course outcomes, no official-assessment claim, research then reviewed plan.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "OUTPUT_TRUNCATED",
+      "inspection": "Actual owned bytes/hash and course applicability/excerpt verification succeed; all scopeBindings use [] or existing aliases, with no invented new scope ID. Both blueprint calls exhaust8192output tokens with zero final content. No usable blueprint, adaptation, review, candidate or apply; this does not qualify educational acceptance.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0
+    }
+  ],
+  "full17Corpus": "NOT_RUN: conditional subset acceptance gate fails",
+  "naturalRepairVerificationApply": "NOT_OBSERVED",
+  "limitsChanged": false,
+  "defectsOrFindingsInjected": false
+}

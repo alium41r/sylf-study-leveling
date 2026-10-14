@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-09T11:23:25.263Z",
+  "status": "FAILED",
+  "database": "generated disposable loopback database",
+  "runtime": null,
+  "requiredSkippedTests": 0,
+  "requiredResults": [],
+  "migrations": [],
+  "limitations": [
+    "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+    "Phase 1 actual services/SQL are exercised; no hosted data is touched."
+  ],
+  "error": "RUNTIME_UNAVAILABLE: working Docker daemon or native PostgreSQL binaries required. PGlite/hosted DB are not permitted. Required suites did not run.",
+  "cleanup": "No server started.",
+  "finishedAt": "2026-10-09T11:23:26.325Z"
+}

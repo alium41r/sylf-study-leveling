@@ -1,0 +1,16 @@
+{
+  "status": "PHASE_2_INCOMPLETE",
+  "technicalStatus": "PASSED",
+  "postgresStatus": "PASSED",
+  "unitsPassed": 551,
+  "postgresPassed": 409,
+  "requiredSkipped": 0,
+  "sourceAndReportStatus": "PASSED",
+  "targetedIndependentAccepted": 0,
+  "targetedTotal": 3,
+  "full17CaseStatus": "NOT_RUN_TARGETED_GATE_FAILED",
+  "acceptedNaturalRepairVerificationApplyWitness": false,
+  "productionConfigurationChanged": false,
+  "budgetOrReviewRequirementsChanged": false,
+  "phase3Begun": false
+}

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "lockedAtUtc": "2026-10-09T14:01:56.008903+00:00",
+  "assessor": "Root AI agent, case-author-side",
+  "independentAgentAssessmentRead": false,
+  "humanEvaluation": false,
+  "sourceBlindSha256": "200e872009a18b642eb39374306ee3abbb9bdb0fbe4abebf614487e0b97ac338",
+  "checks": [
+    {
+      "assessmentId": "B01",
+      "operationalDelivery": "COMPLETE_STOP",
+      "schemaAndGroundingAssessment": "STRICT_CANONICAL_VALIDATOR_PASSED_IN_EXECUTION",
+      "independentEducationalAssessment": "CORRECT_GROUNDED_BLOCKING_FINDING",
+      "seriousDefectCorrectlyDetected": true,
+      "groundedRequirementQuote": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+      "groundedOffendingProposalQuotes": [
+        "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+        "All twelve rewrites are done even after checked success.",
+        "Meet the accepted criterion or record the specific unresolved gap."
+      ],
+      "consequence": "Thirty compulsory minutes of twelve identical rewrites after the single citation already satisfies the accepted stopping requirement defeat that explicit stopping point. Available capacity and internally matching effort totals do not justify that extra work.",
+      "findingCategory": "STRUCTURAL",
+      "findingSeverity": "BLOCKING",
+      "extraFalseBlockers": 0,
+      "requestedResolutionAssessment": "Remove the unnecessary activity and associated effort/allocation/dependency entries, preserving the valid citation and its success gate. This is appropriately focused; no actual repair is performed.",
+      "semanticJudgment": "CORRECT_ON_DELIVERED_DEFECTIVE_CASE",
+      "concerns": []
+    },
+    {
+      "assessmentId": "B02",
+      "operationalDelivery": "BLANK_OUTPUT_CAPPED",
+      "schemaAndGroundingAssessment": "NOT_REACHED_ON_USABLE_OUTPUT",
+      "independentEducationalAssessment": "UNASSESSABLE_NO_VERDICT",
+      "seriousDefectCorrectlyDetected": null,
+      "extraFalseBlockers": null,
+      "semanticJudgment": "UNASSESSABLE",
+      "consequence": "No educational review is available; cannot publish an accepted review or infer whether the sound candidate would be blocked or accepted.",
+      "concerns": []
+    }
+  ],
+  "pairGate": "FAIL_OPERATIONAL_DELIVERY",
+  "reviewerAccuracyAcrossPair": "UNASSESSABLE_AS_TWO_CASE_CLASSIFICATION",
+  "correctUsableJudgments": 1,
+  "usableJudgments": 1,
+  "scheduledCases": 2
+}

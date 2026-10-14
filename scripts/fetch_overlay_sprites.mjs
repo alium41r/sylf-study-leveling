@@ -3,7 +3,7 @@
  * Fetch Character Overlay Equipment Sprites from Habitica's CDN
  * 
  * These are the actual character overlay sprites (not shop icons) that render
- * on top of the pixel character body. Used by CharacterRenderer.tsx.
+ * on top of the pixel character body. Retained inventory product art; companions use authored Pixel assets.
  * 
  * Downloads slim_ variant sprites which are the character-overlay versions.
  */

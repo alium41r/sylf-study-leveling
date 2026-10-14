@@ -1,0 +1,110 @@
+{
+  "status": "PASSED",
+  "startingWorkspaceFiles": 4944,
+  "changedStartingFiles": [
+    "__tests__/planner-v2/intelligence/provider.test.ts",
+    "__tests__/planner-v2/intelligence/quality.test.ts",
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+    "dist/planner-worker/planner/v2/intelligence/blueprint.js",
+    "dist/planner-worker/planner/v2/intelligence/provider.js",
+    "dist/planner-worker/planner/v2/intelligence/quality.js",
+    "dist/planner-worker/planner/v2/intelligence/schemas/quality.js",
+    "dist/planner-worker/planner/v2/server/compiler.js",
+    "dist/planner-worker/planner/v2/server/learning.js",
+    "documentation/planner/README.md",
+    "lib/planner/v2/intelligence/blueprint.ts",
+    "lib/planner/v2/intelligence/provider.ts",
+    "lib/planner/v2/intelligence/quality.ts",
+    "lib/planner/v2/intelligence/schemas/quality.ts",
+    "lib/planner/v2/server/compiler.ts",
+    "lib/planner/v2/server/learning.ts"
+  ],
+  "unexpectedChanges": [],
+  "sourceSha256": {
+    "lib/planner/v2/intelligence/blueprint.ts": "76753456d03e749b7946d51dc6b86ee7e37cbd2f3e5b5c04ceb163f7844af359",
+    "lib/planner/v2/intelligence/provider.ts": "4709a27a95a7369b2d1d6611bc5e5fbe49a880634bbb6ccd61bb5638214ba03b",
+    "lib/planner/v2/intelligence/quality.ts": "b037ea8b85d3d40511ff9525d9c9a5717ad3bf61243cdacdac3d3254528d5c0a",
+    "lib/planner/v2/intelligence/schemas/quality.ts": "997c30858c179b799fad2e112c3b544fbf3b29f9a51bf610d63568cdb487ec8b",
+    "lib/planner/v2/server/compiler.ts": "2a33c1ac3e0fc570ab7c08355dbfe5913ef4dbd4d196527f1828c1d3b3be22aa",
+    "lib/planner/v2/server/learning.ts": "22387116207eeaa81629f4687129088fcf28886d1305bf8b73016662a36ed702",
+    "__tests__/planner-v2/intelligence/provider.test.ts": "4e766d538fed5b715e53b29603bc685d477e2d36ecd6424e8e4d086077cd6de6",
+    "__tests__/planner-v2/intelligence/quality.test.ts": "664f45df98cf147cf376a43aaeb23c6e3e785a00fa40706d95470365dc17c937",
+    "__tests__/planner-v2/intelligence/review-recovery.test.ts": "44156dd553984138c259ea6c4c2927c0119ec70c0627cfaa789e3c3fd0d8c654",
+    "__tests__/planner-v2/intelligence/review-fixtures.ts": "18371f3fefa06858f8a0bd9859206daf26a2a2b7d9f664b475a3461bf1bf38d7",
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts": "6f1858bf924bfe76f63aca84a446f7ad321be6149e1d036c017d4f35a971ff45"
+  },
+  "frozenContracts": {
+    "lib/planner/v2/contracts/artifacts.ts": {
+      "expected": "2d28f60affbab80b0b674f1b35e975f63974bccbe45b5dcfd2a42015bba0fd75",
+      "actual": "2d28f60affbab80b0b674f1b35e975f63974bccbe45b5dcfd2a42015bba0fd75",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/blueprint.ts": {
+      "expected": "409fbcaeaa15acb8dc9d1bee80e8612abb4553ecc7381d2e7965536ac649f4ab",
+      "actual": "409fbcaeaa15acb8dc9d1bee80e8612abb4553ecc7381d2e7965536ac649f4ab",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/envelope.ts": {
+      "expected": "3d8bedf93e5d8bf29ad80841f1f11205c576d25f13e7bafe159f0fb3921e382b",
+      "actual": "3d8bedf93e5d8bf29ad80841f1f11205c576d25f13e7bafe159f0fb3921e382b",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/evidence.ts": {
+      "expected": "13aeaad8563bff0d5fcb7c5044ab0c5ca6227ee13664e0c2a02f215de8620f21",
+      "actual": "13aeaad8563bff0d5fcb7c5044ab0c5ca6227ee13664e0c2a02f215de8620f21",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/execution.ts": {
+      "expected": "a45a6d90a8f58c11f1342d05542a7728e3fbe23fe8830bdfda6a32ae2d5fd3cc",
+      "actual": "a45a6d90a8f58c11f1342d05542a7728e3fbe23fe8830bdfda6a32ae2d5fd3cc",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/index.ts": {
+      "expected": "e89a831c07e54720a0c5251310bf3440d81366e5bbeabfcb0aaa8a9b0990172e",
+      "actual": "e89a831c07e54720a0c5251310bf3440d81366e5bbeabfcb0aaa8a9b0990172e",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/intent.ts": {
+      "expected": "474d8847506ab5f3ee886e375ac3390a9b2e5a805c85343e559fe761dded9b51",
+      "actual": "474d8847506ab5f3ee886e375ac3390a9b2e5a805c85343e559fe761dded9b51",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/lineage.ts": {
+      "expected": "4f72e0cbdf879659cc5326e2006dee2827af790cee68faa2592328e3bac5719b",
+      "actual": "4f72e0cbdf879659cc5326e2006dee2827af790cee68faa2592328e3bac5719b",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/operations.ts": {
+      "expected": "22579b5f3f3b3aeee0e5d8c2db5412d9e8b7e31e1c19d38a95a6ebc340e60e8c",
+      "actual": "22579b5f3f3b3aeee0e5d8c2db5412d9e8b7e31e1c19d38a95a6ebc340e60e8c",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/primitives.ts": {
+      "expected": "3d26fa7a94bca8299b0de5c1d787f3c95b67d14e6bf4bc91d84ade2890244f04",
+      "actual": "3d26fa7a94bca8299b0de5c1d787f3c95b67d14e6bf4bc91d84ade2890244f04",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/session.ts": {
+      "expected": "14c2768a4c773fc33d14d4f681746f34c75952cc3363b85128084fa03b4bb4b8",
+      "actual": "14c2768a4c773fc33d14d4f681746f34c75952cc3363b85128084fa03b4bb4b8",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/workspace.ts": {
+      "expected": "2abc74a5886e51dacb3f76da3ecdd820db9925e2580d2a4dbd1a8802c80c465c",
+      "actual": "2abc74a5886e51dacb3f76da3ecdd820db9925e2580d2a4dbd1a8802c80c465c",
+      "unchanged": true
+    }
+  },
+  "protectedApiPrismaPhase1ProviderFiles": 263,
+  "changedProtectedFiles": [],
+  "historicalReportFiles": 876,
+  "changedHistoricalReports": [],
+  "postgresPrivateCopyChangedDuringRun": [],
+  "postgresComparedFiles": 1335,
+  "postgresFinalSourceDifferences": [
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts"
+  ],
+  "postgresUnexpectedSourceDifferences": [],
+  "postgresTypeOnlyCorrespondence": "postgres-test-type-correspondence.json",
+  "sourceDifferenceExplanation": "All runtime app/lib/Prisma/configuration and unit fixture hashes match the final PostgreSQL snapshot. Only a PostgreSQL test callback type annotation differs; source and emitted-JavaScript correspondence verify unchanged runtime semantics. Full repository typecheck and scoped lint pass on final source."
+}

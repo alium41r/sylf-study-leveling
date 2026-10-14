@@ -6,20 +6,21 @@ import { MOTION_SPRING, MOTION_EASE } from "@/lib/motion";
 import {
   X,
   Plus,
-  Expand,
+  MoreHorizontal,
   CalendarDays,
   Lock,
-  Send,
+  ArrowUp,
   StopCircle,
   Copy,
   Check,
   ArrowUpRight,
 } from "lucide-react";
-import { SystemApertureIcon } from "@/app/components/icons";
+import { SylvieIcon } from "../icons";
 import MarkdownRenderer from "../MarkdownRenderer";
-import { PagePresence } from "./page-presence";
-import { QuotaInfo } from "../AiPlannerModal";
-import { PresenceIconBadge } from "./PresenceIconBadge";
+import type { PagePresence } from "./page-presence";
+import type { QuotaInfo } from "../AiPlannerModal";
+import { lockPageScroll } from "@/lib/scroll-lock";
+import styles from "./SystemOverlay.module.css";
 
 interface OverlayMessage {
   id: string;
@@ -62,8 +63,12 @@ export default function SystemOverlay({
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [actionsOpen, setActionsOpen] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -88,7 +93,7 @@ export default function SystemOverlay({
     contextIdRef.current = presence.id;
 
     setMessages((prev) => {
-      if (prev.length === 0) {
+      if (!prev.some((message) => message.role === "user")) {
         return [{ id: `greet-${presence.id}`, role: "assistant", content: presence.greeting }];
       }
       const last = prev[prev.length - 1];
@@ -108,12 +113,58 @@ export default function SystemOverlay({
   // ── Close on Escape ─────────────────────────────────────────
   useEffect(() => {
     if (!open) return;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const unlock = lockPageScroll();
+    const frame = requestAnimationFrame(() => dialogRef.current?.focus({ preventScroll: true }));
+    return () => {
+      cancelAnimationFrame(frame);
+      unlock();
+      if (previousFocus?.isConnected && previousFocus !== document.body) previousFocus.focus({ preventScroll: true });
+      else document.querySelector<HTMLElement>('[data-system-companion="true"]')?.focus({ preventScroll: true });
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        if (actionsOpen) setActionsOpen(false);
+        else onClose();
+      }
+      if (e.key === "Tab") {
+        const controls = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), textarea:not([disabled]), [tabindex="0"]'
+        );
+        if (!controls?.length) return;
+        const first = controls[0], last = controls[controls.length - 1];
+        if (e.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || document.activeElement === dialogRef.current)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, actionsOpen]);
+
+  useEffect(() => {
+    if (!actionsOpen) return;
+    const dismiss = (event: PointerEvent) => {
+      if (!actionsRef.current?.contains(event.target as Node)) setActionsOpen(false);
+    };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, [actionsOpen]);
+
+  useEffect(() => {
+    const textarea = inputRef.current;
+    if (!textarea) return;
+    textarea.style.height = "auto";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+  }, [input, open]);
 
   // ── Scroll to bottom on new messages (container only, not the page) ──
   useEffect(() => {
@@ -229,8 +280,8 @@ export default function SystemOverlay({
       // so the Stop control stays available during the reveal.
       revealText(aiMsgId, reply);
       onQuotaRefresh();
-    } catch (err: any) {
-      if (err?.name === "AbortError") {
+    } catch (err: unknown) {
+      if (typeof err === "object" && err !== null && "name" in err && err.name === "AbortError") {
         setMessages((prev) => [
           ...prev,
           { id: `stop-${Date.now()}`, role: "assistant", content: "_Generation stopped._", contextNotice: true },
@@ -241,7 +292,7 @@ export default function SystemOverlay({
           {
             id: `err-${Date.now()}`,
             role: "assistant",
-            content: "⚠️ The System is temporarily unavailable. Please try again.",
+            content: "⚠️ Sylvie is temporarily unavailable. Please try again.",
             failed: true,
           },
         ]);
@@ -276,288 +327,161 @@ export default function SystemOverlay({
     <AnimatePresence>
       {open && presence && (
         <>
-          {/* Transparent scrim keeps the page visible; clicking it dismisses */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[54] bg-black/20 backdrop-blur-[2px]"
+            className={styles.scrim}
             onClick={onClose}
+            aria-hidden="true"
           />
-
           <motion.section
+            ref={dialogRef}
             role="dialog"
-            aria-label={`The System quick assistant — ${presence.label} context`}
+            aria-modal="true"
+            aria-label={`Sylvie quick assistant — ${presence.label} context`}
+            tabIndex={-1}
             initial={{ opacity: 0, y: 16, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{
-              opacity: 0,
-              y: 12,
-              scale: 0.97,
-              transition: { duration: 0.14, ease: MOTION_EASE.exit },
-            }}
+            exit={{ opacity: 0, y: 12, scale: 0.97, transition: { duration: 0.14, ease: MOTION_EASE.exit } }}
             transition={MOTION_SPRING.modal}
-            className="fixed z-[55] flex flex-col overflow-hidden rounded-2xl border border-white/[0.1] bg-bg-abyss/90 backdrop-blur-2xl shadow-[0_24px_80px_rgba(0,0,0,0.6),0_0_35px_rgba(124,58,237,0.12)]"
-            style={{
-              transformOrigin: "bottom right",
-              right: "max(1rem, env(safe-area-inset-right))",
-              bottom: "max(1rem, env(safe-area-inset-bottom))",
-              width: "min(24.5rem, calc(100vw - 2rem))",
-              height: "min(36.5rem, calc(100dvh - 5.5rem))",
-            }}
+            className={styles.dialog}
           >
-            {/* Signature system-window top line */}
-            <div className="h-[2px] shrink-0 bg-gradient-to-r from-transparent via-accent-primary/60 to-transparent" />
-
-            {/* ── Header ── */}
-            <header className="shrink-0 px-3.5 py-2.5 border-b border-white/[0.06] flex items-center justify-between gap-2.5 bg-bg-shadow/30">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="w-7 h-7 rounded-xl bg-accent-primary/10 border border-accent-primary/25 flex items-center justify-center text-accent-text-light shrink-0">
-                  <SystemApertureIcon className="w-3.5 h-3.5" />
-                </span>
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span
-                    className="text-xs tracking-[0.14em] text-text-primary font-bold truncate"
-                    style={{ fontFamily: "'Rajdhani', sans-serif" }}
-                  >
-                    THE SYSTEM
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[9.5px] font-mono text-text-muted px-1.5 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] truncate">
-                    <PresenceIconBadge icon={presence.icon} className="w-2.5 h-2.5 text-accent-text-light/70 shrink-0" />
-                    <span className="truncate">{presence.label}</span>
-                  </span>
+            <header className={styles.header}>
+              <div className={styles.identity}>
+                <SylvieIcon size={28} className={styles.brandIcon} />
+                <div className={styles.heading}>
+                  <span className={styles.title}>Sylvie</span>
+                  <span className={styles.context}>{presence.label}</span>
                 </div>
               </div>
-
-              <div className="flex items-center gap-1 shrink-0">
-                {/* Quota pill */}
-                <span
-                  title={
-                    chatQuota?.unlimited
-                      ? "Unlimited AI messages"
-                      : quotaExhausted
-                        ? "Daily AI quota reached — resets at midnight"
-                        : "Daily AI messages remaining"
-                  }
-                  className={`flex items-center gap-1 text-[10px] font-mono rounded-full px-2 py-0.5 border ${
-                    quotaExhausted
-                      ? "bg-rose-500/10 border-rose-500/30 text-rose-300"
-                      : chatQuota && !chatQuota.unlimited && (chatQuota.remaining ?? 0) <= 3
-                      ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
-                      : "bg-white/[0.03] border-white/[0.06] text-text-muted"
-                  }`}
-                >
-                  {quotaExhausted ? (
-                    <>
-                      <Lock className="w-2.5 h-2.5 text-rose-400" />
-                      <span>Limit</span>
-                    </>
-                  ) : chatQuota?.unlimited ? (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" />
-                      <span aria-label="unlimited">∞</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" />
-                      <span>{chatQuota?.remaining ?? "–"} left</span>
-                    </>
-                  )}
-                </span>
-
-                {presence.plannerHint && (
+              <div className={styles.headerActions}>
+                <div ref={actionsRef} className={styles.actionsAnchor}>
                   <button
                     type="button"
-                    onClick={onOpenPlanner}
-                    title={presence.plannerHint}
-                    className="p-1.5 rounded-lg text-text-muted hover:text-accent-text-light hover:bg-white/[0.05] transition-colors"
+                    onClick={() => setActionsOpen(!actionsOpen)}
+                    aria-label="Conversation options"
+                    aria-expanded={actionsOpen}
+                    aria-controls="system-conversation-options"
+                    title="Conversation options"
+                    className={styles.iconButton}
                   >
-                    <CalendarDays className="w-3.5 h-3.5" />
+                    <MoreHorizontal size={18} aria-hidden="true" />
                   </button>
-                )}
-
+                  {actionsOpen && (
+                    <div id="system-conversation-options" className={styles.actionsMenu}>
+                      <button type="button" disabled={sending} onClick={() => { handleNewChat(); setActionsOpen(false); }}>
+                        <Plus size={16} aria-hidden="true" /> New conversation
+                      </button>
+                      {presence.plannerHint && (
+                        <button type="button" onClick={() => { setActionsOpen(false); onOpenPlanner(); }}>
+                          <CalendarDays size={16} aria-hidden="true" /> Create a study plan
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
                 <button
                   type="button"
-                  onClick={() => onOpenWorkspace(sessionId)}
-                  title="Open in System workspace"
-                  className="p-1.5 rounded-lg text-text-muted hover:text-accent-text-light hover:bg-white/[0.05] transition-colors"
+                  onClick={() => { setActionsOpen(false); onOpenWorkspace(sessionId); }}
+                  aria-label="Open in Sylvie workspace"
+                  title="Open in Sylvie workspace"
+                  className={styles.iconButton}
                 >
-                  <Expand className="w-3.5 h-3.5" />
+                  <ArrowUpRight size={17} aria-hidden="true" />
                 </button>
-
-                <button
-                  type="button"
-                  onClick={handleNewChat}
-                  title="New conversation"
-                  className="p-1.5 rounded-lg text-text-muted hover:text-accent-text-light hover:bg-white/[0.05] transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={onClose}
-                  title="Close (Esc)"
-                  className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/[0.05] transition-colors ml-0.5"
-                >
-                  <X className="w-3.5 h-3.5" />
+                <button type="button" onClick={onClose} aria-label="Close conversation" title="Close (Esc)" className={styles.iconButton}>
+                  <X size={18} aria-hidden="true" />
                 </button>
               </div>
             </header>
 
-            {/* ── Messages ── */}
-            <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto chat-scroll px-3.5 py-3 space-y-3">
-              {messages.map((m) =>
-                m.role === "user" ? (
-                  <div key={m.id} className="flex justify-end">
-                    <div className="max-w-[85%] rounded-2xl rounded-br-sm px-3.5 py-2 bg-accent-primary/15 border border-accent-primary/30 text-text-primary text-[12.5px] leading-relaxed shadow-sm">
-                      <MarkdownRenderer content={m.content} compact />
-                      {m.failed && (
-                        <p className="text-[9px] text-rose-400 font-bold mt-1 uppercase tracking-wider font-['Rajdhani']">
-                          ⚠ Failed to send
-                        </p>
-                      )}
-                    </div>
+            <div ref={scrollRef} className={`${styles.messages} chat-scroll`} data-conversation={hasUserMessage} aria-label="Conversation" aria-busy={sending}>
+              {messages.map((message) =>
+                message.contextNotice ? (
+                  <div key={message.id} className={styles.contextNotice}>
+                    <MarkdownRenderer content={message.content} compact />
                   </div>
-                ) : m.contextNotice ? (
-                  <div key={m.id} className="flex justify-center my-1">
-                    <span className="text-[10px] text-text-muted px-2.5 py-0.5 rounded-full bg-white/[0.02] border border-white/[0.05]">
-                      <MarkdownRenderer content={m.content} compact />
-                    </span>
+                ) : message.role === "user" ? (
+                  <div key={message.id} className={styles.userMessage}>
+                    <p>{message.content}</p>
                   </div>
                 ) : (
-                  <div key={m.id} className="flex justify-start gap-2.5 group/msg">
-                    <span className="w-6 h-6 rounded-lg bg-accent-primary/10 border border-accent-primary/20 flex items-center justify-center text-accent-text-light shrink-0 mt-0.5">
-                      <SystemApertureIcon className="w-3 h-3" />
-                    </span>
-                    <div className="max-w-[86%] rounded-2xl rounded-tl-sm px-3.5 py-2.5 bg-bg-panel/60 border border-white/[0.06] text-text-primary text-[12.5px] leading-relaxed shadow-sm relative backdrop-blur-sm">
-                      <MarkdownRenderer content={m.content} compact />
-                      {m.content && !sending && !m.failed && (
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(m.id, m.content)}
-                          title="Copy reply"
-                          className="absolute -top-2 -right-2 p-1 rounded-md bg-bg-abyss border border-border-subtle text-text-muted hover:text-accent-text-light opacity-0 group-hover/msg:opacity-100 transition-opacity shadow-sm"
-                        >
-                          {copiedId === m.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                        </button>
-                      )}
-                    </div>
+                  <div key={message.id} className={styles.assistantMessage} data-failed={message.failed}>
+                    <MarkdownRenderer content={message.content} className={styles.markdown} />
+                    {message.content && !sending && !message.failed && !message.id.startsWith("greet-") && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(message.id, message.content)}
+                        aria-label={copiedId === message.id ? "Reply copied" : "Copy reply"}
+                        title="Copy reply"
+                        className={styles.copyButton}
+                      >
+                        {copiedId === message.id ? <Check size={13} aria-hidden="true" /> : <Copy size={13} aria-hidden="true" />}
+                      </button>
+                    )}
                   </div>
                 )
               )}
-
               {sending && (
-                <div className="flex justify-start gap-2.5">
-                  <span className="w-6 h-6 rounded-lg bg-accent-primary/10 border border-accent-primary/20 flex items-center justify-center text-accent-text-light shrink-0">
-                    <SystemApertureIcon className="w-3 h-3" />
-                  </span>
-                  <div className="rounded-2xl rounded-tl-sm px-3 py-2 bg-bg-panel/60 border border-white/[0.06] flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent-text-light font-['Rajdhani']">
-                      Thinking
-                    </span>
-                    <span className="flex gap-1">
-                      <span className="w-1 h-1 bg-accent-primary rounded-full animate-bounce" />
-                      <span className="w-1 h-1 bg-accent-primary rounded-full animate-bounce [animation-delay:150ms]" />
-                      <span className="w-1 h-1 bg-accent-primary rounded-full animate-bounce [animation-delay:300ms]" />
-                    </span>
-                  </div>
+                <div className={styles.thinking} role="status">
+                  <span>Thinking</span>
+                  <span className={styles.thinkingDots} aria-hidden="true"><i /><i /><i /></span>
                 </div>
               )}
-
               <div ref={endRef} />
             </div>
 
-            {/* ── Suggestions (Clean, non-intrusive chips) ── */}
-            {showSuggestions && (
-              <div className="shrink-0 px-3.5 pb-2.5 pt-1 flex flex-wrap gap-1.5">
-                {presence.suggestions.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => handleSend(s)}
-                    className="text-[11px] font-medium px-2.5 py-1 rounded-full border border-white/[0.08] bg-white/[0.03] text-text-secondary hover:text-accent-text-light hover:bg-accent-primary/10 hover:border-accent-primary/35 active:scale-95 transition-all text-left flex items-center gap-1.5 group"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-accent-primary/50 group-hover:bg-accent-primary transition-colors" />
-                    <span>{s}</span>
+            {showSuggestions && !quotaExhausted && (
+              <div className={styles.suggestions}>
+                {presence.suggestions.map(suggestion => (
+                  <button key={suggestion} type="button" onClick={() => handleSend(suggestion)}>
+                    {suggestion}<ArrowUpRight size={12} aria-hidden="true" />
                   </button>
                 ))}
               </div>
             )}
-
-            {/* ── Quota banner ── */}
             {quotaExhausted && (
-              <div className="shrink-0 mx-3.5 mb-2 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-[10.5px] text-rose-300 flex items-center gap-2 font-['Rajdhani']">
-                <Lock className="w-3 h-3 shrink-0" />
-                <span>
-                  Daily prompt limit reached. Resets at midnight
-                  {chatQuota?.resetsAt ? ` (${new Date(chatQuota.resetsAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})` : ""}.
-                </span>
-              </div>
+              <p className={styles.quotaNotice} role="status">
+                <Lock size={14} aria-hidden="true" />
+                <span>Daily limit reached. Resets at midnight{chatQuota?.resetsAt ? ` (${new Date(chatQuota.resetsAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})` : ""}.</span>
+              </p>
             )}
-
-            {/* ── Composer (Integrated, sleek input bar) ── */}
-            <div className="shrink-0 p-3 border-t border-white/[0.06] bg-bg-shadow/20">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSend();
-                }}
-                className="relative flex items-center gap-1.5 rounded-xl bg-bg-void/90 border border-white/[0.08] focus-within:border-accent-primary/50 focus-within:ring-1 focus-within:ring-accent-primary/20 px-3 py-1.5 transition-all shadow-inner"
-              >
+            <div className={styles.composerArea}>
+              <form onSubmit={event => { event.preventDefault(); handleSend(); }} className={styles.composer}>
                 <textarea
+                  ref={inputRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
+                  onChange={event => setInput(event.target.value)}
+                  onKeyDown={event => {
+                    if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                      event.preventDefault();
                       handleSend();
                     }
                   }}
                   rows={1}
                   disabled={quotaExhausted}
-                  placeholder={
-                    quotaExhausted
-                      ? "Daily quota reached — resets at midnight"
-                      : `Ask The System…`
-                  }
-                  className="flex-1 resize-none bg-transparent border-0 text-xs text-text-primary placeholder:text-text-muted/60 focus:outline-none focus:ring-0 max-h-24 min-h-[32px] py-1 leading-relaxed disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Message Sylvie"
+                  placeholder={quotaExhausted ? "Daily limit reached" : "Ask anything…"}
                 />
                 {sending ? (
-                  <button
-                    type="button"
-                    onClick={stopGeneration}
-                    title="Stop generation"
-                    className="w-7 h-7 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 flex items-center justify-center shrink-0 transition-colors"
-                  >
-                    <StopCircle className="w-3.5 h-3.5" />
+                  <button type="button" onClick={stopGeneration} aria-label="Stop generation" title="Stop generation" className={styles.sendButton}>
+                    <StopCircle size={18} aria-hidden="true" />
                   </button>
                 ) : (
-                  <button
-                    type="submit"
-                    disabled={!input.trim() || quotaExhausted}
-                    title="Send (Enter)"
-                    className="w-7 h-7 rounded-lg bg-accent-primary hover:bg-accent-primary-light text-white disabled:opacity-20 disabled:hover:bg-accent-primary flex items-center justify-center shrink-0 transition-all shadow-sm active:scale-95"
-                  >
-                    {quotaExhausted ? <Lock className="w-3 h-3" /> : <Send className="w-3.5 h-3.5 ml-0.5" />}
+                  <button type="submit" disabled={!input.trim() || quotaExhausted} aria-label="Send message" title="Send (Enter)" className={styles.sendButton}>
+                    {quotaExhausted ? <Lock size={15} aria-hidden="true" /> : <ArrowUp size={19} aria-hidden="true" />}
                   </button>
                 )}
               </form>
-
-              {/* Connection to the workspace */}
-              <div className="flex items-center justify-between mt-2 px-1 text-[9.5px] font-['Rajdhani']">
-                <span className="text-text-muted/70 uppercase tracking-wider">
-                  The System • {presence.label}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => onOpenWorkspace(sessionId)}
-                  className="flex items-center gap-1 font-bold uppercase tracking-wider text-accent-text-light/80 hover:text-accent-primary-light transition-colors"
-                >
-                  <span>Open Workspace</span>
-                  <ArrowUpRight className="w-2.5 h-2.5" />
-                </button>
+              <div className={styles.footer}>
+                <span>Shift + Enter for a new line</span>
+                {chatQuota && (
+                  <span title={chatQuota.unlimited ? "Unlimited AI messages" : "Daily AI messages remaining"}>
+                    {chatQuota.unlimited ? "Unlimited" : `${chatQuota.remaining ?? "–"} messages left`}
+                  </span>
+                )}
               </div>
             </div>
           </motion.section>

@@ -1,0 +1,26 @@
+[
+  {
+    "test": "persist empty equip",
+    "status": 200
+  },
+  {
+    "test": "empty drawing dashboard",
+    "lit": 0,
+    "id": "user:empty-audit"
+  },
+  {
+    "test": "equip before saving",
+    "saveVisibleInStudio": 0
+  },
+  {
+    "test": "persist nonexistent reference",
+    "status": 200
+  },
+  {
+    "test": "unsaved reference result",
+    "savedOutfit": "user:ghost-audit",
+    "exists": false,
+    "renderedId": "sylf:sylf-character",
+    "lit": 707
+  }
+]

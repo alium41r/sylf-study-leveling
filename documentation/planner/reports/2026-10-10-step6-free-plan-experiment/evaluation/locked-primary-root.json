@@ -1,0 +1,65 @@
+{
+  "status": "LOCKED_BEFORE_INDEPENDENT_RESULT",
+  "assessor": "PRIMARY_CASE_AUTHOR_AI_AGENT",
+  "lockedAt": "2026-10-10T17:27:14.751Z",
+  "assessment": {
+    "probability_exam_natural": {
+      "educationalQuality": "UNASSESSABLE_NO_MODEL_OUTPUT",
+      "correctness": null,
+      "personalization": null,
+      "completeness": null,
+      "prioritization": null,
+      "workload": null,
+      "practicality": null,
+      "adaptation": null,
+      "technicalValidity": "NOT_EVALUATED_NO_RESPONSE",
+      "causalInterfaceConclusion": "NOT_IDENTIFIABLE",
+      "note": "One transport attempt failed without a provider response."
+    },
+    "probability_exam_structured": {
+      "educationalQuality": "UNASSESSABLE_NO_MODEL_OUTPUT",
+      "correctness": null,
+      "personalization": null,
+      "completeness": null,
+      "prioritization": null,
+      "workload": null,
+      "practicality": null,
+      "adaptation": null,
+      "technicalValidity": "NOT_EVALUATED_NO_RESPONSE",
+      "causalInterfaceConclusion": "NOT_IDENTIFIABLE",
+      "note": "Skipped after the mandatory whole-run stop."
+    },
+    "sql_project_structured": {
+      "educationalQuality": "UNASSESSABLE_NO_MODEL_OUTPUT",
+      "correctness": null,
+      "personalization": null,
+      "completeness": null,
+      "prioritization": null,
+      "workload": null,
+      "practicality": null,
+      "adaptation": null,
+      "technicalValidity": "NOT_EVALUATED_NO_RESPONSE",
+      "causalInterfaceConclusion": "NOT_IDENTIFIABLE",
+      "note": "Skipped after the mandatory whole-run stop."
+    },
+    "sql_project_natural": {
+      "educationalQuality": "UNASSESSABLE_NO_MODEL_OUTPUT",
+      "correctness": null,
+      "personalization": null,
+      "completeness": null,
+      "prioritization": null,
+      "workload": null,
+      "practicality": null,
+      "adaptation": null,
+      "technicalValidity": "NOT_EVALUATED_NO_RESPONSE",
+      "causalInterfaceConclusion": "NOT_IDENTIFIABLE",
+      "note": "Skipped after the mandatory whole-run stop."
+    }
+  },
+  "actualUsage": null,
+  "usageBasedEstimatedCost": null,
+  "retainedReservationUsd": 0.0421074,
+  "knownBilledZero": false,
+  "futureCallsAuthorizedUnderStoppedRun": false,
+  "recommendation": "Resolve execution-environment reachability and spending uncertainty before any newly authorized calls; retain the approved architecture and strict boundaries."
+}

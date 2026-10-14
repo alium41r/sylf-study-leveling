@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "status": "REPRODUCED_UNCHANGED_VALIDATION_REJECTION",
+  "liveCorpusSha256": "5c7b26f3c46a61aeed60a5502a51acc4cec4f0bfa15d87d8f3dd6cc1171638f9",
+  "method": "Offline validation of immutable returned JSON against its actual server-read source and accepted input. No mutation, provider call, Attempt or replay.",
+  "acceptedScopeRefs": [
+    "scope_1",
+    "scope_2",
+    "scope_3"
+  ],
+  "unknownScopeRefs": [
+    "scope_4"
+  ],
+  "diagnosis": {
+    "code": "INVALID_OUTPUT",
+    "stage": "RESEARCH",
+    "message": "Review must map applicable assessed claims to accepted scope and exclusions."
+  },
+  "sourceHash": "95b26a8b646d48de94b5a0e28dfafde487395918cc3d53dfdde8dfcb1445adc4",
+  "externalAttempts": 0,
+  "budgetConsumed": {
+    "modelCalls": 2,
+    "inputTokens": 3368,
+    "outputTokens": 10492,
+    "planningCalls": 0,
+    "researchSynthesisCalls": 2,
+    "researchQueries": 0,
+    "fetchAttempts": 0,
+    "selectedSourceCharacters": 419,
+    "extractedPages": 0,
+    "ocrPages": 0,
+    "followUps": 0
+  },
+  "rootOutcome": "FAILED",
+  "rootError": {
+    "schemaVersion": 2,
+    "code": "BUDGET_EXHAUSTED",
+    "stage": "RESEARCH",
+    "message": "The root call/token allowance is exhausted.",
+    "retryable": false,
+    "resumable": false,
+    "fieldRefs": [],
+    "activityRefs": [],
+    "dates": [],
+    "recoveryAction": "NONE",
+    "traceId": "4f84e3d4-47b3-403f-915c-e77701f49c63"
+  }
+}

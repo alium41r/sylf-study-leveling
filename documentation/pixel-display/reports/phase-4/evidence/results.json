@@ -1,0 +1,237 @@
+{
+  "description": "Phase 4 evidence: the density model and the animation/effects system, measured on the real dashboard card and the dev surface.",
+  "date": "2026-10-07T15:08:19.759Z",
+  "phase": 4,
+  "density": {
+    "model": {
+      "physicalSize": "host slot, CSS px",
+      "logicalResolution": "cells",
+      "density": "cells per unit physical size",
+      "characterFill": "share of matrix occupied"
+    },
+    "engineChangeRequired": false,
+    "reason": "CanvasPixRenderer.fit derives the backing store from the slot, never from the matrix, so cellPitch was already the only quantity resolution changed.",
+    "devSweepAtConstantPhysicalSize": [
+      {
+        "density": 32,
+        "slotBox": "263x263",
+        "canvasCss": 258,
+        "canvasBacking": 258,
+        "devicePxPerCell": 8.063
+      },
+      {
+        "density": 40,
+        "slotBox": "263x263",
+        "canvasCss": 258,
+        "canvasBacking": 258,
+        "devicePxPerCell": 6.45
+      },
+      {
+        "density": 48,
+        "slotBox": "263x263",
+        "canvasCss": 258,
+        "canvasBacking": 258,
+        "devicePxPerCell": 5.375
+      },
+      {
+        "density": 64,
+        "slotBox": "263x263",
+        "canvasCss": 258,
+        "canvasBacking": 258,
+        "devicePxPerCell": 4.031
+      }
+    ],
+    "conclusion": "Presentation box and canvas backing store are byte-identical across a 4x change in logical resolution. Only cellPitch moves.",
+    "notCssZoom": "The canvas CSS size and device-pixel size are identical at every density; only the logical matrix changes.",
+    "cardInvarianceTest": "A test renders the card at five densities and asserts the produced presentation box is the same value every time.",
+    "persisted": false
+  },
+  "architecture": {
+    "engineChangeRequired": false,
+    "contentSeam": "PixContent.render (full composite) and PixContent.update (continuation signal) already sufficed.",
+    "effectsAreNotStates": "No *_EFFECT entries were added to the state table. A state is what the companion is; an effect is what is briefly happening to it.",
+    "effectsPostProcess": "An effect has no planes, no paint order and no z-index. It modulates cells the composite already painted, so it cannot invent geometry or change what a state means.",
+    "flatPlaneModelEvolved": false,
+    "flatPlaneModelJustification": "No recorded evidence required it. Both effects are expressible as a per-cell intensity over planes that already exist.",
+    "boundariesStillEnforced": [
+      "No dashboard file imports effect internals.",
+      "engine/** imports nothing from @/app/**.",
+      "The adapter remains the only module importing both vocabularies."
+    ],
+    "singleDeliberateException": "THINKING is authored without a loops limit, so it is held until the application withdraws it. A test proves it is the only loop that outlives its own table, and shows BLINK (also without loops) completes its pass and settles."
+  },
+  "signals": {
+    "LEVEL_UP": {
+      "state": "CELEBRATING",
+      "effect": "sparkleWave",
+      "authored": true,
+      "procedural": true
+    },
+    "TASK_COMPLETE": {
+      "state": "IDLE",
+      "effect": "bodyPulse",
+      "note": "Acknowledgment, deliberately quieter than a level-up"
+    },
+    "STREAK_EXTENDED": {
+      "state": "CELEBRATING",
+      "effect": "sparkleWave seed 3",
+      "note": "Same state, different seed"
+    },
+    "AI_THINKING": {
+      "state": "THINKING",
+      "effect": null,
+      "sustained": true,
+      "note": "No effect on purpose: a pulse would imply progress"
+    }
+  },
+  "determinism": {
+    "sameInputsByteIdentical": true,
+    "differentSeedsDiffer": true,
+    "noFloatingPointDrift": "Frame 5 reached by one long step equals frame 5 reached by five short ones.",
+    "logicalCoordinatesOnly": true
+  },
+  "bounds": {
+    "sparkleTable": {
+      "cells": 7,
+      "frames": 24,
+      "integers": 168,
+      "computed": "once per wave, reused"
+    },
+    "bodyPulseRamp": 12,
+    "perFrameAllocation": "none",
+    "growsWithElapsedTime": false,
+    "inventsGeometry": false,
+    "proof": "A test asserts the wave leaves every cell that was empty before it still empty."
+  },
+  "reducedMotion": {
+    "sparkleWave": {
+      "authoredFrames": 24,
+      "reducedFrames": 4
+    },
+    "bodyPulse": {
+      "authoredFrames": 12,
+      "reducedFrames": 2
+    },
+    "rule": "Every reaction is shortened, never removed, and a test asserts the picture still changes."
+  },
+  "performance": {
+    "surface": "Dev surface at 64x64, 652 lit cells, CPU-rasterised headless Chrome, 200 samples.",
+    "clearAndComposite": {
+      "p50": 0.1,
+      "p95": 0.1,
+      "max": 1.1
+    },
+    "fullFrame": {
+      "p50": 0.3,
+      "p95": 0.4,
+      "max": 4.7
+    },
+    "heaviestPhase4Frame": {
+      "p50": 0.3,
+      "p95": 0.3,
+      "max": 4.8,
+      "scene": "THINKING looping with a sparkle wave"
+    },
+    "baselines": {
+      "phase1": "p50 0.1-0.2ms at 48 cells",
+      "phase3": "p50 0.3ms / p95 0.5ms on the real 110px card"
+    },
+    "finding": "The procedural effect costs nothing measurable; the heaviest Phase 4 scene is indistinguishable from an idle frame at the same density.",
+    "rendererOptimizationIntroduced": false
+  },
+  "zeroWork": {
+    "cardMountedResting": {
+      "windowMs": 5008,
+      "frames": 0
+    },
+    "thinkingWithWave": {
+      "windowMs": 4008,
+      "frames": 241
+    },
+    "afterWithdrawal": {
+      "windowMs": 4008,
+      "frames": 0
+    },
+    "conclusion": "Zero-work idle holds in production and is regained after a sustained animation ends."
+  },
+  "defectsFoundAndFixed": [
+    {
+      "defect": "The body pulse changed zero pixels.",
+      "detail": "cellKey returns a byte offset (four bytes per cell) because PixDisplay speaks bytes; paintBodyPulse treated it as a cell index and addressed a quarter of the real offset.",
+      "caughtBy": "The reduced-motion test asserting the picture changes. Every determinism, bounds and termination test passed while the effect did nothing visible.",
+      "fix": "Divide by four bytes per cell, with cellIndexFromKey exported so the conversion is written once."
+    },
+    {
+      "defect": "The content boundary scanner flagged a local variable named window.",
+      "detail": "Three attempts to make the scanner scope-sensitive made it worse, and one broke the engine fixture asserting canvas.getContext(2d) must be flagged.",
+      "resolution": "The scanner is restored to a documented plain name match. A local called window fails too, and that is the intended trade. The local was renamed to litSpan.",
+      "scope": "Test layer only; no engine invariant was weakened."
+    }
+  ],
+  "gates": {
+    "pixelDisplayAndDashboard": {
+      "files": 13,
+      "tests": 263,
+      "failed": 0
+    },
+    "companionRegression": {
+      "files": 24,
+      "tests": 202,
+      "failed": 0
+    },
+    "typecheck": {
+      "errors": 0
+    },
+    "engineBoundaryTypecheck": {
+      "errors": 0
+    },
+    "lint": "0 errors on changed files",
+    "build": "succeeds",
+    "mobile": {
+      "build": "succeeds",
+      "verify": "PASSED"
+    },
+    "productionInaccessibility": {
+      "/dev/pixel-display": 404,
+      "/dev": 404,
+      "/": 200,
+      "/dashboard": 307,
+      "devMarkers": 0
+    }
+  },
+  "visualQa": [
+    {
+      "view": "dashboard desktop dark",
+      "viewport": "1440x950"
+    },
+    {
+      "view": "dashboard light with custom accent #0f766e",
+      "viewport": "1440x950"
+    },
+    {
+      "view": "dashboard mobile dark",
+      "viewport": "390x800",
+      "note": "Card stacks; display holds its 110px box."
+    },
+    {
+      "view": "dev density sweep",
+      "note": "32/40/48/64 all pinned to the same 320px slot."
+    }
+  ],
+  "openDecisions": {
+    "closed": [],
+    "O1": "Open, better informed, and now separable: resolution can be decided as a perceptual question with no layout cost attached.",
+    "O4": "Open, better informed: rAF plus continuation drove a 4-beat loop, a 24-frame effect and a sustained loop unchanged. Two independent animation sources OR-ed without a scheduler change.",
+    "O5": "Open, with negative evidence: no profiling case for a different backend.",
+    "O15": "Open, and now has a second lever. Density can make every cell larger at the same physical size, which is a new option that should be evaluated before the slot grows or the eye design changes.",
+    "O16": "Open, better informed: which sizes and which densities are now two decisions rather than one.",
+    "O17": "New: whether the production card should animate at rest. Neither the Phase 3 nor Phase 4 measurement settles it, and the machinery exists.",
+    "O18": "New: effect vocabulary growth. Whether a fifth signal needs a third effect is a question for the phase that brings the fifth signal."
+  },
+  "limits": [
+    "Live high-DPI rendering remains unobserved (O13): devicePixelRatio was 1 in every environment available.",
+    "Frame cost was measured with CPU rasterisation, not a GPU-accelerated production profile.",
+    "The four signals were verified at browser level by driving the content API the adapter drives; the mappings themselves are verified by tests. No real task, streak or AI run was triggered against production data.",
+    "Density was swept on the dev surface at a pinned 320px slot and on the card at 110px. Larger production slots were not exercised."
+  ]
+}

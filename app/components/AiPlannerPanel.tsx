@@ -12,7 +12,7 @@ import {
   RotateCcw,
   CheckCircle2,
 } from "lucide-react";
-import { SystemApertureIcon } from "@/app/components/icons";
+import { SylvieIcon } from "@/app/components/icons";
 import CustomDatePicker from "./CustomDatePicker";
 
 export interface QuotaInfo {
@@ -49,7 +49,7 @@ interface AiPlannerPanelProps {
 /**
  * The AI Study Planner, extracted so it can live in two places:
  *  - the classic modal (quick action from the overlay / anywhere)
- *  - the dedicated System workspace Planner tab
+ *  - the dedicated Sylvie workspace Planner tab
  * The SSE generation flow, quota handling and state machine are
  * unchanged from the original modal implementation.
  */
@@ -292,7 +292,7 @@ export default function AiPlannerPanel({
             <CheckCircle2 className="w-10 h-10" />
           </div>
           <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-bg-abyss border border-border-subtle text-accent-text-light">
-            <SystemApertureIcon size={16} />
+            <SylvieIcon size={16} />
           </div>
         </div>
 
@@ -302,7 +302,7 @@ export default function AiPlannerPanel({
           </h3>
           <p className="text-xs text-text-secondary font-['Rajdhani'] leading-relaxed">
             Your adaptive syllabus and scheduled quests are ready. The full breakdown was posted
-            into The System conversation
+            into a Sylvie conversation
             {successResult?.sessionId ? ` (thread #${successResult.sessionId})` : ""}.
           </p>
         </div>
@@ -409,7 +409,7 @@ export default function AiPlannerPanel({
               transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
             />
             <div className="absolute inset-0 flex items-center justify-center text-accent-text-light">
-              <SystemApertureIcon size={26} className="animate-pulse" />
+              <SylvieIcon size={26} className="animate-pulse" />
             </div>
           </div>
         </div>
@@ -536,7 +536,7 @@ export default function AiPlannerPanel({
           border: "1px solid rgba(255, 255, 255, 0.2)",
         }}
       >
-        <SystemApertureIcon size={16} />
+        <SylvieIcon size={16} />
         <span>Generate AI Study Plan</span>
       </button>
     </div>

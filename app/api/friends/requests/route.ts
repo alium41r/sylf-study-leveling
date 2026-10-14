@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { selectedCompanionsForUsers } from "@/lib/pixel-companion-service";
 import { areUsersBlocked } from "@/lib/block-service";
 
 /**
@@ -39,7 +40,8 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(requests);
+    const companions = await selectedCompanionsForUsers(requests.map(request => request.sender.id), session.userId, "public");
+    return NextResponse.json(requests.map(request => ({ ...request, sender: { ...request.sender, companion: companions.get(request.sender.id) } })));
   } catch (error) {
     console.error("GET friend requests error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -87,11 +87,11 @@ const SECTIONS = [
   },
   {
     id: "character",
-    title: "Character styles",
+    title: "Pixel companion",
     icon: Sparkles,
-    href: "/locker?tab=identity",
-    action: "Character Studio",
-    note: "Available forms, pedestals, and auras.",
+    href: "/locker?tab=identity&view=customizer",
+    action: "Companion Customizer",
+    note: "Sylf, your drawings, and Pixel Size.",
   },
   {
     id: "backgrounds",
@@ -455,7 +455,7 @@ function CollectionContent() {
                             <span>{style.rarity}</span>
                             <span>
                               {style.available
-                                ? "In Character Studio"
+                                ? "In Companion Customizer"
                                 : `Lv. ${style.requiredLevel || 1} · ${style.requiredRank || "E"}`}
                             </span>
                           </div>
@@ -468,7 +468,7 @@ function CollectionContent() {
                     </LibraryEmpty>
                   )}
                   <p className={styles.notice}>
-                    Select a style in Character Studio. Available styles are
+                    Select a style in Companion Customizer. Available styles are
                     separate from purchased items.
                   </p>
                 </>

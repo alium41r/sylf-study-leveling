@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-08T14:47:57.819291+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-08T14-33-52-329Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "23170bf7f43d37d7de71ffcae64633daef01493826b5d14e06ee22464bf55d9f",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.2,
+    "reviewTemperature": null,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      {
+        "id": "roadmap-open",
+        "trial": 1,
+        "attemptId": "2a775cb8-79c9-48bb-bd45-07cd6105836d"
+      },
+      {
+        "id": "infeasible-zero-capacity",
+        "trial": 1,
+        "attemptId": "dd63c64c-ae91-48bb-a147-3023cfff84e6"
+      },
+      {
+        "id": "indivisible-checkpoint",
+        "trial": 1,
+        "attemptId": "4ea0dc62-9ca0-4704-a263-ef9173a28509"
+      }
+    ],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 36,
+  "usage": {
+    "reportedInputTokens": 269597,
+    "reportedOutputTokens": 42954,
+    "settledCalls": 36,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 36
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 6851.5,
+    "p90Ms": 11497,
+    "maximumMs": 17473
+  },
+  "passed": 12,
+  "total": 17,
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "trial": 1,
+      "attemptId": "d86c00c8-5f83-486b-8c90-1d3ca625a355",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute integrated explanation and correct12V worked/9V changed circuit, stopping after independent success. Further work is contingent on an observed error. No separate compulsory preparation or false readiness credit.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "trial": 1,
+      "attemptId": "63ad9fbf-ad4f-460a-b588-2939a7894f99",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "The same60-minute integrated explanation plus one changed independent series solve; no headroom-driven added stages or committed exercises. Extra24V example is explicitly optional.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "trial": 1,
+      "attemptId": "2a4c1343-7279-45aa-87c1-5aee28a17c69",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "20-minute diagnostic with three fully specified series problems, checked answers and honest erroneous-step evidence.25-minute repair is uncommitted and triggered only by a concrete diagnostic failure; no confidence credit.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "zero-new-work",
+      "trial": 1,
+      "attemptId": "75dc6285-e1d8-4139-aebe-91e068d19135",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Zero activities and Quests as explicitly authorized, scope DEFERRED with reason/contribution; no manufactured optional work.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 0
+    },
+    {
+      "id": "concept-foundation",
+      "trial": 1,
+      "attemptId": "8201d811-054a-4c99-8b62-628abf3956a1",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual current/potential confusion receives definitions/examples and distinct conservation-grounded rules before fresh independent basic circuit application. No timed-paper substitute;150-minute estimate and broad separate tasks remain proportion/scaffolding concerns.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "method-weakness",
+      "trial": 1,
+      "attemptId": "0801ed95-fb9e-4b91-a464-a73e105be301",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Compulsory five-category set includes dependent sources and supernodes/supermeshes, and an assumption invents a full advanced taught repertoire. A generic use-taught-methods/record-gaps disclaimer does not make those categories conditional, and the criterion requires every item solved. Model empty review/apply cannot qualify scope or achievable criteria.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "triage",
+      "trial": 1,
+      "attemptId": "1335cc5d-c9df-41d8-a033-211eb42a2757",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Valid strict output and50 minutes before quiz, all four scope nodes preserved. Series/parallel rules/examples feed fully specified mixed and changed circuits, explicit depth sacrifices and no invented weights. Dense workload remains uncertainty; no scope disappearance.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "roadmap-open",
+      "trial": 1,
+      "attemptId": "2a775cb8-79c9-48bb-bd45-07cd6105836d",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One90-minute concrete csv.reader report with supplied six-row data, grouping, row-width/numeric errors and hand-checked totals. One bounded adaptation produces45+45 meaningful cumulative pieces preserving body/minutes/criterion; no automatic invented split or extra pipeline.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "trial": 1,
+      "attemptId": "53d7fbb1-3f0a-4d8b-b6d0-6138a143f640",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Fully specified1%,90%,95%specificity and changed5%,80%,90%specificity Bayes calculations with frequency table, formula consistency and conceptual distinction. Further confusion-specific remedy remains contingent. Posterior sensitivity phrasing must be read with the supplied fixed test characteristics; no time-based mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "general-homework",
+      "trial": 1,
+      "attemptId": "c6fb4c40-b46c-4124-a27d-0e6478849416",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Exactly the three assigned equations, negative-distribution explanation and substitution checks. Additional self-created equations are OPTIONAL; no extra committed homework or repeated success stage.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "joint-prerequisite",
+      "trial": 1,
+      "attemptId": "afaa5794-d0dc-477d-8ef8-4ce3318c369a",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Primary references nonexistent json_report under empty plan_2; fallback names actual json_report but puts foreign shared_loops_dict in local hardDependencies. Ownership validator rejects both, so no candidate/apply and required joint path fails.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "INVALID_OUTPUT",
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "34a61414-75d6-45c3-9a4f-30df330ee229"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "trial": 1,
+      "attemptId": "dd63c64c-ae91-48bb-a147-3023cfff84e6",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Required positive learning reaches one adaptation and honest NEEDS_DECISION under zero capacity; no empty feasible candidate or readiness claim.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "trial": 1,
+      "attemptId": "4ea0dc62-9ca0-4704-a263-ef9173a28509",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual45-minute uninterrupted work is preserved against30-minute slots, one adaptation and honest NEEDS_DECISION; no fabricated split, shorter substitute or execution.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 1,
+      "attemptId": "9285833a-2b22-448e-978c-4ede67e2e877",
+      "status": "FAILED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Four literal course outcomes and private ownership/content hash are verified, institution=Sylf rejected as title-only. Verifier misclassifies that already-resolved unaccepted metadata rejection as an unresolved learner decision despite explicit applicability of the private project; no blueprint/candidate/apply. Required reviewed course plan fails.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 1,
+      "attemptId": "04e0786f-9303-4763-b973-f7fd21bf1fde",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Contradiction acknowledged but required diagnostic circuits omit resistor values without permitting selection, so they cannot be calculated as instructed. Mandatory teaching also adds two new examples even after a clean diagnostic. Empty review and apply do not meet meaningful achievable/proportionate education.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "roadmap-large",
+      "trial": 1,
+      "attemptId": "7851592c-098c-4e90-8759-f8a1d86d9f58",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "All40 strategic nodes retained, but reviewer wrongly equates explicit strategic DEFERRED scope with dropping and treats a soft timebox as mandatory effort coverage. Its numeric-property excerpts return malformed JSON. Fallback reservation exceeds unchanged root input allowance; no candidate/apply. No false successful output is recorded.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "REVIEW",
+        "message": "The root call/token allowance is exhausted.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "63b1d4ec-d8e7-4224-8b62-05e8449f70f6"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "public-assessment-research",
+      "trial": 1,
+      "attemptId": "ae400ac5-2d14-425c-87c6-138c7d6a0717",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Real official/secondary reads and provenance retained; only front matter/unapplicable secondary topic claims cannot establish Paper2 scope. Valid string conflict verification and authoritative NEEDS_DECISION prevent publication. No invented scope or quota attribution.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    }
+  ],
+  "operationalFailures": 2,
+  "sourceCurrentFinalQualification": false,
+  "sourceCorrespondenceNote": "Sources stayed unchanged during this complete matrix. Subsequent8October14:44prompt correspondence fixes make it historical evidence."
+}

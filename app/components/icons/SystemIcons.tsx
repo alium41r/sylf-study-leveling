@@ -71,40 +71,6 @@ export function ObjectiveTargetIcon({ size = 18, className = "", ...props }: Ico
 }
 
 /**
- * The System Sentience & Holographic AI Aperture.
- * Holographic diamond aperture framed by cybernetic corner brackets.
- * Canonical icon for "The System", "Ask The System", and AI intelligence.
- * Replaces generic AI sparkles and generic chat bubbles.
- */
-export function SystemApertureIcon({ size = 18, className = "", ...props }: IconProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-      {...props}
-    >
-      {/* Central diamond core aperture */}
-      <polygon points="12 4.5 19.5 12 12 19.5 4.5 12" />
-      {/* Tactical HUD corner framing brackets */}
-      <path d="M4 8V4H8" />
-      <path d="M16 4H20V8" />
-      <path d="M20 16V20H16" />
-      <path d="M8 20H4V16" />
-      {/* Center luminous singularity */}
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" strokeWidth="0" />
-    </svg>
-  );
-}
-
-/**
  * Modern, simplistic Streak Momentum Flame.
  * Razor-sharp stylized flame replacing bulbous generic clip-art.
  * Canonical icon for Streaks, Weekly consistency, and study momentum.
@@ -190,7 +156,7 @@ export function DailyQuotaIcon({ size = 16, className = "", ...props }: IconProp
 }
 
 /**
- * The System Telemetry & Insights Scanner Aperture.
+ * Sylvie Telemetry & Insights Scanner Aperture.
  * Holographic scanning lens replacing maritime compass needle.
  */
 export function SystemInsightsIcon({ size = 18, className = "", ...props }: IconProps) {

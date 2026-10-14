@@ -19,7 +19,7 @@ import {
   ChevronDown,
   MoreVertical,
 } from "lucide-react";
-import { StreakFlameIcon, QuestEmblemIcon, SystemApertureIcon } from "@/app/components/icons";
+import { StreakFlameIcon, QuestEmblemIcon, SylvieIcon } from "@/app/components/icons";
 
 export interface ProfileData {
   id: number;
@@ -354,7 +354,7 @@ export function PublicProfileClient({
             exit={{ opacity: 0, y: -20, x: "-50%" }}
             className="fixed top-6 left-1/2 z-50 px-4 py-2 rounded-xl bg-bg-abyss/95 border border-accent-primary/50 text-text-primary text-xs font-['Rajdhani'] font-bold uppercase tracking-wider shadow-2xl flex items-center gap-2 backdrop-blur-md pointer-events-none"
           >
-            <SystemApertureIcon size={14} className="text-accent-primary animate-spin" />
+            <SylvieIcon size={14} className="text-accent-primary animate-spin" />
             <span>{toastMsg}</span>
           </motion.div>
         )}

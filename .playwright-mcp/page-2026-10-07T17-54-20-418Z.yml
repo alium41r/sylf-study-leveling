@@ -1,0 +1,96 @@
+- generic [active] [ref=f7e1]:
+  - main [ref=f7e4]:
+    - generic [ref=f7e6]:
+      - generic [ref=f7e7]:
+        - button "Back to System Hub" [ref=f7e8] [cursor=pointer]
+        - generic [ref=f7e12]:
+          - generic [ref=f7e13]: System Settings → Appearance
+          - heading "Appearance" [level=1] [ref=f7e18]
+          - paragraph [ref=f7e19]: Customize your application mode, accent color, and canvas background. Changes preview below in real-time and apply across the entire system when saved.
+      - generic [ref=f7e20]:
+        - generic [ref=f7e21]:
+          - heading "Live HUD Preview" [level=2] [ref=f7e24]
+          - generic [ref=f7e25]: Reflecting active system
+        - generic [ref=f7e26]:
+          - complementary [aria-hidden] [ref=f7e27]
+          - main [ref=f7e56]:
+            - generic [ref=f7e57]:
+              - generic [ref=f7e58]: Welcome back,
+              - generic [ref=f7e63]:
+                - generic [ref=f7e64]: "2497"
+                - generic [ref=f7e69]: 0 wks
+            - generic [ref=f7e73]:
+              - generic [ref=f7e74]: Lv. 4
+              - generic [ref=f7e85]:
+                - generic [ref=f7e87]:
+                  - generic [ref=f7e88]: EXP
+                  - generic [ref=f7e89]: 223 / 318
+                - generic [ref=f7e93]:
+                  - generic [ref=f7e94]: HP
+                  - generic [ref=f7e95]: 42 / 105
+      - generic [ref=f7e187]:
+        - heading "1. App Mode" [level=2] [ref=f7e188]
+        - generic [ref=f7e189]:
+          - button "Dark" [ref=f7e190] [cursor=pointer]
+          - button "Light" [ref=f7e194] [cursor=pointer]
+      - generic [ref=f7e202]:
+        - heading "2. Accent Color" [level=2] [ref=f7e203]
+        - generic [ref=f7e204]:
+          - generic [ref=f7e205]:
+            - generic [ref=f7e206]:
+              - heading "Accent Color" [level=3] [ref=f7e207]
+              - paragraph [ref=f7e208]: Controls primary actions, active navigation, progress indicators, selected borders, and glow highlights.
+            - button "Reset" [ref=f7e209] [cursor=pointer]
+          - slider "Accent Color saturation and brightness board" [ref=f7e214]
+          - generic [ref=f7e215]:
+            - generic [ref=f7e216]: Hue Spectrum
+            - slider "Accent Color hue slider" [ref=f7e217] [cursor=pointer]
+          - generic [ref=f7e218]:
+            - 'generic "Active Color: #7c3aed" [ref=f7e220]'
+            - generic [ref=f7e221]:
+              - generic: HEX
+              - textbox "Accent Color hex code" [ref=f7e222]:
+                - /placeholder: "#000000"
+                - text: "#7C3AED"
+          - generic [ref=f7e223]:
+            - generic [ref=f7e224]: Curated Swatches
+            - generic [ref=f7e225]:
+              - button "System Purple" [ref=f7e226] [cursor=pointer]
+              - button "Electric Cyan" [ref=f7e229] [cursor=pointer]
+              - button "Emerald" [ref=f7e232] [cursor=pointer]
+              - button "Rose" [ref=f7e235] [cursor=pointer]
+              - button "Amber Gold" [ref=f7e238] [cursor=pointer]
+              - button "Crimson" [ref=f7e241] [cursor=pointer]
+              - button "Neon Lime" [ref=f7e244] [cursor=pointer]
+              - button "Royal Indigo" [ref=f7e247] [cursor=pointer]
+      - generic [ref=f7e250]:
+        - heading "3. Background Color" [level=2] [ref=f7e251]
+        - generic [ref=f7e252]:
+          - generic [ref=f7e253]:
+            - generic [ref=f7e254]:
+              - heading "Background Color" [level=3] [ref=f7e255]
+              - paragraph [ref=f7e256]: Sets the solid canvas backdrop. Surface cards and text adapt automatically to preserve readability and contrast.
+            - button "Reset" [ref=f7e257] [cursor=pointer]
+          - slider "Background Color saturation and brightness board" [ref=f7e262]
+          - generic [ref=f7e263]:
+            - generic [ref=f7e264]: Hue Spectrum
+            - slider "Background Color hue slider" [ref=f7e265] [cursor=pointer]
+          - generic [ref=f7e266]:
+            - 'generic "Active Color: #000000" [ref=f7e268]'
+            - generic [ref=f7e269]:
+              - generic: HEX
+              - textbox "Background Color hex code" [ref=f7e270]:
+                - /placeholder: "#000000"
+                - text: "#000000"
+          - generic [ref=f7e271]:
+            - generic [ref=f7e272]: Curated Swatches
+            - generic [ref=f7e273]:
+              - button "Pure Black" [ref=f7e274] [cursor=pointer]
+              - button "Night Slate" [ref=f7e277] [cursor=pointer]
+              - button "Abyssal Navy" [ref=f7e280] [cursor=pointer]
+              - button "Midnight" [ref=f7e283] [cursor=pointer]
+              - button "Deep Void" [ref=f7e286] [cursor=pointer]
+      - generic [ref=f7e289]:
+        - paragraph [ref=f7e293]: Canonical Appearance Active
+        - button "Save & Apply Changes" [disabled] [ref=f7e295] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=f7e306] [cursor=pointer]

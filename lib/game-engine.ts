@@ -299,11 +299,8 @@ export function getWeeklyBounds(refDate: Date = new Date(), timezone: string = "
   const localMondayStr = TimezoneService.getUserLocalDateOffset(safeTz, diffToMonday, refDate);
   const localNextMondayStr = TimezoneService.getUserLocalDateOffset(safeTz, diffToNextMonday, refDate);
 
-  const mondayNoon = new Date(`${localMondayStr}T12:00:00Z`);
-  const nextMondayNoon = new Date(`${localNextMondayStr}T12:00:00Z`);
-
-  const weekStart = TimezoneService.getStartOfDayUTC(safeTz, mondayNoon);
-  const nextMondayStart = TimezoneService.getStartOfDayUTC(safeTz, nextMondayNoon);
+  const weekStart = TimezoneService.getStartOfLocalDateUTC(safeTz, localMondayStr);
+  const nextMondayStart = TimezoneService.getStartOfLocalDateUTC(safeTz, localNextMondayStr);
   const weekEnd = new Date(nextMondayStart.getTime() - 1);
 
   // ISO Week Key calculation based on local Monday date
@@ -317,7 +314,7 @@ export function getWeeklyBounds(refDate: Date = new Date(), timezone: string = "
     target.setUTCMonth(0, 1 + ((4 - target.getUTCDay()) + 7) % 7);
   }
   const weekNum = 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
-  const year = monYear;
+  const year = target.getUTCFullYear();
   const weekKey = `${year}-W${weekNum.toString().padStart(2, "0")}`;
 
   const timeRemainingMs = Math.max(0, weekEnd.getTime() - refDate.getTime());
@@ -386,7 +383,12 @@ export function calculateWeeklyStreak(
   const last = parseWeek(lastActiveWeek);
   const curr = parseWeek(currentWeek);
 
-  const weekDiff = (curr.year - last.year) * 52 + (curr.week - last.week);
+  const monday = (week: { year: number; week: number }) => {
+    const januaryFourth = new Date(Date.UTC(week.year, 0, 4));
+    januaryFourth.setUTCDate(4 - (januaryFourth.getUTCDay() + 6) % 7 + (week.week - 1) * 7);
+    return januaryFourth.getTime();
+  };
+  const weekDiff = Math.round((monday(curr) - monday(last)) / 604800000);
 
   if (weekDiff === 0) {
     return { newStreak: currentStreak, freezeUsed: false };

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "ceilingNanodollars": 20000000,
+  "stopped": null,
+  "calls": [
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "input": 11303,
+      "output": 4096,
+      "reservedNanodollars": 8306100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8306100,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T13:51:09.506Z",
+      "callId": "25f40da5-9007-4f7b-806c-f2482b244774",
+      "dispatchedAt": "2026-10-09T13:51:09.574Z",
+      "requestBodySha256": "e9f9ad123bd979b7662843fbb3d00672b6e6398b2c84c11284416470d6c66a01",
+      "reasoningEffort": "low",
+      "thinking": "OMITTED_ENABLED_DEFAULT",
+      "rawUsage": {
+        "prompt_tokens": 11303,
+        "completion_tokens": 4096,
+        "total_tokens": 15399,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 11303,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2048
+        }
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11303,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "input": 11939,
+      "output": 4096,
+      "reservedNanodollars": 8496900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 8496900,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T13:51:09.790Z",
+      "callId": "1ecb31c9-7cd7-44b7-8191-b4987da6b534",
+      "dispatchedAt": "2026-10-09T13:51:09.851Z",
+      "requestBodySha256": "d8fb60d90280461efd573e7e1ad478b1ae67f414b9295ce7adafdf808a41ae63",
+      "reasoningEffort": "low",
+      "thinking": "OMITTED_ENABLED_DEFAULT",
+      "rawUsage": {
+        "prompt_tokens": 11939,
+        "completion_tokens": 4096,
+        "total_tokens": 16035,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 11939,
+        "completion_tokens_details": {
+          "reasoning_tokens": 2048
+        }
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "UNPAID_FIXTURE",
+      "finishReason": "stop",
+      "latencyMs": 0,
+      "canonicalUsage": {
+        "inputTokens": 11939,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    }
+  ],
+  "productionPublication": "FORBIDDEN"
+}

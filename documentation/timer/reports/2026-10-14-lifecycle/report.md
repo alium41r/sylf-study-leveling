@@ -1,0 +1,41 @@
+# Timer lifecycle audit — 2026-10-14
+
+Implemented immediate local ending with one durable background journal, retaining the existing epoch engine, shared shell, versioned session protocol, coordinated PostgreSQL settlement and reward ledgers. This report covers local implementation and verification. No hosted data was changed and the migration has not been deployed to production. The [current timer contract](../../README.md) names owners, recovery guarantees and rollout requirements.
+
+## Root causes and fixes
+
+| Finding | Repair |
+| --- | --- |
+| End awaited session creation, serialized flushes, database settlement and statistics; a stalled request or tab lock could strand Focus. | Freeze and persist END synchronously; close UI without any network/lock wait. Root worker delivers afterward. Fully offline Focus has a usable ended screen. |
+| Pending writes and execution receipts were owned by the page or sessionStorage; unload beacons offered no acknowledgment/recovery guarantee. | One account-scoped localStorage journal covers creation, checkpoints, boundaries, END and completion across navigation/restarts. Stable identities, ordered timestamps, automatic retries and bounded whole-response reads handle uncertainty. |
+| Lost creation responses and competing clients could recreate/adopt sessions unsafely. | Persistent start receipts replay one row after END. Expected-owner checks prevent account-switch replay. Protected active work is never silently discarded. |
+| Saved-mode initialization skipped restoration; persistence combined live time with an unchanged live anchor, double-counting after reload. | Restore before mode initialization; persist banked counters and anchors separately, migrate old caches and retain paused state. |
+| Expired countdown phases accumulated beyond their deadlines; suspended timers and late overtime callbacks changed accounting. | Cap each live stretch at its deadline, catch up all elapsed phases at original boundaries, preserve independent focus/break totals and exact click-time seconds. |
+| Leadership races could demote an acquired holder or wait indefinitely for another tab. | Instance-owned release, bounded handoff, safe late-miss handling and existing lease fallback if Locks is absent/denied. Terminal writes do not require takeover. |
+| Final reward eligibility depended on newly credited time; a zero-delta final flush skipped rewards. Closed rows could be changed by late updates. | Pay from full stored duration exactly once under economic locks; terminal settlement rejects changes to time/rewards/end timestamps. Focus/break share one wall budget. |
+| Delayed weekly delivery, ISO-year rollover and UTC+13/+14 boundaries could misattribute rewards or streaks. | Original attributed week, unique weekly ledger receipts, historical streak recovery, local Monday midnight and correct ISO week/year arithmetic. Preserve payout policy and correct the message. |
+| Stats/profile/friends used inconsistent accepted/live accounting; failed stats reads could return false zeros. | Reuse accepted-second/state helpers, retain credited legacy time, exclude pauses/breaks from presence, honor civil dates, retry failed reads, refresh daily baselines after synchronization/reconnect, and follow an accepted resume from another device when no local boundary is pending. |
+| Party leave depended on a network acknowledgment; delayed exits affected rejoined participants, 12-hour clamps dropped legitimate room time, concurrent departures could leave rooms open. | Same journal delivers original participation nonce/exit boundary; immediate LEFT UI, exact server banking, rejoin protection and parent-session locking. Per-participation interval accounting clips in-flight pauses/resumes at the original exit and is cleared on settlement; the accepted total replaces the provisional display. Bound other party requests and restore REST recovery independently of Realtime. |
+| SECURITY DEFINER timer/party functions accepted a caller-supplied owner through public execution grants. | Revoke browser-role capability grants; preserve cookie-authorized server execution and ownership checks. |
+| Sync errors/tools could cover timer controls on small screens. | Nonblocking status surface and reserved mobile bottom space; appearance uses the shared semantic-token system. |
+
+## Verification
+
+Final counts and timings are recorded in [verification evidence](evidence/verification.json). Coverage includes rapid/repeated end, in-flight checkpoints, dropped creation/END acknowledgments, 401/429/503, offline pause/resume, refresh/restart, partial local writes, blocked storage, hung connection/body reads, stale versions, foreign ownership, zero-delta rewards, late heartbeats, party replay/rejoin, concurrent departures and separate PostgreSQL connections.
+
+- **438 tests in 39 files pass** across timer, session-protocol and Focus/background/party regressions; [unit results](evidence/unit-results.json).
+- **78 tests in six suites pass** on genuine disposable PostgreSQL with zero required skips; [database results](evidence/postgres-timer-results.json), [runtime and migration evidence](evidence/postgres-harness-run.json). Existing coordinated Planner lifecycle suites also pass against the timer migration.
+- TypeScript passes. **36 timer owners/regression files pass lint with zero errors or warnings.** Broader touched-file lint retains unrelated existing fixture `any` errors/profile typing and unused layout values; exact details are recorded in evidence rather than represented as a clean full-repository audit.
+- Mobile build and bundle integrity checks pass in a private output directory; no server-only symbols/secrets or enabled mocks. Shared development output was preserved.
+- Browser checks cover desktop 1440×960, mobile 390×844, both modes, and a dark preference with a custom light background/orange accent. Classic timer closing removes the active Focus view in **2–309 ms**, including the existing approximately 300 ms navigation exit animation; the fully offline ended screen renders in about **2 ms**. Failed session requests do not delay closing; END survives reload and drains on reconnect. Full device offline closes locally and navigates on reconnect. [Timings/results](evidence/browser/results.json) and screenshots are beside them. Screenshots were visually inspected for controls, wrapping, overlays and contrast. Browser APIs are synthetic; real database economics are verified separately, not a claimed browser-to-production end-to-end run.
+- Isolated web build compiles successfully, then fails Next's route validation because the existing acoustics route exports `CURATED_SOUNDSCAPES`. [Build log](evidence/web-build.log), [unchanged-source build record](evidence/web-build.json). This prevents a clean production-build result and was left outside the timer scope.
+
+An initial broad filename filter also selected four hosted focus-background cascade tests. They failed because the hosted database hostname was unavailable; the final suite explicitly excludes them. The disposable PostgreSQL timer gate has no skips.
+
+## Remaining risks and rollout
+
+Apply `20261014000000_timer_durable_completion` and regenerate Prisma before deploying this client. Validate the backend connection role's function privileges; public browser RPC access is intentionally revoked. A staging/production migration and full deployed web/browser round trip remain unverified here. Resolve the independent acoustics route export blocker before release.
+
+Recovery is durable on the original device/origin while storage remains intact and the original account can authenticate. App closure postpones delivery until reopening; expired authentication requires signing in. Storage-full errors freeze/preserve the timer and require freeing space before safe closure. Clearing device data/uninstalling before sync cannot preserve an offline-only intent. Removed resources or competing active work retain their pending intent with a visible conflict instead of sacrificing another session's data.
+
+This pass prevents and tests future inconsistencies. Previously lost or already-corrupted production history was not inspected or rewritten; reconstructing missing historical time/rewards would require separate evidence and controlled reconciliation.

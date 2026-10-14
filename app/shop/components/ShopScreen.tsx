@@ -1,11 +1,12 @@
 "use client";
+import { OwnCompanionPreview } from "@/app/components/companion/OwnCompanionPreview";
+
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect, react-hooks/preserve-manual-memoization */
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/app/components/AuthProvider";
 import { useRouter } from "next/navigation";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
 import { CharacterConfig } from "@/lib/character-traits";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 import {
@@ -133,7 +134,7 @@ export function ShopScreen() {
   const baseConfig: CharacterConfig = useMemo(() => {
     return (
       user?.characterConfig || {
-        outfit: "test_hunter_base",
+        outfit: "none",
         pedestal: "pedestal_cyber",
         pedestalKey: "pedestal_cyber",
         aura: user?.activeAura || "none",
@@ -471,15 +472,9 @@ export function ShopScreen() {
         {/* ─── Header & Telemetry HUD ─────────────────────────────── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-[var(--subtle-line)] pb-4 mt-1">
           <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className={styles.eyebrow}>
-                <span className={styles.eyebrowDot} />
-                System Protocol V5 // Architectural Catalog
-              </span>
-            </div>
             <h1 className={styles.title}>
               <Store className="w-8 h-8 sm:w-10 sm:h-10 text-[var(--accent)] animate-pulse" />
-              <span>System Store</span>
+              <span>Shop</span>
             </h1>
           </div>
 
@@ -642,10 +637,10 @@ export function ShopScreen() {
                 <div className={styles.topHighlight} aria-hidden="true" />
                 <AlertCircle className="w-10 h-10 opacity-40 text-[var(--accent)]" />
                 <h3 className="font-['Rajdhani'] text-base font-bold text-[var(--ink)]">
-                  No armory provisions currently in rotation for this sector.
+                  No items match these filters.
                 </h3>
                 <p className="text-xs text-[var(--muted)] font-['Rajdhani'] max-w-md">
-                  All legacy provisions have been quarantined. Custom pixel art gear and provisions will be deployed directly to this sector in future updates.
+                  Choose another category or reset the filters to browse available equipment.
                 </p>
                 <button
                   onClick={() => {
@@ -913,11 +908,7 @@ export function ShopScreen() {
 
               {/* Character Renderer 2D Stage */}
               <div className={styles.previewStage}>
-                <CharacterRenderer
-                  config={activePreviewConfig}
-                  size={200}
-                  showPedestal={true}
-                />
+                <OwnCompanionPreview config={activePreviewConfig} size={200} label="Shop companion preview" showCompatibility />
               </div>
 
               {/* Preview Status Pill */}
@@ -972,7 +963,7 @@ export function ShopScreen() {
               )}
 
               <p className="text-[11px] text-[var(--muted)] mt-3 text-center leading-relaxed font-['Rajdhani']">
-                Hover over or click any Hunter form, pedestal, aura, or relic to preview its layer on your avatar.
+                Preview supported Pixel accessories on your companion. Unsupported equipment keeps its ownership and stat bonuses.
               </p>
             </div>
           </div>

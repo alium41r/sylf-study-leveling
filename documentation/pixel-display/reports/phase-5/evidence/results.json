@@ -1,0 +1,182 @@
+{
+  "description": "Phase 5 evidence: the Pixel Asset authoring contract, its validation, the attachment model, three reference assets and the dev review mode.",
+  "date": "2026-10-07T15:30:17.493Z",
+  "phase": 5,
+  "contract": {
+    "version": 1,
+    "module": "lib/pixel-display/content/asset/",
+    "concepts": [
+      "identity/version",
+      "kind",
+      "reference dimensions",
+      "palette",
+      "authored geometry",
+      "flat planes",
+      "bounds",
+      "origin/pivot",
+      "anchors",
+      "states/variants",
+      "metadata"
+    ],
+    "deliberatelyAbsent": [
+      "scene graph",
+      "inheritance",
+      "scripting",
+      "expressions",
+      "conditional geometry",
+      "z-index",
+      "groups"
+    ],
+    "geometryForms": [
+      "raster (rows of tokens, preferred)",
+      "spans (runs, optionally shaded)"
+    ],
+    "engineChangeRequired": false,
+    "rendererKnowledgeRequiredByAnAuthor": false
+  },
+  "categories": [
+    {
+      "kind": "character",
+      "asset": "sylf:sylf-character",
+      "reference": "32x32",
+      "planes": 11,
+      "states": 6
+    },
+    {
+      "kind": "wearable",
+      "asset": "sylf:study-scarf",
+      "reference": "16x15",
+      "planes": 3,
+      "states": 1,
+      "paintedCells": 108
+    },
+    {
+      "kind": "held",
+      "asset": "sylf:practice-wand",
+      "reference": "5x15",
+      "planes": 3,
+      "states": 2,
+      "paintedCells": "50 idle / 60 charging"
+    }
+  ],
+  "builtInCharacterWrapped": {
+    "approach": "The existing sprite tables are wrapped by a spans geometry, not rewritten as rasters.",
+    "why": "The body is a shaded silhouette whose highlight boundary is derived from each row width, and the eyes are six shapes selected by state. Rasterising would lose the derived shading or freeze it at one size.",
+    "playerVisibleChange": "none",
+    "tests": [
+      "every authored Sylf state has an asset state",
+      "the face is separate planes, not whole-character frames",
+      "every state still composes the body",
+      "the widest body row is still 30 columns",
+      "the asset resolves using content-layer helpers only"
+    ]
+  },
+  "validation": {
+    "issuesAsData": true,
+    "reportsEveryProblemNotTheFirst": true,
+    "deterministic": true,
+    "issueCodes": 24,
+    "failsClosed": "An unknown palette token is an error even though the resolver skips it, because a mistyped key that silently paints nothing is the failure mode being prevented.",
+    "limits": "Integer coordinates, bounds, dimensions, palette references, unique ids, plane references, anchors, size limits and state/variant references. Semantic intent (is the grip where a hand goes?) is the review panel job, not the validator."
+  },
+  "attachment": {
+    "model": "offset = host.anchor - attachment.pivot, in reference space",
+    "thenPaintedWith": "the host placement (its origin AND scale), so an attachment is sized by what holds it",
+    "vocabulary": [
+      "hold-right",
+      "wear-neck",
+      "pivot",
+      "tip"
+    ],
+    "socketTaxonomyIntroduced": false,
+    "logicalSpaceOnly": true,
+    "problemsReturnedAsData": true,
+    "defectFound": "The first implementation gave a placed asset the host scale but not its origin. Because the offset is a reference-space delta, an origin of zero silently turned it into a display coordinate and the wand rendered across the character face at the wrong size.",
+    "defectFix": "A placed asset inherits a whole placement, not a scale."
+  },
+  "agentGuide": {
+    "path": "documentation/pixel-display/authoring-guide.md",
+    "covers": [
+      "what files constitute an asset",
+      "the coordinate system",
+      "valid palette usage",
+      "how planes and states work",
+      "how attachment anchors work",
+      "prohibited architecture dependencies",
+      "how to preview",
+      "how to validate",
+      "tests and evidence required"
+    ],
+    "includesChecklist": true
+  },
+  "reviewTooling": {
+    "path": "app/dev/pixel-display/AssetReviewPanel.tsx",
+    "isPixelStudio": false,
+    "writesAssets": false,
+    "capabilities": [
+      "asset by itself",
+      "plane isolation during the composite",
+      "states",
+      "anchor marks from the painter own mapping",
+      "held item attached to a character",
+      "density 32/40/48/64 at a fixed presentation size",
+      "live validation readout"
+    ],
+    "drawsThrough": "paintAsset, the same entry point a production consumer uses"
+  },
+  "gates": {
+    "pixelDisplayAndDashboard": {
+      "files": 14,
+      "tests": 314,
+      "failed": 0
+    },
+    "newAssetTests": 51,
+    "companionRegression": {
+      "files": 24,
+      "tests": 202,
+      "failed": 0
+    },
+    "typecheck": {
+      "errors": 0
+    },
+    "engineBoundaryTypecheck": {
+      "errors": 0
+    },
+    "lint": "clean",
+    "build": "succeeds",
+    "mobile": {
+      "build": "succeeds",
+      "verify": "PASSED"
+    },
+    "productionInaccessibility": {
+      "/dev/pixel-display": 404,
+      "/dev": 404,
+      "/": 200,
+      "/dashboard": 307,
+      "devMarkers": 0
+    }
+  },
+  "unchanged": [
+    "engine, renderer, runtime and React host",
+    "Sylf content, states and effects",
+    "dashboard integration",
+    "all 11 other CharacterRenderer consumers",
+    "no persistence, Pixel Studio, Character Customizer, cosmetics migration or Sylf redesign",
+    "no new dependency"
+  ],
+  "limitations": [
+    "Ambient scenery is character planes rather than its own asset. Fine for one presentation; if scenery becomes shared it wants to be a separate asset painted first.",
+    "A reference grid is authored per asset, so a pivot meaning is relative to its own asset grid. Attachment is what bridges them.",
+    "Validation cannot check semantic intent; the review panel is the answer to that class of mistake."
+  ],
+  "openDecisions": {
+    "closed": [],
+    "unchanged": "O1-O18 were not informed by this phase.",
+    "O19": "New: whether scenery becomes its own asset kind. Deferred until an asset demonstrates the need.",
+    "O20": "New: whether an asset may compose another asset. Today an asset is flat and attachment is positional only; composition would be a real contract extension and is deferred.",
+    "alsoDeferred": [
+      "a catalogue index beyond a hand-written list",
+      "per-asset revision history, which is persistence and out of scope"
+    ]
+  }
+}

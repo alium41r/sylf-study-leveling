@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "completedAt": "2026-10-09T09:27:48.022734+00:00",
+  "status": "PASSED_TECHNICAL",
+  "changeset": 3,
+  "repairInterpretation": "TARGETED_V1",
+  "phase2EducationalQualification": "NOT_COMPLETE",
+  "paidModelCalls": 0,
+  "units": {
+    "passed": 651,
+    "failed": 0,
+    "requiredSkipped": 0,
+    "files": 46,
+    "targetedRepairControls": 30,
+    "command": "unit-command.json",
+    "results": "units.json"
+  },
+  "postgres": {
+    "passed": 420,
+    "failed": 0,
+    "requiredSkipped": 0,
+    "files": 31,
+    "results": "postgres/postgres-harness-run.json",
+    "sourceSnapshot": "postgres-source-snapshot.json",
+    "finalSourceDifferences": [],
+    "limitations": [
+      "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+      "Phase 1 actual services/SQL are exercised; no hosted data is touched."
+    ]
+  },
+  "staticChecks": [
+    {
+      "name": "isolated-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.planner-v2-phase2.json",
+        "--incremental",
+        "false"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "full-typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--incremental",
+        "false"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "lint",
+      "command": [
+        "node",
+        "node_modules/eslint/bin/eslint.js",
+        "lib/planner/v2/intelligence/blueprint.ts",
+        "lib/planner/v2/intelligence/quality.ts",
+        "lib/planner/v2/intelligence/schemas/blueprint-response.ts",
+        "lib/planner/v2/intelligence/schemas/repair-response.ts",
+        "lib/planner/v2/intelligence/schemas/quality.ts",
+        "lib/planner/v2/server/compiler.ts",
+        "__tests__/planner-v2/intelligence/targeted-repair.test.ts",
+        "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+        "--max-warnings",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "worker-build",
+      "command": [
+        "npm",
+        "run",
+        "planner:worker:build"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "productionBuild": {
+    "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
+    "exitCode": 1,
+    "bundleCompiled": true,
+    "limitation": "Unchanged app/api/acoustics/route.ts CURATED_SOUNDSCAPES export fails route validation; full production build does not pass.",
+    "evidence": "step6-build.json"
+  },
+  "repairDiagnostics": {
+    "cases": 4,
+    "method": "Four separately labelled deterministic repair controls with concrete corrected givens, actions and checks. Scripted verification exercises the boundary; no live model judgment or human adjudication claimed.",
+    "evidence": "repair-diagnostics.json",
+    "liveModelAccuracyEstablished": false
+  },
+  "complexity": {
+    "evidence": "repair-complexity.json",
+    "observations": [
+      {
+        "activities": 1,
+        "beforeInputReservationUnits": 21217,
+        "afterInputReservationUnits": 16993,
+        "beforeOutputUtf8Bytes": 1370,
+        "afterOutputUtf8Bytes": 668,
+        "beforeSystemUtf8Bytes": 12508,
+        "afterSystemUtf8Bytes": 2196,
+        "consequentialContextIdentical": true
+      },
+      {
+        "activities": 12,
+        "beforeInputReservationUnits": 29986,
+        "afterInputReservationUnits": 25762,
+        "beforeOutputUtf8Bytes": 7059,
+        "afterOutputUtf8Bytes": 668,
+        "beforeSystemUtf8Bytes": 12508,
+        "afterSystemUtf8Bytes": 2196,
+        "consequentialContextIdentical": true
+      },
+      {
+        "activities": 60,
+        "beforeInputReservationUnits": 68697,
+        "afterInputReservationUnits": 64473,
+        "beforeOutputUtf8Bytes": 31923,
+        "afterOutputUtf8Bytes": 668,
+        "beforeSystemUtf8Bytes": 12508,
+        "afterSystemUtf8Bytes": 2196,
+        "consequentialContextIdentical": true
+      }
+    ],
+    "providerTokenOrLatencySavingsClaimed": false
+  },
+  "preserved": {
+    "frozenCanonicalContracts": 12,
+    "completeCanonicalProposalValidatorUnchanged": true,
+    "phase1LifecycleExecutionAndApply": true,
+    "providerRoutesReasoningBudgetsCapsAndMetering": true,
+    "unrelatedStartingChanges": true,
+    "sourceEvidence": "source-preservation.json"
+  },
+  "boundedRepair": {
+    "maximumCorrections": 60,
+    "maximumResponseUtf8Bytes": 32768,
+    "maximumRepairAttempts": 1,
+    "repairOutputCap": 8192,
+    "verificationOutputCap": 4096,
+    "additionalMandatoryCalls": 0,
+    "arbitraryPatchPaths": false,
+    "educationalDefaults": false
+  },
+  "sourceSha256": {
+    "lib/planner/v2/intelligence/blueprint.ts": "4d4d8eed0a14f9c21809045096c8afd3df7839550dbc1ea9bc8b85ff822082a0",
+    "lib/planner/v2/intelligence/quality.ts": "df851468196c5d7c60a9d78dffa1cd83fde4e3c555ba1276a20d60849c9b7b68",
+    "lib/planner/v2/intelligence/schemas/blueprint-response.ts": "0609a7061f86ace43cc769d32f4a3639ccb78aa486f7e9f8d7355fb74a89719e",
+    "lib/planner/v2/intelligence/schemas/quality.ts": "ef151337c7f23dcceba5b6a10a6b637522470af9222f8b662b7b0d070e85595d",
+    "lib/planner/v2/intelligence/schemas/repair-response.ts": "e20ac364c019f74d814094db8ba8ef67168ec5e4cd4cd6f03bb93fc669d7fc13",
+    "lib/planner/v2/server/compiler.ts": "75751e5dedf83b99b10fdd0a77da5c79e523cda2e310fba93dbd7d6321109d34",
+    "__tests__/planner-v2/intelligence/targeted-repair.test.ts": "9d47c1ce690b2f615e8374a5885f6c232d2be4edfd5972664a5b9ca9470fd257",
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts": "3be5b7848cdb4730a6ea852ef96eb7651e53c19e39f4ca723adeae0894e0e155"
+  },
+  "generatedWorkerSha256": {
+    "dist/planner-worker/planner/v2/intelligence/blueprint.js": "3c77a7e08c16b7fcb1dc1c13defe535b89f392e3402b52d2e176ca3def39c08a",
+    "dist/planner-worker/planner/v2/intelligence/quality.js": "2f7848466511f7ba412b26aae4027982e286aef64f117c9467176550afbafe4f",
+    "dist/planner-worker/planner/v2/intelligence/schemas/blueprint-response.js": "62785ea8c1ac4fc1f27ee153d1a50ace8c9502237213edb984e9526b6ac8986d",
+    "dist/planner-worker/planner/v2/intelligence/schemas/quality.js": "2180fc17ab732cb146b2d17d94cc69299784a219cc806a08ddc750793b3f9673",
+    "dist/planner-worker/planner/v2/intelligence/schemas/repair-response.js": "ac0c913e7f5082078cf3dbc7d6a8399aa5620b4810990c801774e2f2bfb01765",
+    "dist/planner-worker/planner/v2/server/compiler.js": "e0c406c0a8119062616568af75d9697a7088a4264052f0e0dc461cd372731dd1"
+  },
+  "diagnosticHandoff": "../README.md#diagnostic-handoff-and-limitations",
+  "notStarted": [
+    "Paid/live model diagnostics",
+    "Phase 2 live qualification rerun",
+    "Phase 3 UI"
+  ],
+  "outstanding": "Independent model diagnostics and naturally accepted live repair \u2192 verification \u2192 canonical apply witness."
+}

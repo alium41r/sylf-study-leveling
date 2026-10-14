@@ -213,6 +213,7 @@ import { PublicProfileModal } from "./PublicProfileModal";
 import { useAuth } from "./AuthProvider";
 import { SystemAIProvider } from "./system/SystemAIProvider";
 import { LevelUpProvider } from "./LevelUpProvider";
+import TimerSyncWorker from "./TimerSyncWorker";
 import {
   resolveLegacyTheme,
   resolveLegacyBackground,
@@ -372,6 +373,7 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
 
   return (
     <MotionConfig reducedMotion="user">
+      <TimerSyncWorker />
       <AcousticsProvider>
         <CustomAudioProvider>
         <SettingsProvider>

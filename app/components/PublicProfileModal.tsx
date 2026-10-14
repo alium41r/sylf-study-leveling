@@ -1,4 +1,7 @@
 "use client";
+import { TargetPixelCompanion } from "@/app/components/companion/TargetPixelCompanion";
+import type { SelectedPixelCompanion } from "@/lib/pixel-companion-contract";
+
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -7,7 +10,6 @@ import { backdropVariants, modalDialogVariants, topToastVariants } from "@/lib/m
 import { useAuth } from "./AuthProvider";
 import { useProfileModal } from "./ProfileModalContext";
 import { getClassInfo, COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
-import { CharacterRenderer } from "./character/CharacterRenderer";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 import {
@@ -37,7 +39,7 @@ import {
   Code2,
   Lock,
 } from "lucide-react";
-import { StreakFlameIcon, QuestEmblemIcon, SystemApertureIcon } from "@/app/components/icons";
+import { StreakFlameIcon, QuestEmblemIcon, SylvieIcon } from "@/app/components/icons";
 
 interface ProfileDossier {
   id: number;
@@ -68,6 +70,7 @@ interface ProfileDossier {
   activeAura?: string;
   activeNameColor?: string;
   characterConfig?: any | null;
+  companion?: SelectedPixelCompanion;
   socialLinks?: Record<string, string>;
   connectedAccounts?: {
     github?: string | null;
@@ -574,7 +577,7 @@ export function PublicProfileModal() {
                   exit="exit"
                   className="absolute top-4 left-1/2 z-50 px-4 py-2 rounded-xl bg-bg-abyss/95 border border-accent-primary/50 text-text-primary text-xs font-['Rajdhani'] font-bold uppercase tracking-wider shadow-2xl flex items-center gap-2 backdrop-blur-md pointer-events-none"
                 >
-                  <SystemApertureIcon size={14} className="text-accent-primary animate-spin" />
+                  <SylvieIcon size={14} className="text-accent-primary animate-spin" />
                   <span>{toastMsg}</span>
                 </motion.div>
               )}
@@ -1022,13 +1025,7 @@ export function PublicProfileModal() {
 
                         {/* Vector Character Sprite on Stage */}
                         <div className="relative z-10 flex flex-col items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
-                          <CharacterRenderer
-                            config={dossier.characterConfig}
-                            seed={dossier.username}
-                            size={180}
-                            showPedestal={true}
-                            showAura={true}
-                          />
+                          <TargetPixelCompanion companion={dossier.companion} size={260} label={`${dossier.username} companion`} autoplay />
                           <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-accent-text-light mt-2">
                             {classInfo?.name || "Scholar"} Stage
                           </span>

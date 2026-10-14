@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "assessor": "Root Codex AI agent /root, case-author-side primary assessment",
+  "humanAssessor": false,
+  "independentOfTestedProvider": true,
+  "independentOfCaseAuthor": false,
+  "lockedAtUtc": "2026-10-09T12:48:57.680498+00:00",
+  "blindBundleSha256": "4f9dda1bc03e2168e38670fe195a8d8ad0b285105fa8b3c7d58ad1d24f0b8a79",
+  "method": "Primary educational scores recorded with neutral IDs and full accepted input, before consulting independent agent scores or any tested review verdict. Existing protocol/provider knowledge and recognizable scenarios prevent full blinding.",
+  "checks": [
+    {
+      "assessmentId": "A01",
+      "scores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "decision": "PASS",
+      "rationale": "Targets the observed unsupported climate inference, checks supplied values and limits, and uses one bounded changed-pattern check. No archive fetching or invented exam weights.",
+      "stoppingGate": "Stop on independent defensible interpretation, missing evidence and transfer check.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [
+        "The reference to comparisons across stations overstates what is necessary for a local long-term trend; the decisive missing multi-year evidence is correct."
+      ],
+      "defects": [],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    },
+    {
+      "assessmentId": "A02",
+      "scores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 5
+      },
+      "decision": "PASS",
+      "rationale": "Preserves the recording/editing/speaker-checking scope but books only a consent-aware outline, with all four brief checks. Brief modeling could be more concrete, without requiring a literal interview script.",
+      "stoppingGate": "Checked concrete-event question outline containing permission, open question, follow-up and correction opportunity.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [],
+      "defects": [],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    },
+    {
+      "assessmentId": "A03",
+      "scores": {
+        "goalCorrespondence": 4,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 3
+      },
+      "decision": "FAIL",
+      "rationale": "All three categories are practiced and independently checked, but the strategy credits inferential reading as already partly performed without supplied learner evidence for that ability. Unknown weights remain honestly disclosed.",
+      "stoppingGate": "Independent classification and justification across two unseen passages, not timer attendance.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [],
+      "defects": [
+        {
+          "severity": "MATERIAL_NON_SERIOUS",
+          "dimension": "evidenceAndUncertainty",
+          "acceptedExcerpt": "The learner can find a direct quotation but treats plausible background stories as established facts.",
+          "outputExcerpt": "Inference practice focuses on the evidence-to-conclusion link already partly performed.",
+          "additionalOutputExcerpt": "Evidence shows literal quotation is already partly secure, inferential reading is demonstrated in the sample passage",
+          "consequence": "The supplied classification examples are credited as partly demonstrated learner ability, supporting reduced inference emphasis without actual performance evidence. The credit needs correction or an initial diagnostic; final all-category checks prevent this from being a serious omission of the outcome."
+        }
+      ],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    },
+    {
+      "assessmentId": "A04",
+      "scores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "decision": "PASS",
+      "rationale": "Correctly distinguishes valid implication from converse and requires unfamiliar independent decisions with counterexamples or truth conditions. Formal proof notation and a fixed quota are not required.",
+      "stoppingGate": "Independent decision and bounded justification on fresh items; revisited retention check remains informative.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [
+        "No formal assessment exists is stronger than not supplied, but no assessment weight, readiness or essential resource is invented."
+      ],
+      "defects": [],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    },
+    {
+      "assessmentId": "A05",
+      "scores": {
+        "goalCorrespondence": 3,
+        "educationalUsefulnessAndProportion": 3,
+        "evidenceAndUncertainty": 3
+      },
+      "decision": "FAIL",
+      "rationale": "The strategy retains future scope and the actual description, but applies a mandatory image-alt attribute check even on the explicitly allowed text-placeholder route; this narrows the accepted checkpoint without support.",
+      "stoppingGate": "Independent local card rebuild and alt explanation, but the stated attribute gate excludes an allowed text placeholder.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [
+        "Unaided rebuild without copying is a stricter demonstration than the stated first-card outcome; treat it as a proportion/clarity concern rather than a separate serious blocker."
+      ],
+      "defects": [
+        {
+          "severity": "SERIOUS",
+          "dimension": "goalCorrespondenceAndUsefulness",
+          "acceptedExcerpt": "No object image file is supplied. The first card may use a text placeholder and explain the alternative text that an actual image would need.",
+          "outputExcerpt": "alt attribute is present and descriptive, not empty or decorative",
+          "additionalOutputExcerpt": "an image element — or an explicit placeholder — carrying a meaningful alt attribute",
+          "consequence": "A readable heading/description card using the allowed text placeholder and explanation can meet every accepted requirement yet fail the mandatory alt-attribute gate. A text placeholder is not an image element with an alt attribute. The strategy needs conditional checks for the two permitted routes instead of an image requirement on both."
+        }
+      ],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    },
+    {
+      "assessmentId": "A06",
+      "scores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 4
+      },
+      "decision": "PASS",
+      "rationale": "Uses only the occupation/current-tiredness distinction, changed production and explanation, conditional bounded correction and honest unknown retention. No claimed readiness from self-report.",
+      "stoppingGate": "Novel correct production for both uses, explanations and a bounded transfer item; stop after a failed correction rather than drill.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [
+        "Different pronouns should stay within supplied es/está forms; the explicit opening scope restriction permits that reading, so do not invent a compulsory conjugation expansion.",
+        "Several novel sentences and one transfer item are a modest bounded check, not evidence of a serious fixed quota."
+      ],
+      "defects": [],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    },
+    {
+      "assessmentId": "A07",
+      "scores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "decision": "PASS",
+      "rationale": "Correctly totals all real bars at four, addresses the two-eighths misconception and stops after actual worksheet explanation/checking. Modalities are alternatives; no recording, new bars or broad mastery claim.",
+      "stoppingGate": "All three assigned bars explained and checked as four; single error-triggered recount.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [],
+      "defects": [],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    },
+    {
+      "assessmentId": "A08",
+      "scores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "decision": "PASS",
+      "rationale": "Keeps all four actual annotation requirements and correct observation/interpretation distinction, checks literal quotes and a specific source limit, with no essay or extra sources.",
+      "stoppingGate": "All four annotation requirements, matching quote and author-view wording rather than universal opinion count.",
+      "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+      "minorNotes": [],
+      "defects": [],
+      "completeStopResponse": true,
+      "envelopeValid": true
+    }
+  ],
+  "summary": {
+    "primaryPass": 6,
+    "primaryFail": 2,
+    "seriousDefects": 1,
+    "materialNonSeriousDefects": 1,
+    "adjudication": "Required before final failure verdicts; preserve independent assessment and disagreements without averaging."
+  },
+  "paidCallsInEvaluation": 0
+}

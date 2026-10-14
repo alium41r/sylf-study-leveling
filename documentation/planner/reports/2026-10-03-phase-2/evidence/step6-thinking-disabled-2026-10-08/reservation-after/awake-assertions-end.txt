@@ -1,0 +1,36 @@
+2026-10-08 23:21:32 +0500 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   0
+   PreventUserIdleDisplaySleep    1
+   SoftwareUpdateTask             0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   InternalPreventDisplaySleep    1
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 77259(caffeinate): [0x000db04800019603] 00:00:06 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77259(caffeinate): [0x000db04800059604] 00:00:06 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77259(caffeinate): [0x000db04800079605] 00:00:06 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77185(caffeinate): [0x000db044000195fe] 00:00:10 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77185(caffeinate): [0x000db044000595ff] 00:00:10 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77185(caffeinate): [0x000db04400079600] 00:00:10 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 75074(Google Chrome): [0x000da75500059577] 00:38:16 NoDisplaySleepAssertion named: "Blink Wake Lock"  
+   pid 344(powerd): [0x000da5aa0001953a] 00:45:24 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 344(powerd): [0x000db04300108336] 00:00:10 InternalPreventDisplaySleep named: "com.apple.powermanagement.delayDisplayOff"  
+	Timeout will fire in 109 secs Action=TimeoutActionTurnOff
+No kernel assertions.

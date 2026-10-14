@@ -1,0 +1,45 @@
+{
+  "results": [
+    {
+      "args": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-production-settings",
+        "--live-high-reasoning"
+      ],
+      "status": 1,
+      "refusedBeforeDatabaseProvider": true
+    },
+    {
+      "args": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-production-settings",
+        "--live-low-reasoning"
+      ],
+      "status": 1,
+      "refusedBeforeDatabaseProvider": true
+    },
+    {
+      "args": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-production-settings",
+        "--live-existing-groq"
+      ],
+      "status": 1,
+      "refusedBeforeDatabaseProvider": true
+    },
+    {
+      "args": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-production-settings",
+        "--live-temperature",
+        "0.7"
+      ],
+      "status": 1,
+      "refusedBeforeDatabaseProvider": true
+    }
+  ]
+}

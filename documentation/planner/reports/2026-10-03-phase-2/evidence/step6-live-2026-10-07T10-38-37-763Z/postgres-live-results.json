@@ -1,0 +1,28 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 3,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: owned-course-research trial 1",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: owned-course-research trial 2",
+          "status": "passed"
+        },
+        {
+          "name": "live development qualification: owned-course-research trial 3",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

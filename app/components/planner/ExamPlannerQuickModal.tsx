@@ -32,7 +32,7 @@ export default function ExamPlannerQuickModal({
         <h2 id="exam-quick-title">Prepare for an Exam</h2>
         <p>
           Confirm your scope and availability, generate a draft, then review it
-          in the System planner before creating Quests.
+          in the Sylvie planner before creating Quests.
         </p>
         <div className={s.actions}>
           <Link

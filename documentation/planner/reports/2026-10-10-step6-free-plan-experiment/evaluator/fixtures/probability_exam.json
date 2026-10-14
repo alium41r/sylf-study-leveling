@@ -1,0 +1,737 @@
+{
+  "shared": {
+    "title": "Probability exam: interpreting conditions before calculating",
+    "acceptedOutcome": "Prepare for the 20 October introductory probability assessment by solving and explaining conditional probability, tree-based total probability and Bayes problems, and distinguishing independence from mutually exclusive events, within the confirmed study time.",
+    "student": {
+      "profile": "Nadia, a first-year university student, has attended the probability lectures. This is one course alongside other commitments, not a request for a complete degree study programme.",
+      "goal": "Aim for at least 75% on the upcoming assessment; treat this as a target, not a promised result. I particularly want to stop reversing the conditioning and to explain why a denominator is appropriate.",
+      "preferences": "Use manageable sessions, usually around 20 minutes and never more than 30 minutes without a break. I prefer moderate effort and essential work comfortably before the deadline when feasible, keeping room for actual gaps. I learn from worked examples followed by trying a changed problem without looking at the solution. I dislike copying lecture notes. I can use pen, paper and a basic calculator.",
+      "acceptedRequest": "Make a complete, realistic preparation plan for this assessment using my observed errors and the supplied resources. Prioritize the gaps that actually matter, preserve a modest check of secure material if justified, and leave spare time unused when extra work would not help. Explain what I should do if a checkpoint shows I am still confused. No work on exam day or my unavailable days.",
+      "scope": [
+        "Conditional probability and its denominator",
+        "Tree-based total probability",
+        "Bayes and base rates",
+        "Independence versus mutually exclusive events"
+      ],
+      "assessment": {
+        "date": "2026-10-20",
+        "examDayStudyAllowed": false,
+        "format": "Closed-book, 40 minutes, basic calculator allowed. The teacher's supplied outline lists conditional probability from tables, two-stage tree problems, Bayes calculations and explanations of independence versus mutually exclusive events. Actual exam questions and topic mark weights have not been released.",
+        "provenance": "Synthetic course scenario. The outline below is an accepted student-supplied handout for this experiment, not a verified official external assessment. No claims about unreleased questions or weights are authorized."
+      },
+      "readinessObservedDate": "2026-10-09",
+      "readiness": [
+        {
+          "scopeIndexes": [
+            0
+          ],
+          "statement": "On 9 October I answered 4/4 simple unconditional counting questions and 3/3 fraction-to-decimal questions correctly, unaided. On the supplied 200-person table I answered P(train | late)=24/80, mixing up the denominator; I could correct it to 24/40 after the tutor explicitly pointed out the conditioning group. I have not yet demonstrated that correction unaided on a changed table.",
+          "demonstratesReadiness": false
+        },
+        {
+          "scopeIndexes": [
+            1
+          ],
+          "statement": "On 9 October I multiplied probabilities along one branch correctly in 2/2 attempts but missed the second contributing branch in one total-probability question. There is no timed mixed-test evidence.",
+          "demonstratesReadiness": false
+        },
+        {
+          "scopeIndexes": [
+            2
+          ],
+          "statement": "On 9 October I gave 0.9 for P(Box A | red) in the two-box question, quoting P(red | Box A). I could follow the tutor's numerator and total-probability denominator afterwards, but have not solved a new Bayes problem independently.",
+          "demonstratesReadiness": false
+        },
+        {
+          "scopeIndexes": [
+            3
+          ],
+          "statement": "On 9 October I described two disjoint nonzero-probability events as independent because they do not overlap. I have no subsequent evidence correcting that explanation.",
+          "demonstratesReadiness": false
+        }
+      ],
+      "resources": [
+        {
+          "name": "Available tutor handout: rules and actual practice problems",
+          "available": true,
+          "content": "Rules: P(A|B)=P(A and B)/P(B), provided P(B)>0. For mutually exclusive exhaustive groups G1,G2, P(R)=P(G1)P(R|G1)+P(G2)P(R|G2). Bayes reverses a conditioning using joint probability over the appropriate total. Independence means P(A and B)=P(A)P(B). Mutually exclusive means P(A and B)=0.\nProblem 1: Among 200 students, 80 travel by train and 120 otherwise. Of the train group 24 were late; of the other group 16 were late. Find P(late), P(train|late), and P(late|train), explaining each denominator.\nProblem 2: Box A is selected with probability 0.2 and contains 9 red and 1 blue tokens. Box B is selected with probability 0.8 and contains 2 red and 8 blue tokens. One token is drawn from the selected box. Find P(red) and P(Box A|red), and explain why the latter is not 0.9.\nProblem 3: Repeat the box problem with P(Box A)=0.5, keeping the box contents unchanged; explain how the answer changes.\nProblem 4: A fair six-sided die is rolled. A={1,2,3}, B={4,5,6}, C={2,4,6}. Decide whether A,B are independent and whether A,C are independent; show the relevant probabilities.\nThese are practice problems, not the unreleased assessment. New practice examples may be constructed and must be identified as new."
+        },
+        {
+          "name": "Available tutor solution key",
+          "available": true,
+          "content": "Problem 1: P(late)=40/200=0.2; P(train|late)=24/40=0.6; P(late|train)=24/80=0.3. Problem 2: P(red)=0.2*0.9+0.8*0.2=0.34; P(Box A|red)=0.18/0.34=9/17, approximately 0.5294. Problem 3: P(red)=0.55; P(Box A|red)=0.45/0.55=9/11, approximately 0.8182. Problem 4: A and B each have probability 1/2, their intersection is empty, so they are mutually exclusive and not independent. A and C each have probability 1/2 but P(A and C)=1/6, not 1/4, so they are not independent. The key is available to check work afterwards; reading it is not evidence of unaided mastery."
+        },
+        {
+          "name": "Tutor and other materials",
+          "available": false,
+          "content": "No additional tutor session, paid textbook access, past-paper bank or unreleased exam sheet is available before the assessment. The supplied handout and key are fully available offline."
+        }
+      ],
+      "availability": {
+        "timezone": "Asia/Karachi",
+        "today": "2026-10-12",
+        "dailyCeilingMinutesMondayFirst": [
+          45,
+          45,
+          0,
+          45,
+          30,
+          60,
+          0
+        ],
+        "weeklyCeilingMinutes": 225,
+        "preferredSessionMinutes": 20,
+        "maximumSessionMinutes": 30,
+        "days": [
+          {
+            "date": "2026-10-12",
+            "ceilingMinutes": 45,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 45
+          },
+          {
+            "date": "2026-10-13",
+            "ceilingMinutes": 45,
+            "otherCommittedMinutes": 20,
+            "availableMinutes": 25
+          },
+          {
+            "date": "2026-10-14",
+            "ceilingMinutes": 0,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 0
+          },
+          {
+            "date": "2026-10-15",
+            "ceilingMinutes": 45,
+            "otherCommittedMinutes": 5,
+            "availableMinutes": 40
+          },
+          {
+            "date": "2026-10-16",
+            "ceilingMinutes": 30,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 30
+          },
+          {
+            "date": "2026-10-17",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 60
+          },
+          {
+            "date": "2026-10-18",
+            "ceilingMinutes": 0,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 0
+          },
+          {
+            "date": "2026-10-19",
+            "ceilingMinutes": 45,
+            "otherCommittedMinutes": 10,
+            "availableMinutes": 35
+          }
+        ],
+        "constraints": "All listed available minutes are remaining study capacity after other commitments. Zero means unavailable. There is no hidden extra study window; breaks must not be converted into extra study minutes. The listed ceilings are maxima, not requested workload. No existing Planner work or protected execution is selected."
+      },
+      "unknowns": [
+        "Actual exam questions and mark weights",
+        "Unaided transfer after the tutor's corrections",
+        "Real duration of resolving the identified misconceptions"
+      ]
+    }
+  },
+  "input": {
+    "plans": [
+      {
+        "planRef": "plan_1",
+        "intent": {
+          "schemaVersion": 2,
+          "title": "Probability exam: interpreting conditions before calculating",
+          "outcome": "Prepare for the 20 October introductory probability assessment by solving and explaining conditional probability, tree-based total probability and Bayes problems, and distinguishing independence from mutually exclusive events, within the confirmed study time.",
+          "policy": "EXAM",
+          "policySelection": "USER_OVERRIDE",
+          "deadline": {
+            "kind": "FIXED",
+            "date": "2026-10-20",
+            "examDayStudyAllowed": false
+          },
+          "scope": [
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000001",
+              "modelRef": "scope_1",
+              "title": "Conditional probability and its denominator",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            },
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000002",
+              "modelRef": "scope_2",
+              "title": "Tree-based total probability",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            },
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000003",
+              "modelRef": "scope_3",
+              "title": "Bayes and base rates",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            },
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000004",
+              "modelRef": "scope_4",
+              "title": "Independence versus mutually exclusive events",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ],
+          "evidence": [
+            {
+              "evidenceId": "evidence_1",
+              "scopeKeys": [
+                "00000000-0000-4000-8000-000000000001"
+              ],
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I answered 4/4 simple unconditional counting questions and 3/3 fraction-to-decimal questions correctly, unaided. On the supplied 200-person table I answered P(train | late)=24/80, mixing up the denominator; I could correct it to 24/40 after the tutor explicitly pointed out the conditioning group. I have not yet demonstrated that correction unaided on a changed table.",
+              "demonstratesReadiness": false
+            },
+            {
+              "evidenceId": "evidence_2",
+              "scopeKeys": [
+                "00000000-0000-4000-8000-000000000002"
+              ],
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I multiplied probabilities along one branch correctly in 2/2 attempts but missed the second contributing branch in one total-probability question. There is no timed mixed-test evidence.",
+              "demonstratesReadiness": false
+            },
+            {
+              "evidenceId": "evidence_3",
+              "scopeKeys": [
+                "00000000-0000-4000-8000-000000000003"
+              ],
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I gave 0.9 for P(Box A | red) in the two-box question, quoting P(red | Box A). I could follow the tutor's numerator and total-probability denominator afterwards, but have not solved a new Bayes problem independently.",
+              "demonstratesReadiness": false
+            },
+            {
+              "evidenceId": "evidence_4",
+              "scopeKeys": [
+                "00000000-0000-4000-8000-000000000004"
+              ],
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I described two disjoint nonzero-probability events as independent because they do not overlap. I have no subsequent evidence correcting that explanation.",
+              "demonstratesReadiness": false
+            }
+          ],
+          "availability": {
+            "timezone": "Asia/Karachi",
+            "dailyCeilingMinutes": [
+              45,
+              45,
+              0,
+              45,
+              30,
+              60,
+              0
+            ],
+            "weeklyCeilingMinutes": 225,
+            "restWeekdays": [
+              2,
+              6
+            ],
+            "blockedDates": [],
+            "recoveryPercent": 0,
+            "basis": "CONFIRMED_AVAILABILITY"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 20,
+            "maximumTimeboxMinutes": 30
+          },
+          "assumptions": [],
+          "unresolvedQuestions": [
+            "Actual exam questions and mark weights",
+            "Unaided transfer after the tutor's corrections",
+            "Real duration of resolving the identified misconceptions"
+          ]
+        },
+        "allowed": {
+          "scopeRefs": [
+            "scope_1",
+            "scope_2",
+            "scope_3",
+            "scope_4"
+          ],
+          "excludedScopeRefs": [],
+          "evidenceRefs": [
+            "evidence_1",
+            "evidence_2",
+            "evidence_3",
+            "evidence_4"
+          ],
+          "resourceRefs": [
+            "resource_1",
+            "resource_2"
+          ],
+          "externalActivityRefs": []
+        },
+        "readiness": [],
+        "kept": [],
+        "keptPhases": []
+      }
+    ],
+    "context": {
+      "studentContext": {
+        "title": "Probability exam: interpreting conditions before calculating",
+        "acceptedOutcome": "Prepare for the 20 October introductory probability assessment by solving and explaining conditional probability, tree-based total probability and Bayes problems, and distinguishing independence from mutually exclusive events, within the confirmed study time.",
+        "student": {
+          "profile": "Nadia, a first-year university student, has attended the probability lectures. This is one course alongside other commitments, not a request for a complete degree study programme.",
+          "goal": "Aim for at least 75% on the upcoming assessment; treat this as a target, not a promised result. I particularly want to stop reversing the conditioning and to explain why a denominator is appropriate.",
+          "preferences": "Use manageable sessions, usually around 20 minutes and never more than 30 minutes without a break. I prefer moderate effort and essential work comfortably before the deadline when feasible, keeping room for actual gaps. I learn from worked examples followed by trying a changed problem without looking at the solution. I dislike copying lecture notes. I can use pen, paper and a basic calculator.",
+          "acceptedRequest": "Make a complete, realistic preparation plan for this assessment using my observed errors and the supplied resources. Prioritize the gaps that actually matter, preserve a modest check of secure material if justified, and leave spare time unused when extra work would not help. Explain what I should do if a checkpoint shows I am still confused. No work on exam day or my unavailable days.",
+          "scope": [
+            "Conditional probability and its denominator",
+            "Tree-based total probability",
+            "Bayes and base rates",
+            "Independence versus mutually exclusive events"
+          ],
+          "assessment": {
+            "date": "2026-10-20",
+            "examDayStudyAllowed": false,
+            "format": "Closed-book, 40 minutes, basic calculator allowed. The teacher's supplied outline lists conditional probability from tables, two-stage tree problems, Bayes calculations and explanations of independence versus mutually exclusive events. Actual exam questions and topic mark weights have not been released.",
+            "provenance": "Synthetic course scenario. The outline below is an accepted student-supplied handout for this experiment, not a verified official external assessment. No claims about unreleased questions or weights are authorized."
+          },
+          "readinessObservedDate": "2026-10-09",
+          "readiness": [
+            {
+              "scopeIndexes": [
+                0
+              ],
+              "statement": "On 9 October I answered 4/4 simple unconditional counting questions and 3/3 fraction-to-decimal questions correctly, unaided. On the supplied 200-person table I answered P(train | late)=24/80, mixing up the denominator; I could correct it to 24/40 after the tutor explicitly pointed out the conditioning group. I have not yet demonstrated that correction unaided on a changed table.",
+              "demonstratesReadiness": false
+            },
+            {
+              "scopeIndexes": [
+                1
+              ],
+              "statement": "On 9 October I multiplied probabilities along one branch correctly in 2/2 attempts but missed the second contributing branch in one total-probability question. There is no timed mixed-test evidence.",
+              "demonstratesReadiness": false
+            },
+            {
+              "scopeIndexes": [
+                2
+              ],
+              "statement": "On 9 October I gave 0.9 for P(Box A | red) in the two-box question, quoting P(red | Box A). I could follow the tutor's numerator and total-probability denominator afterwards, but have not solved a new Bayes problem independently.",
+              "demonstratesReadiness": false
+            },
+            {
+              "scopeIndexes": [
+                3
+              ],
+              "statement": "On 9 October I described two disjoint nonzero-probability events as independent because they do not overlap. I have no subsequent evidence correcting that explanation.",
+              "demonstratesReadiness": false
+            }
+          ],
+          "resources": [
+            {
+              "name": "Available tutor handout: rules and actual practice problems",
+              "available": true,
+              "content": "Rules: P(A|B)=P(A and B)/P(B), provided P(B)>0. For mutually exclusive exhaustive groups G1,G2, P(R)=P(G1)P(R|G1)+P(G2)P(R|G2). Bayes reverses a conditioning using joint probability over the appropriate total. Independence means P(A and B)=P(A)P(B). Mutually exclusive means P(A and B)=0.\nProblem 1: Among 200 students, 80 travel by train and 120 otherwise. Of the train group 24 were late; of the other group 16 were late. Find P(late), P(train|late), and P(late|train), explaining each denominator.\nProblem 2: Box A is selected with probability 0.2 and contains 9 red and 1 blue tokens. Box B is selected with probability 0.8 and contains 2 red and 8 blue tokens. One token is drawn from the selected box. Find P(red) and P(Box A|red), and explain why the latter is not 0.9.\nProblem 3: Repeat the box problem with P(Box A)=0.5, keeping the box contents unchanged; explain how the answer changes.\nProblem 4: A fair six-sided die is rolled. A={1,2,3}, B={4,5,6}, C={2,4,6}. Decide whether A,B are independent and whether A,C are independent; show the relevant probabilities.\nThese are practice problems, not the unreleased assessment. New practice examples may be constructed and must be identified as new."
+            },
+            {
+              "name": "Available tutor solution key",
+              "available": true,
+              "content": "Problem 1: P(late)=40/200=0.2; P(train|late)=24/40=0.6; P(late|train)=24/80=0.3. Problem 2: P(red)=0.2*0.9+0.8*0.2=0.34; P(Box A|red)=0.18/0.34=9/17, approximately 0.5294. Problem 3: P(red)=0.55; P(Box A|red)=0.45/0.55=9/11, approximately 0.8182. Problem 4: A and B each have probability 1/2, their intersection is empty, so they are mutually exclusive and not independent. A and C each have probability 1/2 but P(A and C)=1/6, not 1/4, so they are not independent. The key is available to check work afterwards; reading it is not evidence of unaided mastery."
+            },
+            {
+              "name": "Tutor and other materials",
+              "available": false,
+              "content": "No additional tutor session, paid textbook access, past-paper bank or unreleased exam sheet is available before the assessment. The supplied handout and key are fully available offline."
+            }
+          ],
+          "availability": {
+            "timezone": "Asia/Karachi",
+            "today": "2026-10-12",
+            "dailyCeilingMinutesMondayFirst": [
+              45,
+              45,
+              0,
+              45,
+              30,
+              60,
+              0
+            ],
+            "weeklyCeilingMinutes": 225,
+            "preferredSessionMinutes": 20,
+            "maximumSessionMinutes": 30,
+            "days": [
+              {
+                "date": "2026-10-12",
+                "ceilingMinutes": 45,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 45
+              },
+              {
+                "date": "2026-10-13",
+                "ceilingMinutes": 45,
+                "otherCommittedMinutes": 20,
+                "availableMinutes": 25
+              },
+              {
+                "date": "2026-10-14",
+                "ceilingMinutes": 0,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 0
+              },
+              {
+                "date": "2026-10-15",
+                "ceilingMinutes": 45,
+                "otherCommittedMinutes": 5,
+                "availableMinutes": 40
+              },
+              {
+                "date": "2026-10-16",
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 30
+              },
+              {
+                "date": "2026-10-17",
+                "ceilingMinutes": 60,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 60
+              },
+              {
+                "date": "2026-10-18",
+                "ceilingMinutes": 0,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 0
+              },
+              {
+                "date": "2026-10-19",
+                "ceilingMinutes": 45,
+                "otherCommittedMinutes": 10,
+                "availableMinutes": 35
+              }
+            ],
+            "constraints": "All listed available minutes are remaining study capacity after other commitments. Zero means unavailable. There is no hidden extra study window; breaks must not be converted into extra study minutes. The listed ceilings are maxima, not requested workload. No existing Planner work or protected execution is selected."
+          },
+          "unknowns": [
+            "Actual exam questions and mark weights",
+            "Unaided transfer after the tutor's corrections",
+            "Real duration of resolving the identified misconceptions"
+          ]
+        }
+      },
+      "plans": [
+        {
+          "planRef": "plan_1",
+          "requested": {
+            "title": "Probability exam: interpreting conditions before calculating",
+            "outcome": "Prepare for the 20 October introductory probability assessment by solving and explaining conditional probability, tree-based total probability and Bayes problems, and distinguishing independence from mutually exclusive events, within the confirmed study time.",
+            "policy": "EXAM",
+            "deadline": {
+              "kind": "FIXED",
+              "date": "2026-10-20",
+              "examDayStudyAllowed": false
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 20,
+              "maximumTimeboxMinutes": 30
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Conditional probability and its denominator",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Tree-based total probability",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_3",
+                "title": "Bayes and base rates",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_4",
+                "title": "Independence versus mutually exclusive events",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "resolved": {
+            "title": "Probability exam: interpreting conditions before calculating",
+            "outcome": "Prepare for the 20 October introductory probability assessment by solving and explaining conditional probability, tree-based total probability and Bayes problems, and distinguishing independence from mutually exclusive events, within the confirmed study time.",
+            "policy": "EXAM",
+            "deadline": {
+              "kind": "FIXED",
+              "date": "2026-10-20",
+              "examDayStudyAllowed": false
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 20,
+              "maximumTimeboxMinutes": 30
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Conditional probability and its denominator",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "Tree-based total probability",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_3",
+                "title": "Bayes and base rates",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_4",
+                "title": "Independence versus mutually exclusive events",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "learningEvidence": [
+            {
+              "evidenceId": "evidence_1",
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I answered 4/4 simple unconditional counting questions and 3/3 fraction-to-decimal questions correctly, unaided. On the supplied 200-person table I answered P(train | late)=24/80, mixing up the denominator; I could correct it to 24/40 after the tutor explicitly pointed out the conditioning group. I have not yet demonstrated that correction unaided on a changed table.",
+              "demonstratesReadiness": false,
+              "scopeRefs": [
+                "scope_1"
+              ]
+            },
+            {
+              "evidenceId": "evidence_2",
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I multiplied probabilities along one branch correctly in 2/2 attempts but missed the second contributing branch in one total-probability question. There is no timed mixed-test evidence.",
+              "demonstratesReadiness": false,
+              "scopeRefs": [
+                "scope_2"
+              ]
+            },
+            {
+              "evidenceId": "evidence_3",
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I gave 0.9 for P(Box A | red) in the two-box question, quoting P(red | Box A). I could follow the tutor's numerator and total-probability denominator afterwards, but have not solved a new Bayes problem independently.",
+              "demonstratesReadiness": false,
+              "scopeRefs": [
+                "scope_3"
+              ]
+            },
+            {
+              "evidenceId": "evidence_4",
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-09T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 9 October I described two disjoint nonzero-probability events as independent because they do not overlap. I have no subsequent evidence correcting that explanation.",
+              "demonstratesReadiness": false,
+              "scopeRefs": [
+                "scope_4"
+              ]
+            }
+          ],
+          "resources": [
+            {
+              "ref": "resource_1",
+              "name": "Available tutor handout: rules and actual practice problems",
+              "available": true,
+              "content": "Rules: P(A|B)=P(A and B)/P(B), provided P(B)>0. For mutually exclusive exhaustive groups G1,G2, P(R)=P(G1)P(R|G1)+P(G2)P(R|G2). Bayes reverses a conditioning using joint probability over the appropriate total. Independence means P(A and B)=P(A)P(B). Mutually exclusive means P(A and B)=0.\nProblem 1: Among 200 students, 80 travel by train and 120 otherwise. Of the train group 24 were late; of the other group 16 were late. Find P(late), P(train|late), and P(late|train), explaining each denominator.\nProblem 2: Box A is selected with probability 0.2 and contains 9 red and 1 blue tokens. Box B is selected with probability 0.8 and contains 2 red and 8 blue tokens. One token is drawn from the selected box. Find P(red) and P(Box A|red), and explain why the latter is not 0.9.\nProblem 3: Repeat the box problem with P(Box A)=0.5, keeping the box contents unchanged; explain how the answer changes.\nProblem 4: A fair six-sided die is rolled. A={1,2,3}, B={4,5,6}, C={2,4,6}. Decide whether A,B are independent and whether A,C are independent; show the relevant probabilities.\nThese are practice problems, not the unreleased assessment. New practice examples may be constructed and must be identified as new."
+            },
+            {
+              "ref": "resource_2",
+              "name": "Available tutor solution key",
+              "available": true,
+              "content": "Problem 1: P(late)=40/200=0.2; P(train|late)=24/40=0.6; P(late|train)=24/80=0.3. Problem 2: P(red)=0.2*0.9+0.8*0.2=0.34; P(Box A|red)=0.18/0.34=9/17, approximately 0.5294. Problem 3: P(red)=0.55; P(Box A|red)=0.45/0.55=9/11, approximately 0.8182. Problem 4: A and B each have probability 1/2, their intersection is empty, so they are mutually exclusive and not independent. A and C each have probability 1/2 but P(A and C)=1/6, not 1/4, so they are not independent. The key is available to check work afterwards; reading it is not evidence of unaided mastery."
+            }
+          ],
+          "provenance": {
+            "kind": "SYNTHETIC_STUDENT_SUPPLIED",
+            "authority": "Accepted case facts; no external official verification or live execution."
+          }
+        }
+      ]
+    },
+    "envelope": {
+      "schemaVersion": 2,
+      "timezone": "Asia/Karachi",
+      "today": "2026-10-12",
+      "window": {
+        "start": "2026-10-12",
+        "end": "2026-10-19"
+      },
+      "capacityDigest": "c60b9c95f419715c785b5b7258ca4808e8b5337cf5c1d787091397ea3be13c6a",
+      "basis": "CONFIRMED_AVAILABILITY",
+      "weeklyCeilingMinutes": 225,
+      "recoveryPercent": 0,
+      "targets": [
+        {
+          "planRef": "plan_1",
+          "deadline": {
+            "kind": "FIXED",
+            "date": "2026-10-20",
+            "examDayStudyAllowed": false
+          },
+          "perGoalWeeklyCeilingMinutes": null
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-10-12",
+          "ceilingMinutes": 45,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 45,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-13",
+          "ceilingMinutes": 45,
+          "otherCommittedMinutes": 20,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 25,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-14",
+          "ceilingMinutes": 0,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 0,
+          "excluded": true
+        },
+        {
+          "date": "2026-10-15",
+          "ceilingMinutes": 45,
+          "otherCommittedMinutes": 5,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 40,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-16",
+          "ceilingMinutes": 30,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 30,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-17",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-18",
+          "ceilingMinutes": 0,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 0,
+          "excluded": true
+        },
+        {
+          "date": "2026-10-19",
+          "ceilingMinutes": 45,
+          "otherCommittedMinutes": 10,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 35,
+          "excluded": false
+        }
+      ],
+      "protectedExecution": [],
+      "timeboxRange": {
+        "minMinutes": 5,
+        "maxMinutes": 30
+      }
+    },
+    "acceptedRequest": {
+      "text": "Make a complete, realistic preparation plan for this assessment using my observed errors and the supplied resources. Prioritize the gaps that actually matter, preserve a modest check of secure material if justified, and leave spare time unused when extra work would not help. Explain what I should do if a checkpoint shows I am still confused. No work on exam day or my unavailable days.",
+      "authorization": "PLAN_ACTION"
+    }
+  },
+  "allocationFacts": {
+    "weeks": [
+      {
+        "week": "2026-10-12",
+        "otherCommittedMinutes": 25,
+        "protectedTargetMinutes": 0,
+        "perGoalCommittedMinutes": [
+          {
+            "planRef": "plan_1",
+            "minutes": 0
+          }
+        ]
+      },
+      {
+        "week": "2026-10-19",
+        "otherCommittedMinutes": 10,
+        "protectedTargetMinutes": 0,
+        "perGoalCommittedMinutes": [
+          {
+            "planRef": "plan_1",
+            "minutes": 0
+          }
+        ]
+      }
+    ],
+    "pins": [],
+    "externalActivities": [],
+    "preferences": [
+      {
+        "planRef": "plan_1",
+        "pacing": "COMFORTABLE_EARLY",
+        "maximumTimeboxMinutes": 30
+      }
+    ]
+  }
+}

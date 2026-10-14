@@ -1,0 +1,25 @@
+{
+  "status": 200,
+  "responseUserKeys": [
+    "id",
+    "username",
+    "name",
+    "email",
+    "avatarUrl",
+    "bannerUrl",
+    "bio",
+    "activeAvatar",
+    "activeFrame",
+    "activeTitle",
+    "activeAura",
+    "activeNameColor",
+    "socialLinks",
+    "characterConfig",
+    "level",
+    "hunterRank",
+    "currentXP"
+  ],
+  "header": "P\n\nPIXEL AUDIT\n\nE-Rank • Lv. 1\n\n0\n0/100\n0 ← STUDIO\nCompanion\n\nChoose how your companion looks. Changes appear instantly.\n\nSAVED",
+  "serverHP": 100,
+  "serverMaxHP": 100
+}

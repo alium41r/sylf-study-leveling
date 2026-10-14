@@ -10,13 +10,18 @@ const baseline=JSON.parse(fs.readFileSync(path.join(evidence,"step6-baseline.jso
 const temporary=fs.mkdtempSync(path.join(os.tmpdir(),"sylf-planner-step6-gate-"));
 const sha=value=>crypto.createHash("sha256").update(value).digest("hex");
 const sourceSha=file=>sha(fs.readFileSync(path.join(root,file)));
-const edits=[...["attempts","intents","web","research","context","revisions"].map(n=>`lib/planner/v2/server/${n}.ts`),"app/api/planner/generate/route.ts","lib/planner/v2/intelligence/context.ts","lib/planner/v2/intelligence/research-verification.ts","__tests__/planner-v2/intelligence/research-verification.test.ts","__tests__/planner-v2/postgres/compiler-quality.postgres.ts","lib/planner/v2/intelligence/blueprint.ts","lib/planner/v2/intelligence/quality.ts","__tests__/planner-v2/intelligence/quality.test.ts","lib/ai/providers/gemini.ts","lib/ai/providers/deepseek.ts","lib/ai/providers/types.ts","__tests__/ai/provider-contract.test.ts","lib/planner/v2/intelligence/provider.ts","__tests__/planner-v2/intelligence/provider.test.ts","__tests__/planner-v2/intelligence/allocator.test.ts",
+const edits=[...["attempts","intents","web","research","context","revisions"].map(n=>`lib/planner/v2/server/${n}.ts`),"app/api/planner/generate/route.ts","lib/planner/v2/intelligence/context.ts","lib/planner/v2/intelligence/research-verification.ts","__tests__/planner-v2/intelligence/research-verification.test.ts","__tests__/planner-v2/postgres/compiler-quality.postgres.ts","lib/planner/v2/intelligence/blueprint.ts","lib/planner/v2/intelligence/quality.ts","__tests__/planner-v2/intelligence/quality.test.ts","__tests__/planner-v2/intelligence/blueprint.test.ts","lib/ai/providers/gemini.ts","lib/ai/providers/deepseek.ts","lib/ai/providers/types.ts","__tests__/ai/provider-contract.test.ts","lib/planner/v2/intelligence/provider.ts","__tests__/planner-v2/intelligence/provider.test.ts","__tests__/planner-v2/intelligence/allocator.test.ts","lib/planner/v2/intelligence/allocator.ts","lib/planner/v2/intelligence/research-cache.ts","lib/planner/v2/server/learning.ts","__tests__/planner-v2/postgres/learning-allocation.postgres.ts",
  "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts","__tests__/planner-v2/postgres/proposal-fixture.ts","__tests__/planner-v2/postgres/durable-core.postgres.ts","__tests__/planner-v2/postgres/coordinated-routes.postgres.ts","__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts","__tests__/planner-v2/postgres/assistant-research.postgres.ts","__tests__/planner-v2/intelligence/serialization.test.ts","scripts/test-planner-v2-phase1-postgres.mjs",
  "documentation/planner/README.md","documentation/planner/reports/2026-10-03-phase-2/README.md","documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json"];
 const added=["__tests__/ai/deepseek-reasoning-controls.test.ts","lib/planner/v2/server/generation.ts","__tests__/planner-v2/postgres/generation-integration.postgres.ts","__tests__/planner-v2/postgres/maximum-envelope.postgres.ts","__tests__/planner-v2/postgres/research-limits.postgres.ts","__tests__/planner-v2/postgres/compiler-qualification.live.ts",
  "vitest.planner-v2-live.config.ts","scripts/test-planner-v2-phase2-step6-postgres.mjs","scripts/test-planner-v2-phase2-live.mjs","scripts/verify-planner-v2-phase2-step6-build.mjs","scripts/verify-planner-v2-phase2-step6.mjs",
- "documentation/planner/reports/2026-10-03-phase-2/STEP_6.md","documentation/planner/reports/2026-10-03-phase-2/STEP_6_CONTINUATION.md","documentation/planner/reports/2026-10-03-phase-2/COMPLETION.md","documentation/planner/reports/2026-10-03-phase-2/LIVE_QUALIFICATION.md","documentation/planner/reports/2026-10-03-phase-2/DEVELOPMENT_CORPUS.json"];
-const allowed=new Set([...edits,...added]);
+ "documentation/planner/reports/2026-10-03-phase-2/STEP_6.md","documentation/planner/reports/2026-10-03-phase-2/STEP_6_CONTINUATION.md","documentation/planner/reports/2026-10-03-phase-2/STEP_6_BLOCKERS.md","documentation/planner/reports/2026-10-03-phase-2/HIGH_REASONING.md","documentation/planner/reports/2026-10-03-phase-2/STEP_6_BOUNDARY_FIXES.md","documentation/planner/reports/2026-10-03-phase-2/COMPLETION.md","documentation/planner/reports/2026-10-03-phase-2/LIVE_QUALIFICATION.md","documentation/planner/reports/2026-10-03-phase-2/DEVELOPMENT_CORPUS.json"];
+// The user separately authorized the deployed timer defect during Step 6.
+// Classify that work explicitly; it is neither unrelated concurrency nor
+// evidence that the Planner's educational acceptance gate has passed.
+const adjacentTimerFiles=new Set(["app/api/sessions/route.ts","lib/planner/v2/server/settlement.ts","__tests__/timer/session-route.test.ts","__tests__/planner-v2/postgres/durable-core.postgres.ts","documentation/planner/reports/2026-10-07-timer-settlement/README.md"]);
+const adjacentTimerEvidence=file=>file.startsWith("documentation/planner/reports/2026-10-07-timer-settlement/evidence/");
+const allowed=new Set([...edits,...added,...adjacentTimerFiles]);
 const gate={gate:"PLANNER_V2_PHASE_2_STEP_6",startedAt:new Date().toISOString(),status:"FAILED",checks:[],scope:"Existing generation activation, atomic admission, supervised compiler-to-ApplyService, maximum envelopes and live development qualification. No later phase activation."};
 const write=(name,value)=>fs.writeFileSync(path.join(evidence,name),JSON.stringify(value,null,2)+"\n");
 write("step6-gate.json",{...gate,status:"RUNNING"});
@@ -65,12 +70,13 @@ try {
     required("lint","node_modules/eslint/bin/eslint.js",[...allowed].filter(p=>/\.(?:ts|cjs|mjs)$/.test(p)&&!existing.includes(p)).concat("--max-warnings=0"));
     const observations=[];
     for(const file of existing){
-      const before=execFileSync("git",["show",`HEAD:${file}`],{cwd:root,encoding:"utf8"});if(sha(before)!==baseline.files[file].sha256)throw new Error(`Cannot prove original lint source: ${file}`);
+      const baselineRevision="5a275f73c2413aa59b5cb7e8bb097d90da3077f5";
+      const before=execFileSync("git",["show",`${baselineRevision}:${file}`],{cwd:root,encoding:"utf8"});if(sha(before)!==baseline.files[file].sha256)throw new Error(`Cannot prove original lint source: ${file}`);
       const inspect=source=>{const r=spawnSync(process.execPath,[path.join(root,"node_modules/eslint/bin/eslint.js"),"--stdin","--stdin-filename",file,"--format=json"],{cwd:root,input:source,encoding:"utf8",timeout:30000});if(r.error||![0,1].includes(r.status))throw new Error("Lint diagnostics unavailable");const out=JSON.parse(r.stdout)[0];if(out.messages.some(m=>m.fatal))throw new Error("Fatal lint finding");return out.messages.map(m=>({...m,sourceLine:source.split("\n")[m.line-1]}));};
       const previous=inspect(before),current=inspect(fs.readFileSync(path.join(root,file),"utf8"));
       const fingerprints=messages=>messages.map(({ruleId,severity,message,column,sourceLine})=>JSON.stringify({ruleId,severity,message,column,sourceLine})).sort();
       if(JSON.stringify(fingerprints(previous))!==JSON.stringify(fingerprints(current)))throw new Error(`New changed-source lint finding: ${file}`);
-      observations.push({file,baselineSha256:sha(before),existingDiagnostics:previous,currentDiagnostics:current});
+      observations.push({file,baselineRevision,baselineSha256:sha(before),existingDiagnostics:previous,currentDiagnostics:current});
     }
     write("step6-lint-baseline.json",{status:"NO_NEW_DIAGNOSTICS",observations});return {newErrors:0,newWarnings:0,preExistingDiagnostics:observations.reduce((n,o)=>n+o.existingDiagnostics.length,0)};
   });
@@ -94,7 +100,7 @@ try {
   });
   check("isolated production web build qualification",()=>{
     const result=JSON.parse(fs.readFileSync(path.join(evidence,"step6-build.json")));const log=fs.readFileSync(path.join(evidence,"step6-build.log"),"utf8");if(!["PASSED","PRE_EXISTING_ROUTE_EXPORT_BLOCKER"].includes(result.status)||!log.includes("Compiled successfully"))throw new Error("Build failed before successful compilation");
-    for(const [file,expected] of Object.entries(result.sourceSha256??{}))if(sourceSha(file)!==expected)throw new Error(`Build evidence source drift: ${file}`);
+    for(const [file,expected] of Object.entries(result.sourceSha256??{}))if((fs.existsSync(path.join(root,file))?sourceSha(file):null)!==expected)throw new Error(`Build evidence source drift: ${file}`);
     if(!result.sourceSha256||result.changedDuringRun?.length)throw new Error("Build source pins missing or changed");
     for(const file of ["app/api/acoustics/route.ts","app/api/quests/route.ts"])if(sourceSha(file)!==baseline.files[file].sha256)throw new Error("Build blocker owner drift");return result;
   });
@@ -121,6 +127,10 @@ try {
     return {requirements:requirements.map(r=>({id:r.id,status:r.status})),brokenReferences:0,newWhitespaceFindings:0};
   });
   check("baseline preservation and unrelated concurrency",()=>{
+    const concurrentSchema=JSON.parse(fs.readFileSync(path.join(evidence,"step6-concurrent-schema-preservation.json"),"utf8"));
+    if(concurrentSchema.status!=="PRESERVED_UNRELATED_SCHEMA_CHANGE"||!concurrentSchema.userChangeOnlyPixelRelation||!concurrentSchema.poolChangeOnlySchemaVersion||Object.values(concurrentSchema.protectedModelCorrespondence).some(v=>v!==true))throw new Error("Concurrent schema changes require explicit semantic inspection");
+    const auditedConcurrentSources=concurrentSchema.preservedSources;
+    for(const [file,expected] of Object.entries(auditedConcurrentSources))if(sourceSha(file)!==expected)throw new Error(`Concurrent source changed after inspection: ${file}`);
     const files=execFileSync("git",["ls-files","-z","--cached","--others","--exclude-standard"],{cwd:root,encoding:"utf8"}).split("\0").filter(Boolean);
     const observe=file=>{try{return fs.lstatSync(path.join(root,file)).isFile()?{kind:"file",sha256:sourceSha(file)}:{kind:"other"};}catch(error){if(error.code==="ENOENT")return {kind:"missing"};throw error;}};
     const changed=Object.entries(baseline.files).filter(([file,b])=>b.sha256?observe(file).sha256!==b.sha256:observe(file).kind!==b.kind).map(([file])=>file);
@@ -128,9 +138,9 @@ try {
     // Match the starting snapshot's documented coverage: an intentionally
     // excluded path cannot be classified as a newly created concurrent file.
     const excluded=file=>/\.env|secret|credential|privatekey|\.pem/i.test(file)||file.startsWith("documentation/planner/reports/2026-10-03-phase-2/evidence/");
-    const newFiles=files.filter(file=>!baseline.files[file]&&!allowed.has(file)&&!generated(file)&&!excluded(file));
-    if([...external,...newFiles].some(file=>/^(?:lib\/(?:planner|ai)\/|documentation\/planner\/|__tests__\/(?:planner|planner-v2)\/|app\/api\/planner\/|prisma\/)/.test(file)))throw new Error(`Unclassified Planner/schema overlap: ${external.concat(newFiles)}`);
-    const result={status:"PASSED",baselineEntries:Object.keys(baseline.files).length,baselineCoverage:"Git-listed files excluding secret-like paths and Phase 2 evidence; not a full filesystem snapshot.",step6ExistingEdits:changed.filter(file=>allowed.has(file)),derivedWorkerChanges:changed.filter(generated),unrelatedConcurrentChanges:external.map(file=>({path:file,before:baseline.files[file],observed:observe(file)})),unrelatedNewFiles:newFiles,unrelatedLandingUnchanged:sourceSha("app/components/landing/journey/JourneyLanding.tsx")===baseline.files["app/components/landing/journey/JourneyLanding.tsx"].sha256};
+    const newFiles=files.filter(file=>!baseline.files[file]&&!allowed.has(file)&&!generated(file)&&!excluded(file)&&!adjacentTimerEvidence(file));
+    if([...external,...newFiles].some(file=>!Object.hasOwn(auditedConcurrentSources,file)&&/^(?:lib\/(?:planner|ai)\/|documentation\/planner\/|__tests__\/(?:planner|planner-v2)\/|app\/api\/planner\/|prisma\/)/.test(file)))throw new Error(`Unclassified Planner/schema overlap: ${external.concat(newFiles)}`);
+    const result={status:"PASSED",baselineEntries:Object.keys(baseline.files).length,baselineCoverage:"Git-listed files excluding secret-like paths and Phase 2 evidence; not a full filesystem snapshot.",step6ExistingEdits:changed.filter(file=>allowed.has(file)&&!adjacentTimerFiles.has(file)),authorizedAdjacentTimerChanges:changed.filter(file=>adjacentTimerFiles.has(file)),authorizedAdjacentTimerNewFiles:files.filter(file=>!baseline.files[file]&&(adjacentTimerFiles.has(file)||adjacentTimerEvidence(file))),derivedWorkerChanges:changed.filter(generated),unrelatedConcurrentChanges:external.map(file=>({path:file,before:baseline.files[file],observed:observe(file)})),unrelatedNewFiles:newFiles,unrelatedLandingUnchanged:sourceSha("app/components/landing/journey/JourneyLanding.tsx")===baseline.files["app/components/landing/journey/JourneyLanding.tsx"].sha256};
     write("step6-source-preservation.json",result);gate.sourceSha256=Object.fromEntries([...allowed].sort().map(file=>[file,sourceSha(file)]));return result;
   });
   check("Phase 2 completion certification",()=>{

@@ -1,0 +1,353 @@
+{
+  "label": "timer",
+  "files": 6,
+  "passed": 78,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/coordinated-routes.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL headless assistant routes require authentication and ownership and reject model-supplied permission",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL research advice survives HTTP recovery and cancellation with owned read bindings",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL document upload cannot use a foreign Plan or allocate private storage without ownership",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL preserves historical zero estimates while reporting their uncertainty separately from verified zero cost",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL blocks old-client edits, completion and deletion of adopted work without side effects",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL settles explicit generic Quest completion once across duplicate requests",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL makes duplicate desired rest-day writes harmless without moving sealed Planner work",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL rechecks actual calendar work added through the generic Quest route before apply",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL blocks a reset of linked execution without consuming its security code",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL returns derived remaining work to the shared Focus client without rewriting the approved timebox",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL resets ordinary legacy progression atomically, including mirrors and ledger, and consumes the OTP once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL uses fresh coordinated achievement eligibility and credits duplicate claims only once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL erases historical party participation and Planner state through the actual account route",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 production writer routes on PostgreSQL keeps owned recovery reads, cancellation and execution protection available when admission is disabled",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/current-sql-invariants.postgres.ts",
+      "cases": [
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) installs the actual final timer/reward RPCs and Planner trigger functions",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) keeps Planner records RLS-enabled and inaccessible to browser roles",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rejects foreign Subject and Goal references at the actual SQL boundary",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rejects an active revision from a different Plan at deferred commit",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) prevents mutation of sealed input, educational output and operation identity",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) allows exactly one immutable confirmation receipt",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) blocks generic structural Quest edits without review capability",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) protects a zero-second started Quest through the actual Focus RPC",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rejects foreign execution references through the actual start RPC",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) preserves a permanent user-release tombstone",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) rolls back ordinary execution writes and Plan pointers together on an injected SQL failure",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: actual current Planner security, RPC and SQL invariants (not V2 apply) retires unused historical progression, forge and integer-skill reward bypasses",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/durable-core.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 1 actual durable repositories creates one owned immutable intent and returns an identical retry",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories binds one lease, survives cancellation and rejects its late checkpoint",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories never retargets an attempt after accepted intent changes",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories recovers an expired lease without resetting budget or accepting the previous fence",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories admits one planning and one read-only research job per user across workers",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories applies an exact proposal once under concurrent confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories rolls back every materialization boundary without a partial receipt",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories protects zero-second starts, acknowledged pause/resume and receipt replays",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories settles the weekly mission atomically and only once across competing protocols",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories settles legacy timer history without V2 columns and preserves accepted V2 civil dates",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/lifecycle-projection.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration keeps initial retry correspondence after editing and archives without erasing execution",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration preserves deadline and accounting during explicit profile escalation",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration adopts research atomically for both targets and never changes hard facts",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration publishes long research as a durable read-only answer with no Plan side effects",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration uses accepted global availability even while preparing another Plan",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration reviews and atomically applies a joint proposal once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration retains an unstarted identity across semantic edits and rejects a racing Focus start",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration rolls back both targets of a joint apply at every durable boundary and retries exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration adopts Classic once, preserving actual history and conflicting original aliases",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration blocks open timers and rolls back adoption without rewriting ledgers",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration replans an adopted live baseline repeatedly without reverting edited content or lineage",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration shows live remaining work and keeps active intent separate from a later working edit",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration does not renew timing tolerance through repeated acknowledged pause/resume",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration erases owned durable artifacts through the explicit account cascade while fencing old workers",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration pins an owned cross-plan prerequisite, materializes it once and protects reverse dependencies",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration keeps unchanged Quest identity, content and execution rows byte-for-byte stable",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration withdraws stopped unfinished work into a distinct continuation without duplicating completion rewards",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration applies new cross-plan prerequisites in one joint transaction without requiring pre-existing Quests",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration anchors hard learning intervals to accepted completion date rather than the old calendar slot",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration imports Roadmap expansions from live execution and retains strategic revisions, tombstones and large UTF-8 baselines",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration fails closed on independent context/economic SQL writers while allowing coordinated mutations",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration coordinates direct SQL shop/equipment writers with apply and preserves their economic math",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration changes strategy only through a new owned canonical intent and supersedes the old candidate",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration rejects client-minted verified research and readiness while retaining honest self reports",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 correspondence, projection and reviewed migration preserves invalid completed legacy history as an exception while rejecting invalid unfinished adoption",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/separate-connection-concurrency.postgres.ts",
+      "cases": [
+        {
+          "name": "REQUIRED: genuine separate PostgreSQL connections and current execution race uses three independent backend processes, not a single-user emulation",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: genuine separate PostgreSQL connections and current execution race observes cross-connection advisory locking and release at transaction end",
+          "status": "passed"
+        },
+        {
+          "name": "REQUIRED: genuine separate PostgreSQL connections and current execution race makes a racing authorized reschedule wait, then protects the zero-second Focus start",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/timer-lifecycle.postgres.ts",
+      "cases": [
+        {
+          "name": "timer lifecycle on genuine PostgreSQL settles delayed Focus Party exits once and ignores a replay after rejoining",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL cuts off an in-flight party pause/resume at the original saved exit and preserves the prior participation base",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL closes a Focus Party when its last members leave concurrently",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL denies direct public economic RPC calls with a fabricated timer owner",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL uses authoritative pause/resume and receipt replay for an ordinary timer",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL pays zero-delta final settlement exactly once after all time was checkpointed",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL freezes final time, rewards and end timestamp against late higher/lower heartbeats and retries",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL replays a lost start response after END and converges concurrent creation on one row",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL recovers a long offline creation without the old 30-minute truncation",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL does not silently close another subject's unsaved active session",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL keeps focus plus break inside one wall budget when stale writers disagree",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL recovers a delayed weekly mission once and repairs the streak without rewinding its latest week",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL rejects foreign sessions and forged Quest linkage without changing any ledger",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL replays offline V2 pause/resume/end intervals with exact accounting and durable receipts",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

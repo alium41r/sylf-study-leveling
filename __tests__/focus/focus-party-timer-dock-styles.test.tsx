@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { FocusPartyRoom } from "@/app/social/components/focus-party/FocusPartyRoom";
 import { FocusPartyTimerLayoutRouter, resolvePartySafeTimerPosition } from "@/app/social/components/focus-party/FocusPartyTimerLayoutRouter";
-import { ClassicTimerDock, ClassicTimerLayout } from "@/app/focus/components/layouts/ClassicTimerLayout";
+import { ClassicTimerDock } from "@/app/focus/components/layouts/ClassicTimerLayout";
 import { AnimeTimerDock, AnimeTimerLayout } from "@/app/focus/components/layouts/AnimeTimerLayout";
 import { LandscapeTimerDock, LandscapeTimerLayout } from "@/app/focus/components/layouts/LandscapeTimerLayout";
 import { FantasyTimerDock, FantasyTimerLayout } from "@/app/focus/components/layouts/FantasyTimerLayout";
@@ -11,6 +11,7 @@ import * as FocusPartyContextModule from "@/app/social/components/focus-party/Fo
 import * as FocusBackgroundPreferenceModule from "@/lib/focus-background-preference";
 import * as FocusBackgroundClientModule from "@/lib/focus-background-client";
 import { FocusTimerLayoutProps } from "@/app/focus/components/FocusTimerLayoutProps";
+import { FocusTimerLayoutRouter } from "@/app/focus/components/FocusTimerLayoutRouter";
 
 // Mock AuthProvider
 const mockUser = { id: "user-1", username: "SoloLeveler", name: "Ali", hunterRank: "S", level: 25 };
@@ -196,9 +197,9 @@ describe("Focus Party Timer Dock Integration & Solo Parity", () => {
   // 1. Solo Layouts 1:1 Preservation After Extraction
   // ──────────────────────────────────────────────────────────────────────────
   describe("1. Solo Layouts 1:1 Preservation", () => {
-    it("Solo Classic renders centered digital clock, header, and bottom controls", () => {
+    it("Solo Classic renders centered digital clock, shared session bar, and bottom controls", () => {
       const props = createMockSoloProps();
-      const { container } = render(<ClassicTimerLayout {...props} />);
+      const { container } = render(<FocusTimerLayoutRouter {...props} layoutKey="classic" />);
       expect(screen.getByText("25:00")).toBeInTheDocument();
       expect(screen.getByText("Advanced Arcane")).toBeInTheDocument();
       expect(screen.getByText("Pause")).toBeInTheDocument();

@@ -1,0 +1,23 @@
+{
+  "status": "PASSED",
+  "checkedAt": "2026-10-09T11:42:05.061Z",
+  "paidCalls": 0,
+  "realAccounting": true,
+  "guardTestsPassed": 15,
+  "interceptedDispatches": 20,
+  "reasoning": 8,
+  "independentReview": 12,
+  "worstCaseReservedUsd": 0.1943364,
+  "noProductionRoutingMutation": true,
+  "sleepVerified": true,
+  "sourceFreezeSha256": "e7f97f119ab19b684948e7d9a70fac82f000b92088915fa08f81657c90fc6c7f",
+  "toolingSha256": {
+    "block.cjs": "ce598c29653ecad3332b8b7aed52c7b1cf86a51b0823e6d0ff2d3396e9181f12",
+    "guard.cjs": "ad710da27f599aa092e6e2cf5866588a22593f4b759e97556ccb1b9feba16aa3",
+    "guard.test.cjs": "0472b330dfe19e329ffe4f11a109e768665d2144e5e846577cb50ba1e8db6309",
+    "launch.cjs": "63c5dbf7900005cd6737dda63168bec05108ea32c948ce3bf594f1b3c426bafe",
+    "sleep.cjs": "6cbc6c52f146473b6c49c147198d6db1eb59d16ce697d33736d35be74e4e3233",
+    "postgres.test.ts": "d6864b912119e87f9236c4363fc3317523bb0738ce8253f5d9ebde58a80c1b61"
+  },
+  "evidenceDirectory": "initial-block/evidence/unpaid-2026-10-09T11-41-48-845Z"
+}

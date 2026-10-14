@@ -1,4 +1,4 @@
-/* Only the landing imports this world. Ornaments stay behind the reading surface. */
+/* Shared celestial foliage. Ornaments stay behind the reading surface. */
 .world {
   --decor-drift: 0px;
   position: absolute;
@@ -345,5 +345,36 @@
   .driftingLeaf,
   .lantern > svg {
     animation: none;
+  }
+}
+
+/* Auth uses the landing foliage as a quiet page border, outside both content columns. */
+.world[data-celestial-decor="auth"] {
+  --decor-vine: color-mix(in srgb, var(--text-secondary) 36%, #7771cf);
+  --decor-vine-opacity: 0.6;
+  --decor-mobile-vine-opacity: 0.5;
+  --decor-leaf-opacity: 0.8;
+  --decor-leaf-base: color-mix(in srgb, var(--text-secondary) 30%, #43468e);
+  --decor-leaf-mid: color-mix(in srgb, var(--text-secondary) 24%, #7776e4);
+  --decor-leaf-tip: color-mix(in srgb, var(--text-secondary) 20%, #b9caff);
+  inset: 0;
+  width: 100%;
+  transform: none;
+  z-index: 0;
+}
+.world[data-celestial-decor="auth"] .lane[data-side] {
+  width: clamp(22px, 6vw, 110px);
+  overflow: clip;
+  mask-image: linear-gradient(to right, black 65%, transparent);
+}
+.world[data-celestial-decor="auth"] .driftingLeaf {
+  animation: none;
+}
+.world[data-celestial-decor="auth"] .dot {
+  display: none;
+}
+@media (min-width: 901px) and (max-width: 1200px) {
+  .world[data-celestial-decor="auth"] .lane[data-side] {
+    width: 46px;
   }
 }

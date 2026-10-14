@@ -1,0 +1,46 @@
+- generic [active] [ref=f2e1]:
+  - main [ref=f2e4]:
+    - generic [ref=f2e5]:
+      - generic [aria-hidden]:
+        - img:
+          - generic [aria-hidden]:
+            - generic:
+              - generic:
+                - generic: ✦
+                - generic: STUDY TIME
+              - generic: 00:16:43
+              - generic: FOCUS MODE
+      - generic [ref=f2e6]:
+        - link "Sylf Home" [ref=f2e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=f2e10]: sylf.
+        - generic [ref=f2e11]: A Calmer Place to Study
+      - main [ref=f2e15]:
+        - region "Authentication" [ref=f2e16]:
+          - generic [ref=f2e18]:
+            - generic [ref=f2e19]: THE SYSTEM • AUTHENTICATION
+            - heading "Welcome back. Good to see you again." [level=1] [ref=f2e28]:
+              - generic [ref=f2e29]: Welcome back.
+              - generic [ref=f2e30]: Good to see you again.
+            - paragraph [ref=f2e31]: Log in to continue your journey, and pick up right where you left off.
+            - button "Continue with Google" [ref=f2e34] [cursor=pointer]
+            - generic [ref=f2e41]: OR CREDENTIALS
+            - generic [ref=f2e44]:
+              - generic [ref=f2e45]:
+                - generic [ref=f2e46]: Email or Username
+                - textbox "Email or Username" [ref=f2e48]:
+                  - /placeholder: Email or username
+              - generic [ref=f2e49]:
+                - generic [ref=f2e50]: Password
+                - generic [ref=f2e51]:
+                  - textbox "Password" [ref=f2e52]:
+                    - /placeholder: Your password
+                  - button "Show password" [ref=f2e53] [cursor=pointer]
+              - button "ACCESS SYSTEM" [ref=f2e57] [cursor=pointer]
+            - paragraph [ref=f2e66]:
+              - text: Don't have an account?
+              - link "SIGN UP" [ref=f2e67] [cursor=pointer]:
+                - /url: /register?force=true
+        - complementary "Study Scene" [ref=f2e68]
+  - button "Open Next.js Dev Tools" [ref=f2e74] [cursor=pointer]
+  - alert [ref=f2e78]

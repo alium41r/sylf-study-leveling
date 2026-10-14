@@ -1,0 +1,233 @@
+[
+  {
+    "name": "touch draw mirrored",
+    "lit": 2,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "pencil",
+    "color": "1"
+  },
+  {
+    "name": "touch erase leaves mirrored partner",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "eraser",
+    "color": "1"
+  },
+  {
+    "name": "touch erase undo",
+    "lit": 2,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "eraser",
+    "color": "1"
+  },
+  {
+    "name": "touch erase redo",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "eraser",
+    "color": "1"
+  },
+  {
+    "name": "touch pick",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "pencil",
+    "color": "1"
+  },
+  {
+    "name": "touch fill",
+    "lit": 2304,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile zoom 4",
+    "lit": 1,
+    "css": [
+      192,
+      192
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile zoom 6",
+    "lit": 1,
+    "css": [
+      288,
+      288
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile zoom 8",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile zoom 12",
+    "lit": 1,
+    "css": [
+      340,
+      576
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "cursor alignment at cell 40",
+    "canvasWidth": 340,
+    "expectedX": 308.3333333333333,
+    "actualCursorX": 345,
+    "errorPx": 36.666666666666686
+  },
+  {
+    "name": "mobile duplicate selection",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile onion on",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "1",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile reorder",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "0",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile animation playing",
+    "lit": 1,
+    "css": [
+      340,
+      384
+    ],
+    "dpr": 3,
+    "frame": "1",
+    "tool": "fill",
+    "color": "5"
+  },
+  {
+    "name": "mobile save",
+    "status": 200
+  },
+  {
+    "name": "mobile density chunky",
+    "density": "32",
+    "css": [
+      180,
+      180
+    ],
+    "backing": [
+      540,
+      540
+    ],
+    "dpr": 3
+  },
+  {
+    "name": "mobile density balanced",
+    "density": "40",
+    "css": [
+      180,
+      180
+    ],
+    "backing": [
+      540,
+      540
+    ],
+    "dpr": 3
+  },
+  {
+    "name": "mobile density detailed",
+    "density": "48",
+    "css": [
+      180,
+      180
+    ],
+    "backing": [
+      540,
+      540
+    ],
+    "dpr": 3
+  },
+  {
+    "name": "mobile density finest",
+    "density": "64",
+    "css": [
+      180,
+      180
+    ],
+    "backing": [
+      540,
+      540
+    ],
+    "dpr": 3
+  }
+]

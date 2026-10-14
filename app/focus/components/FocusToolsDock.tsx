@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { backdropVariants, bottomSheetVariants } from "@/lib/motion";
 import { useFocusTools, ToolType, DockAnchor } from "./FocusToolsContext";
 import { useAcoustics } from "@/app/components/AcousticsContext";
+import { SylvieIcon } from "@/app/components/icons";
 import {
   Calculator,
-  Sparkles,
   Headphones,
   FileText,
   BookOpen,
@@ -67,11 +67,11 @@ const DOCK_ITEMS: DockItem[] = [
   },
   {
     id: "ai",
-    label: "AI Assistant",
-    shortLabel: "AI Study",
-    description: "Interactive Study Assistant",
+    label: "Sylvie",
+    shortLabel: "Sylvie",
+    description: "Study with Sylvie",
     hotkey: "Alt+A",
-    icon: Sparkles,
+    icon: SylvieIcon,
     color: "text-purple-400 group-hover:text-purple-300",
     activeBorder: "border-purple-400 bg-purple-500/20 text-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.35)]",
   },

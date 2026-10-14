@@ -22,7 +22,7 @@ export interface SessionRow {
   startedAt: Date; endedAt: Date | null; durationSeconds: number; breakSeconds: number;
   executionState: "RUNNING" | "PAUSED" | "ENDED" | null; executionVersion: number;
   runningSince: Date | null; acceptedFocusAtResume: number; acceptedBreakAtResume: number;
-  executionContext: { timezone: string; actualCivilDate: string; toleranceUsedSeconds?: number } | null;
+  executionContext: { timezone: string; actualCivilDate: string; toleranceUsedSeconds?: number; lastTransitionAt?: string } | null;
   transitionReceipts: Record<string, { requestHash: string; response: unknown }> | null;
 }
 export const specDigest = (spec: ExecutionTaskSpecV2): string => hash("execution-spec", {

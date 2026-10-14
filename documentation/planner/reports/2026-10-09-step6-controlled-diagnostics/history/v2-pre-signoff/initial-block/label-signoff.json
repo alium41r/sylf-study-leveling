@@ -1,0 +1,32 @@
+{
+  "status": "PENDING_EXPLICIT_INDEPENDENT_REVIEW_DELEGATION",
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v2",
+  "assessor": null,
+  "assessorKind": null,
+  "independentOfAuthor": false,
+  "independentOfTestedModel": false,
+  "reviewedAt": null,
+  "generationRubricsChecked": 0,
+  "candidateLabelsChecked": 0,
+  "labelsSha256": "e5c949fad59e7ba3d5bea2b2244b772bec5df4176a6812e8d456f52304a322ec",
+  "casesSha256": "21345bd78e1dd784c36df402ba16a44a2ad067b694b60ef03173e730ab9faed6",
+  "rubricSha256": "8dd0ad4d74a1deb7e165972a3b4635cf271a831310200838bbf07ad1a4b13c7d",
+  "candidateSha256": {
+    "v01": "fb1fa1644815755cee2a8a9a6d1e69ac3095885956728522fe273bdda2cb4486",
+    "v02": "0ee3ebc8bba39bfde3b93e100493f23ca9d0442d9981fcb5b8af6808b80b5390",
+    "v03": "031e35636fbda59de395fa97384f42c17af44aec883949f52e49215dd9877636",
+    "v04": "042331d15688d7f2c89cb85cfb82aed1868e88003af78734f51aee02508db7ed",
+    "v05": "04c1e7e3f7f5c35e319d8fe769a55e683f8c19a39dfeca236a171394062ca110",
+    "v06": "2e205fa22e3628eb011dc036194214f805abce483c4c1d965e7eaf5d438669cf",
+    "v07": "524a5bf48630c0e3a3c6ac7c9bd6ea2493dc200af97e2749a9faea914d1e6a7e",
+    "v08": "3e4a9151e1cbec3981f2be5ef5af7cc2a56a33721f56a4ed5c71cc990290fcd6",
+    "v09": "f89020597a86caebf906175445dd3bd418874287bddfe445ee02e5c7bd178a5d",
+    "v10": "914fe738addb60696bde92927516beb0679b565ab2aae7d57505dde374036d64",
+    "v11": "c515206a003f387000fea534564b3b020119083321a86174822b4d212e1d108f",
+    "v12": "3ca67a5f6c8e1880de9c09a2578b11e16007ea684993d3297ad7e276672d99a3"
+  },
+  "notes": [
+    "Case author cannot certify independent signoff. An explicit delegation authorization has been requested; no reviewer agent has been spawned. Technical preflight is separate from label signoff."
+  ],
+  "checks": []
+}

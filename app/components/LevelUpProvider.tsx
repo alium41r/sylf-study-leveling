@@ -41,6 +41,19 @@ interface PendingLevelUp extends LevelUpSignal {
   runId: number;
 }
 
+/**
+ * A level-up that this provider has observed, kept as a record.
+ *
+ * Distinct from `isLevelUpVisible`: the overlay closing must not erase the fact
+ * that a level-up happened, because other surfaces react to the *event* rather
+ * than to the overlay's lifetime. `runId` makes each occurrence individually
+ * identifiable, so a consumer cannot react twice to the same one — or miss two
+ * that arrive close together.
+ */
+export interface ObservedLevelUp extends LevelUpSignal {
+  runId: number;
+}
+
 interface LevelUpContextValue {
   /** Play the sequence. Defaults are synthesized from the current scholar. */
   triggerLevelUp: (signal?: Partial<LevelUpSignal>) => void;
@@ -48,6 +61,14 @@ interface LevelUpContextValue {
   dismissLevelUp: () => void;
   /** Whether the sequence is currently on screen. */
   isLevelUpVisible: boolean;
+  /**
+   * The most recent level-up this provider observed, or `null` before any.
+   *
+   * This is the read-only **application signal** other surfaces consume. It
+   * carries only semantic progression facts — never presentation, and never
+   * anything about how a reaction should be drawn.
+   */
+  lastLevelUp: ObservedLevelUp | null;
 }
 
 const LevelUpContext = createContext<LevelUpContextValue | undefined>(undefined);
@@ -56,6 +77,14 @@ export function LevelUpProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [pending, setPending] = useState<PendingLevelUp | null>(null);
   const runIdRef = useRef(0);
+  /**
+   * Durable record of the last observed level-up, for signal consumers.
+   *
+   * State rather than a ref: it is rendered, so React must re-render when it
+   * changes, and reading a ref during render is exactly the pattern that
+   * silently fails to update.
+   */
+  const [lastLevelUp, setLastLevelUp] = useState<ObservedLevelUp | null>(null);
   /** Last observed level per scholar identity, so logins never celebrate. */
   const baselineRef = useRef<{ userId: number; level: number } | null>(null);
 
@@ -68,7 +97,7 @@ export function LevelUpProvider({ children }: { children: ReactNode }) {
       const previousRank = signal?.previousRank ?? rankForLevel(previousLevel);
 
       runIdRef.current += 1;
-      setPending({
+      const observed: ObservedLevelUp = {
         runId: runIdRef.current,
         newLevel,
         newRank,
@@ -76,7 +105,9 @@ export function LevelUpProvider({ children }: { children: ReactNode }) {
         previousRank,
         didRankUp: signal?.didRankUp ?? newRank !== previousRank,
         xpGained: signal?.xpGained,
-      });
+      };
+      setLastLevelUp(observed);
+      setPending(observed);
     },
     [user?.level]
   );
@@ -87,7 +118,9 @@ export function LevelUpProvider({ children }: { children: ReactNode }) {
 
   const triggerRealLevelUp = useCallback((signal: LevelUpSignal) => {
     runIdRef.current += 1;
-    setPending({ ...signal, runId: runIdRef.current });
+    const observed: ObservedLevelUp = { ...signal, runId: runIdRef.current };
+    setLastLevelUp(observed);
+    setPending(observed);
   }, []);
 
   /* ── Real level-up detection ─────────────────────────────────────────── */
@@ -133,8 +166,12 @@ export function LevelUpProvider({ children }: { children: ReactNode }) {
       triggerLevelUp,
       dismissLevelUp,
       isLevelUpVisible: pending !== null,
+      // Distinct from `pending`: closing the overlay clears `pending` but must
+      // not erase the fact that a level-up happened, because other surfaces
+      // react to the event rather than to the overlay's lifetime.
+      lastLevelUp,
     }),
-    [triggerLevelUp, dismissLevelUp, pending]
+    [triggerLevelUp, dismissLevelUp, pending, lastLevelUp]
   );
 
   return (

@@ -1,0 +1,41 @@
+{
+  "startedAt": "2026-10-08T18:33:51.895Z",
+  "finishedAt": "2026-10-08T18:34:37.769Z",
+  "status": "PASSED",
+  "checks": [
+    {
+      "name": "units",
+      "code": 0
+    },
+    {
+      "name": "phase2-typecheck",
+      "code": 0
+    },
+    {
+      "name": "worker-typecheck",
+      "code": 0
+    },
+    {
+      "name": "whole-typecheck",
+      "code": 0
+    },
+    {
+      "name": "lint",
+      "code": 0
+    },
+    {
+      "name": "compiled-imports",
+      "code": 0
+    }
+  ],
+  "units": {
+    "passed": 551,
+    "failed": 0,
+    "requiredSkipped": 0,
+    "files": 43,
+    "expectedFiles": 43,
+    "validUnits": true,
+    "independentAllocationOracles": 500
+  },
+  "sleepPrevention": true
+}

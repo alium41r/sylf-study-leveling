@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "checkedAtUtc": "2026-10-09T14:03:14.224384+00:00",
+  "status": "PAID_PAIR_COMPLETE_UNASSESSED_EDUCATION",
+  "paidCalls": 2,
+  "maximumAuthorizedCalls": 2,
+  "maximumAuthorizedSpendUsd": 0.02,
+  "retryCalls": 0,
+  "fallbackCalls": 0,
+  "otherProviderCalls": 0,
+  "totalLow": {
+    "inputTokens": 5549,
+    "cacheHitInputTokens": 768,
+    "cacheMissInputTokens": 4781,
+    "completionTokensIncludingReasoning": 6944,
+    "reasoningTokens": 6627,
+    "nonReasoningCompletionTokens": 317,
+    "transportLatencyMs": {
+      "sum": 35549,
+      "median": 17774.5,
+      "min": 14480,
+      "max": 21069
+    },
+    "estimatedChargeUsd": "0.004885854",
+    "conservativePeakUncachedEstimateUsd": 0.0099975,
+    "retainedReservationsUsd": 0.016803
+  },
+  "caseComparisons": [
+    {
+      "caseId": "v09",
+      "trialId": "d_21da0ca3d648bd22",
+      "packetSha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "inputAndCacheMatchHigh": true,
+      "returnedModelAndFingerprintMatchHigh": true,
+      "Low": {
+        "inputTokens": 2689,
+        "cacheHitInputTokens": 0,
+        "cacheMissInputTokens": 2689,
+        "completionTokensIncludingReasoning": 4096,
+        "reasoningTokens": 4096,
+        "nonReasoningCompletionTokens": 0,
+        "finishReason": "length",
+        "transportLatencyMs": 21069,
+        "estimatedChargeUsd": "0.00286095",
+        "conservativePeakUncachedEstimateUsd": 0.0057219,
+        "retainedReservationUsd": 0.0083061,
+        "reasoningEffort": "low",
+        "actualRequestBodySha256": "e9f9ad123bd979b7662843fbb3d00672b6e6398b2c84c11284416470d6c66a01",
+        "dispatchAtUtc": "2026-10-09T13:59:18.351Z"
+      },
+      "HighDefault": {
+        "inputTokens": 2689,
+        "completionTokensIncludingReasoning": 4096,
+        "reasoningTokens": 4096,
+        "nonReasoningCompletionTokens": 0,
+        "finishReason": "length",
+        "transportLatencyMs": 20487,
+        "estimatedChargeUsd": "0.00286095"
+      },
+      "canonicalReceiptSha256": "95d216dee680412c8427524d40fae637c7b5ed01c9825a4423f068526794289d"
+    },
+    {
+      "caseId": "v04",
+      "trialId": "d_6de45b407ca18e60",
+      "packetSha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "inputAndCacheMatchHigh": true,
+      "returnedModelAndFingerprintMatchHigh": true,
+      "Low": {
+        "inputTokens": 2860,
+        "cacheHitInputTokens": 768,
+        "cacheMissInputTokens": 2092,
+        "completionTokensIncludingReasoning": 2848,
+        "reasoningTokens": 2531,
+        "nonReasoningCompletionTokens": 317,
+        "finishReason": "stop",
+        "transportLatencyMs": 14480,
+        "estimatedChargeUsd": "0.002024904",
+        "conservativePeakUncachedEstimateUsd": 0.0042756,
+        "retainedReservationUsd": 0.0084969,
+        "reasoningEffort": "low",
+        "actualRequestBodySha256": "d8fb60d90280461efd573e7e1ad478b1ae67f414b9295ce7adafdf808a41ae63",
+        "dispatchAtUtc": "2026-10-09T13:59:39.761Z"
+      },
+      "HighDefault": {
+        "inputTokens": 2860,
+        "completionTokensIncludingReasoning": 4096,
+        "reasoningTokens": 4096,
+        "nonReasoningCompletionTokens": 0,
+        "finishReason": "length",
+        "transportLatencyMs": 20975,
+        "estimatedChargeUsd": "0.002773704"
+      },
+      "canonicalReceiptSha256": "7287c8bb7dec3e2219f7b27c56ee3e498ce7832a10cca012a386436427deb828"
+    }
+  ],
+  "sleepVerifiedAndOwnedProcessesReleased": true,
+  "cancelledCanonicalRoots": 2,
+  "publication": "FORBIDDEN",
+  "invoiceVerified": false,
+  "currencyEstimateBasis": "Raw cache counters and off-peak published rates. All dispatches at 13:59 UTC are outside peak windows. Reasoning is included in completion exactly once. Canonical alias prices/costUsd remain UNKNOWN/null.",
+  "sameInputsAndLimitsAcrossPair": true,
+  "configurationChange": "Only reasoning_effort=low on wire; enabled thinking omission preserved.",
+  "baselineArtifactsVerified": 46,
+  "variantArtifactsVerified": 9,
+  "postgresHarness": {
+    "passed": 1,
+    "failed": 0,
+    "requiredSkipped": 0
+  },
+  "rawEvidenceSha256": {
+    "canonical-d_21da0ca3d648bd22.json": "95d216dee680412c8427524d40fae637c7b5ed01c9825a4423f068526794289d",
+    "canonical-d_6de45b407ca18e60.json": "7287c8bb7dec3e2219f7b27c56ee3e498ce7832a10cca012a386436427deb828",
+    "launcher-sleep.json": "5beed8facf084e97e8d2775a9cdd666bf561ff8d01a27f0dcc82e5d27b0c315f",
+    "postgres-diagnostic-results.json": "555f217a5d669f8749f211edcff7308fd867eefa6efa3bc40594a108899e32c3",
+    "postgres-harness-run.json": "1f82de083f4fc28cd687830bdeb14126ae2383f2168e40db4895675461433e57",
+    "results.json": "8e011c84e966bd384f9a096fbe2e0cce7e7570e709b74cc194ce19d3640bd0f0",
+    "spending.json": "d6a8487ebdfd5aa6f533acc4e5c1d0157f9483c9b1cf78feaa1c560d35221fdc",
+    "summary.json": "ece4f1aea099087f564a2387b6f146dcb2db0e997017e7479878c1bd08dc7aab"
+  }
+}

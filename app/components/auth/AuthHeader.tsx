@@ -4,7 +4,7 @@ import styles from "./AuthLayout.module.css";
 
 /**
  * AuthHeader: Top navigation bar for auth pages.
- * Displays brand mark '✦ sylf.' on the left and '✦ A CALMER PLACE TO STUDY' on the right.
+ * Displays the Sylf wordmark and a quiet invitation to its study world.
  */
 export function AuthHeader() {
   return (
@@ -30,7 +30,7 @@ export function AuthHeader() {
       </Link>
 
       {/* Right tagline */}
-      <div className={`${styles.tagline} hidden sm:flex`}>
+      <div className={styles.tagline}>
         <svg
           className={styles.taglineSparkle}
           width="12"
@@ -44,7 +44,7 @@ export function AuthHeader() {
             fill="currentColor"
           />
         </svg>
-        <span>A Calmer Place to Study</span>
+        <span>A calmer place to study</span>
       </div>
     </header>
   );

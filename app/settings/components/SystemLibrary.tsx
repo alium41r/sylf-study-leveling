@@ -32,7 +32,7 @@ export function SystemLibrary({
             <div>
               <p className={styles.eyebrow}>System Hub / The Sylf Library</p>
               <h1>
-                The System <em>{volume}</em>
+                Sylf <em>{volume}</em>
               </h1>
             </div>
           </div>

@@ -1,0 +1,36 @@
+{
+  "currency": "USD",
+  "checkedDate": "2026-10-10",
+  "cacheSavingsAssumed": false,
+  "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "ratesPerMillion": {
+    "peak": {
+      "input": 0.3,
+      "cachedInput": 0.006,
+      "output": 1.2
+    },
+    "offPeak": {
+      "input": 0.15,
+      "cachedInput": 0.003,
+      "output": 0.6
+    }
+  },
+  "totalInputReservationUnits": 77252,
+  "totalOutputCap": 131072,
+  "conservativePeakUncachedUpperBoundUsd": 0.180462,
+  "conservativeOffPeakUncachedUpperBoundUsd": 0.090231,
+  "illustrativeUsage": {
+    "assumption": "Per call: 3000 input and 8000 to 16000 combined completion tokens. Planning illustration, not a prediction.",
+    "fourCallOffPeakUsd": [
+      0.021,
+      0.0402
+    ],
+    "fourCallPeakUsd": [
+      0.042,
+      0.0804
+    ]
+  },
+  "requestedCeilingUsd": 0.2,
+  "stopOnMissingUsageOrRateUncertainty": true,
+  "invoiceVerified": false
+}

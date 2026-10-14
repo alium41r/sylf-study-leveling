@@ -1,0 +1,119 @@
+{
+  "status": "TARGETED_QUALIFICATION_FAILED",
+  "observations": [
+    {
+      "run": "targeted-live",
+      "externalAttempts": 7,
+      "settledCalls": 7,
+      "unknownSpendCalls": 0,
+      "knownInputTokens": 38361,
+      "knownOutputTokens": 8079,
+      "unknownReservedInputTokens": 0,
+      "unknownReservedOutputTokens": 0,
+      "unknownPricingReceipts": 7,
+      "truncatedResponses": 0,
+      "completeSTOPReplies": 7,
+      "providerErrors": [],
+      "fallbackDispatches": 1,
+      "repairCalls": 1,
+      "verificationCalls": 0,
+      "caseLatencyMs": {
+        "median": 17233,
+        "maximum": 21085
+      },
+      "upstreamLatencyMs": {
+        "median": 7558,
+        "maximum": 11138
+      },
+      "accepted": 1,
+      "total": 3
+    },
+    {
+      "run": "targeted-after",
+      "externalAttempts": 6,
+      "settledCalls": 6,
+      "unknownSpendCalls": 0,
+      "knownInputTokens": 31754,
+      "knownOutputTokens": 8051,
+      "unknownReservedInputTokens": 0,
+      "unknownReservedOutputTokens": 0,
+      "unknownPricingReceipts": 6,
+      "truncatedResponses": 0,
+      "completeSTOPReplies": 6,
+      "providerErrors": [],
+      "fallbackDispatches": 1,
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "caseLatencyMs": {
+        "median": 10039,
+        "maximum": 24922
+      },
+      "upstreamLatencyMs": {
+        "median": 6858.5,
+        "maximum": 14436
+      },
+      "accepted": 2,
+      "total": 3
+    },
+    {
+      "run": "targeted-contract",
+      "externalAttempts": 6,
+      "settledCalls": 4,
+      "unknownSpendCalls": 2,
+      "knownInputTokens": 23265,
+      "knownOutputTokens": 2963,
+      "unknownReservedInputTokens": 43604,
+      "unknownReservedOutputTokens": 16384,
+      "unknownPricingReceipts": 6,
+      "truncatedResponses": 0,
+      "completeSTOPReplies": 4,
+      "providerErrors": [
+        "network_error",
+        "network_error"
+      ],
+      "fallbackDispatches": 1,
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "caseLatencyMs": {
+        "median": 11129,
+        "maximum": 21329
+      },
+      "upstreamLatencyMs": {
+        "median": 7812,
+        "maximum": 10551
+      },
+      "accepted": 1,
+      "total": 3
+    },
+    {
+      "run": "targeted-importance",
+      "externalAttempts": 9,
+      "settledCalls": 9,
+      "unknownSpendCalls": 0,
+      "knownInputTokens": 49763,
+      "knownOutputTokens": 8130,
+      "unknownReservedInputTokens": 0,
+      "unknownReservedOutputTokens": 0,
+      "unknownPricingReceipts": 9,
+      "truncatedResponses": 0,
+      "completeSTOPReplies": 9,
+      "providerErrors": [],
+      "fallbackDispatches": 4,
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "caseLatencyMs": {
+        "median": 17436,
+        "maximum": 20283
+      },
+      "upstreamLatencyMs": {
+        "median": 6129,
+        "maximum": 11887
+      },
+      "accepted": 0,
+      "total": 3
+    }
+  ],
+  "fullUnchanged17CaseRun": "NOT_RUN_TARGETED_GATE_FAILED",
+  "naturalAcceptedRepairVerificationApplyWitness": false,
+  "permanentSettingRecommendation": "Do not promote disabled thinking to production on this evidence."
+}

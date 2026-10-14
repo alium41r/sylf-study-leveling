@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import CompanionReview from "../components/landing/companion/CompanionReview";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Sylf — Landing companion review",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 
 /** Review surface for the same canonical component used on the landing page. */
 export default function CompanionPrototype() {
-  return <CompanionReview />;
+  redirect('/locker?tab=identity&view=pixel-studio');
 }

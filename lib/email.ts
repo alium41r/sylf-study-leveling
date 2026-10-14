@@ -26,7 +26,7 @@ export async function sendVerificationEmail({
   const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
   const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
   const smtpPort = Number(process.env.SMTP_PORT) || 465;
-  const fromEmail = process.env.EMAIL_FROM || (smtpUser ? `"The System" <${smtpUser}>` : "The System <onboarding@resend.dev>");
+  const fromEmail = process.env.EMAIL_FROM || (smtpUser ? `"Sylf" <${smtpUser}>` : "Sylf <onboarding@resend.dev>");
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -49,7 +49,7 @@ export async function sendVerificationEmail({
       <body>
         <div class="card">
           <div class="header">
-            <div class="tag">THE SYSTEM • SECURITY PROTOCOL</div>
+            <div class="tag">SYLF • SECURITY PROTOCOL</div>
             <h1 class="title">Verify Scholar Identity</h1>
           </div>
           <p class="body-text">
@@ -64,7 +64,7 @@ export async function sendVerificationEmail({
           </p>
           <div class="code-box">${verificationUrl}</div>
           <div class="footer">
-            THE SYSTEM • Solo Leveling Study Platform<br/>
+            SYLF • Solo Leveling Study Platform<br/>
             If you did not initiate this request, you may safely ignore this message.
           </div>
         </div>
@@ -88,8 +88,8 @@ export async function sendVerificationEmail({
       await transporter.sendMail({
         from: fromEmail,
         to,
-        subject: "Verify Your Scholar Account - The System",
-        text: `Greetings ${recipientName},\n\nPlease verify your scholar account by visiting this link:\n${verificationUrl}\n\nThe System`,
+        subject: "Verify Your Scholar Account - Sylf",
+        text: `Greetings ${recipientName},\n\nPlease verify your scholar account by visiting this link:\n${verificationUrl}\n\nSylf`,
         html: htmlContent,
       });
 
@@ -113,7 +113,7 @@ export async function sendVerificationEmail({
         body: JSON.stringify({
           from: fromEmail,
           to: [to],
-          subject: "Verify Your Scholar Account • The System",
+          subject: "Verify Your Scholar Account • Sylf",
           html: htmlContent,
         }),
       });
@@ -134,7 +134,7 @@ export async function sendVerificationEmail({
 
   // 3. Development / Console Fallback (No SMTP or API key configured)
   console.log("\n=======================================================");
-  console.log("📨 [EMAIL DISPATCH - THE SYSTEM]");
+  console.log("📨 [EMAIL DISPATCH - SYLF]");
   console.log(`Recipient: ${to}`);
   console.log(`Verification URL: ${verificationUrl}`);
   console.log("To send real emails to inboxes, add SMTP_USER & SMTP_PASS (Gmail) or RESEND_API_KEY to your .env file.");
@@ -164,15 +164,15 @@ export async function sendSecurityOtpEmail({
     : "A request has been initialized to reset your Hunter level, rank, and study progression back to Level 1.";
 
   const subject = isDelete
-    ? "Account Deletion Security Code - The System"
-    : "Reset Progress Security Code - The System";
+    ? "Account Deletion Security Code - Sylf"
+    : "Reset Progress Security Code - Sylf";
 
   const resendApiKey = process.env.RESEND_API_KEY;
   const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
   const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
   const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
   const smtpPort = Number(process.env.SMTP_PORT) || 465;
-  const fromEmail = process.env.EMAIL_FROM || (smtpUser ? `"The System Security" <${smtpUser}>` : "The System Security <onboarding@resend.dev>");
+  const fromEmail = process.env.EMAIL_FROM || (smtpUser ? `"Sylf Security" <${smtpUser}>` : "Sylf Security <onboarding@resend.dev>");
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -195,7 +195,7 @@ export async function sendSecurityOtpEmail({
       <body>
         <div class="card">
           <div class="header">
-            <div class="tag">THE SYSTEM • DANGER ZONE PROTOCOL</div>
+            <div class="tag">SYLF • DANGER ZONE PROTOCOL</div>
             <h1 class="title">${actionTitle}</h1>
           </div>
           <p class="body-text">
@@ -207,7 +207,7 @@ export async function sendSecurityOtpEmail({
             <div class="expiry">Expires in 10 minutes. Do not share this code with anyone.</div>
           </div>
           <div class="footer">
-            THE SYSTEM • Solo Leveling Study Platform<br/>
+            SYLF • Solo Leveling Study Platform<br/>
             If you did not initiate this action, please secure your account immediately.
           </div>
         </div>
@@ -229,7 +229,7 @@ export async function sendSecurityOtpEmail({
         from: fromEmail,
         to,
         subject,
-        text: `Greetings ${recipientName},\n\n${actionDesc}\n\nYour Verification Code: ${code}\n\nThis code will expire in 10 minutes.\n\nThe System`,
+        text: `Greetings ${recipientName},\n\n${actionDesc}\n\nYour Verification Code: ${code}\n\nThis code will expire in 10 minutes.\n\nSylf`,
         html: htmlContent,
       });
 

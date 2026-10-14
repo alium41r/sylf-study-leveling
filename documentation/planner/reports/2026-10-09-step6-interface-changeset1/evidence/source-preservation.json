@@ -1,0 +1,56 @@
+{
+  "status": "PASSED",
+  "startingFileCount": 4915,
+  "preExistingFilesChanged": [
+    {
+      "file": "__tests__/planner-v2/intelligence/blueprint.test.ts",
+      "before": "e173adc66f85f6e48daf116cf4ba08e2f804b3c977540fd7e6596a540d288100",
+      "after": "0e60aaae41528250fafb0369308f2311016c2edd782e684785c94e34056913d8"
+    },
+    {
+      "file": "__tests__/planner-v2/postgres/compiler-process-fixture.cjs",
+      "before": "31cb65ba74be577e1a91f7f0252835d9f88399738941c39527b70f2176a384b9",
+      "after": "6f448b9c859c086572f385bdddd1777d384ef93aa66fed3b1218c3ed0d013a66"
+    },
+    {
+      "file": "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+      "before": "f1e6b83309434522d79dde839a086d4a79a1522ec8bfa1ddfbc63e03ff585e3c",
+      "after": "02364310f5849d412b6fb763f3cb1492b472878361ee039f2672ad26eceaf16b"
+    },
+    {
+      "file": "__tests__/planner-v2/postgres/generation-integration.postgres.ts",
+      "before": "3852240d1e4f4d2e225a72ba06149c45281a7eafdc91f3cbc0a0c554954a7df8",
+      "after": "79f21cbffc3292baece5d734277c558403a27de5cdca73e85f0e89940f4a555b"
+    },
+    {
+      "file": "__tests__/planner-v2/postgres/learning-allocation.postgres.ts",
+      "before": "6d1d84b9d55851cecae8f10f18434c845444772e323f4a37b764c8beabbe46e1",
+      "after": "919a4c83cc9219e97625d1794679a52aac61c35a643a28111590110923423355"
+    },
+    {
+      "file": "__tests__/planner-v2/postgres/learning-process-fixture.cjs",
+      "before": "1cd8b0de26a240d558726059de564d2aaabed79601f71efabb401df4afa362bb",
+      "after": "50338863baf132698ef0ca98622ab18c881350f3ecf56af285feb3942d087169"
+    },
+    {
+      "file": "dist/planner-worker/planner/v2/intelligence/blueprint.js",
+      "before": "8487d32090d1507d484de583a05162f20bcb847776348d1885d57906ad329f1a",
+      "after": "9f3719452cc4cfecbbac9ef556f5491dac79bda3a68dc5a34059c8e6619e36c9"
+    },
+    {
+      "file": "documentation/planner/README.md",
+      "before": "0f87c276c4f5e4663f0ca2937942e4542d89172d45b3dc8d7dab5d653099105e",
+      "after": "f5f4fe2790749a4598542eea5ad3fded4f37e2cefa1d22819d4205ec43784e9f"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/blueprint.ts",
+      "before": "ae866c2087139b4ae5b711f5eb805027b93627fcbee38c3249be98a98705b38a",
+      "after": "79817737c9f5469561da6ee6187a500bcfd9b5d6bb77c6d7a6a60d9979a12762"
+    }
+  ],
+  "unclassifiedChanges": [],
+  "frozenContractFilesIdenticalToPhase0": 12,
+  "existingExecutionServerSchemaAndApiFilesUnchanged": 217,
+  "preservedHistoricalEvidence": true,
+  "method": "Compare every pre-existing tracked/nonignored file to the working-tree baseline, including all dirty/concurrent changes; no files reverted."
+}

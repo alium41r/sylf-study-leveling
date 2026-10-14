@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-10-10T17:23:56.967Z",
+  "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "retrievedOfficialPage": "https://api-docs.deepseek.com/quick_start/pricing/?push_animated=1&theme=light&webview_progress_bar=1",
+  "crawled": "today",
+  "model": "deepseek-flash",
+  "modelVersion": "DeepSeek-V4.1-Flash",
+  "peakUsdPerMillion": {
+    "input": 0.3,
+    "cachedInput": 0.006,
+    "output": 1.2
+  },
+  "offPeakUsdPerMillion": {
+    "input": 0.15,
+    "cachedInput": 0.003,
+    "output": 0.6
+  },
+  "admissionUsesPeakUncached": true,
+  "externalModelCalls": 0
+}

@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { OwnCompanionPreview } from "@/app/components/companion/OwnCompanionPreview";
+
 
 import { lazy, Suspense, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -25,8 +27,6 @@ import {
   SystemWarningIcon,
   SystemBriefingIcon,
 } from "./DashboardIcons";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
-import { getDefaultCharacterConfig } from "@/lib/character-traits";
 import { useDashboardData } from "@/app/hooks/useDashboardData";
 import { DesignLabBar } from "./DesignLabBar";
 import styles from "../styles/DashboardDesign.module.css";
@@ -202,38 +202,23 @@ export function DashboardDesignScreen() {
           <section className={styles.characterRow} aria-label="Scholar Identity and Progression">
             {/* Compact Standalone Character Card */}
             <div
-              onClick={() => router.push("/locker?tab=identity")}
               className={styles.characterCard}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  router.push("/locker?tab=identity");
-                }
-              }}
-              title="Enter Character Studio in Locker"
+              title="Enter Companion Customizer in Locker"
             >
               <div className={styles.avatarFrame}>
-                <CharacterRenderer
-                  config={characterCfg || getDefaultCharacterConfig(user.username || "scholar")}
-                  seed={user.username || "scholar"}
-                  size={110}
-                  showPedestal={true}
-                  showAura={true}
-                />
+                <OwnCompanionPreview config={characterCfg} size={110} label="Dashboard design companion" />
               </div>
 
               <div className={styles.avatarInfo}>
                 <div className={styles.avatarHeader}>
                   <span className={styles.avatarTag}>
                     <span className={styles.avatarTagDot} />
-                    Character
+                    Pixel Companion
                   </span>
                   <Link
-                    href="/locker?tab=identity"
+                    href="/locker?tab=identity&view=customizer"
                     className={styles.quietCustomizeLink}
-                    title="Customize Traits in Locker"
-                    onClick={(e) => e.stopPropagation()}
+                    title="Customize your Pixel companion"
                   >
                     <span>Customize</span>
                     <ArrowUpRight size={10} />
@@ -754,4 +739,3 @@ export function DashboardDesignScreen() {
 }
 
 export default DashboardDesignScreen;
-

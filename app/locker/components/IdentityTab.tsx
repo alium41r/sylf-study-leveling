@@ -8,18 +8,33 @@ import {
   getDefaultCharacterConfig,
 } from "@/lib/character-traits";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
+import { apiFetch } from "@/lib/api-transport";
 import { Check, X } from "lucide-react";
 import { StudioHubView } from "./identity/StudioHubView";
-import { CharacterStudioView } from "./identity/CharacterStudioView";
+import { PixelCustomizer } from "./identity/PixelCustomizer";
+import { PixelStudio } from "./studio/PixelStudio";
+import { drawsTheSameCompanion } from "./identity/pixel-customizer-options";
 import { ProfileStudioView } from "./identity/ProfileStudioView";
 
-export type IdentityViewMode = "hub" | "character-studio" | "profile-studio";
+export type IdentityViewMode =
+  | "hub"
+  | "pixel-customizer"
+  | "pixel-studio"
+  | "profile-studio";
 
 export function IdentityTab() {
   const { user, mutateUser } = useAuth();
   const { openProfile } = useProfileModal();
 
-  const [viewMode, setViewMode] = useState<IdentityViewMode>("hub");
+  const params = useSearchParams();
+  const router = useRouter();
+  const requestedView = params.get("view");
+  const viewMode: IdentityViewMode = requestedView === "pixel-studio" || requestedView === "profile-studio" ? requestedView : requestedView === "customizer" || requestedView === "pixel-customizer" || requestedView === "character-studio" ? "pixel-customizer" : "hub";
+  const creationId = params.get("creation");
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const location = (view: IdentityViewMode, id?: string) => `/locker?tab=identity${view === "hub" ? "" : `&view=${view}`}${id ? `&creation=${encodeURIComponent(id)}` : ""}`;
+  const navigate = (view: IdentityViewMode, id?: string) => router.push(location(view, id), { scroll: false });
 
   // ─── Draft States (Persisted across sub-view navigation) ─────
   const [characterConfig, setCharacterConfig] = useState<CharacterConfig>(() => {
@@ -47,8 +62,6 @@ export function IdentityTab() {
     instagram?: string | null;
   }>({});
 
-  const [stats, setStats] = useState<any>(null);
-  const [initialLoad, setInitialLoad] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveToast, setSaveToast] = useState(false);
 
@@ -56,7 +69,7 @@ export function IdentityTab() {
   useEffect(() => {
     if (!user) return;
 
-    fetch("/api/cosmetics")
+    apiFetch("/api/cosmetics")
       .then(async (res) => (res.ok ? res.json().catch(() => null) : null))
       .then((data) => {
         if (!data) return;
@@ -66,7 +79,7 @@ export function IdentityTab() {
       })
       .catch(console.error);
 
-    fetch("/api/user/connections")
+    apiFetch("/api/user/connections")
       .then(async (res) => (res.ok ? res.json().catch(() => null) : null))
       .then((data) => {
         if (!data?.connections) return;
@@ -83,14 +96,17 @@ export function IdentityTab() {
       })
       .catch(console.error);
 
-    fetch("/api/profile/stats")
-      .then(async (res) => (res.ok ? res.json().catch(() => null) : null))
-      .then((data) => {
-        if (data?.stats) setStats(data);
-      })
-      .catch(console.error)
-      .finally(() => setInitialLoad(false));
   }, [user?.id]);
+
+  useEffect(() => {
+    const next = user?.characterConfig;
+    if (!next || JSON.stringify(next) === JSON.stringify(savedConfig)) return;
+    // Synchronize external equip/delete/stat refreshes without destroying a draft.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSavedConfig(next);
+    if (drawsTheSameCompanion(characterConfig, savedConfig)) setCharacterConfig(next);
+    else setSaveError('Your equipped companion changed elsewhere. Your unapplied choices are retained; Reset uses the latest saved companion.');
+  }, [user?.characterConfig, savedConfig, characterConfig]);
 
   useEffect(() => {
     if (user) {
@@ -102,9 +118,9 @@ export function IdentityTab() {
       if (user.avatarUrl !== undefined) setAvatarUrl(user.avatarUrl || "");
       if (user.bio !== undefined) setBio(user.bio || "");
     }
-  }, [user]);
+  }, [user?.id]);
 
-  if (!user || initialLoad) {
+  if (!user) {
     return (
       <div className="p-12 text-center text-text-muted font-['Rajdhani'] animate-pulse">
         Accessing Scholar Identity Hub...
@@ -113,7 +129,7 @@ export function IdentityTab() {
   }
 
   const hasUnsavedChanges =
-    JSON.stringify(characterConfig) !== JSON.stringify(savedConfig) ||
+    !drawsTheSameCompanion(characterConfig, savedConfig) ||
     bannerUrl !== (user.bannerUrl || "") ||
     avatarUrl !== (user.avatarUrl || "") ||
     bio !== (user.bio || "");
@@ -121,9 +137,10 @@ export function IdentityTab() {
   const handleSaveAll = async () => {
     if (saving) return;
     setSaving(true);
+    setSaveError(null);
 
     try {
-      const res = await fetch("/api/profile/customization", {
+      const res = await apiFetch("/api/profile/customization", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -147,16 +164,28 @@ export function IdentityTab() {
         mutateUser(data.user);
         setSaveToast(true);
         setTimeout(() => setSaveToast(false), 3000);
+      } else {
+        const failure = await res.json();
+        setSaveError(failure.error ?? "Could not save identity changes.");
       }
     } catch (err) {
+      setSaveError("Could not save identity changes. Please retry.");
       console.error("Failed to save identity modifications:", err);
     } finally {
       setSaving(false);
     }
   };
 
+  const applyCompanion = async (next: CharacterConfig) => {
+    const response = await apiFetch("/api/profile/customization", { method: "PATCH", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ characterConfig: next }) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error ?? "Could not apply companion changes.");
+    setCharacterConfig(next); setSavedConfig(next); mutateUser(result.user);
+  };
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className={viewMode === "pixel-studio" ? "flex flex-col h-full min-h-0" : "flex flex-col gap-6"}>
+      {saveError && <p role="alert">{saveError}</p>}
       {/* ─── Save Success Toast Banner ─────────────────────────── */}
       <AnimatePresence>
         {saveToast && (
@@ -168,7 +197,7 @@ export function IdentityTab() {
           >
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-400" />
-              <span>Identity configuration, sprite traits, and profile details saved successfully!</span>
+              <span>Identity changes saved successfully!</span>
             </div>
             <button
               type="button"
@@ -193,13 +222,13 @@ export function IdentityTab() {
           >
             <StudioHubView
               user={user}
-              characterConfig={characterConfig}
+              characterConfig={savedConfig}
               bannerUrl={bannerUrl}
               avatarUrl={avatarUrl}
               bio={bio}
               connectedAccounts={connectedAccounts}
               activeCosmetics={activeCosmetics}
-              onNavigate={(view) => setViewMode(view)}
+              onNavigate={navigate}
               onPreviewProfile={() => openProfile(user.username)}
               hasUnsavedChanges={hasUnsavedChanges}
               onSaveAll={handleSaveAll}
@@ -208,26 +237,54 @@ export function IdentityTab() {
           </motion.div>
         )}
 
-        {viewMode === "character-studio" && (
+        {/*
+          The Pixel Display customizer.
+
+          It shares this tab's draft, save, reset and toast — there is one
+          persistence path and one ownership rule for the whole identity section,
+          and this view is another way to edit the same draft.
+        */}
+        {viewMode === "pixel-customizer" && (
           <motion.div
-            key="character-studio"
+            key="pixel-customizer"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
           >
-            <CharacterStudioView
-              user={user}
+            <PixelCustomizer
               characterConfig={characterConfig}
-              setCharacterConfig={setCharacterConfig}
               savedConfig={savedConfig}
-              activeCosmetics={activeCosmetics}
-              setActiveCosmetics={setActiveCosmetics}
-              stats={stats}
-              onBackToHub={() => setViewMode("hub")}
-              onPreviewProfile={() => openProfile(user.username)}
-              onSaveCharacter={handleSaveAll}
+              user={user}
+              onChange={(patch) =>
+                setCharacterConfig((prev) => ({ ...prev, ...patch }))
+              }
+              onReset={() => setCharacterConfig(savedConfig)}
+              onSave={async () => { setSaving(true); try { await applyCompanion(characterConfig); } finally { setSaving(false); } }}
+              onEdit={(id) => navigate("pixel-studio", id)}
               saving={saving}
+              onBack={() => navigate("hub")}
+            />
+          </motion.div>
+        )}
+
+        {/* Studio saves artwork and can equip it through the same config owner. */}
+        {viewMode === "pixel-studio" && (
+          <motion.div
+            key="pixel-studio"
+            className="h-full min-h-0"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <PixelStudio
+              characterConfig={savedConfig}
+              onEquip={async (patch) => applyCompanion({ ...savedConfig, ...patch })}
+              creationId={creationId}
+              onSaved={(id) => router.replace(location("pixel-studio", id), { scroll: false })}
+              saving={saving}
+              onBack={() => navigate("hub")}
             />
           </motion.div>
         )}
@@ -250,7 +307,7 @@ export function IdentityTab() {
               setBio={setBio}
               connectedAccounts={connectedAccounts}
               activeCosmetics={activeCosmetics}
-              onBackToHub={() => setViewMode("hub")}
+              onBackToHub={() => navigate("hub")}
               onPreviewProfile={() => openProfile(user.username)}
               onSaveProfile={handleSaveAll}
               saving={saving}

@@ -1,0 +1,13 @@
+# Floating companion and quick chat
+
+The authenticated app reuses the canonical SVG [Companion](../../app/components/landing/companion/Companion.tsx) as the [SystemFab](../../app/components/system/SystemFab.tsx) quick-chat launcher. It is separate from scholars' equipped Pixel artwork.
+
+[SystemAIProvider](../../app/components/system/SystemAIProvider.tsx) owns its visibility alongside the existing quick assistant state. [Sidebar](../../app/components/Sidebar.tsx) offers **Show companion / Hide companion** in both the desktop rail and mobile drawer. Showing it is the default. A per-account browser preference (`sylf:companion-visible:<userId>`) persists the choice on that device and synchronizes between tabs. Blocked storage falls back to the current visit's state. Account changes load the appropriate preference; logout removes the authenticated launcher.
+
+The companion appears wherever [page presence](../../app/components/system/page-presence.ts) enables contextual quick AI: Dashboard, Calendar and Goals/Quests. Its 88px target stays unobtrusive; hover or keyboard focus enlarges the artwork 1.45 times and selects the renderer's happy greeting presentation. Pointer exit or blur returns it to idle. Reduced-motion preferences remove animated transitions and ambient movement. Clicking opens the existing assistant, and the companion returns when the conversation closes.
+
+[SystemOverlay](../../app/components/system/SystemOverlay.tsx) presents a compact floating conversation on one glass surface. Assistant replies have no individual containers; user prompts use a subtle accent tint. The panel adapts to content and scrolls longer conversations. Its 96% semantic surface opacity and backdrop blur protect text from the underlying page, including custom backgrounds with a different polarity from the selected mode. Surface, foreground and filled-button contrast tokens come from Sylf's existing appearance system.
+
+The header exposes close, workspace continuation and a small options menu for new conversations and the contextual Planner. Suggestions, sending, progressive replies, Stop, copy, errors, quota feedback and session continuation retain the existing API flow. Enter sends; Shift+Enter inserts a line break; input composition does not submit prematurely. The dialog contains keyboard focus, locks background scrolling through the shared lock owner, and returns focus to the companion on close. Escape closes an open options menu before dismissing the conversation.
+
+Web and mobile share these components through `GlobalSystemWrapper`; no additional companion store, renderer, AI backend or appearance system is introduced.

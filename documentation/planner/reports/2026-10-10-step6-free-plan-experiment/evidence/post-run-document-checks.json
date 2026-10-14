@@ -1,0 +1,30 @@
+{
+  "recordedAt": "2026-10-10T17:31:40.357663+00:00",
+  "scope": "Read-only hashes, saved journal consistency and documentation reference checks; no network probes or provider/test execution",
+  "freezeChecks": {
+    "local": {
+      "count": 26,
+      "status": "MATCH"
+    },
+    "external": {
+      "count": 7,
+      "status": "MATCH"
+    },
+    "source": {
+      "count": 207,
+      "status": "MATCH"
+    }
+  },
+  "approvalFreezeMatches": true,
+  "independentReportHashMatches": true,
+  "reportLocalLinks": "PASS",
+  "whitespace": "PASS",
+  "journalPreserved": true,
+  "attemptedWires": 1,
+  "completeProviderResponses": 0,
+  "unknownSpendRetained": true,
+  "reportSha256": "c63e90571292e2e3eaf6e2f4b5cf6858a7fd6e6c73b40bb6434f7c13764fb46d",
+  "adjudicationSha256": "6b8c5b3dd29663690a3c5ba4d8812ccf0e95138c766f3521ba6f0f05226df92f",
+  "networkCalls": 0,
+  "modelCalls": 0
+}

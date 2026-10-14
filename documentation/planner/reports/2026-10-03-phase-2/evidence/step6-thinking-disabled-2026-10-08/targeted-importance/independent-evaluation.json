@@ -1,0 +1,64 @@
+{
+  "assessedAt": "2026-10-08T18:36:36.475Z",
+  "method": "Manual independent inspection of actual raw outputs, final checkpoint, findings, declared expectations, workload arithmetic and canonical apply receipts; no model self-approval/apply shortcut.",
+  "status": "FAILED",
+  "accepted": 0,
+  "total": 3,
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "accepted": false,
+      "reasons": [
+        "One30-minute task has correct supplied values, changed-circuit answer and voltage-sum check; canonical apply succeeds. But strategy.stoppingConditions says to stop immediately if the changed circuit is solved correctly without any explanation step, contradicting the explicit solve-and-explain goal. The model review misses that contradiction."
+      ],
+      "limits": [
+        "The initial reviewer also invents an external-key requirement and uses invalid literal grounds. Existing strict grounding rejection triggers only the configured fallback, not a quality repair."
+      ]
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "accepted": false,
+      "reasons": [
+        "Final output books50minutes for the same goal/evidence versus30for its paired control; both are one integrated explanation/worked/changed task and no distinct accepted contribution explains20extra committed minutes. A supposed worked example supplies actions but no solution before asking the learner to compare. Model review fallback returns empty issues; no repair occurs."
+      ],
+      "limits": [
+        "The voltage-sum check can be meaningful; the first reviewer warning overstates that every self-check is invalid. The primary blueprint and primary review are structurally rejected, not educationally repaired."
+      ]
+    },
+    {
+      "id": "triage",
+      "accepted": false,
+      "reasons": [
+        "Primary and configured fallback return STOP but malformed JSON nesting. Strict validation rejects both; no reviewed education/candidate/apply exists. The primary also adds an undeclared null note and unsupported relative-return language; fallback presupposes source/notes content it does not supply."
+      ],
+      "limits": []
+    }
+  ],
+  "metrics": {
+    "externalAttempts": 9,
+    "settledCalls": 9,
+    "unknownSpendCalls": 0,
+    "knownInputTokens": 49763,
+    "knownOutputTokens": 8130,
+    "unknownReservedInputTokens": 0,
+    "unknownReservedOutputTokens": 0,
+    "unknownPricingReceipts": 9,
+    "truncatedResponses": 0,
+    "completeSTOPReplies": 9,
+    "providerErrors": [],
+    "fallbackDispatches": 4,
+    "repairCalls": 0,
+    "verificationCalls": 0,
+    "caseLatencyMs": {
+      "median": 17436,
+      "maximum": 20283
+    },
+    "upstreamLatencyMs": {
+      "median": 6129,
+      "maximum": 11887
+    }
+  },
+  "naturalAcceptedRepairVerificationApplyWitness": false,
+  "productionConfigurationChanged": false
+}

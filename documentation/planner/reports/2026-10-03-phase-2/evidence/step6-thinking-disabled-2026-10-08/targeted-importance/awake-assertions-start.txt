@@ -1,0 +1,38 @@
+2026-10-08 23:29:56 +0500 
+Assertion status system-wide:
+   BackgroundTask                 0
+   PreventDiskIdle                1
+   ApplePushServiceTask           0
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    1
+   SoftwareUpdateTask             0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   InternalPreventDisplaySleep    1
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 75074(Google Chrome): [0x000da75500059577] 00:46:41 NoDisplaySleepAssertion named: "Blink Wake Lock"  
+   pid 77982(caffeinate): [0x000db2460001963a] 00:00:01 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77982(caffeinate): [0x000db2460005963b] 00:00:01 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77982(caffeinate): [0x000db2460007963c] 00:00:01 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77982(caffeinate): [0x000db2460009963d] 00:00:01 UserIsActive named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 4 secs Action=TimeoutActionRelease
+   pid 77982(caffeinate): [0x000db246000f963e] 00:00:01 PreventDiskIdle named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77981)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 4 secs Action=TimeoutActionRelease
+   pid 344(powerd): [0x000da5aa0001953a] 00:53:49 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 344(powerd): [0x000db1c000108336] 00:00:53 InternalPreventDisplaySleep named: "com.apple.powermanagement.delayDisplayOff"  
+	Timeout will fire in 66 secs Action=TimeoutActionTurnOff
+   pid 403(WindowServer): [0x000db1bf00099623] 00:01:44 UserIsActive named: "com.apple.iohideventsystem.queue.tickle serviceID:1000c384b service:AppleMultitouchDevice product:Apple Internal Keyboard / Trackpad eventType:11"  
+	Timeout will fire in 15 secs Action=TimeoutActionRelease
+No kernel assertions.

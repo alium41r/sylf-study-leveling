@@ -1,0 +1,70 @@
+{
+  "status": "PASSED",
+  "measuredAt": "2026-10-08T16:24:39.948656+00:00",
+  "checks": [
+    {
+      "arguments": [
+        "--live-high-reasoning"
+      ],
+      "status": "REJECTED_BEFORE_DATABASE_OR_PROVIDER",
+      "exitCode": 1,
+      "reason": "High-reasoning trial requires exclusive non-Gemini DeepSeek qualification"
+    },
+    {
+      "arguments": [
+        "--live-qualification",
+        "--live-high-reasoning"
+      ],
+      "status": "REJECTED_BEFORE_DATABASE_OR_PROVIDER",
+      "exitCode": 1,
+      "reason": "High-reasoning trial requires exclusive non-Gemini DeepSeek qualification"
+    },
+    {
+      "arguments": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-high-reasoning",
+        "--live-low-reasoning"
+      ],
+      "status": "REJECTED_BEFORE_DATABASE_OR_PROVIDER",
+      "exitCode": 1,
+      "reason": "High-reasoning trial requires exclusive non-Gemini DeepSeek qualification"
+    },
+    {
+      "arguments": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-high-reasoning",
+        "--live-existing-groq"
+      ],
+      "status": "REJECTED_BEFORE_DATABASE_OR_PROVIDER",
+      "exitCode": 1,
+      "reason": "High-reasoning trial requires exclusive non-Gemini DeepSeek qualification"
+    },
+    {
+      "arguments": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-high-reasoning",
+        "--live-temperature",
+        "0.7"
+      ],
+      "status": "REJECTED_BEFORE_DATABASE_OR_PROVIDER",
+      "exitCode": 1,
+      "reason": "Only explicit recorded non-thinking qualification sampling trials are permitted"
+    },
+    {
+      "arguments": [
+        "--live-qualification",
+        "--live-non-gemini",
+        "--live-high-reasoning",
+        "--live-review-low-reasoning",
+        "--live-temperature",
+        "0.7"
+      ],
+      "status": "REJECTED_BEFORE_DATABASE_OR_PROVIDER",
+      "exitCode": 1,
+      "reason": "Only explicit recorded non-thinking qualification sampling trials are permitted"
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+ M __tests__/ai/deepseek-reasoning-controls.test.ts
+ M __tests__/focus/focus-party-background-unification.test.tsx
+ M __tests__/focus/focus-party-dedicated-room.test.tsx
+ M __tests__/focus/focus-party-frontend.test.tsx
+ M __tests__/landing/journey-motion.test.tsx
+ M __tests__/landing/pixel-companion-layering.test.tsx
+ M __tests__/landing/pixel-companion-prototype.test.tsx
+ M __tests__/landing/svg-reaction-sequence.test.tsx
+ M __tests__/planner-v2/intelligence/allocator.test.ts
+ M __tests__/planner-v2/intelligence/blueprint.test.ts
+ M __tests__/planner-v2/intelligence/provider.test.ts
+ M __tests__/planner-v2/intelligence/quality.test.ts
+ M __tests__/planner-v2/intelligence/research-verification.test.ts
+ M __tests__/planner-v2/postgres/assistant-research.postgres.ts
+ M __tests__/planner-v2/postgres/compiler-qualification.live.ts
+ M __tests__/planner-v2/postgres/learning-allocation.postgres.ts
+ M app/api/friends/requests/route.ts
+ M app/api/friends/route.ts
+ M app/api/profile/customization/route.ts
+ M app/api/user/stats/route.ts
+ M app/companion-prototype/page.tsx
+ M app/components/AuthProvider.tsx
+ M app/components/FriendRequestsModal.tsx
+ M app/components/LevelUpProvider.tsx
+ M app/components/PublicProfileModal.tsx
+ D app/components/character/CharacterRenderer.tsx
+ M app/components/landing/companion/Companion.tsx
+ M app/components/landing/companion/CompanionReview.tsx
+ D app/components/landing/companion/PixelCompanion.module.css
+ D app/components/landing/companion/PixelCompanion.tsx
+ D app/components/landing/companion/pixel-preview.ts
+ M app/components/landing/journey/JourneyPath.tsx
+ M app/dashboard-design/components/DashboardDesignScreen.tsx
+ M app/dashboard/Dashboard.module.css
+ M app/dashboard/components/DashboardScreen.tsx
+ M app/locker/Locker.module.css
+ M app/locker/components/IdentityTab.tsx
+ M app/locker/components/ItemsTab.tsx
+ M app/locker/components/LockerScreen.tsx
+ D app/locker/components/identity/CharacterStudioView.tsx
+ M app/locker/components/identity/StudioHubView.tsx
+ M app/settings/appearance/components/AppearanceSettingsScreen.tsx
+ M app/settings/collection/components/CollectionSettingsScreen.tsx
+ M app/shop/components/ShopScreen.tsx
+ M app/social/components/SocialScreen.tsx
+ M app/social/components/focus-party/FocusPartyInviteModal.tsx
+ M app/social/components/focus-party/FocusPartyLobby.tsx
+ M app/social/components/focus-party/FocusPartyMemberStage.tsx
+ M app/social/components/focus-party/FocusPartyRoom.tsx
+ M dist/planner-worker/planner/v2/intelligence/allocator.js
+ M dist/planner-worker/planner/v2/intelligence/blueprint.js
+ M dist/planner-worker/planner/v2/intelligence/context.js
+ M dist/planner-worker/planner/v2/intelligence/provider.js
+ M dist/planner-worker/planner/v2/intelligence/quality.js
+ M dist/planner-worker/planner/v2/intelligence/research-cache.js
+ M dist/planner-worker/planner/v2/server/learning.js
+ M dist/planner-worker/planner/v2/server/research.js
+ M documentation/README.md
+ M documentation/landing-companion/README.md
+ M documentation/performance/phase-0/artifacts/render-diagnostics.json
+ M documentation/pixel-companion/README.md
+ M documentation/planner/reports/2026-10-03-phase-2/COMPLETION.md
+ M documentation/planner/reports/2026-10-03-phase-2/LIVE_QUALIFICATION.md
+ M documentation/planner/reports/2026-10-03-phase-2/README.md
+ M documentation/planner/reports/2026-10-03-phase-2/REQUIREMENTS.json
+ M documentation/planner/reports/2026-10-03-phase-2/STEP_6.md
+ M documentation/planner/reports/2026-10-03-phase-2/STEP_6_CONTINUATION.md
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-build.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-build.log
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-full-typecheck.log
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-gate.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-lint-baseline.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-evaluation.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-observations.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-maximum-postgres.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-postgres/postgres-harness-run.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-postgres/postgres-phase1-command-error.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-postgres/postgres-phase1-results.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-postgres/step6-source-pins.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-source-preservation.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-units.json
+ M documentation/planner/reports/2026-10-03-phase-2/evidence/step6-units.log
+ M documentation/planner/reports/2026-10-07-timer-settlement/README.md
+ M lib/archive-catalog.ts
+ M lib/asset-manifest.ts
+ M lib/character-traits.ts
+ M lib/client-data-cache.ts
+ M lib/focus-party-service.ts
+ M lib/focus-party-types.ts
+ M lib/planner/v2/intelligence/allocator.ts
+ M lib/planner/v2/intelligence/blueprint.ts
+ M lib/planner/v2/intelligence/context.ts
+ M lib/planner/v2/intelligence/provider.ts
+ M lib/planner/v2/intelligence/quality.ts
+ M lib/planner/v2/intelligence/research-cache.ts
+ M lib/planner/v2/server/learning.ts
+ M lib/planner/v2/server/research.ts
+ M lib/prisma.ts
+ M lib/profile-service.ts
+ M lib/system-collection.ts
+ M mobile/dist/.mock-manifest.json
+ D mobile/dist/assets/AccountSettingsScreen-BWzK9p_7.js
+ D mobile/dist/assets/AchievementsSettingsScreen-BAUH8GGj.js
+ D mobile/dist/assets/AppearanceSettingsScreen-Ko92ZCLW.js
+ D mobile/dist/assets/ArchiveSettingsScreen-j0Qg3tK9.js
+ D mobile/dist/assets/BackToSettings-DcWYvsOt.js
+ D mobile/dist/assets/BackgroundsSettingsScreen-BaKe49px.js
+ D mobile/dist/assets/BadgesRedirectController-OFSPHpMQ.js
+ D mobile/dist/assets/CalendarScreen-U8SLnvO_.js
+ D mobile/dist/assets/CalendarSettingsScreen-DTVDulNg.js
+ D mobile/dist/assets/CollectionSettingsScreen-C3d92TRy.js
+ D mobile/dist/assets/CustomAudioTab-BXu1mbro.js
+ D mobile/dist/assets/CustomAudioTab-VJEWvgsz.css
+ D mobile/dist/assets/DashboardScreen-6QQCEjFC.js
+ D mobile/dist/assets/DashboardScreen-r8XZl4Kr.css
+ D mobile/dist/assets/FantasyTimerLayout-uH2PLLjY.js
+ D mobile/dist/assets/FocusBackgroundPicker-BKDuaGtK.js
+ D mobile/dist/assets/FocusBackgroundsSettingsScreen-CZAiHa6f.js
+ D mobile/dist/assets/FocusScreen-CJa4n_9Q.js
+ D mobile/dist/assets/FocusTimerLayoutRouter-BfaVsxMj.js
+ D mobile/dist/assets/GoalsScreen-B8602421.js
+ D mobile/dist/assets/LockerScreen-DAJNB9_U.js
+ D mobile/dist/assets/ModesSettingsScreen-jrsLtez0.js
+ D mobile/dist/assets/NotificationsSettingsScreen-yaG-bMEy.js
+ D mobile/dist/assets/ProfileRedirectController-D0A02koZ.js
+ D mobile/dist/assets/QuestsScreen-DW2p10il.js
+ D mobile/dist/assets/RankingsSettingsScreen-D36TMgCI.js
+ D mobile/dist/assets/SettingsIndexController-MXETdFWA.js
+ D mobile/dist/assets/ShopScreen-DAJybIoT.js
+ D mobile/dist/assets/SocialScreen-CtOEztw3.js
+ D mobile/dist/assets/StatsSettingsScreen-Dnc2poCP.js
+ D mobile/dist/assets/SyncRedirectController-BtddILqW.js
+ D mobile/dist/assets/SystemIcons-C72zWRh-.js
+ D mobile/dist/assets/SystemLibrary-CM4MNBN4.js
+ D mobile/dist/assets/SystemScreen-CJ7MS6eq.js
+ D mobile/dist/assets/ThemesSettingsScreen-SJd_alGE.js
+ D mobile/dist/assets/TimerScreen-DEzKE6oT.js
+ D mobile/dist/assets/client-data-cache-gMotkeLg.js
+ D mobile/dist/assets/index-BCuMXoAu.js
+ D mobile/dist/assets/index-JZltZ5lf.css
+ D mobile/dist/assets/useSystemAppearance-Cb_IUQei.js
+ D mobile/dist/assets/vendor-icons-ClxYTyPb.js
+ D mobile/dist/assets/vendor-motion-DkukPa_c.js
+ D mobile/dist/assets/vendor-react-CBlieeui.js
+ M mobile/dist/index.html
+ D mobile/dist/sprites/character/body/test_hunter_base.png
+ D mobile/dist/sprites/character/forms/form_choso.png
+ D mobile/dist/sprites/character/forms/form_deadpool.png
+ D mobile/dist/sprites/character/forms/form_eren.png
+ D mobile/dist/sprites/character/forms/form_gojo.png
+ D mobile/dist/sprites/character/forms/form_itadori.png
+ D mobile/dist/sprites/character/forms/form_megumi.png
+ D mobile/dist/sprites/character/forms/form_megumin.png
+ D mobile/dist/sprites/character/forms/form_mitsuri.png
+ D mobile/dist/sprites/character/forms/form_nezuko.png
+ D mobile/dist/sprites/character/forms/form_nobara.png
+ D mobile/dist/sprites/character/forms/form_rengoku.png
+ D mobile/dist/sprites/character/forms/form_shinobu.png
+ D mobile/dist/sprites/character/forms/form_spiderman.png
+ D mobile/dist/sprites/character/forms/form_tanjiro.png
+ D mobile/dist/sprites/character/forms/form_uzui.png
+ D mobile/dist/sprites/character/forms/form_venom.png
+ M mobile/src/MobileApp.tsx
+ M package.json
+ M prisma/schema.prisma
+ M proxy.ts
+ D public/companions/pixel/sylf/base/body.png
+ D public/companions/pixel/sylf/eyes/blink.png
+ D public/companions/pixel/sylf/eyes/focused.png
+ D public/companions/pixel/sylf/eyes/happy.png
+ D public/companions/pixel/sylf/eyes/neutral.png
+ D public/companions/pixel/sylf/eyes/sleepy.png
+ D public/companions/pixel/sylf/eyes/thinking.png
+ D public/companions/sylf-pixel-companion.png
+ D public/sprites/character/body/test_hunter_base.png
+ D public/sprites/character/forms/form_choso.png
+ D public/sprites/character/forms/form_deadpool.png
+ D public/sprites/character/forms/form_eren.png
+ D public/sprites/character/forms/form_gojo.png
+ D public/sprites/character/forms/form_itadori.png
+ D public/sprites/character/forms/form_megumi.png
+ D public/sprites/character/forms/form_megumin.png
+ D public/sprites/character/forms/form_mitsuri.png
+ D public/sprites/character/forms/form_nezuko.png
+ D public/sprites/character/forms/form_nobara.png
+ D public/sprites/character/forms/form_rengoku.png
+ D public/sprites/character/forms/form_shinobu.png
+ D public/sprites/character/forms/form_spiderman.png
+ D public/sprites/character/forms/form_tanjiro.png
+ D public/sprites/character/forms/form_uzui.png
+ D public/sprites/character/forms/form_venom.png
+ D scripts/download_and_normalize_canary.mjs
+ M scripts/fetch_overlay_sprites.mjs
+ D scripts/normalize_base_canary.mjs
+ M scripts/test-planner-v2-phase1-postgres.mjs
+ M scripts/verify-planner-v2-phase2-step6-build.mjs
+ M scripts/verify-planner-v2-phase2-step6.mjs
+?? .playwright-mcp/
+?? "Sylf Pixel Display.md"
+?? __tests__/dashboard/
+?? __tests__/landing/fixtures/retired-pixel-preview.ts
+?? __tests__/pixel-display/
+?? app/api/pixel-creations/
+?? app/components/companion/
+?? app/dashboard/components/PixelCompanionCard.module.css
+?? app/dashboard/components/PixelCompanionCard.tsx
+?? app/dashboard/pixel-companion-adapter.ts
+?? app/dashboard/pixel-cosmetic-registry.ts
+?? app/dashboard/pixel-modular-character.ts
+?? app/dev/
+?? app/locker/components/identity/PixelCustomizer.module.css
+?? app/locker/components/identity/PixelCustomizer.tsx
+?? app/locker/components/identity/StudioHubView.module.css
+?? app/locker/components/identity/pixel-customizer-options.ts
+?? app/locker/components/studio/
+?? documentation/pixel-display/
+?? documentation/planner/reports/2026-10-03-phase-2/HIGH_REASONING.md
+?? documentation/planner/reports/2026-10-03-phase-2/SLEEP_INVESTIGATION.md
+?? documentation/planner/reports/2026-10-03-phase-2/STEP_6_BLOCKERS.md
+?? documentation/planner/reports/2026-10-03-phase-2/STEP_6_BOUNDARY_FIXES.md
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-before-2026-10-07-technical-refresh/step6-postgres/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-boundary-2026-10-08/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-build-before-deleted-source-fix.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-calendar-reservation.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-calendar-test-typecheck-failure/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-concept-repair-reservation.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-concurrent-schema-preservation.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-high-cli-controls.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-high-controls.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-high-reasoning-comparison.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-07T10-14-12-948Z/independent-evaluation.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-07T10-38-37-763Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-07T10-44-49-038Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T14-13-54-426Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T14-33-20-295Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T14-33-52-329Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T14-46-11-114Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T14-58-39-086Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T15-17-26-249Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T15-28-59-317Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T15-51-37-919Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T16-21-10-915Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T16-22-12-193Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T17-04-25-567Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T17-16-24-282Z/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-evaluation-before-2026-10-08-refresh.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-postgres-harness-control-source-drift/
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-review-instruction-reservation.json
+?? documentation/planner/reports/2026-10-03-phase-2/evidence/step6-sleep-audit-2026-10-08/
+?? lib/pixel-companion-contract.ts
+?? lib/pixel-companion-service.ts
+?? lib/pixel-creation-service.ts
+?? lib/pixel-creations-client.ts
+?? lib/pixel-display-style.ts
+?? lib/pixel-display/
+?? mobile/dist/assets/AccountSettingsScreen-BIUW3yKZ.js
+?? mobile/dist/assets/AchievementsSettingsScreen-g91gxVrH.js
+?? mobile/dist/assets/AppearanceSettingsScreen-BYEqGql_.js
+?? mobile/dist/assets/ArchiveSettingsScreen-C-_SOwIY.js
+?? mobile/dist/assets/AuthProvider-CfChqgOW.js
+?? mobile/dist/assets/BackToSettings-4TsoRFTt.js
+?? mobile/dist/assets/BackgroundsSettingsScreen-v4i9sIdT.js
+?? mobile/dist/assets/BadgesRedirectController-jVNoobB8.js
+?? mobile/dist/assets/CalendarScreen-BKkp-5bU.js
+?? mobile/dist/assets/CalendarSettingsScreen-BMAAETQ1.js
+?? mobile/dist/assets/CollectionSettingsScreen-DzU0OKfj.js
+?? mobile/dist/assets/CustomAudioTab-DXvRg2xB.css
+?? mobile/dist/assets/CustomAudioTab-y9AOzAhp.js
+?? mobile/dist/assets/DashboardScreen-B0xXNYs8.js
+?? mobile/dist/assets/DashboardScreen-Cu1CYQeO.css
+?? mobile/dist/assets/FantasyTimerLayout-DOGe7I5J.js
+?? mobile/dist/assets/FocusBackgroundPicker-A2y_va5u.js
+?? mobile/dist/assets/FocusBackgroundsSettingsScreen-QnnidANd.js
+?? mobile/dist/assets/FocusScreen-rr1DFRTb.js
+?? mobile/dist/assets/FocusTimerLayoutRouter-DvT7APf_.js
+?? mobile/dist/assets/GoalsScreen-CsPedXjg.js
+?? mobile/dist/assets/LockerScreen-CgGuhRNf.css
+?? mobile/dist/assets/LockerScreen-DNLLBMdo.js
+?? mobile/dist/assets/ModesSettingsScreen-3PM8SII9.js
+?? mobile/dist/assets/NotificationsSettingsScreen-EbM4Mnoe.js
+?? mobile/dist/assets/OwnCompanionPreview-BlMadczO.js
+?? mobile/dist/assets/PixelCompanion-B8TYoe2W.js
+?? mobile/dist/assets/PixelCompanion-gCik2SoP.css
+?? mobile/dist/assets/ProfileRedirectController-DhgPVFO_.js
+?? mobile/dist/assets/QuestsScreen-CUa0qkGB.js
+?? mobile/dist/assets/RankingsSettingsScreen-C-qzr7tI.js
+?? mobile/dist/assets/SettingsIndexController-h6q7Ew3d.js
+?? mobile/dist/assets/ShopScreen-DltKH7c3.js
+?? mobile/dist/assets/SocialScreen-D0HlminI.js
+?? mobile/dist/assets/StatsSettingsScreen-DdYigXkd.js
+?? mobile/dist/assets/SyncRedirectController-DqThO92p.js
+?? mobile/dist/assets/SystemIcons-CyB8Ul_u.js
+?? mobile/dist/assets/SystemLibrary-CXxzVHcV.js
+?? mobile/dist/assets/SystemScreen-HGdteThf.js
+?? mobile/dist/assets/ThemesSettingsScreen-DiYapaOD.js
+?? mobile/dist/assets/TimerScreen-BuxktgzF.js
+?? mobile/dist/assets/client-data-cache-BpHdSVLh.js
+?? mobile/dist/assets/index-Dfsj4KuI.js
+?? mobile/dist/assets/index-DyH0Nt9r.css
+?? mobile/dist/assets/next-image-k9z0LVIc.js
+?? mobile/dist/assets/useSystemAppearance-BB85psGh.js
+?? mobile/dist/assets/vendor-icons-Cqee6HW5.js
+?? mobile/dist/assets/vendor-motion-D-n_FYJU.js
+?? mobile/dist/assets/vendor-react-p6Uu_7ZG.js
+?? prisma/migrations/20261005000000_pixel_creations/
+?? prisma/migrations/20261007000000_pixel_companion_consolidation/
+?? scripts/measure-pixel-display.mjs
+?? scripts/test-pixel-postgres.mjs
+?? tsconfig.pixel-engine.json

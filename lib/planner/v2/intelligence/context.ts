@@ -219,3 +219,21 @@ export async function loadPlannerInterviewContext(sql: Sql, ownerId: number, req
   const snapshot = await loadContextSnapshot(sql,ownerId,requested,window,options);
   return { ...projectPlannerInterviewContext(snapshot.contexts[0].context,snapshot.targets,window,{...options,academicSources:snapshot.academicSources}),contexts:snapshot.contexts };
 }
+
+/** Input-only lossless representation shared by generation and quality.
+ * Distinct windows stay distinct; only redundant calendar field names and
+ * identical scalar values are factored out. Durable facts remain unchanged. */
+function modelRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+/** Only repeated field names/identical scalar values are factored out. Unknown
+ * day fields are retained too; irregular records use the original encoding. */
+export function calendarForModel(value: unknown): unknown {
+  if (!modelRecord(value) || !Array.isArray(value.days) || !value.days.length || !value.days.every(modelRecord)) return value;
+  const days = value.days, keys = Object.keys(days[0]);
+  if (days.some(day => Object.keys(day).length !== keys.length || keys.some(key => !Object.hasOwn(day, key) || day[key] === undefined))) return value;
+  const constants = keys.filter(key => (days[0][key] === null || ["string", "number", "boolean"].includes(typeof days[0][key])) && days.every(day => day[key] === days[0][key]));
+  const columns = keys.filter(key => !constants.includes(key));
+  return { ...value, days: { constantFields: Object.fromEntries(constants.map(key => [key, days[0][key]])), columns,
+    rows: days.map(day => columns.map(key => day[key])) } };
+}

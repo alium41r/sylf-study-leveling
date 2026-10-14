@@ -1,0 +1,428 @@
+{
+  "viewports": [
+    {
+      "name": "login-desktop-dark",
+      "width": 1440,
+      "height": 1000,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 17.03,
+      "secondaryContrast": 8.19,
+      "buttonContrast": 5.7,
+      "inputFontSize": "13px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 277.3828125,
+          "height": 277.3828125
+        },
+        {
+          "label": "Lantern light",
+          "width": 90.296875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "register-desktop-light",
+      "width": 1440,
+      "height": 1000,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 17.85,
+      "secondaryContrast": 10.35,
+      "buttonContrast": 5.7,
+      "inputFontSize": "13px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 277.3828125,
+          "height": 277.3828125
+        },
+        {
+          "label": "Lantern light",
+          "width": 90.296875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "login-mobile-dark",
+      "width": 390,
+      "height": 844,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 50,
+      "submitHeight": 50,
+      "textContrast": 17.03,
+      "secondaryContrast": 8.19,
+      "buttonContrast": 5.7,
+      "inputFontSize": "16px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 146.25,
+          "height": 146.25
+        },
+        {
+          "label": "Lantern light",
+          "width": 81.96875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "register-mobile-light",
+      "width": 390,
+      "height": 844,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 50,
+      "submitHeight": 50,
+      "textContrast": 17.85,
+      "secondaryContrast": 10.35,
+      "buttonContrast": 5.7,
+      "inputFontSize": "16px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 146.25,
+          "height": 146.25
+        },
+        {
+          "label": "Lantern light",
+          "width": 81.96875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "register-small-light",
+      "width": 320,
+      "height": 568,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 50,
+      "submitHeight": 50,
+      "textContrast": 17.85,
+      "secondaryContrast": 10.35,
+      "buttonContrast": 5.7,
+      "inputFontSize": "16px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 120,
+          "height": 120
+        },
+        {
+          "label": "Lantern light",
+          "width": 81.96875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "register-tablet-light",
+      "width": 768,
+      "height": 1024,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 17.85,
+      "secondaryContrast": 10.35,
+      "buttonContrast": 5.7,
+      "inputFontSize": "16px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 195,
+          "height": 195
+        },
+        {
+          "label": "Lantern light",
+          "width": 90.296875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "login-tablet-dark",
+      "width": 900,
+      "height": 700,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 17.03,
+      "secondaryContrast": 8.19,
+      "buttonContrast": 5.7,
+      "inputFontSize": "13px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 195,
+          "height": 195
+        },
+        {
+          "label": "Lantern light",
+          "width": 90.296875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "register-small-desktop",
+      "width": 1024,
+      "height": 768,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 17.03,
+      "secondaryContrast": 8.19,
+      "buttonContrast": 5.7,
+      "inputFontSize": "13px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 200.421875,
+          "height": 200.42193603515625
+        },
+        {
+          "label": "Lantern light",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "login-wide",
+      "width": 1920,
+      "height": 1080,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 17.03,
+      "secondaryContrast": 8.19,
+      "buttonContrast": 5.7,
+      "inputFontSize": "13px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 300,
+          "height": 299.99993896484375
+        },
+        {
+          "label": "Lantern light",
+          "width": 90.296875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "register-short-desktop",
+      "width": 1280,
+      "height": 600,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 17.03,
+      "secondaryContrast": 8.19,
+      "buttonContrast": 5.7,
+      "inputFontSize": "13px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 240,
+          "height": 240
+        },
+        {
+          "label": "Lantern light",
+          "width": 90.296875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "register-custom-light-in-dark-mode",
+      "width": 1366,
+      "height": 768,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 49,
+      "submitHeight": 50,
+      "textContrast": 14.79,
+      "secondaryContrast": 8.58,
+      "buttonContrast": 6.03,
+      "inputFontSize": "13px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 240,
+          "height": 240.00003051757812
+        },
+        {
+          "label": "Lantern light",
+          "width": 90.296875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    },
+    {
+      "name": "login-custom-dark-in-light-mode",
+      "width": 390,
+      "height": 844,
+      "horizontalOverflow": false,
+      "formInBounds": true,
+      "inputHeight": 50,
+      "submitHeight": 50,
+      "textContrast": 12.16,
+      "secondaryContrast": 5.84,
+      "buttonContrast": 13.23,
+      "inputFontSize": "16px",
+      "canonicalCompanions": 1,
+      "sceneryImages": 0,
+      "sceneControls": [
+        {
+          "label": "Say hello to Sylf",
+          "width": 146.25,
+          "height": 146.25
+        },
+        {
+          "label": "Lantern light",
+          "width": 81.96875,
+          "height": 44
+        },
+        {
+          "label": "Pause scene animation",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "companionInWorld": true
+    }
+  ],
+  "interactions": {
+    "lantern": true,
+    "pause": true,
+    "passwordFocus": true,
+    "canonicalGreeting": true,
+    "greetingReturnsToReading": true,
+    "keyboardReveal": true,
+    "loginPayload": true,
+    "loginLoading": true,
+    "loginError": true,
+    "verificationMessage": true,
+    "registrationValidation": true,
+    "registrationRetry": true,
+    "reducedMotion": true,
+    "offscreenPause": true,
+    "onscreenResume": true,
+    "skipLink": true
+  },
+  "performance": {
+    "cpuThrottle": 4,
+    "frames": 120,
+    "medianFrameMs": 16.7,
+    "p95FrameMs": 17.5,
+    "maxFrameMs": 17.7,
+    "svgNodes": 728,
+    "activeAnimations": 26
+  },
+  "errors": []
+}

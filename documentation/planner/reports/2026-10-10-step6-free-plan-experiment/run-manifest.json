@@ -1,0 +1,77 @@
+{
+  "protocolVersion": "step6-free-plan-pair-v1",
+  "status": "PREPARED_AWAITING_SPENDING_APPROVAL",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "expectedModelVersion": "DeepSeek-V4.1-Flash",
+  "endpoint": "https://api.deepseek.com/chat/completions",
+  "maximumTotalDispatches": 4,
+  "maximumRecoveryDispatches": 0,
+  "maximumSpendUsd": 0.2,
+  "reasoningEffort": "high",
+  "thinking": "enabled",
+  "callTimeoutMs": 240000,
+  "globalExecutionTimeoutMs": 1200000,
+  "runs": [
+    {
+      "trialId": "probability_exam_natural",
+      "caseId": "probability_exam",
+      "arm": "natural",
+      "packet": "model/probability_exam_natural.json",
+      "wire": "model/probability_exam_natural.wire.json",
+      "inputReservationUnits": 9286,
+      "outputTokenCap": 32768,
+      "requestBodySha256": "159b418e0914fc30bfd26cfde122b06b2bd1417da6445ce0aad1eb693400818e",
+      "studentContextSha256": "525bf5b6f5cfc7be82332f9c85520c86f935d5127e40ab9f9d7f54e7b9de886d",
+      "productionOutputTokenCap": null,
+      "reservedNanodollars": 42107400
+    },
+    {
+      "trialId": "probability_exam_structured",
+      "caseId": "probability_exam",
+      "arm": "structured",
+      "packet": "model/probability_exam_structured.json",
+      "wire": "model/probability_exam_structured.wire.json",
+      "inputReservationUnits": 28577,
+      "outputTokenCap": 32768,
+      "requestBodySha256": "32710c8bf3a8adb3663e1643a72aac528cf5f90d3988ff95821d996553ffe0a4",
+      "studentContextSha256": "525bf5b6f5cfc7be82332f9c85520c86f935d5127e40ab9f9d7f54e7b9de886d",
+      "productionOutputTokenCap": 8192,
+      "reservedNanodollars": 47894700
+    },
+    {
+      "trialId": "sql_project_structured",
+      "caseId": "sql_project",
+      "arm": "structured",
+      "packet": "model/sql_project_structured.json",
+      "wire": "model/sql_project_structured.wire.json",
+      "inputReservationUnits": 29474,
+      "outputTokenCap": 32768,
+      "requestBodySha256": "477230088794e3c2a904d98db26a8601d491ef39cdde2542dedfad848a024671",
+      "studentContextSha256": "fb739a9456c385dfc6d7bed23c706ee2f419d77709032ae40f24ca9c860dfd8e",
+      "productionOutputTokenCap": 8192,
+      "reservedNanodollars": 48163800
+    },
+    {
+      "trialId": "sql_project_natural",
+      "caseId": "sql_project",
+      "arm": "natural",
+      "packet": "model/sql_project_natural.json",
+      "wire": "model/sql_project_natural.wire.json",
+      "inputReservationUnits": 9915,
+      "outputTokenCap": 32768,
+      "requestBodySha256": "4886b1f7efc19a3ccea5e5f7385adcde42ba033ce9a0a6054043c852cedb9320",
+      "studentContextSha256": "fb739a9456c385dfc6d7bed23c706ee2f419d77709032ae40f24ca9c860dfd8e",
+      "productionOutputTokenCap": null,
+      "reservedNanodollars": 42296100
+    }
+  ],
+  "productionPublication": "FORBIDDEN",
+  "productionBudgets": {
+    "modelCalls": 6,
+    "executionSeconds": 180,
+    "inputTokens": 80000,
+    "outputTokens": 24000
+  },
+  "matchedDiagnosticCapNotProductionQualification": true
+}

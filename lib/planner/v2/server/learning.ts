@@ -145,7 +145,7 @@ export class LearningCompilerService {
    });checkpoint=next;return next;
   };
   const meter=workerProviderMeter(this.attempts,token);
-  const input:BlueprintInput={plans:owned.targets,context:owned.view,envelope:owned.envelope,sharedDependencies:owned.sharedDependencies};
+  const input:BlueprintInput={acceptedRequest:{text:owned.attempt.acceptedRequest.text,authorization:"PLAN_ACTION"},plans:owned.targets,context:owned.view,envelope:owned.envelope,sharedDependencies:owned.sharedDependencies};
   if(!checkpoint)await save({stage:'PREFLIGHT',research:owned.research,envelope:owned.envelope});
   if(checkpoint!.payload.stage==='PREFLIGHT'){
    const response=await generateLearningBlueprint(meter,input,signal,this.dependencies.provider);
@@ -168,7 +168,10 @@ export class LearningCompilerService {
   if(checkpoint!.payload.stage==='ADAPTATION'){
    if(owned.dispatchedAdaptation)reject('PROVIDER_FAILURE','The single adaptation was dispatched without a durable accepted result. Use an explicit linked retry; it cannot be repeated on takeover.','ADAPTATION');
    const p=checkpoint!.payload;
-   const response=await generateLearningBlueprint(meter,{...input,envelope:p.envelope,previous:p.blueprints,feedback:p.allocation.report},signal,this.dependencies.provider,true);
+   let bindingConstraints:import('../intelligence/allocator').BindingConstraint[]=[];
+   const explained=allocateLearning(p.blueprints,p.envelope,owned.facts,{maximumSearchNodes:this.dependencies.maximumSearchNodes,onBindingConstraints:constraints=>{bindingConstraints=constraints;}});
+   if(hash('allocation',explained)!==p.allocation.digest)reject('STALE_CONTEXT','Allocation facts changed before educational adaptation.','ADAPTATION');
+   const response=await generateLearningBlueprint(meter,{...input,envelope:p.envelope,previous:p.blueprints,feedback:p.allocation.report,bindingConstraints,splitReceipts:p.planning?.splits},signal,this.dependencies.provider,true);
    if(response.decision==='KEEP'){const report=allocateLearning(p.blueprints,p.envelope,owned.facts,{maximumSearchNodes:this.dependencies.maximumSearchNodes});await save({...p,stage:'ALLOCATION',allocation:{report,digest:hash('allocation',report)},planning:{...p.planning!,adaptation:'KEPT',adaptationReason:response.reason}},1);}
    else{
     const envelope=learningEnvelope(owned.envelope,response.detail.days,response.recoveryAdjustment);

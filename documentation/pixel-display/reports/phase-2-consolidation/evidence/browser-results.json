@@ -1,0 +1,1021 @@
+{
+  "date": "2026-10-08",
+  "environment": "Real Chrome; local Next dev/optimized production, built mobile with real API proxy; isolated QA users",
+  "checks": {
+    "Parity": {
+      "apply": 200,
+      "customizer": {
+        "hash": 1518717635,
+        "density": 40
+      },
+      "dashboard": {
+        "hash": 1518717635,
+        "density": 40
+      },
+      "studio": {
+        "hash": 1518717635,
+        "density": 40
+      },
+      "parity": true
+    },
+    "Mobile": {
+      "save": 200,
+      "equip": 200,
+      "apply": 200,
+      "owner": 1152,
+      "id": "user:323dddde173346e4b2fcddfa",
+      "revision": 5,
+      "grid": 48,
+      "touchRow": ".......1111111.....1111111111...................",
+      "frames": [
+        50,
+        1
+      ],
+      "device": {
+        "width": 390,
+        "height": 844,
+        "dpr": 3,
+        "touch": 1,
+        "overflow": 0,
+        "mobile": true,
+        "mock": false
+      },
+      "headers": [
+        {
+          "top": 0,
+          "bottom": 56,
+          "text": "P\n\nPIXEL PRODUCTION QA\n\nE-Rank"
+        },
+        {
+          "top": 56,
+          "bottom": 220,
+          "text": "Back\nPIXEL STUDIO\nSaved & equi"
+        }
+      ],
+      "density": "40"
+    },
+    "Performance": {
+      "width": 1440,
+      "dpr": 1,
+      "density": 48,
+      "forcedFrames": 300,
+      "cpuMs": {
+        "p50": 0.10000002384185791,
+        "p95": 0.3999999761581421,
+        "max": 1.5
+      },
+      "phase": "idle",
+      "idleFrames": 0,
+      "idleWindowMs": 1500,
+      "scope": "synchronous runtime and Canvas2D frame, excludes browser layout/GPU composition"
+    },
+    "Lifecycle": {
+      "activeFrames": 4,
+      "activeWindowMs": 1100,
+      "offscreenFrames": 0,
+      "offscreenPhase": "stopped",
+      "offscreenBottom": -172.0625,
+      "offscreenWindowMs": 700,
+      "resumedFrames": 3,
+      "reducedFrames": 0,
+      "reducedWindowMs": 1100
+    },
+    "Customizer": {
+      "collection": "BACK TO SYSTEM HUB\n\nSYSTEM HUB / THE SYLF LIBRARY\n\nThe System Collection\n\nPIXEL PRODUCTION QA / PERSONAL COLLECTION\n\nA world of your own.\n0\nOWNED ITEMS\n3\nAVAILABLE STYLES\n0\nPERSONAL IMAGES\n0\nLOCAL TRACKS\n\nCOLLECTION INDEX\n\nItems & equipment\n0\nPixel companion\n3\nFocus backgrounds\n0\nAudio library\n0\nProfile & keepsakes\n0\nCurrency ledger\n\u2197\nSYLF / COLLECTION\nVOLUME 01 \u00b7 02\nPixel companion\n\nSylf, your drawings, and Pixel Size.\n\nCompanion Customizer\nPIXEL COMPANION\nSELECTED\nYour drawing\nIn Companion Customizer\nPIXEL COMPANION\nAVAILABLE\nSylf\nCOMMON\nIn Companion Customizer\nPEDESTAL\nSELECTED\nMeadow\nCOMMON\nIn Companion Customizer\n\nSelect a style in Companion Customizer. Available styles are separate from purchased items.\n\nYOUR PERSONAL LEDGER\nSYLF / COLLECTION",
+      "customizerStaticFrame": true,
+      "caption": true
+    },
+    "Freshness": {
+      "save": 200,
+      "id": "user:323dddde173346e4b2fcddfa",
+      "revision": 4,
+      "before": {
+        "hash": 1196981056,
+        "density": 48
+      },
+      "mountedDashboardAfter": {
+        "hash": 545697611,
+        "density": 48
+      },
+      "studio": {
+        "hash": 545697611,
+        "density": 48
+      },
+      "customizer": {
+        "hash": 545697611,
+        "density": 48
+      },
+      "sameIdRefresh": true,
+      "parity": true,
+      "density": 48
+    },
+    "Densities": {
+      "results": [
+        {
+          "label": "Original pixels",
+          "apply": 200,
+          "expectedDensity": 48,
+          "preview": {
+            "hash": 3067098262,
+            "density": 48
+          },
+          "dashboard": {
+            "hash": 3067098262,
+            "density": 48
+          },
+          "parity": true
+        },
+        {
+          "label": "Chunky",
+          "apply": 200,
+          "expectedDensity": 32,
+          "preview": {
+            "hash": 1214234897,
+            "density": 32
+          },
+          "dashboard": {
+            "hash": 1214234897,
+            "density": 32
+          },
+          "parity": true
+        },
+        {
+          "label": "Balanced",
+          "apply": 200,
+          "expectedDensity": 40,
+          "preview": {
+            "hash": 455386735,
+            "density": 40
+          },
+          "dashboard": {
+            "hash": 455386735,
+            "density": 40
+          },
+          "parity": true
+        },
+        {
+          "label": "Detailed",
+          "apply": 200,
+          "expectedDensity": 48,
+          "preview": {
+            "hash": 3067098262,
+            "density": 48
+          },
+          "dashboard": {
+            "hash": 3067098262,
+            "density": 48
+          },
+          "parity": true
+        },
+        {
+          "label": "Finest",
+          "apply": 200,
+          "expectedDensity": 64,
+          "preview": {
+            "hash": 4089115287,
+            "density": 64
+          },
+          "dashboard": {
+            "hash": 4089115287,
+            "density": 64
+          },
+          "parity": true
+        }
+      ],
+      "storedArtworkUnchanged": true,
+      "revisionBefore": 5,
+      "revisionAfter": 5,
+      "comparisonSizes": [
+        {
+          "density": "48",
+          "width": 96,
+          "height": 96
+        },
+        {
+          "density": "32",
+          "width": 96,
+          "height": 96
+        },
+        {
+          "density": "40",
+          "width": 96,
+          "height": 96
+        },
+        {
+          "density": "48",
+          "width": 96,
+          "height": 96
+        },
+        {
+          "density": "64",
+          "width": 96,
+          "height": 96
+        }
+      ]
+    },
+    "Failures": {
+      "doubleClickPosts": 1,
+      "failedNameRetained": "\u56de\u5fa9 test final",
+      "recovery": {
+        "name": "\u56de\u5fa9 test final",
+        "id": "user:323dddde173346e4b2fcddfa",
+        "revision": 6
+      },
+      "saveRetry": 200,
+      "sameId": "user:323dddde173346e4b2fcddfa",
+      "revision": 7,
+      "equipFailures": 1,
+      "equipMessage": "Drawing saved; could not equip. Retry Save & equip. QA equip unavailable",
+      "equipRetry": 200,
+      "missingDeleteRevision": 400
+    },
+    "Responsive": {
+      "results": [
+        {
+          "width": 1440,
+          "height": 1000,
+          "zoom": "Fit",
+          "canvas": {
+            "width": 626,
+            "height": 626
+          },
+          "preview": {
+            "width": 230,
+            "height": 230,
+            "right": 1389
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1440,
+          "height": 1000,
+          "zoom": "4",
+          "canvas": {
+            "width": 192,
+            "height": 192
+          },
+          "preview": {
+            "width": 230,
+            "height": 230,
+            "right": 1389
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1440,
+          "height": 1000,
+          "zoom": "6",
+          "canvas": {
+            "width": 288,
+            "height": 288
+          },
+          "preview": {
+            "width": 230,
+            "height": 230,
+            "right": 1389
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1440,
+          "height": 1000,
+          "zoom": "8",
+          "canvas": {
+            "width": 384,
+            "height": 384
+          },
+          "preview": {
+            "width": 230,
+            "height": 230,
+            "right": 1389
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1440,
+          "height": 1000,
+          "zoom": "12",
+          "canvas": {
+            "width": 576,
+            "height": 576
+          },
+          "preview": {
+            "width": 230,
+            "height": 230,
+            "right": 1389
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1024,
+          "height": 1000,
+          "zoom": "Fit",
+          "canvas": {
+            "width": 626,
+            "height": 626
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1024,
+          "height": 1000,
+          "zoom": "4",
+          "canvas": {
+            "width": 192,
+            "height": 192
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1024,
+          "height": 1000,
+          "zoom": "6",
+          "canvas": {
+            "width": 288,
+            "height": 288
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1024,
+          "height": 1000,
+          "zoom": "8",
+          "canvas": {
+            "width": 384,
+            "height": 384
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 1024,
+          "height": 1000,
+          "zoom": "12",
+          "canvas": {
+            "width": 576,
+            "height": 576
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 820,
+          "height": 1000,
+          "zoom": "Fit",
+          "canvas": {
+            "width": 450,
+            "height": 450
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 820,
+          "height": 1000,
+          "zoom": "4",
+          "canvas": {
+            "width": 192,
+            "height": 192
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 820,
+          "height": 1000,
+          "zoom": "6",
+          "canvas": {
+            "width": 288,
+            "height": 288
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 820,
+          "height": 1000,
+          "zoom": "8",
+          "canvas": {
+            "width": 384,
+            "height": 384
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 820,
+          "height": 1000,
+          "zoom": "12",
+          "canvas": {
+            "width": 576,
+            "height": 576
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "zoom": "Fit",
+          "canvas": {
+            "width": 340,
+            "height": 340
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "zoom": "4",
+          "canvas": {
+            "width": 192,
+            "height": 192
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "zoom": "6",
+          "canvas": {
+            "width": 288,
+            "height": 288
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "zoom": "8",
+          "canvas": {
+            "width": 384,
+            "height": 384
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "zoom": "12",
+          "canvas": {
+            "width": 576,
+            "height": 576
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 320,
+          "height": 720,
+          "zoom": "Fit",
+          "canvas": {
+            "width": 270,
+            "height": 270
+          },
+          "preview": {
+            "width": 266,
+            "height": 266,
+            "right": 293
+          },
+          "overflow": 0
+        },
+        {
+          "width": 320,
+          "height": 720,
+          "zoom": "4",
+          "canvas": {
+            "width": 192,
+            "height": 192
+          },
+          "preview": {
+            "width": 266,
+            "height": 266,
+            "right": 293
+          },
+          "overflow": 0
+        },
+        {
+          "width": 320,
+          "height": 720,
+          "zoom": "6",
+          "canvas": {
+            "width": 288,
+            "height": 288
+          },
+          "preview": {
+            "width": 266,
+            "height": 266,
+            "right": 293
+          },
+          "overflow": 0
+        },
+        {
+          "width": 320,
+          "height": 720,
+          "zoom": "8",
+          "canvas": {
+            "width": 384,
+            "height": 384
+          },
+          "preview": {
+            "width": 266,
+            "height": 266,
+            "right": 293
+          },
+          "overflow": 0
+        },
+        {
+          "width": 320,
+          "height": 720,
+          "zoom": "12",
+          "canvas": {
+            "width": 576,
+            "height": 576
+          },
+          "preview": {
+            "width": 266,
+            "height": 266,
+            "right": 293
+          },
+          "overflow": 0
+        },
+        {
+          "width": 844,
+          "height": 390,
+          "zoom": "Fit",
+          "canvas": {
+            "width": 229.5,
+            "height": 229.5
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 844,
+          "height": 390,
+          "zoom": "4",
+          "canvas": {
+            "width": 192,
+            "height": 192
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 844,
+          "height": 390,
+          "zoom": "6",
+          "canvas": {
+            "width": 288,
+            "height": 288
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 844,
+          "height": 390,
+          "zoom": "8",
+          "canvas": {
+            "width": 384,
+            "height": 384
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 844,
+          "height": 390,
+          "zoom": "12",
+          "canvas": {
+            "width": 576,
+            "height": 576
+          },
+          "preview": {
+            "width": 240,
+            "height": 240,
+            "right": 567
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 500,
+          "zoom": "Fit",
+          "canvas": {
+            "width": 301,
+            "height": 301
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 500,
+          "zoom": "4",
+          "canvas": {
+            "width": 192,
+            "height": 192
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 500,
+          "zoom": "6",
+          "canvas": {
+            "width": 288,
+            "height": 288
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 500,
+          "zoom": "8",
+          "canvas": {
+            "width": 384,
+            "height": 384
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        },
+        {
+          "width": 390,
+          "height": 500,
+          "zoom": "12",
+          "canvas": {
+            "width": 576,
+            "height": 576
+          },
+          "preview": {
+            "width": 280,
+            "height": 280,
+            "right": 335
+          },
+          "overflow": 0
+        }
+      ],
+      "allSquare": true,
+      "previewsVisible": true,
+      "noDocumentOverflow": true
+    },
+    "Production": {
+      "stats": 200,
+      "save": 200,
+      "equip": 200,
+      "apply": 200,
+      "owner": 1152,
+      "id": "user:323dddde173346e4b2fcddfa",
+      "revision": 9,
+      "grid": 48,
+      "frames": [
+        51,
+        1
+      ],
+      "display": {
+        "css": 278,
+        "backing": 278,
+        "density": "40"
+      },
+      "errors": [],
+      "devRoutes": [
+        {
+          "path": "/dev/pixel-display",
+          "status": 404
+        },
+        {
+          "path": "/dev/pixel-display/authoring",
+          "status": 404
+        },
+        {
+          "path": "/api/dev/progression",
+          "status": 404
+        }
+      ],
+      "devProbes": {
+        "dashboard": "undefined",
+        "displays": "undefined"
+      },
+      "url": "http://127.0.0.1:3211/dashboard",
+      "viewport": {
+        "width": 1440,
+        "dpr": 1,
+        "overflow": 0
+      }
+    },
+    "Duration": {
+      "typed": "1200",
+      "committed": true,
+      "save": 200,
+      "savedDuration": 1200,
+      "undoDuration": "240"
+    },
+    "Appearance": {
+      "hp": 100,
+      "maxHp": 100,
+      "theme": "#facc15",
+      "background": "#d9eee7",
+      "displayDensity": "40",
+      "mode": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1
+      }
+    },
+    "Release": {
+      "save": 200,
+      "equip": 200,
+      "apply": 200,
+      "savedDuration": 1200,
+      "owner": 1152,
+      "id": "user:323dddde173346e4b2fcddfa",
+      "revision": 12,
+      "grid": 48,
+      "errors": [],
+      "display": {
+        "width": 278,
+        "height": 278,
+        "density": "48"
+      },
+      "viewport": {
+        "width": 1440,
+        "height": 1000,
+        "dpr": 1,
+        "overflow": 0
+      }
+    },
+    "MobileRelease": {
+      "save": 200,
+      "equip": 200,
+      "apply": 200,
+      "durationTyped": true,
+      "durationAfterUndo": 240,
+      "owner": 1152,
+      "id": "user:323dddde173346e4b2fcddfa",
+      "revision": 14,
+      "grid": 48,
+      "touchRow": "....11111111......1111111.......................",
+      "touchRowOccupied": 15,
+      "headers": [
+        {
+          "top": 0,
+          "bottom": 56
+        },
+        {
+          "top": 56,
+          "bottom": 220
+        }
+      ],
+      "errors": [],
+      "density": "40",
+      "device": {
+        "width": 390,
+        "height": 844,
+        "dpr": 3,
+        "touch": 1,
+        "overflow": 0,
+        "mobile": true,
+        "mock": false
+      }
+    },
+    "FinalEdgeLayout": {
+      "events": [
+        {
+          "path": "/api/pixel-creations",
+          "status": 200
+        },
+        {
+          "path": "/api/profile/customization",
+          "status": 200
+        },
+        {
+          "path": "/api/user/heartbeat",
+          "status": 200
+        }
+      ],
+      "id": "user:8123e0d15e914056b468e077",
+      "revision": 2,
+      "grid": 48,
+      "allFilled": true,
+      "config": {
+        "outfit": "user:8123e0d15e914056b468e077",
+        "displayBorder": "#e855ad",
+        "pixelGap": 0
+      },
+      "layout": {
+        "root": 1088,
+        "canvas": [
+          736,
+          736
+        ],
+        "gutter": 15.515625,
+        "inspector": 316.484375,
+        "usedWidth": 1086,
+        "blackBackground": "rgb(0, 0, 0)",
+        "backgroundImage": "none"
+      },
+      "dashboard": {
+        "art": "user:8123e0d15e914056b468e077",
+        "size": [
+          278,
+          278
+        ],
+        "gap": "0",
+        "border": "#e855ad",
+        "radius": "0px",
+        "mismatches": 0,
+        "deviceSize": [
+          278,
+          278
+        ]
+      }
+    },
+    "MobileDisplayStyling": {
+      "responses": [
+        {
+          "path": "/api/pixel-creations",
+          "status": 200
+        },
+        {
+          "path": "/api/profile/customization",
+          "status": 200
+        }
+      ],
+      "device": {
+        "width": 390,
+        "dpr": 3,
+        "touch": 1,
+        "overflow": false
+      },
+      "canvas": {
+        "x": 21,
+        "y": -688.5,
+        "width": 348,
+        "height": 348
+      },
+      "spaced": {
+        "gap": "0.3",
+        "width": 840,
+        "height": 840
+      },
+      "status": "Saved & equipped"
+    },
+    "SimpleColorSelection": [
+      {
+        "mobile": false,
+        "errors": [],
+        "name": "Edge fidelity QA",
+        "initialStatus": "Saved",
+        "spectrumTraversal": {
+          "events": 20,
+          "recentUnchanged": true,
+          "status": "Saved"
+        },
+        "selectionStatus": "Saved",
+        "saveStatus": 200,
+        "existingPixelChanges": 0,
+        "newPixels": [
+          "#f04a29",
+          "#2288dd",
+          "#f04a29"
+        ],
+        "removedActions": 0,
+        "recent": [
+          "Recent color #f04a29",
+          "Recent color #2288dd",
+          "Recent color #28cfb6"
+        ],
+        "overflow": false
+      },
+      {
+        "mobile": true,
+        "errors": [],
+        "name": "Edge fidelity QA",
+        "initialStatus": "Saved",
+        "spectrumTraversal": {
+          "events": 20,
+          "recentUnchanged": true,
+          "status": "Saved"
+        },
+        "selectionStatus": "Saved",
+        "saveStatus": 200,
+        "existingPixelChanges": 0,
+        "newPixels": [
+          "#f04a29",
+          "#2288dd",
+          "#f04a29"
+        ],
+        "removedActions": 0,
+        "recent": [
+          "Recent color #f04a29",
+          "Recent color #2288dd",
+          "Recent color #28cfb6"
+        ],
+        "overflow": false
+      }
+    ]
+  }
+}

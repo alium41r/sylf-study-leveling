@@ -182,7 +182,7 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
 
           <div className="min-w-0">
             <p className="text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-primary group-hover:text-accent-primary-light transition-colors truncate">
-              {user?.name || user?.username || "The System"}
+              {user?.name || user?.username || "Scholar"}
             </p>
             <p className="text-[10px] font-mono text-text-muted truncate">
               {user?.hunterRank || "E"}-Rank • Lv. {user?.level || 1}

@@ -1,0 +1,230 @@
+[
+  {
+    "surface": "customizer",
+    "preset": "chunky",
+    "baseId": "user:audit-pattern",
+    "resolution": 32,
+    "css": 180,
+    "backing": [
+      180,
+      180
+    ],
+    "dpr": 1,
+    "hash": 1659327472,
+    "lit": 27,
+    "extent": [
+      6,
+      11,
+      21,
+      20
+    ],
+    "colors": {
+      "67,225,176": 6,
+      "161,121,251": 7,
+      "255,255,255": 13,
+      "90,201,209": 1
+    }
+  },
+  {
+    "surface": "save density",
+    "preset": "chunky",
+    "status": 200
+  },
+  {
+    "surface": "dashboard",
+    "preset": "chunky",
+    "baseId": "user:audit-pattern",
+    "resolution": 32,
+    "css": 110,
+    "backing": [
+      110,
+      110
+    ],
+    "dpr": 1,
+    "hash": 1659327472,
+    "lit": 27,
+    "extent": [
+      6,
+      11,
+      21,
+      20
+    ],
+    "colors": {
+      "67,225,176": 6,
+      "161,121,251": 7,
+      "255,255,255": 13,
+      "90,201,209": 1
+    }
+  },
+  {
+    "surface": "customizer",
+    "preset": "balanced",
+    "baseId": "user:audit-pattern",
+    "resolution": 40,
+    "css": 180,
+    "backing": [
+      180,
+      180
+    ],
+    "dpr": 1,
+    "hash": 1762301109,
+    "lit": 31,
+    "extent": [
+      8,
+      14,
+      26,
+      25
+    ],
+    "colors": {
+      "161,121,251": 10,
+      "67,225,176": 5,
+      "255,255,255": 15,
+      "90,201,209": 1
+    }
+  },
+  {
+    "surface": "save density",
+    "preset": "balanced",
+    "status": 200
+  },
+  {
+    "surface": "dashboard",
+    "preset": "balanced",
+    "baseId": "user:audit-pattern",
+    "resolution": 40,
+    "css": 110,
+    "backing": [
+      110,
+      110
+    ],
+    "dpr": 1,
+    "hash": 1762301109,
+    "lit": 31,
+    "extent": [
+      8,
+      14,
+      26,
+      25
+    ],
+    "colors": {
+      "161,121,251": 10,
+      "67,225,176": 5,
+      "255,255,255": 15,
+      "90,201,209": 1
+    }
+  },
+  {
+    "surface": "customizer",
+    "preset": "detailed",
+    "baseId": "user:audit-pattern",
+    "resolution": 48,
+    "css": 180,
+    "backing": [
+      180,
+      180
+    ],
+    "dpr": 1,
+    "hash": 1225253025,
+    "lit": 58,
+    "extent": [
+      10,
+      17,
+      32,
+      30
+    ],
+    "colors": {
+      "67,225,176": 10,
+      "161,121,251": 8,
+      "255,255,255": 36,
+      "90,201,209": 4
+    }
+  },
+  {
+    "surface": "save density",
+    "preset": "detailed",
+    "status": 200
+  },
+  {
+    "surface": "dashboard",
+    "preset": "detailed",
+    "baseId": "user:audit-pattern",
+    "resolution": 48,
+    "css": 110,
+    "backing": [
+      110,
+      110
+    ],
+    "dpr": 1,
+    "hash": 1225253025,
+    "lit": 58,
+    "extent": [
+      10,
+      17,
+      32,
+      30
+    ],
+    "colors": {
+      "67,225,176": 10,
+      "161,121,251": 8,
+      "255,255,255": 36,
+      "90,201,209": 4
+    }
+  },
+  {
+    "surface": "customizer",
+    "preset": "finest",
+    "baseId": "user:audit-pattern",
+    "resolution": 64,
+    "css": 180,
+    "backing": [
+      180,
+      180
+    ],
+    "dpr": 1,
+    "hash": 1116922993,
+    "lit": 104,
+    "extent": [
+      12,
+      22,
+      42,
+      40
+    ],
+    "colors": {
+      "67,225,176": 22,
+      "161,121,251": 28,
+      "255,255,255": 50,
+      "90,201,209": 4
+    }
+  },
+  {
+    "surface": "save density",
+    "preset": "finest",
+    "status": 200
+  },
+  {
+    "surface": "dashboard",
+    "preset": "finest",
+    "baseId": "user:audit-pattern",
+    "resolution": 64,
+    "css": 110,
+    "backing": [
+      110,
+      110
+    ],
+    "dpr": 1,
+    "hash": 1116922993,
+    "lit": 104,
+    "extent": [
+      12,
+      22,
+      42,
+      40
+    ],
+    "colors": {
+      "67,225,176": 22,
+      "161,121,251": 28,
+      "255,255,255": 50,
+      "90,201,209": 4
+    }
+  }
+]

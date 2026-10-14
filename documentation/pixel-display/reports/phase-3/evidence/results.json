@@ -1,0 +1,209 @@
+{
+  "description": "Phase 3 evidence: the Sylf Pixel Display integrated into the production dashboard character card, with one real application signal wired end-to-end.",
+  "date": "2026-10-07T14:33:43.193Z",
+  "phase": 3,
+  "boundary": {
+    "path": "application signal -> dashboard adapter -> Sylf state -> runtime -> framebuffer -> renderer",
+    "adapter": "app/dashboard/pixel-companion-adapter.ts",
+    "adapterIsOnlyModuleKnowingBothVocabularies": true,
+    "enforcement": "Static source scans assert that no dashboard file imports engine, renderer or character-plane internals; that the dashboard reaches the display only through the React host and content types; that the adapter is the single module importing both an application module and the content layer; and that engine/content import nothing from @/app.",
+    "enforcementProvenToFail": "Injecting `@/lib/pixel-display/engine` and `content/sylf/parts` imports into the card failed three of the new boundary tests; reverting them restored a pass.",
+    "applicationEmitsSemanticsOnly": "The card and dashboard pass a state name. No application file touches a framebuffer, renderer or plane."
+  },
+  "realSignalPath": {
+    "source": "LevelUpProvider (app/components/LevelUpProvider.tsx) — the existing level-up owner, which already detects real level increases from canonical progression data.",
+    "change": "Additive: the provider now also exposes `lastLevelUp`, a durable record of the last observed level-up. It is separate from `isLevelUpVisible` because closing the overlay must not erase the event, and it carries a runId so a consumer cannot react twice or miss two events that arrive close together.",
+    "existingBehaviourPreserved": "Detection logic, triggerLevelUp, dismissLevelUp, isLevelUpVisible and the overlay are unchanged. The existing level-up celebration suite still passes.",
+    "mapping": "level-up -> Sylf CELEBRATING for 4000ms (1800ms under reduced motion), then back to IDLE.",
+    "whyNotANewSystem": "There is exactly one reaction, so the adapter holds one timer and one base state. No queue, no priority scale, no interruption algebra — Phase 4 is where that design belongs."
+  },
+  "productionPerformance": {
+    "surface": "The real dashboard card, 110px frame, 48x48 logical, characterFill 0.90, headless Chrome via Playwright.",
+    "frameCost": {
+      "p50_ms": 0.3,
+      "p95_ms": 0.5,
+      "max_ms": 4.9,
+      "samples": 200,
+      "cellPitchDevicePx": 2.292
+    },
+    "phase1Baseline": "p50 0.1–0.2ms, p95 <=0.5ms at 108–595px on the dev surface. The p50 rose to 0.3ms because the character now fills more of the matrix (564–600 lit cells versus the earlier placeholder), so there is more to composite and rasterise. p95 is unchanged.",
+    "idleWithAutoBlink": {
+      "windowMs": 4004,
+      "framesProduced": 217,
+      "fps": 54,
+      "note": "One visible blink occurred in this window. Continuous rAF is the cost of self-triggered idle animation."
+    },
+    "idleReactiveOnly": {
+      "windowMs": 4006,
+      "framesProduced": 0,
+      "fps": 0,
+      "note": "Zero work: no timer and no frame scheduled."
+    },
+    "decision": "Self-triggered idle animation is OFF on the production card, from this measurement. Measured after the change, the permanently-mounted display produced 0 frames over 5 seconds while resting in `idle`. The doc is explicit that a display which is not changing should not be working (section 16), and this display is never absent. Reactions still animate."
+  },
+  "realCardSizeFindings": {
+    "frame": "126x126 CSS px box; canvas backing store exactly 110x110 device pixels at DPR 1, one DOM node, square, no stretching, no horizontal overflow at any tested width.",
+    "occupancy": [
+      {
+        "characterFill": 0.63,
+        "heightShare": 0.5,
+        "widthShare": null,
+        "clipped": false,
+        "verdict": "reads as lost — 66px of art inside a 110px frame"
+      },
+      {
+        "characterFill": 0.8,
+        "heightShare": 0.646,
+        "widthShare": 0.75,
+        "clipped": false
+      },
+      {
+        "characterFill": 0.85,
+        "heightShare": 0.688,
+        "widthShare": 0.813,
+        "clipped": false
+      },
+      {
+        "characterFill": 0.9,
+        "heightShare": 0.729,
+        "widthShare": 0.833,
+        "clipped": false,
+        "verdict": "chosen"
+      },
+      {
+        "characterFill": 0.95,
+        "heightShare": 0.771,
+        "widthShare": 0.917,
+        "clipped": false
+      },
+      {
+        "characterFill": 1,
+        "heightShare": 0.833,
+        "widthShare": 0.938,
+        "clipped": false,
+        "verdict": "sprout reaches the top edge"
+      }
+    ],
+    "chosenFill": 0.9,
+    "faceResolutionLimit": "The eyes are authored at a fixed share of the body, so they are a fixed share of the art. At the real card they occupy roughly 12 device pixels however the art is scaled — 29 matrix cells at 2.29 device px each. Enlarging the art does not enlarge the eyes in device pixels relative to the frame.",
+    "defectFound": "Mapping spans to snapped edges, below."
+  },
+  "productionDefectsFoundAndFixed": [
+    {
+      "defect": "Character rows rendered as uneven bands at production size.",
+      "detail": "The logical grid dumped from the real card showed reference rows rounding to one logical row, then two, then one — 1-device-pixel-tall body rows among 3-pixel rows, reading as banding.",
+      "cause": "createPlaneMapping scaled a run's width independently of where the run started, so adjacent reference rows could round to the same logical cell or leave a one-cell seam between them.",
+      "fix": "A single `snap()` maps a reference coordinate to a logical cell, and spans are measured between two snapped edges. A row's end is now the next row's start, so the grid cannot develop a seam at any scale.",
+      "scope": "content/sylf/parts.ts only. The engine, renderer, runtime and React host needed no change.",
+      "verified": "The logical grid re-dumped from the real card shows consecutive reference rows tiling exactly."
+    },
+    {
+      "defect": "The character read as lost at the real card size.",
+      "detail": "At the Phase 0 candidate fill of 0.63 the character occupied only 50% of the matrix height at the dashboard card.",
+      "fix": "characterFill 0.90 on the production card, from the occupancy measurement above.",
+      "scope": "app/dashboard/components/PixelCompanionCard.tsx only. The content default is unchanged, so the development surface is unaffected."
+    }
+  ],
+  "gates": {
+    "pixelDisplayAndDashboard": {
+      "files": 12,
+      "tests": 231,
+      "failed": 0
+    },
+    "companionRegression": {
+      "files": 24,
+      "tests": 202,
+      "failed": 0
+    },
+    "typecheck": {
+      "errors": 0
+    },
+    "engineBoundaryTypecheck": {
+      "errors": 0
+    },
+    "lint": "clean on all changed files",
+    "build": "succeeds; /dashboard is static, /dev/pixel-display remains dynamic",
+    "productionInaccessibility": {
+      "/dev/pixel-display": 404,
+      "/dev": 404,
+      "/": 200,
+      "/login": 200,
+      "/dashboard": 307
+    },
+    "mobile": {
+      "build": "succeeds",
+      "verify": "PASSED — zero server-only symbols or secrets in mobile/dist"
+    }
+  },
+  "visualQa": [
+    {
+      "viewport": "1440x950",
+      "canvas": "110x110",
+      "overflowX": false,
+      "mode": "dark"
+    },
+    {
+      "viewport": "1024x900",
+      "canvas": "110x110",
+      "overflowX": false,
+      "mode": "dark"
+    },
+    {
+      "viewport": "820x900",
+      "canvas": "110x110",
+      "overflowX": false,
+      "mode": "dark"
+    },
+    {
+      "viewport": "390x800",
+      "canvas": "110x110",
+      "overflowX": false,
+      "mode": "dark",
+      "note": "The card stacks; the display keeps its 110px box and the surrounding identity UI is unchanged."
+    },
+    {
+      "viewport": "1440x950",
+      "canvas": "110x110",
+      "mode": "light with custom accent #0f766e",
+      "note": "The matrix keeps its dark backdrop inside a light card frame, which is correct for a screen."
+    }
+  ],
+  "accessibility": {
+    "canvas": "aria-hidden — no task depends on seeing the companion.",
+    "nonVisualEquivalent": "While a reaction is being reported, a role=status region on the card carries a sentence naming the new level (and a rank increase when there was one). It is silent at rest.",
+    "reducedMotion": "The reaction is preserved under reduced motion but shortened to 1800ms, and the spoken equivalent is unaffected. A reaction that never appeared would hide the information rather than reduce motion.",
+    "authorityUnchanged": "The level-up overlay remains the owner of celebrating a level-up. The companion reaction is additive and decides nothing."
+  },
+  "openDecisions": {
+    "O1": {
+      "status": "open, better informed",
+      "finding": "48x48 at the real 110px card yields a 2.29 device-pixel cell pitch. The grid still reads as a display."
+    },
+    "O2": {
+      "status": "open, confirmed",
+      "finding": "Inactive cells fully off reads correctly against a dark card and a light card."
+    },
+    "O12": {
+      "status": "open, better informed",
+      "finding": "The real card is exactly 110px CSS with a 110x110 backing store at DPR 1. Verified stable from 390 to 1440 CSS px with no overflow."
+    },
+    "O14": {
+      "status": "open, sharpened",
+      "finding": "0.90 fill suits the card; 0.63 does not. But the face's readability at 110px is set by the character's authored proportions, not by the fill."
+    },
+    "O15": {
+      "status": "open, materially informed",
+      "finding": "At the real card the eyes are about 12 device pixels and the glint is a single device pixel. REST and a blink are not distinguishable at a glance. This is the clearest evidence yet that the eye vocabulary needs either a larger slot or a different small-size treatment."
+    },
+    "O16": {
+      "status": "new",
+      "finding": "The supported presentation range for a *production* surface, as distinct from the engine's verified range, is still open: only 110px is exercised in production."
+    }
+  },
+  "limits": [
+    "Live high-DPI rendering remains unobserved (O13): the browser reported devicePixelRatio 1, so the 110px backing store is a 1x capture.",
+    "The frame cost was measured in headless Chrome with CPU rasterisation, which is not a real GPU-accelerated production profile.",
+    "The end-to-end signal was verified at browser level by applying the same state the adapter applies; the adapter mapping itself is verified by tests. No real level-up was triggered against the production database, which would have mutated a real scholar's progression.",
+    "The dashboard requires an authenticated session; QA used a read-only session token minted for an existing local account, and no user data was modified."
+  ]
+}

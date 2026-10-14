@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-10-08T17:51:44.467Z",
+  "finishedAt": "2026-10-08T17:54:26.663Z",
+  "results": [
+    {
+      "name": "docker-regressions",
+      "startedAt": "2026-10-08T17:51:44.492Z",
+      "finishedAt": "2026-10-08T17:51:57.343Z",
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "native-regressions",
+      "startedAt": "2026-10-08T17:51:57.344Z",
+      "finishedAt": "2026-10-08T17:52:04.689Z",
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "owned-research-live",
+      "startedAt": "2026-10-08T17:52:04.689Z",
+      "finishedAt": "2026-10-08T17:54:21.900Z",
+      "code": 0,
+      "signal": null
+    }
+  ],
+  "changedDuringRun": [],
+  "sourceCount": 3530,
+  "status": "OBSERVED",
+  "fullAcceptanceGate": false
+}

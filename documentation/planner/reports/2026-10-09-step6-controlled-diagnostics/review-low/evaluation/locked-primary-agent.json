@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "status": "LOCKED_PRIMARY_INDEPENDENT_AI_AGENT_REVIEW_ASSESSMENT",
+  "lockedAtUtc": "2026-10-09T14:03:32.168936+00:00",
+  "reviewer": "Independent AI-agent /root/independent_label_signoff",
+  "humanEvaluation": false,
+  "independentOfCaseAuthor": true,
+  "independentOfTestedProvider": true,
+  "providerCallsMadeByReviewer": 0,
+  "subagentsSpawned": 0,
+  "method": {
+    "readBeforeLock": [
+      "review-low/evaluation/reviews-blind.json",
+      "evaluator/RUBRIC.md"
+    ],
+    "notReadBeforeLock": [
+      "review-low/evaluation/mapping-private.json",
+      "review-low paid receipts",
+      "parent assessment or comparison"
+    ],
+    "sequence": "Complete accepted review inputs, canonical candidate content, supplied message bodies and exact final receipts inspected from the blind bundle before recording this primary. Literal output grounds checked against the original full reviewInput.grounding text. Formal strict-validator receipts will be read only after this lock.",
+    "blindingLimitations": "Neutral IDs and execution/configuration mapping were withheld. The task title explicitly names the Low experiment, and prior signoff knowledge recognizes these two scenarios and their gold mixture. This is not full configuration or task blinding.",
+    "fairness": "Judge consequential content and literal grounding, not exact author category/wording. No method/timebox preference is a blocker. Blank/capped output receives no semantic score or inferred verdict."
+  },
+  "inputs": [
+    {
+      "path": "review-low/evaluation/reviews-blind.json",
+      "sha256": "200e872009a18b642eb39374306ee3abbb9bdb0fbe4abebf614487e0b97ac338"
+    },
+    {
+      "path": "evaluator/RUBRIC.md",
+      "sha256": "8dd0ad4d74a1deb7e165972a3b4635cf271a831310200838bbf07ad1a4b13c7d"
+    }
+  ],
+  "assessments": [
+    {
+      "assessmentId": "B01",
+      "reviewInputSha256": "c3ffc8c90add2dbf5edc4c7fd0b0f118c43de85122df5a0e896cfa1f578f8c67",
+      "suppliedModelMessageBodySha256": "7a6dacfe86a54e043760c30fa015316757d91b4f553a0554d2883d123f8a7bf6",
+      "rawFinalTextSha256": "99f1210be7ce3e6adcf96d723c804372ef8c4b49e648e7727c3e67e0abd5240f",
+      "verbatimRawFinalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_work2_stop_violation\",\"category\":\"STRUCTURAL\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_2\",\"strategy\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/accepted\",\"excerpt\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"All twelve rewrites are done even after checked success.\"},{\"ref\":\"plan_1/uncertainty\",\"excerpt\":\"Meet the accepted criterion or record the specific unresolved gap.\"}],\"evidence\":\"The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.\",\"consequence\":\"The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.\",\"requestedResolution\":\"Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.\",\"requiresAcknowledgement\":false}]}]}",
+      "finishReason": "stop",
+      "contentComplete": true,
+      "acceptedOutcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+      "completeCandidateInspected": true,
+      "effortAndStructure": {
+        "recommendedEffort": {
+          "lowMinutes": 40,
+          "likelyMinutes": 40,
+          "highMinutes": 40
+        },
+        "workloadAudit": [
+          {
+            "planRef": "plan_1",
+            "bookedTimeboxMinutes": 40,
+            "unprotectedTimeboxMinutes": 40,
+            "protectedRemainingMinutes": 0,
+            "remainingCommittedMinutes": 40,
+            "recommendedEffort": {
+              "lowMinutes": 40,
+              "likelyMinutes": 40,
+              "highMinutes": 40
+            },
+            "remainingAboveStrategyHigh": false,
+            "committedRefs": [
+              "work_1",
+              "work_2"
+            ]
+          }
+        ],
+        "allocation": {
+          "schemaVersion": 2,
+          "status": "FEASIBLE",
+          "placements": [
+            {
+              "planRef": "plan_1",
+              "activityRef": "work_1",
+              "minutes": 10,
+              "date": "2026-10-12"
+            },
+            {
+              "planRef": "plan_1",
+              "activityRef": "work_2",
+              "minutes": 30,
+              "date": "2026-10-12"
+            }
+          ],
+          "unscheduled": [],
+          "committedMinutes": 40,
+          "capacityProof": null,
+          "findings": [
+            {
+              "findingId": "finding_ed329fe5b20f4d190a99",
+              "category": "FINISH",
+              "consequential": false,
+              "planRefs": [
+                "plan_1"
+              ],
+              "activityRefs": [],
+              "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+              "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+            }
+          ]
+        },
+        "sharedDependencies": [],
+        "splits": [],
+        "protectedExecution": []
+      },
+      "formalStrictValidatorOutcome": "NOT_CONSULTED_BEFORE_LOCK; VERIFY_AFTER_LOCK",
+      "candidateIndependentJudgment": "SERIOUS_CONCRETE_DEFECT",
+      "candidateSeriousness": "SERIOUS",
+      "candidateRationale": "The accepted stopping point is one correct checked citation. work_1 produces it correctly; work_2 then compulsorily requires twelve identical rewrites after success. Its committed 30-minute estimate is beyond that stopping gate without a supported educational purpose. Daily feasibility and matching 40-minute strategy/booked effort do not cure the contradiction.",
+      "candidateGrounds": {
+        "requirementQuote": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+        "proposalInstructionsQuote": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+        "proposalCriterionQuote": "All twelve rewrites are done even after checked success.",
+        "consequence": "The candidate mandates twelve redundant rewrites and a further booked 30 minutes after the explicit accepted success gate. It requires substantive removal or withdrawal of that compulsory work."
+      },
+      "assessability": "ASSESSABLE_COMPLETE_STOP",
+      "operationalDelivery": "COMPLETE_JSON_DELIVERED",
+      "manualOutputValidity": "ONE_PLAN_ONE_ISSUE_WITH_EXPECTED_FIELDS; CANONICAL_VALIDATOR_PENDING",
+      "semanticJudgment": "PASS",
+      "consequentialDefectCorrectlyDetected": true,
+      "rawIdentifiedIssues": [
+        {
+          "issueId": "issue_work2_stop_violation",
+          "category": "STRUCTURAL",
+          "severity": "BLOCKING",
+          "affectedRefs": [
+            "work_2",
+            "strategy"
+          ],
+          "basis": "CONCRETE_VIOLATION",
+          "grounds": [
+            {
+              "ref": "plan_1/accepted",
+              "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+            },
+            {
+              "ref": "plan_1/activity/work_2",
+              "excerpt": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily."
+            },
+            {
+              "ref": "plan_1/activity/work_2",
+              "excerpt": "All twelve rewrites are done even after checked success."
+            },
+            {
+              "ref": "plan_1/uncertainty",
+              "excerpt": "Meet the accepted criterion or record the specific unresolved gap."
+            }
+          ],
+          "evidence": "The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.",
+          "consequence": "The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.",
+          "requestedResolution": "Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.",
+          "requiresAcknowledgement": false
+        }
+      ],
+      "identifiedIssueCount": 1,
+      "groundingChecks": [
+        {
+          "ref": "plan_1/accepted",
+          "kind": "REQUIREMENT",
+          "path": "goals[0].resolved",
+          "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+          "literalMatch": true
+        },
+        {
+          "ref": "plan_1/activity/work_2",
+          "kind": "PROPOSAL",
+          "path": "proposal.blueprints.plans[0].blueprint.activities[1]",
+          "excerpt": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.",
+          "literalMatch": true
+        },
+        {
+          "ref": "plan_1/activity/work_2",
+          "kind": "PROPOSAL",
+          "path": "proposal.blueprints.plans[0].blueprint.activities[1]",
+          "excerpt": "All twelve rewrites are done even after checked success.",
+          "literalMatch": true
+        },
+        {
+          "ref": "plan_1/uncertainty",
+          "kind": "PROPOSAL",
+          "path": "proposal.blueprints.plans[0].blueprint.decisions",
+          "excerpt": "Meet the accepted criterion or record the specific unresolved gap.",
+          "literalMatch": true
+        }
+      ],
+      "groundingValidity": "PASS_LITERAL_AND_SUBSTANTIVE",
+      "extraFalseBlockerCount": 0,
+      "missedConsequentialDefect": false,
+      "correctVerdict": true,
+      "seriousReviewerDefect": false,
+      "reviewerIssues": [],
+      "rationale": "The sole issue identifies the actual compulsory post-success work, quotes both the accepted outcome and original offending instructions/criterion, and explains its unnecessary booked work and stopping-rule consequence. Its request to remove work_2 plus related effort/allocation/dependency entries preserves the valid first citation check. STRUCTURAL is a defensible category for the conflicting compulsory plan structure; exact authored category wording is not required. No unsupported blocker, stylistic preference or duration floor is introduced.",
+      "reviewOutputQuotes": {
+        "evidence": "The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.",
+        "consequence": "The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.",
+        "requestedResolution": "Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop."
+      },
+      "admissibleAlternatives": "Any independently checked single citation matching the actual pattern is valid; remediation can be conditional on an actual failure. Compulsory twelve post-success copies are not justified by capacity or a preferred practice method."
+    },
+    {
+      "assessmentId": "B02",
+      "reviewInputSha256": "65763614f7c36bd6f606ce1df6e81ca37e68333a9250c14f9c38ad3f258b5c2b",
+      "suppliedModelMessageBodySha256": "be9d76545fde6151fe2c0e1960e6c613be60f6553f1ace1fdb2ea5572de5e271",
+      "rawFinalTextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "verbatimRawFinalText": "",
+      "finishReason": "length",
+      "contentComplete": false,
+      "acceptedOutcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+      "completeCandidateInspected": true,
+      "effortAndStructure": {
+        "recommendedEffort": {
+          "lowMinutes": 10,
+          "likelyMinutes": 10,
+          "highMinutes": 10
+        },
+        "workloadAudit": [
+          {
+            "planRef": "plan_1",
+            "bookedTimeboxMinutes": 10,
+            "unprotectedTimeboxMinutes": 10,
+            "protectedRemainingMinutes": 0,
+            "remainingCommittedMinutes": 10,
+            "recommendedEffort": {
+              "lowMinutes": 10,
+              "likelyMinutes": 10,
+              "highMinutes": 10
+            },
+            "remainingAboveStrategyHigh": false,
+            "committedRefs": [
+              "work_1"
+            ]
+          }
+        ],
+        "allocation": {
+          "schemaVersion": 2,
+          "status": "FEASIBLE",
+          "placements": [
+            {
+              "planRef": "plan_1",
+              "activityRef": "work_1",
+              "minutes": 10,
+              "date": "2026-10-12"
+            }
+          ],
+          "unscheduled": [],
+          "committedMinutes": 10,
+          "capacityProof": null,
+          "findings": [
+            {
+              "findingId": "finding_ed329fe5b20f4d190a99",
+              "category": "FINISH",
+              "consequential": false,
+              "planRefs": [
+                "plan_1"
+              ],
+              "activityRefs": [],
+              "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+              "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+            }
+          ]
+        },
+        "sharedDependencies": [],
+        "splits": [],
+        "protectedExecution": []
+      },
+      "formalStrictValidatorOutcome": "NOT_CONSULTED_BEFORE_LOCK; VERIFY_AFTER_LOCK",
+      "candidateIndependentJudgment": "NO_CONCRETE_BLOCKER",
+      "candidateSeriousness": "NONE",
+      "candidateRationale": "The written task uses the supplied morning/evening greetings, covers the key, chooses on fresh stated-time prompts and explains the time match. The instructions require the accepted explanation even though the abbreviated criterion names written choices only. No pronunciation requirement, extra curriculum or unavailable resource is needed. The 10-minute bounded check fits the 30-minute daily capacity and has no shared, split or protected-work complication.",
+      "candidateGrounds": {
+        "requirementQuote": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+        "proposalInstructionsQuote": "For morning choose おはよう; for evening choose こんばんは. Cover the key, choose for two new morning/evening prompts and explain the time match.",
+        "proposalCriterionQuote": "Written choices match the supplied time categories.",
+        "consequence": "A nonblocking clarification could repeat the explanation in the criterion; the full instruction already requires it. Pronunciation preference alone cannot justify a blocker."
+      },
+      "assessability": "UNASSESSABLE_BLANK_CAPPED",
+      "operationalDelivery": "FAIL_BLANK_CAPPED",
+      "manualOutputValidity": "NO_COMPLETE_OUTPUT_TO_VALIDATE",
+      "semanticJudgment": "UNASSESSABLE",
+      "consequentialDefectCorrectlyDetected": null,
+      "rawIdentifiedIssues": null,
+      "identifiedIssueCount": null,
+      "groundingChecks": null,
+      "groundingValidity": null,
+      "extraFalseBlockerCount": null,
+      "missedConsequentialDefect": null,
+      "correctVerdict": null,
+      "seriousReviewerDefect": null,
+      "reviewerIssues": null,
+      "rationale": "The final text is exactly empty and finish is length. No educational verdict, preference note, grounding evidence or issue can be inferred. A blank result is an operational failure, not a sound judgment or true negative.",
+      "admissibleAlternatives": "Written choice/explanation is sufficient; an optional pronunciation suggestion or explicit-explanation criterion advisory may be legitimate but is not required. Empty completed findings could be valid; this receipt is not a completed empty-findings verdict."
+    }
+  ],
+  "summary": {
+    "cases": 2,
+    "completeReviewOutputs": 1,
+    "blankCappedOutputs": 1,
+    "assessableSemanticReviews": 1,
+    "semanticallyCorrectAssessableReviews": 1,
+    "confirmedSemanticFailures": 0,
+    "operationalFailures": 1,
+    "observedCorrectConsequentialDefectDetections": 1,
+    "extraFalseBlockersOnAssessableReviews": 0,
+    "nondefectiveReviewVerdict": "UNASSESSABLE",
+    "allTwoReviewGate": "NOT_PASSED_DELIVERY_FAILURE; STRICT_VALIDATION_PENDING",
+    "blankIncludedInAccuracyDenominator": false,
+    "noFurtherDiagnosticsAuthorized": true
+  }
+}

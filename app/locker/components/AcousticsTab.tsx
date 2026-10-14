@@ -104,16 +104,7 @@ export function AcousticsTab() {
       {/* ─── Acoustics Header ───────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-subtle pb-5 w-full min-w-0">
         <div className="min-w-0">
-          <div className={`${styles.eyebrow} mb-2`}>
-            <span className={styles.eyebrowDot} />
-            <span>Soundscapes // Acoustics Matrix</span>
-          </div>
-          <h1 className={styles.title}>
-            Scholar <em>Acoustics</em>
-          </h1>
-          <p className="text-xs text-text-muted font-['Rajdhani'] mt-0.5">
-            Ambient soundscapes and multi-track audio for deep focus sessions.
-          </p>
+          <h2 className={styles.title}>Acoustics</h2>
         </div>
 
         {/* Category Filters */}

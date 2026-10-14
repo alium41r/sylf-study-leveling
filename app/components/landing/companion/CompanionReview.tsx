@@ -10,46 +10,11 @@ import {
   type CompanionState,
 } from "./model";
 import s from "./CompanionReview.module.css";
-import {
-  setPixelCompanionPreview,
-  setPixelCompanionVariant,
-  setPixelEyePreview,
-  usePixelCompanionVariant,
-  usePixelEyePreview,
-  PIXEL_EYE_STATES,
-  type PixelEyeState,
-} from "./pixel-preview";
+
 
 const label = (value: string) => value.toLowerCase().replaceAll("_", " ");
 export default function CompanionReview() {
-  const pixelVariant = usePixelCompanionVariant();
-  const pixelPreview = pixelVariant !== "svg";
-  const pixelEye = usePixelEyePreview();
-  const comparisonQuery =
-    pixelVariant === "svg"
-      ? ""
-      : `?companion=${pixelVariant}${pixelVariant === "pixel-layered" ? `&eyes=${pixelEye}` : ""}`;
-  const blinkTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const clearBlink = () => {
-    blinkTimers.current.forEach(clearTimeout);
-    blinkTimers.current = [];
-  };
-  useEffect(
-    () => () => {
-      blinkTimers.current.forEach(clearTimeout);
-    },
-    []
-  );
-  const testBlink = () => {
-    clearBlink();
-    setPixelEyePreview("neutral");
-    blinkTimers.current.push(
-      setTimeout(() => setPixelEyePreview("blink"), 100)
-    );
-    blinkTimers.current.push(
-      setTimeout(() => setPixelEyePreview("neutral"), 240)
-    );
-  };
+  const pixelPreview = false;
   const [state, setState] = useState<CompanionState>("IDLE");
   const [reaction, setReaction] = useState<CompanionReaction>();
   const [count, setCount] = useState(0);
@@ -187,73 +152,8 @@ export default function CompanionReview() {
             One character. Original palette. A little life between the chapters.
           </p>
         </div>
-        <Link href={`/${comparisonQuery}`}>View the landing page →</Link>
+        <Link href="/">View the landing page →</Link>
       </header>
-      {process.env.NODE_ENV === "development" && (
-        <div
-          className={s.comparison}
-          aria-label="Development companion comparison"
-        >
-          <p className={s.eyebrow}>DEVELOPMENT ONLY · PIXEL PHASES 1 & 2</p>
-          <div className={s.buttons}>
-            <button
-              aria-pressed={pixelVariant === "svg"}
-              onClick={() => {
-                clearBlink();
-                setPixelCompanionPreview(false);
-              }}
-            >
-              Current SVG companion
-            </button>
-            <button
-              aria-pressed={pixelVariant === "pixel"}
-              onClick={() => {
-                clearBlink();
-                setPixelCompanionPreview(true);
-              }}
-            >
-              New pixel companion
-            </button>
-            <button
-              aria-pressed={pixelVariant === "pixel-layered"}
-              onClick={() => {
-                clearBlink();
-                setPixelCompanionVariant("pixel-layered");
-              }}
-            >
-              Layered pixel companion
-            </button>
-            <Link href={`/onboarding${comparisonQuery}`}>
-              View onboarding →
-            </Link>
-          </div>
-          <p>
-            Compare the complete Phase 1 artwork with the Phase 2 body and
-            isolated eyes, then use the links for the small landing traveler and
-            medium onboarding character. The SVG studies below stay available.
-          </p>
-          {pixelVariant === "pixel-layered" && (
-            <div className={`${s.eyeControls} ${s.buttons}`}>
-              <label htmlFor="pixel-eye-state">Pixel eye expression</label>
-              <select
-                id="pixel-eye-state"
-                value={pixelEye}
-                onChange={(event) => {
-                  clearBlink();
-                  setPixelEyePreview(event.target.value as PixelEyeState);
-                }}
-              >
-                {PIXEL_EYE_STATES.map((eye) => (
-                  <option key={eye} value={eye}>
-                    {label(eye)}
-                  </option>
-                ))}
-              </select>
-              <button onClick={testBlink}>Test blink</button>
-            </div>
-          )}
-        </div>
-      )}
       <section className={s.stage} aria-label="Interactive motion review">
         <div className={s.canvas}>
           <Companion

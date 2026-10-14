@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-08T15:20:30.067354+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-08T14-58-39-086Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "860f3e5bfc4859eb9832349af7798eebcfd0af3bdccd0eaad6ceae380ad89b8e",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "reviewTemperature": null,
+    "reviewThinking": "enabled",
+    "reviewReasoningEffort": "low",
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      {
+        "id": "contradictory-readiness",
+        "trial": 2,
+        "attemptId": "29cb8758-60ba-4f95-9788-9fa2eeb91a0a"
+      }
+    ],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 20,
+  "usage": {
+    "reportedInputTokens": 128470,
+    "reportedOutputTokens": 51586,
+    "settledCalls": 20,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 20
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 10032.5,
+    "p90Ms": 20184,
+    "maximumMs": 24767
+  },
+  "passed": 1,
+  "total": 6,
+  "cases": [
+    {
+      "id": "method-weakness",
+      "trial": 1,
+      "attemptId": "4c83f723-881f-4a1b-a031-164bf1f82cca",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Independent review and its actual fallback exhaust4096 output tokens with OUTPUT_TRUNCATED. Usage is settled, no review is accepted and no candidate/apply/repair occurs. A safe failure does not meet registered educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "OUTPUT_TRUNCATED",
+        "stage": "REVIEW",
+        "message": "The provider reached its output limit.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "75c4a714-4308-49c3-88b1-3755a178f15f"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "method-weakness",
+      "trial": 2,
+      "attemptId": "fc0a1500-fe0f-4da8-aab0-ff9f4ebe47c7",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Independent review and its actual fallback exhaust4096 output tokens with OUTPUT_TRUNCATED. Usage is settled, no review is accepted and no candidate/apply/repair occurs. A safe failure does not meet registered educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "OUTPUT_TRUNCATED",
+        "stage": "REVIEW",
+        "message": "The provider reached its output limit.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "2667b8f1-b0e8-4df9-ba72-31aed5696f10"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 1,
+      "attemptId": "a84084ba-be16-4862-9a6c-7f75f7895f5d",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Independent review and its actual fallback exhaust4096 output tokens with OUTPUT_TRUNCATED. Usage is settled, no review is accepted and no candidate/apply/repair occurs. A safe failure does not meet registered educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "OUTPUT_TRUNCATED",
+        "stage": "REVIEW",
+        "message": "The provider reached its output limit.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "0159553a-a186-4e0d-a636-7025b21f72eb"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 2,
+      "attemptId": "41c35439-44f9-49f7-a348-aaae2b2c2b53",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Actual owned hash/content and course-outcome verification/adoption retain UNKNOWN issuer authority. One integrated90-minute CSV/grouping/malformed-row build and changed-data demonstration is genuinely split45/45, supplies learner-created data and permits new learning. Complete scope/provenance, valid independent review and canonical apply are observed; no named compiler repair occurs. Tool/library guidance remains sparse, not fabricated source content.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 1,
+      "attemptId": "4f2fb26e-37fe-4d31-a857-2d941eda544a",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Independent review and its actual fallback exhaust4096 output tokens with OUTPUT_TRUNCATED. Usage is settled, no review is accepted and no candidate/apply/repair occurs. A safe failure does not meet registered educational qualification.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "OUTPUT_TRUNCATED",
+        "stage": "REVIEW",
+        "message": "The provider reached its output limit.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "07deccd9-ea14-4c83-95fc-8d15c2327a02"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 2,
+      "attemptId": "29cb8758-60ba-4f95-9788-9fa2eeb91a0a",
+      "status": "FAILED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "One bounded adaptation retains an oversized70-minute compulsory methods lesson against60-minute slots and ends NEEDS_DECISION. Tasks still assume nodal/mesh/source transformation and specify circuit descriptions without indispensable values or explicit permission to choose them. This is not the registered proportionate readiness/check outcome and has no named compiler repair.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    }
+  ],
+  "operationalFailures": 4,
+  "historicalSourceOnly": true
+}

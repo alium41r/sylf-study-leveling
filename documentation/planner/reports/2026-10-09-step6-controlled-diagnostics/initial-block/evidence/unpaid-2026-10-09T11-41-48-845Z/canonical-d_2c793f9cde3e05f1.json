@@ -1,0 +1,117 @@
+{
+  "attempt": {
+    "schemaVersion": 2,
+    "attemptId": "d8c5e9ec-3b8f-4156-be11-8e7016fd6326",
+    "ownerId": 17,
+    "kind": "PLAN",
+    "state": "CANCELLED",
+    "stage": "PREFLIGHT",
+    "idempotencyKey": "3c8a160b-018e-46d9-9e19-6734ec449977",
+    "requestHash": "824950b4cd9b555ed74c31c618041d0f3b5063bff77bca47dffde3af9f907005",
+    "requestedAt": "2026-10-09T11:42:03.526Z",
+    "parentAttemptId": null,
+    "acceptedRequest": {
+      "text": "Isolated educational diagnostic: d_2c793f9cde3e05f1",
+      "authorization": "PLAN_ACTION",
+      "researchRequested": false,
+      "targetAuthorizationDigest": "0680b07f0773b3d0b15558c591309147d825f83a13a44e58796985552f2d6e63"
+    },
+    "targets": [
+      {
+        "planId": "4613d32f-1da8-4057-8275-500a37c3c930",
+        "requestedIntentVersionId": "1fb0a022-e36a-4964-b194-32ea8051b34e",
+        "resolvedIntentVersionId": null,
+        "resolution": null,
+        "baseActiveRevisionId": null,
+        "sourceCandidateRevisionId": null,
+        "planningVersion": 0,
+        "resolvedPlanningVersion": null,
+        "contextDigest": null
+      }
+    ],
+    "budget": {
+      "rootRequestId": "b9b52b4e-fc7c-45d9-9042-6f94d636ca63",
+      "profile": "EDUCATIONAL",
+      "foregroundProcessingMs": 0,
+      "processingStartedAt": "2026-10-09T11:42:03.539Z",
+      "executionDeadlineAt": "2026-10-09T11:45:03.539Z",
+      "consumed": {
+        "modelCalls": 1,
+        "inputTokens": 11080,
+        "outputTokens": 4096,
+        "planningCalls": 1,
+        "researchSynthesisCalls": 0,
+        "researchQueries": 0,
+        "fetchAttempts": 0,
+        "selectedSourceCharacters": 0,
+        "extractedPages": 0,
+        "ocrPages": 0,
+        "followUps": 0
+      },
+      "reserved": {
+        "modelCalls": 0,
+        "inputTokens": 0,
+        "outputTokens": 0
+      }
+    },
+    "fence": 1,
+    "lease": null,
+    "checkpoint": null,
+    "question": null,
+    "error": null,
+    "result": null,
+    "applyReceipt": null
+  },
+  "payload": {
+    "calls": [
+      {
+        "fence": 1,
+        "model": "deepseek-flash",
+        "stage": "PREFLIGHT",
+        "state": "SETTLED",
+        "callId": "7ce82eb8-a885-4f06-add8-a73dcc76b8c4",
+        "costUsd": null,
+        "pricing": "UNKNOWN",
+        "provider": "deepseek",
+        "attemptId": "d8c5e9ec-3b8f-4156-be11-8e7016fd6326",
+        "rootRequestId": "b9b52b4e-fc7c-45d9-9042-6f94d636ca63",
+        "schemaVersion": 2,
+        "settlementKey": "7ce82eb8-a885-4f06-add8-a73dcc76b8c4",
+        "actualInputTokens": 11080,
+        "actualOutputTokens": 4096,
+        "reservedInputTokens": 11080,
+        "reservedOutputTokens": 4096
+      }
+    ],
+    "quotaReceipt": {
+      "state": "SETTLED",
+      "userId": 17,
+      "dateKey": "2026-10-05",
+      "feature": "planner",
+      "resetsAt": "2026-10-12T00:00:00.000Z",
+      "settledAt": "2026-10-09T11:42:03.597Z",
+      "unlimited": true,
+      "reservedAt": "2026-10-09T11:42:03.586Z",
+      "schemaVersion": 1
+    },
+    "providerCalls": {
+      "7ce82eb8-a885-4f06-add8-a73dcc76b8c4": {
+        "purpose": "REVIEW",
+        "reservedAt": "2026-10-09T11:42:03.585Z",
+        "completedAt": "2026-10-09T11:42:03.689Z",
+        "dispatchedAt": "2026-10-09T11:42:03.596Z",
+        "finishReason": "STOP"
+      }
+    },
+    "providerGuard": {
+      "reviewReserve": {
+        "inputTokens": 11080,
+        "outputTokens": 4096
+      },
+      "reviewCompleted": true
+    },
+    "callCategories": {
+      "7ce82eb8-a885-4f06-add8-a73dcc76b8c4": "PLANNING"
+    }
+  }
+}

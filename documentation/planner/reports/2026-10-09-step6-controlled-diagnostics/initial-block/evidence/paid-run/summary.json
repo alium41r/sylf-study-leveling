@@ -1,0 +1,32 @@
+{
+  "status": "COMPLETE_UNASSESSED",
+  "mode": "PAID",
+  "paidCalls": 10,
+  "interceptedRequests": 0,
+  "calls": 10,
+  "stopped": null,
+  "reservedUsd": 0.1063986,
+  "actualPeakUpperEstimateUsd": 0.0272352,
+  "sleep": {
+    "start": {
+      "pid": 94163,
+      "ownerPid": 94162,
+      "assertions": [
+        "pid 94163(caffeinate): [0x000e29270001a27b] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\""
+      ],
+      "verifiedAt": "2026-10-09T12:42:10.390Z"
+    },
+    "end": {
+      "pid": 94163,
+      "ownerPid": 94162,
+      "assertions": [
+        "pid 94163(caffeinate): [0x000e29270001a27b] 00:01:53 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+        "pid 94163(caffeinate): [0x000e29270005a27c] 00:01:53 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+        "pid 94163(caffeinate): [0x000e29270007a27d] 00:01:53 PreventSystemSleep named: \"caffeinate command-line tool\""
+      ],
+      "verifiedAt": "2026-10-09T12:44:03.437Z"
+    }
+  },
+  "productionRoutingChanged": false,
+  "publication": "FORBIDDEN"
+}

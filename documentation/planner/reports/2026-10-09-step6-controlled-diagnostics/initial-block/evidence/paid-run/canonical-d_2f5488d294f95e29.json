@@ -1,0 +1,116 @@
+{
+  "attempt": {
+    "schemaVersion": 2,
+    "attemptId": "6f2679eb-b7bd-4d31-b344-5e8b2f1f2a97",
+    "ownerId": 7,
+    "kind": "PLAN",
+    "state": "CANCELLED",
+    "stage": "PREFLIGHT",
+    "idempotencyKey": "499cf654-2acf-4aba-9fb3-7c454b7dfb2a",
+    "requestHash": "1f9a8e768092bfb9e55f27e24cb5dfe988bdb4e0124de5ea1f03f2c1aa8c51a1",
+    "requestedAt": "2026-10-09T12:43:07.632Z",
+    "parentAttemptId": null,
+    "acceptedRequest": {
+      "text": "Isolated educational diagnostic: d_2f5488d294f95e29",
+      "authorization": "PLAN_ACTION",
+      "researchRequested": false,
+      "targetAuthorizationDigest": "dc759183616421e9dc5a0d71f77c46fddb31c096a5cb681db0aa93fa5dea43d0"
+    },
+    "targets": [
+      {
+        "planId": "4139a60c-0aae-411c-aa88-ba3e79ce0c74",
+        "requestedIntentVersionId": "5b05a11d-14fa-4c7d-ae44-f77ea35a3c6b",
+        "resolvedIntentVersionId": null,
+        "resolution": null,
+        "baseActiveRevisionId": null,
+        "sourceCandidateRevisionId": null,
+        "planningVersion": 0,
+        "resolvedPlanningVersion": null,
+        "contextDigest": null
+      }
+    ],
+    "budget": {
+      "rootRequestId": "c7f503b5-e092-42e7-9259-e0e6d5ae2681",
+      "profile": "EDUCATIONAL",
+      "foregroundProcessingMs": 0,
+      "processingStartedAt": "2026-10-09T12:43:07.652Z",
+      "executionDeadlineAt": "2026-10-09T12:46:07.652Z",
+      "consumed": {
+        "modelCalls": 1,
+        "inputTokens": 950,
+        "outputTokens": 699,
+        "planningCalls": 1,
+        "researchSynthesisCalls": 0,
+        "researchQueries": 0,
+        "fetchAttempts": 0,
+        "selectedSourceCharacters": 0,
+        "extractedPages": 0,
+        "ocrPages": 0,
+        "followUps": 0
+      },
+      "reserved": {
+        "modelCalls": 0,
+        "inputTokens": 0,
+        "outputTokens": 0
+      }
+    },
+    "fence": 1,
+    "lease": null,
+    "checkpoint": null,
+    "question": null,
+    "error": null,
+    "result": null,
+    "applyReceipt": null
+  },
+  "payload": {
+    "calls": [
+      {
+        "fence": 1,
+        "model": "deepseek-flash",
+        "stage": "PREFLIGHT",
+        "state": "SETTLED",
+        "callId": "d3e222dd-25e3-4283-86d7-8698a8ed53ed",
+        "costUsd": null,
+        "pricing": "UNKNOWN",
+        "provider": "deepseek",
+        "attemptId": "6f2679eb-b7bd-4d31-b344-5e8b2f1f2a97",
+        "rootRequestId": "c7f503b5-e092-42e7-9259-e0e6d5ae2681",
+        "schemaVersion": 2,
+        "settlementKey": "d3e222dd-25e3-4283-86d7-8698a8ed53ed",
+        "actualInputTokens": 950,
+        "actualOutputTokens": 699,
+        "reservedInputTokens": 4337,
+        "reservedOutputTokens": 8192
+      }
+    ],
+    "quotaReceipt": {
+      "state": "SETTLED",
+      "userId": 7,
+      "dateKey": "2026-10-05",
+      "feature": "planner",
+      "resetsAt": "2026-10-12T00:00:00.000Z",
+      "settledAt": "2026-10-09T12:43:07.724Z",
+      "unlimited": true,
+      "reservedAt": "2026-10-09T12:43:07.711Z",
+      "schemaVersion": 1
+    },
+    "providerCalls": {
+      "d3e222dd-25e3-4283-86d7-8698a8ed53ed": {
+        "purpose": "BLUEPRINT",
+        "reservedAt": "2026-10-09T12:43:07.710Z",
+        "completedAt": "2026-10-09T12:43:12.851Z",
+        "dispatchedAt": "2026-10-09T12:43:07.722Z",
+        "finishReason": "STOP"
+      }
+    },
+    "providerGuard": {
+      "reviewReserve": {
+        "inputTokens": 8192,
+        "outputTokens": 4096
+      }
+    },
+    "callCategories": {
+      "d3e222dd-25e3-4283-86d7-8698a8ed53ed": "PLANNING"
+    }
+  }
+}

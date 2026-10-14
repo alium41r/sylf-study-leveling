@@ -1,6 +1,13 @@
 # Landing companion history and evidence
 
+**8 October 2026:** built-in Pixel characters, raster previews and their comparison
+route are retired. Users supply their own artwork. The landing SVG illustration
+is separate. See the [current Pixel contract](../pixel-display/pixel-display-contract.md).
+
+
 Current source entry points are the [SVG renderer](../../app/components/landing/companion/Companion.tsx), [artwork](../../app/components/landing/companion/artwork.tsx), [MagicalEyes](../../app/components/landing/companion/MagicalEyes.tsx), [review surface](../../app/components/landing/companion/CompanionReview.tsx), [JourneyCompanion](../../app/components/landing/companion/JourneyCompanion.tsx), and [JourneyPath](../../app/components/landing/journey/JourneyPath.tsx). Reports below describe their own task state and are not current contracts.
+
+The authenticated app also reuses this renderer as its floating quick-chat companion. Its sidebar visibility control, interaction and glass chat presentation are documented in [Floating companion and quick chat](floating-companion.md), with [implementation verification](reports/floating-chat/report.md).
 
 The celestial world is owned by [CelestialDecor](../../app/components/landing/journey/CelestialDecor.tsx), its [CSS module](../../app/components/landing/journey/CelestialDecor.module.css), and [CelestialMotifs](../../app/components/landing/journey/CelestialMotifs.tsx). Decoration materials inherit the landing's `data-surface` palette through `--decor-*` aliases. Light-mode aliases change the glass, paper, leaves and decorative ink; SVG properties retain the original dark materials as fallbacks. The landing's [existing theme owner](../../app/components/landing/journey/JourneyLanding.tsx) and local page aliases remain separate from app background preferences.
 

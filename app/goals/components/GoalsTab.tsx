@@ -231,16 +231,10 @@ export function GoalsTab() {
       {/* ─── Action Header ──────────────────────────── */}
       <div className="mb-6 flex flex-wrap justify-between items-center gap-3">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className={styles.eyebrowDot} />
-            <span className={styles.eyebrow}>
-              Scholar Objectives
-            </span>
-          </div>
-          <h2 className={styles.title}>
+          <h1 className={styles.title}>
             <ObjectiveTargetIcon size={24} className="text-accent-primary shrink-0" />
-            <span>Active <em>Goals</em></span>
-          </h2>
+            <span>Objectives</span>
+          </h1>
         </div>
         <div className="flex items-center gap-2.5">
           {isSelectMode ? (

@@ -1,52 +1,62 @@
-import React from "react";
+"use client";
+
+import { useState, type ReactNode, type FocusEvent } from "react";
 import AuthHeader from "./AuthHeader";
-import CelestialStudyArtwork from "./CelestialStudyArtwork";
-import AuthGlowingStars from "./AuthGlowingStars";
+import CelestialDecor from "../landing/journey/CelestialDecor";
+import StudyIslandScene, {
+  type IslandAttention,
+  type IslandGreeting,
+} from "./StudyIslandScene";
 import styles from "./AuthLayout.module.css";
 
-interface AuthSplitLayoutProps {
-  children: React.ReactNode;
-  rightContent?: React.ReactNode;
-}
-
-/**
- * AuthSplitLayout: Responsive 2-column split composition for Login and Register.
- * 
- * - Background layer: exact Figma exported artwork from "celestial-study — full illustration.svg"
- * - Glow layers: illuminated hanging/standing lanterns + subtle glowing stars & sparkles
- * - Left side: open, floating form with zero enclosing card.
- * - Right side: study scene area with floating study timer HUD.
- * - Header: Sylf branding and "A CALMER PLACE TO STUDY" tagline.
- */
-export function AuthSplitLayout({ children, rightContent }: AuthSplitLayoutProps) {
+/** Shared, naturally scrolling composition for both authentication routes. */
+export function AuthSplitLayout({
+  children,
+  greeting,
+}: {
+  children: ReactNode;
+  greeting: IslandGreeting;
+}) {
+  const [attention, setAttention] = useState<IslandAttention>("reading");
+  const noticeFocus = (event: FocusEvent<HTMLElement>) => {
+    const target = event.target;
+    setAttention(
+      target.closest("[data-private-field]")
+        ? "private"
+        : target instanceof HTMLInputElement
+          ? "curious"
+          : "reading"
+    );
+  };
   return (
     <div className={styles.page}>
-      {/* ─── Layer 1: Figma Celestial Study Artwork with Lantern Illumination ─── */}
-      <CelestialStudyArtwork />
-
-      {/* ─── Layer 2: Subtle Glowing Stars & Sparkles Overlay ─── */}
-      <AuthGlowingStars />
-
-      {/* ─── Layer 3: Top Branding Header (✦ sylf. & tagline) ─── */}
+      <div className={styles.edgeDecor} aria-hidden="true">
+        <CelestialDecor variant="auth" />
+      </div>
+      <a className={styles.skipLink} href="#auth-form">
+        Skip to sign in or sign up
+      </a>
       <AuthHeader />
-
-      {/* ─── Layer 4: Main Two-Column Split (Form on left, Scene on right) */}
-      <main className={styles.mainSplit}>
-        {/* Left Column: Floating Auth Form Area */}
-        <section className={styles.leftColumn} aria-label="Authentication">
-          <div className={styles.floatingFormContainer}>
-            {/* Auth Form Children */}
-            {children}
-          </div>
+      <div className={styles.mainSplit}>
+        <section
+          id="auth-form"
+          className={styles.formColumn}
+          aria-label="Authentication"
+          tabIndex={-1}
+          onFocusCapture={noticeFocus}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget))
+              setAttention("reading");
+          }}
+        >
+          <div className={styles.floatingFormContainer}>{children}</div>
+          <p className={styles.formFootnote}>
+            A calmer place to study. A little more you.
+          </p>
         </section>
-
-        {/* Right Column: Scene Container (Preserving grid layout on desktop) */}
-        <aside className={styles.rightColumn} aria-label="Study Scene">
-          {rightContent !== undefined ? rightContent : null}
-        </aside>
-      </main>
+        <StudyIslandScene attention={attention} greeting={greeting} />
+      </div>
     </div>
   );
 }
-
 export default AuthSplitLayout;

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "ceilingNanodollars": 20000000,
+  "stopped": null,
+  "calls": [
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "input": 11303,
+      "output": 4096,
+      "reservedNanodollars": 8306100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 5721900,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T13:59:18.278Z",
+      "callId": "d9be5d1b-ea8a-4bb4-b2b3-60ff8aced95f",
+      "dispatchedAt": "2026-10-09T13:59:18.351Z",
+      "requestBodySha256": "e9f9ad123bd979b7662843fbb3d00672b6e6398b2c84c11284416470d6c66a01",
+      "reasoningEffort": "low",
+      "thinking": "OMITTED_ENABLED_DEFAULT",
+      "rawUsage": {
+        "prompt_tokens": 2689,
+        "completion_tokens": 4096,
+        "total_tokens": 6785,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4096
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 2689
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "length",
+      "latencyMs": 21069,
+      "canonicalUsage": {
+        "inputTokens": 2689,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "MAX_TOKENS",
+        "errorCode": "OUTPUT_TRUNCATED"
+      }
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "input": 11939,
+      "output": 4096,
+      "reservedNanodollars": 8496900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 4275600,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T13:59:39.693Z",
+      "callId": "98b20261-4cb9-40a3-b281-31847bcb61fc",
+      "dispatchedAt": "2026-10-09T13:59:39.761Z",
+      "requestBodySha256": "d8fb60d90280461efd573e7e1ad478b1ae67f414b9295ce7adafdf808a41ae63",
+      "reasoningEffort": "low",
+      "thinking": "OMITTED_ENABLED_DEFAULT",
+      "rawUsage": {
+        "prompt_tokens": 2860,
+        "completion_tokens": 2848,
+        "total_tokens": 5708,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2531
+        },
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 2092
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 14480,
+      "canonicalUsage": {
+        "inputTokens": 2860,
+        "outputTokens": 2848,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    }
+  ],
+  "productionPublication": "FORBIDDEN"
+}

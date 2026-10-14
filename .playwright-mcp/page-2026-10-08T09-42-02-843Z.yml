@@ -1,0 +1,115 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - button "Collapse sidebar" [ref=e7]
+        - button "Open System Hub" [ref=e11]
+        - button "Notifications" [ref=e16]
+        - button "View Profile Card" [ref=e20] [cursor=pointer]:
+          - img "ali" [ref=e22]
+          - generic [ref=e23]:
+            - paragraph [ref=e24]: ali
+            - paragraph [ref=e25]: E-Rank • Lv. 4
+      - navigation "Main Navigation" [ref=e26]:
+        - link "Home" [ref=e28] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Timer" [ref=e35] [cursor=pointer]:
+          - /url: /timer
+        - link "Social" [ref=e42] [cursor=pointer]:
+          - /url: /social
+        - link "The System AI" [ref=e49] [cursor=pointer]:
+          - /url: /system
+          - generic [ref=e58]:
+            - generic [ref=e59]: The System
+            - generic [ref=e60]: AI
+        - link "Objectives" [ref=e62] [cursor=pointer]:
+          - /url: /goals
+        - link "Calendar" [ref=e71] [cursor=pointer]:
+          - /url: /calendar
+        - link "Locker" [ref=e78] [cursor=pointer]:
+          - /url: /locker
+        - link "Shop" [ref=e85] [cursor=pointer]:
+          - /url: /inventory
+        - link "Studio ADMIN" [ref=e92] [cursor=pointer]:
+          - /url: /admin/background-studio
+          - generic [ref=e96]:
+            - generic [ref=e97]: Studio
+            - generic [ref=e98]: ADMIN
+      - button "Logout" [ref=e101]
+    - main [ref=e107]:
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - paragraph [ref=e111]: Scholar Dashboard
+          - heading [level=1] [ref=e113]:
+            - text: Welcome back,
+            - emphasis [ref=e114]: ali
+          - paragraph [ref=e115]: Your daily focus and quest overview.
+          - region "Scholar Identity and Progression" [ref=e116]:
+            - generic [ref=e117]:
+              - link "Locker" [ref=e118] [cursor=pointer]:
+                - /url: /locker?tab=identity
+              - img "Your dashboard companion" [ref=e125]
+            - generic [ref=e126]:
+              - generic [ref=e128]:
+                - generic [ref=e129]: EXP
+                - generic [ref=e130]:
+                  - generic [ref=e131]: 223 / 318
+                  - generic [ref=e132]: 70%
+              - generic [ref=e136]:
+                - generic [ref=e137]: HP
+                - generic [ref=e138]:
+                  - generic [ref=e139]: 0 / 105
+                  - generic [ref=e140]: 0%
+        - region "Metrics" [ref=e142]:
+          - generic [ref=e143]:
+            - paragraph [ref=e149]: Level
+            - paragraph [ref=e150]: "4"
+            - paragraph [ref=e151]: E-Rank Tier
+          - generic [ref=e152]:
+            - paragraph [ref=e157]: Total Focus
+            - paragraph [ref=e158]: 5h 42m
+            - paragraph [ref=e159]: All-time recorded
+          - generic [ref=e160]:
+            - paragraph [ref=e165]: Today's Quotas
+            - paragraph [ref=e166]: 0 / 0
+            - paragraph [ref=e167]: No active quotas
+        - generic [ref=e168]:
+          - generic [ref=e169]:
+            - region "Today's Quests" [ref=e170]:
+              - heading "Today's Quests" [level=2] [ref=e176]
+              - generic [ref=e177]:
+                - paragraph [ref=e182]: No quests assigned for today.
+                - generic [ref=e183]:
+                  - link "Create Quest" [ref=e184] [cursor=pointer]:
+                    - /url: /quests
+                  - button "Quick Focus" [ref=e186] [cursor=pointer]
+            - region "Streak Quest" [ref=e189]:
+              - generic [ref=e190]:
+                - generic [ref=e191]:
+                  - generic [ref=e192]: Streak Quest
+                  - generic [ref=e193]: Cumulative Focus
+                - generic [ref=e194]: +318 XP • +110 Sylph
+              - generic [ref=e200]:
+                - generic [ref=e201]:
+                  - text: 0h 0m / 3h 00m
+                  - generic [ref=e202]: • Resets in 4d
+                - generic [ref=e203]: 0%
+          - region "Study Circle" [ref=e206]:
+            - generic [ref=e207]:
+              - heading "Study Circle" [level=2] [ref=e214]
+              - link "View All" [ref=e215] [cursor=pointer]:
+                - /url: /social
+            - generic [ref=e218]:
+              - paragraph [ref=e225]: Connect with companions to study together.
+              - link "Find Friends" [ref=e226] [cursor=pointer]:
+                - /url: /social
+  - button "Ask The System — Command Center context" [ref=e227]:
+    - generic [ref=e236]: Ask The System
+    - generic [ref=e237]: Command Center
+  - generic [ref=e238]:
+    - generic "Sylph (System Currency)" [ref=e239]:
+      - img "Sylph" [ref=e241]
+      - generic [ref=e242]: "2497"
+    - 'generic "Weekly Streak: 0 consecutive weeks hitting the 3h milestone" [ref=e243] [cursor=pointer]': 0 wks
+  - button "Open Next.js Dev Tools" [ref=e253] [cursor=pointer]
+  - alert [ref=e257]

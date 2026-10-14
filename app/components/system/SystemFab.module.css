@@ -1,0 +1,126 @@
+.launcher {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 39;
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.launcher:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 5px;
+}
+
+/* Keep the enlarged character inside the pointer's hover target. */
+.launcher[data-attentive="true"]::after {
+  content: '';
+  position: absolute;
+  inset: -28px -6px 0 -24px;
+  border-radius: 50%;
+}
+
+.aura {
+  position: absolute;
+  inset: 14px 6px 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, var(--accent-primary-mid), transparent 70%);
+  opacity: 0.45;
+  transform: scale(0.85);
+  transition: opacity var(--duration-normal), transform var(--duration-normal) var(--ease-spring);
+  pointer-events: none;
+}
+
+.character {
+  display: inline-flex;
+  pointer-events: none;
+  transform-origin: 65% 85%;
+  filter: drop-shadow(0 4px 8px color-mix(in srgb, var(--app-canvas) 45%, transparent));
+}
+
+.chatBadge {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  background: var(--surface-1);
+  color: var(--accent-text);
+  box-shadow: 0 2px 8px var(--accent-primary-dim);
+  pointer-events: none;
+  transition: opacity var(--duration-fast), transform var(--duration-fast);
+}
+
+.hint {
+  position: absolute;
+  right: calc(100% + 14px);
+  bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: max-content;
+  max-width: min(220px, calc(100vw - 150px));
+  padding: 11px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px 16px 4px 16px;
+  background: var(--surface-1);
+  box-shadow: 0 4px 24px var(--accent-primary-dim);
+  text-align: left;
+  opacity: 0;
+  transform: translateX(5px);
+  pointer-events: none;
+  transition: opacity var(--duration-fast), transform var(--duration-normal) var(--ease-spring);
+}
+
+.hintTitle {
+  color: var(--text-primary);
+  font: 600 13px/1.2 'Rajdhani', sans-serif;
+  letter-spacing: 0.025em;
+}
+
+.hintContext {
+  color: var(--text-secondary);
+  font: 400 11px/1.35 'Inter', sans-serif;
+}
+
+.launcher[data-attentive="true"] .aura {
+  opacity: 0.8;
+  transform: scale(1.3);
+}
+
+.launcher[data-attentive="true"] .chatBadge {
+  opacity: 0;
+  transform: scale(0.85);
+}
+
+.launcher[data-attentive="true"] .hint {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (min-width: 640px) {
+  .launcher {
+    right: max(26px, env(safe-area-inset-right, 0px));
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher *, .launcher *::before, .launcher *::after {
+    transition: none;
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "status": "FINAL_INDEPENDENT_ASSESSMENT_AGREEMENT",
+  "recordedAtUtc": "2026-10-10T15:32:37.214344+00:00",
+  "assessors": [
+    "Root AI agent, case-author-side",
+    "Existing independent AI-agent /root/independent_label_signoff"
+  ],
+  "humanEvaluation": false,
+  "additionalExternalJudgeCalls": 0,
+  "originalLabelsAndRubricChanged": false,
+  "lockedPrimarySha256": {
+    "locked-primary-root.json": "e6d5e1079cf7b6039f51be6539166e556c1ffe0689db160c33ce02adb4c35a0a",
+    "locked-primary-agent.json": "cf0b0114ba3e3de98c91d123165ef91396e2bf34ec55c1881fac8ca3c68f448a"
+  },
+  "assessmentMethod": "Two separately locked primaries on complete accepted inputs. Independent primary withheld private mapping and root judgment before lock, with prior case/configuration knowledge explicitly disclosed. No averaged score, missing output or semantic verdict manufactured. Strict canonical validation confirmed by execution receipts; independent post-lock receipt verification is recorded in the independent final report.",
+  "materialDisagreements": [],
+  "cases": [
+    {
+      "assessmentId": "B01",
+      "caseId": "v04",
+      "finalEducationalJudgment": "CORRECT_GROUNDED_BLOCKING_FINDING",
+      "validatorOutcome": "VALIDATED_REPORT_BLOCKED_OPEN_ISSUE",
+      "completeStop": true,
+      "seriousConsequentialDefectCorrectlyDetected": true,
+      "extraFalseBlockers": 0,
+      "resolution": "Both primaries independently identify compulsory twelve identical rewrites after accepted checked success as a real violation. Actual finding and requested educational correction are appropriately targeted. All original grounds and final output are retained."
+    },
+    {
+      "assessmentId": "B02",
+      "caseId": "v09",
+      "finalEducationalJudgment": "UNASSESSABLE_BLANK_CAPPED",
+      "validatorOutcome": "NO_USABLE_OUTPUT_TO_VALIDATE",
+      "completeStop": false,
+      "seriousConsequentialDefectCorrectlyDetected": null,
+      "extraFalseBlockers": null,
+      "resolution": "Both primaries refuse to infer a sound-plan acceptance or false blocker from empty capped output."
+    }
+  ],
+  "delivery": {
+    "attempted": 2,
+    "completeStrictlyValidReviews": 1,
+    "operationalFailures": 1,
+    "pairGate": "FAILED_DELIVERY_REQUIREMENT",
+    "correctDeliveredVerdicts": 1,
+    "deliveredSemanticDenominator": 1,
+    "overallTwoCaseSemanticAccuracy": null,
+    "soundCaseFalseBlockerRate": null,
+    "populationSensitivityAndPrecision": "NOT_ESTIMABLE_FROM_THIS_SAMPLE",
+    "blankInSemanticAccuracyDenominator": false
+  },
+  "furtherCallsAuthorized": false,
+  "continuationRecommendedOnCurrentConfiguration": false,
+  "finalizedAtUtc": "2026-10-10T15:36:19.609074+00:00",
+  "independentFinalReportSha256": "e8e062b3c581a0d04835232bd64e1bb6d48fa18800a0ee7755d2e1d6b875cc23",
+  "independentStrictValidatorReplay": "PASS_FOR_v04; NOT_REACHED_ON_BLANK_v09",
+  "independentUsageLatencyCostReconciliation": "PASSED_NO_DISAGREEMENT"
+}

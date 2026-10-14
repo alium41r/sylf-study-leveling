@@ -1,0 +1,198 @@
+{
+  "description": "Phase 8 evidence: Pixel Studio — the editor, its authored format, persistence, the animation contract extension, and the measured cost of a user looping animation on the production dashboard.",
+  "date": "2026-10-07T16:41:21.685Z",
+  "phase": 8,
+  "editor": {
+    "entry": "Locker -> Identity -> Studio Hub -> Companion -> Open Pixel Studio",
+    "tools": [
+      "draw",
+      "erase",
+      "fill",
+      "pick",
+      "undo",
+      "redo",
+      "zoom 4/6/8/12",
+      "mirror"
+    ],
+    "exposedInternals": "none — no planes, anchors, coordinates, asset ids, JSON or matrix sizes on screen",
+    "drawingModel": "One canvas at the authored grid size, enlarged by CSS with image-rendering pixelated. Nothing is stored per cell in React state.",
+    "input": "Pointer events, so mouse/touch/pen share one path; touch-action none; pointer capture",
+    "history": {
+      "model": "documents, not inverse operations",
+      "granularity": "one entry per stroke",
+      "limit": 40
+    },
+    "fill": "iterative and bounded by the cell count, so it cannot recurse or run away",
+    "verifiedInBrowser": {
+      "drag": "10 cells painted, 1 colour reported",
+      "undo": "stroke removed",
+      "redo": "stroke restored",
+      "onion": "toggling twice left the drawing byte-identical"
+    }
+  },
+  "threeConceptsKeptDistinct": {
+    "authoredGrid": "the document; one of 32/40/48/64; persisted",
+    "editorZoom": "the editor only; never persisted",
+    "productionCardSize": "the rendering surface; not the editor concern",
+    "enforcement": "a test asserts the serialised creation contains no zoom and that two drafts at different zooms are the same document"
+  },
+  "timeline": {
+    "operations": [
+      "add",
+      "duplicate",
+      "delete",
+      "reorder",
+      "set per-frame hold"
+    ],
+    "reorder": "buttons rather than drag, so it is reachable by keyboard",
+    "duration": "60–1000ms in the editor, 60–2000ms in the format",
+    "onionSkin": "previous frame at 28%, next at 16%, drawn as a wash and never written to the draft",
+    "editorPlayback": "one setTimeout per frame, not a frame loop"
+  },
+  "contractExtension": {
+    "mismatch": "A PixelAsset was static, so an animation could only be one plane per frame (defeating plane selection) or a second content kind with its own renderer (forbidden).",
+    "extension": [
+      "geometry: animated with frames[] and optional order[]",
+      "animation: { mode: once|loop, frameDurationsMs[] }",
+      "paletteMode: allow-unused"
+    ],
+    "whyFramesOnGeometry": "so a hand-authored asset with several planes could animate one of them, and neither case is special",
+    "paletteModeReason": "found by testing: under the strict default a creation became invalid the moment its last pixel of a colour was erased. A scholar palette is a tool, not a description. The strict default is unchanged for built-in assets."
+  },
+  "authoredFormat": {
+    "name": "PixelCreation",
+    "version": 1,
+    "pixels": "palette indices as digits, . transparent — a 64x64 16-frame drawing fits the payload bound",
+    "direction": "one-way: creation -> asset. A test asserts a built-in asset is not a drawable creation."
+  },
+  "persistence": {
+    "model": "PixelCreation (userId, slug, name, grid, version, data Json)",
+    "migration": "20261005000000_pixel_creations — applied successfully",
+    "schemaBuildVersion": "27 -> 28",
+    "characterConfigShapeChanged": false,
+    "whyNotCharacterConfig": [
+      "Size: up to ~70KB of artwork, and characterConfig is read by useDashboardData, the stats route, conversation payloads and profile views.",
+      "Ownership: a creation is a thing a scholar has, in possibly several instances, independent of what they wear. characterConfig records a choice, so it references one by id."
+    ],
+    "whyJsonDocument": "frames are small, self-contained, always read together, and their shape is owned by the Pixel Display contract; normalising would spread a content format across the schema."
+  },
+  "validation": {
+    "failsClosed": true,
+    "bounds": {
+      "grid": "32/40/48/64 only",
+      "frames": 16,
+      "frameMs": "60–2000",
+      "totalMs": 30000,
+      "palette": 16,
+      "payloadBytes": 131072
+    },
+    "layering": "the client validator gates the save button; the API refuses with per-problem reasons before storing; the decoder is total and never throws, so half-typed input cannot crash the editor",
+    "largestLegitimateCreationBytes": 69267
+  },
+  "playback": {
+    "modes": [
+      "once",
+      "loop"
+    ],
+    "onceBehaves": "plays through, parks on its final frame, and returns to zero work by itself",
+    "notWiredToSystemSignals": "a saved animation is not a response to task completion, level-up or AI-thinking",
+    "staticAssetsUnaffected": "a test asserts a static asset reports no animation at all"
+  },
+  "defectsFoundByMeasurement": [
+    {
+      "defect": "The loop ran at 60 fps.",
+      "detail": "update() returned true whenever the animation was unfinished, which asks for another frame immediately. A 400ms frame produced hundreds of frames of work to hold one picture.",
+      "measured": "181 frames over 3008ms (~60 fps) for a two-frame loop at 400/240ms.",
+      "fix": "when a frame is not due, return false so the runtime settles to idle, and schedule one timer for the remaining duration."
+    },
+    {
+      "defect": "A hidden tab kept animating.",
+      "detail": "the new timer called requestFrame(), the explicit external wake-up, which reopened a suspended session.",
+      "measured": "9 frames over 3 seconds in a hidden tab.",
+      "fix": "requestFrameFromContent() refuses while a suspension is in force. requestFrame() still wakes the display, because a dev control or a test doing so is a different intention — an existing Phase 1 test asserts exactly that, which is how the distinction was found rather than invented."
+    }
+  ],
+  "productionPerformance": {
+    "scene": "a two-frame creation at 400ms + 240ms, equipped, on the real 110px dashboard card",
+    "visibleLooping": {
+      "windowMs": 5005,
+      "frames": 14,
+      "perSecond": 2.8,
+      "note": "exactly the authored 1/0.64s"
+    },
+    "tabHidden": {
+      "windowMs": 4004,
+      "frames": 0,
+      "phase": "stopped"
+    },
+    "returnedToView": {
+      "windowMs": 4006,
+      "frames": 13,
+      "phase": "idle"
+    },
+    "loopUnequipped": {
+      "windowMs": 5007,
+      "frames": 0,
+      "phase": "idle"
+    },
+    "conclusion": "the loop costs what its frames say and nothing more, and every zero-work path returns"
+  },
+  "preview": {
+    "editingCanvas": "4x–12x zoom over the authored grid",
+    "dashboardCard": "110px at the authored density",
+    "sharedPath": "both previews go through the production card and the same resolver the dashboard uses",
+    "whyTheCardPreviewMatters": "Phase 7 O15 established that artwork which looks good enlarged can fail at 110px"
+  },
+  "customizerIntegration": {
+    "flow": "Create in Studio -> Save -> appears in the Customizer -> Equip -> dashboard renders it",
+    "separation": "Studio creates; the Customizer equips",
+    "namespace": "the registry claims user:, so a creation resolves like any other form key",
+    "fallback": "a missing, corrupt or unsupported creation degrades to the built-in character and is reported — verified with an equipped id that does not exist: a valid companion, 438 lit cells"
+  },
+  "accessibility": {
+    "layout": "below 1000px the controls move under the canvas in one column; the canvas reflows rather than shrinking",
+    "toolRow": "horizontally scrollable so primary tools stay reachable with a thumb",
+    "touchTargets": ">= 44px",
+    "overflow": "no page-level horizontal overflow",
+    "keyboard": "tools, palette, frames, reorder, playback, zoom and save are all buttons with visible focus rings",
+    "reducedMotion": "verified under prefers-reduced-motion: reduce — the preview renders and selection stays legible"
+  },
+  "gates": {
+    "pixelDisplayAndDashboard": {
+      "files": 17,
+      "tests": 440,
+      "failed": 0
+    },
+    "newStudioTests": 56,
+    "shopLockerCompanionRegression": {
+      "files": 24,
+      "tests": 202,
+      "failed": 0
+    },
+    "typecheck": {
+      "errors": 0
+    },
+    "engineBoundaryTypecheck": {
+      "errors": 0
+    },
+    "lintNewFiles": "0 errors",
+    "build": "succeeds; /api/pixel-creations present",
+    "migration": "applied successfully",
+    "productionInaccessibility": {
+      "/dev/pixel-display": 404
+    }
+  },
+  "openDecisions": {
+    "closed": [],
+    "O25": "New: whether a scholar may author more than a base character. Studio deliberately creates base characters only.",
+    "O26": "New: whether creations should be shareable. A creation is private to its scholar; sharing is a social feature with its own moderation surface.",
+    "O27": "New and the honest gap: reduced motion is respected in the editor, but an equipped looping creation still loops on the dashboard. The smallest correct behaviour is probably to hold the first frame under prefers-reduced-motion, and it should be decided with a scholar view of it rather than assumed.",
+    "O1_O15": "Better informed: a user-facing density choice now exists end to end, and the 110px preview gives art production somewhere to check readability before shipping a form."
+  },
+  "limits": [
+    "One editor, one asset kind: a creation is a base character and nothing else is authorable yet.",
+    "QA wrote one creation to one account and removed it afterwards, restoring that account configuration. No other data was touched.",
+    "One editing session was walked end to end by hand; the tool behaviours themselves are covered by direct tests.",
+    "Live high-DPI rendering remains unobserved (O13)."
+  ]
+}

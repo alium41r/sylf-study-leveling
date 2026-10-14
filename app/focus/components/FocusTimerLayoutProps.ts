@@ -33,6 +33,8 @@ export interface FocusTimerLayoutProps {
   questData: FocusQuestPresentation | null;
 
   // ── Cumulative Totals ───────────────────────────────────────
+  /** Session time attributed to the current local study date. */
+  todayElapsedSeconds?: number;
   initialSubjectSeconds: number;
   initialTotalSeconds: number;
 
@@ -54,6 +56,7 @@ export interface FocusTimerLayoutProps {
   onCompleteQuest?: () => void;
   onTakeFlowBreak?: () => void;
   onSkipFlowBreak?: () => void;
+  onOpenBackgroundPicker?: () => void;
 
   // ── Active Atmosphere & Layout Metadata ─────────────────────
   background: FocusBackgroundClient | null;

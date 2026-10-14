@@ -1,0 +1,53 @@
+async (page) => {
+  const records = [];
+  const canvas = page.locator('[data-editor-canvas]');
+  const read = () => page.evaluate(() => {
+    const c = document.querySelector('[data-editor-canvas]');
+    const bytes = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    const cells = [];
+    for (let i = 0; i < bytes.length; i += 4) if (bytes[i + 3]) cells.push({x:(i/4)%c.width, y:Math.floor(i/4/c.width), rgba:Array.from(bytes.slice(i,i+4))});
+    const rect = c.getBoundingClientRect();
+    return {grid:c.width, css:[rect.width,rect.height], cells, selectedFrame:document.querySelector('[data-frame][aria-pressed="true"]')?.dataset.frame, selectedTool:document.querySelector('[data-tool][aria-pressed="true"]')?.dataset.tool, color:document.querySelector('[data-swatch][aria-checked="true"]')?.dataset.swatch};
+  });
+  const record = async (name) => { await page.waitForTimeout(60); records.push({name,...await read()}); };
+  const point = async (x,y) => { await canvas.scrollIntoViewIfNeeded(); const b=await canvas.boundingBox(); const g=Number(await canvas.getAttribute('data-grid')); return {x:b.x+(x+.5)*b.width/g,y:b.y+(y+.5)*b.height/g}; };
+  const tap = async (x,y) => { const p=await point(x,y); await page.mouse.click(p.x,p.y); };
+  const stroke = async (x1,y1,x2,y2,steps) => { const a=await point(x1,y1),b=await point(x2,y2); await page.mouse.move(a.x,a.y);await page.mouse.down();await page.mouse.move(b.x,b.y,{steps});await page.mouse.up(); };
+  await tap(8,8); await record('mirrored pencil tap');
+  await page.getByRole('button',{name:'Erase',exact:true}).click();await tap(8,8);await record('erase with mirror still On');
+  await page.getByRole('button',{name:'Undo',exact:true}).click();await record('undo erase');
+  await page.getByRole('button',{name:'Redo',exact:true}).click();await record('redo erase');
+  await page.getByRole('button',{name:'Delete frame',exact:true}).click();
+  await page.getByRole('button',{name:'Draw',exact:true}).click();await stroke(4,12,35,12,1);await record('fast sparse pointer stroke');
+  await page.getByRole('button',{name:'Undo',exact:true}).click();await record('undo whole fast stroke');
+  await page.getByRole('button',{name:'Redo',exact:true}).click();await record('redo whole fast stroke');
+  await page.getByRole('button',{name:'Delete frame',exact:true}).click();
+  await page.locator('[data-mirror]').click();await stroke(8,22,27,22,19);await record('slow 20-cell pencil stroke');
+  await page.getByRole('button',{name:'Erase',exact:true}).click();await stroke(8,22,27,22,1);await record('fast erase over 20-cell line');
+  await page.getByRole('button',{name:'Undo',exact:true}).click();await record('undo fast erase');
+  await page.locator('[data-swatch="5"]').click();
+  await page.getByRole('button',{name:'Pick',exact:true}).click();await tap(15,22);await record('pick white returns to pencil');
+  await page.locator('[data-swatch="5"]').click();await page.getByRole('button',{name:'Fill',exact:true}).click();await tap(0,0);await record('flood transparent background');
+  await page.getByRole('button',{name:'Undo',exact:true}).click();
+  for(const z of [4,6,8,12]){await page.locator('[data-zoom="'+z+'"]').click();await record('zoom '+z);}
+  await page.locator('[data-zoom="8"]').click();
+  await page.getByRole('button',{name:'Duplicate frame',exact:true}).click();await record('copy frame 1 selection');
+  await page.getByRole('button',{name:'Add frame',exact:true}).click();await record('add from frame 1 with two frames');
+  await page.getByRole('button',{name:'Frame 3',exact:true}).click();
+  await page.getByRole('button',{name:'Draw',exact:true}).click();await tap(24,24);await record('third frame green dot');
+  await page.locator('[data-onion-toggle]').click();await record('onion shows preceding line');
+  await page.getByRole('button',{name:'Erase',exact:true}).click();await tap(15,22);await record('erasing an onion ghost');
+  await page.locator('[data-onion-toggle]').click();await record('ghost gone when onion off');
+  await page.getByRole('button',{name:'Move frame 3 earlier',exact:true}).click();await record('move frame 3 earlier');
+  await page.getByRole('button',{name:'Move frame 2 later',exact:true}).click();await record('move frame 2 later');
+  await page.getByRole('button',{name:'Frame 1',exact:true}).click();
+  await page.locator('[data-frame-duration]').focus();await page.keyboard.press('ArrowRight');await record('duration changed');
+  await page.keyboard.press('ControlOrMeta+z');await record('keyboard undo has no editor handler');
+  await page.locator('[data-playback="once"]').click();await page.locator('[data-play-toggle]').click();
+  await page.waitForTimeout(1300);await record('editor playback after Once exceeds full duration');
+  await page.locator('[data-play-toggle]').click();
+  await page.getByRole('button',{name:'Frame 1',exact:true}).click();
+  await page.locator('[data-name-field]').fill('Audit Line');
+  await page.evaluate(r=>window.__editorAudit=r,records);
+  return records.map(r=>({...r,cells:r.cells.length,example:r.cells.slice(0,4)}));
+}

@@ -646,6 +646,7 @@ export const FantasyTimerDock = memo(function FantasyTimerDock({
 export const FantasyTimerLayout = memo(function FantasyTimerLayout({
   formattedDisplayTime,
   elapsedSeconds,
+  todayElapsedSeconds = elapsedSeconds,
   breakSeconds,
   remainingSeconds,
   isCountdown,
@@ -653,7 +654,6 @@ export const FantasyTimerLayout = memo(function FantasyTimerLayout({
   phase,
   phaseColor,
   phaseLabel,
-  modeDisplayName,
   subjectName,
   questData,
   initialTotalSeconds,
@@ -684,7 +684,6 @@ export const FantasyTimerLayout = memo(function FantasyTimerLayout({
 
   // 2. Derive Active State
   const isNotStarted = elapsedSeconds === 0 && !isPaused && !isBreak;
-  const activeAccentColor = isPaused ? "#f59e0b" : phaseColor;
   const activeSecond = elapsedSeconds % 60;
 
   // 3. Circular Progress Percentage (0 - 100)
@@ -742,46 +741,6 @@ export const FantasyTimerLayout = memo(function FantasyTimerLayout({
 
   return (
     <div className="w-full flex-1 flex flex-col justify-between py-4 sm:py-6 px-4 md:px-8 z-10 select-none">
-      {/* ─── Top Accessory: Mystical Scholar Header ────────────────────── */}
-      <div className="w-full flex items-center justify-between px-2 pt-1 pointer-events-none">
-        {/* Mode & Phase Capsule with Celestial Accent */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <div
-            className="flex items-center gap-2 px-3.5 py-1 rounded-full border text-xs font-bold uppercase tracking-[0.16em] backdrop-blur-md shadow-sm"
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              color: activeAccentColor,
-              backgroundColor: "rgba(11, 14, 24, 0.65)",
-              borderColor: "var(--accent-primary-mid)",
-              boxShadow: "0 0 15px var(--accent-primary-dim)",
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{
-                backgroundColor: activeAccentColor,
-                boxShadow: `0 0 8px ${activeAccentColor}`,
-              }}
-            />
-            <span>{phaseLabel}</span>
-            <span className="text-white/25">•</span>
-            <span className="text-white/60 font-medium tracking-wider">{modeDisplayName}</span>
-          </div>
-        </div>
-
-        {/* Scholar Subject / Quest Dossier Badge (Desktop) */}
-        {(questData || subjectName) && (
-          <div className="hidden sm:flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0b0e18]/65 border border-[var(--accent-primary-mid)] backdrop-blur-md text-xs font-mono text-white/80 pointer-events-auto shadow-sm">
-            <span className="text-[var(--accent-primary-light)] text-[10px] tracking-widest uppercase">
-              Chronicle:
-            </span>
-            <span className="font-semibold text-white truncate max-w-[220px]">
-              {questData ? questData.title : subjectName}
-            </span>
-          </div>
-        )}
-      </div>
-
       {/* ─── Center / Docking Zone: Liquid-Glass Celestial Clock ──────── */}
       <FantasyTimerDock
         formattedDisplayTime={formattedDisplayTime}
@@ -800,7 +759,7 @@ export const FantasyTimerLayout = memo(function FantasyTimerLayout({
             : null
         }
         breakFormatted={breakSeconds > 0 && isBreak ? formatTime(breakSeconds) : null}
-        dailyTotalFormatted={formatTime(initialTotalSeconds + elapsedSeconds)}
+        dailyTotalFormatted={formatTime(initialTotalSeconds + todayElapsedSeconds)}
         sessionDots={showSessionDots ? { current: currentSession, total: totalSessions } : null}
         progressPercent={progressPercent}
         activeSecond={activeSecond}

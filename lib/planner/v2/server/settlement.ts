@@ -9,6 +9,15 @@ export async function settleWeeklyMission(sql: Sql, ownerId: number, now: Date):
     'SELECT timezone,"lastActiveDate","streakDays",level FROM "User" WHERE id=$1 FOR UPDATE', [ownerId]))[0];
   const bounds = getWeeklyBounds(now, user.timezone);
   if (user.lastActiveDate === bounds.weekKey) return false;
+  // The legacy scalar remembers only the latest award. Preserve it as a ledger
+  // receipt before recovering an older/newer week, so delayed sessions cannot
+  // repay an old mission or rewind the current streak.
+  if (user.lastActiveDate?.match(/^\d{4}-W\d{2}$/)) await sql.query(`INSERT INTO "SylphLedger" ("userId",amount,delta,reason,source,metadata)
+    VALUES ($1,0,0,'WEEKLY_MISSION','SYSTEM',$2) ON CONFLICT DO NOTHING`,
+    [ownerId, { weekKey: user.lastActiveDate, streakDays: user.streakDays, freezeUsed: false }]);
+  const receipts = await rows<{ metadata: { weekKey: string; streakDays: number; freezeUsed: boolean } }>(sql,
+    'SELECT metadata FROM "SylphLedger" WHERE "userId"=$1 AND reason=\'WEEKLY_MISSION\' ORDER BY metadata->>\'weekKey\'', [ownerId]);
+  if (receipts.some(receipt => receipt.metadata.weekKey === bounds.weekKey)) return false;
   const stats = (await rows<{ tenacity: number }>(sql, 'SELECT tenacity FROM "UserStats" WHERE "userId"=$1 FOR UPDATE', [ownerId]))[0];
   const target = getCognitiveEffects({ tenacity: stats?.tenacity }).weeklyTargetMinutes;
   // Keep the existing per-session rounded-minute reward rule. V2 actuals retain
@@ -24,17 +33,29 @@ export async function settleWeeklyMission(sql: Sql, ownerId: number, now: Date):
     [ownerId, localStart, localEnd, bounds.weekStart.toISOString(), bounds.weekEnd.toISOString()]))[0].minutes);
   if (minutes < target) return false;
   const freeze = (await rows<{ id: number }>(sql, 'SELECT id FROM "InventoryItem" WHERE "userId"=$1 AND "itemKey"=\'STREAK_FREEZE\' AND quantity>0 ORDER BY id LIMIT 1 FOR UPDATE', [ownerId]))[0];
-  const streak = calculateWeeklyStreak(user.lastActiveDate, bounds.weekKey, user.streakDays, !!freeze);
+  const historical = !!user.lastActiveDate && user.lastActiveDate > bounds.weekKey;
+  const streak = historical ? { newStreak: user.streakDays, freezeUsed: false }
+    : calculateWeeklyStreak(user.lastActiveDate, bounds.weekKey, user.streakDays, !!freeze);
   const reward = calculateWeeklyQuestReward(user.level);
   // Preserve the existing weekly economic policy (Sylph payout); this phase
   // does not change reward math or introduce an additional XP payout.
-  await sql.query('UPDATE "User" SET "streakDays"=$2,"lastActiveDate"=$3,sylph=sylph+$4 WHERE id=$1', [ownerId, streak.newStreak, bounds.weekKey, reward.sylphReward]);
+  await sql.query('INSERT INTO "SylphLedger" ("userId",amount,delta,reason,source,metadata) VALUES ($1,$2,$2,\'WEEKLY_MISSION\',\'SYSTEM\',$3)',
+    [ownerId, reward.sylphReward, { weekKey: bounds.weekKey, streakDays: streak.newStreak, freezeUsed: streak.freezeUsed }]);
+  if (historical) {
+    const known = [...receipts.map(receipt => receipt.metadata), { weekKey: bounds.weekKey, streakDays: 1, freezeUsed: false }]
+      .sort((a, b) => a.weekKey.localeCompare(b.weekKey));
+    let consecutive = known[0].streakDays;
+    for (let i = 1; i < known.length; i++) consecutive = calculateWeeklyStreak(known[i - 1].weekKey, known[i].weekKey, consecutive, known[i].freezeUsed).newStreak;
+    streak.newStreak = Math.max(user.streakDays, consecutive);
+  }
+  await sql.query('UPDATE "User" SET "streakDays"=$2,"lastActiveDate"=$3,sylph=sylph+$4 WHERE id=$1',
+    [ownerId, streak.newStreak, historical ? user.lastActiveDate : bounds.weekKey, reward.sylphReward]);
   if (streak.freezeUsed && freeze) {
     await sql.query('UPDATE "InventoryItem" SET quantity=quantity-1,"updatedAt"=$2 WHERE id=$1', [freeze.id, now.toISOString()]);
     await sql.query('INSERT INTO "SystemMessage" ("userId",content,type) VALUES ($1,$2,\'STREAK\')', [ownerId,
       `**Weekly Streak Freeze Consumed**\n\nYour Streak Freeze protected your weekly streak after a missed cycle. Streak continues at **${streak.newStreak} weeks**!`]);
   }
   await sql.query('INSERT INTO "SystemMessage" ("userId",content,type) VALUES ($1,$2,\'STREAK\')', [ownerId,
-    `**Weekly Mission Complete: ${Math.round(target / 60 * 10) / 10} Hours of Focus!**\n\nYou completed the weekly ${target}-minute study target (Tenacity reduces it below the standard 3h). Weekly streak is now **${streak.newStreak} week${streak.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${reward.xpReward} XP, +${reward.sylphReward} Sylph.`]);
+    `**Weekly Mission Complete: ${Math.round(target / 60 * 10) / 10} Hours of Focus!**\n\nYou completed the weekly ${target}-minute study target (Tenacity reduces it below the standard 3h). Weekly streak is now **${streak.newStreak} week${streak.newStreak === 1 ? "" : "s"}**!\n\nRewards Claimed: +${reward.sylphReward} Sylph.`]);
   return true;
 }

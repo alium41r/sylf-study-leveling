@@ -1,4 +1,7 @@
 "use client";
+import { TargetPixelCompanion } from "@/app/components/companion/TargetPixelCompanion";
+import type { SelectedPixelCompanion } from "@/lib/pixel-companion-contract";
+
 
 // ============================================================================
 // FocusPartyInviteModal — Invite Mutual Friends to Focus Party
@@ -12,8 +15,6 @@ import { Search, UserPlus, Check, X, Users, Loader2, AlertCircle } from "lucide-
 import { motion } from "framer-motion";
 import { useFocusParty } from "./FocusPartyContext";
 import { getRankBadgeStyles } from "./focus-party-utils";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
-import { getDefaultCharacterConfig } from "@/lib/character-traits";
 
 interface FriendItem {
   id: number;
@@ -22,6 +23,7 @@ interface FriendItem {
   hunterRank?: string;
   level?: number;
   characterConfig?: any;
+  companion?: SelectedPixelCompanion;
   avatarUrl?: string | null;
 }
 
@@ -169,13 +171,7 @@ export function FocusPartyInviteModal({ friends, onClose }: FocusPartyInviteModa
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/[0.04] border border-border-subtle flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
-                      <CharacterRenderer
-                        config={friend.characterConfig || getDefaultCharacterConfig(friend.username)}
-                        seed={friend.username}
-                        size={40}
-                        showPedestal={false}
-                        showAura={false}
-                      />
+                      <TargetPixelCompanion companion={friend.companion} size={40} label={`${friend.username} companion`} />
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-text-primary truncate">

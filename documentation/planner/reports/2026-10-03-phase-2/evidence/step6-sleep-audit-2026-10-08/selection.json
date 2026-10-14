@@ -1,0 +1,21 @@
+{
+  "scope": "Only four recent regression failures and the sleep-overlapped owned research case; no implementation or provider configuration changes",
+  "postgresPattern": "recovers an expired lease without resetting budget or accepting the previous fence|retains mandatory review capacity under parallel reservations and refunds rejected/undispatched calls|enforces the database root deadline even when the adapter ignores abort|an explicit linked new root can retry a lost repair while ordinary takeover cannot",
+  "postgresRuntimes": [
+    "docker",
+    "native"
+  ],
+  "liveCase": "owned-course-research",
+  "liveRuntime": "native",
+  "liveOptions": [
+    "--live-qualification",
+    "--live-cases",
+    "owned-course-research",
+    "--live-non-gemini",
+    "--live-production-settings"
+  ],
+  "unchangedTestAssertionsAndTimeouts": true,
+  "unchangedBootstrapAndTeardown": true,
+  "fullGatesNotRerun": true,
+  "harnessSourceSha256": "74f0ac6f4e62058e50c4fd9aba943e75b333fe4dfe6f2be37de951b16d0f57d6"
+}

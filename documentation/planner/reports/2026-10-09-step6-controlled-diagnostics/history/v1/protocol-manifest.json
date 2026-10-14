@@ -1,0 +1,31 @@
+{
+  "version": "2026-10-09-step6-controlled-diagnostics-v1",
+  "status": "AWAITING_PROTOCOL_AND_PAID_APPROVAL",
+  "paidCalls": 0,
+  "independentLabelSignoff": "PENDING",
+  "executionGuardMockPreflight": "REQUIRED_BEFORE_PAID_EXECUTION",
+  "primaryMaximum": 52,
+  "totalMaximum": 64,
+  "recoveryMaximum": 12,
+  "spendingCeilingUsd": 3,
+  "artifacts": {
+    "README.md": "ca5ce2bf02bbb7cda6094b7cac5ece543f989c2c75747a2c88712018ba3671d7",
+    "prepare.cjs": "9c90e201097f2b3428abebfebcaf8319cff7e1ba7a96a5d091db321a83596156",
+    "freeze.json": "e7f97f119ab19b684948e7d9a70fac82f000b92088915fa08f81657c90fc6c7f",
+    "run-manifest.json": "1f676f7a5cd7fb777d41e741e77e86fabd0e835836442e3b8d552b6702f71317",
+    "inputs/ASTRA_REVISION_PLAN.md": "8090ad52db817688f5a605d8e4c95965a9dbb7334cd0db922230de43b83f13bd",
+    "inputs/ASTRA_INTELLIGENCE_AUDIT.md": "1068fa85dd67bb1d7cbef447ab79f9fd7f34a023bc3dab4f8ec236479d763a42",
+    "evaluator/cases.cjs": "21345bd78e1dd784c36df402ba16a44a2ad067b694b60ef03173e730ab9faed6",
+    "evaluator/labels.json": "e5c949fad59e7ba3d5bea2b2244b772bec5df4176a6812e8d456f52304a322ec",
+    "evaluator/RUBRIC.md": "331f2b01ab67fb220ce29bc42fefa38a5c4e6763c011c4a0df6d6e3db7a8f691",
+    "evaluator/results-template.json": "62f488b4b792a1ffee6542cdb37b38c96b99eb4f10033f4a24b504174e70fbd2",
+    "evaluator/signoff-template.json": "3616d3e4979a9c53e2f2ab11d06b51dc6379ab00ce62ab7605e4a770638a80a0",
+    "evidence/cost.json": "66f83ce547500b7056ad5cccd5ff2c48eefff3173de828ea12349ea31e53eb66",
+    "evidence/preparation.json": "306ef997c868c49fd5c5c74a4ef752d3baf37e20eb9cf4b912f0f928cbcacafb",
+    "evidence/static-checks.json": "72f13b8085a08c59ef4d2448a16abae244f94b5737431b2b09e0b64a361d31bc",
+    "evidence/materialization-checks.json": "ac6f362728099a16bfe50995d90fea2f80c669854c1794ca91b2c2a7098cd6be",
+    "evidence/source-preservation.json": "500793d873653da46fe55b08bf7c9519fb467dc15486ce77598d790827f49e80",
+    "evidence/artifact-checks.json": "b766e0be26b6e7d6108dc92bcefc17c031acb6ddb6c4699b3c7eb0ab10607e2e",
+    "evidence/frozen-source.tar.gz": "c50783f2972017fb4338b7a54c42cfc4bfa85bcc7ba79dd4f1cf6edc377d9f6a"
+  }
+}

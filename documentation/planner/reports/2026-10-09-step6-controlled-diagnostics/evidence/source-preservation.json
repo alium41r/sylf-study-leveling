@@ -1,0 +1,23 @@
+{
+  "startingPreexistingFiles": 4588,
+  "changedPreexistingFiles": [
+    "documentation/planner/README.md"
+  ],
+  "authorizedIndexChange": "documentation/planner/README.md",
+  "changeset3Correspondence": {
+    "sourceSha256": {
+      "checked": 8,
+      "changed": []
+    },
+    "generatedWorkerSha256": {
+      "checked": 6,
+      "changed": []
+    },
+    "frozenContracts": {
+      "checked": 12,
+      "changed": []
+    }
+  },
+  "productionCodeChangedByPreparation": false,
+  "paidCalls": 0
+}

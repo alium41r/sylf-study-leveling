@@ -1,0 +1,35 @@
+{
+  "method": "Matched exact legacy and actual current compiler request, same complete review input and concrete one-object correction. Reservation units are conservative UTF-8 accounting, not provider tokens. No model calls.",
+  "observations": [
+    {
+      "activities": 1,
+      "beforeInputReservationUnits": 21217,
+      "afterInputReservationUnits": 16993,
+      "beforeOutputUtf8Bytes": 1370,
+      "afterOutputUtf8Bytes": 668,
+      "beforeSystemUtf8Bytes": 12508,
+      "afterSystemUtf8Bytes": 2196,
+      "consequentialContextIdentical": true
+    },
+    {
+      "activities": 12,
+      "beforeInputReservationUnits": 29986,
+      "afterInputReservationUnits": 25762,
+      "beforeOutputUtf8Bytes": 7059,
+      "afterOutputUtf8Bytes": 668,
+      "beforeSystemUtf8Bytes": 12508,
+      "afterSystemUtf8Bytes": 2196,
+      "consequentialContextIdentical": true
+    },
+    {
+      "activities": 60,
+      "beforeInputReservationUnits": 68697,
+      "afterInputReservationUnits": 64473,
+      "beforeOutputUtf8Bytes": 31923,
+      "afterOutputUtf8Bytes": 668,
+      "beforeSystemUtf8Bytes": 12508,
+      "afterSystemUtf8Bytes": 2196,
+      "consequentialContextIdentical": true
+    }
+  ]
+}

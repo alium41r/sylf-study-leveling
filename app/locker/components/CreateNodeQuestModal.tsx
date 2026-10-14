@@ -15,7 +15,7 @@ import {
   Zap,
   Info,
 } from "lucide-react";
-import { QuestEmblemIcon, SystemApertureIcon } from "@/app/components/icons";
+import { QuestEmblemIcon, SylvieIcon } from "@/app/components/icons";
 
 interface CreateNodeQuestModalProps {
   isOpen: boolean;
@@ -408,7 +408,7 @@ export function CreateNodeQuestModal({
               <div className="p-3.5 rounded-xl bg-accent-primary-dim/20 border border-accent-primary/30 space-y-1.5 transition-all">
                 <div className="flex items-center justify-between text-xs font-rajdhani">
                   <div className="flex items-center gap-2">
-                    <SystemApertureIcon className="w-4 h-4 text-purple-600 dark:text-purple-300" />
+                    <SylvieIcon className="w-4 h-4 text-purple-600 dark:text-purple-300" />
                     <span className="text-text-primary font-semibold">
                       Estimated Node Mastery Boost:
                     </span>

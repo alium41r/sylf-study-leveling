@@ -1,21 +1,13 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../components/AuthProvider";
 import OAuthButtons from "../components/OAuthButtons";
 import { AuthSplitLayout } from "../components/auth/AuthSplitLayout";
 import styles from "../components/auth/AuthLayout.module.css";
-import { motion } from "framer-motion";
-import {
-  Eye,
-  EyeOff,
-  ShieldCheck,
-  Mail,
-  Lock,
-} from "lucide-react";
-import { SystemApertureIcon } from "@/app/components/icons";
+import { ArrowRight, Eye, EyeOff, ShieldCheck, Mail, Lock } from "lucide-react";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -27,35 +19,28 @@ function LoginForm() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
+  const [submitError, setError] = useState("");
+  const [feedbackDismissed, setFeedbackDismissed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
 
-  // Extract query params for feedback
-  useEffect(() => {
-    const errorParam = searchParams.get("error");
-    const registeredParam = searchParams.get("registered");
-    const verifiedParam = searchParams.get("verified");
-
-    if (errorParam) {
-      setError(decodeURIComponent(errorParam));
-    }
-    if (registeredParam) {
-      setInfoMessage("Registration complete. Please authenticate to initialize your system.");
-    }
-    if (verifiedParam) {
-      setInfoMessage("Your email has been verified. Welcome back, Scholar.");
-    }
-  }, [searchParams]);
+  // URLSearchParams already decodes OAuth feedback. Keep it visible until submission.
+  const error =
+    submitError || (!feedbackDismissed ? searchParams.get("error") || "" : "");
+  const infoMessage = feedbackDismissed
+    ? ""
+    : searchParams.get("verified")
+      ? "Your email has been verified. Welcome back, Scholar."
+      : searchParams.get("registered")
+        ? "Your account is ready. Sign in to begin your journey."
+        : "";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setInfoMessage("");
+    setFeedbackDismissed(true);
     setIsLoading(true);
 
     const validation = loginSchema.safeParse({ identifier, password });
@@ -79,11 +64,13 @@ function LoginForm() {
         login(data.user);
         const redirectTarget = searchParams.get("redirect");
         const destination =
-          redirectTarget && redirectTarget.startsWith("/") && !redirectTarget.startsWith("//")
+          redirectTarget &&
+          redirectTarget.startsWith("/") &&
+          !redirectTarget.startsWith("//")
             ? redirectTarget
             : data.user.hasCompletedOnboarding
-            ? "/dashboard"
-            : "/onboarding";
+              ? "/dashboard"
+              : "/onboarding";
         window.location.href = destination;
       } else {
         setError(data.error || "Login failed. Check your credentials.");
@@ -96,31 +83,15 @@ function LoginForm() {
   };
 
   return (
-    <AuthSplitLayout>
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full flex flex-col"
-      >
-        {/* Subtle System Badge */}
-        <div className={styles.systemBadge}>
-          <SystemApertureIcon size={13} className="text-cyan-400" />
-          <span>THE SYSTEM • AUTHENTICATION</span>
-        </div>
-
-        {/* Editorial Heading */}
+    <AuthSplitLayout greeting="Your space is just as you left it.">
+      <div className={styles.formContent}>
         <h1 className={styles.headline}>
           <span className={styles.headlinePrimary}>Welcome back.</span>
-          <span className={styles.headlineAccent}>Good to see you again.</span>
         </h1>
-        <p className={styles.subheadline}>
-          Log in to continue your journey, and pick up right where you left off.
-        </p>
 
         {/* Info Notification */}
         {infoMessage && (
-          <div className="p-3 mb-4 rounded-xl border text-xs flex items-center gap-2.5 bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
+          <div className={styles.notice} role="status">
             <ShieldCheck className="w-4 h-4 shrink-0" />
             <span>{infoMessage}</span>
           </div>
@@ -128,9 +99,22 @@ function LoginForm() {
 
         {/* Error Notification */}
         {error && (
-          <div className="p-3 mb-4 rounded-xl border text-xs flex items-center gap-2.5 bg-red-500/10 border-red-500/30 text-red-400">
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          <div
+            className={`${styles.notice} ${styles.errorNotice}`}
+            role="alert"
+          >
+            <svg
+              className="w-4 h-4 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
             </svg>
             <span>{error}</span>
           </div>
@@ -147,11 +131,15 @@ function LoginForm() {
         {/* Hairline Divider */}
         <div className={styles.credentialsDivider}>
           <div className={styles.dividerLine} />
-          <span className={styles.dividerPill}>OR CREDENTIALS</span>
+          <span className={styles.dividerPill}>or continue with email</span>
         </div>
 
         {/* Credentials Form */}
-        <form onSubmit={handleLogin} className={styles.formGroup}>
+        <form
+          onSubmit={handleLogin}
+          className={styles.formGroup}
+          aria-busy={isLoading}
+        >
           <div>
             <label className={styles.fieldLabel} htmlFor="identifier">
               Email or Username
@@ -176,7 +164,7 @@ function LoginForm() {
             <label className={styles.fieldLabel} htmlFor="password">
               Password
             </label>
-            <div className={styles.inputWrapper}>
+            <div className={styles.inputWrapper} data-private-field>
               <Lock className={styles.inputIcon} />
               <input
                 id="password"
@@ -193,10 +181,15 @@ function LoginForm() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className={styles.passwordToggle}
-                tabIndex={-1}
+                aria-pressed={showPassword}
+                disabled={isLoading}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
@@ -208,13 +201,16 @@ function LoginForm() {
           >
             {isLoading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>AUTHENTICATING...</span>
+                <div
+                  aria-hidden="true"
+                  className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"
+                />
+                <span>Signing in…</span>
               </>
             ) : (
               <>
-                <SystemApertureIcon size={16} />
-                <span>ACCESS SYSTEM</span>
+                <span>Sign in</span>
+                <ArrowRight aria-hidden="true" />
               </>
             )}
           </button>
@@ -224,10 +220,10 @@ function LoginForm() {
         <p className={styles.footerText}>
           Don&apos;t have an account?{" "}
           <Link href="/register?force=true" className={styles.footerLink}>
-            SIGN UP
+            Create an account
           </Link>
         </p>
-      </motion.div>
+      </div>
     </AuthSplitLayout>
   );
 }
@@ -236,8 +232,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#070913]">
-          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+        <div className={styles.loadingPage} role="status">
+          Opening your sanctuary…
         </div>
       }
     >

@@ -1,0 +1,574 @@
+{
+  "results": [
+    {
+      "name": "mobile-390-dark",
+      "mode": "dark",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 16,
+          "y": 412.21875,
+          "width": 173,
+          "height": 500
+        },
+        {
+          "x": 201,
+          "y": 412.21875,
+          "width": 173,
+          "height": 692.1875
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for Review differential equations and integration techniques",
+          "width": 153,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Past paper: algebra",
+          "width": 153,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for maths",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 390,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "name": "mobile-320-light",
+      "mode": "light",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 16,
+          "y": 430.21875,
+          "width": 138,
+          "height": 518.890625
+        },
+        {
+          "x": 166,
+          "y": 430.21875,
+          "width": 138,
+          "height": 711.078125
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for Review differential equations and integration techniques",
+          "width": 118,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Past paper: algebra",
+          "width": 118,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for maths",
+          "width": 68,
+          "height": 44
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 68,
+          "height": 44
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 68,
+          "height": 44
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 320,
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "name": "mobile-390-light-custom-dark-background",
+      "mode": "light",
+      "background": "#172b37",
+      "accent": "#efab54",
+      "regions": [
+        {
+          "x": 16,
+          "y": 412.21875,
+          "width": 173,
+          "height": 500
+        },
+        {
+          "x": 201,
+          "y": 412.21875,
+          "width": 173,
+          "height": 692.1875
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for Review differential equations and integration techniques",
+          "width": 153,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Past paper: algebra",
+          "width": 153,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for maths",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 390,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "name": "mobile-430-dark-custom-light-background",
+      "mode": "dark",
+      "background": "#eee6dc",
+      "accent": "#a83b6b",
+      "regions": [
+        {
+          "x": 16,
+          "y": 391.21875,
+          "width": 193,
+          "height": 500
+        },
+        {
+          "x": 221,
+          "y": 391.21875,
+          "width": 193,
+          "height": 692.1875
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for Review differential equations and integration techniques",
+          "width": 173,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Past paper: algebra",
+          "width": 173,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for maths",
+          "width": 123,
+          "height": 44
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 123,
+          "height": 44
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 123,
+          "height": 44
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 430,
+      "scrollWidth": 430,
+      "width": 430
+    },
+    {
+      "name": "tablet-768-dark",
+      "mode": "dark",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 304,
+          "y": 353.96875,
+          "width": 213.90625,
+          "height": 481.109375
+        },
+        {
+          "x": 530.09375,
+          "y": 353.96875,
+          "width": 213.90625,
+          "height": 692.1875
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for Review differential equations and integration techniques",
+          "width": 193.90625,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Past paper: algebra",
+          "width": 193.90625,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for maths",
+          "width": 143.90625,
+          "height": 44
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 143.90625,
+          "height": 44
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 143.90625,
+          "height": 44
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 488,
+      "scrollWidth": 768,
+      "width": 768
+    },
+    {
+      "name": "tablet-980-dark",
+      "mode": "dark",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 304,
+          "y": 439.921875,
+          "width": 317.25,
+          "height": 490.296875
+        },
+        {
+          "x": 638.75,
+          "y": 439.921875,
+          "width": 317.25,
+          "height": 687.078125
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for Review differential equations and integration techniques",
+          "width": 289.25,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Past paper: algebra",
+          "width": 289.25,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for maths",
+          "width": 239.25,
+          "height": 44
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 239.25,
+          "height": 44
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 239.25,
+          "height": 44
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 700,
+      "scrollWidth": 980,
+      "width": 980
+    },
+    {
+      "name": "desktop-1440-light",
+      "mode": "light",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 322,
+          "y": 472.015625,
+          "width": 522,
+          "height": 224.6875
+        },
+        {
+          "x": 876,
+          "y": 472.015625,
+          "width": 522,
+          "height": 381.1875
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for Review differential equations and integration techniques",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "label": "Start focus session for Past paper: algebra",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "label": "Start focus session for maths",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 1160,
+      "scrollWidth": 1440,
+      "width": 1440
+    },
+    {
+      "name": "mobile-390-empty-quests",
+      "mode": "dark",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 16,
+          "y": 412.21875,
+          "width": 173,
+          "height": 222.90625
+        },
+        {
+          "x": 201,
+          "y": 412.21875,
+          "width": 173,
+          "height": 692.1875
+        }
+      ],
+      "overflows": [],
+      "controls": [
+        {
+          "label": "Start focus session for maths",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage maths",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Further mathematics and advanced calculus",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage Further mathematics and advanced calculus",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "label": "Start focus session for Biology",
+          "width": 103,
+          "height": 44
+        },
+        {
+          "label": "Manage Biology",
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "mainWidth": 390,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "name": "mobile-320-both-empty",
+      "mode": "light",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 16,
+          "y": 430.21875,
+          "width": 138,
+          "height": 241.03125
+        },
+        {
+          "x": 166,
+          "y": 430.21875,
+          "width": 138,
+          "height": 241.03125
+        }
+      ],
+      "overflows": [],
+      "controls": [],
+      "mainWidth": 320,
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "name": "mobile-390-loading",
+      "mode": "dark",
+      "background": "simple",
+      "accent": "#419b78",
+      "regions": [
+        {
+          "x": 16,
+          "y": 412.21875,
+          "width": 173,
+          "height": 116.125
+        },
+        {
+          "x": 201,
+          "y": 412.21875,
+          "width": 173,
+          "height": 116.125
+        }
+      ],
+      "overflows": [],
+      "controls": [],
+      "mainWidth": 390,
+      "scrollWidth": 390,
+      "width": 390
+    }
+  ],
+  "errors": [],
+  "fixture": "Browser-only API fixtures; no database changes"
+}

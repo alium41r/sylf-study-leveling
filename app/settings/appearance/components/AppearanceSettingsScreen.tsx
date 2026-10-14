@@ -206,10 +206,10 @@ export function AppearanceSettingsScreen() {
           body: JSON.stringify({ category: "BACKGROUND", itemKey: draftBackground }),
         }),
       ])
-        .then(async ([resTheme]) => {
-          if (resTheme.ok) {
+        .then(async ([resTheme, resBackground]) => {
+          if (resTheme.ok && resBackground.ok) {
             const data = await resTheme.json().catch(() => ({}));
-            if (data.user) mutateUser(data.user);
+            if (data.user) mutateUser({ ...data.user, activeTheme: draftAccent, activeBackground: draftBackground });
           }
         })
         .catch(console.error);

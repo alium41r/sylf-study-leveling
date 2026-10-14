@@ -1,0 +1,20 @@
+{
+  "status": "PASSED",
+  "checkedAt": "2026-10-08T18:01:03.190767+00:00",
+  "reportLinksChecked": [
+    "SLEEP_INVESTIGATION.md",
+    "COMPLETION.md",
+    "README.md",
+    "LIVE_QUALIFICATION.md",
+    "STEP_6_BLOCKERS.md",
+    "STEP_6_BOUNDARY_FIXES.md",
+    "STEP_6.md"
+  ],
+  "missingReferences": [],
+  "trailingWhitespace": [],
+  "implementationOrOtherSourceChanges": [],
+  "sourceFilesCompared": 3530,
+  "samePreviousProductionPrimaryAndTemporaryFallbackOptions": true,
+  "unchangedRegisteredCorpus": true,
+  "noFullGateClaim": true
+}

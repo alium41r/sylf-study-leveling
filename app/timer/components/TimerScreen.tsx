@@ -17,6 +17,7 @@ import { QuestEmblemIcon, SubjectGrimoireIcon, FocusClockIcon } from "@/app/comp
 import { SubjectModal, SubjectItem } from "./SubjectModal";
 import { DeleteSubjectModal } from "./DeleteSubjectModal";
 import styles from "../Timer.module.css";
+import { TIMER_SYNC_EVENT, getTimerSync } from "@/lib/timer-sync";
 
 export function TimerScreen() {
   const { user } = useAuth();
@@ -97,6 +98,13 @@ export function TimerScreen() {
 
   useEffect(() => {
     fetchSubjectsAndQuests();
+    const onSync = (event: Event) => {
+      if ((event as CustomEvent<{ ownerId: number }>).detail?.ownerId === user?.id) void fetchSubjectsAndQuests();
+    };
+    window.addEventListener(TIMER_SYNC_EVENT, onSync);
+    return () => window.removeEventListener(TIMER_SYNC_EVENT, onSync);
+    // fetchSubjectsAndQuests is an account-scoped read; React stats updates do not create a subscription.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const handleOpenAddSubject = () => {
@@ -113,7 +121,7 @@ export function TimerScreen() {
 
   const handleOpenDelete = async (subject: SubjectItem) => {
     // Check client-side running timer
-    let hasLocalActive = false;
+    let hasLocalActive = user ? getTimerSync(user.id).hasUnsettledSubject(subject.id) : false;
     if (typeof window !== "undefined" && window.localStorage) {
       try {
         for (let i = 0; i < localStorage.length; i++) {
@@ -259,16 +267,7 @@ export function TimerScreen() {
       >
         {/* ─── Header ───────────────────────────────────────── */}
         <div className={styles.headerArea}>
-          <p className={styles.eyebrow}>
-            <span className={styles.eyebrowDot} />
-            Study Timer
-          </p>
-          <h1 className={styles.title}>
-            Focus <em>Sessions</em>
-          </h1>
-          <p className={styles.subtitle}>
-            Track daily focus, active quests, and subject sessions.
-          </p>
+          <h1 className={styles.title}>Timer</h1>
         </div>
 
         {/* ─── Hero Cumulative Focus Display ─────────────────── */}
@@ -290,12 +289,14 @@ export function TimerScreen() {
         {/* ─── Two Column Layout ─────────────────────────────── */}
         <div className={styles.splitLayout}>
           {/* ─── Active Quests Section ──────────────────────── */}
-          <div className={styles.columnArea}>
+          <section className={styles.columnArea} aria-labelledby="timer-quests-heading">
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitleGroup}>
                 <QuestEmblemIcon className={styles.sectionIcon} size={18} />
-                <h2 className={styles.sectionTitle}>Active Quests</h2>
-                {activeQuests.length > 0 && (
+                <h2 id="timer-quests-heading" className={styles.sectionTitle} aria-label="Active Quests">
+                  <span className={styles.expandedLabel}>Active </span>Quests
+                </h2>
+                {!isLoading && (
                   <span className={styles.countChip}>{activeQuests.length}</span>
                 )}
               </div>
@@ -311,9 +312,12 @@ export function TimerScreen() {
                   <QuestEmblemIcon size={20} />
                 </div>
                 <p className={styles.emptyText}>No active quests today.</p>
-                <Link href="/dashboard" className={styles.emptyLink}>
+                <Link href="/dashboard" className={styles.emptyLink} aria-label="View Quests in Dashboard">
                   <QuestEmblemIcon size={13} />
-                  <span>View Quests in Dashboard</span>
+                  <span>
+                    <span className={styles.expandedLabel}>View </span>
+                    Quests<span className={styles.expandedLabel}> in Dashboard</span>
+                  </span>
                 </Link>
               </div>
             ) : (
@@ -338,6 +342,7 @@ export function TimerScreen() {
                         aria-label={`Start focus session for ${quest.title}`}
                       >
                         <Play size={16} fill="currentColor" className={styles.playIcon} />
+                        <span className={styles.playLabel}>Focus</span>
                       </button>
                       <div className={styles.itemContent}>
                         <div className={styles.itemTitleRow}>
@@ -366,26 +371,18 @@ export function TimerScreen() {
                 ))}
               </div>
             )}
-          </div>
+          </section>
 
           {/* ─── Subjects Section ────────────────────────────── */}
-          <div className={styles.columnArea}>
+          <section className={styles.columnArea} aria-labelledby="timer-subjects-heading">
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitleGroup}>
                 <SubjectGrimoireIcon className={styles.sectionIcon} size={18} />
-                <h2 className={styles.sectionTitle}>Subjects</h2>
-                {subjects.length > 0 && (
+                <h2 id="timer-subjects-heading" className={styles.sectionTitle}>Subjects</h2>
+                {!isLoading && (
                   <span className={styles.countChip}>{subjects.length}</span>
                 )}
               </div>
-              <button
-                onClick={handleOpenAddSubject}
-                className={styles.btnAddSubject}
-                type="button"
-              >
-                <Plus size={14} />
-                Add Subject
-              </button>
             </div>
 
             {isLoading ? (
@@ -402,9 +399,10 @@ export function TimerScreen() {
                   onClick={handleOpenAddSubject}
                   className={styles.emptyLink}
                   type="button"
+                  aria-label="Add your first subject"
                 >
                   <Plus size={13} />
-                  <span>Add your first subject</span>
+                  <span>Add<span className={styles.expandedLabel}> your first</span> subject</span>
                 </button>
               </div>
             ) : (
@@ -412,7 +410,7 @@ export function TimerScreen() {
                 {subjects.map((subject) => (
                   <div
                     key={subject.id}
-                    className={styles.itemCard}
+                    className={`${styles.itemCard} ${styles.subjectCard}`}
                     style={{
                       borderLeft: `3px solid ${subject.color || "var(--accent-strong)"}`,
                     }}
@@ -425,6 +423,7 @@ export function TimerScreen() {
                         aria-label={`Start focus session for ${subject.name}`}
                       >
                         <Play size={16} fill="currentColor" className={styles.playIcon} />
+                        <span className={styles.playLabel}>Focus</span>
                       </button>
                       <div className={styles.itemContent}>
                         <div className={styles.itemTitleRow}>
@@ -520,7 +519,17 @@ export function TimerScreen() {
                 ))}
               </div>
             )}
-          </div>
+            {!isLoading && subjects.length > 0 && (
+              <button
+                onClick={handleOpenAddSubject}
+                className={styles.btnAddSubject}
+                type="button"
+              >
+                <Plus size={14} />
+                Add Subject
+              </button>
+            )}
+          </section>
         </div>
       </div>
 

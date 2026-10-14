@@ -1,0 +1,450 @@
+{
+  "schemaVersion": 1,
+  "ceilingNanodollars": 400000000,
+  "stopped": null,
+  "calls": [
+    {
+      "trialId": "d_4455ae843acc1082",
+      "input": 4842,
+      "output": 8192,
+      "reservedNanodollars": 11283000,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 1244100,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:42:10.572Z",
+      "callId": "471124a5-4373-461b-ad73-22eabd276927",
+      "dispatchedAt": "2026-10-09T12:42:10.640Z",
+      "rawUsage": {
+        "prompt_tokens": 1091,
+        "completion_tokens": 764,
+        "total_tokens": 1855,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 415
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1091
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 6020,
+      "canonicalUsage": {
+        "inputTokens": 1091,
+        "outputTokens": 764,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_0f51cb688400b89c",
+      "input": 4189,
+      "output": 8192,
+      "reservedNanodollars": 11087100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 1925100,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:42:16.948Z",
+      "callId": "06b063e5-9d32-493e-80ee-37230ae0addd",
+      "dispatchedAt": "2026-10-09T12:42:17.017Z",
+      "rawUsage": {
+        "prompt_tokens": 961,
+        "completion_tokens": 1364,
+        "total_tokens": 2325,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1066
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 961
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 7949,
+      "canonicalUsage": {
+        "inputTokens": 961,
+        "outputTokens": 1364,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_d5011475b34a9da1",
+      "input": 4575,
+      "output": 8192,
+      "reservedNanodollars": 11202900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 3720600,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:42:25.178Z",
+      "callId": "812cd479-2e7d-4500-b5c8-c0cf0be7b436",
+      "dispatchedAt": "2026-10-09T12:42:25.236Z",
+      "rawUsage": {
+        "prompt_tokens": 1010,
+        "completion_tokens": 2848,
+        "total_tokens": 3858,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2483
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1010
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 16130,
+      "canonicalUsage": {
+        "inputTokens": 1010,
+        "outputTokens": 2848,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_ac6e119faa6748a5",
+      "input": 4163,
+      "output": 8192,
+      "reservedNanodollars": 11079300,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 2339400,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:42:41.645Z",
+      "callId": "8dc16b24-fcad-4600-94ae-a6dc6547dfe2",
+      "dispatchedAt": "2026-10-09T12:42:41.712Z",
+      "rawUsage": {
+        "prompt_tokens": 994,
+        "completion_tokens": 1701,
+        "total_tokens": 2695,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1349
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 994
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 10066,
+      "canonicalUsage": {
+        "inputTokens": 994,
+        "outputTokens": 1701,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_63ea398f0b23e2f0",
+      "input": 5147,
+      "output": 8192,
+      "reservedNanodollars": 11374500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 2016600,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:42:52.066Z",
+      "callId": "e92f47ce-7f90-44cf-b937-756b40d2e3d5",
+      "dispatchedAt": "2026-10-09T12:42:52.134Z",
+      "rawUsage": {
+        "prompt_tokens": 1162,
+        "completion_tokens": 1390,
+        "total_tokens": 2552,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1109
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1162
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 8343,
+      "canonicalUsage": {
+        "inputTokens": 1162,
+        "outputTokens": 1390,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_28b1cf3e53f64ddf",
+      "input": 5068,
+      "output": 8192,
+      "reservedNanodollars": 11350800,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 1595100,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:43:00.728Z",
+      "callId": "b7abc40b-6664-4c99-8c40-22c7fa4d7185",
+      "dispatchedAt": "2026-10-09T12:43:00.801Z",
+      "rawUsage": {
+        "prompt_tokens": 1153,
+        "completion_tokens": 1041,
+        "total_tokens": 2194,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 606
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 1153
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 6636,
+      "canonicalUsage": {
+        "inputTokens": 1153,
+        "outputTokens": 1041,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_2f5488d294f95e29",
+      "input": 4337,
+      "output": 8192,
+      "reservedNanodollars": 11131500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 1123800,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:43:07.704Z",
+      "callId": "d3e222dd-25e3-4283-86d7-8698a8ed53ed",
+      "dispatchedAt": "2026-10-09T12:43:07.767Z",
+      "rawUsage": {
+        "prompt_tokens": 950,
+        "completion_tokens": 699,
+        "total_tokens": 1649,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 333
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 950
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 4966,
+      "canonicalUsage": {
+        "inputTokens": 950,
+        "outputTokens": 699,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_3284c39bab869cee",
+      "input": 4187,
+      "output": 8192,
+      "reservedNanodollars": 11086500,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 1775400,
+      "policy": {
+        "purpose": "BLUEPRINT",
+        "reviewReserve": {
+          "inputTokens": 8192,
+          "outputTokens": 4096
+        }
+      },
+      "reservedAt": "2026-10-09T12:43:13.000Z",
+      "callId": "9fa2c902-e02a-4a54-88f7-35785eb2b4c8",
+      "dispatchedAt": "2026-10-09T12:43:13.060Z",
+      "rawUsage": {
+        "prompt_tokens": 994,
+        "completion_tokens": 1231,
+        "total_tokens": 2225,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 776
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 994
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "stop",
+      "latencyMs": 8007,
+      "canonicalUsage": {
+        "inputTokens": 994,
+        "outputTokens": 1231,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "STOP",
+        "accepted": true
+      }
+    },
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "input": 11303,
+      "output": 4096,
+      "reservedNanodollars": 8306100,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 5721900,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T12:43:21.363Z",
+      "callId": "0a6ef5ee-0090-437d-b377-5939d0ec63cd",
+      "dispatchedAt": "2026-10-09T12:43:21.426Z",
+      "rawUsage": {
+        "prompt_tokens": 2689,
+        "completion_tokens": 4096,
+        "total_tokens": 6785,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4096
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 2689
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "length",
+      "latencyMs": 20487,
+      "canonicalUsage": {
+        "inputTokens": 2689,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "MAX_TOKENS",
+        "errorCode": "OUTPUT_TRUNCATED"
+      }
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "input": 11939,
+      "output": 4096,
+      "reservedNanodollars": 8496900,
+      "status": "SETTLED",
+      "wires": 1,
+      "actualNanodollars": 5773200,
+      "policy": {
+        "purpose": "REVIEW"
+      },
+      "reservedAt": "2026-10-09T12:43:42.204Z",
+      "callId": "b5123a13-86fb-40bb-a37a-6dd5c1415f57",
+      "dispatchedAt": "2026-10-09T12:43:42.284Z",
+      "rawUsage": {
+        "prompt_tokens": 2860,
+        "completion_tokens": 4096,
+        "total_tokens": 6956,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4096
+        },
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 2092
+      },
+      "returnedModel": "deepseek-flash",
+      "fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+      "finishReason": "length",
+      "latencyMs": 20975,
+      "canonicalUsage": {
+        "inputTokens": 2860,
+        "outputTokens": 4096,
+        "costUsd": null
+      },
+      "result": {
+        "finishReason": "MAX_TOKENS",
+        "errorCode": "OUTPUT_TRUNCATED"
+      }
+    }
+  ],
+  "productionPublication": "FORBIDDEN"
+}

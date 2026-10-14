@@ -1,0 +1,20 @@
+{
+  "ratesVerifiedAt": "2026-10-09T11:16:59.305Z",
+  "sources": [
+    "https://api-docs.deepseek.com/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-chat-completion/"
+  ],
+  "ratesPerMillionUsd": {
+    "peakUncachedInput": 0.3,
+    "peakOutput": 1.2,
+    "offPeakUncachedInput": 0.15,
+    "offPeakOutput": 0.6
+  },
+  "inputReservationUnits": 189036,
+  "outputTokenCap": 114688,
+  "conservativePeakUsd": 0.1943364,
+  "conservativeOffPeakUsd": 0.0971682,
+  "ceilingUsd": 0.4,
+  "method": "Keep full peak/cache-miss reservations for the entire batch; no release on actual savings or unknown usage. Completion includes reasoning. UTF-8 input bounds are the unchanged dispatcher authority; returned usage must fit every reservation.",
+  "assumptions": "Text-only, frozen packets, one upstream attempt per trial, no tools/streaming/fallback/retry/search/judge API call. Any metadata or usage uncertainty stops execution."
+}

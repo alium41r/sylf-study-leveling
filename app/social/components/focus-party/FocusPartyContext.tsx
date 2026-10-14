@@ -18,7 +18,10 @@ import React, {
   useRef,
   ReactNode,
 } from "react";
+import { fetchWithTimeout } from "@/lib/api-transport";
 import { useAuth } from "@/app/components/AuthProvider";
+import { getTimerSync, TIMER_SYNC_EVENT } from "@/lib/timer-sync";
+import { normalizeFocusTimestamp } from "@/lib/focus-party-types";
 import {
   useFocusPartyRealtime,
   type RealtimeConnectionState,
@@ -78,7 +81,9 @@ export interface FocusPartyContextValue {
 
 const FocusPartyContext = createContext<FocusPartyContextValue | null>(null);
 
-async function parseSafeJson<T = any>(
+interface PartyResponse { error?: string; activeParty?: FocusPartySummaryView | null; pendingInvites?: FocusPartyInviteView[]; success?: boolean; partyId?: number; leaderId?: number; name?: string }
+
+async function parseSafeJson<T = PartyResponse>(
   res: Response,
   fallbackError: string
 ): Promise<{ data: T | null; error: string | null }> {
@@ -110,11 +115,19 @@ export function FocusPartyProvider({
   const [actionError, setActionError] = useState<string | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [viewMode, setViewMode] = useState<FocusPartyViewMode>(partyIdOverride ? "room" : "lobby");
+  const [exitRevision, setExitRevision] = useState(0);
+  const overviewGenerationRef = useRef(0);
+
+  useEffect(() => {
+    const generation = ++overviewGenerationRef.current;
+    return () => { overviewGenerationRef.current = generation + 1; };
+  }, [currentUserId]);
 
   const partyId = partyIdOverride ?? partySummary?.id ?? null;
 
   // ─── 1. Load User's Active Party & Pending Invites ───────────────────────
   const fetchActivePartyOverview = useCallback(async () => {
+    const generation = overviewGenerationRef.current;
     if (!currentUserId) {
       setPartySummary(null);
       setPendingInvites([]);
@@ -123,8 +136,9 @@ export function FocusPartyProvider({
     }
 
     try {
-      const res = await fetch("/api/focus-party", { credentials: "include", cache: "no-store" });
+      const res = await fetchWithTimeout(fetch, "/api/focus-party", { credentials: "include", cache: "no-store" });
       const { data, error: parseErr } = await parseSafeJson(res, "Failed to load focus party");
+      if (generation !== overviewGenerationRef.current) return;
       if (res.ok && data) {
         setPartySummary(data.activeParty || null);
         setPendingInvites(Array.isArray(data.pendingInvites) ? data.pendingInvites : []);
@@ -132,15 +146,17 @@ export function FocusPartyProvider({
       } else {
         setActionError(data?.error || parseErr || "Failed to load focus party");
       }
-    } catch (err: any) {
-      setActionError(err.message || "Network error loading focus party");
+    } catch (err) {
+      if (generation === overviewGenerationRef.current) setActionError(err instanceof Error ? err.message : "Network error loading focus party");
     } finally {
-      setIsInitialLoading(false);
+      if (generation === overviewGenerationRef.current) setIsInitialLoading(false);
     }
   }, [currentUserId]);
 
   useEffect(() => {
-    fetchActivePartyOverview();
+    let cancelled = false;
+    queueMicrotask(() => { if (!cancelled) void fetchActivePartyOverview(); });
+    return () => { cancelled = true; };
   }, [fetchActivePartyOverview]);
 
   // ─── 2. Supabase Realtime Hook for Party ─────────────────────────────────
@@ -158,26 +174,35 @@ export function FocusPartyProvider({
 
   // Keep partySummary synchronized if Realtime detects leader change or disband
   useEffect(() => {
-    if (rt.party?.party) {
-      setPartySummary(rt.party.party);
-    } else if (partyId && !rt.isLoading && rt.error && rt.error.includes("disbanded")) {
-      setPartySummary(null);
-      setViewMode("lobby");
-    }
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      if (rt.party?.party) {
+        setPartySummary(rt.party.party);
+      } else if (partyId && !rt.isLoading && rt.error && rt.error.includes("disbanded")) {
+        setPartySummary(null);
+        setViewMode("lobby");
+      }
+    });
+    return () => { cancelled = true; };
   }, [rt.party, rt.isLoading, rt.error, partyId]);
 
   // Keep viewMode synced with party existence
   useEffect(() => {
-    if (!rt.party && !rt.isLoading && !rt.error && !partyId) {
-      setViewMode("lobby");
-    }
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      if (!rt.party && !rt.isLoading && !rt.error && !partyId) {
+        setViewMode("lobby");
+      }
+    });
+    return () => { cancelled = true; };
   }, [rt.party, rt.isLoading, rt.error, partyId]);
 
   // ─── 3. Derived State Helpers ───────────────────────────────────────────
   const party = rt.party;
   const session = rt.session;
-  const timerViews = rt.timerViews;
-  const collectiveSeconds = rt.collectiveSeconds;
+  const rawTimerViews = rt.timerViews;
   const connectionState = rt.connectionState;
 
   const hasActiveParty = Boolean(
@@ -193,15 +218,42 @@ export function FocusPartyProvider({
     return session.members.find((p) => p.userId === currentUserId) || null;
   }, [session, currentUserId]);
 
-  const isInFocus = Boolean(myParticipant && myParticipant.timerState !== "LEFT");
+  const joinedAt = normalizeFocusTimestamp(myParticipant?.joinedAt);
+  const exitKey = session && currentUserId && joinedAt ? `party-exit-${session.id}-${Date.parse(joinedAt)}` : null;
+  const savedExit = useMemo(() => {
+    if (!currentUserId || !exitKey) return null;
+    try { return getTimerSync(currentUserId).journal(exitKey); } catch { return null; }
+    // Journal notifications trigger this account/participation-scoped read.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId, exitKey, exitRevision]);
+  const isInFocus = Boolean(myParticipant && myParticipant.timerState !== "LEFT" && !savedExit?.endedAt);
+  const own = currentUserId ? rawTimerViews[currentUserId] : null;
+  const timerViews = useMemo(() => savedExit?.endedAt && currentUserId && own ? { ...rawTimerViews, [currentUserId]: {
+    ...own, timerState: "LEFT" as const, isFocusing: false, currentStartedAt: null, leftAt: savedExit.endedAt,
+    liveSeconds: savedExit.endedFocusSeconds ?? own.liveSeconds,
+  } } : rawTimerViews, [savedExit, currentUserId, own, rawTimerViews]);
+  const collectiveSeconds = Math.max(0, rt.collectiveSeconds - Math.max(0, (own?.liveSeconds ?? 0) - (savedExit?.endedFocusSeconds ?? own?.liveSeconds ?? 0)));
+  useEffect(() => {
+    if (!currentUserId) return;
+    return getTimerSync(currentUserId).subscribe(() => setExitRevision(value => value + 1));
+  }, [currentUserId]);
+  const refreshPartyRef = useRef(rt.refresh);
+  useEffect(() => { refreshPartyRef.current = rt.refresh; }, [rt.refresh]);
+  useEffect(() => {
+    const onSync = (event: Event) => {
+      if ((event as CustomEvent<{ ownerId: number }>).detail?.ownerId === currentUserId) void refreshPartyRef.current();
+    };
+    window.addEventListener(TIMER_SYNC_EVENT, onSync);
+    return () => window.removeEventListener(TIMER_SYNC_EVENT, onSync);
+  }, [currentUserId]);
 
   const myTimerView = useMemo<MemberTimerView | null>(() => {
     if (!currentUserId || !timerViews[currentUserId]) return null;
     return timerViews[currentUserId];
   }, [currentUserId, timerViews]);
 
-  const myTimerState: FocusTimerState = myParticipant?.timerState ?? "NOT_STARTED";
-  const myLiveSeconds: number = myTimerView?.liveSeconds ?? myParticipant?.accumulatedSeconds ?? 0;
+  const myTimerState: FocusTimerState = savedExit?.endedAt ? "LEFT" : myParticipant?.timerState ?? "NOT_STARTED";
+  const myLiveSeconds: number = savedExit?.endedFocusSeconds ?? myTimerView?.liveSeconds ?? myParticipant?.accumulatedSeconds ?? 0;
 
   const combinedError = actionError || rt.error;
   const isLoading = isInitialLoading || (Boolean(partyId) && rt.isLoading && !party);
@@ -209,7 +261,7 @@ export function FocusPartyProvider({
   // ─── 4. Safe Action Dispatchers (Concurrency & Double-Submit Guarded) ────
   const isSubmittingRef = useRef(false);
 
-  const executeAction = async <T,>(
+  const executeAction = useCallback(async <T,>(
     actionFn: () => Promise<T>,
     onSuccess?: (res: T) => void
   ): Promise<{ success: boolean; error?: string; data?: T }> => {
@@ -224,20 +276,20 @@ export function FocusPartyProvider({
       const result = await actionFn();
       onSuccess?.(result);
       return { success: true, data: result };
-    } catch (err: any) {
-      const msg = err.message || "An error occurred";
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "An error occurred";
       setActionError(msg);
       return { success: false, error: msg };
     } finally {
       isSubmittingRef.current = false;
       setIsActionLoading(false);
     }
-  };
+  }, []);
 
   const createParty = useCallback(
     async (name?: string) => {
       const res = await executeAction(async () => {
-        const response = await fetch("/api/focus-party", {
+        const response = await fetchWithTimeout(fetch, "/api/focus-party", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -245,7 +297,7 @@ export function FocusPartyProvider({
         });
         const { data, error: parseErr } = await parseSafeJson(response, "Failed to create Focus Party");
         if (!response.ok || !data) {
-          throw new Error((data as any)?.error || parseErr || "Failed to create Focus Party");
+          throw new Error(data?.error || parseErr || "Failed to create Focus Party");
         }
         return data as { success: boolean; partyId: number; leaderId: number; name: string };
       });
@@ -257,19 +309,19 @@ export function FocusPartyProvider({
       }
       return { success: false, error: res.error };
     },
-    [fetchActivePartyOverview]
+    [executeAction, fetchActivePartyOverview]
   );
 
   const joinParty = useCallback(
     async (targetPartyId: number) => {
       const res = await executeAction(async () => {
-        const response = await fetch(`/api/focus-party/${targetPartyId}/join`, {
+        const response = await fetchWithTimeout(fetch, `/api/focus-party/${targetPartyId}/join`, {
           method: "POST",
           credentials: "include",
         });
         const { data, error: parseErr } = await parseSafeJson(response, "Failed to join Focus Party");
         if (!response.ok || !data) {
-          throw new Error((data as any)?.error || parseErr || "Failed to join Focus Party");
+          throw new Error(data?.error || parseErr || "Failed to join Focus Party");
         }
         return data;
       });
@@ -281,7 +333,7 @@ export function FocusPartyProvider({
       }
       return { success: false, error: res.error };
     },
-    [fetchActivePartyOverview]
+    [executeAction, fetchActivePartyOverview]
   );
 
   const leaveParty = useCallback(async () => {
@@ -302,7 +354,7 @@ export function FocusPartyProvider({
       return { success: true };
     }
     return { success: false, error: res.error };
-  }, [partyId, rt, fetchActivePartyOverview]);
+  }, [executeAction, partyId, rt, fetchActivePartyOverview]);
 
   const kickMember = useCallback(
     async (memberId: number) => {
@@ -315,7 +367,7 @@ export function FocusPartyProvider({
       });
       return { success: res.success, error: res.error };
     },
-    [rt]
+    [executeAction, rt]
   );
 
   const inviteFriend = useCallback(
@@ -329,13 +381,13 @@ export function FocusPartyProvider({
       });
       return { success: res.success, error: res.error };
     },
-    [rt]
+    [executeAction, rt]
   );
 
   const respondToInvite = useCallback(
     async (inviteId: number, action: "ACCEPTED" | "DECLINED") => {
       const res = await executeAction(async () => {
-        const response = await fetch(`/api/focus-party/invites/${inviteId}`, {
+        const response = await fetchWithTimeout(fetch, `/api/focus-party/invites/${inviteId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -343,7 +395,7 @@ export function FocusPartyProvider({
         });
         const { data, error: parseErr } = await parseSafeJson(response, `Failed to ${action.toLowerCase()} invite`);
         if (!response.ok || !data) {
-          throw new Error((data as any)?.error || parseErr || `Failed to ${action.toLowerCase()} invite`);
+          throw new Error(data?.error || parseErr || `Failed to ${action.toLowerCase()} invite`);
         }
         return data;
       });
@@ -357,11 +409,12 @@ export function FocusPartyProvider({
       }
       return { success: false, error: res.error };
     },
-    [fetchActivePartyOverview]
+    [executeAction, fetchActivePartyOverview]
   );
 
   const enterFocus = useCallback(
     async (durationGoalMinutes?: number, title?: string) => {
+      if (savedExit?.endedAt && !savedExit.settled) return { success: false, error: "Your previous focus room exit is still syncing. Rejoin when it finishes." };
       const res = await executeAction(async () => {
         const result = await rt.enterFocus(durationGoalMinutes, title);
         if (!result.success) {
@@ -376,7 +429,7 @@ export function FocusPartyProvider({
       }
       return { success: false, error: res.error };
     },
-    [rt]
+    [executeAction, rt, savedExit]
   );
 
   const startTimer = useCallback(async () => {
@@ -388,7 +441,7 @@ export function FocusPartyProvider({
       return result;
     });
     return { success: res.success, error: res.error };
-  }, [rt]);
+  }, [executeAction, rt]);
 
   const pauseTimer = useCallback(async () => {
     const res = await executeAction(async () => {
@@ -399,7 +452,7 @@ export function FocusPartyProvider({
       return result;
     });
     return { success: res.success, error: res.error };
-  }, [rt]);
+  }, [executeAction, rt]);
 
   const resumeTimer = useCallback(async () => {
     const res = await executeAction(async () => {
@@ -410,23 +463,22 @@ export function FocusPartyProvider({
       return result;
     });
     return { success: res.success, error: res.error };
-  }, [rt]);
+  }, [executeAction, rt]);
 
   const leaveFocus = useCallback(async () => {
-    const res = await executeAction(async () => {
-      const result = await rt.leaveFocus();
-      if (!result.success) {
-        throw new Error(result.error || "Failed to leave focus");
-      }
-      return result;
-    });
-
-    if (res.success) {
+    if (!currentUserId || !partyId || !session || !joinedAt || !exitKey) return { success: false, error: "Couldn't identify this focus room. Refresh its accepted state and retry." };
+    try {
+      const sync = getTimerSync(currentUserId);
+      sync.create({ ownerId: currentUserId, clientKey: exitKey, kind: "party", partyId, sessionId: session.id,
+        startedAt: normalizeFocusTimestamp(session.startedAt)!, participationJoinedAt: joinedAt });
+      sync.finish(exitKey, myLiveSeconds, 0);
       setViewMode("lobby");
       return { success: true };
+    } catch {
+      const error = "Couldn't save the focus room exit on this device. Free some device storage and retry.";
+      setActionError(error); return { success: false, error };
     }
-    return { success: false, error: res.error };
-  }, [rt]);
+  }, [currentUserId, partyId, session, joinedAt, exitKey, myLiveSeconds]);
 
   const refresh = useCallback(async () => {
     await Promise.all([fetchActivePartyOverview(), rt.refresh()]);
@@ -436,11 +488,16 @@ export function FocusPartyProvider({
     setActionError(null);
   }, []);
 
+  const shownSession = useMemo(() => savedExit?.endedAt && session && currentUserId ? { ...session, collectiveSeconds,
+    members: session.members.map(member => member.userId === currentUserId ? { ...member, timerState: "LEFT" as const,
+      isFocusing: false, currentStartedAt: null, liveSeconds: myLiveSeconds, leftAt: savedExit.endedAt } : member) } : session,
+    [savedExit, session, currentUserId, collectiveSeconds, myLiveSeconds]);
+
   const value = useMemo<FocusPartyContextValue>(
     () => ({
       partySummary,
       party,
-      session,
+      session: shownSession,
       timerViews,
       collectiveSeconds,
       connectionState,
@@ -474,7 +531,7 @@ export function FocusPartyProvider({
     [
       partySummary,
       party,
-      session,
+      shownSession,
       timerViews,
       collectiveSeconds,
       connectionState,

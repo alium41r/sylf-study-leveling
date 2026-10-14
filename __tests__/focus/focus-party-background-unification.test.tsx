@@ -8,11 +8,11 @@ import * as FocusBackgroundClientModule from "@/lib/focus-background-client";
 import * as FocusBackgroundPreferenceModule from "@/lib/focus-background-preference";
 import { resolvePartySafeTimerPosition } from "@/app/social/components/focus-party/FocusPartyTimerLayoutRouter";
 
-// Mock CharacterRenderer
-vi.mock("@/app/components/character/CharacterRenderer", () => ({
-  CharacterRenderer: ({ seed, size, showAura }: any) => (
-    <div data-testid={`character-renderer-${seed}`} data-aura={String(showAura)}>
-      Avatar({seed})
+// Mock the explicit target-owner Pixel presenter
+vi.mock("@/app/components/companion/TargetPixelCompanion", () => ({
+  TargetPixelCompanion: ({ companion, size }: any) => (
+    <div data-testid={`pixel-companion-${companion?.ownerId ?? "unavailable"}`} data-owner={companion?.ownerId}>
+      Pixel companion ({companion?.ownerId ?? "unavailable"})
     </div>
   ),
 }));

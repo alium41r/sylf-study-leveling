@@ -1,0 +1,72 @@
+{
+  "status": "PASSED",
+  "paidCalls": 0,
+  "scriptedCases": [
+    {
+      "status": "MATERIALIZED_OFFLINE",
+      "caseId": "v01",
+      "changedActivities": [
+        "plan_1/work_1"
+      ],
+      "verificationInputUnits": 12618,
+      "unchangedObjects": [
+        "plan_1/strategy",
+        "plan_1/decisions",
+        "plan_1/scope/scope_1"
+      ],
+      "networkCalls": 0,
+      "label": "SCRIPTED_OFFLINE_TOOL_CHECK_ONLY"
+    },
+    {
+      "status": "MATERIALIZED_OFFLINE",
+      "caseId": "v02",
+      "changedActivities": [
+        "plan_1/work_1"
+      ],
+      "verificationInputUnits": 11691,
+      "unchangedObjects": [
+        "plan_1/decisions"
+      ],
+      "networkCalls": 0,
+      "label": "SCRIPTED_OFFLINE_TOOL_CHECK_ONLY"
+    },
+    {
+      "status": "MATERIALIZED_OFFLINE",
+      "caseId": "v03",
+      "changedActivities": [
+        "plan_1/work_1_part_1",
+        "plan_1/work_1_part_2"
+      ],
+      "verificationInputUnits": 22639,
+      "unchangedObjects": [
+        "plan_1/strategy",
+        "plan_1/decisions",
+        "plan_1/scope/scope_1",
+        "plan_1/activity/kept_1",
+        "plan_1/activity/work_2",
+        "plan_2/strategy",
+        "plan_2/decisions",
+        "plan_2/scope/scope_1",
+        "plan_2/activity/work_3"
+      ],
+      "networkCalls": 0,
+      "label": "SCRIPTED_OFFLINE_TOOL_CHECK_ONLY"
+    },
+    {
+      "status": "MATERIALIZED_OFFLINE",
+      "caseId": "v04",
+      "changedActivities": [
+        "plan_1/work_2"
+      ],
+      "verificationInputUnits": 12628,
+      "unchangedObjects": [
+        "plan_1/decisions",
+        "plan_1/scope/scope_1",
+        "plan_1/activity/work_1"
+      ],
+      "networkCalls": 0,
+      "label": "SCRIPTED_OFFLINE_TOOL_CHECK_ONLY"
+    }
+  ],
+  "arbitraryPathRejected": true
+}

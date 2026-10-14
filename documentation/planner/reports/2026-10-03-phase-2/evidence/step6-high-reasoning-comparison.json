@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-08T16:37:28.722575+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-08T16-22-12-193Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "5c7b26f3c46a61aeed60a5502a51acc4cec4f0bfa15d87d8f3dd6cc1171638f9",
+  "method": "Separate inspection of actual request/scope, source quotations, full instructions and criteria, actual allocation, durable review/repair state and canonical apply. Model self-approval is not educational acceptance.",
+  "route": {
+    "temporaryNonGemini": true,
+    "temporaryExistingGroq": false,
+    "thinking": "enabled",
+    "reasoningEffort": "high",
+    "temperature": null,
+    "reviewTemperature": null,
+    "reviewThinking": null,
+    "reviewReasoningEffort": null,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 8,
+  "fallbackAttempts": 2,
+  "usage": {
+    "reportedInputTokens": 41527,
+    "reportedOutputTokens": 43457,
+    "settledCalls": 8,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 8,
+    "knownPricedCostUsd": 0,
+    "estimatedCostComplete": false
+  },
+  "latency": {
+    "case": {
+      "samples": 3,
+      "medianMs": 45776,
+      "p90Ms": 111399,
+      "maximumMs": 111399
+    },
+    "upstream": {
+      "samples": 8,
+      "medianMs": 22588.0,
+      "p90Ms": 38359,
+      "maximumMs": 38359
+    }
+  },
+  "truncation": {
+    "calls": 3,
+    "roots": 1,
+    "details": [
+      {
+        "caseId": "triage",
+        "responseIndex": 0,
+        "finishReason": "MAX_TOKENS",
+        "maxTokens": 8192,
+        "actualOutputTokens": 8192,
+        "finalContentBytes": 6850
+      },
+      {
+        "caseId": "triage",
+        "responseIndex": 2,
+        "finishReason": "MAX_TOKENS",
+        "maxTokens": 4096,
+        "actualOutputTokens": 4096,
+        "finalContentBytes": 0
+      },
+      {
+        "caseId": "triage",
+        "responseIndex": 3,
+        "finishReason": "MAX_TOKENS",
+        "maxTokens": 4096,
+        "actualOutputTokens": 4096,
+        "finalContentBytes": 0
+      }
+    ]
+  },
+  "passed": 1,
+  "total": 3,
+  "cases": [
+    {
+      "id": "tiny-roomy-exam",
+      "trial": 1,
+      "attemptId": "af7ccf9b-3ca1-4b0d-8e75-54de27508b42",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One integrated 60-minute task, versus 90 in the prior paired matrix and matching its ordinary tiny-exam 60-minute baseline. The supplied 12V/3ohm/6ohm series example correctly gives 9ohm,4/3A and4V/8V; the changed example is learner-chosen with explicit givens, correct checked solution and explanation without assistance as the stopping criterion. No compulsory additional sets or stages. Both High calls STOP; independent review is empty, and canonical apply is observed. Timebox is the high end of a30/45/60 estimate; this remains an estimate, not observed learner mastery.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "triage",
+      "trial": 1,
+      "attemptId": "893020ed-75a0-43c5-a6de-9ce4c3c97173",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "The valid fallback retains all four scope dispositions and actual25/25 placements before the quiz deadline, explicitly defers mixed circuits and gives prerequisite-based prioritization without numeric topic weights. It prepares with course-appropriate problems rather than requiring unavailable actual future quiz questions. These improve goal correspondence. However generation primary clips at8192; both independent reviews clip at4096 with no final content. No accepted review, candidate, repair or apply. Scope wording suggesting more likely core content has no verified quiz weighting and remains a limitation. Partial educational improvement cannot qualify the failed path.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "OUTPUT_TRUNCATED",
+        "stage": "REVIEW",
+        "message": "The provider reached its output limit.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "85df58c6-319a-4d2d-9be3-5e1f85e55a47"
+      },
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 1,
+      "attemptId": "9676e09a-b65a-46c4-82bd-5341ddcbcf5c",
+      "status": "FAILED",
+      "observedOutcome": "FAILED",
+      "assessment": "Actual owned upload/read/hash and quoted note are retained. Extraction and verification both STOP. Verification invents scope_4 in ADD_SCOPE, although only scope_1/2/3 were supplied; unchanged compiled validation reproduces INVALID_OUTPUT. Both allowed research syntheses have been consumed, so a fallback reservation fails BUDGET_EXHAUSTED before external dispatch. This is the research sub-cap, not provider quota or output truncation. No adoption, blueprint, allocation, quality review, repair, candidate or apply is completed; the prior split failure is not tested by this output.",
+      "error": {
+        "schemaVersion": 2,
+        "code": "BUDGET_EXHAUSTED",
+        "stage": "RESEARCH",
+        "message": "The root call/token allowance is exhausted.",
+        "retryable": false,
+        "resumable": false,
+        "fieldRefs": [],
+        "activityRefs": [],
+        "dates": [],
+        "recoveryAction": "NONE",
+        "traceId": "4f84e3d4-47b3-403f-915c-e77701f49c63"
+      },
+      "applied": false,
+      "actualQuests": 0
+    }
+  ],
+  "operationalFailures": 2,
+  "naturalRepair": {
+    "actualRepairCalls": 0,
+    "actualVerificationCalls": 0,
+    "acceptedWitnesses": [],
+    "reason": "Tiny has no findings; triage has no complete review; owned research fails before the compiler quality stage. No defects or findings were injected."
+  },
+  "fullCorpusDecision": {
+    "status": "NOT_RUN",
+    "reason": "The selected comparison introduces generation and mandatory-review truncation and fails research. The user required material improvement without truncation or other regressions before running the full17."
+  },
+  "sourceCurrentAtAssessment": true,
+  "priorFullBaselineDirectory": "step6-live-2026-10-08T15-28-59-317Z",
+  "selectedFullEvaluationUnchanged": true,
+  "productionPolicyChanged": false,
+  "proTrialRun": false,
+  "maxReasoningUsed": false,
+  "baselineLimitation": "The ordinary tiny-exam baseline is the prior non-thinking full matrix. No same-run ordinary High counterpart or complete High corpus was sampled; the individual bounded-task pass does not certify that full paired capacity expectation."
+}

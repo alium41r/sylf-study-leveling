@@ -273,6 +273,7 @@ export const LandscapeTimerDock = memo(function LandscapeTimerDock({
 export const LandscapeTimerLayout = memo(function LandscapeTimerLayout({
   formattedDisplayTime,
   elapsedSeconds,
+  todayElapsedSeconds = elapsedSeconds,
   breakSeconds,
   remainingSeconds,
   isCountdown,
@@ -280,7 +281,6 @@ export const LandscapeTimerLayout = memo(function LandscapeTimerLayout({
   phase,
   phaseColor,
   phaseLabel,
-  modeDisplayName,
   subjectName,
   questData,
   initialTotalSeconds,
@@ -361,49 +361,6 @@ export const LandscapeTimerLayout = memo(function LandscapeTimerLayout({
 
   return (
     <div className="w-full flex-1 flex flex-col justify-between pt-4 pb-4 sm:pb-6 px-4 md:px-8 z-10 select-none">
-      {/* ─── Top Ambient Bar: Unified Focus Status Container ─────────── */}
-      <div className="w-full flex items-center justify-between px-2 pt-0 pointer-events-none">
-        {/* Single Combined Status Container */}
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <div
-            className="h-8 flex items-center gap-2 sm:gap-2.5 px-3.5 rounded-full text-xs backdrop-blur-xl border border-white/10 bg-black/35 shadow-lg max-w-[calc(100vw-200px)] sm:max-w-none overflow-hidden"
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0"
-              style={{ backgroundColor: phaseColor, boxShadow: `0 0 8px ${phaseColor}` }}
-            />
-            <span
-              className="font-bold tracking-[0.16em] uppercase shrink-0"
-              style={{ color: phaseColor }}
-            >
-              {phaseLabel}
-            </span>
-            {modeDisplayName.toUpperCase() !== phaseLabel.toUpperCase() && (
-              <>
-                <span className="text-white/20 shrink-0">•</span>
-                <span className="text-white/60 font-medium tracking-wider uppercase shrink-0">
-                  {modeDisplayName}
-                </span>
-              </>
-            )}
-            {(questData || subjectName) && (
-              <>
-                <span className="text-white/20 shrink-0">|</span>
-                <span className="text-white/40 font-mono text-[11px] shrink-0 hidden sm:inline">
-                  focusing on:
-                </span>
-                <span className="text-white font-medium truncate max-w-[160px] sm:max-w-[260px] font-mono text-xs">
-                  {questData ? questData.title : subjectName}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* ─── Lower-Third Cinematic HUD ─────────────────────────────────── */}
       {/* Positioned towards bottom so scenic vista remains wide open above */}
       <div className={`w-full flex flex-col mt-auto mb-3 sm:mb-6 md:mb-8 ${dockClasses.dockAlignment} ${dockClasses.margin}`}>
@@ -417,7 +374,7 @@ export const LandscapeTimerLayout = memo(function LandscapeTimerLayout({
           isNotStarted={false}
           title={questData ? questData.title : subjectName}
           elapsedFormatted={formatTime(elapsedSeconds)}
-          dailyTotalFormatted={formatTime(initialTotalSeconds + elapsedSeconds)}
+          dailyTotalFormatted={formatTime(initialTotalSeconds + todayElapsedSeconds)}
           breakFormatted={breakSeconds > 0 && isBreak ? formatTime(breakSeconds) : null}
           progressPercent={progressPercent}
           isCountdown={isCountdown}

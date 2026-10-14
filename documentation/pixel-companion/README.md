@@ -1,5 +1,10 @@
 # Pixel companion documentation
 
+**8 October 2026:** built-in Pixel characters, raster previews and their comparison
+route are retired. Users supply their own artwork. The landing SVG illustration
+is separate. See the [current Pixel contract](../pixel-display/pixel-display-contract.md).
+
+
 The [pixel asset contract](pixel-asset-contract.md) is **current technical documentation**. It defines the canvas, registration, runtime locations, extraction/validation rules, and sampling constraints.
 
 The [Phase 1 report](phase1-report.md) and [revised Phase 2 report](phase2-report.md) are **historical development reports**. Preserve their task-era descriptions and limitations.

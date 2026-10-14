@@ -1,0 +1,153 @@
+{
+  "description": "Phase 7 evidence: the scholar-facing Character Customizer, its draft/save model, the pixel density preference, and safe fallback for legacy configurations.",
+  "date": "2026-10-07T16:11:39.741Z",
+  "phase": 7,
+  "ux": {
+    "entry": "Locker → Identity → Studio Hub → Companion card → Customize Companion",
+    "preview": "The production PixelCompanionCard, driven by the shared draft",
+    "vocabulary": "No asset ids, planes, anchors, coordinates, states or matrix sizes anywhere in the interface. Tested: every category label, hint and option label is asserted not to match /asset|plane|anchor|pivot|matrix|framebuffer|renderer|state|form_|pedestal_|relic_|aura_/i",
+    "requiredRankPhrasing": "RANK E becomes Rank E — a thing a scholar has rather than a code. Asserted.",
+    "categoriesShown": [
+      "Character",
+      "Pixel size"
+    ],
+    "categoriesHidden": [
+      "Ground",
+      "Aura",
+      "Held"
+    ],
+    "whyHidden": "A category is shown when it offers a real choice (more than one option) or has finished content with more on the way. Ground, Aura and Held each hold only an unequipped entry in their catalogue plus one authored asset, so none is a choice."
+  },
+  "draftSave": {
+    "model": "Shared with the existing Identity tab: characterConfig is the draft, savedConfig is persisted, handleSaveAll PATCHes /api/profile/customization.",
+    "customizerIsNotAWriter": "It raises changes upward through onChange and asks to save through onSave. There is one persistence path in the application and this did not add a second.",
+    "saveControlAdded": "A Save changes button inside the customizer, because the only save bar lived on the hub and a scholar editing the companion would have had to leave to save.",
+    "reset": "Restores the draft from savedConfig. Verified in the browser: load dirty=false, select dirty=true, reset dirty=false.",
+    "dirtyComparison": "Compares only the fields the companion draws from, with density resolved on both sides. A whole-object comparison reported Unsaved for every scholar who had never opened the customizer, because the preview resolves a density the saved configuration does not carry."
+  },
+  "density": {
+    "presets": [
+      {
+        "id": "chunky",
+        "label": "Chunky",
+        "resolution": 32
+      },
+      {
+        "id": "balanced",
+        "label": "Balanced",
+        "resolution": 40
+      },
+      {
+        "id": "detailed",
+        "label": "Detailed",
+        "resolution": 48
+      },
+      {
+        "id": "finest",
+        "label": "Finest",
+        "resolution": 64
+      }
+    ],
+    "bounded": "Four presets, each a resolution every phase since Phase 0 measured and tested at. An arbitrary continuous value has never been looked at, so none is offered.",
+    "labelsAreNotNumbers": "Asserted: no preset id is numeric and no label contains a digit.",
+    "physicalSizeUnchanged": true,
+    "verified": "Saved finest for the QA account, then measured the production dashboard: data-density 64, logical 64, cell pitch 1.719, canvas CSS 110 and backing store 110 — identical to the 48-column card. Density changed and the card did not.",
+    "anchorsUnaffected": "Asserted across all four presets: the set of reference-space offsets for every attached part is identical."
+  },
+  "persistence": {
+    "schemaChange": false,
+    "migration": false,
+    "schemaBuildVersionBump": false,
+    "where": "CharacterConfig.density, inside the existing characterConfig JSON",
+    "readWithADefault": "resolutionForDensity(undefined) is 48, so no scholar had to re-equip or migrate anything.",
+    "verifiedInDatabase": "The save wrote density: finest into User.characterConfig for the QA account, and the QA account was restored afterwards by removing that one key and touching nothing else."
+  },
+  "categorySupport": {
+    "character": {
+      "keys": 3,
+      "note": "form_tanjiro, form_gojo, form_uzui. All render the base figure; the roadmap forbids redesigning Sylf here, and each becomes its own asset in one line when the artwork lands."
+    },
+    "ground": {
+      "status": "deferred",
+      "reason": "PEDESTAL_OPTIONS holds one entry, so it is not a choice."
+    },
+    "aura": {
+      "status": "deferred",
+      "reason": "AURA_PRESETS holds only none, and the live configuration carries aura_obsidian which nothing defines — O24."
+    },
+    "held": {
+      "status": "deferred",
+      "reason": "RELIC_OPTIONS holds only the unequipped relic."
+    },
+    "reportedNotHidden": "13 companion looks are counted and stated in the interface, so a scholar who owns one knows why it is absent rather than wondering whether the page is broken."
+  },
+  "legacyHandling": {
+    "liveConfiguration": {
+      "aura": "aura_obsidian",
+      "outfit": "form_deadpool",
+      "accessory": "circlet_heroic",
+      "skin": "olive",
+      "hairStyle": "3"
+    },
+    "outcome": "Loads with no unsaved changes, paints 381 lit cells, shows form_tanjiro as equipped because that is what is on screen, and offers no option the companion cannot draw.",
+    "equippedSemantics": "Equipped means what the companion is showing, not what string is stored. When a stored key cannot be drawn the figure falls back to the base, so the base reads as selected."
+  },
+  "accessibility": {
+    "keyboard": "Verified: focusing an option and pressing Enter selects it.",
+    "radioSemantics": "The density picker is a radiogroup of role=radio with aria-checked; the measured state matches the selection.",
+    "reducedMotion": "Verified under prefers-reduced-motion: reduce — the preview renders, the state is legible, and selection never depends on animation.",
+    "focusVisible": "Focus rings defined for every interactive element.",
+    "mobile": "No horizontal overflow at 390px; the layout reflows from a stacked column to a sticky preview beside the options at 900px."
+  },
+  "gates": {
+    "pixelDisplayAndDashboard": {
+      "files": 16,
+      "tests": 382,
+      "failed": 0
+    },
+    "newCustomizerTests": 26,
+    "shopLockerCompanionRegression": {
+      "files": 24,
+      "tests": 202,
+      "failed": 0
+    },
+    "typecheck": {
+      "errors": 0
+    },
+    "engineBoundaryTypecheck": {
+      "errors": 0
+    },
+    "lintNewFiles": "0 errors; 6 pre-existing errors remain in the two files edited",
+    "build": "succeeds",
+    "mobile": {
+      "build": "succeeds",
+      "verify": "PASSED"
+    },
+    "productionInaccessibility": {
+      "/dev/pixel-display": 404,
+      "/dev": 404,
+      "/": 200,
+      "/dashboard": 307,
+      "/locker": 307
+    }
+  },
+  "architecturalChanges": [
+    "The dual-vocabulary boundary list grew from two modules to five, each documented with its reason: the card receives a resolved composition, the customizer resolves its draft, the options builder turns catalogues into choices, and the Locker hub previews the draft. All four resolve or present; none rasterises.",
+    "The card accepts an optional already-resolved composition so a preview cannot disagree with production. Resolution stays at the surface rather than moving into the card.",
+    "The card reads resolution from the scholar saved density when not given one explicitly."
+  ],
+  "openDecisions": {
+    "closed": [],
+    "O1": "Not closed, and Phase 7 is the reason: density is now a scholar-facing preference, so a configurable default may itself be the resolution of the resolution question rather than a fixed choice.",
+    "O21": "Sharpened: the remaining thirteen forms are the visible gap. 13 counted in the interface.",
+    "O22": "Sharpened but still undecided: three forms are mapped to one figure, which is exactly the ambiguity O22 names.",
+    "O24": "Unchanged and now user-visible: the aura and relic catalogues are empty, so two categories cannot be offered at all.",
+    "new": []
+  },
+  "limits": [
+    "Only the Character category offers a real choice today, so the multi-category layout is exercised by Density rather than by several populated categories.",
+    "The three mapped forms render the same figure, so switching form changes the stored key and not the picture. Documented rather than hidden.",
+    "Live high-DPI rendering remains unobserved (O13).",
+    "QA wrote a density preference to one existing account and removed it afterwards; no other data was touched."
+  ]
+}

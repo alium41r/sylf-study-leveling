@@ -1,5 +1,5 @@
 // ============================================================
-// Page Presence — where The System's quick AI entry appears
+// Page Presence — where Sylvie's quick AI entry appears
 // ============================================================
 // The lightweight AI access point is NOT rendered on every page.
 // Each entry here is a deliberate decision: these pages contain
@@ -89,7 +89,7 @@ const PRESENCE: Record<string, PagePresence> = {
 /**
  * Resolve whether the quick AI entry appears for a given route.
  * Returns null where the experience stays focused (settings, social,
- * focus, visual pages, and the System workspace itself).
+ * focus, visual pages, and the Sylvie workspace itself).
  */
 export function resolvePresence(pathname: string, search: string): PagePresence | null {
   if (!pathname) return null;

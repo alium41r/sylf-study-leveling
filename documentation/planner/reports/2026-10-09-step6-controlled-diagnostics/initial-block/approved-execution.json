@@ -1,0 +1,28 @@
+{
+  "status": "APPROVED",
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v2",
+  "protocolManifestSha256": "500a7bc44741b43d12d6953ab122198e2f114d838b88edf42b9d1848e039b291",
+  "independentLabelSignoffSha256": "e88d1ed961881b9994311631b0b0f66a8cf8e6f5a96eed7560eebb26eb900f30",
+  "unpaidPreflightSha256": "49d11ea5cf711cb427e04c801b0ee1f06c78cf5a68001a742960690c7c040bc6",
+  "approvedBy": "Human user in this Codex conversation",
+  "approvedAt": "2026-10-09T12:41:40.009469+00:00",
+  "approvalEvidence": {
+    "source": "User message received immediately before this execution",
+    "text": "I approve the controlled diagnostic execution of up to 20 DeepSeek V4.1 Flash calls, with a strict $0.40 total spending ceiling. Proceed using the independently signed-off protocol and verified execution safeguards. Preserve all frozen configurations, budgets, evaluation requirements and stopping conditions. Use no Gemini, retries or fallbacks, and prevent system sleep throughout execution. Afterward, independently evaluate the results and provide a concise report covering educational reasoning quality, reviewer accuracy, failures, token usage, latency and actual estimated cost. Do not automatically proceed to further diagnostic blocks, modify the implementation or begin Phase 3. Wait for my review of the results."
+  },
+  "maximumSpendUsd": 0.4,
+  "maximumTotalDispatches": 20,
+  "maximumRecoveryDispatches": 0,
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "publication": "FORBIDDEN",
+  "publicMetadataVerifiedAt": "2026-10-09T12:41:40.009469+00:00",
+  "publicMetadataEvidence": {
+    "path": "initial-block/evidence/public-metadata-2026-10-09.json",
+    "sha256": "f925057bf392a7c04d360b6b16a80e8140f989a89915480e03f88292aa21dc02",
+    "sources": [
+      "https://api-docs.deepseek.com/quick_start/pricing/",
+      "https://api-docs.deepseek.com/api/create-chat-completion/"
+    ]
+  }
+}

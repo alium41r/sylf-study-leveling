@@ -1,6 +1,6 @@
 # Planner V2 Phase 2 progress
 
-**Started 3 October 2026; Steps 1–5 are complete. Step 6 integration is implemented; actual live qualification failed on 5 October 2026. Phase 2 remains incomplete. DeepSeek has usable quota; output reliability, educational defects and repair/verification coverage remain acceptance blockers.**
+**Started 3 October 2026; Steps1–5 remain complete. Phase2 is INCOMPLETE and Phase3 has not begun. The latest [temporary disabled-thinking trial](THINKING_DISABLED_QUALIFICATION.md) passes409required PostgreSQL tests and551units/typecheck/lint/imports after reproducing and correcting the genuine reservation race. Thinking disabled eliminates observed truncation in26complete selected replies, but the final independent gate is0/3; the full17-case corpus and accepted exact repair witness remain open. Production settings/budgets/review authority are unchanged, and no permanent reasoning change is recommended yet.**
 
 The approved [execution roadmap](IMPLEMENTATION_PLAN.md) follows the repository's [V2 architecture](../../PLANNER_TARGET_ARCHITECTURE.md) and completed Phase 0/1 owners. The [requirement map](REQUIREMENTS.json) records 28 requirements, governing sections, audit findings, affected systems, required evidence and completion gates across the six ordered steps. A supporting schema is explicitly distinguished from a working runtime service.
 
@@ -34,3 +34,6 @@ The new tests exercise malformed/stale checkpoints, exact attempt and artifact b
 Limits of this step are deliberate: no model/provider calls or PostgreSQL transactions execute, no actual generation/publish/apply integration is newly claimed, and no Planner UI or Phase 4/5 feature work begins. Phase 1 remains the authoritative owner for those existing lifecycle guarantees. Actual compiler handlers, ownership/source verification, feasible scheduling, independent semantic review and recovery/API/ApplyService integration remain required Steps 2–6. No architectural deviation has been introduced.
 
 [Step 6 integration and qualification](STEP_6.md) records the existing generation branch, atomic final-intent admission, canonical apply integration and maximum-envelope witnesses. [Live qualification](LIVE_QUALIFICATION.md) retains actual provider failures separately from fixtures. The [completion record](COMPLETION.md) states the remaining acceptance blockers and exact Phase 3 handoff; it must not certify completion prematurely. No deployment flag or hosted system was changed.
+
+
+[8 October general boundary corrections](STEP_6_BOUNDARY_FIXES.md) supersede model-comparison work. Current production-options subsets do not pass educational acceptance; Phase2 remains incomplete, the17-case rerun is gated off, and no current-source natural repair/verification/apply witness exists. See the exact unimplemented configuration proposal before any production reasoning change.

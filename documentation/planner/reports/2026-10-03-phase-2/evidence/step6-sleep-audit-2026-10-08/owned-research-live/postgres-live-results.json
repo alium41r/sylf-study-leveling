@@ -1,0 +1,21 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 1,
+  "failed": 0,
+  "intentionallyNotSelected": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: owned-course-research",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

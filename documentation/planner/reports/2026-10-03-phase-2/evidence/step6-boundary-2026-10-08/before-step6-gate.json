@@ -1,0 +1,7 @@
+{
+  "gate": "PLANNER_V2_PHASE_2_STEP_6",
+  "startedAt": "2026-10-08T17:04:58.773Z",
+  "status": "RUNNING",
+  "checks": [],
+  "scope": "Existing generation activation, atomic admission, supervised compiler-to-ApplyService, maximum envelopes and live development qualification. No later phase activation."
+}

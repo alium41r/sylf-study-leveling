@@ -1,0 +1,24 @@
+/*
+ * Pixel Display host presentational shell.
+ *
+ * The slot is a square-friendly container; the renderer owns the canvas's
+ * backing-store size and inline CSS size, so no rule here may set a pixel
+ * dimension. Logical coordinates must never be derivable from this file.
+ */
+
+.slot {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.canvas {
+  display: block;
+  /* Physical size is assigned by the renderer in CSS pixels. */
+  margin-inline: auto;
+  /* The matrix must never be smoothed by the compositor. */
+  image-rendering: pixelated;
+}

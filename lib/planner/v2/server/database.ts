@@ -65,7 +65,17 @@ export class PlannerDatabase {
     if (!Number.isSafeInteger(ownerId) || ownerId <= 0) reject("REFERENCE_NOT_OWNED", "An authenticated owner is required.");
     for (let retry = 0; ; retry++) {
       const sql = await this.pool.connect();
+      let ownerLocked = false; let lockAttempted = false; let previousTimeout: string | undefined; let discard = false;
       try {
+        // Waiting in a SELECT inside SERIALIZABLE would pin its snapshot before
+        // the preceding owner commits. Wait on the same key before BEGIN, then
+        // keep the transaction-scoped lock required by the existing SQL guards.
+        previousTimeout = (await sql.query("SHOW statement_timeout")).rows[0].statement_timeout;
+        await sql.query("SET statement_timeout = '10s'");
+        lockAttempted = true;
+        await sql.query("SELECT pg_advisory_lock(73641, $1::int)", [ownerId]);
+        ownerLocked = true;
+        await sql.query("SELECT set_config('statement_timeout',$1,false)", [previousTimeout]);
         await sql.query("BEGIN ISOLATION LEVEL SERIALIZABLE");
         await sql.query("SET LOCAL TIME ZONE 'UTC'");
         await sql.query("SET LOCAL statement_timeout = '10s'");
@@ -76,13 +86,24 @@ export class PlannerDatabase {
         await sql.query("COMMIT");
         return result;
       } catch (error) {
-        await sql.query("ROLLBACK").catch(() => {});
+        await sql.query("ROLLBACK").catch(() => { discard = true; });
         if (["40001", "40P01"].includes(String((error as { code?: string }).code)) && retry < 2) {
           await new Promise(resolve => setTimeout(resolve, 10 + Math.floor(Math.random() * 20)));
           continue;
         }
         throw error;
-      } finally { sql.release(); }
+      } finally {
+        try {
+          if (lockAttempted) {
+            const unlocked = (await sql.query("SELECT pg_advisory_unlock(73641, $1::int) AS unlocked", [ownerId])).rows[0].unlocked;
+            if (ownerLocked && !unlocked) discard = true;
+          }
+          if (previousTimeout !== undefined) await sql.query("SELECT set_config('statement_timeout',$1,false)", [previousTimeout]);
+        } catch { discard = true; }
+        // Destroying an uncertain backend releases session locks instead of
+        // leaking them into the pool. A known committed result stays replayable.
+        sql.release(discard);
+      }
     }
   }
 }

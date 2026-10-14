@@ -2,9 +2,8 @@
 // Classic Sylf Timer Layout (Mechanical Extraction)
 // ============================================================================
 // Preserves the exact, authentic Focus Timer visual presentation and controls.
-// Zero visual changes from the original design:
+// The shared session bar is owned by FocusTimerLayoutRouter.
 //   - Centered digital clock with ambient text glow
-//   - Top status and mode pill
 //   - Sub-timers and daily cumulative totals
 //   - Bottom action controls
 // ============================================================================
@@ -298,6 +297,7 @@ export const ClassicTimerDock = memo(function ClassicTimerDock({
 export const ClassicTimerLayout = memo(function ClassicTimerLayout({
   formattedDisplayTime,
   elapsedSeconds,
+  todayElapsedSeconds = elapsedSeconds,
   breakSeconds,
   remainingSeconds,
   isCountdown,
@@ -306,7 +306,6 @@ export const ClassicTimerLayout = memo(function ClassicTimerLayout({
   phaseColor,
   phaseLabel,
   modeDisplayName,
-  subjectName,
   questData,
   initialSubjectSeconds,
   initialTotalSeconds,
@@ -335,7 +334,7 @@ export const ClassicTimerLayout = memo(function ClassicTimerLayout({
   const isDocked = Boolean(background && effectivePosition !== "center");
   const prefix = isPreview ? "" : "md:";
 
-  // Outer placement for header, center core, and bottom controls (keeps vertical column co-aligned)
+  // Outer placement for the timer and bottom controls
   const dockAlignmentClass =
     isDocked && effectivePosition === "right"
       ? `${prefix}self-end ${prefix}mr-8 lg:mr-14`
@@ -343,49 +342,11 @@ export const ClassicTimerLayout = memo(function ClassicTimerLayout({
       ? `${prefix}self-start ${prefix}ml-8 lg:ml-14`
       : `${prefix}self-center`;
 
-  const headerAlignmentClass = dockAlignmentClass;
   const centerAlignmentClass = dockAlignmentClass;
   const controlsAlignmentClass = dockAlignmentClass;
 
   return (
     <>
-      {/* ─── Top Header Section ─────────────────── */}
-      <div className={`w-full flex flex-col items-center text-center gap-1.5 shrink-0 z-10 max-w-2xl px-4 transition-all duration-300 ${headerAlignmentClass}`}>
-        {/* Mode / Phase Badge */}
-        <div className="flex items-center justify-center">
-          <span
-            className="text-xs tracking-[0.2em] uppercase font-bold px-3.5 py-1 rounded-full border shadow-sm transition-colors"
-            style={{
-              fontFamily: "'Rajdhani', sans-serif",
-              color: phaseColor,
-              backgroundColor: "var(--accent-primary-dim)",
-              borderColor: "var(--accent-primary-mid)",
-            }}
-          >
-            {questData
-              ? phaseLabel
-              : modeDisplayName.toUpperCase() === phaseLabel.toUpperCase()
-              ? phaseLabel
-              : `${modeDisplayName} • ${phaseLabel}`}
-          </span>
-        </div>
-
-        {/* Main Focus Title (Quest Title or Subject Name) */}
-        <h1
-          className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide text-text-primary mt-1 leading-snug line-clamp-2"
-          style={{ fontFamily: "'Rajdhani', sans-serif" }}
-        >
-          {questData ? questData.title : subjectName}
-        </h1>
-
-        {/* Secondary Context (Subject tag if different from Quest title) */}
-        {questData && subjectName && subjectName.toLowerCase() !== questData.title.toLowerCase() && (
-          <span className="text-xs text-text-muted font-mono bg-bg-abyss/80 border border-border-subtle px-2.5 py-0.5 rounded-full mt-0.5">
-            Subject: {subjectName}
-          </span>
-        )}
-      </div>
-
       {/* ─── Center Core: Digital Timer & Sub-stats ─ */}
       <div className={`flex-1 min-h-0 flex flex-col items-center justify-center my-auto py-4 z-10 w-full transition-all duration-300 ${isDocked ? "max-w-2xl" : "max-w-4xl text-center"} ${centerAlignmentClass}`}>
         {isDocked ? (
@@ -405,8 +366,8 @@ export const ClassicTimerLayout = memo(function ClassicTimerLayout({
             isNotStarted={false}
             elapsedFormatted={isCountdown ? formatTime(elapsedSeconds) : null}
             breakFormatted={breakSeconds > 0 ? formatTime(breakSeconds) : null}
-            subjectTotalFormatted={formatTime(initialSubjectSeconds + elapsedSeconds)}
-            dailyTotalFormatted={formatTime(initialTotalSeconds + elapsedSeconds)}
+            subjectTotalFormatted={formatTime(initialSubjectSeconds + todayElapsedSeconds)}
+            dailyTotalFormatted={formatTime(initialTotalSeconds + todayElapsedSeconds)}
             sessionDots={showSessionDots ? { current: currentSession, total: totalSessions } : null}
             stretchNudge={
               flowNudge && onTakeFlowBreak
@@ -502,7 +463,7 @@ export const ClassicTimerLayout = memo(function ClassicTimerLayout({
                   Today&apos;s Subject
                 </span>
                 <span className="font-bold text-text-primary tabular-nums">
-                  {formatTime(initialSubjectSeconds + elapsedSeconds)}
+                  {formatTime(initialSubjectSeconds + todayElapsedSeconds)}
                 </span>
               </div>
               <div className="h-6 w-px bg-white/10" />
@@ -513,7 +474,7 @@ export const ClassicTimerLayout = memo(function ClassicTimerLayout({
                   Daily Cumulative
                 </span>
                 <span className="font-bold text-text-primary tabular-nums">
-                  {formatTime(initialTotalSeconds + elapsedSeconds)}
+                  {formatTime(initialTotalSeconds + todayElapsedSeconds)}
                 </span>
               </div>
             </div>

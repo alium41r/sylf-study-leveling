@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "input": "/login",
+      "onboarded": true,
+      "destination": "/dashboard"
+    },
+    {
+      "input": "/login",
+      "onboarded": false,
+      "destination": "/onboarding"
+    },
+    {
+      "input": "/login?redirect=%2Ffocus%3Fmode%3Dstudy",
+      "onboarded": true,
+      "destination": "/focus?mode=study"
+    },
+    {
+      "input": "/login?redirect=https%3A%2F%2Fexample.test",
+      "onboarded": true,
+      "destination": "/dashboard"
+    },
+    {
+      "registration": true,
+      "destination": "/onboarding"
+    },
+    {
+      "authLinks": true,
+      "googleDispatch": true
+    }
+  ],
+  "credentialRequests": [
+    {
+      "path": "/api/auth/login",
+      "method": "POST"
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST"
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST"
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST"
+    },
+    {
+      "path": "/api/auth/register",
+      "method": "POST"
+    }
+  ],
+  "note": "All API calls and destination pages intercepted in an isolated context. No real accounts or provider sessions changed."
+}

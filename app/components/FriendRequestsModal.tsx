@@ -1,9 +1,11 @@
 "use client";
+import { TargetPixelCompanion } from "@/app/components/companion/TargetPixelCompanion";
+import type { SelectedPixelCompanion } from "@/lib/pixel-companion-contract";
+
 
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, UserPlus, Inbox, Loader2 } from "lucide-react";
-import { CharacterRenderer } from "./character/CharacterRenderer";
 import { backdropVariants, modalDialogVariants } from "@/lib/motion";
 
 export interface FriendRequestItem {
@@ -19,6 +21,7 @@ export interface FriendRequestItem {
     activeFrame?: string;
     activeTitle?: string;
     characterConfig?: any | null;
+  companion?: SelectedPixelCompanion;
     createdAt?: string;
   };
   createdAt?: string;
@@ -147,13 +150,7 @@ export function FriendRequestsModal({
                     <div className="relative shrink-0">
                       <div className="w-12 h-12 rounded-xl bg-bg-abyss border border-border-subtle flex items-center justify-center overflow-hidden">
                         {req.sender.characterConfig ? (
-                          <CharacterRenderer
-                            config={req.sender.characterConfig}
-                            seed={req.sender.username}
-                            size={48}
-                            showPedestal={false}
-                            showAura={false}
-                          />
+                          <TargetPixelCompanion companion={req.sender.companion} size={48} label={`${req.sender.username} companion`} />
                         ) : req.sender.avatarUrl ? (
                           <img
                             src={req.sender.avatarUrl}

@@ -1,3 +1,4 @@
+import type { SelectedPixelCompanion } from "./pixel-companion-contract";
 // ============================================================================
 // Focus Party — Type Definitions & State Contracts
 // ============================================================================
@@ -82,6 +83,7 @@ export interface FocusPartyMemberView {
   hunterRank: string;
   avatarUrl: string | null;
   characterConfig: unknown;
+  companion?: SelectedPixelCompanion;
   joinedAt: string;
   isLeader: boolean;
 }
@@ -160,6 +162,14 @@ export interface FocusPartyRealtimeEvent {
 
 // ─── Pure Timer Derivation Helpers (Client & Server Safe) ─────
 
+/** PostgreSQL's timestamp-without-zone JSON represents UTC, not device time. */
+export function normalizeFocusTimestamp(value: string | Date | null | undefined): string | null {
+  if (!value) return null;
+  const raw = value instanceof Date ? value : /(?:Z|[+-]\d\d:?\d\d)$/i.test(value) ? value : `${value.replace(" ", "T")}Z`;
+  const date = new Date(raw);
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+}
+
 /**
  * Derives current live focus duration from authoritative timestamps.
  * Formula:
@@ -175,8 +185,8 @@ export function deriveMemberTimer(
   let elapsed = 0;
 
   if (isFocusing && currentStartedAt) {
-    const startedMs = new Date(currentStartedAt).getTime();
-    elapsed = Math.max(0, Math.floor((nowMs - startedMs) / 1000));
+    const started = normalizeFocusTimestamp(currentStartedAt);
+    if (started) elapsed = Math.max(0, Math.floor((nowMs - Date.parse(started)) / 1000));
   }
 
   return {

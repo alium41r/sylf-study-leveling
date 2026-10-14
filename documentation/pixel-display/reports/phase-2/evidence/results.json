@@ -1,0 +1,175 @@
+{
+  "description": "Phase 2 evidence: the Sylf character as composable pixel content, verified against the real development surface.",
+  "date": "2026-10-07T14:10:31.829Z",
+  "phase": 2,
+  "model": {
+    "planes": [
+      "body",
+      "leaves",
+      "blush",
+      "eyes"
+    ],
+    "planeOrderDeclaredNotComputed": true,
+    "stateVocabulary": [
+      "IDLE",
+      "FOCUSING",
+      "REST",
+      "CELEBRATING",
+      "BLINK"
+    ],
+    "compositions": {
+      "IDLE": {
+        "eyes": "open",
+        "blush": false,
+        "sparkles": true
+      },
+      "FOCUSING": {
+        "eyes": "focused",
+        "blush": false,
+        "sparkles": false
+      },
+      "REST": {
+        "eyes": "sleeping",
+        "blush": false,
+        "sparkles": false
+      },
+      "CELEBRATING": {
+        "eyes": "happy",
+        "blush": true,
+        "sparkles": true
+      }
+    },
+    "authoredBlink": [
+      "open",
+      "half",
+      "closed",
+      "half",
+      "open"
+    ],
+    "blinkBeatsMs": [
+      70,
+      60,
+      110,
+      60,
+      100
+    ],
+    "authoredAsPixelData": "reference-grid spans resolved to a palette at draw time; no image, SVG, sprite sheet or texture",
+    "eyeShapes": [
+      "open",
+      "focused",
+      "half",
+      "closed",
+      "sleeping",
+      "happy"
+    ]
+  },
+  "liveChecks": {
+    "method": "Read from the real dev surface in a browser, not from jsdom.",
+    "statesDiffer": {
+      "IDLE": {
+        "eyeCells": 24,
+        "blushCells": 0
+      },
+      "FOCUSING": {
+        "eyeCells": 16,
+        "blushCells": 0
+      },
+      "REST": {
+        "eyeCells": 6,
+        "blushCells": 0
+      },
+      "CELEBRATING": {
+        "eyeCells": 10,
+        "blushCells": 5
+      }
+    },
+    "planeIsolation": [
+      {
+        "effectivePlanes": "body,leaves,blush,eyes",
+        "eyeCells": 10,
+        "blushCells": 5,
+        "lit": 403
+      },
+      {
+        "effectivePlanes": "body,leaves,blush",
+        "eyeCells": 0,
+        "blushCells": 5,
+        "lit": 403
+      },
+      {
+        "effectivePlanes": "body,leaves",
+        "eyeCells": 0,
+        "blushCells": 0,
+        "lit": 403
+      }
+    ],
+    "conclusion": "Suppressing a plane removes its cells and nothing else — the body and leaves are byte-identical throughout."
+  },
+  "gates": {
+    "typecheck": {
+      "errors": 0
+    },
+    "engineBoundaryTypecheck": {
+      "errors": 0,
+      "note": "The engine is still DOM-free after content was rewritten."
+    },
+    "tests": {
+      "files": 11,
+      "tests": 211,
+      "failed": 0
+    },
+    "lint": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "build": "succeeds",
+    "productionInaccessibility": {
+      "/dev/pixel-display": 404,
+      "/dev": 404,
+      "/": 200,
+      "devControlMarkers": 0
+    },
+    "companionRegression": {
+      "files": 20,
+      "tests": 179,
+      "failed": 0
+    }
+  },
+  "defectsFoundAndFixed": [
+    "The state composition table gated nothing: render painted every plane, so IDLE drew blush. All painting now routes through selectsPlane.",
+    "focused was geometrically identical to open, so FOCUSING was indistinguishable from IDLE. Every eye shape now occupies distinct cells, enforced by test.",
+    "Plane hiding was a post-render patch that the next full composite immediately undid. Suppression is now content state, so it survives repeated frames.",
+    "A sparkle sat under the character hem, making the scenery-order assertion ambiguous; it moved.",
+    "The hem deep edge was painted past the row end, widening the silhouette by a column; it is now the last column of the shade run.",
+    "Shading used a fixed split, making the narrow crown rows almost all highlight; the split is now a share of each row width."
+  ],
+  "presentationCandidates": {
+    "status": "retained as candidates, not closed",
+    "resolution": 48,
+    "cellGap": 0.12,
+    "inactiveOpacity": 0,
+    "characterFill": 0.63,
+    "backdrop": "#0b1220",
+    "finding": "Rendering the real character confirmed each Phase 0 candidate without invalidating any. At 32 the eye ink and glint merge and the face stops reading; at 48 both survive at dashboard-card size."
+  },
+  "visualCaptures": [
+    {
+      "file": "phase2-preview-458-dark.png",
+      "shows": "Character at a 456px preview, dark mode, with all Phase 2 review controls"
+    },
+    {
+      "file": "phase2-card-110-dark.png",
+      "shows": "The same character at a 108px dashboard-card slot, and the 32/40/48/64 resolution comparison"
+    },
+    {
+      "file": "phase2-planes-body-leaves-only.png",
+      "shows": "Body and leaves only, with eyes and blush suppressed — the figure is intact without its face"
+    }
+  ],
+  "limits": [
+    "Live high-DPI rendering remains unobserved (O13): neither environment could force a device pixel ratio above 1.",
+    "The 640px presentation slot is clamped to 464px by the dev layout, so sizes above that are asserted in tests rather than observed.",
+    "Visual correctness still rests on recorded captures plus human review; the deterministic tests do not prove it.",
+    "No production surface renders this character yet, so nothing here is evidence about a real dashboard card."
+  ]
+}

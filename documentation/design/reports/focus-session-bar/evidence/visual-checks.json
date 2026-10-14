@@ -1,0 +1,338 @@
+[
+  {
+    "layout": "classic",
+    "width": 1440,
+    "height": 900,
+    "mode": "dark",
+    "flags": "",
+    "bar": {
+      "x": 555.9375,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 795.015625,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1440
+  },
+  {
+    "layout": "classic",
+    "width": 1024,
+    "height": 768,
+    "mode": "light",
+    "flags": "custom",
+    "bar": {
+      "x": 350.890625,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 589.328125,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1024
+  },
+  {
+    "layout": "classic",
+    "width": 390,
+    "height": 844,
+    "mode": "dark",
+    "flags": "long&paused&custom",
+    "bar": {
+      "x": 17.9375,
+      "y": 24,
+      "width": 358,
+      "height": 46
+    },
+    "button": {
+      "x": 330.46875,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 390
+  },
+  {
+    "layout": "classic",
+    "width": 320,
+    "height": 740,
+    "mode": "light",
+    "flags": "long&break&custom",
+    "bar": {
+      "x": 17.875,
+      "y": 24,
+      "width": 288,
+      "height": 46
+    },
+    "button": {
+      "x": 260.078125,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 320
+  },
+  {
+    "layout": "anime",
+    "width": 1440,
+    "height": 900,
+    "mode": "dark",
+    "flags": "",
+    "bar": {
+      "x": 557,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 795.78125,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1440
+  },
+  {
+    "layout": "anime",
+    "width": 1024,
+    "height": 768,
+    "mode": "light",
+    "flags": "custom",
+    "bar": {
+      "x": 349.234375,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 587.171875,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1024
+  },
+  {
+    "layout": "anime",
+    "width": 390,
+    "height": 844,
+    "mode": "dark",
+    "flags": "long&paused&custom",
+    "bar": {
+      "x": 19.578125,
+      "y": 24,
+      "width": 358,
+      "height": 46
+    },
+    "button": {
+      "x": 331.8125,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 390
+  },
+  {
+    "layout": "anime",
+    "width": 320,
+    "height": 740,
+    "mode": "light",
+    "flags": "long&break&custom",
+    "bar": {
+      "x": 19.546875,
+      "y": 24,
+      "width": 288,
+      "height": 46
+    },
+    "button": {
+      "x": 261.796875,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 320
+  },
+  {
+    "layout": "landscape",
+    "width": 1440,
+    "height": 900,
+    "mode": "dark",
+    "flags": "",
+    "bar": {
+      "x": 559.140625,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 798.21875,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1440
+  },
+  {
+    "layout": "landscape",
+    "width": 1024,
+    "height": 768,
+    "mode": "light",
+    "flags": "custom",
+    "bar": {
+      "x": 351.609375,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 589.953125,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1024
+  },
+  {
+    "layout": "landscape",
+    "width": 390,
+    "height": 844,
+    "mode": "dark",
+    "flags": "long&paused&custom",
+    "bar": {
+      "x": 19.296875,
+      "y": 24,
+      "width": 358,
+      "height": 46
+    },
+    "button": {
+      "x": 331.578125,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 390
+  },
+  {
+    "layout": "landscape",
+    "width": 320,
+    "height": 740,
+    "mode": "light",
+    "flags": "long&break&custom",
+    "bar": {
+      "x": 22.25,
+      "y": 24,
+      "width": 288,
+      "height": 46
+    },
+    "button": {
+      "x": 264.25,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 320
+  },
+  {
+    "layout": "fantasy",
+    "width": 1440,
+    "height": 900,
+    "mode": "dark",
+    "flags": "",
+    "bar": {
+      "x": 555.9375,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 795.015625,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1440
+  },
+  {
+    "layout": "fantasy",
+    "width": 1024,
+    "height": 768,
+    "mode": "light",
+    "flags": "custom",
+    "bar": {
+      "x": 350.078125,
+      "y": 32,
+      "width": 328.109375,
+      "height": 40
+    },
+    "button": {
+      "x": 588.65625,
+      "y": 33,
+      "width": 88.03125,
+      "height": 38
+    },
+    "keyboardPicker": true,
+    "documentWidth": 1024
+  },
+  {
+    "layout": "fantasy",
+    "width": 390,
+    "height": 844,
+    "mode": "dark",
+    "flags": "long&paused&custom",
+    "bar": {
+      "x": 16,
+      "y": 24,
+      "width": 358,
+      "height": 46
+    },
+    "button": {
+      "x": 329,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 390
+  },
+  {
+    "layout": "fantasy",
+    "width": 320,
+    "height": 740,
+    "mode": "light",
+    "flags": "long&break&custom",
+    "bar": {
+      "x": 19.1875,
+      "y": 24,
+      "width": 288,
+      "height": 46
+    },
+    "button": {
+      "x": 261.5,
+      "y": 25,
+      "width": 44,
+      "height": 44
+    },
+    "keyboardPicker": true,
+    "documentWidth": 320
+  }
+]

@@ -1,0 +1,858 @@
+{
+  "mode": "UNPAID_PREFLIGHT",
+  "educationalJudgment": "UNASSESSED",
+  "records": [
+    {
+      "trialId": "d_4455ae843acc1082",
+      "category": "REASONING",
+      "packetSha256": "dcc02ea0ced4a7eadadd2b65674b9a314e5fd6897110b16e08653deec34dcf8e",
+      "rootRequestId": "3f48f56f-22cd-4561-b23b-d7aa40457ac1",
+      "attemptId": "767e5c25-c735-407f-bc64-a64e3e0ca749",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "2f962aea-4069-44c5-8179-4d6e0f80aad0",
+        "attempts": [
+          {
+            "callId": "2f962aea-4069-44c5-8179-4d6e0f80aad0",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_0f51cb688400b89c",
+      "category": "REASONING",
+      "packetSha256": "e7e003aee91b5b5d429640b36b391342839b487fd0cfc8a3b2f19d4f2ff5cfed",
+      "rootRequestId": "799a08f4-3014-49d5-9344-8f700fd4344a",
+      "attemptId": "8cdceea4-29b2-415a-a716-51783b2d95c0",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "513b90e9-3f91-4ee6-8b10-8df2d830f6f7",
+        "attempts": [
+          {
+            "callId": "513b90e9-3f91-4ee6-8b10-8df2d830f6f7",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_d5011475b34a9da1",
+      "category": "REASONING",
+      "packetSha256": "9b88ab43dd7c9e35d29cce2f38d8df0452e367df05937f50f3274e966f920f2f",
+      "rootRequestId": "98c6c9e0-000e-4b03-bff6-0e1c10d32d3a",
+      "attemptId": "fabd3488-9bac-41f7-890f-c5e20823db88",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "5c4b2eb7-50a0-47d1-84fe-762f5171d28d",
+        "attempts": [
+          {
+            "callId": "5c4b2eb7-50a0-47d1-84fe-762f5171d28d",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_ac6e119faa6748a5",
+      "category": "REASONING",
+      "packetSha256": "4ac1a1ab2fc41689ec1d6acb9ee4091fda7febf50c62d6bae4fd15ecb1e86344",
+      "rootRequestId": "8d53ae39-7699-48b7-97f4-abffe5d5de5a",
+      "attemptId": "a834f98c-f9ab-44bc-8661-461e49757c63",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "13e6c618-9782-437a-a628-27384b67dfe0",
+        "attempts": [
+          {
+            "callId": "13e6c618-9782-437a-a628-27384b67dfe0",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_63ea398f0b23e2f0",
+      "category": "REASONING",
+      "packetSha256": "cc1a9477590972458031fce41534c83b2dba50e40fe0f80d286410f45723af84",
+      "rootRequestId": "c54148b6-67b6-49fd-af3f-997637f1bac0",
+      "attemptId": "6758a755-876b-4f42-a7dc-366f2409f915",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "4bc089a9-b0d2-41af-83ba-c7467f265acc",
+        "attempts": [
+          {
+            "callId": "4bc089a9-b0d2-41af-83ba-c7467f265acc",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_28b1cf3e53f64ddf",
+      "category": "REASONING",
+      "packetSha256": "80432668033ed9ec240edfe93940e2554fdf67cb705f5d241555a8b37c5c6cdc",
+      "rootRequestId": "f4e3f5ea-ec3b-4af4-9665-32c104ac22ca",
+      "attemptId": "e0f8cdf5-3faf-468c-80af-984ab6863ebb",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "e3871ede-aa72-495f-b7f1-566e3084673f",
+        "attempts": [
+          {
+            "callId": "e3871ede-aa72-495f-b7f1-566e3084673f",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_2f5488d294f95e29",
+      "category": "REASONING",
+      "packetSha256": "bd3bf65747f52c03f8c90076c23851c0b86121959bc42b229089fc2bad5125a5",
+      "rootRequestId": "936ee2f3-5f59-4559-8e6d-5cc535c25814",
+      "attemptId": "69c927b0-8d98-4862-8ed3-c0240782c9fd",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "0647c541-9efc-49a1-b813-8d37b2643150",
+        "attempts": [
+          {
+            "callId": "0647c541-9efc-49a1-b813-8d37b2643150",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_3284c39bab869cee",
+      "category": "REASONING",
+      "packetSha256": "e0c6dcaf4aa0c75467cf4e83e6fc53c843756674b000bc04aa377500d725f07f",
+      "rootRequestId": "fb477a75-1200-4ac6-9897-af949bdab96e",
+      "attemptId": "f8423916-0020-4294-a840-efe166625828",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "strategy": "Scripted transport fixture only. Educational quality is not evaluated by this preflight."
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "13ffb32b-813a-4311-b2fe-621a63c14625",
+        "attempts": [
+          {
+            "callId": "13ffb32b-813a-4311-b2fe-621a63c14625",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"strategy\":\"Scripted transport fixture only. Educational quality is not evaluated by this preflight.\"}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "packetSha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "rootRequestId": "5edbee0d-3b4d-4c54-82a1-f59fdaac53f1",
+      "attemptId": "0d114a2d-c437-4b74-8975-79bc5865c9d1",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "a9236b4b-8822-43ee-8c71-4889a8647226",
+                "status": "PASSED",
+                "evidenceDigest": "3cb85a76a8badd1f7942d6664ba52f05d830b499f452f956c52457cc871b3552",
+                "educationalContentDigest": "1ed7d8acd0ebfba0d4084be6e10588355ec1b2211402817544c6ce63adec6153",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "fc5a0a39-be45-4352-a168-b9cbee4188e8",
+        "attempts": [
+          {
+            "callId": "fc5a0a39-be45-4352-a168-b9cbee4188e8",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "packetSha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "rootRequestId": "30682159-407d-4614-857f-a7a660bb2a81",
+      "attemptId": "794d5362-a188-4f59-bf92-0a8ecc66346e",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "5a609c3d-40ff-4872-b14b-cbc7d26ffb03",
+                "status": "BLOCKED",
+                "evidenceDigest": "59f675978bd39c41caab02584bd6eb5d596f2ed5ce0f35d4693d43a7d4e0c12b",
+                "educationalContentDigest": "2f266baedd400893e844de8e44cde7255ac900ef861dfa6cabae4b8731c8dc66",
+                "issues": [
+                  {
+                    "issueId": "issue_1",
+                    "category": "UNREALISTIC_WORKLOAD",
+                    "severity": "BLOCKING",
+                    "affectedRefs": [
+                      "work_2"
+                    ],
+                    "evidence": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+                    "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                    "resolution": "OPEN",
+                    "verification": null
+                  }
+                ],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": [
+            {
+              "planRef": "plan_1",
+              "finding": {
+                "issueId": "issue_1",
+                "category": "UNREALISTIC_WORKLOAD",
+                "severity": "BLOCKING",
+                "affectedRefs": [
+                  "work_2"
+                ],
+                "basis": "CONCRETE_VIOLATION",
+                "grounds": [
+                  {
+                    "ref": "plan_1/goal",
+                    "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+                  },
+                  {
+                    "ref": "plan_1/activity/work_2",
+                    "excerpt": "All twelve rewrites are done even after checked success."
+                  }
+                ],
+                "evidence": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+                "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                "requestedResolution": "Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check.",
+                "requiresAcknowledgement": false
+              }
+            }
+          ]
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "2dc8eb02-4973-43d6-ba43-a221ec9b1a14",
+        "attempts": [
+          {
+            "callId": "2dc8eb02-4973-43d6-ba43-a221ec9b1a14",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_1\",\"category\":\"UNREALISTIC_WORKLOAD\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_2\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/goal\",\"excerpt\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"All twelve rewrites are done even after checked success.\"}],\"evidence\":\"Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.\",\"consequence\":\"The accepted educational outcome cannot be met correctly as proposed.\",\"requestedResolution\":\"Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check.\",\"requiresAcknowledgement\":false}]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_23cb1deab0819ac1",
+      "category": "REVIEW",
+      "packetSha256": "2ccea2aa936e8967f5363a694a8c5c4d391cb6083a1b1408a91be5378d4cd1d0",
+      "rootRequestId": "10c43204-3308-4cc3-b206-5aa821172642",
+      "attemptId": "64883fa6-40fd-441e-9460-4e2b3b3ae58f",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "d6ef33d3-4729-447a-a272-9b0d7f609218",
+                "status": "PASSED",
+                "evidenceDigest": "56f1442d1f19b919f6f79ec623c7b429a8f9b5994d67274506fa993883f28f2c",
+                "educationalContentDigest": "a92e4e0d037651270b26e36478f220dacb566fa52adda18311aabd72d10bdeee",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "b661bb53-70e1-42fc-99d9-3eefa696f205",
+        "attempts": [
+          {
+            "callId": "b661bb53-70e1-42fc-99d9-3eefa696f205",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_39bd912910b6cdc4",
+      "category": "REVIEW",
+      "packetSha256": "4e94bb8b47cdfde922865fbdeb7dab33a5248c581e7645aefc00b115c2a60c07",
+      "rootRequestId": "07fffadb-a369-4242-8bcd-7d55672abef3",
+      "attemptId": "50592394-ed62-4bd7-a804-761f7ff92e7e",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "1ac64255-8ea3-4ba6-a95f-0d68c4872e4e",
+                "status": "BLOCKED",
+                "evidenceDigest": "07369aa6985e32bea53b4b3dafcbc9ce23cac14e211917439fba30fd41da72da",
+                "educationalContentDigest": "18d90e98286050c063d86198e3bc20b495ca974bc375ef303677e01735d72f3a",
+                "issues": [
+                  {
+                    "issueId": "issue_1",
+                    "category": "MISSING_PREREQUISITE",
+                    "severity": "BLOCKING",
+                    "affectedRefs": [
+                      "work_1"
+                    ],
+                    "evidence": "Invented content cannot transcribe the unavailable authentic document.",
+                    "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                    "resolution": "OPEN",
+                    "verification": null
+                  }
+                ],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": [
+            {
+              "planRef": "plan_1",
+              "finding": {
+                "issueId": "issue_1",
+                "category": "MISSING_PREREQUISITE",
+                "severity": "BLOCKING",
+                "affectedRefs": [
+                  "work_1"
+                ],
+                "basis": "CONCRETE_VIOLATION",
+                "grounds": [
+                  {
+                    "ref": "plan_1/goal",
+                    "excerpt": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable."
+                  },
+                  {
+                    "ref": "plan_1/activity/work_1",
+                    "excerpt": "Mark the authentic assigned transcription complete once the invented text is written."
+                  }
+                ],
+                "evidence": "Invented content cannot transcribe the unavailable authentic document.",
+                "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                "requestedResolution": "Represent the unavailable dependency honestly; do not claim invented content completes the assignment.",
+                "requiresAcknowledgement": false
+              }
+            }
+          ]
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "ea7aca71-6461-45a0-a60a-855f64a0de57",
+        "attempts": [
+          {
+            "callId": "ea7aca71-6461-45a0-a60a-855f64a0de57",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_1\",\"category\":\"MISSING_PREREQUISITE\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_1\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/goal\",\"excerpt\":\"Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.\"},{\"ref\":\"plan_1/activity/work_1\",\"excerpt\":\"Mark the authentic assigned transcription complete once the invented text is written.\"}],\"evidence\":\"Invented content cannot transcribe the unavailable authentic document.\",\"consequence\":\"The accepted educational outcome cannot be met correctly as proposed.\",\"requestedResolution\":\"Represent the unavailable dependency honestly; do not claim invented content completes the assignment.\",\"requiresAcknowledgement\":false}]}]}",
+      "latencyMs": 1
+    },
+    {
+      "trialId": "d_aa0fdce6c965934e",
+      "category": "REVIEW",
+      "packetSha256": "da7d98966b3e63950a6d442e4a0e33e5ec9d1ab199b11e458284290a114f9ca6",
+      "rootRequestId": "9a263957-f3e0-4ab5-a474-336b2cdc9f1c",
+      "attemptId": "6b6d5c9d-8eff-468a-ae84-f27b177d1750",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "9f43e9c8-143f-4705-85de-5d969424f61b",
+                "status": "PASSED",
+                "evidenceDigest": "0f2f9ec9a69df3709e3c1fafd3818f7882ee0750d877682666989c6c2ded2e7a",
+                "educationalContentDigest": "b6ad7929f459d4cac19e7dd40cc83d5c4819581e85916f826330f873a45fbfd4",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            },
+            {
+              "planRef": "plan_2",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "9d958c94-d79c-4922-8e82-f038716e5274",
+                "status": "PASSED",
+                "evidenceDigest": "0f2f9ec9a69df3709e3c1fafd3818f7882ee0750d877682666989c6c2ded2e7a",
+                "educationalContentDigest": "7635cdabde5a9f7059083446ec86905691d21e31a2c17814e5c01d8e2f23d21a",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "e75114c2-ecfb-4a69-8f8f-1a5e51a60868",
+        "attempts": [
+          {
+            "callId": "e75114c2-ecfb-4a69-8f8f-1a5e51a60868",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]},{\"planRef\":\"plan_2\",\"issues\":[]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_edc200cbc63de947",
+      "category": "REVIEW",
+      "packetSha256": "cb1fb320cdea149f3b80466c0b19857a55bb0a33b429d15f6efff833ce10afc8",
+      "rootRequestId": "813af2e0-3d0c-4956-b54f-1557b694ddb7",
+      "attemptId": "5ff964d0-d588-4c10-902e-f811263584e5",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "677124af-64fe-40b0-8b19-b8f2570385d0",
+                "status": "PASSED",
+                "evidenceDigest": "106cd9d6cc7013b979d8cc4b4680900c08de6108e60c74b43fe2a53cb2103a37",
+                "educationalContentDigest": "2f05dfd950d5c999150bf4db46f2c9d6875f70b1167faf8402f8bc0a637e0d62",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "fbfd925a-ff2a-4043-84cd-4aac231e3f3f",
+        "attempts": [
+          {
+            "callId": "fbfd925a-ff2a-4043-84cd-4aac231e3f3f",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_162f3a5840b6d145",
+      "category": "REVIEW",
+      "packetSha256": "82d737934947194602386660a434ff32e0442c991b6c6cf4d20e80aca9810e27",
+      "rootRequestId": "9178d159-f671-417e-8e63-16b3180d8403",
+      "attemptId": "31cbb9d1-6af8-44ba-b165-d25067e9cb70",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "3544860f-e3d2-4e54-aa41-ba1089c6a716",
+                "status": "BLOCKED",
+                "evidenceDigest": "59aa59b59b4a9cd46bea40bb715b864a8277bbd8470f035663c75c8c84ea634a",
+                "educationalContentDigest": "42c1f9d657202cc0f188889c822f814091033b5c1d3e33b213a38cff972f3a86",
+                "issues": [
+                  {
+                    "issueId": "issue_1",
+                    "category": "WEAK_CRITERION",
+                    "severity": "BLOCKING",
+                    "affectedRefs": [
+                      "work_1"
+                    ],
+                    "evidence": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+                    "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                    "resolution": "OPEN",
+                    "verification": null
+                  }
+                ],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": [
+            {
+              "planRef": "plan_1",
+              "finding": {
+                "issueId": "issue_1",
+                "category": "WEAK_CRITERION",
+                "severity": "BLOCKING",
+                "affectedRefs": [
+                  "work_1"
+                ],
+                "basis": "CONCRETE_VIOLATION",
+                "grounds": [
+                  {
+                    "ref": "plan_1/goal",
+                    "excerpt": "Find the median of four ordered numbers using the mean of the middle two, and explain the check."
+                  },
+                  {
+                    "ref": "plan_1/activity/work_1",
+                    "excerpt": "Pass only if the median is 6 and the learner says the upper middle rule is correct."
+                  }
+                ],
+                "evidence": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+                "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                "requestedResolution": "Correct the rule, worked result and observable correctness check.",
+                "requiresAcknowledgement": false
+              }
+            }
+          ]
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "b636cb5b-d3f9-45c4-b26f-e4df9279e5dc",
+        "attempts": [
+          {
+            "callId": "b636cb5b-d3f9-45c4-b26f-e4df9279e5dc",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_1\",\"category\":\"WEAK_CRITERION\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_1\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/goal\",\"excerpt\":\"Find the median of four ordered numbers using the mean of the middle two, and explain the check.\"},{\"ref\":\"plan_1/activity/work_1\",\"excerpt\":\"Pass only if the median is 6 and the learner says the upper middle rule is correct.\"}],\"evidence\":\"The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.\",\"consequence\":\"The accepted educational outcome cannot be met correctly as proposed.\",\"requestedResolution\":\"Correct the rule, worked result and observable correctness check.\",\"requiresAcknowledgement\":false}]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_b949be4c907cfe4b",
+      "category": "REVIEW",
+      "packetSha256": "c0948231682d81d299578c41f4335c9da4bdee5f5f3252c5993b9cfca49c6de1",
+      "rootRequestId": "a1da9fd0-af52-40f5-a03c-9b328681c67e",
+      "attemptId": "bdc8f3c4-2da8-45e4-9560-3057355f3153",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "85c3faca-2035-4a07-b9bc-c1595b5bd977",
+                "status": "PASSED",
+                "evidenceDigest": "38ef993964f332b12dee2a81d8377a46ff898aef82d7cfc25b306a3c8f98660e",
+                "educationalContentDigest": "56f72f26cdb6518ee571af3c324bd40b3ae30b8d28a87103c2eb69db197e105b",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "69177349-2e6b-4c37-a3a0-127864a30067",
+        "attempts": [
+          {
+            "callId": "69177349-2e6b-4c37-a3a0-127864a30067",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 1
+    },
+    {
+      "trialId": "d_2c793f9cde3e05f1",
+      "category": "REVIEW",
+      "packetSha256": "59e5cef794a763f6eb20bfffab4cf9990cab475eac27680d626d2aa04feb7bb1",
+      "rootRequestId": "fd261caa-f0da-4b63-9c53-100da638db3b",
+      "attemptId": "76b52f5a-4d1a-4df7-94df-0403fd75e20f",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "f888ee45-6b10-4862-acc6-7e5d07e9cf8a",
+                "status": "PASSED",
+                "evidenceDigest": "5578d94d0283975fb6d89f07106f51818f371e64eb2c88f4bfab2c492787baf7",
+                "educationalContentDigest": "43d7f02cd0bb43c80d301d5b312ccab6520239e6d2a65847d2926c9117d0117d",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "5008284c-a7f1-482c-bab3-35f0fc08005e",
+        "attempts": [
+          {
+            "callId": "5008284c-a7f1-482c-bab3-35f0fc08005e",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 0
+    },
+    {
+      "trialId": "d_d4791a8b4cdede65",
+      "category": "REVIEW",
+      "packetSha256": "f21771d2444166d245cbbcc8b59e85f416d3253f17ce63a1338fe40ea077cf51",
+      "rootRequestId": "b905633f-6171-43d3-b564-7d7d3e73179c",
+      "attemptId": "926ea4af-f317-41eb-82ed-f4b12d527d5b",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "12470834-6721-48ad-b493-223e64b99270",
+                "status": "PASSED",
+                "evidenceDigest": "f1c5ec679d8b699c5c4a202af9fdc9c51826852dd5af5dac5168ea6272094640",
+                "educationalContentDigest": "53af935b854f970eb5db9329b7a27dd0a84f9c890b6f0357e9e987330f2de7c3",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "868ad318-ab10-44d7-a6c0-c7e731a2b150",
+        "attempts": [
+          {
+            "callId": "868ad318-ab10-44d7-a6c0-c7e731a2b150",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 1
+    },
+    {
+      "trialId": "d_ea74e8dff125fb1c",
+      "category": "REVIEW",
+      "packetSha256": "79145a4b225630aa4c44eefb511fe9ef7e853e849c28bbfe4ecaf97e3190306d",
+      "rootRequestId": "682d0905-785d-4835-86e1-cd11ac620413",
+      "attemptId": "9b5c46cf-69a9-4760-b781-a8fd9bffaa31",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "46d9d721-acac-400d-9921-c5ccbb28f9dc",
+                "status": "PASSED",
+                "evidenceDigest": "5eabfd1a92dde8e57359f73ee632a85725b4a33d4652c9fca982874b9f8265c2",
+                "educationalContentDigest": "0bfeb19dcff026d4891ee442d2c6fcbd784d3ccefa503ff7cef267b79aff2e06",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": []
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "637c852e-1b1d-423a-88a9-fe0049b6686a",
+        "attempts": [
+          {
+            "callId": "637c852e-1b1d-423a-88a9-fe0049b6686a",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[]}]}",
+      "latencyMs": 1
+    },
+    {
+      "trialId": "d_e9c5b907ca74eaa2",
+      "category": "REVIEW",
+      "packetSha256": "e250b2d07ae8f70fee5bb41752a12fa0101d788bf792f66b74489f39a1f7662b",
+      "rootRequestId": "538f9727-9560-4ae9-8828-b7354e3bde43",
+      "attemptId": "46f6f8ab-aff5-4721-939b-1de830ae1ad6",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "ba4d87c5-3673-443f-8fdc-47afdacebdb4",
+                "status": "BLOCKED",
+                "evidenceDigest": "9569f145768c61d41f54567789da5f7641514eb258c853fac2313e04c91189a1",
+                "educationalContentDigest": "b1a3d287c8c08780df0c33153a0bf71108943b5328fa2a3ca5594b695b72a958",
+                "issues": [
+                  {
+                    "issueId": "issue_1",
+                    "category": "PEDAGOGICAL",
+                    "severity": "BLOCKING",
+                    "affectedRefs": [
+                      "work_1"
+                    ],
+                    "evidence": "The prerequisite fabricates a maker and converts an approximate date to exact; both labels depend on it.",
+                    "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                    "resolution": "OPEN",
+                    "verification": null
+                  }
+                ],
+                "requiredAcknowledgements": []
+              }
+            },
+            {
+              "planRef": "plan_2",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "28c724df-574b-4db8-ad03-ab6e084b4f4b",
+                "status": "PASSED",
+                "evidenceDigest": "9569f145768c61d41f54567789da5f7641514eb258c853fac2313e04c91189a1",
+                "educationalContentDigest": "6bf85707502f5bc1bee6aa996fa29066868a88c5f87e5756a25e8f390a99e729",
+                "issues": [],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": [
+            {
+              "planRef": "plan_1",
+              "finding": {
+                "issueId": "issue_1",
+                "category": "PEDAGOGICAL",
+                "severity": "BLOCKING",
+                "affectedRefs": [
+                  "work_1"
+                ],
+                "basis": "CONCRETE_VIOLATION",
+                "grounds": [
+                  {
+                    "ref": "plan_1/goal",
+                    "excerpt": "Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date."
+                  },
+                  {
+                    "ref": "plan_1/split/work_1",
+                    "excerpt": "Checked facts must name Elena Ruiz and exact 1900."
+                  }
+                ],
+                "evidence": "The prerequisite fabricates a maker and converts an approximate date to exact; both labels depend on it.",
+                "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+                "requestedResolution": "Correct the complete shared prerequisite and any necessary dependent wording while preserving the protected exercise.",
+                "requiresAcknowledgement": false
+              }
+            }
+          ]
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "0e12e0b2-f1c7-4d2f-9672-ba5b0225d574",
+        "attempts": [
+          {
+            "callId": "0e12e0b2-f1c7-4d2f-9672-ba5b0225d574",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_1\",\"category\":\"PEDAGOGICAL\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_1\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/goal\",\"excerpt\":\"Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date.\"},{\"ref\":\"plan_1/split/work_1\",\"excerpt\":\"Checked facts must name Elena Ruiz and exact 1900.\"}],\"evidence\":\"The prerequisite fabricates a maker and converts an approximate date to exact; both labels depend on it.\",\"consequence\":\"The accepted educational outcome cannot be met correctly as proposed.\",\"requestedResolution\":\"Correct the complete shared prerequisite and any necessary dependent wording while preserving the protected exercise.\",\"requiresAcknowledgement\":false}]},{\"planRef\":\"plan_2\",\"issues\":[]}]}",
+      "latencyMs": 1
+    }
+  ]
+}

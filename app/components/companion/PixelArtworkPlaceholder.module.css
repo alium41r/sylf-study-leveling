@@ -1,0 +1,32 @@
+.root {
+  container-type: inline-size;
+  inline-size:100%; block-size:100%; min-block-size:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:8px; padding:12px; text-align:center; border-radius:inherit;
+  background:var(--surface-1); color:var(--text-primary);
+  background-image:radial-gradient(circle at 50% 35%, color-mix(in srgb,var(--accent-primary) 9%, transparent), transparent 70%);
+}
+.canvas {
+  position:relative; display:grid; place-items:center; inline-size:56px; block-size:56px;
+  color:var(--accent-primary); border:1px dashed color-mix(in srgb,var(--accent-primary) 40%,var(--border-subtle));
+  background-color:var(--surface-2);
+  background-image:linear-gradient(var(--border-subtle) 1px,transparent 1px),linear-gradient(90deg,var(--border-subtle) 1px,transparent 1px);
+  background-size:8px 8px;
+}
+.canvas > svg { inline-size:22px; block-size:22px; padding:2px; background:var(--surface-2); }
+.corner { position:absolute; inset:-3px auto auto -3px; inline-size:10px; block-size:10px; border-top:2px solid var(--accent-primary); border-left:2px solid var(--accent-primary); }
+.pixel { position:absolute; inset:auto -3px -3px auto; inline-size:6px; block-size:6px; background:var(--accent-primary); }
+.root strong { font-size:14px; line-height:1.25; font-weight:650; }
+.root p { margin:0; color:var(--text-secondary); font-size:11px; line-height:1.55; }
+.action { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-block-size:44px; padding:7px 11px; margin-top:3px; border:1px solid var(--border-subtle); border-radius:8px; background:var(--surface-raised); color:var(--text-primary); font-size:11px; font-weight:650; text-decoration:none; cursor:pointer; transition:transform .12s ease, background .18s ease, border-color .18s ease; }
+.action:hover { border-color:var(--accent-primary); background:color-mix(in srgb,var(--accent-primary) 12%,var(--surface-raised)); }
+.action:active { transform:translateY(1px); }
+.action:focus-visible { outline:2px solid var(--accent-primary); outline-offset:3px; }
+@container (max-width:170px) {
+  .canvas { inline-size:32px; block-size:32px; background-size:6px 6px; }
+  .canvas > svg { inline-size:18px; block-size:18px; }
+  .root strong, .root p, .arrow, .actionSuffix { display:none; }
+  .action { min-block-size:44px; padding:5px 7px; margin:0; }
+}
+@container (max-width:64px) { .canvas { inline-size:24px; block-size:24px; border:0; } .action { display:none; } }
+@media (prefers-reduced-motion:reduce) { .action { transition:none; } }

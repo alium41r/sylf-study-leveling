@@ -259,6 +259,19 @@ function allocateLearning(raw, rawEnvelope, rawFacts, options = {}) {
         }
     const placements = [...nodes.values()].filter(n => assigned.has(n.key)).map(n => ({ planRef: n.planRef, activityRef: n.activity.localId, date: assigned.get(n.key), minutes: n.activity.timeboxMinutes }));
     const unscheduled = [...nodes.values()].filter(n => !assigned.has(n.key)).map(n => ({ planRef: n.planRef, activityRef: n.activity.localId, minutes: n.activity.timeboxMinutes }));
+    options.onBindingConstraints?.(unscheduled.map(work => {
+        const node = nodes.get(key(work.planRef, work.activityRef));
+        const sessionMaximumMinutes = facts.preferences.find(p => p.planRef === node.planRef)?.maximumTimeboxMinutes ?? envelope.timeboxRange.maxMinutes;
+        const eligibleDays = domains.get(node.key).map(date => {
+            const dayMinutes = days.get(date)?.availableMinutes ?? 0, weekMinutes = weekRemaining((0, context_1.weekKey)(date)), goal = goalRemaining(node.planRef, (0, context_1.weekKey)(date));
+            return { date, dayMinutes, weekMinutes, goalMinutes: Number.isFinite(goal) ? goal : null,
+                upperBoundMinutes: Math.min(sessionMaximumMinutes, dayMinutes, weekMinutes, goal), remainingAfterPlacementsMinutes: available(node, date) };
+        });
+        return { planRef: node.planRef, activityRef: node.activity.localId, approvedMinutes: node.activity.timeboxMinutes,
+            remainingMinutes: node.pin?.remainingMinutes ?? node.activity.timeboxMinutes, capacityChargeMinutes: node.charge,
+            alreadyReserved: node.pin?.alreadyReserved ?? false, sessionMaximumMinutes,
+            maximumIndivisibleMinutes: Math.max(0, ...eligibleDays.map(d => d.upperBoundMinutes)), eligibleDays };
+    }));
     const findings = [];
     const finding = (category, consequential, planRefs, activityRefs, evidence, consequence) => findings.push({ findingId: `finding_${(0, database_1.hash)("allocation-finding", { category, planRefs, evidence }).slice(0, 20)}`, category, consequential, planRefs, activityRefs: activityRefs.slice(0, 60), evidence: evidence.slice(0, 1000), consequence });
     if (capacityProof)

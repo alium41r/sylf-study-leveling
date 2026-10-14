@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     await prisma.systemMessage.create({
       data: {
         userId: session.userId,
-        content: `**New Goal Detected**\n\nObjective: "${title}"\nTimeline: ${effectiveTargetWeeks ?? 4} weeks${effectiveTargetDate ? `\nDeadline: ${effectiveTargetDate.toISOString().slice(0, 10)}` : ""}\nEffort Level: ${effortLevel}\n\nThe System has registered your objective. Talk to The System in the chat to generate and schedule quests for this goal!`,
+        content: `**New Goal Detected**\n\nObjective: "${title}"\nTimeline: ${effectiveTargetWeeks ?? 4} weeks${effectiveTargetDate ? `\nDeadline: ${effectiveTargetDate.toISOString().slice(0, 10)}` : ""}\nEffort Level: ${effortLevel}\n\nSylvie has registered your objective. Talk to Sylvie in the chat to generate and schedule quests for this goal!`,
         type: "SYSTEM",
       },
     });

@@ -1,0 +1,14 @@
+[
+  {
+    "step": "initial",
+    "lit": 0
+  },
+  {
+    "step": "right click paints",
+    "lit": 2
+  },
+  {
+    "step": "leave canvas and return while held",
+    "lit": 4
+  }
+]

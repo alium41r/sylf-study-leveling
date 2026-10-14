@@ -1,0 +1,509 @@
+{
+  "schemaVersion": 1,
+  "status": "FROZEN_PENDING_PAID_APPROVAL",
+  "provider": {
+    "environment": {
+      "DEEPSEEK_MODEL": null,
+      "DEEPSEEK_FLASH_MODEL": null,
+      "DEEPSEEK_BASE_URL": null,
+      "DEEPSEEK_FLASH_IN_PER_1M": null,
+      "DEEPSEEK_FLASH_OUT_PER_1M": null,
+      "DEEPSEEK_FLASH_IN_CACHED_PER_1M": null
+    },
+    "workload": "syllabus",
+    "routing": {
+      "workload": "syllabus",
+      "primary": {
+        "provider": "deepseek",
+        "model": "deepseek-flash"
+      },
+      "fallback": {
+        "provider": "gemini",
+        "model": "gemini-2.5-flash"
+      },
+      "description": "AI Syllabus Constellation 48-Node Compiler",
+      "outputTokenCap": 8192
+    },
+    "resolvedPrimaryModel": "deepseek-flash",
+    "endpoint": "https://api.deepseek.com",
+    "dispatcherOptions": {
+      "responseFormat": "json_object",
+      "singleAttempt": true,
+      "thinking": "OMITTED",
+      "reasoningEffort": "OMITTED",
+      "temperature": "OMITTED",
+      "topP": "OMITTED",
+      "tools": [],
+      "stream": false
+    },
+    "publishedDefaults": {
+      "thinking": "enabled",
+      "reasoningEffort": "high",
+      "source": "https://api-docs.deepseek.com/api/create-chat-completion/"
+    },
+    "configuredPrimaryLedgerRate": null,
+    "budgets": {
+      "modelCalls": 6,
+      "executionSeconds": 180,
+      "inputTokens": 80000,
+      "outputTokens": 24000
+    },
+    "node": "26.7.0"
+  },
+  "sourcePins": {
+    "dist/planner-worker/ai/agent-router.js": "dd54b7fe73cde7594bc2f54d8b16ef5161a26e881daf79953ecb86955ebe4fc1",
+    "dist/planner-worker/ai/config.js": "f8b72d995c33141e35c77b4049643947f80f47f91182770ae08c24edfb13145f",
+    "dist/planner-worker/ai/entitlement-policy.js": "4c6f27727b8f7b2943e93f2903c201b49e1dc3bde5ba8911156c87ad3807ef4f",
+    "dist/planner-worker/ai/json-extractor.js": "d287a89da64b6a3e480abcf6babab0205133feb259709e5be255afd073934a57",
+    "dist/planner-worker/ai/message-intent.js": "b9bc2865f5c1c85b874d15ee7f17fea2dd0ded4a5badd1bcac1e854acc3433e9",
+    "dist/planner-worker/ai/providers/deepseek.js": "95163c4d5a5296479ab0db005e05d25511a13df68f89376495380fdb4dadfcd3",
+    "dist/planner-worker/ai/providers/factory.js": "9e9ea60da6d87283f408ea98da052f8b597ee6d295aaee2e8f793cd12963d671",
+    "dist/planner-worker/ai/providers/gemini.js": "06a985ac25f225922de9354e7da9bd535f5d0758a4f5b2b40172aebc4d591704",
+    "dist/planner-worker/ai/providers/groq.js": "42649bb749b7edcec41d35f6c85ed7a18d70fec31147da52bc4983fa4dae5f9d",
+    "dist/planner-worker/ai/providers/types.js": "5528c965c9df0118e7f66230defe1a5003ad2faff74fbd9a85a025845cb06b71",
+    "dist/planner-worker/ai/quota-accounting.js": "07fec4f383d5575635a03620589b5b1719d7e7826bc175b35f715a38a296c940",
+    "dist/planner-worker/ai/usage-pricing.js": "69b17a58a1f0af740c258f0f28abc1e0500321ab08fd171ecbfbf50fa1500eeb",
+    "dist/planner-worker/cognitive-stats.js": "226ceff8609870de10c2c701df55d915d4b341d578a11a334446beefaba246fa",
+    "dist/planner-worker/difficulty-engine.js": "192b81469b91e80036f8ee49d5fe4e0b4f3971d879236d1b6eb9b932b79b365b",
+    "dist/planner-worker/game-engine.js": "e25b335a095f5cb9d1be97ca5431902da77f7897bae72d437350278b8c22061d",
+    "dist/planner-worker/main.js": "219a0f950abae2e1bd33baa8bad4fed67f5e035e57259b47290539a47d2df534",
+    "dist/planner-worker/planner/import/pdf-runtime.js": "3eacf78e507adbb8a1861110a88eb17511b56be310f697bf87f13d644184b3c3",
+    "dist/planner-worker/planner/intake/scope-node.js": "f6d043a1d7a30cc203bbe07b7638e15fa01b3a38a36a0b68ac66446f099228f6",
+    "dist/planner-worker/planner/research/authority.js": "361576218aff09913d9f421be0da948af6ed962ee418aecf59667c6c019713a7",
+    "dist/planner-worker/planner/research/contracts.js": "8937d4103cbccfe204a5c4a0876885472dbebbeefa3f8f4837ffa283a0f93210",
+    "dist/planner-worker/planner/research/evidence-runtime.js": "ca98ff1ed00f70c40afa8141bc1a9964b4feb7ba437b6e0deefc7b0cd865e2e8",
+    "dist/planner-worker/planner/research/search/contracts.js": "2c672eacbd7f480c34dc1e92d4173a0126c1fb7605d473c7b779a6f860d02f32",
+    "dist/planner-worker/planner/research/search/fetch-runtime.js": "e2ec1d75a68af61a5330f640b667ef389a5054f291001d32dd5581a7c629d9ac",
+    "dist/planner-worker/planner/research/search/provider-runtime.js": "000b8c528ddd501dbe34a86b946d4af248609edca260a08de8277d9fe8e51d95",
+    "dist/planner-worker/planner/research/search/url.js": "0c6189652074190ecd85504e98ba6eda752dbdb4a524bfc289c00a98b4f63278",
+    "dist/planner-worker/planner/v2/contracts/artifacts.js": "077223e9bd82db02dbd5f5f9aa8ec3d6bc1d62493c2f13ba5f09fa650f4f1263",
+    "dist/planner-worker/planner/v2/contracts/blueprint.js": "81e2fcd7510e9931a6035b7584c1a2566ef75356e9501c5f8669d928e3f9da56",
+    "dist/planner-worker/planner/v2/contracts/envelope.js": "a389acf3c4600ccdcd2883b415288bbf40e86c0bdb09d2ef107914562fca504d",
+    "dist/planner-worker/planner/v2/contracts/evidence.js": "22ca375d6f41ac36026a96986262f84d3a44c7a2aad81241ebd42f7f123c9fb9",
+    "dist/planner-worker/planner/v2/contracts/execution.js": "0a91765f432b29d7ad935125c506559b8721e88ebc7d28d6816a461a9736d2a9",
+    "dist/planner-worker/planner/v2/contracts/index.js": "a286e9bb85e867af1239de8573f4f07b522e27ad6597bb8b07e023771ead8dc2",
+    "dist/planner-worker/planner/v2/contracts/intent.js": "e58d27751c9830560bcfab26805431fe2122063e4cd09a0560170f0de7fc5eb8",
+    "dist/planner-worker/planner/v2/contracts/lineage.js": "81a61da81f5a399ad00165fe35c1fe74548922e2f7614bee58ddb128ccdc1194",
+    "dist/planner-worker/planner/v2/contracts/operations.js": "3cec703202327431f6c5d6082a7938138cca77b97a6e3bb7102f915c7ca90b37",
+    "dist/planner-worker/planner/v2/contracts/primitives.js": "b9c817f6778fa9cbd626e4eecb2497eccbfaf31967f731787dde245cfb5f1b12",
+    "dist/planner-worker/planner/v2/contracts/session.js": "e1e76170209a8c32803a9391fae571d5e25ba31d5017af37aa89288c02e10702",
+    "dist/planner-worker/planner/v2/contracts/workspace.js": "2d251d951be38347871f44707c72a75c1ccb20b4d13d83d73d8057010c702a38",
+    "dist/planner-worker/planner/v2/intelligence/allocator.js": "3ca2e1023d553af0b84bb3d536178eb12994702cee2fe269672e21dba0f67ece",
+    "dist/planner-worker/planner/v2/intelligence/assistant.js": "7d99948acfc9b0959ef512bc60b563e98d33c774f0aeca04c9504ee102d8464d",
+    "dist/planner-worker/planner/v2/intelligence/blueprint.js": "3c77a7e08c16b7fcb1dc1c13defe535b89f392e3402b52d2e176ca3def39c08a",
+    "dist/planner-worker/planner/v2/intelligence/capacity.js": "4bf90eef1a1ef39bba669b72f7cc868b723ac398e350d826e3cdcba7fbf15b38",
+    "dist/planner-worker/planner/v2/intelligence/checkpoints.js": "a7a12766fccb1af5b29391a888bf049b96dd84705f160611fb982fd3cd96ec9e",
+    "dist/planner-worker/planner/v2/intelligence/context.js": "a5254b87152d74cbdf94bbf6803f1a100ce2898b8f2642f2404255415bc4f8ce",
+    "dist/planner-worker/planner/v2/intelligence/forecast.js": "24b48b35ac34703fb7dd3ab55d6b6d89f4cf4ed5de76f8e3ff95ca0f00dae041",
+    "dist/planner-worker/planner/v2/intelligence/ocr.js": "17896cd771068e448792606aa5191b2e123f38305dda157ed706a111c3da2895",
+    "dist/planner-worker/planner/v2/intelligence/provider-policy.js": "c5b81ade5de73482c33b642a1289fd7a14ef17324896687f7aa50845a0cf7e14",
+    "dist/planner-worker/planner/v2/intelligence/provider.js": "7b64f405dbec8cc9907dbb91271bd5b787aa7596dd80bad31a1e6654e56d3892",
+    "dist/planner-worker/planner/v2/intelligence/quality.js": "2f7848466511f7ba412b26aae4027982e286aef64f117c9467176550afbafe4f",
+    "dist/planner-worker/planner/v2/intelligence/research-cache.js": "52967e1a120caa12560a3451eed112fe4e5cf20bf1aa2994f7fe83cffbebde4b",
+    "dist/planner-worker/planner/v2/intelligence/research-reader.js": "e48ff0c9d6cc9f52c1c33fd367bb9cd13f0f4d47cbe8555d7c09d8a4873a7fd8",
+    "dist/planner-worker/planner/v2/intelligence/research-verification.js": "d46abd3900ba784d1a665f595265a4a5645855ef784fd33dbdebc5a29a70c740",
+    "dist/planner-worker/planner/v2/intelligence/schemas/assistant-intake.js": "3011633f02fcd769dab777e951dde8e9ae6767b99e9fb4078f8b253b92a3a95d",
+    "dist/planner-worker/planner/v2/intelligence/schemas/assistant.js": "c77e993fcee207e5461590f43e55b39a61b5f40d5a218f526ac013d1bdc0e462",
+    "dist/planner-worker/planner/v2/intelligence/schemas/blueprint-response.js": "62785ea8c1ac4fc1f27ee153d1a50ace8c9502237213edb984e9526b6ac8986d",
+    "dist/planner-worker/planner/v2/intelligence/schemas/checkpoint.js": "d3c631ff488204cd3ba13ca04feeddc59a9f215765ef7841dabfef59f88e959c",
+    "dist/planner-worker/planner/v2/intelligence/schemas/conversation.js": "ea0d302299daa0e1c8c3b8190916d3f0496d1a5f3f2c422b4648d6bddf5f4068",
+    "dist/planner-worker/planner/v2/intelligence/schemas/documents.js": "ccfe35bebb7c16cf184dd1b035dafbde42d672af79ee7c688335a13c43e38e08",
+    "dist/planner-worker/planner/v2/intelligence/schemas/planning.js": "16c655b1f548c655affffde94ce06d1f1d39ad83c660d6ab936e134aab828ed6",
+    "dist/planner-worker/planner/v2/intelligence/schemas/quality.js": "2180fc17ab732cb146b2d17d94cc69299784a219cc806a08ddc750793b3f9673",
+    "dist/planner-worker/planner/v2/intelligence/schemas/repair-response.js": "ac0c913e7f5082078cf3dbc7d6a8399aa5620b4810990c801774e2f2bfb01765",
+    "dist/planner-worker/planner/v2/intelligence/schemas/research-model.js": "1290cb018ecfe21674df8d83b7de2339df56129c180cc96ba41bea1162e39fc8",
+    "dist/planner-worker/planner/v2/intelligence/schemas/research.js": "840453807dd099ccb96196c420680f858cf3b5ac0cb83a407da5e145454d1270",
+    "dist/planner-worker/planner/v2/intelligence/schemas/scheduling.js": "1db2f671a053cbeda3eeba90b9e2b10e1e97b4f1a31ac54fb6bd2fd4856ab2d3",
+    "dist/planner-worker/planner/v2/main.js": "434fc5178f07dc1cd0c05e641a8af07351c3d7d8359922bf0f5611149614aa6c",
+    "dist/planner-worker/planner/v2/server/accounting.js": "aad62dd597fc22e4da931183d4384bc4bc5a928631a05e2ce1c77f83e44ceb8c",
+    "dist/planner-worker/planner/v2/server/adoption.js": "8f1f4e0c8cb3484f59f84cbb19ae52562a83eb96e27bf374f43c2e1a5347c8d9",
+    "dist/planner-worker/planner/v2/server/apply.js": "dddfe64fb52270ee6f305be8b1277c592917afe84226e057131a1262b02052bf",
+    "dist/planner-worker/planner/v2/server/assistant.js": "c00a1bf6f1b0f48dee2b65335eb2ab72d731b61a0403e3c2e0ec83718d26f47e",
+    "dist/planner-worker/planner/v2/server/attempts.js": "292c694cbc903724dabd6786ca86c167a33727ce636d18c7b6fdfcd9ada60543",
+    "dist/planner-worker/planner/v2/server/compilation.js": "7575f27a9de9a80529f7a16956b12d2fb7e62dde7a60174a7ef1629ab0c8e905",
+    "dist/planner-worker/planner/v2/server/compiler.js": "e0c406c0a8119062616568af75d9697a7088a4264052f0e0dc461cd372731dd1",
+    "dist/planner-worker/planner/v2/server/context.js": "eca3eaa68b946005681991207d24ed58aa79b76f83af5102731d6b27e1e20039",
+    "dist/planner-worker/planner/v2/server/database.js": "16a168385fd56f03891b40177c84e34c80654fe24b48c6a162b16aa1ba413691",
+    "dist/planner-worker/planner/v2/server/documents.js": "a005ae732c43ea0446fa2dcab7dc0725cb1c45d008345628f84a7ac0fa3f52b5",
+    "dist/planner-worker/planner/v2/server/execution-validation.js": "f11a4ff6b12870e0e1179c3f2d3e3726777b7718d8c1e47d811be5968630c769",
+    "dist/planner-worker/planner/v2/server/generation.js": "d4c4b452c01aab884fe42d923434e2505c2d57f067429fa351dade564c9b36cc",
+    "dist/planner-worker/planner/v2/server/intents.js": "87ae19ed2723e340fbf1e2da9b0878ee1231e681f48518c07e3e6cd7b0551e13",
+    "dist/planner-worker/planner/v2/server/learning.js": "eb0fcbce104908ec5eaf2acf2b39c714f81a2c75a292f00c02b9498be406cc27",
+    "dist/planner-worker/planner/v2/server/research.js": "7094f2580206e49f2d0d84ba7dbc299b2be09f622ef3421d25beaafc8ef44d9f",
+    "dist/planner-worker/planner/v2/server/revisions.js": "8f1f26c90f8dfd8b19c43bec45bab0791f69cb1fceed9567d990f4a4c5e3db0c",
+    "dist/planner-worker/planner/v2/server/sessions.js": "57d5bd3f48b84439f1574a8f76ef243be12118eb00520ad049ee510dcf55d5b2",
+    "dist/planner-worker/planner/v2/server/settlement.js": "abfca78a1ced31d0a243961190bceea488b0eca593c1dba0ed15088efc5a631a",
+    "dist/planner-worker/planner/v2/server/worker.js": "f313ff391dc290dfaf75b88479c6fb681d2650e2b03fa07acbe33f1a62239b6c",
+    "dist/planner-worker/planner/v2/server/workspace.js": "9a8274d5eb49e50b277f62127324b3b024d183992c5c558529aad070ea167b79",
+    "dist/planner-worker/redis.js": "c49f99ad5f0991d83b13526ce294f9073e85284581207e9b5d646f5428962357",
+    "dist/planner-worker/skill-tree.js": "f0cf6e4d7188ae7436bc5f48b9c75280f5445eda8ef937319d4defa70696dc9b",
+    "dist/planner-worker/study-systems.js": "295fbc87992a9e0981c1676c4d351b25328a745097a70bcb27adaf42ecfccecd",
+    "dist/planner-worker/supabase-storage.js": "ef1312e35b0bfeb57677d57fbfb373096a5a4e5478980d2bea2720ed7b0a88b5",
+    "dist/planner-worker/timezone-service.js": "9adba5e5f1b4de067bbbb16bcf14c5215f2c28dd09cffc074a9e2c7d0e31dcfb",
+    "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md": "899a31f164c481907a89286507a71c613e5a27813140b2eaf951e7ec718ca365",
+    "lib/ai/agent-router.ts": "a822adb4e47f5b898ddeaf9c0bce36c24759a360df20bc2c59cf66ab9d4bf842",
+    "lib/ai/chat-tool-executor.ts": "6e2da62775ca99e5004cd61c17b0664ed60b4a1c62a249c6365339730b05549f",
+    "lib/ai/chat-tools.ts": "ebb6246cbe449e937d6272d19fe53adc206839e25bdb88e1bd8b5b3fa1f409eb",
+    "lib/ai/cheap-answers/calculators.ts": "e8fe0671398f8a4e6d088ac319795678b86bdf5656bf4dcd81ef03042d5b547a",
+    "lib/ai/cheap-answers/datetime.ts": "7fbd6614f1eb8c4725bae7b9186ad8d3e82580b5da1bab15cf1c352efb2b99e4",
+    "lib/ai/cheap-answers/facts.ts": "1f26e80853352a0628ebc33ed64dc4239d9982f9c84fbbd56590ac08183c99e7",
+    "lib/ai/cheap-answers/index.ts": "853aaee87bf2a5c49f8ec4c3f48b4ee7928bcc57354ac45421594c2627423953",
+    "lib/ai/cheap-answers/math.ts": "bf9050e7dbfd4d1ccb8ad1a4bc7c2e6096bb4be5a5396f548eec1510c1d242c3",
+    "lib/ai/cheap-answers/units.ts": "704af245e646aac7ddfb84e3ae5ec9085606e8386b45430c96c5fec713af03d9",
+    "lib/ai/config.ts": "9dc6ea97553436d2d14302199a28eb7a5448352f5b01b961d918001319b5bddc",
+    "lib/ai/context-engine.ts": "af4a1f10ffd3b8095d366ba7e66652a8053ad656dfecf2d25abfc7570d465dc1",
+    "lib/ai/daily-briefing-service.ts": "7f2886c693d3099e57d153c2023f0579b7ff48ac9463ad01cb86df9b374406d2",
+    "lib/ai/deterministic-responder.ts": "81d4a17a1846c4946acdd6d7572e467c7d84ccef7c55c48e78aac53c4d0d46db",
+    "lib/ai/entitlement-policy.ts": "ffeb263b85db454519fc19c2937da250306cee93831ecd744ff7f86f81dd5a14",
+    "lib/ai/entitlements.ts": "b918a347ea26b7dd473f039889efed9931f83a6c5371301aefe9a19bc597ad5f",
+    "lib/ai/intents/continuation.ts": "c4e952549249570fee167fcc0db724e71dfaa9fff3832ae93cf70d5acea8b84a",
+    "lib/ai/intents/executors.ts": "fbc4375ba87976eeb3b623cad543b679cf3cade24bffab602da156b4ead2ab6a",
+    "lib/ai/intents/matcher.ts": "8d73efef7d9bff9aa81b1fb27031f08171f19f1206541ba0d4a6d9c9bf29c355",
+    "lib/ai/intents/registry.ts": "1872586dde32918d7851340ad78fad346b667a92fdd148b0a598527105cdaebc",
+    "lib/ai/intents/signals.ts": "781b0064c8c578b635e606d721602bd884ff92ce3a1cdafe845842352880fb7e",
+    "lib/ai/intents/vocabulary.ts": "b259a096093ac6528dbc7ba9517a9c6e07b08eed8c23c8ada02def4e1f77b88e",
+    "lib/ai/json-extractor.ts": "9d97a8c43ebd351dfd3a4d401ea1bc9f2758bcc166b223f02a78d553e7122528",
+    "lib/ai/message-intent.ts": "0d40792104a614e13f0f693987cc8065ccbf8487333629e0f463454d1637bc7f",
+    "lib/ai/orchestrator.ts": "b17dfdf9d9e6f861c1731c013354baeca72f9c15ca7aa7f281d7e0069b36062e",
+    "lib/ai/planner/context.ts": "dad2bcb5daadfdd7c27ddd5638495bceb170db235e7cc41ee958f8a23ce791c0",
+    "lib/ai/planner/critic.ts": "f6ef83b17f5f96276cf975eafcb5949f9a1e47a41b7a95b0e346d3bc59c3908b",
+    "lib/ai/planner/exam.ts": "160093ce830f97f1bad33ed3eeed215b27d6a86669f3bd98fd8a3c45b3b27b43",
+    "lib/ai/planner/expansion.ts": "23fe9ccbc7da4b5155dd5f48ed2f5ef60c5d4a065859e9bbc4fffcfd2ca453fb",
+    "lib/ai/planner/mastery.ts": "7609be0383edab4b1640dc84e2502a8c0155305d4bc766798b130e49a9db9259",
+    "lib/ai/planner/pipeline.ts": "035fc52378815a149d4ec37daf3a88c67b5f1e523bb06456504c9b0ff200541d",
+    "lib/ai/planner/rebalance.ts": "65ff82165bae2bd165a61b47aa320740948aad79bb33a1261852fe0e1652e4ce",
+    "lib/ai/planner/repair.ts": "b6a99b6cadd41825709ca53c53d80faa90ad1ee4a651b9800126e2d45069fdb4",
+    "lib/ai/planner/roadmap.ts": "add1def9c8b28a4dccf7c5c414b76c031f4338707de5573bcd4bf9167eab04d9",
+    "lib/ai/planner/validation-hints.ts": "34423698299a34f1fa0054611a318f13f2a78c513efe8c536458a9e10e994573",
+    "lib/ai/planning-engine.ts": "cd3d197852f1198420fb5daea2a78c1784d5377b1f82436b70f8796846027153",
+    "lib/ai/prompts.ts": "88cd94f7545c5d1e629568230f7b7fb8af4b2ae6409ea93e9133effd57e347d7",
+    "lib/ai/providers/deepseek.ts": "55490d78e56e3fa3e8f30c90ea5cc8d923f41259da12b7a64d4d52f0d91095ad",
+    "lib/ai/providers/factory.ts": "8c55b9e0ff53bcf45a115b5707be757100aaee7640e05a87c0242383cee06c9a",
+    "lib/ai/providers/gemini.ts": "68eccabf6a67c213d4525aa01daf1dee0bb530a5d8c0f6f766aef5b4bcfef44d",
+    "lib/ai/providers/groq.ts": "9f335759037ef118f1b8e19b4d7a0b449f4cdaaea04ea8c7a63eec80a2bee37d",
+    "lib/ai/providers/types.ts": "091ac20ee77e27382dcbc6d4704eb0b96330190ebae854502295f1fdb714ccce",
+    "lib/ai/quota-accounting.ts": "2d1433efb9dc247bcea7f48c25d95597d8564342ce2ab91562899a1a4512354f",
+    "lib/ai/scope-evaluator.ts": "3aea02914a406a23dbfdda246685090c113992df46035878eabf371c52f25c5a",
+    "lib/ai/syllabus-compiler.ts": "b46ce623576a43a759e9027f3fdd8bf0e53f954247fe101c6f87dcb442d002a3",
+    "lib/ai/tool-confirmation.ts": "e252ed334f4eba31cf34934147a15cce23d29d7edf654ac11a426e6b2aa40f73",
+    "lib/ai/usage-limiter.ts": "7b25a43d4938cbaeea1690ede04fad09a1590cddc5349ce241d8d09777cfe6d3",
+    "lib/ai/usage-logger.ts": "b7c225d188a56d1fb04bc149e12a0a8e2b2bb35426a2db04c3ac20f202b25b26",
+    "lib/ai/usage-pricing.ts": "32d8f8ef17c7ed70b5b843c3c5b24a05496f62ca523066369a20f11621d485ec",
+    "lib/planner/v2/contracts/artifacts.ts": "2d28f60affbab80b0b674f1b35e975f63974bccbe45b5dcfd2a42015bba0fd75",
+    "lib/planner/v2/contracts/blueprint.ts": "409fbcaeaa15acb8dc9d1bee80e8612abb4553ecc7381d2e7965536ac649f4ab",
+    "lib/planner/v2/contracts/envelope.ts": "3d8bedf93e5d8bf29ad80841f1f11205c576d25f13e7bafe159f0fb3921e382b",
+    "lib/planner/v2/contracts/evidence.ts": "13aeaad8563bff0d5fcb7c5044ab0c5ca6227ee13664e0c2a02f215de8620f21",
+    "lib/planner/v2/contracts/execution.ts": "a45a6d90a8f58c11f1342d05542a7728e3fbe23fe8830bdfda6a32ae2d5fd3cc",
+    "lib/planner/v2/contracts/index.ts": "e89a831c07e54720a0c5251310bf3440d81366e5bbeabfcb0aaa8a9b0990172e",
+    "lib/planner/v2/contracts/intent.ts": "474d8847506ab5f3ee886e375ac3390a9b2e5a805c85343e559fe761dded9b51",
+    "lib/planner/v2/contracts/lineage.ts": "4f72e0cbdf879659cc5326e2006dee2827af790cee68faa2592328e3bac5719b",
+    "lib/planner/v2/contracts/operations.ts": "22579b5f3f3b3aeee0e5d8c2db5412d9e8b7e31e1c19d38a95a6ebc340e60e8c",
+    "lib/planner/v2/contracts/primitives.ts": "3d26fa7a94bca8299b0de5c1d787f3c95b67d14e6bf4bc91d84ade2890244f04",
+    "lib/planner/v2/contracts/session.ts": "14c2768a4c773fc33d14d4f681746f34c75952cc3363b85128084fa03b4bb4b8",
+    "lib/planner/v2/contracts/workspace.ts": "2abc74a5886e51dacb3f76da3ecdd820db9925e2580d2a4dbd1a8802c80c465c",
+    "lib/planner/v2/intelligence/allocator.ts": "81bc5f691e9993f8ea3ad2f1ce798a79952622271346108f7a1eaa96d19c5499",
+    "lib/planner/v2/intelligence/assistant.ts": "44aad7f7e764ff67e96f787dd6b8670d8bfbf20b12100142794747d5a7781ef4",
+    "lib/planner/v2/intelligence/blueprint.ts": "4d4d8eed0a14f9c21809045096c8afd3df7839550dbc1ea9bc8b85ff822082a0",
+    "lib/planner/v2/intelligence/capacity.ts": "56989fb9d74637b6536a952dfa63b57fb4e5cdd9b19968807052de0c5cb2f4ad",
+    "lib/planner/v2/intelligence/checkpoints.ts": "d81d74cac16cf9ce6c6d36b213ba42f8cd32ac3c20074a79d62e68372e9a11ee",
+    "lib/planner/v2/intelligence/context.ts": "2dbf57c3e1d95f1040f8bd51fe46d0a3ee7d0eb612af24fb87eb96d18f096c66",
+    "lib/planner/v2/intelligence/forecast.ts": "d7208b1369a2bfef69a62ed1cff9aa56f492f1a30eda97b8b6dd88be35b47bf5",
+    "lib/planner/v2/intelligence/ocr.ts": "050856144f969fd26b8e2bec882b517c600d161f0c8cab89b00e52bb43f89c6e",
+    "lib/planner/v2/intelligence/provider-policy.ts": "2a91cef9945f74eedaeb48bfd0e4e60422ff512dfe711cbff4650a15a6cb2f0b",
+    "lib/planner/v2/intelligence/provider.ts": "4709a27a95a7369b2d1d6611bc5e5fbe49a880634bbb6ccd61bb5638214ba03b",
+    "lib/planner/v2/intelligence/quality.ts": "df851468196c5d7c60a9d78dffa1cd83fde4e3c555ba1276a20d60849c9b7b68",
+    "lib/planner/v2/intelligence/research-cache.ts": "c28b5beee06479d9299695a32c76c9d35c24f32fb9cc9d115331832ad2b511c5",
+    "lib/planner/v2/intelligence/research-reader.ts": "f01ddfc0dd4ae0cfd8b69a5bba8b7ba4a6dc563dd8c1f7b96cb25702cba128a2",
+    "lib/planner/v2/intelligence/research-verification.ts": "1c5d37b519c3e4d5484341d9029689ee5a3e156176b11a6e75958589e9c12701",
+    "lib/planner/v2/intelligence/schemas/assistant-intake.ts": "2b40c7936df0b6e04f843168ab348738dae160cfa8fbd10ed058dffa6f40a3c4",
+    "lib/planner/v2/intelligence/schemas/assistant.ts": "118791339d5a92eb976c79c11b6457b2c355abc06cbe710b1c3a4976d8c2ab58",
+    "lib/planner/v2/intelligence/schemas/blueprint-response.ts": "0609a7061f86ace43cc769d32f4a3639ccb78aa486f7e9f8d7355fb74a89719e",
+    "lib/planner/v2/intelligence/schemas/checkpoint.ts": "23105b162ec131963cbc0fa9e068d4a54f6bdcda22ef4192c1728da39a015f29",
+    "lib/planner/v2/intelligence/schemas/conversation.ts": "9dcc0c8023913a06ea689a811bc50971b46f2faf9efc28be81b04db22b92914a",
+    "lib/planner/v2/intelligence/schemas/documents.ts": "928162c66506cdca42eb167d13489182d687acc843523b5d067f861d44c608e7",
+    "lib/planner/v2/intelligence/schemas/planning.ts": "e8c2976f642352176241be527ee4461ab2521081ae850e8d2ac4f385e6cc7576",
+    "lib/planner/v2/intelligence/schemas/quality.ts": "ef151337c7f23dcceba5b6a10a6b637522470af9222f8b662b7b0d070e85595d",
+    "lib/planner/v2/intelligence/schemas/repair-response.ts": "e20ac364c019f74d814094db8ba8ef67168ec5e4cd4cd6f03bb93fc669d7fc13",
+    "lib/planner/v2/intelligence/schemas/research-model.ts": "02ccbb99f42630849308c223fde1072369d850c4f604b3d43e859188775aff50",
+    "lib/planner/v2/intelligence/schemas/research.ts": "7dfa0c36541e7110fb2fb1eba2debfb92847c78dadc205bffee3a127d0bbcc41",
+    "lib/planner/v2/intelligence/schemas/scheduling.ts": "482f75e33ca156ddb01142257904c8a624596b784a486e43e791ce19d19768da",
+    "lib/planner/v2/main.ts": "e9a0bb93d7ce3a49431c9882338a2b51672a6e6fd68196328a168a09efad08f7",
+    "lib/planner/v2/quest-read.ts": "8b1e47766576f3d0f1f415294af54c74302e13d52d4c5be9e0a16e3d28c6c3fd",
+    "lib/planner/v2/server/accounting.ts": "23645a46cfa7acd0d4a5deaaf79fda500094ef19f9bde0ec7ad4f39229dc9f57",
+    "lib/planner/v2/server/adoption.ts": "6010aa43077507d38b2ace4def9744971fa435d14a6f4678f33ada2b2d9c5e99",
+    "lib/planner/v2/server/apply.ts": "7c264f096499bf543379b9ce82ad9b55898bf40341638a86968bad6636430357",
+    "lib/planner/v2/server/assistant.ts": "e1969ed65e3b411cbaa00555bd5856f74826bfda056f47efba41231f7e1344c9",
+    "lib/planner/v2/server/attempts.ts": "c33e17ddc1eec5b67d3c25e36ded7cbbf1412235380ee8438ea3a2db798c64b1",
+    "lib/planner/v2/server/compilation.ts": "7884b7ded89a61fd5e60544f154c1b12ba80d18c59005ec8ee9fb3e17dcd3674",
+    "lib/planner/v2/server/compiler.ts": "75751e5dedf83b99b10fdd0a77da5c79e523cda2e310fba93dbd7d6321109d34",
+    "lib/planner/v2/server/context.ts": "54d3e81d5ec990033cd6621954828f3859abb77991e16826a7df40e71da63305",
+    "lib/planner/v2/server/database.ts": "4fa35a7a88b7ae8733d6d15ca1ef8874796d9821172141ac8fe1a18e689e3f85",
+    "lib/planner/v2/server/documents.ts": "2ea76a272034a5d5a9687fac63abf229f3ac0276e89f6b2c54a323b24d9d84cf",
+    "lib/planner/v2/server/execution-validation.ts": "20eb872eb6cef347b86e37d71c978dcae98898f89e980a6776e8aab3c678214b",
+    "lib/planner/v2/server/generation.ts": "16d263ff3f8139f0573ec758f53248dff245dc746a362145a7f822fa42f9d7cc",
+    "lib/planner/v2/server/intents.ts": "d289fe33c2505e8a73c80c61eea02703fd66aa459f80f21c58115d5783505bf9",
+    "lib/planner/v2/server/learning.ts": "22387116207eeaa81629f4687129088fcf28886d1305bf8b73016662a36ed702",
+    "lib/planner/v2/server/research.ts": "b203a1322a42332abe6f91bbbb944d73bf6e99e6f74a3a09c7d37443252d6477",
+    "lib/planner/v2/server/revisions.ts": "b4c259b1d7e22f3af7d9d2299b7bc9ae3780f420cb4400db767b1239fe3fbba0",
+    "lib/planner/v2/server/sessions.ts": "6589a76b8e51d08b9d7781cf735a50060d1eab81d75cbed4770c3627312221aa",
+    "lib/planner/v2/server/settlement.ts": "936913f411841ac76f8f1187ead5811c3bcc78b8bd631d9a6e05b624bdf399a9",
+    "lib/planner/v2/server/web.ts": "e1c5e678471af5e9926685d42afa4a3829425b357817a6c76db05991d5a67c53",
+    "lib/planner/v2/server/worker.ts": "de60caaefca2a7ff7d11f685308a04f391a6f44c1b9c9ec3406d2008cf9311cb",
+    "lib/planner/v2/server/workspace.ts": "ba58a464b04919cb7cb63c7cad0d549601231fbf557461577c6b13dc36ac2f9b",
+    "lib/planner/v2/session-client.ts": "1cae5318bda7ae200534df1fc60aa0144f38155cae71a8f11a14e1a7bfd0be51",
+    "package-lock.json": "1e1ce363400b4c112a1a779f1e7ffe42a93516213b5e37cadf3839c397b8488e",
+    "package.json": "d5140a5f10086c5c33ae59fb6789be61760d59b8a90275cbef3a23d6cf119b3b",
+    "prisma/schema.prisma": "f5fbe318b2134a743ef35624f1b35d4b33e530e87c93fdf8ce2fe63da212d588",
+    "scripts/build-planner-worker.mjs": "d375fa61f52d2fcfe34f63cfbeac40861d9f42e8883e0856647bdd3ce72bbb69",
+    "scripts/test-planner-postgres.mjs": "d9835383a63ed827c10c01863179a1878139185581498d4f7990c3281ff5c9d8",
+    "scripts/test-planner-v2-phase2-live.mjs": "da05e6daaf8208d062b626c513900a0a724e16282ce7e02278c5943fb80fe29d",
+    "tsconfig.planner-worker.json": "1a6fd09b2f79837d8a72042779436e528137e848820897fd7a7ee486e5b65ab4"
+  },
+  "packets": [
+    {
+      "trialId": "d_4455ae843acc1082",
+      "name": "model/packets/d_4455ae843acc1082.json",
+      "sha256": "dcc02ea0ced4a7eadadd2b65674b9a314e5fd6897110b16e08653deec34dcf8e"
+    },
+    {
+      "trialId": "d_0f51cb688400b89c",
+      "name": "model/packets/d_0f51cb688400b89c.json",
+      "sha256": "e7e003aee91b5b5d429640b36b391342839b487fd0cfc8a3b2f19d4f2ff5cfed"
+    },
+    {
+      "trialId": "d_d5011475b34a9da1",
+      "name": "model/packets/d_d5011475b34a9da1.json",
+      "sha256": "9b88ab43dd7c9e35d29cce2f38d8df0452e367df05937f50f3274e966f920f2f"
+    },
+    {
+      "trialId": "d_ac6e119faa6748a5",
+      "name": "model/packets/d_ac6e119faa6748a5.json",
+      "sha256": "4ac1a1ab2fc41689ec1d6acb9ee4091fda7febf50c62d6bae4fd15ecb1e86344"
+    },
+    {
+      "trialId": "d_63ea398f0b23e2f0",
+      "name": "model/packets/d_63ea398f0b23e2f0.json",
+      "sha256": "cc1a9477590972458031fce41534c83b2dba50e40fe0f80d286410f45723af84"
+    },
+    {
+      "trialId": "d_28b1cf3e53f64ddf",
+      "name": "model/packets/d_28b1cf3e53f64ddf.json",
+      "sha256": "80432668033ed9ec240edfe93940e2554fdf67cb705f5d241555a8b37c5c6cdc"
+    },
+    {
+      "trialId": "d_2f5488d294f95e29",
+      "name": "model/packets/d_2f5488d294f95e29.json",
+      "sha256": "bd3bf65747f52c03f8c90076c23851c0b86121959bc42b229089fc2bad5125a5"
+    },
+    {
+      "trialId": "d_3284c39bab869cee",
+      "name": "model/packets/d_3284c39bab869cee.json",
+      "sha256": "e0c6dcaf4aa0c75467cf4e83e6fc53c843756674b000bc04aa377500d725f07f"
+    },
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "name": "model/packets/d_21da0ca3d648bd22.json",
+      "sha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b"
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "name": "model/packets/d_6de45b407ca18e60.json",
+      "sha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30"
+    },
+    {
+      "trialId": "d_23cb1deab0819ac1",
+      "name": "model/packets/d_23cb1deab0819ac1.json",
+      "sha256": "2ccea2aa936e8967f5363a694a8c5c4d391cb6083a1b1408a91be5378d4cd1d0"
+    },
+    {
+      "trialId": "d_39bd912910b6cdc4",
+      "name": "model/packets/d_39bd912910b6cdc4.json",
+      "sha256": "4e94bb8b47cdfde922865fbdeb7dab33a5248c581e7645aefc00b115c2a60c07"
+    },
+    {
+      "trialId": "d_aa0fdce6c965934e",
+      "name": "model/packets/d_aa0fdce6c965934e.json",
+      "sha256": "da7d98966b3e63950a6d442e4a0e33e5ec9d1ab199b11e458284290a114f9ca6"
+    },
+    {
+      "trialId": "d_edc200cbc63de947",
+      "name": "model/packets/d_edc200cbc63de947.json",
+      "sha256": "cb1fb320cdea149f3b80466c0b19857a55bb0a33b429d15f6efff833ce10afc8"
+    },
+    {
+      "trialId": "d_162f3a5840b6d145",
+      "name": "model/packets/d_162f3a5840b6d145.json",
+      "sha256": "82d737934947194602386660a434ff32e0442c991b6c6cf4d20e80aca9810e27"
+    },
+    {
+      "trialId": "d_b949be4c907cfe4b",
+      "name": "model/packets/d_b949be4c907cfe4b.json",
+      "sha256": "c0948231682d81d299578c41f4335c9da4bdee5f5f3252c5993b9cfca49c6de1"
+    },
+    {
+      "trialId": "d_2c793f9cde3e05f1",
+      "name": "model/packets/d_2c793f9cde3e05f1.json",
+      "sha256": "59e5cef794a763f6eb20bfffab4cf9990cab475eac27680d626d2aa04feb7bb1"
+    },
+    {
+      "trialId": "d_d4791a8b4cdede65",
+      "name": "model/packets/d_d4791a8b4cdede65.json",
+      "sha256": "f21771d2444166d245cbbcc8b59e85f416d3253f17ce63a1338fe40ea077cf51"
+    },
+    {
+      "trialId": "d_ea74e8dff125fb1c",
+      "name": "model/packets/d_ea74e8dff125fb1c.json",
+      "sha256": "79145a4b225630aa4c44eefb511fe9ef7e853e849c28bbfe4ecaf97e3190306d"
+    },
+    {
+      "trialId": "d_e9c5b907ca74eaa2",
+      "name": "model/packets/d_e9c5b907ca74eaa2.json",
+      "sha256": "e250b2d07ae8f70fee5bb41752a12fa0101d788bf792f66b74489f39a1f7662b"
+    },
+    {
+      "trialId": "d_6dc01b32b6500a8c",
+      "name": "model/packets/d_6dc01b32b6500a8c.json",
+      "sha256": "fd842e015325456133497394d9060f1d3097d8fd1318be32c6f8f754f04e9450"
+    },
+    {
+      "trialId": "d_8d3120aa4c6410ee",
+      "name": "model/packets/d_8d3120aa4c6410ee.json",
+      "sha256": "07abbca4269ede0b7f5c6522748ec70f06cd68695c8d8295a0f21c85c82a03fd"
+    },
+    {
+      "trialId": "d_e93fb15a1e30f945",
+      "name": "model/packets/d_e93fb15a1e30f945.json",
+      "sha256": "7030993ebb99a9d3d43468d947d918611d2e3684942a7a1aa4d0b7f81d2f9539"
+    },
+    {
+      "trialId": "d_8af5979351f85950",
+      "name": "model/packets/d_8af5979351f85950.json",
+      "sha256": "092de4d419020ccea7f58156c867bd9a1ce99a31c86a63869a4c5532b0aed959"
+    },
+    {
+      "trialId": "d_8f93c1ebbecb2534",
+      "name": "model/packets/d_8f93c1ebbecb2534.json",
+      "sha256": "2348bca122a4de92304bae078ef695c6837ca659a514be462f9ae19431798610"
+    },
+    {
+      "trialId": "d_de499457fce70bce",
+      "name": "model/packets/d_de499457fce70bce.json",
+      "sha256": "6b7602a948329a9e78f3627c642e02de46ed4761aefd782680c8279e83b45853"
+    },
+    {
+      "trialId": "d_2ef6a57df8896a82",
+      "name": "model/packets/d_2ef6a57df8896a82.json",
+      "sha256": "8daca5cc699177a32e00a322cfaed5b2d068e35f16407c1821e616110296f77e"
+    },
+    {
+      "trialId": "d_b548117d4fcb2e12",
+      "name": "model/packets/d_b548117d4fcb2e12.json",
+      "sha256": "cfd62755ed017fc0a30d15e30a9e002a6682937e52ee47d06768b2158504b955"
+    },
+    {
+      "trialId": "d_8708108f89778d35",
+      "name": "model/packets/d_8708108f89778d35.json",
+      "sha256": "18d8739f9ecc4e6ddc64bde62a66bf47031bf24c04306b0d8b5b17dc0994bd3b"
+    },
+    {
+      "trialId": "d_25f99e97240f159b",
+      "name": "model/packets/d_25f99e97240f159b.json",
+      "sha256": "e383cb75f4bba7c9f52cc3c059510ee820f37b79f870538eb4a36c66c31117e4"
+    },
+    {
+      "trialId": "d_27795de9e4d18f37",
+      "name": "model/packets/d_27795de9e4d18f37.json",
+      "sha256": "23480499a12c40078ceb58c6bf627f13b20615b292793ac17e22081cc13e791d"
+    },
+    {
+      "trialId": "d_3269f824d0acc012",
+      "name": "model/packets/d_3269f824d0acc012.json",
+      "sha256": "b3f403b830f8ec7e0201ef47ef329651c58eebe482f4f1da041a8f0d5f606b6b"
+    },
+    {
+      "trialId": "d_64e27908dc78dac6",
+      "name": "model/packets/d_64e27908dc78dac6.json",
+      "sha256": "a21c1029437e1ef6e5a4607568b223bb844fc7d371be0a94a649719b9e17c13e"
+    },
+    {
+      "trialId": "d_9ffef4de2b1f6a2f",
+      "name": "model/packets/d_9ffef4de2b1f6a2f.json",
+      "sha256": "5d942f9828d7b058626bc3c2b0ea19266170f5b14d625cc7f412e6bd4b8a47b6"
+    },
+    {
+      "trialId": "d_b70b17007cd2a289",
+      "name": "model/packets/d_b70b17007cd2a289.json",
+      "sha256": "cca3239d2ce3c11b355739cdd046b77afe18f87c2709eced06d0fa6f7cbe0321"
+    },
+    {
+      "trialId": "d_8a5dc6d5f0e3bd27",
+      "name": "model/packets/d_8a5dc6d5f0e3bd27.json",
+      "sha256": "6732ea553f96ea6bf2a220bb7718440a549bd076caccb70a55fa66ce23f0ee56"
+    },
+    {
+      "trialId": "d_2cb306a318067132",
+      "name": "model/packets/d_2cb306a318067132.json",
+      "sha256": "7d7123f3c66b7e671f2b3dc1a276af27961de679aca247c9cc0a797bfe223b72"
+    },
+    {
+      "trialId": "d_2ca20f3ff24f8dfa",
+      "name": "model/packets/d_2ca20f3ff24f8dfa.json",
+      "sha256": "020e7df9aa9d166c61622141ebfdf6ea810d492d001f1248680e3631edf05572"
+    },
+    {
+      "trialId": "d_7200677f38f74d15",
+      "name": "model/packets/d_7200677f38f74d15.json",
+      "sha256": "635932fa4bc1b3ae339298d1f8939ee48a8bc63a48f8d02473e7ebf9bda93398"
+    },
+    {
+      "trialId": "d_2a263cd8549e5d7b",
+      "name": "model/packets/d_2a263cd8549e5d7b.json",
+      "sha256": "5925259ca9dfd4bbe542f41989d45062694fd5ca9187eb46c3b6b5ed5ec2925d"
+    },
+    {
+      "trialId": "d_6e9211c77599aabb",
+      "name": "model/packets/d_6e9211c77599aabb.json",
+      "sha256": "3742b2e50aa8b49eca5b8659f00653e3cc2aab59a5e3d683e3f5139f20602942"
+    },
+    {
+      "trialId": "d_c50d268c24a35efe",
+      "name": "model/packets/d_c50d268c24a35efe.json",
+      "sha256": "956ebaa014e783abea1d0e4323d20ce206e547c78350028fcafb08c44ef72782"
+    },
+    {
+      "trialId": "d_f66530ad81c72957",
+      "name": "model/packets/d_f66530ad81c72957.json",
+      "sha256": "956ebaa014e783abea1d0e4323d20ce206e547c78350028fcafb08c44ef72782"
+    },
+    {
+      "trialId": "d_39be8a5d2ec24c63",
+      "name": "model/packets/d_39be8a5d2ec24c63.json",
+      "sha256": "3742b2e50aa8b49eca5b8659f00653e3cc2aab59a5e3d683e3f5139f20602942"
+    },
+    {
+      "trialId": "d_b985523c94210e52",
+      "name": "model/packets/d_b985523c94210e52.json",
+      "sha256": "0dc11266e3d7e8fb9070bcacd9efeae3a2c26baf421f6df9f70674c959c39bf9"
+    },
+    {
+      "trialId": "d_755cf5aa56ef6282",
+      "name": "model/packets/d_755cf5aa56ef6282.json",
+      "sha256": "b7fc1e908eb971cd241f180f5005f36724440f58540e3a40217a1b4d12efcd69"
+    },
+    {
+      "trialId": "d_416fb15b8b00563e",
+      "name": "model/packets/d_416fb15b8b00563e.json",
+      "sha256": "b7fc1e908eb971cd241f180f5005f36724440f58540e3a40217a1b4d12efcd69"
+    },
+    {
+      "trialId": "d_84edb196743535a2",
+      "name": "model/packets/d_84edb196743535a2.json",
+      "sha256": "0dc11266e3d7e8fb9070bcacd9efeae3a2c26baf421f6df9f70674c959c39bf9"
+    }
+  ],
+  "authoringSha256": "21345bd78e1dd784c36df402ba16a44a2ad067b694b60ef03173e730ab9faed6",
+  "preparerSha256": "9c90e201097f2b3428abebfebcaf8319cff7e1ba7a96a5d091db321a83596156",
+  "proseInstructionSha256": "e4f847c9a8568303209b9f75cfddcbaf2ab96cf73a30f9b3f1347341b669f20f",
+  "primaryCalls": 52,
+  "approvedPaidCalls": 0
+}

@@ -1,0 +1,69 @@
+{
+  "description": "Measurements taken while auditing the Pixel Display (Phase 0-8) at 48x48 with characterFill 0.9, before the fixes recorded in the report. Every number is reproduced by a test in __tests__/pixel-display/audit-*.test.* or by the run recorded beside it.",
+  "date": "2026-10-07",
+  "baselineSuites": {
+    "command": "npx vitest run __tests__/pixel-display __tests__/dashboard",
+    "before": "441 passed / 17 files, 0 failed",
+    "after": "457 passed / 20 files, 0 failed (see tests.log)"
+  },
+  "defectMeasurements": {
+    "contentStateNotApplied": {
+      "how": "render PixelDisplay with content={{ state }} and rerender with a different state; compare display.snapshot()",
+      "observed": "0 cells differ between IDLE and CELEBRATING; 1 display instance, so the state was never applied after mount"
+    },
+    "compositionIgnoresContentState": {
+      "how": "construct content with a composition at state IDLE and at CELEBRATING; compare framebuffers",
+      "observed": "bare-character path: 60 cells differ. Composition path (what the dashboard card always uses): 0 cells differ"
+    },
+    "logicalSizeChange": {
+      "how": "render PixelDisplay at width 48, then rerender at width 64; read the new handle's renderer",
+      "observed": "new renderer presentationSize.cssWidth 0, cellPitch 0, isReady() false, 0 draws after the change (first renderer was fitted to 110px, pitch 2.29)"
+    },
+    "pedestalErased": {
+      "how": "paintComposition with SYLF_CHARACTER_ASSET + MEADOW_PEDESTAL_ASSET; count surviving pedestal cells and lit rows",
+      "observed": "parts report pedestal paintedCells 9 and character 438 (total 447); the framebuffer holds 429 lit cells and no row beyond 26 - the ground row (30) is empty",
+      "after": "the pedestal's 13 logical cells survive; lit rows include 30"
+    },
+    "effectsUseTheWrongMapping": {
+      "how": "run bodyPulse and sparkleWave over a composition and diff against the composite",
+      "observed": "bodyPulse changed 344 cells, 13 of them on the pedestal's ground rows (>= 28); sparkleWave invented up to 4 cells the composite had left empty",
+      "after": "0 ground cells touched; 0 invented cells"
+    },
+    "eyeCellsPulsed": {
+      "how": "count cells whose pre-pulse colour is the eye ink or glint and that the pulse changes",
+      "observed": "36 of 40 eye cells brighten - the code comment claiming the eyes are excluded did not match the implementation"
+    },
+    "creationPaletteAtTheAcceptedBound": {
+      "how": "validateCreation then creationToAsset then validateAsset for a creation with 10, 11 and 16 colours",
+      "observed": "10 colours: no issues. 11: [palette-color-invalid]. 16: 6x palette-color-invalid - keys \"10\"..\"15\" are not single characters",
+      "consequence": "resolveAttachment reports asset-invalid for such a base, and the resolver treats an invalid asset's anchors as untrustworthy"
+    },
+    "creationHostsNoAccessory": {
+      "how": "resolveEquippedCharacter({ outfit: 'user:...', accessory: 'accessory_study_scarf' }) with the creation in the catalogue",
+      "observed": "the wearable part is present but resolveAttachment returns ['asset-invalid', 'host-anchor-unknown'] - a creation asset declares no anchors, so every accessory attached to wear-neck/hold-right/ground/core is dropped for any equipped drawing",
+      "status": "reported, not fixed - which anchors a scholar's drawing should offer is a product decision"
+    },
+    "creationCatalogueCache": {
+      "how": "mount a card (fills the cache), save a creation in Pixel Studio, mount a card again and count catalogue reads",
+      "observed": "0 reads at the second mount - the cache from before the write was served; a traced race also showed an in-flight read re-filling the cache after the invalidation",
+      "after": "1 read, and the drawn companion contains the creation's own pixels"
+    },
+    "customizerPreviewWithoutCreations": {
+      "how": "render PixelCustomizer with an equipped creation and count the drawing's own red pixels in the preview card",
+      "observed": "0 - the preview resolved the user: key against the built-in catalogue and fell back to the base figure",
+      "after": "the drawing is what the preview shows"
+    },
+    "cardFillOnTheCompositionPath": {
+      "how": "measure the drawn extent of the character on the bare path and on the composition path at 48x48",
+      "observed": "bare @0.90: 765 lit cells, 41x35 cells, rows 4-38; composition (asset framing 0.63): 429 lit cells, 29x22 cells, rows 5-26(+30 ground)",
+      "status": "reported, not changed - the card's characterFill prop no longer reaches the composition path, so the documented 0.90 fill is not in force; changing it is a visual decision"
+    }
+  },
+  "productionChecks": {
+    "build": "npm run build - compiled successfully; /api/pixel-creations and /dev/pixel-display present in the route table",
+    "devRouteInProduction": "GET / -> 200, /dev -> 404, /dev/pixel-display -> 404, /dashboard -> 307 against npm run start on port 3211",
+    "liveBrowserDensityFlow": "NOT VERIFIED in this pass: the Next dev client did not hydrate in the audit browser session (HMR websocket refused, canvases left at their 300x150 defaults, no probe published), so the density change could not be driven through the real UI. The mechanism is covered deterministically at the component level instead (audit-react-host-regressions.test.tsx).",
+    "mobile": "npm run mobile:build succeeds and npm run mobile:verify PASSED (see mobile-build.log, mobile-verify.log)",
+    "backdrop": "the contract's backdrop candidate #0b1220 and SYLF_PALETTE.displayBackdrop are referenced nowhere; the card passes no presentation prop, so it renders DEFAULT_PRESENTATION.backdrop (#000000). The dev surface defaults to deep navy through its own list. Reported as R13."
+  }
+}

@@ -10,6 +10,7 @@
 //   (when timerState === 'FOCUSING' and currentStartedAt is set)
 // ============================================================================
 
+import { selectedCompanionsForUsers } from "./pixel-companion-service";
 import { prisma } from "@/lib/prisma";
 import type {
   FocusTimerState,
@@ -24,6 +25,7 @@ import type {
 import {
   deriveMemberTimer,
   deriveCollectiveSeconds,
+  normalizeFocusTimestamp,
 } from "./focus-party-types";
 
 export type {
@@ -406,7 +408,8 @@ export const resumeFocusTimer = resumeTimer;
  */
 export async function leaveFocus(
   sessionId: number,
-  userId: number
+  userId: number,
+  boundary?: { joinedAt: string; endedAt: string }
 ): Promise<{
   success: boolean;
   sessionId: number;
@@ -415,6 +418,12 @@ export async function leaveFocus(
   remainingParticipants: number;
   sessionEnded: boolean;
 }> {
+  if (boundary) {
+    const rows = await prisma.$queryRaw<Array<{ result: Awaited<ReturnType<typeof leaveFocus>> }>>`
+      SELECT public.leave_focus_session(${sessionId}, ${userId}, ${boundary.joinedAt}::timestamp, ${boundary.endedAt}::timestamp) AS result
+    `;
+    return rows[0].result;
+  }
   const rows = await prisma.$queryRaw<Array<{ result: {
     success: boolean;
     sessionId: number;
@@ -441,9 +450,20 @@ export async function getPartyState(
     SELECT public.get_focus_party_state(${partyId}, ${userId}) AS result
   `;
   const raw = rows[0].result;
+  if (raw.activeSession) {
+    raw.activeSession = { ...raw.activeSession, startedAt: normalizeFocusTimestamp(raw.activeSession.startedAt)!,
+      members: raw.activeSession.members.map(member => {
+        const normalized = { ...member, currentStartedAt: normalizeFocusTimestamp(member.currentStartedAt),
+          joinedAt: normalizeFocusTimestamp(member.joinedAt) ?? undefined, leftAt: normalizeFocusTimestamp(member.leftAt) };
+        return { ...normalized, ...deriveMemberTimer(normalized.accumulatedSeconds, normalized.currentStartedAt, normalized.timerState) };
+      }) };
+    raw.activeSession.collectiveSeconds = deriveCollectiveSeconds(raw.activeSession.members);
+  }
+  const companions = await selectedCompanionsForUsers(raw.members.map(member => member.userId), userId, "party");
 
   return {
     ...raw,
+    members: raw.members.map(member => ({ ...member, companion: companions.get(member.userId) })),
     party: {
       ...raw.party,
       isCurrentUserLeader: raw.party.leaderId === userId,

@@ -1,5 +1,5 @@
 import {
-  FULL_BODY_FORMS,
+  PIXEL_COMPANIONS,
   PEDESTAL_OPTIONS,
   AURA_PRESETS,
   type CharacterConfig,
@@ -53,10 +53,11 @@ export function characterStyles(
   config?: CharacterConfig
 ) {
   return [
-    ...FULL_BODY_FORMS.map((option) => ({
+    ...(config?.outfit?.startsWith('user:') ? [{ id: config.outfit, value: config.outfit, label: 'Your drawing', kind: 'Pixel companion', active: true, description: 'Your saved Pixel Studio artwork.', requiredLevel: 1, requiredRank: 'RANK E', imagePath: undefined }] : []),
+    ...PIXEL_COMPANIONS.map((option) => ({
       ...option,
-      kind: "Character form",
-      active: option.value === (config?.outfit || "form_tanjiro"),
+      kind: "Pixel companion",
+      active: !config?.outfit?.startsWith("user:"),
     })),
     ...PEDESTAL_OPTIONS.map((option) => ({
       ...option,

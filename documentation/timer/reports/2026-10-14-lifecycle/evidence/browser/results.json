@@ -1,0 +1,172 @@
+[
+  {
+    "name": "desktop-dark",
+    "endMs": 307.39999997615814,
+    "automationMs": 138,
+    "pending": 1,
+    "restored": 1,
+    "accepted": {
+      "id": 101,
+      "durationSeconds": 45,
+      "breakSeconds": 0,
+      "startedAt": "2026-10-14T15:21:26.092Z",
+      "endedAt": "2026-10-14T15:22:11.637Z",
+      "execution": {
+        "schemaVersion": 2,
+        "sessionId": 101,
+        "ownerId": 7,
+        "questId": null,
+        "state": "ENDED",
+        "executionVersion": 4,
+        "acceptedFocusSeconds": 45,
+        "acceptedBreakSeconds": 0,
+        "startedAt": "2026-10-14T15:21:26.092Z",
+        "endedAt": "2026-10-14T15:22:11.637Z",
+        "actualCivilDate": "2026-10-14",
+        "timezone": "Asia/Karachi"
+      }
+    },
+    "storageRecovery": false,
+    "fullOffline": false,
+    "overflow": false,
+    "mode": "dark",
+    "errors": [],
+    "requests": 4
+  },
+  {
+    "name": "mobile-light",
+    "endMs": 307.39999997615814,
+    "automationMs": 35,
+    "pending": 1,
+    "restored": 1,
+    "accepted": {
+      "id": 101,
+      "durationSeconds": 45,
+      "breakSeconds": 0,
+      "startedAt": "2026-10-14T15:21:29.920Z",
+      "endedAt": "2026-10-14T15:22:15.483Z",
+      "execution": {
+        "schemaVersion": 2,
+        "sessionId": 101,
+        "ownerId": 7,
+        "questId": null,
+        "state": "ENDED",
+        "executionVersion": 4,
+        "acceptedFocusSeconds": 45,
+        "acceptedBreakSeconds": 0,
+        "startedAt": "2026-10-14T15:21:29.920Z",
+        "endedAt": "2026-10-14T15:22:15.483Z",
+        "actualCivilDate": "2026-10-14",
+        "timezone": "Asia/Karachi"
+      }
+    },
+    "storageRecovery": true,
+    "fullOffline": false,
+    "overflow": false,
+    "mode": "light",
+    "errors": [],
+    "requests": 4
+  },
+  {
+    "name": "desktop-custom",
+    "endMs": 308.90000009536743,
+    "automationMs": 89,
+    "pending": 1,
+    "restored": 1,
+    "accepted": {
+      "id": 101,
+      "durationSeconds": 45,
+      "breakSeconds": 0,
+      "startedAt": "2026-10-14T15:21:34.553Z",
+      "endedAt": "2026-10-14T15:22:20.011Z",
+      "execution": {
+        "schemaVersion": 2,
+        "sessionId": 101,
+        "ownerId": 7,
+        "questId": null,
+        "state": "ENDED",
+        "executionVersion": 4,
+        "acceptedFocusSeconds": 45,
+        "acceptedBreakSeconds": 0,
+        "startedAt": "2026-10-14T15:21:34.553Z",
+        "endedAt": "2026-10-14T15:22:20.011Z",
+        "actualCivilDate": "2026-10-14",
+        "timezone": "Asia/Karachi"
+      }
+    },
+    "storageRecovery": false,
+    "fullOffline": false,
+    "overflow": false,
+    "mode": "dark",
+    "errors": [],
+    "requests": 4
+  },
+  {
+    "name": "desktop-light",
+    "endMs": 306.7000000476837,
+    "automationMs": 96,
+    "pending": 1,
+    "restored": 1,
+    "accepted": {
+      "id": 101,
+      "durationSeconds": 45,
+      "breakSeconds": 0,
+      "startedAt": "2026-10-14T15:21:38.148Z",
+      "endedAt": "2026-10-14T15:22:23.707Z",
+      "execution": {
+        "schemaVersion": 2,
+        "sessionId": 101,
+        "ownerId": 7,
+        "questId": null,
+        "state": "ENDED",
+        "executionVersion": 4,
+        "acceptedFocusSeconds": 45,
+        "acceptedBreakSeconds": 0,
+        "startedAt": "2026-10-14T15:21:38.148Z",
+        "endedAt": "2026-10-14T15:22:23.707Z",
+        "actualCivilDate": "2026-10-14",
+        "timezone": "Asia/Karachi"
+      }
+    },
+    "storageRecovery": false,
+    "fullOffline": false,
+    "overflow": false,
+    "mode": "light",
+    "errors": [],
+    "requests": 4
+  },
+  {
+    "name": "mobile-dark-offline",
+    "endMs": 2.299999952316284,
+    "automationMs": 104,
+    "pending": 1,
+    "restored": 1,
+    "accepted": {
+      "id": 101,
+      "durationSeconds": 45,
+      "breakSeconds": 0,
+      "startedAt": "2026-10-14T15:21:41.841Z",
+      "endedAt": "2026-10-14T15:22:27.119Z",
+      "execution": {
+        "schemaVersion": 2,
+        "sessionId": 101,
+        "ownerId": 7,
+        "questId": null,
+        "state": "ENDED",
+        "executionVersion": 4,
+        "acceptedFocusSeconds": 45,
+        "acceptedBreakSeconds": 0,
+        "startedAt": "2026-10-14T15:21:41.841Z",
+        "endedAt": "2026-10-14T15:22:27.119Z",
+        "actualCivilDate": "2026-10-14",
+        "timezone": "Asia/Karachi"
+      }
+    },
+    "storageRecovery": false,
+    "fullOffline": true,
+    "overflow": false,
+    "mode": "dark",
+    "errors": [],
+    "requests": 4
+  }
+]

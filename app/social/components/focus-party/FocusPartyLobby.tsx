@@ -1,4 +1,7 @@
 "use client";
+import { TargetPixelCompanion } from "@/app/components/companion/TargetPixelCompanion";
+import type { SelectedPixelCompanion } from "@/lib/pixel-companion-contract";
+
 
 // ============================================================================
 // FocusPartyLobby — Squad Gathering Dais & Multiplayer Study Lobby
@@ -25,8 +28,6 @@ import {
 } from "lucide-react";
 import { StreakFlameIcon } from "@/app/components/icons";
 import { useFocusParty } from "./FocusPartyContext";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
-import { getDefaultCharacterConfig } from "@/lib/character-traits";
 import { getRankBadgeStyles, formatFocusTime } from "./focus-party-utils";
 import type { FocusPartyMemberView, MemberTimerView } from "@/lib/focus-party-types";
 
@@ -296,14 +297,8 @@ export function FocusPartyLobby({ onOpenInvite }: FocusPartyLobbyProps) {
                 {/* Chibi Character Stage on Dais Platform */}
                 <div className="my-2 relative flex flex-col items-center justify-center min-h-[190px] w-full">
                   {/* Floating idle breath animation container */}
-                  <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105 animate-[float_4s_ease-in-out_infinite]">
-                    <CharacterRenderer
-                      config={(member.characterConfig as any) || getDefaultCharacterConfig(member.username || "scholar")}
-                      seed={member.username || "scholar"}
-                      size={140}
-                      showPedestal={true}
-                      showAura={isUserInFocus}
-                    />
+                  <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                    <TargetPixelCompanion companion={member.companion} size={140} label={`${member.username} companion`} />
                   </div>
 
                   {/* Holographic energy ring / Dais grounding disk directly under pedestal */}

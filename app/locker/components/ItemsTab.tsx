@@ -1,8 +1,9 @@
 "use client";
+import { OwnCompanionPreview } from "@/app/components/companion/OwnCompanionPreview";
+
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "@/app/components/AuthProvider";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
 import { CharacterConfig } from "@/lib/character-traits";
 import styles from "../Locker.module.css";
 import {
@@ -280,6 +281,7 @@ export function ItemsTab() {
     const baseRelic = equippedSlots.RELIC_1?.item.sku || equippedSlots.RELIC_1?.item.spriteLayer || "none";
 
     return {
+      ...user?.characterConfig,
       outfit:
         previewCompat.includes("ARMOUR") && previewItem
           ? previewItem.item.sku || previewItem.item.spriteLayer || baseForm
@@ -515,12 +517,7 @@ export function ItemsTab() {
 
           {/* 2D Character Renderer Stage */}
           <div className="relative w-60 h-64 bg-bg-abyss/80 rounded-2xl border border-white/10 flex items-center justify-center p-3 shadow-inner overflow-hidden z-10">
-            <CharacterRenderer
-              config={activeCharacterConfig}
-              size={190}
-              showPedestal={true}
-              showAura={true}
-            />
+            <OwnCompanionPreview config={activeCharacterConfig} size={190} label="Items companion preview" showCompatibility />
 
             {/* Drag / Hover Live Overlay Indicator */}
             {(hoveredPreviewItem || draggingItem) && (

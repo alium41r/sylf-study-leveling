@@ -1,0 +1,52 @@
+{
+  "events": [
+    {
+      "path": "/api/pixel-creations",
+      "status": 200
+    },
+    {
+      "path": "/api/profile/customization",
+      "status": 200
+    },
+    {
+      "path": "/api/user/heartbeat",
+      "status": 200
+    }
+  ],
+  "id": "user:8123e0d15e914056b468e077",
+  "revision": 2,
+  "grid": 48,
+  "allFilled": true,
+  "config": {
+    "outfit": "user:8123e0d15e914056b468e077",
+    "displayBorder": "#e855ad",
+    "pixelGap": 0
+  },
+  "layout": {
+    "root": 1088,
+    "canvas": [
+      736,
+      736
+    ],
+    "gutter": 15.515625,
+    "inspector": 316.484375,
+    "usedWidth": 1086,
+    "blackBackground": "rgb(0, 0, 0)",
+    "backgroundImage": "none"
+  },
+  "dashboard": {
+    "art": "user:8123e0d15e914056b468e077",
+    "size": [
+      278,
+      278
+    ],
+    "gap": "0",
+    "border": "#e855ad",
+    "radius": "0px",
+    "mismatches": 0,
+    "deviceSize": [
+      278,
+      278
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "B01": {
+    "caseId": "v04",
+    "trialId": "d_6de45b407ca18e60",
+    "category": "REVIEW",
+    "packet": "model/packets/d_6de45b407ca18e60.json"
+  },
+  "B02": {
+    "caseId": "v09",
+    "trialId": "d_21da0ca3d648bd22",
+    "category": "REVIEW",
+    "packet": "model/packets/d_21da0ca3d648bd22.json"
+  }
+}

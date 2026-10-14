@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-10-14T15:24:43.488606+00:00",
+  "units": {
+    "passed": 438,
+    "failed": 0,
+    "files": 39,
+    "excludedHostedSuite": "__tests__/focus-backgrounds-cascade-triggers.test.ts"
+  },
+  "postgres": {
+    "passed": 78,
+    "failed": 0,
+    "files": 6,
+    "requiredSkipped": 0,
+    "version": 180004,
+    "hostedDataTouched": false,
+    "schemaMatchesRun": true,
+    "timerMigration": {
+      "name": "20261014000000_timer_durable_completion",
+      "sha256": "5c310882f6b324b0cb7a82883ad1eda63fcf68c1a20a718587d7b26b9fa094b0"
+    }
+  },
+  "typecheck": {
+    "exitCode": 0
+  },
+  "prismaGenerate": {
+    "exitCode": 0
+  },
+  "lint": {
+    "taskFiles": 36,
+    "errors": 0,
+    "warnings": 0,
+    "broaderExistingErrors": 33,
+    "broaderExistingWarnings": 10
+  },
+  "mobile": {
+    "buildExitCode": 0,
+    "bundleVerificationExitCode": 0,
+    "privateOutput": true,
+    "mocksDisabled": true
+  },
+  "webBuild": {
+    "compiled": true,
+    "nextExitCode": 1,
+    "classification": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
+    "sourceDrift": [],
+    "blocker": "app/api/acoustics/route.ts exports CURATED_SOUNDSCAPES"
+  },
+  "browser": {
+    "cases": 5,
+    "clickToFocusRemovedMs": [
+      2.299999952316284,
+      308.90000009536743
+    ],
+    "navigationTransitionMsApprox": 300,
+    "fullyOfflineTerminalMs": 2.299999952316284,
+    "storageFailureAndRetry": true,
+    "refreshRecovery": true,
+    "syntheticApi": true,
+    "pageErrors": 0,
+    "horizontalOverflow": false
+  },
+  "notVerified": [
+    "Production migration/deployment",
+    "Historical production reconciliation",
+    "Complete historical migration-chain replay",
+    "Browser-to-deployed-PostgreSQL end-to-end run"
+  ],
+  "sourceSha256": {
+    "__tests__/planner-v2/postgres/timer-lifecycle.postgres.ts": "a3c43263c2c9860557290c27fe8da6437faac427774f167c1c81ff95ac8f9458",
+    "__tests__/timer/auth-recovery.test.tsx": "3c2a3472c33b4c5ff38257a7894c8c6dd060457031e81947b3149afa8c3eb55b",
+    "__tests__/timer/focus-lifecycle.test.tsx": "2e6161535f798c8667a8cebf481f23aec245f64a1633f2156ec5444423ca760d",
+    "__tests__/timer/party-lifecycle.test.tsx": "fb8327d97f762ab8603bc4db930684f429362454bf599f19ed9f2d7b2d2f5815",
+    "__tests__/timer/session-route.test.ts": "8fd470b2b2b7f080e31f55d977cecc2c0036bcd9b37274d5f2a715231296838b",
+    "__tests__/timer/stats-recovery.test.ts": "4ee0cb88f0f66227543cd18fe5c1d8498249a08bd06b44c85883c3160919a5eb",
+    "__tests__/timer/time-read-model.test.ts": "0de20855280d288784bb89a6f67ce13b4d5c45ef8b0128bdbf6af461aa5043ce",
+    "__tests__/timer/timer-sync.test.ts": "9cfc8439cb33d8193c097f5acb10dcb5dc7c5abe702846d49aaaeb3bc0138163",
+    "app/api/focus-party/[id]/session/timer/route.ts": "062506bf9b4680ade54de64fca0b4178a9969839eb959a817b9e75e1917d658b",
+    "app/api/friends/route.ts": "dd23fa90d875357aa6c3f72ad37bc0379e2246f59278888276e2e0ad66cf4277",
+    "app/api/sessions/route.ts": "231d4f06e0cd4c3bd45bc5dd1b643ee004a5066f4aeacc78a6faa56612d4cc34",
+    "app/api/subjects/route.ts": "af9f852a81165ef9d20787cc3466c66bdfee2a72288f89688bd9b07fb04aba05",
+    "app/api/user/stats/route.ts": "516ef4af04b56526aaebac859ea0c6f631aa89733917650a917603e00aa5fff6",
+    "app/components/AuthProvider.tsx": "3ddc9636ab69ca40379d84e122a926ac53cf3d6ae3effd5873f4ed6de9a80b69",
+    "app/components/GlobalSystemWrapper.tsx": "9c465b8807fbce6ea4df8e90565d37302aae10648d60b090d89d63c7a5319afd",
+    "app/components/TimerSyncWorker.tsx": "8a1dbd30703eaa1aee11e8d1343a05b97b56ae716e945a7f567403f0c4b3d117",
+    "app/focus/components/FocusScreen.tsx": "546084f5452e57ddcb88eb17e1e79310961ee551fb9d3e2d77061cfee478f886",
+    "app/focus/components/FocusTimerLayoutProps.ts": "57def9ca2c52cf4f3a20a608db53685f13645f964ff1ca39a5a91f0742a281d5",
+    "app/focus/hooks/useTimerLeadership.ts": "5297ffa9725a17dfe2f3f5812922027449c20bf2d69b199def2bbf05fd2f533e",
+    "app/hooks/useFocusPartyRealtime.ts": "3ecfcf2821c48d517503d7f529f06fb3a58dd950a1edb503e4b48fa99654dfaa",
+    "app/social/components/focus-party/FocusPartyContext.tsx": "dae4559822eaeb7404ed7c82d423dbefa39bc8af05402139de6442a3a094c8a9",
+    "app/timer/components/TimerScreen.tsx": "856abfdda3ec16dc69e64a96740d27cffdc9edd80a4dd5dadeb2c7d88c02876e",
+    "lib/api-transport.ts": "6f63e6b45f50a3662d45812ebf55f3113ec855b386f8df2f5ab9b5c9af1e119e",
+    "lib/focus-party-service.ts": "a4ff0823c1beb7b595fbc59abdfb608bb9ca68fcb3c952b2339bd8c20803f80b",
+    "lib/focus-party-types.ts": "ee60d648d44f684b2b95e1e437c3906514b61cacff258a2b003219a070fdb0a1",
+    "lib/game-engine.ts": "28e29148f21577efafade634836647842283b0ba188a603a56347bebde87d8a1",
+    "lib/planner/v2/contracts/session.ts": "024ba70c47afb805053d3ef6aa305ab36365366ba004de601c5528b7ab792444",
+    "lib/planner/v2/server/sessions.ts": "a74e2c495c8f54d5d3f629854c3a50c772576efc3b869533a4554d0a2befe8ab",
+    "lib/planner/v2/server/settlement.ts": "f6de186cc25fcb8ffc350508b785017c6155b3d2dfe36b13bd35b4d213d7ba15",
+    "lib/planner/v2/session-client.ts": "40d4970bdf9127c7a4c9bbedd0fe2ac2e6c849b80ac455c657a2094a161cd893",
+    "lib/prisma.ts": "367510c50a3da4b89dd94d261b64dbee576d01778733ce63a2c3c30418e92949",
+    "lib/profile-service.ts": "6b439d4e0c4f7b8f7f1481d52023517cf1ae7ff5351255c04b5f48561fa3792a",
+    "lib/session-math.ts": "95b4f4883beb8239fe4f1b7212bd9cab47f702e61df6beb4fae843c8d091ef44",
+    "lib/timer-engine.ts": "81003ef5bbef9803f5cbad6f648dbbc71a81f6d542a2b4bebbc35b2e09edbe8c",
+    "lib/timer-sync.ts": "5466e0e2277911203b5a33f388cd710a18e30b3d80a17a55497f35c9a26bb1e7",
+    "prisma/migrations/20261014000000_timer_durable_completion/migration.sql": "5c310882f6b324b0cb7a82883ad1eda63fcf68c1a20a718587d7b26b9fa094b0",
+    "prisma/schema.prisma": "ef19bfec04a19016360271748ef24adff464fc9b11145d5f85e00d243f22645c",
+    "scripts/test-timer-postgres.mjs": "c1dc17ef8feb58c84e68d8b18dfd79aa8743a217e2458f08539d9ef8e37a820d",
+    "scripts/verify-timer-build.mjs": "94dae14207b2c314ae974228fec09e2d2ee917025e1464d97df5cbb00710e03e"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "pid": 6121,
+  "ownerPid": 6119,
+  "assertions": [
+    "pid 6121(caffeinate): [0x000ec52e00019a41] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+    "pid 6121(caffeinate): [0x000ec52e00059a42] 00:00:00 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+    "pid 6121(caffeinate): [0x000ec52e00079a43] 00:00:00 PreventSystemSleep named: \"caffeinate command-line tool\""
+  ],
+  "verifiedAt": "2026-10-10T17:23:57.329Z"
+}

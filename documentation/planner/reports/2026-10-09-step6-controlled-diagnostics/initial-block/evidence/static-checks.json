@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-09T11:45:09.046Z",
+  "status": "PASSED",
+  "nodeSyntax": "passed for diagnostic CommonJS tooling",
+  "eslint": "scoped CJS + PostgreSQL stage suite, zero warnings",
+  "typecheck": "npx tsc --noEmit --incremental false passed",
+  "guardRegressions": 15,
+  "disposablePostgres": {
+    "requiredTestsPassed": 1,
+    "interceptedDispatches": 20,
+    "realAccounting": true,
+    "evidenceDirectory": "initial-block/evidence/unpaid-2026-10-09T11-41-48-845Z"
+  },
+  "freeze": "207 source/config/runtime pins and all 48 packets match",
+  "sourceProductionEdits": 0,
+  "paidCalls": 0,
+  "labelSignoff": "PENDING_EXPLICIT_DELEGATION",
+  "fullUnitOrReleaseQualificationRerun": false
+}

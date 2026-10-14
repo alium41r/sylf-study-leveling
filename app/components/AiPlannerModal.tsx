@@ -2,8 +2,8 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, X } from "lucide-react";
-import { SystemApertureIcon } from "@/app/components/icons";
+import { X } from "lucide-react";
+import { SylvieIcon } from "@/app/components/icons";
 import AiPlannerPanel, { QuotaInfo } from "./AiPlannerPanel";
 import { backdropVariants, modalDialogVariants } from "@/lib/motion";
 
@@ -67,15 +67,15 @@ export function AiPlannerModal({
           <div className="p-5 sm:p-6 flex justify-between items-center border-b border-border-subtle bg-bg-shadow/60 relative z-10">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-accent-primary-dim border border-accent-primary-mid text-accent-text-light">
-                <Brain className="w-5 h-5" />
+                <SylvieIcon size={20} />
               </div>
               <div>
                 <h2 className="flex items-center gap-2 flex-wrap">
                   <span className="text-xl font-bold font-['Rajdhani'] text-text-primary tracking-wide">
-                    AI Study Planner
+                    Sylvie Planner
                   </span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-accent-primary-dim border border-accent-primary-mid/40 text-accent-text-light flex items-center gap-1">
-                    <SystemApertureIcon size={12} className="text-accent-primary" />
+                    <SylvieIcon size={12} className="text-accent-primary" />
                     <span>Multi-Agent</span>
                   </span>
                   {quota && (

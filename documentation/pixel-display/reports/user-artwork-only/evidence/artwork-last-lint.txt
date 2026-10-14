@@ -1,0 +1,2 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/dashboard/components/PixelCompanionCard.tsx app/components/landing/journey/JourneyPath.tsx app/components/companion/PixelArtworkPlaceholder.tsx app/locker/components/studio/PixelStudio.tsx

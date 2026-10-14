@@ -1,0 +1,18 @@
+{
+  "before": {
+    "id": "user:audit-pattern",
+    "hash": 1116922993,
+    "resolution": 64
+  },
+  "afterFocus": {
+    "id": "user:audit-pattern",
+    "hash": 1116922993,
+    "resolution": 64
+  },
+  "afterReload": {
+    "id": "user:audit-pattern",
+    "hash": 2929918073,
+    "resolution": 64
+  },
+  "restoredOriginal": true
+}

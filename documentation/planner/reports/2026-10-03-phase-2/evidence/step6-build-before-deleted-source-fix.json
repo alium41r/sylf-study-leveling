@@ -1,0 +1,7 @@
+{
+  "status": "FAILED_BEFORE_BUILD",
+  "observedAt": "2026-10-08T14:50:17.637219+00:00",
+  "reason": "The isolated build inventory attempted to read a tracked CharacterRenderer.tsx that concurrent companion work had deleted. No compilation started. Preserve the deletion and pin it explicitly instead of restoring unrelated source.",
+  "credentialsLoaded": false,
+  "sharedGeneratedFilesModified": false
+}

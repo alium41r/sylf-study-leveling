@@ -1,4 +1,7 @@
 "use client";
+import { TargetPixelCompanion } from "@/app/components/companion/TargetPixelCompanion";
+import type { SelectedPixelCompanion } from "@/lib/pixel-companion-contract";
+
 
 // ============================================================================
 // FocusPartyMemberStage — Multiplayer Member Cards Reserved UI Zone
@@ -15,8 +18,6 @@
 
 import React, { memo } from "react";
 import { BookMarked } from "lucide-react";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
-import { getDefaultCharacterConfig } from "@/lib/character-traits";
 import { formatFocusTime, getRankBadgeStyles } from "./focus-party-utils";
 
 export interface FocusPartyStageParticipant {
@@ -25,6 +26,7 @@ export interface FocusPartyStageParticipant {
   username: string;
   hunterRank?: string;
   characterConfig?: unknown;
+  companion?: SelectedPixelCompanion;
   avatarUrl?: string | null;
   timerState: "NOT_STARTED" | "FOCUSING" | "PAUSED" | "LEFT";
   liveSeconds: number;
@@ -140,13 +142,7 @@ export const FocusPartyMemberStage = memo(function FocusPartyMemberStage({
               {/* Center: Chibi Character Studying at Station */}
               <div className="relative my-auto flex flex-col items-center justify-center py-2 sm:py-3">
                 <div className="relative z-10 transform sm:scale-105 transition-transform">
-                  <CharacterRenderer
-                    seed={participant.username || participant.name || "scholar"}
-                    config={getDefaultCharacterConfig()}
-                    size={100}
-                    showPedestal={false}
-                    showAura={isFocusing}
-                  />
+                  <TargetPixelCompanion companion={participant.companion} size={100} label={`${participant.username} companion`} />
                 </div>
 
                 {/* Dark Oak Desk Surface Under Chibi */}

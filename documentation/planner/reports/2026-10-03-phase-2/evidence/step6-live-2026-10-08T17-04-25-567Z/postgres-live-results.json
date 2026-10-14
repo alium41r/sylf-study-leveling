@@ -1,0 +1,47 @@
+{
+  "label": "live",
+  "files": 1,
+  "passed": 0,
+  "failed": 3,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "live development qualification: tiny-roomy-exam",
+      "messages": [
+        "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: triage",
+      "messages": [
+        "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "live development qualification: owned-course-research",
+      "messages": [
+        "AssertionError: expected 'OUTPUT_TRUNCATED' to be 'SUCCEEDED' // Object.is equality\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts:104:64\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+      "cases": [
+        {
+          "name": "live development qualification: tiny-roomy-exam",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: triage",
+          "status": "failed"
+        },
+        {
+          "name": "live development qualification: owned-course-research",
+          "status": "failed"
+        }
+      ]
+    }
+  ]
+}

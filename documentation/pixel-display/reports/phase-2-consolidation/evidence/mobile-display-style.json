@@ -1,0 +1,30 @@
+{
+  "responses": [
+    {
+      "path": "/api/pixel-creations",
+      "status": 200
+    },
+    {
+      "path": "/api/profile/customization",
+      "status": 200
+    }
+  ],
+  "device": {
+    "width": 390,
+    "dpr": 3,
+    "touch": 1,
+    "overflow": false
+  },
+  "canvas": {
+    "x": 21,
+    "y": -688.5,
+    "width": 348,
+    "height": 348
+  },
+  "spaced": {
+    "gap": "0.3",
+    "width": 840,
+    "height": 840
+  },
+  "status": "Saved & equipped"
+}

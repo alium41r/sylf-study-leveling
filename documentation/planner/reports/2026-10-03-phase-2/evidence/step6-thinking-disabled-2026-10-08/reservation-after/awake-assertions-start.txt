@@ -1,0 +1,53 @@
+2026-10-08 23:21:26 +0500 
+Assertion status system-wide:
+   BackgroundTask                 0
+   PreventDiskIdle                1
+   ApplePushServiceTask           0
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    1
+   SoftwareUpdateTask             0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   InternalPreventDisplaySleep    1
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 77259(caffeinate): [0x000db04800019603] 00:00:00 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77259(caffeinate): [0x000db04800059604] 00:00:00 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77259(caffeinate): [0x000db04800079605] 00:00:00 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77259(caffeinate): [0x000db04800099606] 00:00:00 UserIsActive named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 4 secs Action=TimeoutActionRelease
+   pid 77259(caffeinate): [0x000db048000f9607] 00:00:00 PreventDiskIdle named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77258)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 4 secs Action=TimeoutActionRelease
+   pid 77185(caffeinate): [0x000db044000195fe] 00:00:04 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77185(caffeinate): [0x000db044000595ff] 00:00:04 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77185(caffeinate): [0x000db04400079600] 00:00:04 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 77185(caffeinate): [0x000db04400099601] 00:00:04 UserIsActive named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 0 secs Action=TimeoutActionRelease
+   pid 77185(caffeinate): [0x000db044000f9602] 00:00:04 PreventDiskIdle named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 77184)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 0 secs Action=TimeoutActionRelease
+   pid 75074(Google Chrome): [0x000da75500059577] 00:38:11 NoDisplaySleepAssertion named: "Blink Wake Lock"  
+   pid 344(powerd): [0x000da5aa0001953a] 00:45:18 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 344(powerd): [0x000db04300108336] 00:00:05 InternalPreventDisplaySleep named: "com.apple.powermanagement.delayDisplayOff"  
+	Timeout will fire in 115 secs Action=TimeoutActionTurnOff
+No kernel assertions.

@@ -1,0 +1,34 @@
+{
+  "status": "COMPLETE_UNASSESSED",
+  "mode": "PAID",
+  "paidCalls": 2,
+  "interceptedRequests": 0,
+  "calls": 2,
+  "stopped": null,
+  "reservedUsd": 0.016803,
+  "actualPeakUpperEstimateUsd": 0.0099975,
+  "sleep": {
+    "start": {
+      "pid": 95919,
+      "ownerPid": 95918,
+      "assertions": [
+        "pid 95919(caffeinate): [0x000e3b3b0001a310] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+        "pid 95919(caffeinate): [0x000e3b3b0005a311] 00:00:00 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+        "pid 95919(caffeinate): [0x000e3b3b0007a312] 00:00:00 PreventSystemSleep named: \"caffeinate command-line tool\""
+      ],
+      "verifiedAt": "2026-10-09T13:59:18.083Z"
+    },
+    "end": {
+      "pid": 95919,
+      "ownerPid": 95918,
+      "assertions": [
+        "pid 95919(caffeinate): [0x000e3b3b0001a310] 00:00:36 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+        "pid 95919(caffeinate): [0x000e3b3b0005a311] 00:00:36 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+        "pid 95919(caffeinate): [0x000e3b3b0007a312] 00:00:36 PreventSystemSleep named: \"caffeinate command-line tool\""
+      ],
+      "verifiedAt": "2026-10-09T13:59:54.466Z"
+    }
+  },
+  "productionRoutingChanged": false,
+  "publication": "FORBIDDEN"
+}

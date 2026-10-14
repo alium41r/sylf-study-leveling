@@ -1,0 +1,36 @@
+2026-10-08 23:30:58 +0500 
+Assertion status system-wide:
+   BackgroundTask                 0
+   PreventDiskIdle                1
+   ApplePushServiceTask           0
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    1
+   SoftwareUpdateTask             0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   InternalPreventDisplaySleep    1
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 344(powerd): [0x000da5aa0001953a] 00:54:50 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 344(powerd): [0x000db1c000108336] 00:00:03 InternalPreventDisplaySleep named: "com.apple.powermanagement.delayDisplayOff"  
+	Timeout will fire in 116 secs Action=TimeoutActionTurnOff
+   pid 78193(caffeinate): [0x000db28300019643] 00:00:00 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 78193(caffeinate): [0x000db28300059644] 00:00:00 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 78193(caffeinate): [0x000db28300079645] 00:00:00 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 78193(caffeinate): [0x000db28300099646] 00:00:00 UserIsActive named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 4 secs Action=TimeoutActionRelease
+   pid 78193(caffeinate): [0x000db283000f9647] 00:00:00 PreventDiskIdle named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+	Timeout will fire in 4 secs Action=TimeoutActionRelease
+   pid 75074(Google Chrome): [0x000da75500059577] 00:47:42 NoDisplaySleepAssertion named: "Blink Wake Lock"  
+No kernel assertions.

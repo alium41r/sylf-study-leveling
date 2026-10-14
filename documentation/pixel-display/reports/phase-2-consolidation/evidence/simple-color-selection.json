@@ -1,0 +1,54 @@
+[
+  {
+    "mobile": false,
+    "errors": [],
+    "name": "Edge fidelity QA",
+    "initialStatus": "Saved",
+    "spectrumTraversal": {
+      "events": 20,
+      "recentUnchanged": true,
+      "status": "Saved"
+    },
+    "selectionStatus": "Saved",
+    "saveStatus": 200,
+    "existingPixelChanges": 0,
+    "newPixels": [
+      "#f04a29",
+      "#2288dd",
+      "#f04a29"
+    ],
+    "removedActions": 0,
+    "recent": [
+      "Recent color #f04a29",
+      "Recent color #2288dd",
+      "Recent color #28cfb6"
+    ],
+    "overflow": false
+  },
+  {
+    "mobile": true,
+    "errors": [],
+    "name": "Edge fidelity QA",
+    "initialStatus": "Saved",
+    "spectrumTraversal": {
+      "events": 20,
+      "recentUnchanged": true,
+      "status": "Saved"
+    },
+    "selectionStatus": "Saved",
+    "saveStatus": 200,
+    "existingPixelChanges": 0,
+    "newPixels": [
+      "#f04a29",
+      "#2288dd",
+      "#f04a29"
+    ],
+    "removedActions": 0,
+    "recent": [
+      "Recent color #f04a29",
+      "Recent color #2288dd",
+      "Recent color #28cfb6"
+    ],
+    "overflow": false
+  }
+]

@@ -1,0 +1,506 @@
+{
+  "generation": {
+    "g01": {
+      "policy": "EXAM",
+      "title": "Reading evidence assessment",
+      "expectations": [
+        "Practise evidence versus plausibility, rather than more literal recall alone.",
+        "Use unfamiliar or changed text with enough information to check the classification.",
+        "Priority may follow the stated weakness; it cannot follow invented assessment weights."
+      ],
+      "reasonTrialId": "d_4455ae843acc1082",
+      "pairOrder": [
+        "compact",
+        "legacy"
+      ]
+    },
+    "g08": {
+      "policy": "GENERAL",
+      "title": "Counting a rhythm worksheet",
+      "expectations": [
+        "Repair the eighth-note misconception while completing all actual bars.",
+        "All three supplied bars total four under the given key.",
+        "No invented replacement worksheet or compulsory recording/practice quota."
+      ],
+      "reasonTrialId": "d_0f51cb688400b89c",
+      "pairOrder": [
+        "legacy",
+        "compact"
+      ]
+    },
+    "g02": {
+      "policy": "EXAM",
+      "title": "Weather graph interpretation",
+      "expectations": [
+        "Check comparisons and the limitation of a single-year sample.",
+        "Do not claim a climate trend or require unavailable observations.",
+        "Avoid making correct value reading the main remediation."
+      ],
+      "reasonTrialId": "d_d5011475b34a9da1",
+      "pairOrder": [
+        "compact",
+        "legacy"
+      ]
+    },
+    "g06": {
+      "policy": "MASTERY",
+      "title": "Testing an argument",
+      "expectations": [
+        "Check new argument evaluation, not memorization alone.",
+        "Allow a valid truth-table or concrete counterexample.",
+        "Do not reverse the implication or demand unnecessary formal logic."
+      ],
+      "reasonTrialId": "d_ac6e119faa6748a5",
+      "pairOrder": [
+        "legacy",
+        "compact"
+      ]
+    },
+    "g03": {
+      "policy": "ROADMAP",
+      "title": "Oral history project",
+      "expectations": [
+        "First useful checkpoint is an executable outline, not completion of the future recording.",
+        "Later scope remains represented and unbooked.",
+        "No invented date, recording, software prerequisite or completed consent."
+      ],
+      "reasonTrialId": "d_63ea398f0b23e2f0",
+      "pairOrder": [
+        "compact",
+        "legacy"
+      ]
+    },
+    "g04": {
+      "policy": "ROADMAP",
+      "title": "Small museum web exhibit",
+      "expectations": [
+        "Teach only the needed HTML constructs and check the actual first card.",
+        "Do not attribute a nonexistent image or force deployment/tooling.",
+        "Full future scope survives without booking every milestone."
+      ],
+      "reasonTrialId": "d_28b1cf3e53f64ddf",
+      "pairOrder": [
+        "legacy",
+        "compact"
+      ]
+    },
+    "g07": {
+      "policy": "GENERAL",
+      "title": "Annotating a historical source",
+      "expectations": [
+        "The observation is six departures, not proof of everyone’s opinion.",
+        "Quote the actual text and preserve the single-source limitation.",
+        "Do not replace the assignment with a generic essay or mandatory extra annotations."
+      ],
+      "reasonTrialId": "d_2f5488d294f95e29",
+      "pairOrder": [
+        "compact",
+        "legacy"
+      ]
+    },
+    "g05": {
+      "policy": "MASTERY",
+      "title": "Spanish descriptions",
+      "expectations": [
+        "Recognition alone does not meet production and explanation.",
+        "Preserve accents and the bounded two-use distinction.",
+        "No universal permanent-versus-temporary rule or forced study of every tense."
+      ],
+      "reasonTrialId": "d_3284c39bab869cee",
+      "pairOrder": [
+        "legacy",
+        "compact"
+      ]
+    }
+  },
+  "review": {
+    "v09": {
+      "label": "PREFERENCE",
+      "title": "Japanese greeting choice",
+      "expectations": [
+        "Preferring an audio/pronunciation exercise does not justify blocking the accepted written outcome."
+      ],
+      "trialId": "d_21da0ca3d648bd22",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v04": {
+      "label": "DEFECTIVE",
+      "title": "Citation punctuation",
+      "expectations": [
+        "Block unsupported compulsory repetition; preserve the valid first task."
+      ],
+      "trialId": "d_6de45b407ca18e60",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": [
+        {
+          "affected": "work_2",
+          "category": "UNREALISTIC_WORKLOAD",
+          "requirement": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+          "excerpt": "All twelve rewrites are done even after checked success.",
+          "reason": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+          "resolution": "Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check."
+        }
+      ]
+    },
+    "v08": {
+      "label": "SOUND",
+      "title": "Using a spreadsheet sum",
+      "expectations": [
+        "Supported learning followed by a changed-input independent check is appropriate; no larger spreadsheet curriculum is required."
+      ],
+      "trialId": "d_23cb1deab0819ac1",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v02": {
+      "label": "DEFECTIVE",
+      "title": "An archive transcription assignment",
+      "expectations": [
+        "Block the dishonest authentic completion.",
+        "A repair may honestly defer or request the actual scan, rather than invent a substitute."
+      ],
+      "trialId": "d_39bd912910b6cdc4",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": [
+        {
+          "affected": "work_1",
+          "category": "MISSING_PREREQUISITE",
+          "requirement": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+          "excerpt": "Mark the authentic assigned transcription complete once the invented text is written.",
+          "reason": "Invented content cannot transcribe the unavailable authentic document.",
+          "resolution": "Represent the unavailable dependency honestly; do not claim invented content completes the assignment."
+        }
+      ]
+    },
+    "v07": {
+      "label": "SOUND",
+      "title": "A shared food-web source check",
+      "expectations": [
+        "One owned prerequisite supports both goals; it must not be duplicated or objected to for being sibling-owned.",
+        "Appropriately qualified possible effects are sound."
+      ],
+      "trialId": "d_aa0fdce6c965934e",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v12": {
+      "label": "UNCERTAINTY",
+      "title": "Planning a plant observation log",
+      "expectations": [
+        "A future specimen is not a missing prerequisite for the accepted blank-log checkpoint.",
+        "Do not block the usable first checkpoint or require fabricated observations."
+      ],
+      "trialId": "d_edc200cbc63de947",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v01": {
+      "label": "DEFECTIVE",
+      "title": "Median of an even sample",
+      "expectations": [
+        "Grounded blocker for the wrong rule/result; not merely a formatting preference.",
+        "Repair must change both instructions and criterion if needed."
+      ],
+      "trialId": "d_162f3a5840b6d145",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": [
+        {
+          "affected": "work_1",
+          "category": "WEAK_CRITERION",
+          "requirement": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+          "excerpt": "Pass only if the median is 6 and the learner says the upper middle rule is correct.",
+          "reason": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+          "resolution": "Correct the rule, worked result and observable correctness check."
+        }
+      ]
+    },
+    "v11": {
+      "label": "UNCERTAINTY",
+      "title": "Identifying sentence clauses",
+      "expectations": [
+        "Unknown importance/readiness remains nonblocking uncertainty; it is not evidence of compulsory extensive remediation."
+      ],
+      "trialId": "d_b949be4c907cfe4b",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v10": {
+      "label": "PREFERENCE",
+      "title": "Describing a map route",
+      "expectations": [
+        "A preferred colored diagram can be advisory, never a blocker for the correct accepted verbal route."
+      ],
+      "trialId": "d_2c793f9cde3e05f1",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v06": {
+      "label": "SOUND",
+      "title": "Comparing two eyewitness accounts",
+      "expectations": [
+        "This meets the actual limited assignment; independent invented sources or a longer essay are unnecessary."
+      ],
+      "trialId": "d_d4791a8b4cdede65",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v05": {
+      "label": "SOUND",
+      "title": "Balancing a supplied equation",
+      "expectations": [
+        "The supplied equation and atom-count check suffice; no external answer key or advanced chemistry is necessary."
+      ],
+      "trialId": "d_ea74e8dff125fb1c",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": []
+    },
+    "v03": {
+      "label": "DEFECTIVE",
+      "title": "Museum labels",
+      "expectations": [
+        "Detect the fabricated catalogue claims even though the strategy describes source checking.",
+        "Repair complete split parent; rebind shared dependency and retain the paused work identically.",
+        "Both labels must preserve unknown/approximate information."
+      ],
+      "trialId": "d_e9c5b907ca74eaa2",
+      "independentLabelSignoff": "PENDING_HUMAN_REVIEW",
+      "blockingIssues": [
+        {
+          "affected": "work_1",
+          "category": "PEDAGOGICAL",
+          "requirement": "Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date.",
+          "excerpt": "Checked facts must name Elena Ruiz and exact 1900.",
+          "reason": "The prerequisite fabricates a maker and converts an approximate date to exact; both labels depend on it.",
+          "resolution": "Correct the complete shared prerequisite and any necessary dependent wording while preserving the protected exercise."
+        }
+      ]
+    }
+  },
+  "repair": {
+    "v04": {
+      "repairTrialId": "d_2cb306a318067132",
+      "verifyTrialId": "d_d0bbedfc63e8af66",
+      "originalFindings": [
+        {
+          "planRef": "plan_1",
+          "finding": {
+            "issueId": "issue_1",
+            "category": "UNREALISTIC_WORKLOAD",
+            "severity": "BLOCKING",
+            "affectedRefs": [
+              "work_2"
+            ],
+            "basis": "CONCRETE_VIOLATION",
+            "grounds": [
+              {
+                "ref": "plan_1/goal",
+                "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+              },
+              {
+                "ref": "plan_1/activity/work_2",
+                "excerpt": "All twelve rewrites are done even after checked success."
+              }
+            ],
+            "evidence": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+            "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+            "requestedResolution": "Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check.",
+            "requiresAcknowledgement": false
+          }
+        }
+      ],
+      "expectations": [
+        "Block unsupported compulsory repetition; preserve the valid first task."
+      ],
+      "verificationReserve": {
+        "inputTokens": 21651,
+        "outputTokens": 4096
+      },
+      "modelIndependentLabelSignoff": "PENDING_HUMAN_REVIEW"
+    },
+    "v02": {
+      "repairTrialId": "d_2ca20f3ff24f8dfa",
+      "verifyTrialId": "d_09695213ad05e61e",
+      "originalFindings": [
+        {
+          "planRef": "plan_1",
+          "finding": {
+            "issueId": "issue_1",
+            "category": "MISSING_PREREQUISITE",
+            "severity": "BLOCKING",
+            "affectedRefs": [
+              "work_1"
+            ],
+            "basis": "CONCRETE_VIOLATION",
+            "grounds": [
+              {
+                "ref": "plan_1/goal",
+                "excerpt": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable."
+              },
+              {
+                "ref": "plan_1/activity/work_1",
+                "excerpt": "Mark the authentic assigned transcription complete once the invented text is written."
+              }
+            ],
+            "evidence": "Invented content cannot transcribe the unavailable authentic document.",
+            "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+            "requestedResolution": "Represent the unavailable dependency honestly; do not claim invented content completes the assignment.",
+            "requiresAcknowledgement": false
+          }
+        }
+      ],
+      "expectations": [
+        "Block the dishonest authentic completion.",
+        "A repair may honestly defer or request the actual scan, rather than invent a substitute."
+      ],
+      "verificationReserve": {
+        "inputTokens": 21070,
+        "outputTokens": 4096
+      },
+      "modelIndependentLabelSignoff": "PENDING_HUMAN_REVIEW"
+    },
+    "v01": {
+      "repairTrialId": "d_7200677f38f74d15",
+      "verifyTrialId": "d_cd6a5fc231f99055",
+      "originalFindings": [
+        {
+          "planRef": "plan_1",
+          "finding": {
+            "issueId": "issue_1",
+            "category": "WEAK_CRITERION",
+            "severity": "BLOCKING",
+            "affectedRefs": [
+              "work_1"
+            ],
+            "basis": "CONCRETE_VIOLATION",
+            "grounds": [
+              {
+                "ref": "plan_1/goal",
+                "excerpt": "Find the median of four ordered numbers using the mean of the middle two, and explain the check."
+              },
+              {
+                "ref": "plan_1/activity/work_1",
+                "excerpt": "Pass only if the median is 6 and the learner says the upper middle rule is correct."
+              }
+            ],
+            "evidence": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+            "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+            "requestedResolution": "Correct the rule, worked result and observable correctness check.",
+            "requiresAcknowledgement": false
+          }
+        }
+      ],
+      "expectations": [
+        "Grounded blocker for the wrong rule/result; not merely a formatting preference.",
+        "Repair must change both instructions and criterion if needed."
+      ],
+      "verificationReserve": {
+        "inputTokens": 20786,
+        "outputTokens": 4096
+      },
+      "modelIndependentLabelSignoff": "PENDING_HUMAN_REVIEW"
+    },
+    "v03": {
+      "repairTrialId": "d_2a263cd8549e5d7b",
+      "verifyTrialId": "d_65302e173a413f9f",
+      "originalFindings": [
+        {
+          "planRef": "plan_1",
+          "finding": {
+            "issueId": "issue_1",
+            "category": "PEDAGOGICAL",
+            "severity": "BLOCKING",
+            "affectedRefs": [
+              "work_1"
+            ],
+            "basis": "CONCRETE_VIOLATION",
+            "grounds": [
+              {
+                "ref": "plan_1/goal",
+                "excerpt": "Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date."
+              },
+              {
+                "ref": "plan_1/split/work_1",
+                "excerpt": "Checked facts must name Elena Ruiz and exact 1900."
+              }
+            ],
+            "evidence": "The prerequisite fabricates a maker and converts an approximate date to exact; both labels depend on it.",
+            "consequence": "The accepted educational outcome cannot be met correctly as proposed.",
+            "requestedResolution": "Correct the complete shared prerequisite and any necessary dependent wording while preserving the protected exercise.",
+            "requiresAcknowledgement": false
+          }
+        }
+      ],
+      "expectations": [
+        "Detect the fabricated catalogue claims even though the strategy describes source checking.",
+        "Repair complete split parent; rebind shared dependency and retain the paused work identically.",
+        "Both labels must preserve unknown/approximate information."
+      ],
+      "verificationReserve": {
+        "inputTokens": 30775,
+        "outputTokens": 4096
+      },
+      "modelIndependentLabelSignoff": "PENDING_HUMAN_REVIEW"
+    }
+  },
+  "capacity": {
+    "c02": {
+      "title": "Reading a scale-bar map",
+      "expectations": [
+        "Correct the scale confusion and acknowledge the estimate.",
+        "Extra availability alone cannot justify a navigation curriculum or repeated identical measurements."
+      ],
+      "trials": [
+        {
+          "trialId": "d_6e9211c77599aabb",
+          "dailyMinutes": 30,
+          "sample": 1
+        },
+        {
+          "trialId": "d_c50d268c24a35efe",
+          "dailyMinutes": 180,
+          "sample": 1
+        },
+        {
+          "trialId": "d_f66530ad81c72957",
+          "dailyMinutes": 180,
+          "sample": 2
+        },
+        {
+          "trialId": "d_39be8a5d2ec24c63",
+          "dailyMinutes": 30,
+          "sample": 2
+        }
+      ]
+    },
+    "c01": {
+      "title": "Checking a poster’s claim",
+      "expectations": [
+        "A larger study is outside the accepted revision task.",
+        "Every committed activity must contribute before the same bounded stopping point."
+      ],
+      "trials": [
+        {
+          "trialId": "d_b985523c94210e52",
+          "dailyMinutes": 180,
+          "sample": 1
+        },
+        {
+          "trialId": "d_755cf5aa56ef6282",
+          "dailyMinutes": 30,
+          "sample": 1
+        },
+        {
+          "trialId": "d_416fb15b8b00563e",
+          "dailyMinutes": 30,
+          "sample": 2
+        },
+        {
+          "trialId": "d_84edb196743535a2",
+          "dailyMinutes": 180,
+          "sample": 2
+        }
+      ]
+    }
+  }
+}

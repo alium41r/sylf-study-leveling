@@ -1,0 +1,973 @@
+{
+  "proposal": {
+    "stage": "ALLOCATION",
+    "research": null,
+    "envelope": {
+      "schemaVersion": 2,
+      "timezone": "Asia/Karachi",
+      "today": "2026-10-12",
+      "window": {
+        "start": "2026-10-12",
+        "end": "2026-10-14"
+      },
+      "capacityDigest": "fd0c4b6004a70457f72017b9ca712f6c26c3cfd110eb0bac291b63f77107c732",
+      "basis": "CONFIRMED_AVAILABILITY",
+      "weeklyCeilingMinutes": 420,
+      "recoveryPercent": 0,
+      "targets": [
+        {
+          "planRef": "plan_1",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "perGoalWeeklyCeilingMinutes": null
+        },
+        {
+          "planRef": "plan_2",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "perGoalWeeklyCeilingMinutes": null
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-10-12",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-13",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-14",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        }
+      ],
+      "protectedExecution": [],
+      "timeboxRange": {
+        "minMinutes": 5,
+        "maxMinutes": 240
+      }
+    },
+    "blueprints": {
+      "plans": [
+        {
+          "planRef": "plan_1",
+          "blueprint": {
+            "schemaVersion": 2,
+            "strategy": {
+              "policy": "ROADMAP",
+              "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+              "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+              "recommendedEffort": {
+                "lowMinutes": 15,
+                "likelyMinutes": 15,
+                "highMinutes": 15
+              },
+              "phases": []
+            },
+            "scope": [
+              {
+                "scopeRef": "scope_1",
+                "disposition": "INCLUDED",
+                "contribution": "Draw the supplied three-organism feeding chain with an explained arrow convention."
+              }
+            ],
+            "activities": [
+              {
+                "localId": "work_1",
+                "outcomeRefs": [],
+                "scopeRefs": [
+                  "scope_1"
+                ],
+                "title": "Read the shared relationships",
+                "activityType": "PRACTICE",
+                "purpose": "Read the shared relationships",
+                "instructions": "Check the two supplied feeding relationships and arrow convention once.",
+                "completionCriterion": "Grass to rabbit and rabbit to fox relationships are stated correctly.",
+                "effort": {
+                  "lowMinutes": 5,
+                  "likelyMinutes": 5,
+                  "highMinutes": 5
+                },
+                "timeboxMinutes": 5,
+                "commitment": {
+                  "category": "COMMITTED"
+                },
+                "hardDependencies": []
+              },
+              {
+                "localId": "work_2",
+                "outcomeRefs": [],
+                "scopeRefs": [
+                  "scope_1"
+                ],
+                "title": "Draw the chain",
+                "activityType": "PRACTICE",
+                "purpose": "Draw the chain",
+                "instructions": "Draw grass → rabbit → fox, explain the food-to-consumer arrows and check both against the supplied relationships.",
+                "completionCriterion": "Both arrows match the agreed convention.",
+                "effort": {
+                  "lowMinutes": 10,
+                  "likelyMinutes": 10,
+                  "highMinutes": 10
+                },
+                "timeboxMinutes": 10,
+                "commitment": {
+                  "category": "COMMITTED"
+                },
+                "hardDependencies": [
+                  "work_1"
+                ]
+              }
+            ],
+            "decisions": {
+              "assumptions": [],
+              "tradeOffs": [],
+              "unresolvedUncertainty": [],
+              "stoppingConditions": [
+                "Meet the accepted criterion or record the specific unresolved gap."
+              ]
+            }
+          },
+          "digest": "763e1a49a8bddfef1a9c76f02cfff9b03c7ec81472b3176a25027aef06684fe2"
+        },
+        {
+          "planRef": "plan_2",
+          "blueprint": {
+            "schemaVersion": 2,
+            "strategy": {
+              "policy": "ROADMAP",
+              "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+              "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+              "recommendedEffort": {
+                "lowMinutes": 10,
+                "likelyMinutes": 10,
+                "highMinutes": 10
+              },
+              "phases": []
+            },
+            "scope": [
+              {
+                "scopeRef": "scope_1",
+                "disposition": "INCLUDED",
+                "contribution": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude."
+              }
+            ],
+            "activities": [
+              {
+                "localId": "work_3",
+                "outcomeRefs": [],
+                "scopeRefs": [
+                  "scope_1"
+                ],
+                "title": "Explain a bounded effect",
+                "activityType": "PRACTICE",
+                "purpose": "Explain a bounded effect",
+                "instructions": "Use the shared relationships to explain that fewer rabbits may reduce food for foxes and reduce grazing on grass; do not predict a numerical change or certainty about a whole ecosystem.",
+                "completionCriterion": "Directions are explained as possible effects; magnitude and other relationships remain uncertain.",
+                "effort": {
+                  "lowMinutes": 10,
+                  "likelyMinutes": 10,
+                  "highMinutes": 10
+                },
+                "timeboxMinutes": 10,
+                "commitment": {
+                  "category": "COMMITTED"
+                },
+                "hardDependencies": []
+              }
+            ],
+            "decisions": {
+              "assumptions": [],
+              "tradeOffs": [],
+              "unresolvedUncertainty": [],
+              "stoppingConditions": [
+                "Meet the accepted criterion or record the specific unresolved gap."
+              ]
+            }
+          },
+          "digest": "b2ccfb57ca2b6a850521767303bcb985692dddacb7884069a32ae3a8d5c509ed"
+        }
+      ],
+      "sharedDependencies": [
+        {
+          "prerequisite": {
+            "planRef": "plan_1",
+            "activityId": "work_1"
+          },
+          "dependent": {
+            "planRef": "plan_2",
+            "activityId": "work_3"
+          },
+          "strength": "HARD",
+          "reason": "One owned source check supports both accepted outcomes."
+        }
+      ]
+    },
+    "allocation": {
+      "report": {
+        "schemaVersion": 2,
+        "status": "FEASIBLE",
+        "placements": [
+          {
+            "planRef": "plan_1",
+            "activityRef": "work_1",
+            "minutes": 5,
+            "date": "2026-10-12"
+          },
+          {
+            "planRef": "plan_1",
+            "activityRef": "work_2",
+            "minutes": 10,
+            "date": "2026-10-12"
+          },
+          {
+            "planRef": "plan_2",
+            "activityRef": "work_3",
+            "minutes": 10,
+            "date": "2026-10-12"
+          }
+        ],
+        "unscheduled": [],
+        "committedMinutes": 25,
+        "capacityProof": null,
+        "findings": [
+          {
+            "findingId": "finding_ed329fe5b20f4d190a99",
+            "category": "FINISH",
+            "consequential": false,
+            "planRefs": [
+              "plan_1"
+            ],
+            "activityRefs": [],
+            "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+            "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+          },
+          {
+            "findingId": "finding_67f25c6c60d305254162",
+            "category": "FINISH",
+            "consequential": false,
+            "planRefs": [
+              "plan_2"
+            ],
+            "activityRefs": [],
+            "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+            "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+          }
+        ]
+      },
+      "digest": "905db46284cc05e5c67e8bdb71ee105d7529f35ea5f1e4943448f17b1843c1a8"
+    },
+    "planning": {
+      "detail": {
+        "days": 14,
+        "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+      },
+      "tradeOffExplanation": "Only the accepted next work is detailed.",
+      "splits": [],
+      "forecasts": [],
+      "adaptation": "NOT_REQUESTED",
+      "unreviewedPhaseRefs": []
+    }
+  },
+  "input": {
+    "stage": "REVIEW",
+    "goals": [
+      {
+        "planRef": "plan_1",
+        "requested": {
+          "title": "A shared food-web source check",
+          "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+          "policy": "ROADMAP",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 15
+          },
+          "scope": [
+            {
+              "ref": "scope_1",
+              "title": "Accepted outcome",
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ]
+        },
+        "resolved": {
+          "title": "A shared food-web source check",
+          "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+          "policy": "ROADMAP",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 15
+          },
+          "scope": [
+            {
+              "ref": "scope_1",
+              "title": "Accepted outcome",
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ]
+        }
+      },
+      {
+        "planRef": "plan_2",
+        "requested": {
+          "title": "A shared food-web source check",
+          "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+          "policy": "ROADMAP",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 15
+          },
+          "scope": [
+            {
+              "ref": "scope_1",
+              "title": "Accepted outcome",
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ]
+        },
+        "resolved": {
+          "title": "A shared food-web source check",
+          "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+          "policy": "ROADMAP",
+          "deadline": {
+            "kind": "NONE"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 15
+          },
+          "scope": [
+            {
+              "ref": "scope_1",
+              "title": "Accepted outcome",
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ]
+        }
+      }
+    ],
+    "context": {
+      "plans": [
+        {
+          "planRef": "plan_1",
+          "requested": {
+            "title": "A shared food-web source check",
+            "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "resolved": {
+            "title": "A shared food-web source check",
+            "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "learningEvidence": [],
+          "facts": [
+            "Supplied relationships: rabbits eat grass; foxes eat rabbits. Arrows in this task point from food to consumer.",
+            "Other species and population counts are unknown. The effect’s size cannot be predicted."
+          ],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        },
+        {
+          "planRef": "plan_2",
+          "requested": {
+            "title": "A shared food-web source check",
+            "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "resolved": {
+            "title": "A shared food-web source check",
+            "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+            "policy": "ROADMAP",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 15
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Accepted outcome",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "learningEvidence": [],
+          "facts": [
+            "Supplied relationships: rabbits eat grass; foxes eat rabbits. Arrows in this task point from food to consumer.",
+            "Other species and population counts are unknown. The effect’s size cannot be predicted."
+          ],
+          "provenance": {
+            "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+            "asOf": "2026-10-12",
+            "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+          }
+        }
+      ]
+    },
+    "proposal": {
+      "stage": "ALLOCATION",
+      "research": null,
+      "envelope": {
+        "schemaVersion": 2,
+        "timezone": "Asia/Karachi",
+        "today": "2026-10-12",
+        "window": {
+          "start": "2026-10-12",
+          "end": "2026-10-14"
+        },
+        "capacityDigest": "fd0c4b6004a70457f72017b9ca712f6c26c3cfd110eb0bac291b63f77107c732",
+        "basis": "CONFIRMED_AVAILABILITY",
+        "weeklyCeilingMinutes": 420,
+        "recoveryPercent": 0,
+        "targets": [
+          {
+            "planRef": "plan_1",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "perGoalWeeklyCeilingMinutes": null
+          },
+          {
+            "planRef": "plan_2",
+            "deadline": {
+              "kind": "NONE"
+            },
+            "perGoalWeeklyCeilingMinutes": null
+          }
+        ],
+        "days": [
+          {
+            "date": "2026-10-12",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          },
+          {
+            "date": "2026-10-13",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          },
+          {
+            "date": "2026-10-14",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "protectedTargetMinutes": 0,
+            "recoveryMinutes": 0,
+            "availableMinutes": 60,
+            "excluded": false
+          }
+        ],
+        "protectedExecution": [],
+        "timeboxRange": {
+          "minMinutes": 5,
+          "maxMinutes": 240
+        }
+      },
+      "blueprints": {
+        "plans": [
+          {
+            "planRef": "plan_1",
+            "blueprint": {
+              "schemaVersion": 2,
+              "strategy": {
+                "policy": "ROADMAP",
+                "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+                "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                "recommendedEffort": {
+                  "lowMinutes": 15,
+                  "likelyMinutes": 15,
+                  "highMinutes": 15
+                },
+                "phases": []
+              },
+              "scope": [
+                {
+                  "scopeRef": "scope_1",
+                  "disposition": "INCLUDED",
+                  "contribution": "Draw the supplied three-organism feeding chain with an explained arrow convention."
+                }
+              ],
+              "activities": [
+                {
+                  "localId": "work_1",
+                  "outcomeRefs": [],
+                  "scopeRefs": [
+                    "scope_1"
+                  ],
+                  "title": "Read the shared relationships",
+                  "activityType": "PRACTICE",
+                  "purpose": "Read the shared relationships",
+                  "instructions": "Check the two supplied feeding relationships and arrow convention once.",
+                  "completionCriterion": "Grass to rabbit and rabbit to fox relationships are stated correctly.",
+                  "effort": {
+                    "lowMinutes": 5,
+                    "likelyMinutes": 5,
+                    "highMinutes": 5
+                  },
+                  "timeboxMinutes": 5,
+                  "commitment": {
+                    "category": "COMMITTED"
+                  },
+                  "hardDependencies": []
+                },
+                {
+                  "localId": "work_2",
+                  "outcomeRefs": [],
+                  "scopeRefs": [
+                    "scope_1"
+                  ],
+                  "title": "Draw the chain",
+                  "activityType": "PRACTICE",
+                  "purpose": "Draw the chain",
+                  "instructions": "Draw grass → rabbit → fox, explain the food-to-consumer arrows and check both against the supplied relationships.",
+                  "completionCriterion": "Both arrows match the agreed convention.",
+                  "effort": {
+                    "lowMinutes": 10,
+                    "likelyMinutes": 10,
+                    "highMinutes": 10
+                  },
+                  "timeboxMinutes": 10,
+                  "commitment": {
+                    "category": "COMMITTED"
+                  },
+                  "hardDependencies": [
+                    "work_1"
+                  ]
+                }
+              ],
+              "decisions": {
+                "assumptions": [],
+                "tradeOffs": [],
+                "unresolvedUncertainty": [],
+                "stoppingConditions": [
+                  "Meet the accepted criterion or record the specific unresolved gap."
+                ]
+              }
+            },
+            "digest": "763e1a49a8bddfef1a9c76f02cfff9b03c7ec81472b3176a25027aef06684fe2"
+          },
+          {
+            "planRef": "plan_2",
+            "blueprint": {
+              "schemaVersion": 2,
+              "strategy": {
+                "policy": "ROADMAP",
+                "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+                "explanation": "Use the supplied facts and the named learner action; evaluate the actual content independently.",
+                "recommendedEffort": {
+                  "lowMinutes": 10,
+                  "likelyMinutes": 10,
+                  "highMinutes": 10
+                },
+                "phases": []
+              },
+              "scope": [
+                {
+                  "scopeRef": "scope_1",
+                  "disposition": "INCLUDED",
+                  "contribution": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude."
+                }
+              ],
+              "activities": [
+                {
+                  "localId": "work_3",
+                  "outcomeRefs": [],
+                  "scopeRefs": [
+                    "scope_1"
+                  ],
+                  "title": "Explain a bounded effect",
+                  "activityType": "PRACTICE",
+                  "purpose": "Explain a bounded effect",
+                  "instructions": "Use the shared relationships to explain that fewer rabbits may reduce food for foxes and reduce grazing on grass; do not predict a numerical change or certainty about a whole ecosystem.",
+                  "completionCriterion": "Directions are explained as possible effects; magnitude and other relationships remain uncertain.",
+                  "effort": {
+                    "lowMinutes": 10,
+                    "likelyMinutes": 10,
+                    "highMinutes": 10
+                  },
+                  "timeboxMinutes": 10,
+                  "commitment": {
+                    "category": "COMMITTED"
+                  },
+                  "hardDependencies": []
+                }
+              ],
+              "decisions": {
+                "assumptions": [],
+                "tradeOffs": [],
+                "unresolvedUncertainty": [],
+                "stoppingConditions": [
+                  "Meet the accepted criterion or record the specific unresolved gap."
+                ]
+              }
+            },
+            "digest": "b2ccfb57ca2b6a850521767303bcb985692dddacb7884069a32ae3a8d5c509ed"
+          }
+        ],
+        "sharedDependencies": [
+          {
+            "prerequisite": {
+              "planRef": "plan_1",
+              "activityId": "work_1"
+            },
+            "dependent": {
+              "planRef": "plan_2",
+              "activityId": "work_3"
+            },
+            "strength": "HARD",
+            "reason": "One owned source check supports both accepted outcomes."
+          }
+        ]
+      },
+      "allocation": {
+        "report": {
+          "schemaVersion": 2,
+          "status": "FEASIBLE",
+          "placements": [
+            {
+              "planRef": "plan_1",
+              "activityRef": "work_1",
+              "minutes": 5,
+              "date": "2026-10-12"
+            },
+            {
+              "planRef": "plan_1",
+              "activityRef": "work_2",
+              "minutes": 10,
+              "date": "2026-10-12"
+            },
+            {
+              "planRef": "plan_2",
+              "activityRef": "work_3",
+              "minutes": 10,
+              "date": "2026-10-12"
+            }
+          ],
+          "unscheduled": [],
+          "committedMinutes": 25,
+          "capacityProof": null,
+          "findings": [
+            {
+              "findingId": "finding_ed329fe5b20f4d190a99",
+              "category": "FINISH",
+              "consequential": false,
+              "planRefs": [
+                "plan_1"
+              ],
+              "activityRefs": [],
+              "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+              "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+            },
+            {
+              "findingId": "finding_67f25c6c60d305254162",
+              "category": "FINISH",
+              "consequential": false,
+              "planRefs": [
+                "plan_2"
+              ],
+              "activityRefs": [],
+              "evidence": "Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.",
+              "consequence": "This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases."
+            }
+          ]
+        },
+        "digest": "905db46284cc05e5c67e8bdb71ee105d7529f35ea5f1e4943448f17b1843c1a8"
+      },
+      "planning": {
+        "detail": {
+          "days": 14,
+          "checkpoint": "Meet the accepted observable outcome or disclose the actual unresolved dependency."
+        },
+        "tradeOffExplanation": "Only the accepted next work is detailed.",
+        "splits": [],
+        "forecasts": [],
+        "adaptation": "NOT_REQUESTED",
+        "unreviewedPhaseRefs": []
+      }
+    },
+    "grounding": [
+      {
+        "ref": "accepted_request",
+        "kind": "REQUIREMENT",
+        "path": "acceptedRequest.text",
+        "text": "\"Prepare the accepted educational outcome using the supplied facts and constraints.\""
+      },
+      {
+        "ref": "plan_1/goal",
+        "kind": "REQUIREMENT",
+        "path": "goals[0].requested",
+        "text": "{\"title\":\"A shared food-web source check\",\"outcome\":\"Draw the supplied three-organism feeding chain with an explained arrow convention.\",\"policy\":\"ROADMAP\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+      },
+      {
+        "ref": "plan_1/accepted",
+        "kind": "REQUIREMENT",
+        "path": "goals[0].resolved",
+        "text": "{\"title\":\"A shared food-web source check\",\"outcome\":\"Draw the supplied three-organism feeding chain with an explained arrow convention.\",\"policy\":\"ROADMAP\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+      },
+      {
+        "ref": "plan_2/goal",
+        "kind": "REQUIREMENT",
+        "path": "goals[1].requested",
+        "text": "{\"title\":\"A shared food-web source check\",\"outcome\":\"Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.\",\"policy\":\"ROADMAP\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+      },
+      {
+        "ref": "plan_2/accepted",
+        "kind": "REQUIREMENT",
+        "path": "goals[1].resolved",
+        "text": "{\"title\":\"A shared food-web source check\",\"outcome\":\"Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.\",\"policy\":\"ROADMAP\",\"deadline\":{\"kind\":\"NONE\"},\"preferences\":{\"pacing\":\"COMFORTABLE_EARLY\",\"desiredIntensity\":\"MODERATE\",\"preferredTimeboxMinutes\":15},\"scope\":[{\"ref\":\"scope_1\",\"title\":\"Accepted outcome\",\"inclusion\":\"REQUESTED\",\"sourceClaimIds\":[]}]}"
+      },
+      {
+        "ref": "plan_1/strategy",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.strategy",
+        "text": "{\"policy\":\"ROADMAP\",\"outcome\":\"Draw the supplied three-organism feeding chain with an explained arrow convention.\",\"explanation\":\"Use the supplied facts and the named learner action; evaluate the actual content independently.\",\"recommendedEffort\":{\"lowMinutes\":15,\"likelyMinutes\":15,\"highMinutes\":15},\"phases\":[]}"
+      },
+      {
+        "ref": "plan_1/scope/scope_1",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.scope[0]",
+        "text": "{\"scopeRef\":\"scope_1\",\"disposition\":\"INCLUDED\",\"contribution\":\"Draw the supplied three-organism feeding chain with an explained arrow convention.\"}"
+      },
+      {
+        "ref": "plan_1/activity/work_1",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.activities[0]",
+        "text": "{\"localId\":\"work_1\",\"outcomeRefs\":[],\"scopeRefs\":[\"scope_1\"],\"title\":\"Read the shared relationships\",\"activityType\":\"PRACTICE\",\"purpose\":\"Read the shared relationships\",\"instructions\":\"Check the two supplied feeding relationships and arrow convention once.\",\"completionCriterion\":\"Grass to rabbit and rabbit to fox relationships are stated correctly.\",\"effort\":{\"lowMinutes\":5,\"likelyMinutes\":5,\"highMinutes\":5},\"timeboxMinutes\":5,\"commitment\":{\"category\":\"COMMITTED\"},\"hardDependencies\":[]}"
+      },
+      {
+        "ref": "plan_1/activity/work_2",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.activities[1]",
+        "text": "{\"localId\":\"work_2\",\"outcomeRefs\":[],\"scopeRefs\":[\"scope_1\"],\"title\":\"Draw the chain\",\"activityType\":\"PRACTICE\",\"purpose\":\"Draw the chain\",\"instructions\":\"Draw grass → rabbit → fox, explain the food-to-consumer arrows and check both against the supplied relationships.\",\"completionCriterion\":\"Both arrows match the agreed convention.\",\"effort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"timeboxMinutes\":10,\"commitment\":{\"category\":\"COMMITTED\"},\"hardDependencies\":[\"work_1\"]}"
+      },
+      {
+        "ref": "plan_1/uncertainty",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[0].blueprint.decisions",
+        "text": "{\"assumptions\":[],\"tradeOffs\":[],\"unresolvedUncertainty\":[],\"stoppingConditions\":[\"Meet the accepted criterion or record the specific unresolved gap.\"]}"
+      },
+      {
+        "ref": "plan_1/workload",
+        "kind": "PROPOSAL",
+        "path": "workloadAudit[0]",
+        "text": "{\"planRef\":\"plan_1\",\"bookedTimeboxMinutes\":15,\"unprotectedTimeboxMinutes\":15,\"protectedRemainingMinutes\":0,\"remainingCommittedMinutes\":15,\"recommendedEffort\":{\"lowMinutes\":15,\"likelyMinutes\":15,\"highMinutes\":15},\"remainingAboveStrategyHigh\":false,\"committedRefs\":[\"work_1\",\"work_2\"]}"
+      },
+      {
+        "ref": "plan_2/strategy",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[1].blueprint.strategy",
+        "text": "{\"policy\":\"ROADMAP\",\"outcome\":\"Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.\",\"explanation\":\"Use the supplied facts and the named learner action; evaluate the actual content independently.\",\"recommendedEffort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"phases\":[]}"
+      },
+      {
+        "ref": "plan_2/scope/scope_1",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[1].blueprint.scope[0]",
+        "text": "{\"scopeRef\":\"scope_1\",\"disposition\":\"INCLUDED\",\"contribution\":\"Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.\"}"
+      },
+      {
+        "ref": "plan_2/activity/work_3",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[1].blueprint.activities[0]",
+        "text": "{\"localId\":\"work_3\",\"outcomeRefs\":[],\"scopeRefs\":[\"scope_1\"],\"title\":\"Explain a bounded effect\",\"activityType\":\"PRACTICE\",\"purpose\":\"Explain a bounded effect\",\"instructions\":\"Use the shared relationships to explain that fewer rabbits may reduce food for foxes and reduce grazing on grass; do not predict a numerical change or certainty about a whole ecosystem.\",\"completionCriterion\":\"Directions are explained as possible effects; magnitude and other relationships remain uncertain.\",\"effort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"timeboxMinutes\":10,\"commitment\":{\"category\":\"COMMITTED\"},\"hardDependencies\":[]}"
+      },
+      {
+        "ref": "plan_2/uncertainty",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.plans[1].blueprint.decisions",
+        "text": "{\"assumptions\":[],\"tradeOffs\":[],\"unresolvedUncertainty\":[],\"stoppingConditions\":[\"Meet the accepted criterion or record the specific unresolved gap.\"]}"
+      },
+      {
+        "ref": "plan_2/workload",
+        "kind": "PROPOSAL",
+        "path": "workloadAudit[1]",
+        "text": "{\"planRef\":\"plan_2\",\"bookedTimeboxMinutes\":10,\"unprotectedTimeboxMinutes\":10,\"protectedRemainingMinutes\":0,\"remainingCommittedMinutes\":10,\"recommendedEffort\":{\"lowMinutes\":10,\"likelyMinutes\":10,\"highMinutes\":10},\"remainingAboveStrategyHigh\":false,\"committedRefs\":[\"work_3\"]}"
+      },
+      {
+        "ref": "shared_dependency_1",
+        "kind": "PROPOSAL",
+        "path": "proposal.blueprints.sharedDependencies[0]",
+        "text": "{\"prerequisite\":{\"planRef\":\"plan_1\",\"activityId\":\"work_1\"},\"dependent\":{\"planRef\":\"plan_2\",\"activityId\":\"work_3\"},\"strength\":\"HARD\",\"reason\":\"One owned source check supports both accepted outcomes.\"}"
+      },
+      {
+        "ref": "allocation",
+        "kind": "PROPOSAL",
+        "path": "proposal.allocation.report",
+        "text": "{\"schemaVersion\":2,\"status\":\"FEASIBLE\",\"placements\":[{\"planRef\":\"plan_1\",\"activityRef\":\"work_1\",\"minutes\":5,\"date\":\"2026-10-12\"},{\"planRef\":\"plan_1\",\"activityRef\":\"work_2\",\"minutes\":10,\"date\":\"2026-10-12\"},{\"planRef\":\"plan_2\",\"activityRef\":\"work_3\",\"minutes\":10,\"date\":\"2026-10-12\"}],\"unscheduled\":[],\"committedMinutes\":25,\"capacityProof\":null,\"findings\":[{\"findingId\":\"finding_ed329fe5b20f4d190a99\",\"category\":\"FINISH\",\"consequential\":false,\"planRefs\":[\"plan_1\"],\"activityRefs\":[],\"evidence\":\"Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.\",\"consequence\":\"This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases.\"},{\"findingId\":\"finding_67f25c6c60d305254162\",\"category\":\"FINISH\",\"consequential\":false,\"planRefs\":[\"plan_2\"],\"activityRefs\":[],\"evidence\":\"Committed remaining work finishes on 2026-10-12; the detailed window ends 2026-10-14.\",\"consequence\":\"This is the finish of booked detail, not proof of overall readiness or completion of future strategic phases.\"}]}"
+      },
+      {
+        "ref": "constraints",
+        "kind": "REQUIREMENT",
+        "path": "proposal.envelope",
+        "text": "{\"schemaVersion\":2,\"timezone\":\"Asia/Karachi\",\"today\":\"2026-10-12\",\"window\":{\"start\":\"2026-10-12\",\"end\":\"2026-10-14\"},\"capacityDigest\":\"fd0c4b6004a70457f72017b9ca712f6c26c3cfd110eb0bac291b63f77107c732\",\"basis\":\"CONFIRMED_AVAILABILITY\",\"weeklyCeilingMinutes\":420,\"recoveryPercent\":0,\"targets\":[{\"planRef\":\"plan_1\",\"deadline\":{\"kind\":\"NONE\"},\"perGoalWeeklyCeilingMinutes\":null},{\"planRef\":\"plan_2\",\"deadline\":{\"kind\":\"NONE\"},\"perGoalWeeklyCeilingMinutes\":null}],\"days\":[{\"date\":\"2026-10-12\",\"ceilingMinutes\":60,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":60,\"excluded\":false},{\"date\":\"2026-10-13\",\"ceilingMinutes\":60,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":60,\"excluded\":false},{\"date\":\"2026-10-14\",\"ceilingMinutes\":60,\"otherCommittedMinutes\":0,\"protectedTargetMinutes\":0,\"recoveryMinutes\":0,\"availableMinutes\":60,\"excluded\":false}],\"protectedExecution\":[],\"timeboxRange\":{\"minMinutes\":5,\"maxMinutes\":240}}"
+      }
+    ],
+    "workloadAudit": [
+      {
+        "planRef": "plan_1",
+        "bookedTimeboxMinutes": 15,
+        "unprotectedTimeboxMinutes": 15,
+        "protectedRemainingMinutes": 0,
+        "remainingCommittedMinutes": 15,
+        "recommendedEffort": {
+          "lowMinutes": 15,
+          "likelyMinutes": 15,
+          "highMinutes": 15
+        },
+        "remainingAboveStrategyHigh": false,
+        "committedRefs": [
+          "work_1",
+          "work_2"
+        ]
+      },
+      {
+        "planRef": "plan_2",
+        "bookedTimeboxMinutes": 10,
+        "unprotectedTimeboxMinutes": 10,
+        "protectedRemainingMinutes": 0,
+        "remainingCommittedMinutes": 10,
+        "recommendedEffort": {
+          "lowMinutes": 10,
+          "likelyMinutes": 10,
+          "highMinutes": 10
+        },
+        "remainingAboveStrategyHigh": false,
+        "committedRefs": [
+          "work_3"
+        ]
+      }
+    ],
+    "acceptedRequest": {
+      "text": "Prepare the accepted educational outcome using the supplied facts and constraints.",
+      "authorization": "PLAN_ACTION"
+    }
+  },
+  "allocationFacts": {
+    "weeks": [
+      {
+        "week": "2026-10-12",
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "perGoalCommittedMinutes": [
+          {
+            "planRef": "plan_1",
+            "minutes": 0
+          },
+          {
+            "planRef": "plan_2",
+            "minutes": 0
+          }
+        ]
+      }
+    ],
+    "pins": [],
+    "externalActivities": [],
+    "preferences": [
+      {
+        "planRef": "plan_1",
+        "pacing": "COMFORTABLE_EARLY"
+      },
+      {
+        "planRef": "plan_2",
+        "pacing": "COMFORTABLE_EARLY"
+      }
+    ]
+  }
+}

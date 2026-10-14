@@ -1,0 +1,107 @@
+- generic [active] [ref=f3e1]:
+  - generic [ref=f3e3]:
+    - complementary [ref=f3e20]:
+      - generic [ref=f3e21]:
+        - button "Collapse sidebar" [ref=f3e23]
+        - button "Open System Hub" [ref=f3e27]
+        - button "Notifications" [ref=f3e32]
+        - button "View Profile Card" [ref=f3e36] [cursor=pointer]:
+          - generic [ref=f3e37]: P
+          - generic [ref=f3e39]:
+            - paragraph [ref=f3e40]: Pixel Audit
+            - paragraph [ref=f3e41]: E-Rank • Lv. 1
+      - navigation "Main Navigation" [ref=f3e42]:
+        - link "Home" [ref=f3e44] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Timer" [ref=f3e51] [cursor=pointer]:
+          - /url: /timer
+        - link "Social" [ref=f3e58] [cursor=pointer]:
+          - /url: /social
+        - link "The System AI" [ref=f3e65] [cursor=pointer]:
+          - /url: /system
+          - generic [ref=f3e74]:
+            - generic [ref=f3e75]: The System
+            - generic [ref=f3e76]: AI
+        - link "Objectives" [ref=f3e78] [cursor=pointer]:
+          - /url: /goals
+        - link "Calendar" [ref=f3e87] [cursor=pointer]:
+          - /url: /calendar
+        - link "Locker" [ref=f3e94] [cursor=pointer]:
+          - /url: /locker
+        - link "Shop" [ref=f3e101] [cursor=pointer]:
+          - /url: /inventory
+      - button "Logout" [ref=f3e109]
+    - main [ref=f3e5]:
+      - generic [ref=f3e263]:
+        - generic [ref=f3e265]:
+          - button "IDENTITY" [ref=f3e266]
+          - button "ITEMS" [ref=f3e271]
+          - button "ACOUSTICS" [ref=f3e275]
+        - generic [ref=f3e282]:
+          - generic [ref=f3e283]:
+            - generic [ref=f3e284]:
+              - generic [ref=f3e285]: Scholar Arsenal // Identity Hub
+              - heading [level=1] [ref=f3e294]:
+                - text: Identity
+                - emphasis [ref=f3e295]: Studio Hub
+              - paragraph [ref=f3e296]: Select a specialized studio workbench below to customize your sprite visuals, academic gear, and public profile dossier.
+            - button "Preview Profile" [ref=f3e298] [cursor=pointer]
+          - generic [ref=f3e303]:
+            - generic [ref=f3e304]:
+              - generic [ref=f3e305]:
+                - generic [ref=f3e306]:
+                  - generic [ref=f3e312]:
+                    - heading "Companion" [level=3] [ref=f3e313]
+                    - generic [ref=f3e314]: Pixel Display Customizer
+                  - generic [ref=f3e315]: Tanjiro
+                - paragraph [ref=f3e316]: Choose your companion's look and how large its pixels are. This is the character that appears on your dashboard.
+              - generic [ref=f3e321]:
+                - button "Customize Companion" [ref=f3e322] [cursor=pointer]
+                - button "Open Pixel Studio" [ref=f3e326]
+            - generic [ref=f3e331]:
+              - generic [ref=f3e332]:
+                - generic [ref=f3e333]:
+                  - generic [ref=f3e342]:
+                    - heading "Character Studio" [level=3] [ref=f3e343]
+                    - generic [ref=f3e344]: Full-Body Sprite Customizer
+                  - generic [ref=f3e345]: Level 1
+                - paragraph [ref=f3e346]: Build and style your full-body avatar, gear, optics, hair swatches, academic robes, and radiant holographic aura effects.
+                - generic [ref=f3e347]:
+                  - generic [ref=f3e349]:
+                    - generic:
+                      - img "Pedestal Platform"
+                    - generic [ref=f3e350]:
+                      - img "Character Form"
+                  - generic [ref=f3e351]:
+                    - generic [ref=f3e352]:
+                      - generic [ref=f3e353]: Form
+                      - generic [ref=f3e354]: Tanjiro
+                    - generic [ref=f3e355]:
+                      - generic [ref=f3e356]: Pedestal
+                      - generic [ref=f3e357]: Cyber
+                    - generic [ref=f3e358]:
+                      - generic [ref=f3e359]: Aura
+                      - generic [ref=f3e360]: "No"
+                    - generic [ref=f3e361]:
+                      - generic [ref=f3e362]: Relic
+                      - generic [ref=f3e363]: None
+              - button "Enter Character Studio" [ref=f3e364] [cursor=pointer]
+            - generic [ref=f3e368]:
+              - generic [ref=f3e369]:
+                - generic [ref=f3e370]:
+                  - generic [ref=f3e376]:
+                    - heading "Profile Studio" [level=3] [ref=f3e377]
+                    - generic [ref=f3e378]: Public Dossier & Media Curating
+                  - generic [ref=f3e379]: 0 Socials Linked
+                - paragraph [ref=f3e380]: Curate your full-bleed profile banner, high-resolution circular avatar photo, academic thesis bio, and connected social media profiles.
+                - generic [ref=f3e384]:
+                  - generic [ref=f3e385]:
+                    - generic [ref=f3e386]: P
+                    - generic [ref=f3e388]: Novice
+                  - generic [ref=f3e389]:
+                    - heading "Pixel Audit" [level=4] [ref=f3e390]
+                    - generic [ref=f3e391]: "@pixelqa_1791394440151"
+                  - paragraph [ref=f3e392]: No thesis statement provided yet. Click to author your bio...
+              - button "Enter Profile Studio" [ref=f3e393] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=f3e15] [cursor=pointer]
+  - alert [ref=f3e19]

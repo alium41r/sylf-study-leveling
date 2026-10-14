@@ -1,0 +1,31 @@
+{
+  "status": "OFFLINE_BUDGET_DIAGNOSIS_NOT_LIVE_REPAIR",
+  "observedAt": "2026-10-08T15:00:30.420Z",
+  "sourceRun": "documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T14-46-11-114Z/live-corpus.json",
+  "sourceRunSha256": "63198c8981ace36d4bdd0c943a9b53dc25c18e38c607a7d27abb4e80dba2535b",
+  "facts": "Reconstruct actual original/resolved goals, full context and durable proposal/findings; no Attempt/provider/database call. Current existing compiler request builders used.",
+  "goalCorrespondence": true,
+  "namedIssueIds": [
+    "problem_set_untaught_method_skip"
+  ],
+  "rootInputCeiling": 80000,
+  "actualConsumedInput": 15329,
+  "repairInputReservation": 45481,
+  "verificationInputReservation": 39174,
+  "verificationGrowthMargin": 8192,
+  "totalInputNeeded": 99984,
+  "excessInputUnits": 19984,
+  "repairOutputReservation": 8192,
+  "verificationOutputReservation": 4096,
+  "sourceFiles": {
+    "lib/planner/v2/intelligence/blueprint.ts": "f39c19adc69370c10af11349c9fcecca109a33d7255545b0950672bf669d34e9",
+    "lib/planner/v2/intelligence/quality.ts": "e167d58d44d2fa33ba18fb08c6abb8baae989a306915b55a8da22705f743bacf",
+    "lib/planner/v2/server/compiler.ts": "a47964671575315cd345ddd8a275258c4bc13ec42c9b55b8331dcc188b55b144",
+    "lib/planner/v2/intelligence/provider.ts": "bdbf175e35a54e6d78e9f9894d633877f065285621186d809048ef7564f30c56"
+  },
+  "limitations": [
+    "Does not certify the semantic finding or qualify an actual repair.",
+    "Current instruction bytes differ from the historical dispatch; historical failure remains retained.",
+    "No budget/call/token/output/verification margin changed."
+  ]
+}

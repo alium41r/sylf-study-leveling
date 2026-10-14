@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-07T10:46:19.402138+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-07T10-38-37-763Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "77f6dfabf381ae29dfe203c1b37751ed6a9bf750c030ed04b828f939dd92ed09",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "reviewTemperature": 0.2,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 17,
+  "usage": {
+    "reportedInputTokens": 114119,
+    "reportedOutputTokens": 18848,
+    "settledCalls": 17,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 17
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 3518,
+    "p90Ms": 9611,
+    "maximumMs": 9774
+  },
+  "passed": 0,
+  "total": 3,
+  "cases": [
+    {
+      "id": "owned-course-research",
+      "trial": 1,
+      "attemptId": "027a713c-0026-47ee-9630-21ff30076e70",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Review names taught-repertoire-restriction and a bounded repair/fallback plus exact verification and canonical apply occur. Final instructions still forbid untaught methods and offer splitting fields while requiring a quoted comma. Verification falsely resolves the surviving discrepancy. Initial unknown teaching also cannot alone prove impossibility. This is rejected as a qualified repair witness.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 2,
+      "attemptId": "91da865f-f38e-4933-8d88-438a97cd1fc1",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "A genuine method_restriction_blocks_task finding compares the exclusive uploaded-note method rule with the verified outcome-only note. Actual repair permits any reasonable method, exact independent verification confirms that named change and canonical apply materializes it. This demonstrates a real named correction, but final instructions still require sample data supposedly supplied by the note, which contains none. The candidate is not overall educationally accepted.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 3,
+      "attemptId": "a3624197-93d6-460c-9193-49b47b8e3147",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Ownership/hash/applicability/excerpts are genuinely verified, but required methods are limited to those actually taught in the outcome-only note. No reviewer finding or repair corrects that impossible restriction; successful publication/apply cannot qualify the case.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    }
+  ],
+  "operationalFailures": 0,
+  "observedNamedRepairPaths": [
+    {
+      "trial": 1,
+      "attemptId": "027a713c-0026-47ee-9630-21ff30076e70",
+      "issueIds": [
+        "taught-repertoire-restriction"
+      ],
+      "canonicalApplyReceiptId": "1a2509fa-ff88-4188-994a-6c0e7ed855fc",
+      "genuineNamedCorrectionObserved": false,
+      "overallEducationalAcceptance": false,
+      "sourceCurrentFinalQualification": false
+    },
+    {
+      "trial": 2,
+      "attemptId": "91da865f-f38e-4933-8d88-438a97cd1fc1",
+      "issueIds": [
+        "method_restriction_blocks_task"
+      ],
+      "canonicalApplyReceiptId": "64aa34d2-0d5c-4dfa-927a-d65bc0b8fc1b",
+      "genuineNamedCorrectionObserved": true,
+      "overallEducationalAcceptance": false,
+      "sourceCurrentFinalQualification": false
+    }
+  ]
+}

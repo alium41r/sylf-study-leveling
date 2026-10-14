@@ -1,0 +1,764 @@
+{
+  "shared": {
+    "title": "Library query project: correct joins and honest counts",
+    "acceptedOutcome": "Complete and understand four read-only SQLite queries for the supplied library database, including all readers when required, correct zero counts and the requested filtering, with a short explanation and a checked result for each query by 28 October.",
+    "student": {
+      "profile": "Omar is a part-time information systems student preparing a small assessed SQL project. He can already run an SQL script in the installed offline SQLite editor. Installation, programming an app and publishing a website are outside this request.",
+      "goal": "Deliver the four queries and their explanations by 28 October. At a later class demonstration I want to explain them without reading a copied answer. Do not turn this assignment into a complete data engineering roadmap.",
+      "preferences": "Sessions normally around 20 minutes, maximum 30 minutes. I prefer moderate effort and essential work comfortably before the deadline when feasible, keeping room for actual gaps. I prefer small experiments in the actual database, comparing results against the supplied expected tables and explaining why each row appears. I have no partner or tutor available and no budget for additional tools.",
+      "acceptedRequest": "Plan how I should complete and understand the actual four-query assignment using the provided database, expected results and syntax notes. Address my join and count errors. Stop once the queries and explanations meet the rubric; suggest further work only if it has a clear purpose or a checkpoint actually fails. Keep the stated deadline, unavailable days and session limits.",
+      "scope": [
+        "Open-loan inner join",
+        "All-reader total counts including zero",
+        "All-reader open-loan counts with correct filtering",
+        "Group filtering with HAVING and explanation"
+      ],
+      "assessment": {
+        "date": "2026-10-28",
+        "examDayStudyAllowed": true,
+        "format": "The synthetic instructor's assignment requires four saved read-only SELECT queries, results matching the supplied expected tables, and a two- or three-sentence explanation of each join/filter/count choice. SQL keyword case, aliases and equivalent correct query forms are unrestricted. No UI, indexes, performance benchmark, extra schema or app code is required.",
+        "provenance": "Synthetic student-supplied assignment and database, fully included here. This is not an official external qualification or a production database."
+      },
+      "readinessObservedDate": "2026-10-16",
+      "readiness": [
+        {
+          "scopeIndexes": [
+            0
+          ],
+          "statement": "On 16 October I independently selected the title column and filtered returned_at IS NULL correctly on two single-table tasks. On a joined task I omitted the ON condition and produced repeated unrelated reader/loan pairs; with a hint I corrected the join. I have not demonstrated a correct join unaided.",
+          "demonstratesReadiness": false
+        },
+        {
+          "scopeIndexes": [
+            1,
+            2
+          ],
+          "statement": "On 16 October I used an INNER JOIN for an all-reader count and omitted Eli, who has no loans. After changing to a LEFT JOIN I used COUNT(*) and reported Eli as having one loan instead of zero. I have not corrected that count independently.",
+          "demonstratesReadiness": false
+        },
+        {
+          "scopeIndexes": [
+            3
+          ],
+          "statement": "I can group rows when shown an example. I have not yet explained WHERE versus HAVING or tested a grouped filter unaided. No completion or time log is being treated as mastery.",
+          "demonstratesReadiness": false
+        }
+      ],
+      "resources": [
+        {
+          "name": "Installed offline SQLite editor and complete assignment database",
+          "available": true,
+          "content": "CREATE TABLE readers (reader_id INTEGER PRIMARY KEY, name TEXT NOT NULL);\nCREATE TABLE loans (loan_id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, title TEXT NOT NULL, returned_at TEXT);\nINSERT INTO readers VALUES (1,'Amina'),(2,'Ben'),(3,'Cleo'),(4,'Dara'),(5,'Eli');\nINSERT INTO loans VALUES (101,1,'Atlas',NULL),(102,1,'Comets','2026-10-18'),(103,2,'Atlas',NULL),(104,2,'Rivers','2026-10-17'),(105,3,'Moss',NULL),(106,3,'Comets',NULL),(107,4,'Trees','2026-10-18');\nEach loan_id is non-null and unique. NULL in returned_at means currently open. Eli has no loans; Dara has only a returned loan. The data are artificial and contain no real users. Do not change these tables or records to make a query pass."
+        },
+        {
+          "name": "Actual tasks and available expected results",
+          "available": true,
+          "content": "Query 1: Show each open loan's loan_id, reader name and title, ordered by loan_id. Expected rows: (101,Amina,Atlas); (103,Ben,Atlas); (105,Cleo,Moss); (106,Cleo,Comets).\nQuery 2: Show every reader's name and total loan count, ordered by name, including zero. Expected rows: (Amina,2); (Ben,2); (Cleo,2); (Dara,1); (Eli,0).\nQuery 3: Show every reader's name and current open-loan count, ordered by name, including readers whose count is zero. Expected rows: (Amina,1); (Ben,1); (Cleo,2); (Dara,0); (Eli,0).\nQuery 4: Show names and total loan counts for readers with at least two loans, ordered by name. Expected rows: (Amina,2); (Ben,2); (Cleo,2).\nThe instructor accepts equivalent correct SELECT queries. A matching output needs a correct explanation, not just a screenshot. Extra queries are not required deliverables."
+        },
+        {
+          "name": "Available classroom syntax notes",
+          "available": true,
+          "content": "An INNER JOIN keeps matching row pairs. A LEFT JOIN keeps every left-table row and supplies NULL right-table columns when no match exists. The ON predicate decides matching; WHERE filters joined rows, so a right-table condition there can remove a left row that was meant to remain. COUNT(*) counts rows; COUNT(column) counts non-null values of that column. GROUP BY forms groups; HAVING filters groups after aggregation. Test IS NULL rather than equality to NULL. SELECT ... FROM readers AS r LEFT JOIN loans AS l ON l.reader_id=r.reader_id GROUP BY r.reader_id,r.name is a useful structure to inspect, not a completed answer to all four tasks. Small learner-created counterexamples are allowed if kept separate from the assignment data and identified as practice; they are not extra assessed deliverables."
+        },
+        {
+          "name": "Unavailable support",
+          "available": false,
+          "content": "No tutor, partner feedback, internet tutorial subscription, application starter code or external answer service is available. There is no requirement for a GitHub repository or publication."
+        }
+      ],
+      "availability": {
+        "timezone": "Asia/Karachi",
+        "today": "2026-10-19",
+        "dailyCeilingMinutesMondayFirst": [
+          30,
+          0,
+          45,
+          30,
+          0,
+          60,
+          0
+        ],
+        "weeklyCeilingMinutes": 180,
+        "preferredSessionMinutes": 20,
+        "maximumSessionMinutes": 30,
+        "days": [
+          {
+            "date": "2026-10-19",
+            "ceilingMinutes": 30,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 30
+          },
+          {
+            "date": "2026-10-20",
+            "ceilingMinutes": 0,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 0
+          },
+          {
+            "date": "2026-10-21",
+            "ceilingMinutes": 45,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 45
+          },
+          {
+            "date": "2026-10-22",
+            "ceilingMinutes": 30,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 30
+          },
+          {
+            "date": "2026-10-23",
+            "ceilingMinutes": 0,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 0
+          },
+          {
+            "date": "2026-10-24",
+            "ceilingMinutes": 60,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 60
+          },
+          {
+            "date": "2026-10-25",
+            "ceilingMinutes": 0,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 0
+          },
+          {
+            "date": "2026-10-26",
+            "ceilingMinutes": 30,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 30
+          },
+          {
+            "date": "2026-10-27",
+            "ceilingMinutes": 0,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 0
+          },
+          {
+            "date": "2026-10-28",
+            "ceilingMinutes": 45,
+            "otherCommittedMinutes": 0,
+            "availableMinutes": 45
+          }
+        ],
+        "constraints": "Listed minutes are the complete remaining study capacity. Zero means unavailable. Breaks must not become extra study time; the ceilings are not a target to fill. There is no selected existing Planner work or protected execution. Completion on the deadline is permitted, but finishing earlier is preferred when realistic."
+      },
+      "unknowns": [
+        "How many attempts the join/count misconceptions will require",
+        "Unaided explanation after correction",
+        "The eventual demonstration questions, which are not extra deliverables now"
+      ]
+    }
+  },
+  "input": {
+    "plans": [
+      {
+        "planRef": "plan_1",
+        "intent": {
+          "schemaVersion": 2,
+          "title": "Library query project: correct joins and honest counts",
+          "outcome": "Complete and understand four read-only SQLite queries for the supplied library database, including all readers when required, correct zero counts and the requested filtering, with a short explanation and a checked result for each query by 28 October.",
+          "policy": "GENERAL",
+          "policySelection": "USER_OVERRIDE",
+          "deadline": {
+            "kind": "FIXED",
+            "date": "2026-10-28",
+            "examDayStudyAllowed": true
+          },
+          "scope": [
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000001",
+              "modelRef": "scope_1",
+              "title": "Open-loan inner join",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            },
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000002",
+              "modelRef": "scope_2",
+              "title": "All-reader total counts including zero",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            },
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000003",
+              "modelRef": "scope_3",
+              "title": "All-reader open-loan counts with correct filtering",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            },
+            {
+              "scopeKey": "00000000-0000-4000-8000-000000000004",
+              "modelRef": "scope_4",
+              "title": "Group filtering with HAVING and explanation",
+              "parentKey": null,
+              "inclusion": "REQUESTED",
+              "sourceClaimIds": []
+            }
+          ],
+          "evidence": [
+            {
+              "evidenceId": "evidence_1",
+              "scopeKeys": [
+                "00000000-0000-4000-8000-000000000001"
+              ],
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-16T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 16 October I independently selected the title column and filtered returned_at IS NULL correctly on two single-table tasks. On a joined task I omitted the ON condition and produced repeated unrelated reader/loan pairs; with a hint I corrected the join. I have not demonstrated a correct join unaided.",
+              "demonstratesReadiness": false
+            },
+            {
+              "evidenceId": "evidence_2",
+              "scopeKeys": [
+                "00000000-0000-4000-8000-000000000002",
+                "00000000-0000-4000-8000-000000000003"
+              ],
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-16T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 16 October I used an INNER JOIN for an all-reader count and omitted Eli, who has no loans. After changing to a LEFT JOIN I used COUNT(*) and reported Eli as having one loan instead of zero. I have not corrected that count independently.",
+              "demonstratesReadiness": false
+            },
+            {
+              "evidenceId": "evidence_3",
+              "scopeKeys": [
+                "00000000-0000-4000-8000-000000000004"
+              ],
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-16T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "I can group rows when shown an example. I have not yet explained WHERE versus HAVING or tested a grouped filter unaided. No completion or time log is being treated as mastery.",
+              "demonstratesReadiness": false
+            }
+          ],
+          "availability": {
+            "timezone": "Asia/Karachi",
+            "dailyCeilingMinutes": [
+              30,
+              0,
+              45,
+              30,
+              0,
+              60,
+              0
+            ],
+            "weeklyCeilingMinutes": 180,
+            "restWeekdays": [
+              1,
+              4,
+              6
+            ],
+            "blockedDates": [],
+            "recoveryPercent": 0,
+            "basis": "CONFIRMED_AVAILABILITY"
+          },
+          "preferences": {
+            "pacing": "COMFORTABLE_EARLY",
+            "desiredIntensity": "MODERATE",
+            "preferredTimeboxMinutes": 20,
+            "maximumTimeboxMinutes": 30
+          },
+          "assumptions": [],
+          "unresolvedQuestions": [
+            "How many attempts the join/count misconceptions will require",
+            "Unaided explanation after correction",
+            "The eventual demonstration questions, which are not extra deliverables now"
+          ]
+        },
+        "allowed": {
+          "scopeRefs": [
+            "scope_1",
+            "scope_2",
+            "scope_3",
+            "scope_4"
+          ],
+          "excludedScopeRefs": [],
+          "evidenceRefs": [
+            "evidence_1",
+            "evidence_2",
+            "evidence_3"
+          ],
+          "resourceRefs": [
+            "resource_1",
+            "resource_2",
+            "resource_3"
+          ],
+          "externalActivityRefs": []
+        },
+        "readiness": [],
+        "kept": [],
+        "keptPhases": []
+      }
+    ],
+    "context": {
+      "studentContext": {
+        "title": "Library query project: correct joins and honest counts",
+        "acceptedOutcome": "Complete and understand four read-only SQLite queries for the supplied library database, including all readers when required, correct zero counts and the requested filtering, with a short explanation and a checked result for each query by 28 October.",
+        "student": {
+          "profile": "Omar is a part-time information systems student preparing a small assessed SQL project. He can already run an SQL script in the installed offline SQLite editor. Installation, programming an app and publishing a website are outside this request.",
+          "goal": "Deliver the four queries and their explanations by 28 October. At a later class demonstration I want to explain them without reading a copied answer. Do not turn this assignment into a complete data engineering roadmap.",
+          "preferences": "Sessions normally around 20 minutes, maximum 30 minutes. I prefer moderate effort and essential work comfortably before the deadline when feasible, keeping room for actual gaps. I prefer small experiments in the actual database, comparing results against the supplied expected tables and explaining why each row appears. I have no partner or tutor available and no budget for additional tools.",
+          "acceptedRequest": "Plan how I should complete and understand the actual four-query assignment using the provided database, expected results and syntax notes. Address my join and count errors. Stop once the queries and explanations meet the rubric; suggest further work only if it has a clear purpose or a checkpoint actually fails. Keep the stated deadline, unavailable days and session limits.",
+          "scope": [
+            "Open-loan inner join",
+            "All-reader total counts including zero",
+            "All-reader open-loan counts with correct filtering",
+            "Group filtering with HAVING and explanation"
+          ],
+          "assessment": {
+            "date": "2026-10-28",
+            "examDayStudyAllowed": true,
+            "format": "The synthetic instructor's assignment requires four saved read-only SELECT queries, results matching the supplied expected tables, and a two- or three-sentence explanation of each join/filter/count choice. SQL keyword case, aliases and equivalent correct query forms are unrestricted. No UI, indexes, performance benchmark, extra schema or app code is required.",
+            "provenance": "Synthetic student-supplied assignment and database, fully included here. This is not an official external qualification or a production database."
+          },
+          "readinessObservedDate": "2026-10-16",
+          "readiness": [
+            {
+              "scopeIndexes": [
+                0
+              ],
+              "statement": "On 16 October I independently selected the title column and filtered returned_at IS NULL correctly on two single-table tasks. On a joined task I omitted the ON condition and produced repeated unrelated reader/loan pairs; with a hint I corrected the join. I have not demonstrated a correct join unaided.",
+              "demonstratesReadiness": false
+            },
+            {
+              "scopeIndexes": [
+                1,
+                2
+              ],
+              "statement": "On 16 October I used an INNER JOIN for an all-reader count and omitted Eli, who has no loans. After changing to a LEFT JOIN I used COUNT(*) and reported Eli as having one loan instead of zero. I have not corrected that count independently.",
+              "demonstratesReadiness": false
+            },
+            {
+              "scopeIndexes": [
+                3
+              ],
+              "statement": "I can group rows when shown an example. I have not yet explained WHERE versus HAVING or tested a grouped filter unaided. No completion or time log is being treated as mastery.",
+              "demonstratesReadiness": false
+            }
+          ],
+          "resources": [
+            {
+              "name": "Installed offline SQLite editor and complete assignment database",
+              "available": true,
+              "content": "CREATE TABLE readers (reader_id INTEGER PRIMARY KEY, name TEXT NOT NULL);\nCREATE TABLE loans (loan_id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, title TEXT NOT NULL, returned_at TEXT);\nINSERT INTO readers VALUES (1,'Amina'),(2,'Ben'),(3,'Cleo'),(4,'Dara'),(5,'Eli');\nINSERT INTO loans VALUES (101,1,'Atlas',NULL),(102,1,'Comets','2026-10-18'),(103,2,'Atlas',NULL),(104,2,'Rivers','2026-10-17'),(105,3,'Moss',NULL),(106,3,'Comets',NULL),(107,4,'Trees','2026-10-18');\nEach loan_id is non-null and unique. NULL in returned_at means currently open. Eli has no loans; Dara has only a returned loan. The data are artificial and contain no real users. Do not change these tables or records to make a query pass."
+            },
+            {
+              "name": "Actual tasks and available expected results",
+              "available": true,
+              "content": "Query 1: Show each open loan's loan_id, reader name and title, ordered by loan_id. Expected rows: (101,Amina,Atlas); (103,Ben,Atlas); (105,Cleo,Moss); (106,Cleo,Comets).\nQuery 2: Show every reader's name and total loan count, ordered by name, including zero. Expected rows: (Amina,2); (Ben,2); (Cleo,2); (Dara,1); (Eli,0).\nQuery 3: Show every reader's name and current open-loan count, ordered by name, including readers whose count is zero. Expected rows: (Amina,1); (Ben,1); (Cleo,2); (Dara,0); (Eli,0).\nQuery 4: Show names and total loan counts for readers with at least two loans, ordered by name. Expected rows: (Amina,2); (Ben,2); (Cleo,2).\nThe instructor accepts equivalent correct SELECT queries. A matching output needs a correct explanation, not just a screenshot. Extra queries are not required deliverables."
+            },
+            {
+              "name": "Available classroom syntax notes",
+              "available": true,
+              "content": "An INNER JOIN keeps matching row pairs. A LEFT JOIN keeps every left-table row and supplies NULL right-table columns when no match exists. The ON predicate decides matching; WHERE filters joined rows, so a right-table condition there can remove a left row that was meant to remain. COUNT(*) counts rows; COUNT(column) counts non-null values of that column. GROUP BY forms groups; HAVING filters groups after aggregation. Test IS NULL rather than equality to NULL. SELECT ... FROM readers AS r LEFT JOIN loans AS l ON l.reader_id=r.reader_id GROUP BY r.reader_id,r.name is a useful structure to inspect, not a completed answer to all four tasks. Small learner-created counterexamples are allowed if kept separate from the assignment data and identified as practice; they are not extra assessed deliverables."
+            },
+            {
+              "name": "Unavailable support",
+              "available": false,
+              "content": "No tutor, partner feedback, internet tutorial subscription, application starter code or external answer service is available. There is no requirement for a GitHub repository or publication."
+            }
+          ],
+          "availability": {
+            "timezone": "Asia/Karachi",
+            "today": "2026-10-19",
+            "dailyCeilingMinutesMondayFirst": [
+              30,
+              0,
+              45,
+              30,
+              0,
+              60,
+              0
+            ],
+            "weeklyCeilingMinutes": 180,
+            "preferredSessionMinutes": 20,
+            "maximumSessionMinutes": 30,
+            "days": [
+              {
+                "date": "2026-10-19",
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 30
+              },
+              {
+                "date": "2026-10-20",
+                "ceilingMinutes": 0,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 0
+              },
+              {
+                "date": "2026-10-21",
+                "ceilingMinutes": 45,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 45
+              },
+              {
+                "date": "2026-10-22",
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 30
+              },
+              {
+                "date": "2026-10-23",
+                "ceilingMinutes": 0,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 0
+              },
+              {
+                "date": "2026-10-24",
+                "ceilingMinutes": 60,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 60
+              },
+              {
+                "date": "2026-10-25",
+                "ceilingMinutes": 0,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 0
+              },
+              {
+                "date": "2026-10-26",
+                "ceilingMinutes": 30,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 30
+              },
+              {
+                "date": "2026-10-27",
+                "ceilingMinutes": 0,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 0
+              },
+              {
+                "date": "2026-10-28",
+                "ceilingMinutes": 45,
+                "otherCommittedMinutes": 0,
+                "availableMinutes": 45
+              }
+            ],
+            "constraints": "Listed minutes are the complete remaining study capacity. Zero means unavailable. Breaks must not become extra study time; the ceilings are not a target to fill. There is no selected existing Planner work or protected execution. Completion on the deadline is permitted, but finishing earlier is preferred when realistic."
+          },
+          "unknowns": [
+            "How many attempts the join/count misconceptions will require",
+            "Unaided explanation after correction",
+            "The eventual demonstration questions, which are not extra deliverables now"
+          ]
+        }
+      },
+      "plans": [
+        {
+          "planRef": "plan_1",
+          "requested": {
+            "title": "Library query project: correct joins and honest counts",
+            "outcome": "Complete and understand four read-only SQLite queries for the supplied library database, including all readers when required, correct zero counts and the requested filtering, with a short explanation and a checked result for each query by 28 October.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "FIXED",
+              "date": "2026-10-28",
+              "examDayStudyAllowed": true
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 20,
+              "maximumTimeboxMinutes": 30
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Open-loan inner join",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "All-reader total counts including zero",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_3",
+                "title": "All-reader open-loan counts with correct filtering",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_4",
+                "title": "Group filtering with HAVING and explanation",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "resolved": {
+            "title": "Library query project: correct joins and honest counts",
+            "outcome": "Complete and understand four read-only SQLite queries for the supplied library database, including all readers when required, correct zero counts and the requested filtering, with a short explanation and a checked result for each query by 28 October.",
+            "policy": "GENERAL",
+            "deadline": {
+              "kind": "FIXED",
+              "date": "2026-10-28",
+              "examDayStudyAllowed": true
+            },
+            "preferences": {
+              "pacing": "COMFORTABLE_EARLY",
+              "desiredIntensity": "MODERATE",
+              "preferredTimeboxMinutes": 20,
+              "maximumTimeboxMinutes": 30
+            },
+            "scope": [
+              {
+                "ref": "scope_1",
+                "title": "Open-loan inner join",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_2",
+                "title": "All-reader total counts including zero",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_3",
+                "title": "All-reader open-loan counts with correct filtering",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              },
+              {
+                "ref": "scope_4",
+                "title": "Group filtering with HAVING and explanation",
+                "inclusion": "REQUESTED",
+                "sourceClaimIds": []
+              }
+            ]
+          },
+          "learningEvidence": [
+            {
+              "evidenceId": "evidence_1",
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-16T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 16 October I independently selected the title column and filtered returned_at IS NULL correctly on two single-table tasks. On a joined task I omitted the ON condition and produced repeated unrelated reader/loan pairs; with a hint I corrected the join. I have not demonstrated a correct join unaided.",
+              "demonstratesReadiness": false,
+              "scopeRefs": [
+                "scope_1"
+              ]
+            },
+            {
+              "evidenceId": "evidence_2",
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-16T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "On 16 October I used an INNER JOIN for an all-reader count and omitted Eli, who has no loans. After changing to a LEFT JOIN I used COUNT(*) and reported Eli as having one loan instead of zero. I have not corrected that count independently.",
+              "demonstratesReadiness": false,
+              "scopeRefs": [
+                "scope_2",
+                "scope_3"
+              ]
+            },
+            {
+              "evidenceId": "evidence_3",
+              "source": "SELF_REPORT",
+              "observedAt": "2026-10-16T00:00:00Z",
+              "reliability": "SELF_REPORTED",
+              "statement": "I can group rows when shown an example. I have not yet explained WHERE versus HAVING or tested a grouped filter unaided. No completion or time log is being treated as mastery.",
+              "demonstratesReadiness": false,
+              "scopeRefs": [
+                "scope_4"
+              ]
+            }
+          ],
+          "resources": [
+            {
+              "ref": "resource_1",
+              "name": "Installed offline SQLite editor and complete assignment database",
+              "available": true,
+              "content": "CREATE TABLE readers (reader_id INTEGER PRIMARY KEY, name TEXT NOT NULL);\nCREATE TABLE loans (loan_id INTEGER PRIMARY KEY, reader_id INTEGER NOT NULL, title TEXT NOT NULL, returned_at TEXT);\nINSERT INTO readers VALUES (1,'Amina'),(2,'Ben'),(3,'Cleo'),(4,'Dara'),(5,'Eli');\nINSERT INTO loans VALUES (101,1,'Atlas',NULL),(102,1,'Comets','2026-10-18'),(103,2,'Atlas',NULL),(104,2,'Rivers','2026-10-17'),(105,3,'Moss',NULL),(106,3,'Comets',NULL),(107,4,'Trees','2026-10-18');\nEach loan_id is non-null and unique. NULL in returned_at means currently open. Eli has no loans; Dara has only a returned loan. The data are artificial and contain no real users. Do not change these tables or records to make a query pass."
+            },
+            {
+              "ref": "resource_2",
+              "name": "Actual tasks and available expected results",
+              "available": true,
+              "content": "Query 1: Show each open loan's loan_id, reader name and title, ordered by loan_id. Expected rows: (101,Amina,Atlas); (103,Ben,Atlas); (105,Cleo,Moss); (106,Cleo,Comets).\nQuery 2: Show every reader's name and total loan count, ordered by name, including zero. Expected rows: (Amina,2); (Ben,2); (Cleo,2); (Dara,1); (Eli,0).\nQuery 3: Show every reader's name and current open-loan count, ordered by name, including readers whose count is zero. Expected rows: (Amina,1); (Ben,1); (Cleo,2); (Dara,0); (Eli,0).\nQuery 4: Show names and total loan counts for readers with at least two loans, ordered by name. Expected rows: (Amina,2); (Ben,2); (Cleo,2).\nThe instructor accepts equivalent correct SELECT queries. A matching output needs a correct explanation, not just a screenshot. Extra queries are not required deliverables."
+            },
+            {
+              "ref": "resource_3",
+              "name": "Available classroom syntax notes",
+              "available": true,
+              "content": "An INNER JOIN keeps matching row pairs. A LEFT JOIN keeps every left-table row and supplies NULL right-table columns when no match exists. The ON predicate decides matching; WHERE filters joined rows, so a right-table condition there can remove a left row that was meant to remain. COUNT(*) counts rows; COUNT(column) counts non-null values of that column. GROUP BY forms groups; HAVING filters groups after aggregation. Test IS NULL rather than equality to NULL. SELECT ... FROM readers AS r LEFT JOIN loans AS l ON l.reader_id=r.reader_id GROUP BY r.reader_id,r.name is a useful structure to inspect, not a completed answer to all four tasks. Small learner-created counterexamples are allowed if kept separate from the assignment data and identified as practice; they are not extra assessed deliverables."
+            }
+          ],
+          "provenance": {
+            "kind": "SYNTHETIC_STUDENT_SUPPLIED",
+            "authority": "Accepted case facts; no external official verification or live execution."
+          }
+        }
+      ]
+    },
+    "envelope": {
+      "schemaVersion": 2,
+      "timezone": "Asia/Karachi",
+      "today": "2026-10-19",
+      "window": {
+        "start": "2026-10-19",
+        "end": "2026-10-28"
+      },
+      "capacityDigest": "c6ce67c1399ef04311e29411219725042d56915da3480f1af293ae3bfffa9d78",
+      "basis": "CONFIRMED_AVAILABILITY",
+      "weeklyCeilingMinutes": 180,
+      "recoveryPercent": 0,
+      "targets": [
+        {
+          "planRef": "plan_1",
+          "deadline": {
+            "kind": "FIXED",
+            "date": "2026-10-28",
+            "examDayStudyAllowed": true
+          },
+          "perGoalWeeklyCeilingMinutes": null
+        }
+      ],
+      "days": [
+        {
+          "date": "2026-10-19",
+          "ceilingMinutes": 30,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 30,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-20",
+          "ceilingMinutes": 0,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 0,
+          "excluded": true
+        },
+        {
+          "date": "2026-10-21",
+          "ceilingMinutes": 45,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 45,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-22",
+          "ceilingMinutes": 30,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 30,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-23",
+          "ceilingMinutes": 0,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 0,
+          "excluded": true
+        },
+        {
+          "date": "2026-10-24",
+          "ceilingMinutes": 60,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 60,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-25",
+          "ceilingMinutes": 0,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 0,
+          "excluded": true
+        },
+        {
+          "date": "2026-10-26",
+          "ceilingMinutes": 30,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 30,
+          "excluded": false
+        },
+        {
+          "date": "2026-10-27",
+          "ceilingMinutes": 0,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 0,
+          "excluded": true
+        },
+        {
+          "date": "2026-10-28",
+          "ceilingMinutes": 45,
+          "otherCommittedMinutes": 0,
+          "protectedTargetMinutes": 0,
+          "recoveryMinutes": 0,
+          "availableMinutes": 45,
+          "excluded": false
+        }
+      ],
+      "protectedExecution": [],
+      "timeboxRange": {
+        "minMinutes": 5,
+        "maxMinutes": 30
+      }
+    },
+    "acceptedRequest": {
+      "text": "Plan how I should complete and understand the actual four-query assignment using the provided database, expected results and syntax notes. Address my join and count errors. Stop once the queries and explanations meet the rubric; suggest further work only if it has a clear purpose or a checkpoint actually fails. Keep the stated deadline, unavailable days and session limits.",
+      "authorization": "PLAN_ACTION"
+    }
+  },
+  "allocationFacts": {
+    "weeks": [
+      {
+        "week": "2026-10-19",
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "perGoalCommittedMinutes": [
+          {
+            "planRef": "plan_1",
+            "minutes": 0
+          }
+        ]
+      },
+      {
+        "week": "2026-10-26",
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "perGoalCommittedMinutes": [
+          {
+            "planRef": "plan_1",
+            "minutes": 0
+          }
+        ]
+      }
+    ],
+    "pins": [],
+    "externalActivities": [],
+    "preferences": [
+      {
+        "planRef": "plan_1",
+        "pacing": "COMFORTABLE_EARLY",
+        "maximumTimeboxMinutes": 30
+      }
+    ]
+  }
+}

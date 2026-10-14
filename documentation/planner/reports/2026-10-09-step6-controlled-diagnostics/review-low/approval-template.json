@@ -1,0 +1,23 @@
+{
+  "status": "PENDING",
+  "protocolVersion": "2026-10-09-step6-review-low-pair-v1",
+  "manifestSha256": "75283ae84dca1c855e05475cdf1f218367a83e85cd1cd62b8a0ace3b51ce3351",
+  "variantFreezeSha256": "79e1036e6557a2491df994d9110644b276922345208c1976e6c774f3b3b466d0",
+  "independentLabelSignoffSha256": "e88d1ed961881b9994311631b0b0f66a8cf8e6f5a96eed7560eebb26eb900f30",
+  "unpaidPreflightSha256": "9897d5c2be48465c38d5a184b9c9b38f129f9e25abffe8c9ca0cf0798fa4245a",
+  "maximumSpendUsd": 0.02,
+  "maximumTotalDispatches": 2,
+  "maximumRecoveryDispatches": 0,
+  "reasoningEffort": "low",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "publication": "FORBIDDEN",
+  "approvedBy": null,
+  "approvedAt": null,
+  "approvalEvidence": null,
+  "publicMetadataVerifiedAt": null,
+  "publicMetadataEvidence": {
+    "path": "review-low/evidence/public-metadata.json",
+    "sha256": "ebc0faa4f9a2f70e3f0a767c0b47adf1a532166e2258bf66e3f5abf946137bce"
+  }
+}

@@ -99,7 +99,6 @@ enum ItemRarity {
   MYTHIC
 }
 
-
 enum CosmeticCategory {
   THEME
   BACKGROUND
@@ -163,12 +162,12 @@ model User {
   notificationPreferences Json?
 
   // Focus Timer Background Preference (Phase 4 & 5B)
-  focusBackgroundSource            String                    @default("classic") // 'classic' | 'official' | 'custom'
+  focusBackgroundSource            String               @default("classic") // 'classic' | 'official' | 'custom'
   selectedFocusBackgroundId        Int?
-  selectedFocusBackground          FocusBackground?          @relation(fields: [selectedFocusBackgroundId], references: [id], onDelete: SetNull)
+  selectedFocusBackground          FocusBackground?     @relation(fields: [selectedFocusBackgroundId], references: [id], onDelete: SetNull)
   selectedCustomBackgroundId       Int?
-  selectedCustomBackground         UserFocusBackground?      @relation("SelectedCustomBackground", fields: [selectedCustomBackgroundId], references: [id], onDelete: SetNull)
-  focusBackgroundPreferenceVersion Int                       @default(0)
+  selectedCustomBackground         UserFocusBackground? @relation("SelectedCustomBackground", fields: [selectedCustomBackgroundId], references: [id], onDelete: SetNull)
+  focusBackgroundPreferenceVersion Int                  @default(0)
 
   // Academic Cognitive Stats Matrix (Attributes 0-100+)
   statEndurance  Int @default(10) // END: Long-duration unbroken focus blocks (>60m)
@@ -187,30 +186,32 @@ model User {
   enableHpPenalty               Boolean @default(true)
   lastDailyPenaltyEvaluatedDate String  @default("")
 
-  goals              Goal[]
-  quests             Quest[]
-  sessions           StudySession[]
-  systemMessages     SystemMessage[]
-  subjects           Subject[]
-  inventoryItems     InventoryItem[]
-  inventory          UserInventory[]
-  sylphLedger        SylphLedger[]
-  hpLedger           HpLedger[]
-  xpLedger           XpLedger[]
-  userSkillNodes     UserSkillNode[]
-  chatSessions       ChatSession[]
-  cosmetics          UserCosmetic[]
-  achievements       UserAchievement[]
-  privacy            UserPrivacy?
-  connectedAccounts  ConnectedAccount[]
-  verificationTokens VerificationToken[]
-  authSessions       AuthSession[]
-  floatingRestDays   FloatingRestDay[]
-  plannerPlans       PlannerPlan[]
+  goals                 Goal[]
+  quests                Quest[]
+  sessions              StudySession[]
+  timerStarts           TimerSessionStart[]
+  systemMessages        SystemMessage[]
+  subjects              Subject[]
+  inventoryItems        InventoryItem[]
+  inventory             UserInventory[]
+  sylphLedger           SylphLedger[]
+  hpLedger              HpLedger[]
+  xpLedger              XpLedger[]
+  userSkillNodes        UserSkillNode[]
+  chatSessions          ChatSession[]
+  cosmetics             UserCosmetic[]
+  pixelCreations        PixelCreation[]
+  achievements          UserAchievement[]
+  privacy               UserPrivacy?
+  connectedAccounts     ConnectedAccount[]
+  verificationTokens    VerificationToken[]
+  authSessions          AuthSession[]
+  floatingRestDays      FloatingRestDay[]
+  plannerPlans          PlannerPlan[]
   plannerIntentVersions PlannerIntentVersion[]
-  plannerAttempts PlannerAttempt[]
-  plannerCheckResults PlannerCheckResult[]
-  plannerPreferences PlannerPreference[]
+  plannerAttempts       PlannerAttempt[]
+  plannerCheckResults   PlannerCheckResult[]
+  plannerPreferences    PlannerPreference[]
   plannerFrictionEvents PlannerFrictionEvent[]
   plannerIntakeSessions PlannerIntakeSession[]
 
@@ -300,7 +301,7 @@ model Goal {
   color       String      @default("EMERALD")
   createdAt   DateTime    @default(now())
 
-  quests Quest[]
+  quests       Quest[]
   plannerPlans PlannerPlan[]
 
   @@index([userId, status])
@@ -313,20 +314,20 @@ model Goal {
 // ==========================================
 
 model Subject {
-  id           Int           @id @default(autoincrement())
-  userId       Int
-  name         String        // e.g., "A-Level Mathematics"
-  code         String        @default("GENERAL") // e.g., "9709"
-  examBoard    String        @default("CAIE")    // e.g., "CAIE", "Edexcel", "AQA", "AP", "IB"
-  level        String        @default("A-Level") // e.g., "A-Level", "AS-Level", "AP", "University"
-  color        String        @default("#8B5CF6")
-  syllabusNote String?       // Free-text book / syllabus details (used by the AI syllabus dissection)
-  lastCompiledAt DateTime?   // Set when the AI 48-node syllabus compilation commits (30-day recompile cooldown)
-  archivedAt   DateTime?     // Soft-delete timestamp for safe subject deletion
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @default(now()) @updatedAt
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  name           String // e.g., "A-Level Mathematics"
+  code           String    @default("GENERAL") // e.g., "9709"
+  examBoard      String    @default("CAIE") // e.g., "CAIE", "Edexcel", "AQA", "AP", "IB"
+  level          String    @default("A-Level") // e.g., "A-Level", "AS-Level", "AP", "University"
+  color          String    @default("#8B5CF6")
+  syllabusNote   String? // Free-text book / syllabus details (used by the AI syllabus dissection)
+  lastCompiledAt DateTime? // Set when the AI 48-node syllabus compilation commits (30-day recompile cooldown)
+  archivedAt     DateTime? // Soft-delete timestamp for safe subject deletion
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   nodes        SubjectNode[]
   quests       Quest[]
   sessions     StudySession[]
@@ -338,22 +339,22 @@ model Subject {
 }
 
 model SubjectNode {
-  id           Int       @id @default(autoincrement())
-  subjectId    Int
-  nodeId       String    // Matches skeleton: "N1_1", "N2_1", ..., "N10_1"
-  tier         Int       // 1 to 10
-  title        String    // AI-generated syllabus topic name
-  description  String    // Learning objectives / syllabus subtopics
-  difficulty   Int       // 1 to 5
-  spAward      Int       // T1-T3: 1, T4-T5: 2, T6-T7: 3, T8-T9: 4, T10: 0
-  progress     Float     @default(0.0) // 0.0 to 100.0%
-  isMastered   Boolean   @default(false)
-  masteredAt   DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id          Int       @id @default(autoincrement())
+  subjectId   Int
+  nodeId      String // Matches skeleton: "N1_1", "N2_1", ..., "N10_1"
+  tier        Int // 1 to 10
+  title       String // AI-generated syllabus topic name
+  description String // Learning objectives / syllabus subtopics
+  difficulty  Int // 1 to 5
+  spAward     Int // T1-T3: 1, T4-T5: 2, T6-T7: 3, T8-T9: 4, T10: 0
+  progress    Float     @default(0.0) // 0.0 to 100.0%
+  isMastered  Boolean   @default(false)
+  masteredAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  subject      Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  quests       Quest[]
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  quests  Quest[]
 
   @@unique([subjectId, nodeId])
 }
@@ -385,19 +386,19 @@ model Quest {
   createdAt          DateTime        @default(now())
   completedAt        DateTime?
 
-  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  goal               Goal?           @relation(fields: [goalId], references: [id], onDelete: SetNull)
-  subject            Subject?        @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  subjectNode        SubjectNode?    @relation(fields: [subjectNodeId], references: [id], onDelete: SetNull)
-  sessions           StudySession[]
-  plannerLink        PlannerQuestLink?
-  plannedMinutes     Int?
-  remainingMinutesEstimate Int?
+  user                                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal                                Goal?             @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  subject                             Subject?          @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subjectNode                         SubjectNode?      @relation(fields: [subjectNodeId], references: [id], onDelete: SetNull)
+  sessions                            StudySession[]
+  plannerLink                         PlannerQuestLink?
+  plannedMinutes                      Int?
+  remainingMinutesEstimate            Int?
   remainingEstimateBasisActualSeconds Int?
-  remainingDisposition String @default("OPEN")
-  executionVersion   Int @default(0)
-  plannerSpec        Json?
-  plannerSpecDigest  String?
+  remainingDisposition                String            @default("OPEN")
+  executionVersion                    Int               @default(0)
+  plannerSpec                         Json?
+  plannerSpecDigest                   String?
 
   @@index([userId, status])
   @@index([subjectNodeId])
@@ -406,40 +407,41 @@ model Quest {
 
 // Planner snapshots and lineage only; Quest remains the execution model.
 model PlannerPlan {
-  id                    String @id @default(uuid()) @db.Uuid
-  userId                Int
-  mode                  String
-  title                 String
-  state                 String @default("DRAFT")
-  subjectId             Int?
-  goalId                Int?
-  activeRevisionId      String? @unique @db.Uuid
-  latestDraftRevisionId String? @unique @db.Uuid
-  version               Int @default(0)
-  creationKey           String
-  creationHash          String
-  contractVersion       Int @default(1)
-  workingIntentVersionId String? @unique @db.Uuid
-  conversationVersion   Int @default(0)
-  conversation          Json?
-  researchDocuments     Json?
-  reservedGoalId        Int? @unique
-  migrationEvidence     Json?
-  intentVersions        PlannerIntentVersion[] @relation("IntentPlan")
-  workingIntentVersion  PlannerIntentVersion? @relation("WorkingIntent", fields: [workingIntentVersionId], references: [id], onDelete: NoAction)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  user                  User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject               Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  goal                  Goal? @relation(fields: [goalId], references: [id], onDelete: SetNull)
-  revisions             PlannerRevision[] @relation("PlanRevisions")
-  activeRevision        PlannerRevision? @relation("ActiveRevision", fields: [activeRevisionId], references: [id], onDelete: NoAction)
-  latestDraftRevision   PlannerRevision? @relation("LatestDraft", fields: [latestDraftRevisionId], references: [id], onDelete: NoAction)
-  links                 PlannerQuestLink[]
-  checkResults          PlannerCheckResult[]
-  preferences           PlannerPreference[]
-  frictionEvents        PlannerFrictionEvent[]
-  intakeSessions        PlannerIntakeSession[]
+  id                     String                 @id @default(uuid()) @db.Uuid
+  userId                 Int
+  mode                   String
+  title                  String
+  state                  String                 @default("DRAFT")
+  subjectId              Int?
+  goalId                 Int?
+  activeRevisionId       String?                @unique @db.Uuid
+  latestDraftRevisionId  String?                @unique @db.Uuid
+  version                Int                    @default(0)
+  creationKey            String
+  creationHash           String
+  contractVersion        Int                    @default(1)
+  workingIntentVersionId String?                @unique @db.Uuid
+  conversationVersion    Int                    @default(0)
+  conversation           Json?
+  researchDocuments      Json?
+  reservedGoalId         Int?                   @unique
+  migrationEvidence      Json?
+  intentVersions         PlannerIntentVersion[] @relation("IntentPlan")
+  workingIntentVersion   PlannerIntentVersion?  @relation("WorkingIntent", fields: [workingIntentVersionId], references: [id], onDelete: NoAction)
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  user                   User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject                Subject?               @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  goal                   Goal?                  @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  revisions              PlannerRevision[]      @relation("PlanRevisions")
+  activeRevision         PlannerRevision?       @relation("ActiveRevision", fields: [activeRevisionId], references: [id], onDelete: NoAction)
+  latestDraftRevision    PlannerRevision?       @relation("LatestDraft", fields: [latestDraftRevisionId], references: [id], onDelete: NoAction)
+  links                  PlannerQuestLink[]
+  checkResults           PlannerCheckResult[]
+  preferences            PlannerPreference[]
+  frictionEvents         PlannerFrictionEvent[]
+  intakeSessions         PlannerIntakeSession[]
+
   @@unique([userId, creationKey])
   @@index([userId, state, createdAt])
   @@index([goalId])
@@ -447,42 +449,43 @@ model PlannerPlan {
 }
 
 model PlannerRevision {
-  id                  String @id @default(uuid()) @db.Uuid
-  planId              String @db.Uuid
-  sequence            Int
-  source              String
-  baseRevisionId      String? @db.Uuid
-  baseVersion         Int
-  schemaVersion       Int @default(1)
-  attemptId           String? @db.Uuid
-  requestedIntentVersionId String? @db.Uuid
-  resolvedIntentVersionId String? @db.Uuid
-  v2Artifact          Json?
-  attempt             PlannerAttempt? @relation(fields: [attemptId], references: [id], onDelete: NoAction)
-  inputSnapshot       Json
-  availabilitySnapshot Json
-  outputSnapshot      Json?
-  digest              String?
-  operationKey        String
-  operationHash       String
-  operationState      String @default("PREPARING")
-  leaseExpiresAt      DateTime?
-  quotaReceipt        Json?
-  confirmationKey     String?
-  confirmationHash    String?
-  confirmationReceipt Json?
-  confirmedAt         DateTime?
-  createdAt           DateTime @default(now())
-  sealedAt            DateTime?
-  updatedAt           DateTime @updatedAt
-  plan                PlannerPlan @relation("PlanRevisions", fields: [planId], references: [id], onDelete: Cascade)
-  baseRevision        PlannerRevision? @relation("RevisionBase", fields: [baseRevisionId], references: [id], onDelete: NoAction)
-  childRevisions      PlannerRevision[] @relation("RevisionBase")
-  activeFor           PlannerPlan? @relation("ActiveRevision")
-  latestDraftFor      PlannerPlan? @relation("LatestDraft")
-  createdLinks        PlannerQuestLink[] @relation("CreatedRevision")
-  appliedLinks        PlannerQuestLink[] @relation("AppliedRevision")
-  frictionEvents      PlannerFrictionEvent[]
+  id                       String                 @id @default(uuid()) @db.Uuid
+  planId                   String                 @db.Uuid
+  sequence                 Int
+  source                   String
+  baseRevisionId           String?                @db.Uuid
+  baseVersion              Int
+  schemaVersion            Int                    @default(1)
+  attemptId                String?                @db.Uuid
+  requestedIntentVersionId String?                @db.Uuid
+  resolvedIntentVersionId  String?                @db.Uuid
+  v2Artifact               Json?
+  attempt                  PlannerAttempt?        @relation(fields: [attemptId], references: [id], onDelete: NoAction)
+  inputSnapshot            Json
+  availabilitySnapshot     Json
+  outputSnapshot           Json?
+  digest                   String?
+  operationKey             String
+  operationHash            String
+  operationState           String                 @default("PREPARING")
+  leaseExpiresAt           DateTime?
+  quotaReceipt             Json?
+  confirmationKey          String?
+  confirmationHash         String?
+  confirmationReceipt      Json?
+  confirmedAt              DateTime?
+  createdAt                DateTime               @default(now())
+  sealedAt                 DateTime?
+  updatedAt                DateTime               @updatedAt
+  plan                     PlannerPlan            @relation("PlanRevisions", fields: [planId], references: [id], onDelete: Cascade)
+  baseRevision             PlannerRevision?       @relation("RevisionBase", fields: [baseRevisionId], references: [id], onDelete: NoAction)
+  childRevisions           PlannerRevision[]      @relation("RevisionBase")
+  activeFor                PlannerPlan?           @relation("ActiveRevision")
+  latestDraftFor           PlannerPlan?           @relation("LatestDraft")
+  createdLinks             PlannerQuestLink[]     @relation("CreatedRevision")
+  appliedLinks             PlannerQuestLink[]     @relation("AppliedRevision")
+  frictionEvents           PlannerFrictionEvent[]
+
   @@unique([planId, sequence])
   @@unique([planId, operationKey])
   @@unique([planId, confirmationKey])
@@ -491,28 +494,29 @@ model PlannerRevision {
 }
 
 model PlannerQuestLink {
-  id                String @id @default(uuid()) @db.Uuid
-  planId            String @db.Uuid
-  itemKey           String @db.Uuid
-  questId           Int? @unique
-  createdRevisionId String @db.Uuid
-  appliedRevisionId String @db.Uuid
-  disposition       String @default("LIVE")
-  baseline          Json
+  id                 String          @id @default(uuid()) @db.Uuid
+  planId             String          @db.Uuid
+  itemKey            String          @db.Uuid
+  questId            Int?            @unique
+  createdRevisionId  String          @db.Uuid
+  appliedRevisionId  String          @db.Uuid
+  disposition        String          @default("LIVE")
+  baseline           Json
   baselineSpecDigest String?
-  changedAt         DateTime?
-  removedAt         DateTime?
-  removalReason     String?
+  changedAt          DateTime?
+  removedAt          DateTime?
+  removalReason      String?
   /// Released-work re-offer bookkeeping: OFFERED | ACCEPTED | DECLINED, or null.
   /// Never the release decision itself — that stays frozen by the row guard.
-  reofferState      String?
-  reofferedAt       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  plan              PlannerPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
-  quest             Quest? @relation(fields: [questId], references: [id], onDelete: SetNull)
-  createdRevision   PlannerRevision @relation("CreatedRevision", fields: [createdRevisionId], references: [id], onDelete: NoAction)
-  appliedRevision   PlannerRevision @relation("AppliedRevision", fields: [appliedRevisionId], references: [id], onDelete: NoAction)
+  reofferState       String?
+  reofferedAt        DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  plan               PlannerPlan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  quest              Quest?          @relation(fields: [questId], references: [id], onDelete: SetNull)
+  createdRevision    PlannerRevision @relation("CreatedRevision", fields: [createdRevisionId], references: [id], onDelete: NoAction)
+  appliedRevision    PlannerRevision @relation("AppliedRevision", fields: [appliedRevisionId], references: [id], onDelete: NoAction)
+
   @@unique([planId, itemKey])
 }
 
@@ -522,14 +526,14 @@ model PlannerQuestLink {
 // enabled and no client grants, and it deliberately carries no reflection text or
 // score, only the fixed closed vocabulary the user chose.
 model PlannerCheckResult {
-  id         String   @id @default(uuid()) @db.Uuid
-  planId     String   @db.Uuid
+  id         String      @id @default(uuid()) @db.Uuid
+  planId     String      @db.Uuid
   userId     Int
-  revisionId String   @db.Uuid
-  itemKey    String   @db.Uuid
+  revisionId String      @db.Uuid
+  itemKey    String      @db.Uuid
   result     String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   plan       PlannerPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -545,17 +549,17 @@ model PlannerCheckResult {
 // grants — and deliberately carries no academic content (no topic/quest titles,
 // no free text). See lib/planner/server/preferences.ts for the value encodings.
 model PlannerPreference {
-  id              String   @id @default(uuid()) @db.Uuid
+  id              String       @id @default(uuid()) @db.Uuid
   userId          Int
-  planId          String?  @db.Uuid
+  planId          String?      @db.Uuid
   preferenceType  String
   value           String
-  evidenceCount   Int      @default(0)
-  confidence      Int      @default(0) // 0..100; 100 = explicitly confirmed
+  evidenceCount   Int          @default(0)
+  confidence      Int          @default(0) // 0..100; 100 = explicitly confirmed
   lastConfirmedAt DateTime?
   ignoredAt       DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
   user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan            PlannerPlan? @relation(fields: [planId], references: [id], onDelete: Cascade)
 
@@ -570,16 +574,16 @@ model PlannerPreference {
 // column: the closed reason code is the whole signal. Private planner storage:
 // RLS enabled, no client grants.
 model PlannerFrictionEvent {
-  id         String   @id @default(uuid()) @db.Uuid
-  planId     String   @db.Uuid
-  revisionId String?  @db.Uuid
+  id         String           @id @default(uuid()) @db.Uuid
+  planId     String           @db.Uuid
+  revisionId String?          @db.Uuid
   itemKey    String
   userId     Int
   reasonCode String
-  createdAt  DateTime @default(now())
-  plan       PlannerPlan       @relation(fields: [planId], references: [id], onDelete: Cascade)
-  revision   PlannerRevision?  @relation(fields: [revisionId], references: [id], onDelete: SetNull)
-  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+  plan       PlannerPlan      @relation(fields: [planId], references: [id], onDelete: Cascade)
+  revision   PlannerRevision? @relation(fields: [revisionId], references: [id], onDelete: SetNull)
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, planId, revisionId, itemKey, reasonCode])
   @@index([planId])
@@ -595,16 +599,16 @@ model PlannerFrictionEvent {
 // is bounded by the server module on write (64 KiB), not by the column. Private
 // planner storage: RLS enabled, no client grants.
 model PlannerIntakeSession {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String       @id @default(uuid()) @db.Uuid
   userId    Int
   clientKey String
   mode      String
   brief     Json
-  version   Int      @default(0)
-  planId    String?  @db.Uuid
+  version   Int          @default(0)
+  planId    String?      @db.Uuid
   expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan      PlannerPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
 
@@ -614,31 +618,46 @@ model PlannerIntakeSession {
 }
 
 model StudySession {
-  id              Int       @id @default(autoincrement())
-  userId          Int
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  questId         Int?
-  quest           Quest?    @relation(fields: [questId], references: [id], onDelete: SetNull)
-  subjectId       Int?
-  subject         Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  durationMinutes Int
-  durationSeconds Int       @default(0)
-  breakSeconds     Int       @default(0) // break/rest time inside this session — NEVER counted as study time
-  focusRate       Int       @default(80) // Added for AI study planning
-  rewardsClaimed  Boolean   @default(false) // Quest rewards claimed via claim_session_reward_atomic
-  startedAt       DateTime  @default(now())
-  endedAt         DateTime?
-  executionState  String?
-  executionVersion Int @default(0)
-  transitionReceipts Json?
-  executionContext Json?
-  runningSince    DateTime?
-  acceptedFocusAtResume Int @default(0)
-  acceptedBreakAtResume Int @default(0)
+  id                    Int       @id @default(autoincrement())
+  userId                Int
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questId               Int?
+  quest                 Quest?    @relation(fields: [questId], references: [id], onDelete: SetNull)
+  subjectId             Int?
+  subject               Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  durationMinutes       Int
+  durationSeconds       Int       @default(0)
+  breakSeconds          Int       @default(0) // break/rest time inside this session — NEVER counted as study time
+  focusRate             Int       @default(80) // Added for AI study planning
+  rewardsClaimed        Boolean   @default(false) // Quest rewards claimed via claim_session_reward_atomic
+  startedAt             DateTime  @default(now())
+  endedAt               DateTime?
+  executionState        String?
+  executionVersion      Int       @default(0)
+  transitionReceipts    Json?
+  executionContext      Json?
+  runningSince          DateTime?
+  acceptedFocusAtResume Int       @default(0)
+  acceptedBreakAtResume Int       @default(0)
+  timerStarts           TimerSessionStart[]
 
   @@index([userId, startedAt(sort: Desc)])
   @@index([userId, questId])
   @@index([userId, subjectId])
+}
+
+// Durable creation receipts keep a lost POST response replayable after END.
+model TimerSessionStart {
+  userId      Int
+  clientKey   String
+  requestHash String
+  sessionId   Int
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session     StudySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+
+  @@id([userId, clientKey])
+  @@index([sessionId])
 }
 
 model SystemMessage {
@@ -772,10 +791,10 @@ model SessionInvite {
 // ─── Focus Party Multiplayer Study Models ─────────────────────
 
 model FocusParty {
-  id        Int      @id @default(autoincrement())
-  name      String   @default("Focus Party")
-  leaderId  Int
-  leader    User     @relation("partyLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  id          Int       @id @default(autoincrement())
+  name        String    @default("Focus Party")
+  leaderId    Int
+  leader      User      @relation("partyLeader", fields: [leaderId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   disbandedAt DateTime?
@@ -802,10 +821,10 @@ model FocusPartyMember {
 }
 
 model FocusSession {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   partyId   Int
   party     FocusParty @relation(fields: [partyId], references: [id], onDelete: Cascade)
-  startedAt DateTime  @default(now())
+  startedAt DateTime   @default(now())
   endedAt   DateTime?
 
   members FocusSessionMember[]
@@ -825,6 +844,7 @@ model FocusSessionMember {
   joinedAt           DateTime        @default(now())
   leftAt             DateTime?
   lastHeartbeatAt    DateTime?       @default(now())
+  timerTimeline      Json?
 
   @@unique([sessionId, userId])
   @@index([userId])
@@ -870,7 +890,6 @@ model UserInventory {
   @@unique([userId, itemId])
   @@index([userId, isEquipped])
 }
-
 
 model InventoryItem {
   id        Int      @id @default(autoincrement())
@@ -987,6 +1006,48 @@ model UserCosmetic {
 
   @@unique([userId, category, itemKey])
   @@index([userId, category])
+}
+
+/**
+ * A companion drawn by a scholar in Pixel Studio.
+ * WHY A DEDICATED TABLE RATHER THAN `characterConfig`
+ * Two reasons, and the first is the decisive one.
+ * 1. **Size.** A creation is frames of pixels — up to 64 KB of authored data.
+ * `characterConfig` is loaded on every stats fetch, is read by `useDashboardData`,
+ * is embedded in conversation and profile payloads, and is selected by
+ * queries across the app. Putting artwork in it would make every one of
+ * those reads carry the artwork.
+ * 2. **Ownership and lifecycle.** A creation is a thing a scholar *has*, in
+ * possibly several instances, independent of what they currently wear.
+ * `characterConfig` records a *choice*, which is why it references a
+ * creation by id rather than containing it.
+ * The artwork lives in `data` as a versioned JSON document rather than in columns,
+ * because frames are a small, self-contained, always-read-together document whose
+ * shape is owned by the Pixel Display contract — normalising frames into rows
+ * would spread a content format across a schema and make every future version
+ * bump a migration.
+ */
+model PixelCreation {
+  id        String   @id @default(cuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// The creation's own slug, unique per scholar. Usable as a stable reference.
+  slug      String
+  /// Display name, echoed from the document for listing without decoding it.
+  name      String
+  /// The authored grid size, echoed for the same reason.
+  grid      Int
+  /// Format version of `data`, so a future format can be migrated rather than
+  /// guessed at.
+  revision  Int      @default(1)
+  version   Int
+  /// The whole `PixelCreation` document: palette, frames, timings, playback.
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, slug])
+  @@index([userId, updatedAt(sort: Desc)])
 }
 
 model UserAchievement {
@@ -1153,10 +1214,10 @@ model WaitlistEntry {
   id            Int      @id @default(autoincrement())
   email         String   @unique
   name          String?
-  targetExam    String?  // e.g. "MCAT", "USMLE", "A-Levels", "AP Exams", "Computer Science", "Engineering", "General Study"
-  scholarClass  String?  // e.g. "SCHOLAR", "ANALYST", "ENGINEER", "SCIENTIST", "RESEARCHER", "PSYCHOLOGIST", "STRATEGIST", "CREATIVE"
+  targetExam    String? // e.g. "MCAT", "USMLE", "A-Levels", "AP Exams", "Computer Science", "Engineering", "General Study"
+  scholarClass  String? // e.g. "SCHOLAR", "ANALYST", "ENGINEER", "SCIENTIST", "RESEARCHER", "PSYCHOLOGIST", "STRATEGIST", "CREATIVE"
   referralCode  String   @unique
-  referredBy    String?  // referralCode of who referred them
+  referredBy    String? // referralCode of who referred them
   referralCount Int      @default(0)
   createdAt     DateTime @default(now())
 
@@ -1183,21 +1244,21 @@ model FocusBackgroundCategory {
 }
 
 model FocusBackground {
-  id          Int                     @id @default(autoincrement())
-  categoryId  Int
-  category    FocusBackgroundCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  name        String
-  storagePath String
-  width       Int
-  height      Int
-  aspectRatio Float
-  focalX        Float?                  @default(0.5)
-  focalY        Float?                  @default(0.5)
-  timerPosition String?                 @default("auto")
-  sortOrder     Int                     @default(0)
-  isActive    Boolean                 @default(true)
-  createdAt   DateTime                @default(now())
-  updatedAt   DateTime                @updatedAt
+  id                Int                     @id @default(autoincrement())
+  categoryId        Int
+  category          FocusBackgroundCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name              String
+  storagePath       String
+  width             Int
+  height            Int
+  aspectRatio       Float
+  focalX            Float?                  @default(0.5)
+  focalY            Float?                  @default(0.5)
+  timerPosition     String?                 @default("auto")
+  sortOrder         Int                     @default(0)
+  isActive          Boolean                 @default(true)
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
   usersWithSelected User[]
 
   @@index([categoryId])
@@ -1207,23 +1268,23 @@ model FocusBackground {
 // ─── Custom User Focus Backgrounds (Phase 5A) ─────────────────
 
 model UserFocusBackground {
-  id            Int      @id @default(autoincrement())
-  userId        Int
-  user          User     @relation("UserOwnedCustomBackgrounds", fields: [userId], references: [id], onDelete: Cascade)
-  name          String
-  storagePath   String
-  width         Int
-  height        Int
-  aspectRatio   Float
-  focalX        Float?   @default(0.5)
-  focalY        Float?   @default(0.5)
-  timerPosition String?  @default("auto")
-  layoutKey     String?  @default("classic") // 'classic' | 'anime' | 'landscape' | 'fantasy'
-  fileSize      Int?
-  mimeType      String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  selectedByUsers User[] @relation("SelectedCustomBackground")
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation("UserOwnedCustomBackgrounds", fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  storagePath     String
+  width           Int
+  height          Int
+  aspectRatio     Float
+  focalX          Float?   @default(0.5)
+  focalY          Float?   @default(0.5)
+  timerPosition   String?  @default("auto")
+  layoutKey       String?  @default("classic") // 'classic' | 'anime' | 'landscape' | 'fantasy'
+  fileSize        Int?
+  mimeType        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  selectedByUsers User[]   @relation("SelectedCustomBackground")
 
   @@index([userId])
   @@index([userId, createdAt])
@@ -1231,40 +1292,42 @@ model UserFocusBackground {
 
 // V2 adds only immutable intent versions and the durable Attempt/queue.
 model PlannerIntentVersion {
-  id String @id @db.Uuid
-  planId String @db.Uuid
-  userId Int
-  parentId String? @db.Uuid
-  version Int
-  artifact Json
-  digest String
-  createdAt DateTime @default(now())
-  plan PlannerPlan @relation("IntentPlan", fields: [planId], references: [id], onDelete: Cascade)
-  workingFor PlannerPlan? @relation("WorkingIntent")
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parent PlannerIntentVersion? @relation("IntentAncestry", fields: [parentId], references: [id], onDelete: NoAction)
-  children PlannerIntentVersion[] @relation("IntentAncestry")
+  id         String                 @id @db.Uuid
+  planId     String                 @db.Uuid
+  userId     Int
+  parentId   String?                @db.Uuid
+  version    Int
+  artifact   Json
+  digest     String
+  createdAt  DateTime               @default(now())
+  plan       PlannerPlan            @relation("IntentPlan", fields: [planId], references: [id], onDelete: Cascade)
+  workingFor PlannerPlan?           @relation("WorkingIntent")
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent     PlannerIntentVersion?  @relation("IntentAncestry", fields: [parentId], references: [id], onDelete: NoAction)
+  children   PlannerIntentVersion[] @relation("IntentAncestry")
+
   @@unique([planId, version])
   @@unique([id, planId])
 }
 
 model PlannerAttempt {
-  id String @id @db.Uuid
-  userId Int
-  kind String
-  state String
-  requestKey String
-  requestHash String
-  fence Int @default(0)
-  leaseOwner String?
-  leaseExpiresAt DateTime?
+  id                  String            @id @db.Uuid
+  userId              Int
+  kind                String
+  state               String
+  requestKey          String
+  requestHash         String
+  fence               Int               @default(0)
+  leaseOwner          String?
+  leaseExpiresAt      DateTime?
   executionDeadlineAt DateTime?
-  artifact Json
-  payload Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  revisions PlannerRevision[]
+  artifact            Json
+  payload             Json?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revisions           PlannerRevision[]
+
   @@unique([userId, requestKey])
   @@index([state, createdAt])
   @@index([state, leaseExpiresAt])

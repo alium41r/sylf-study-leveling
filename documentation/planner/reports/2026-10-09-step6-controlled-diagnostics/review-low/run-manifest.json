@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "2026-10-09-step6-review-low-pair-v1",
+  "status": "PREPARED_AWAITING_PAID_APPROVAL",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "modelVersion": "DeepSeek-V4.1-Flash",
+  "reasoningEffort": "low",
+  "thinking": "OMITTED_ENABLED_DEFAULT",
+  "maximumTotalDispatches": 2,
+  "maximumRecoveryDispatches": 0,
+  "maximumSpendUsd": 0.02,
+  "publication": "FORBIDDEN",
+  "allowFallback": false,
+  "perCaseAttempts": 1,
+  "runs": [
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "caseId": "v09",
+      "variant": "fixed",
+      "packet": "model/packets/d_21da0ca3d648bd22.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11303,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "caseId": "v04",
+      "variant": "fixed",
+      "packet": "model/packets/d_6de45b407ca18e60.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11939,
+      "dependencies": []
+    }
+  ],
+  "wholeBatchInputReservationUnits": 23242,
+  "wholeBatchOutputTokenCap": 8192,
+  "reservedNanodollars": 16803000
+}

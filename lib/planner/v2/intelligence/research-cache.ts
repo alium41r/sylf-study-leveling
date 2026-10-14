@@ -5,7 +5,7 @@ import type { fetchSource } from "../../research/search/fetch-runtime";
 import type { ReadSource } from "./research-verification";
 
 export function researchResultCacheKey(ownerId:number,intents:unknown,sources:readonly ReadSource[],extraction:unknown) {
-  return `planner:v2:research:owner:${ownerId}:${hash("research-cache-v1",{intents,extraction,sources:sources.map(s=>({location:s.source.location,contentHash:s.source.contentHash,sectionsDigest:hash("selected-source-text",s.sections),extraction:s.source.extraction}))})}`;
+  return `planner:v2:research:owner:${ownerId}:${hash("research-cache-v2-bound-scope",{intents,extraction,sources:sources.map(s=>({location:s.source.location,contentHash:s.source.contentHash,sectionsDigest:hash("selected-source-text",s.sections),extraction:s.source.extraction}))})}`;
 }
 /** Keep individual values bounded even in the existing in-process fallback. */
 export async function boundedResearchCache<T>(key:string,ttl:number,load:()=>Promise<T>):Promise<T> {

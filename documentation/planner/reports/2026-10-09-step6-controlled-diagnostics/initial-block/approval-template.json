@@ -1,0 +1,18 @@
+{
+  "status": "PENDING",
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v2",
+  "protocolManifestSha256": null,
+  "independentLabelSignoffSha256": null,
+  "unpaidPreflightSha256": null,
+  "approvedBy": null,
+  "approvedAt": null,
+  "approvalEvidence": null,
+  "maximumSpendUsd": 0.4,
+  "maximumTotalDispatches": 20,
+  "maximumRecoveryDispatches": 0,
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "publication": "FORBIDDEN",
+  "publicMetadataVerifiedAt": null,
+  "publicMetadataEvidence": null
+}

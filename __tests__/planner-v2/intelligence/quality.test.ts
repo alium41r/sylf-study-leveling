@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildReviewInput, goalForReview, incompleteQuality, validateQualityReview,
-  validateQualityVerification, qualityInstruction, verificationHoldback, modelReviewInput } from "@/lib/planner/v2/intelligence/quality";
+  validateQualityVerification, qualityInstruction, verificationHoldback, modelReviewInput, auditWorkload } from "@/lib/planner/v2/intelligence/quality";
 import { CompilerCheckpointSchema } from "@/lib/planner/v2/intelligence/schemas/checkpoint";
 import { QualitySupportSchema } from "@/lib/planner/v2/intelligence/schemas/quality";
 import { hash } from "@/lib/planner/v2/server/database";
@@ -214,4 +214,29 @@ describe("independent grounded quality boundary", () => {
     f.checkpoint.payload={...f.checkpoint.payload,stage:'REPAIR',quality:review.reports.map(q=>({...q,report:{...q.report,status:'INCOMPLETE'}})),reviewSupport:{...support,phase:'REPAIR_ACCEPTED',findings:review.findings,acceptedRepair:'{}',acceptedRepairDigest:hash('accepted-repair','different')}};
     expect(readCompilerCheckpoint(f.checkpoint,checkpointAttempt(f.checkpoint),f.checkpoint.binding)).toEqual({ok:false,reason:'ARTIFACT_DIGEST_MISMATCH'});
   });
+});
+
+
+it("counts expanded workload once and keeps arithmetic discrepancies reviewable rather than automatically blocking",()=>{
+ const f=fixture(),p=f.input.proposal,a=p.blueprints.plans[0].blueprint.activities[0];
+ p.envelope.days.forEach(d=>{d.availableMinutes=20;});a.timeboxMinutes=40;a.effort={lowMinutes:25,likelyMinutes:35,highMinutes:50};
+ a.splitPoints=[{afterMinutes:20,completionCriterion:"One useful intermediate result"}];
+ const expanded=expandDeclaredSplits(p.blueprints,p.envelope);p.blueprints=expanded.snapshot;
+ p.planning={detail:{days:14,checkpoint:"Final result"},tradeOffExplanation:"Keep the authentic result",splits:expanded.splits,unreviewedPhaseRefs:[],forecasts:[],adaptation:"NOT_REQUESTED"};
+ p.blueprints.plans[0].blueprint.strategy.recommendedEffort={lowMinutes:10,likelyMinutes:20,highMinutes:30};
+ p.envelope.protectedExecution=[];
+ expect(auditWorkload(p)[0]).toMatchObject({bookedTimeboxMinutes:40,remainingCommittedMinutes:40,remainingAboveStrategyHigh:true,committedRefs:expanded.splits[0].pieceRefs});
+ const input=buildReviewInput(f.input.goals,f.input.context,p);
+ expect(input.grounding.find(g=>g.ref==="physics/workload")?.kind).toBe("PROPOSAL");
+ expect(validateQualityReview({plans:[{planRef:"physics",issues:[]}]},input,f.blank).reports[0].report.status).toBe("PASSED");
+ const finding={...f.finding,category:"UNREALISTIC_WORKLOAD",affectedRefs:expanded.splits[0].pieceRefs,
+ grounds:[{ref:"physics/goal",excerpt:intentFixture().outcome},{ref:"physics/workload",excerpt:expanded.splits[0].pieceRefs[0]}]};
+ expect(validateQualityReview({plans:[{planRef:"physics",issues:[finding]}]},input,f.blank).reports[0].report.status).toBe("BLOCKED");
+});
+it("separates protected actual/history timeboxes from remaining educational effort without double charging",()=>{
+ const f=fixture(),p=f.input.proposal,a=p.blueprints.plans[0].blueprint.activities[0];
+ p.envelope.protectedExecution[0].activityRef=a.localId;p.envelope.protectedExecution[0].remainingMinutes=7;
+ expect(auditWorkload(p)[0]).toMatchObject({bookedTimeboxMinutes:30,unprotectedTimeboxMinutes:0,protectedRemainingMinutes:7,remainingCommittedMinutes:7});
+ p.envelope.protectedExecution[0].remainingMinutes=0;p.envelope.protectedExecution[0].state="COMPLETED";
+ expect(auditWorkload(p)[0].remainingCommittedMinutes).toBe(0);
 });

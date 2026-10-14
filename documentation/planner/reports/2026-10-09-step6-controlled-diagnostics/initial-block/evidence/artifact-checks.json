@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-10-09T12:22:47.512196+00:00",
+  "status": "PASSED",
+  "currentMarkdownFilesChecked": 6,
+  "linksChecked": 116,
+  "missingLinks": 0,
+  "whitespace": "PASSED",
+  "activePrimaryRecords": 20,
+  "independentAgentCaseChecks": 20,
+  "sourceFreezePreserved": true,
+  "manifestArtifacts": 40,
+  "historicalSnapshots": "Verbatim pending state retained; original-relative links are historical, not execution instructions.",
+  "paidCalls": 0
+}

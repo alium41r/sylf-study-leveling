@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-10-10T17:28:00.198Z",
+  "method": "pmset -g assertions",
+  "ownedCaffeinatePid": 6121,
+  "remainingOwnedAssertionLines": [],
+  "ownedAssertionsReleased": true,
+  "guardLockPresent": false,
+  "note": "Read-only post-run system assertion snapshot; no network or model call."
+}

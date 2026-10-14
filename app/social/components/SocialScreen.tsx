@@ -1,4 +1,8 @@
 "use client";
+import { TargetPixelCompanion } from "@/app/components/companion/TargetPixelCompanion";
+import type { SelectedPixelCompanion } from "@/lib/pixel-companion-contract";
+import { OwnCompanionPreview } from "@/app/components/companion/OwnCompanionPreview";
+
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect, react-hooks/purity, react-hooks/refs */
 
 import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from "react";
@@ -8,8 +12,6 @@ import { useRealtimePresence } from "@/app/hooks/useRealtimePresence";
 import { usePostgresChanges } from "@/app/hooks/usePostgresChanges";
 import { AddFriendModal } from "@/app/components/AddFriendModal";
 import { FriendRequestsModal } from "@/app/components/FriendRequestsModal";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
-import { getDefaultCharacterConfig } from "@/lib/character-traits";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -77,6 +79,7 @@ interface Friend {
   activeAura?: string;
   activeTitle: string | null;
   characterConfig?: any | null;
+  companion?: SelectedPixelCompanion;
   bio: string | null;
   streakDays: number;
   lastSeenAt: string | null;
@@ -95,6 +98,7 @@ interface FriendRequest {
     activeFrame?: string;
     activeTitle?: string;
     characterConfig?: any | null;
+  companion?: SelectedPixelCompanion;
     createdAt?: string;
   };
   createdAt?: string;
@@ -116,6 +120,7 @@ interface Conversation {
     activeAvatar?: string;
     activeFrame?: string;
     characterConfig?: any | null;
+  companion?: SelectedPixelCompanion;
     isOnline: boolean;
   }[];
   lastMessage: {
@@ -605,16 +610,7 @@ function SocialContent() {
         {/* ─── Top Header & Title ──────────────────────────────── */}
         <div className={styles.headerArea}>
           <div className={styles.headerTextGroup}>
-            <span className={styles.eyebrow}>
-              <span className={styles.eyebrowDot} />
-              Scholar Network
-            </span>
-            <h1 className={styles.title}>
-              Social <em>Network</em>
-            </h1>
-            <p className={styles.subtitle}>
-              Connect with fellow scholars, track focus sync, and coordinate parties.
-            </p>
+            <h1 className={styles.title}>Social</h1>
           </div>
 
           <div className={styles.headerActions}>
@@ -859,14 +855,7 @@ function SocialContent() {
                     className={styles.characterStage}
                     title="View My Profile"
                   >
-                    <CharacterRenderer
-                      config={user?.characterConfig || getDefaultCharacterConfig(user?.username || "scholar")}
-                      seed={user?.username || "scholar"}
-                      size={135}
-                      showPedestal={true}
-                      showAura={isUserStudying}
-                      className="[--character-size:92px] sm:[--character-size:135px]"
-                    />
+                    <OwnCompanionPreview config={user?.characterConfig} size={135} label="Your social companion" />
 
                     {/* Name & Handle */}
                     <div className={styles.characterInfo}>
@@ -972,14 +961,7 @@ function SocialContent() {
                       onClick={() => openProfile(friend.username)}
                       className={styles.characterStage}
                     >
-                      <CharacterRenderer
-                        config={friend.characterConfig}
-                        seed={friend.username}
-                        size={135}
-                        showPedestal={true}
-                        showAura={friend.isStudying || friend.activeAura !== "none"}
-                        className="[--character-size:92px] sm:[--character-size:135px]"
-                      />
+                      <TargetPixelCompanion companion={friend.companion} size={135} label={`${friend.username} companion`} />
 
                       {/* Name & Handle */}
                       <div className={styles.characterInfo}>

@@ -8,6 +8,10 @@ import { prisma } from "@/lib/prisma";
 import { signToken } from "@/lib/auth";
 import { NextRequest } from "next/server";
 
+// Companion lookup is unrelated to session aggregation and must not connect
+// to a hosted database from these route unit tests.
+vi.mock("@/lib/pixel-companion-service", () => ({ selectedCompanionsForUsers: async () => new Map() }));
+
 describe("Study Timer Accuracy & Synchronization Tests", () => {
   const userId = 505;
   let validToken: string;

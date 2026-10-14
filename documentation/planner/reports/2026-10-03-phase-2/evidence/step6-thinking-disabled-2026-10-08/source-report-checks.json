@@ -1,0 +1,34 @@
+{
+  "status": "PASSED",
+  "baselineSourceCount": 3530,
+  "authorizedChanges": [
+    "__tests__/planner-v2/intelligence/blueprint.test.ts",
+    "__tests__/planner-v2/postgres/compiler-qualification.live.ts",
+    "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts",
+    "lib/planner/v2/intelligence/blueprint.ts",
+    "lib/planner/v2/intelligence/quality.ts",
+    "lib/planner/v2/server/compiler.ts",
+    "lib/planner/v2/server/database.ts",
+    "scripts/test-planner-v2-phase1-postgres.mjs"
+  ],
+  "derivedWorkerChanges": [
+    "dist/planner-worker/planner/v2/intelligence/blueprint.js",
+    "dist/planner-worker/planner/v2/intelligence/quality.js",
+    "dist/planner-worker/planner/v2/server/compiler.js",
+    "dist/planner-worker/planner/v2/server/database.js"
+  ],
+  "unrelatedSourceDrift": [],
+  "governingUnchanged": {
+    "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md": true,
+    "documentation/planner/reports/2026-10-02-final-architecture-review/REVIEW.md": true,
+    "documentation/planner/reports/2026-10-02-end-to-end-audit/AUDIT.md": true,
+    "documentation/planner/reports/2026-10-02-phase-0/README.md": true,
+    "documentation/planner/reports/2026-10-02-phase-1/README.md": true,
+    "documentation/planner/reports/2026-10-03-phase-2/IMPLEMENTATION_PLAN.md": true
+  },
+  "frozenContracts": 12,
+  "frozenContractsUnchanged": true,
+  "brokenReportLinks": [],
+  "scopedWhitespaceFindings": [],
+  "productionModelConfigurationUnchanged": true
+}

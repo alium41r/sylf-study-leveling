@@ -1,0 +1,40 @@
+{
+  "status": "OFFLINE_LOSSLESS_RESERVATION_EVIDENCE_NOT_LIVE_ADAPTATION",
+  "recordedAt": "2026-10-08T15:33:25.936Z",
+  "sourceRun": "documentation/planner/reports/2026-10-03-phase-2/evidence/step6-live-2026-10-08T15-17-26-249Z/live-corpus.json",
+  "sourceRunSha256": "840dddc1cd5c3fa112972ae6d96a88b61993abc203c54ebf507a4154c6be2ce3",
+  "stage": "ADAPTATION",
+  "sameAllFactsAfterRoundTrip": true,
+  "contextDays": 28,
+  "allocationDays": 14,
+  "rootInputCeiling": 80000,
+  "reviewOutputHoldback": 4096,
+  "verbose": {
+    "inputReservation": 61668,
+    "outputReservation": 8192,
+    "actualChargedInput": 10433,
+    "reviewHoldback": 8192,
+    "totalInputIncludingReview": 80293,
+    "outcome": "BUDGET_EXHAUSTED"
+  },
+  "compact": {
+    "inputReservation": 55560,
+    "outputReservation": 8192,
+    "actualChargedInput": 10433,
+    "reviewHoldback": 8192,
+    "totalInputIncludingReview": 74185,
+    "outcome": "FIT"
+  },
+  "savedInputUnits": 6108,
+  "sourceFiles": {
+    "lib/planner/v2/intelligence/context.ts": "2dbf57c3e1d95f1040f8bd51fe46d0a3ee7d0eb612af24fb87eb96d18f096c66",
+    "lib/planner/v2/intelligence/blueprint.ts": "39cfe41ef3d2e49dfd3d4d3843f19ebea8ba067d9321255fa2221414955d7308",
+    "lib/planner/v2/intelligence/provider.ts": "bdbf175e35a54e6d78e9f9894d633877f065285621186d809048ef7564f30c56",
+    "lib/planner/v2/intelligence/provider-policy.ts": "2a91cef9945f74eedaeb48bfd0e4e60422ff512dfe711cbff4650a15a6cb2f0b"
+  },
+  "limitations": [
+    "No model, Attempt, database or execution call occurs.",
+    "Model adaptation output and educational acceptance still require fresh live qualification.",
+    "All limits/holdbacks, protected facts, distinct windows and actual feedback are unchanged."
+  ]
+}

@@ -1,0 +1,6 @@
+2026-10-08 22:21:50 +0500 Sleep               	Entering Sleep state due to 'Idle Sleep':TCPKeepAlive=active Using Batt (Charge:88%) 231 secs  
+2026-10-08 22:25:41 +0500 Wake                	Wake from Deep Idle [CDNVA] : due to smc.sysState.Wake(0x70070000) trackpadkeyboard SMC.OutboxNotEmpty/HID Activity Using BATT (Charge:88%) 322 secs  
+2026-10-08 22:31:03 +0500 Sleep               	Entering Sleep state due to 'Idle Sleep':TCPKeepAlive=active Using Batt (Charge:88%) 33 secs   
+2026-10-08 22:31:36 +0500 Wake                	Wake from Deep Idle [CDNVA] : due to smc.sysState.Wake(0x70070000) trackpadkeyboard SMC.OutboxNotEmpty/HID Activity Using BATT (Charge:88%) 259 secs  
+2026-10-08 22:35:55 +0500 Sleep               	Entering Sleep state due to 'Idle Sleep':TCPKeepAlive=active Using Batt (Charge:87%) 12 secs   
+2026-10-08 22:36:07 +0500 Wake                	Wake from Deep Idle [CDNVA] : due to smc.sysState.Wake(0x70070000) trackpadkeyboard SMC.OutboxNotEmpty/HID Activity Using BATT (Charge:87%)           

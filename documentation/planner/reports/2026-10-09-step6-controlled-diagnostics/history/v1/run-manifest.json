@@ -1,0 +1,609 @@
+{
+  "schemaVersion": 1,
+  "status": "PREPARED_AWAITING_APPROVAL",
+  "seed": "sylf-diagnostic-1",
+  "primaryDispatches": 52,
+  "maximumTotalDispatches": 64,
+  "maximumRecoveryDispatches": 12,
+  "maximumSpendUsd": 3,
+  "publication": "FORBIDDEN",
+  "casesSignedOff": false,
+  "runs": [
+    {
+      "trialId": "d_4455ae843acc1082",
+      "category": "REASONING",
+      "caseId": "g01",
+      "variant": "prose",
+      "packet": "model/packets/d_4455ae843acc1082.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4842,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_0f51cb688400b89c",
+      "category": "REASONING",
+      "caseId": "g08",
+      "variant": "prose",
+      "packet": "model/packets/d_0f51cb688400b89c.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4189,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_d5011475b34a9da1",
+      "category": "REASONING",
+      "caseId": "g02",
+      "variant": "prose",
+      "packet": "model/packets/d_d5011475b34a9da1.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4575,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_ac6e119faa6748a5",
+      "category": "REASONING",
+      "caseId": "g06",
+      "variant": "prose",
+      "packet": "model/packets/d_ac6e119faa6748a5.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4163,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_63ea398f0b23e2f0",
+      "category": "REASONING",
+      "caseId": "g03",
+      "variant": "prose",
+      "packet": "model/packets/d_63ea398f0b23e2f0.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 5147,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_28b1cf3e53f64ddf",
+      "category": "REASONING",
+      "caseId": "g04",
+      "variant": "prose",
+      "packet": "model/packets/d_28b1cf3e53f64ddf.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 5068,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_2f5488d294f95e29",
+      "category": "REASONING",
+      "caseId": "g07",
+      "variant": "prose",
+      "packet": "model/packets/d_2f5488d294f95e29.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4337,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_3284c39bab869cee",
+      "category": "REASONING",
+      "caseId": "g05",
+      "variant": "prose",
+      "packet": "model/packets/d_3284c39bab869cee.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 4187,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "caseId": "v09",
+      "variant": "fixed",
+      "packet": "model/packets/d_21da0ca3d648bd22.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11303,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "caseId": "v04",
+      "variant": "fixed",
+      "packet": "model/packets/d_6de45b407ca18e60.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11939,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_23cb1deab0819ac1",
+      "category": "REVIEW",
+      "caseId": "v08",
+      "variant": "fixed",
+      "packet": "model/packets/d_23cb1deab0819ac1.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11134,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_39bd912910b6cdc4",
+      "category": "REVIEW",
+      "caseId": "v02",
+      "variant": "fixed",
+      "packet": "model/packets/d_39bd912910b6cdc4.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11352,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_aa0fdce6c965934e",
+      "category": "REVIEW",
+      "caseId": "v07",
+      "variant": "fixed",
+      "packet": "model/packets/d_aa0fdce6c965934e.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 17467,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_edc200cbc63de947",
+      "category": "REVIEW",
+      "caseId": "v12",
+      "variant": "fixed",
+      "packet": "model/packets/d_edc200cbc63de947.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11544,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_162f3a5840b6d145",
+      "category": "REVIEW",
+      "caseId": "v01",
+      "variant": "fixed",
+      "packet": "model/packets/d_162f3a5840b6d145.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11110,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_b949be4c907cfe4b",
+      "category": "REVIEW",
+      "caseId": "v11",
+      "variant": "fixed",
+      "packet": "model/packets/d_b949be4c907cfe4b.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11718,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_2c793f9cde3e05f1",
+      "category": "REVIEW",
+      "caseId": "v10",
+      "variant": "fixed",
+      "packet": "model/packets/d_2c793f9cde3e05f1.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11080,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_d4791a8b4cdede65",
+      "category": "REVIEW",
+      "caseId": "v06",
+      "variant": "fixed",
+      "packet": "model/packets/d_d4791a8b4cdede65.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11656,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_ea74e8dff125fb1c",
+      "category": "REVIEW",
+      "caseId": "v05",
+      "variant": "fixed",
+      "packet": "model/packets/d_ea74e8dff125fb1c.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 11158,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_e9c5b907ca74eaa2",
+      "category": "REVIEW",
+      "caseId": "v03",
+      "variant": "fixed",
+      "packet": "model/packets/d_e9c5b907ca74eaa2.json",
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 21067,
+      "dependencies": []
+    },
+    {
+      "trialId": "d_6dc01b32b6500a8c",
+      "category": "STRUCTURE",
+      "caseId": "g01",
+      "variant": "compact",
+      "packet": "model/packets/d_6dc01b32b6500a8c.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 15563,
+      "dependencies": [
+        "d_4455ae843acc1082"
+      ]
+    },
+    {
+      "trialId": "d_8d3120aa4c6410ee",
+      "category": "STRUCTURE",
+      "caseId": "g01",
+      "variant": "legacy",
+      "packet": "model/packets/d_8d3120aa4c6410ee.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18610,
+      "dependencies": [
+        "d_4455ae843acc1082"
+      ]
+    },
+    {
+      "trialId": "d_e93fb15a1e30f945",
+      "category": "STRUCTURE",
+      "caseId": "g08",
+      "variant": "legacy",
+      "packet": "model/packets/d_e93fb15a1e30f945.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 17948,
+      "dependencies": [
+        "d_0f51cb688400b89c"
+      ]
+    },
+    {
+      "trialId": "d_8af5979351f85950",
+      "category": "STRUCTURE",
+      "caseId": "g08",
+      "variant": "compact",
+      "packet": "model/packets/d_8af5979351f85950.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14901,
+      "dependencies": [
+        "d_0f51cb688400b89c"
+      ]
+    },
+    {
+      "trialId": "d_8f93c1ebbecb2534",
+      "category": "STRUCTURE",
+      "caseId": "g02",
+      "variant": "compact",
+      "packet": "model/packets/d_8f93c1ebbecb2534.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 15284,
+      "dependencies": [
+        "d_d5011475b34a9da1"
+      ]
+    },
+    {
+      "trialId": "d_de499457fce70bce",
+      "category": "STRUCTURE",
+      "caseId": "g02",
+      "variant": "legacy",
+      "packet": "model/packets/d_de499457fce70bce.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18331,
+      "dependencies": [
+        "d_d5011475b34a9da1"
+      ]
+    },
+    {
+      "trialId": "d_2ef6a57df8896a82",
+      "category": "STRUCTURE",
+      "caseId": "g06",
+      "variant": "legacy",
+      "packet": "model/packets/d_2ef6a57df8896a82.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 17922,
+      "dependencies": [
+        "d_ac6e119faa6748a5"
+      ]
+    },
+    {
+      "trialId": "d_b548117d4fcb2e12",
+      "category": "STRUCTURE",
+      "caseId": "g06",
+      "variant": "compact",
+      "packet": "model/packets/d_b548117d4fcb2e12.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14875,
+      "dependencies": [
+        "d_ac6e119faa6748a5"
+      ]
+    },
+    {
+      "trialId": "d_8708108f89778d35",
+      "category": "STRUCTURE",
+      "caseId": "g03",
+      "variant": "compact",
+      "packet": "model/packets/d_8708108f89778d35.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 15883,
+      "dependencies": [
+        "d_63ea398f0b23e2f0"
+      ]
+    },
+    {
+      "trialId": "d_25f99e97240f159b",
+      "category": "STRUCTURE",
+      "caseId": "g03",
+      "variant": "legacy",
+      "packet": "model/packets/d_25f99e97240f159b.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18930,
+      "dependencies": [
+        "d_63ea398f0b23e2f0"
+      ]
+    },
+    {
+      "trialId": "d_27795de9e4d18f37",
+      "category": "STRUCTURE",
+      "caseId": "g04",
+      "variant": "legacy",
+      "packet": "model/packets/d_27795de9e4d18f37.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18851,
+      "dependencies": [
+        "d_28b1cf3e53f64ddf"
+      ]
+    },
+    {
+      "trialId": "d_3269f824d0acc012",
+      "category": "STRUCTURE",
+      "caseId": "g04",
+      "variant": "compact",
+      "packet": "model/packets/d_3269f824d0acc012.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 15804,
+      "dependencies": [
+        "d_28b1cf3e53f64ddf"
+      ]
+    },
+    {
+      "trialId": "d_64e27908dc78dac6",
+      "category": "STRUCTURE",
+      "caseId": "g07",
+      "variant": "compact",
+      "packet": "model/packets/d_64e27908dc78dac6.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 15037,
+      "dependencies": [
+        "d_2f5488d294f95e29"
+      ]
+    },
+    {
+      "trialId": "d_9ffef4de2b1f6a2f",
+      "category": "STRUCTURE",
+      "caseId": "g07",
+      "variant": "legacy",
+      "packet": "model/packets/d_9ffef4de2b1f6a2f.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18084,
+      "dependencies": [
+        "d_2f5488d294f95e29"
+      ]
+    },
+    {
+      "trialId": "d_b70b17007cd2a289",
+      "category": "STRUCTURE",
+      "caseId": "g05",
+      "variant": "legacy",
+      "packet": "model/packets/d_b70b17007cd2a289.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 17946,
+      "dependencies": [
+        "d_3284c39bab869cee"
+      ]
+    },
+    {
+      "trialId": "d_8a5dc6d5f0e3bd27",
+      "category": "STRUCTURE",
+      "caseId": "g05",
+      "variant": "compact",
+      "packet": "model/packets/d_8a5dc6d5f0e3bd27.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14899,
+      "dependencies": [
+        "d_3284c39bab869cee"
+      ]
+    },
+    {
+      "trialId": "d_2cb306a318067132",
+      "category": "REPAIR",
+      "caseId": "v04",
+      "variant": "targeted",
+      "packet": "model/packets/d_2cb306a318067132.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18992,
+      "dependencies": [
+        "GATE_REVIEW"
+      ]
+    },
+    {
+      "trialId": "d_d0bbedfc63e8af66",
+      "category": "VERIFICATION",
+      "caseId": "v04",
+      "variant": "actual_repaired_candidate",
+      "packet": null,
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 21651,
+      "dependencies": [
+        "d_2cb306a318067132"
+      ],
+      "materialize": "node documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/prepare.cjs materialize v04 <actual-repair-json> <result-directory>"
+    },
+    {
+      "trialId": "d_2ca20f3ff24f8dfa",
+      "category": "REPAIR",
+      "caseId": "v02",
+      "variant": "targeted",
+      "packet": "model/packets/d_2ca20f3ff24f8dfa.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18748,
+      "dependencies": [
+        "GATE_REVIEW"
+      ]
+    },
+    {
+      "trialId": "d_09695213ad05e61e",
+      "category": "VERIFICATION",
+      "caseId": "v02",
+      "variant": "actual_repaired_candidate",
+      "packet": null,
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 21070,
+      "dependencies": [
+        "d_2ca20f3ff24f8dfa"
+      ],
+      "materialize": "node documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/prepare.cjs materialize v02 <actual-repair-json> <result-directory>"
+    },
+    {
+      "trialId": "d_7200677f38f74d15",
+      "category": "REPAIR",
+      "caseId": "v01",
+      "variant": "targeted",
+      "packet": "model/packets/d_7200677f38f74d15.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 18100,
+      "dependencies": [
+        "GATE_REVIEW"
+      ]
+    },
+    {
+      "trialId": "d_cd6a5fc231f99055",
+      "category": "VERIFICATION",
+      "caseId": "v01",
+      "variant": "actual_repaired_candidate",
+      "packet": null,
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 20786,
+      "dependencies": [
+        "d_7200677f38f74d15"
+      ],
+      "materialize": "node documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/prepare.cjs materialize v01 <actual-repair-json> <result-directory>"
+    },
+    {
+      "trialId": "d_2a263cd8549e5d7b",
+      "category": "REPAIR",
+      "caseId": "v03",
+      "variant": "targeted",
+      "packet": "model/packets/d_2a263cd8549e5d7b.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 33836,
+      "dependencies": [
+        "GATE_REVIEW"
+      ]
+    },
+    {
+      "trialId": "d_65302e173a413f9f",
+      "category": "VERIFICATION",
+      "caseId": "v03",
+      "variant": "actual_repaired_candidate",
+      "packet": null,
+      "outputTokenCap": 4096,
+      "inputReservationUnits": 30775,
+      "dependencies": [
+        "d_2a263cd8549e5d7b"
+      ],
+      "materialize": "node documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/prepare.cjs materialize v03 <actual-repair-json> <result-directory>"
+    },
+    {
+      "trialId": "d_6e9211c77599aabb",
+      "category": "CAPACITY",
+      "caseId": "c02",
+      "variant": "30_1",
+      "packet": "model/packets/d_6e9211c77599aabb.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14372,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    },
+    {
+      "trialId": "d_c50d268c24a35efe",
+      "category": "CAPACITY",
+      "caseId": "c02",
+      "variant": "180_1",
+      "packet": "model/packets/d_c50d268c24a35efe.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14375,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    },
+    {
+      "trialId": "d_f66530ad81c72957",
+      "category": "CAPACITY",
+      "caseId": "c02",
+      "variant": "180_2",
+      "packet": "model/packets/d_f66530ad81c72957.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14375,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    },
+    {
+      "trialId": "d_39be8a5d2ec24c63",
+      "category": "CAPACITY",
+      "caseId": "c02",
+      "variant": "30_2",
+      "packet": "model/packets/d_39be8a5d2ec24c63.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14372,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    },
+    {
+      "trialId": "d_b985523c94210e52",
+      "category": "CAPACITY",
+      "caseId": "c01",
+      "variant": "180_1",
+      "packet": "model/packets/d_b985523c94210e52.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14742,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    },
+    {
+      "trialId": "d_755cf5aa56ef6282",
+      "category": "CAPACITY",
+      "caseId": "c01",
+      "variant": "30_1",
+      "packet": "model/packets/d_755cf5aa56ef6282.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14739,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    },
+    {
+      "trialId": "d_416fb15b8b00563e",
+      "category": "CAPACITY",
+      "caseId": "c01",
+      "variant": "30_2",
+      "packet": "model/packets/d_416fb15b8b00563e.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14739,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    },
+    {
+      "trialId": "d_84edb196743535a2",
+      "category": "CAPACITY",
+      "caseId": "c01",
+      "variant": "180_2",
+      "packet": "model/packets/d_84edb196743535a2.json",
+      "outputTokenCap": 8192,
+      "inputReservationUnits": 14742,
+      "dependencies": [
+        "GATE_REASONING",
+        "GATE_COMPACT"
+      ]
+    }
+  ]
+}

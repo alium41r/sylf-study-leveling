@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   Plus,
 } from "lucide-react";
-import { ObjectiveTargetIcon } from "@/app/components/icons";
+import { ObjectiveTargetIcon, SylvieIcon } from "@/app/components/icons";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import { QuotaInfo } from "../../components/AiPlannerPanel";
 import { SystemChatSession } from "./SessionSidebar";
@@ -51,86 +51,9 @@ function getMessageModelBadge(msg: SystemMsg, currentModelPref?: string): string
   if (msg.type?.includes("GROQ")) return "Groq";
   if (currentModelPref === "deepseek") return "DeepSeek";
   if (currentModelPref === "groq") return "Groq";
-  return "The System AI";
+  return "Sylvie AI";
 }
 
-function SystemChatVectorSymbol({ className = "w-12 h-12" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="sysChatBubbleGrad" x1="12" y1="10" x2="52" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="var(--accent-primary, #7c3aed)" />
-          <stop offset="100%" stopColor="#4f46e5" />
-        </linearGradient>
-        <linearGradient id="sysChatFillGrad" x1="16" y1="12" x2="48" y2="42" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="var(--accent-primary, #7c3aed)" stopOpacity="0.14" />
-          <stop offset="100%" stopColor="#6366f1" stopOpacity="0.04" />
-        </linearGradient>
-        <linearGradient id="sysCoreSparkGrad" x1="26" y1="18" x2="38" y2="34" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="50%" stopColor="var(--accent-primary, #7c3aed)" />
-          <stop offset="100%" stopColor="#a855f7" />
-        </linearGradient>
-        <radialGradient id="sysBackGlow" cx="50%" cy="45%" r="50%">
-          <stop offset="0%" stopColor="var(--accent-primary, #7c3aed)" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="var(--accent-primary, #7c3aed)" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      {/* Ambient soft glow backdrop */}
-      <circle cx="32" cy="26" r="23" fill="url(#sysBackGlow)" className="opacity-90" />
-
-      {/* Main speech bubble silhouette */}
-      <path
-        d="M 21 12 H 43 A 8 8 0 0 1 51 20 V 32 A 8 8 0 0 1 43 40 H 32 L 22.5 47.5 A 1.6 1.6 0 0 1 20 46.2 L 21.8 40 H 21 A 8 8 0 0 1 13 32 V 20 A 8 8 0 0 1 21 12 Z"
-        fill="url(#sysChatFillGrad)"
-        stroke="url(#sysChatBubbleGrad)"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-
-      {/* Subtle transmission axis */}
-      <line
-        x1="20.5"
-        y1="26"
-        x2="43.5"
-        y2="26"
-        stroke="var(--accent-primary, #7c3aed)"
-        strokeOpacity="0.3"
-        strokeDasharray="2 3"
-        strokeWidth="1"
-      />
-
-      {/* Flanking pulse nodes */}
-      <circle cx="20.5" cy="26" r="2" fill="url(#sysChatBubbleGrad)" />
-      <circle cx="20.5" cy="26" r="0.8" fill="#ffffff" />
-      <circle cx="43.5" cy="26" r="2" fill="url(#sysChatBubbleGrad)" />
-      <circle cx="43.5" cy="26" r="0.8" fill="#ffffff" />
-
-      {/* Central System Star core */}
-      <path
-        d="M 32 18 C 32 22.2 33.8 24.2 38 26 C 33.8 27.8 32 29.8 32 34 C 32 29.8 30.2 27.8 26 26 C 30.2 24.2 32 22.2 32 18 Z"
-        fill="url(#sysCoreSparkGrad)"
-      />
-      <circle cx="32" cy="26" r="1.2" fill="#ffffff" />
-
-      {/* Floating System Spark at top right */}
-      <path
-        d="M 51 5 C 51 7.8 51.8 8.8 54.5 10 C 51.8 11.2 51 12.2 51 15 C 51 12.2 50.2 11.2 47.5 10 C 50.2 8.8 51 7.8 51 5 Z"
-        fill="#38bdf8"
-      />
-      <circle cx="51" cy="10" r="0.7" fill="#ffffff" />
-    </svg>
-  );
-}
-
-// 4 Interactive Quick Prompt Starters for Empty State
 const PROMPT_STARTERS = [
   {
     icon: ObjectiveTargetIcon,
@@ -442,11 +365,11 @@ export default function ConversationPanel({
             <div className="my-auto py-8 px-2 flex flex-col items-center text-center max-w-lg mx-auto w-full">
               <div className="relative group mb-3">
                 <div className="absolute -inset-3 rounded-full bg-accent-primary/20 blur-xl opacity-75 pointer-events-none" />
-                <SystemChatVectorSymbol className="w-12 h-12 relative z-10 transition-transform duration-300 group-hover:scale-105 drop-shadow-md" />
+                <SylvieIcon className="w-12 h-12 relative z-10 transition-transform duration-300 group-hover:scale-105 drop-shadow-md" />
               </div>
 
               <h2 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-text-muted mb-4">
-                How can The System assist you?
+                How can Sylvie assist you?
               </h2>
 
               {/* Minimalist Prompt Chips */}
@@ -493,11 +416,12 @@ export default function ConversationPanel({
                       <div className="flex justify-between items-center mb-2 gap-4">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
-                            className={`text-[10px] font-bold uppercase tracking-wider font-['Rajdhani'] ${
+                            className={`text-[10px] font-bold uppercase tracking-wider font-['Rajdhani'] inline-flex items-center gap-1.5 ${
                               isUser ? "text-accent-text-light" : "text-accent-primary"
                             }`}
                           >
-                            {isUser ? "You" : "The System"}
+                            {!isUser && <SylvieIcon size={14} />}
+                            {isUser ? "You" : "Sylvie"}
                           </span>
                           {!isUser && isDevMode && (() => {
                             const modelBadge = getMessageModelBadge(msg, modelPref);
@@ -601,8 +525,9 @@ export default function ConversationPanel({
                 className="flex justify-start"
               >
                 <div className="border border-border-subtle bg-bg-abyss/90 rounded-2xl p-3.5 flex items-center gap-2.5 shadow-md">
-                  <span className="text-[10px] font-bold uppercase tracking-wider font-['Rajdhani'] text-accent-text-light">
-                    The System
+                  <span className="text-[10px] font-bold uppercase tracking-wider font-['Rajdhani'] text-accent-text-light inline-flex items-center gap-1.5">
+                    <SylvieIcon size={14} />
+                    Sylvie
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-accent-primary italic font-medium font-['Rajdhani']">

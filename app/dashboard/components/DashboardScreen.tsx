@@ -15,6 +15,8 @@ import {
   Users,
   X,
   Play,
+  Zap,
+  Heart,
 } from "lucide-react";
 import {
   LevelInsigniaIcon,
@@ -25,8 +27,7 @@ import {
   SystemWarningIcon,
   SystemBriefingIcon,
 } from "./DashboardIcons";
-import { CharacterRenderer } from "@/app/components/character/CharacterRenderer";
-import { getDefaultCharacterConfig } from "@/lib/character-traits";
+import { PixelCompanionCard } from "./PixelCompanionCard";
 import { useDashboardData } from "@/app/hooks/useDashboardData";
 import styles from "../Dashboard.module.css";
 
@@ -54,7 +55,6 @@ export function DashboardScreen() {
     hp,
     maxHp,
     hpPercent,
-    characterCfg,
     activeWeeklyQuest,
   } = useDashboardData();
 
@@ -104,19 +104,6 @@ export function DashboardScreen() {
   const activeQuest =
     quests.find((q) => q.status === "IN_PROGRESS") ||
     quests.find((q) => q.status === "PENDING");
-
-  const rankClass =
-    user.hunterRank === "S"
-      ? styles.rankS
-      : user.hunterRank === "A"
-      ? styles.rankA
-      : user.hunterRank === "B"
-      ? styles.rankB
-      : user.hunterRank === "C"
-      ? styles.rankC
-      : user.hunterRank === "D"
-      ? styles.rankD
-      : styles.rankE;
 
   const getDifficultyClass = (diff: string) => {
     switch (diff?.toUpperCase()) {
@@ -181,164 +168,123 @@ export function DashboardScreen() {
       <div className={styles.contentWrapper}>
         {/* ─── Header ───────────────────────────────────────── */}
         <header className={styles.headerArea}>
-          <p className={styles.eyebrow}>
-            <span className={styles.eyebrowDot} />
-            Scholar Dashboard
-          </p>
-          <h1 className={styles.title}>
-            Welcome back, <em>{user.name || user.username || "Scholar"}</em>
-          </h1>
-          <p className={styles.subtitle}>
-            Your daily focus and quest overview.
-          </p>
+          <h1 className={styles.title}>Dashboard</h1>
 
-          {/* ─── Scholar Identity & Progression Row (Hybrid Refinement) ─── */}
+          {/* Companion, progression and daily metrics share one compact overview. */}
           <section className={styles.characterRow} aria-label="Scholar Identity and Progression">
-            {/* Compact Standalone Character Card */}
-            <div
-              onClick={() => router.push("/locker?tab=identity")}
-              className={styles.characterCard}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  router.push("/locker?tab=identity");
-                }
-              }}
-              title="Enter Character Studio in Locker"
-            >
-              <div className={styles.avatarFrame}>
-                <CharacterRenderer
-                  config={characterCfg || getDefaultCharacterConfig(user.username || "scholar")}
-                  seed={user.username || "scholar"}
-                  size={110}
-                  showPedestal={true}
-                  showAura={true}
-                />
+            <div className={styles.companionDisplay}>
+              <div className={styles.displayHeader}>
+                <span className={styles.displayLabel}>Your artwork</span>
+                <Link href="/locker?tab=identity" className={styles.lockerLink}>Locker <ArrowUpRight size={15} /></Link>
               </div>
-
-              <div className={styles.avatarInfo}>
-                <div className={styles.avatarHeader}>
-                  <span className={styles.avatarTag}>
-                    <span className={styles.avatarTagDot} />
-                    Character
-                  </span>
-                  <Link
-                    href="/locker?tab=identity"
-                    className={styles.quietCustomizeLink}
-                    title="Customize Traits in Locker"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <span>Customize</span>
-                    <ArrowUpRight size={10} />
-                  </Link>
-                </div>
-
-                <div className={styles.identityDetailsRow}>
-                  <span className={styles.scholarName}>
-                    {user.name || user.username || "Scholar"}
-                  </span>
-                  <div className={styles.rankBadges}>
-                    <span className={`${styles.rankPill} ${rankClass}`}>
-                      {user.hunterRank || "E"}-Rank
-                    </span>
-                    <span className={styles.levelBadge}>
-                      Lv. {user.level || 1}
-                    </span>
-                  </div>
-                </div>
+              <div className={styles.companionStage}>
+                <PixelCompanionCard size="100%" />
               </div>
             </div>
 
-            {/* Stacked Telemetry Bars (Outside Character Card) */}
-            <div className={styles.barsContainer}>
-              {/* EXP Track */}
-              <div className={styles.trackGroup}>
-                <div className={styles.trackHeader}>
-                  <span className={styles.trackLabel}>EXP</span>
-                  <div className={styles.trackValues}>
-                    <span>
-                      {currentXP} / {xpToNextLevel}
-                    </span>
-                    <span className={styles.percentChip}>{expPercent}%</span>
+            <div className={styles.progressionSummary}>
+              <div className={styles.barsContainer}>
+                <div className={styles.trackGroup}>
+                  <div className={styles.trackHeader}>
+                    <span className={styles.trackLabel}><Zap size={14} aria-hidden="true" /> XP</span>
+                    <div className={styles.trackValues}>
+                      <span>
+                        {currentXP} / {xpToNextLevel}
+                      </span>
+                      <span className={styles.percentChip}>{expPercent}%</span>
+                    </div>
+                  </div>
+                  <div
+                    className={styles.progressWell}
+                    role="progressbar"
+                    aria-label="Experience"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={expPercent}
+                    aria-valuetext={`${currentXP} of ${xpToNextLevel} XP, ${expPercent}%`}
+                  >
+                    <div
+                      className={styles.expFill}
+                      style={{ width: `${expPercent}%` }}
+                    />
                   </div>
                 </div>
-                <div className={styles.progressWell}>
+
+                <div className={`${styles.trackGroup} ${styles.hpTrack} ${hpPercent < 25 ? styles.hpTrackLow : ""}`}>
+                  <div className={styles.trackHeader}>
+                    <span className={styles.trackLabel}><Heart size={14} aria-hidden="true" /> HP</span>
+                    <div className={styles.trackValues}>
+                      <span>
+                        {hp} / {maxHp}
+                      </span>
+                      <span className={styles.percentChip}>{hpPercent}%</span>
+                    </div>
+                  </div>
                   <div
-                    className={styles.expFill}
-                    style={{ width: `${expPercent}%` }}
-                  />
+                    className={styles.progressWell}
+                    role="progressbar"
+                    aria-label="Health"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={hpPercent}
+                    aria-valuetext={`${hp} of ${maxHp} HP, ${hpPercent}%`}
+                  >
+                    <div
+                      className={styles.hpFill}
+                      style={{ width: `${hpPercent}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* HP Track */}
-              <div className={styles.trackGroup}>
-                <div className={styles.trackHeader}>
-                  <span className={styles.trackLabel}>HP</span>
-                  <div className={styles.trackValues}>
-                    <span>
-                      {hp} / {maxHp}
-                    </span>
-                    <span className={styles.percentChip}>{hpPercent}%</span>
+              <section className={styles.metricsGrid} aria-label="Metrics">
+                <div className={styles.statCard}>
+                  <div className={styles.statHeading}>
+                    <span className={styles.statIconBadge}><LevelInsigniaIcon size={14} /></span>
+                    <p className={styles.statLabel}>Level</p>
                   </div>
+                  <p className={styles.statValue}>{user.level || 1}</p>
+                  <p className={styles.statSubtitle}>{user.hunterRank || "E"}-Rank Tier</p>
                 </div>
-                <div className={styles.progressWell}>
-                  <div
-                    className={`${styles.hpFill} ${hpPercent < 25 ? styles.hpFillLow : ""}`}
-                    style={{ width: `${hpPercent}%` }}
-                  />
+
+                <div className={styles.statCard}>
+                  <div className={styles.statHeading}>
+                    <span className={styles.statIconBadge}><Clock3 size={14} aria-hidden="true" /></span>
+                    <p className={styles.statLabel}>Total Focus</p>
+                  </div>
+                  <p className={styles.statValue}>
+                    {(() => {
+                      const totalMin = Number(user.totalStudyMinutes) || 0;
+                      const hrs = Math.floor(totalMin / 60);
+                      const mins = totalMin % 60;
+                      return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+                    })()}
+                  </p>
+                  <p className={styles.statSubtitle}>All-time recorded</p>
                 </div>
-              </div>
+
+                <div className={styles.statCard}>
+                  <div className={styles.statHeading}>
+                    <span className={styles.statIconBadge}><DailyQuotaIcon size={14} /></span>
+                    <p className={styles.statLabel}>Today&apos;s Quota</p>
+                  </div>
+                  <p className={styles.statValue}>
+                    {completedToday}
+                    <span className={styles.statValueDivider}> / </span>
+                    {totalToday}
+                  </p>
+                  <p className={styles.statSubtitle}>
+                    {totalToday === 0
+                      ? "No active quotas"
+                      : completedToday >= totalToday
+                      ? "All completed"
+                      : `${totalToday - completedToday} remaining`}
+                  </p>
+                </div>
+              </section>
             </div>
           </section>
         </header>
-
-        {/* ─── Metric Tiles Grid (Numbers Dominate) ─────────── */}
-        <section className={styles.metricsGrid} aria-label="Metrics">
-          <div className={styles.statCard}>
-            <div className={styles.statIconBadge}>
-              <LevelInsigniaIcon size={15} />
-            </div>
-            <p className={styles.statLabel}>Level</p>
-            <p className={styles.statValue}>{user.level || 1}</p>
-            <p className={styles.statSubtitle}>{user.hunterRank || "E"}-Rank Tier</p>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIconBadge}>
-              <Clock3 size={15} />
-            </div>
-            <p className={styles.statLabel}>Total Focus</p>
-            <p className={styles.statValue}>
-              {(() => {
-                const totalMin = Number(user.totalStudyMinutes) || 0;
-                const hrs = Math.floor(totalMin / 60);
-                const mins = totalMin % 60;
-                return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
-              })()}
-            </p>
-            <p className={styles.statSubtitle}>All-time recorded</p>
-          </div>
-
-          <div className={styles.statCard}>
-            <div className={styles.statIconBadge}>
-              <DailyQuotaIcon size={15} />
-            </div>
-            <p className={styles.statLabel}>Today&apos;s Quotas</p>
-            <p className={styles.statValue}>
-              {completedToday}
-              <span className={styles.statValueDivider}> / </span>
-              {totalToday}
-            </p>
-            <p className={styles.statSubtitle}>
-              {totalToday === 0
-                ? "No active quotas"
-                : completedToday >= totalToday
-                ? "All completed"
-                : `${totalToday - completedToday} remaining`}
-            </p>
-          </div>
-        </section>
 
         {/* ─── Daily Briefing Notification ──────────────────── */}
         <AnimatePresence>

@@ -3,14 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeft, Bell } from "lucide-react";
-import { SystemApertureIcon, ObjectiveTargetIcon } from "@/app/components/icons";
+import { PanelLeft, Bell, Sparkles } from "lucide-react";
+import { SylvieIcon, ObjectiveTargetIcon } from "@/app/components/icons";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { useProfileModal } from "./ProfileModalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import MarkdownRenderer from "./MarkdownRenderer";
 import { MOTION_SPRING } from "@/lib/motion";
+import { useSystemAI } from "./system/SystemAIProvider";
 
 interface SystemMessage {
   id: number;
@@ -50,9 +51,8 @@ const NAV_ITEMS = [
   },
   {
     href: "/system",
-    label: "The System",
-    icon: <SystemApertureIcon size={20} />,
-    badge: "AI",
+    label: "Sylvie",
+    icon: <SylvieIcon size={20} />,
   },
   {
     href: "/goals",
@@ -104,6 +104,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
   const { user, logout, refreshStats } = useAuth();
   const { openSettings } = useSettings();
   const { openProfile } = useProfileModal();
+  const { companionVisible, toggleCompanion } = useSystemAI();
 
   const handleOpenProfile = () => {
     if (user?.username) {
@@ -684,13 +685,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
                   <span className="truncate font-['Rajdhani'] font-semibold tracking-wide text-sm">
                     {item.label}
                   </span>
-                  {"badge" in item && item.badge && (
-                    <span
-                      className="ml-auto text-[8px] font-bold tracking-widest px-1.5 py-0.5 rounded-full border border-accent-primary/40 bg-accent-primary/20 text-[var(--accent-text,var(--accent-primary))]"
-                    >
-                      {item.badge}
-                    </span>
-                  )}
                 </div>
               </Link>
 
@@ -701,16 +695,43 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
                   className="absolute left-full ml-3 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-xl liquid-glass-sidebar text-xs font-['Rajdhani'] font-bold tracking-wider text-text-primary uppercase pointer-events-none opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-200 whitespace-nowrap z-[70] shadow-2xl border border-[var(--border-subtle)] flex items-center gap-1.5"
                 >
                   <span>{item.label}</span>
-                  {"badge" in item && item.badge && (
-                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-accent-primary/25 text-accent-primary-light border border-accent-primary/40">
-                      {item.badge}
-                    </span>
-                  )}
                 </div>
               )}
             </div>
           );
         })}
+
+        <div className="relative group mt-2 pt-2 border-t border-[var(--sidebar-border,var(--border-subtle))]">
+          <button
+            type="button"
+            onClick={() => {
+              toggleCompanion();
+              if (mobile) onCloseMobile?.();
+            }}
+            aria-label={companionVisible ? "Hide companion" : "Show companion"}
+            aria-pressed={companionVisible}
+            title={companionVisible ? "Hide companion" : "Show companion"}
+            className={`flex items-center h-10 rounded-2xl border transition-colors duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary ${
+              isCollapsed ? "w-10 mx-auto justify-center" : "w-full"
+            } ${
+              companionVisible
+                ? "border-[var(--accent-primary-mid)] bg-[var(--accent-primary-dim)] text-[var(--accent-text)]"
+                : "border-transparent text-[var(--sidebar-fg,var(--text-secondary))] hover:bg-[var(--surface-raised)] hover:border-[var(--border-subtle)]"
+            }`}
+          >
+            <span className="w-10 h-10 shrink-0 flex items-center justify-center">
+              <Sparkles size={20} strokeWidth={1.7} aria-hidden="true" />
+            </span>
+            {!isCollapsed && (
+              <>
+                <span className="truncate font-['Rajdhani'] font-semibold tracking-wide text-sm">
+                  {companionVisible ? "Hide companion" : "Show companion"}
+                </span>
+                <span aria-hidden="true" className={`ml-auto mr-3 h-1.5 w-1.5 shrink-0 rounded-full ${companionVisible ? "bg-[var(--accent-text)]" : "bg-[var(--text-muted)]"}`} />
+              </>
+            )}
+          </button>
+        </div>
 
         {user?.isAdmin && (
           <div key="/admin/background-studio" className="relative group">

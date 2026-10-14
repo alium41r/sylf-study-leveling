@@ -18,9 +18,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { attachRealtimeAuth, isRealtimeConfigured } from "@/lib/supabase-browser";
+import { fetchWithTimeout } from "@/lib/api-transport";
 import {
   deriveMemberTimer,
   deriveCollectiveSeconds,
+  normalizeFocusTimestamp,
   type FocusPartyStateView,
   type FocusSessionView,
   type MemberTimerView,
@@ -61,7 +63,9 @@ export interface UseFocusPartyRealtimeReturn {
   inviteFriend: (friendId: number) => Promise<{ success: boolean; error?: string }>;
 }
 
-async function parseSafeJson<T = any>(
+interface PartyResponse { error?: string; session?: FocusSessionView | null }
+
+async function parseSafeJson<T = PartyResponse>(
   res: Response,
   fallbackError: string
 ): Promise<{ data: T | null; error: string | null }> {
@@ -95,26 +99,30 @@ export function useFocusPartyRealtime(
 
   const channelRef = useRef<RealtimeChannel | null>(null);
   const isMountedRef = useRef(true);
-  const isSyncingRef = useRef(false);
+  const generationRef = useRef(0);
+  const syncingGenerationRef = useRef<number | null>(null);
+  const onEventRef = useRef(onEvent);
+  useEffect(() => { onEventRef.current = onEvent; }, [onEvent]);
 
   // ──────────────────────────────────────────────────────────────────────────
   // 1. Authoritative State Fetcher (REST)
   // ──────────────────────────────────────────────────────────────────────────
   const refresh = useCallback(async () => {
-    if (!partyId || !isMountedRef.current || isSyncingRef.current) return;
-    isSyncingRef.current = true;
+    const generation = generationRef.current;
+    if (!partyId || !enabled || !currentUserId || !isMountedRef.current || syncingGenerationRef.current === generation) return;
+    syncingGenerationRef.current = generation;
 
     try {
       const [partyRes, sessionRes] = await Promise.all([
-        fetch(`/api/focus-party/${partyId}`, { credentials: "include", cache: "no-store" }),
-        fetch(`/api/focus-party/${partyId}/session`, { credentials: "include", cache: "no-store" }),
+        fetchWithTimeout(fetch, `/api/focus-party/${partyId}`, { credentials: "include", cache: "no-store" }),
+        fetchWithTimeout(fetch, `/api/focus-party/${partyId}/session`, { credentials: "include", cache: "no-store" }),
       ]);
 
-      if (!isMountedRef.current) return;
+      if (!isMountedRef.current || generation !== generationRef.current) return;
 
       if (!partyRes.ok) {
         const { data: errData, error: parseErr } = await parseSafeJson(partyRes, "Failed to load party state");
-        setError((errData as any)?.error || parseErr || "Failed to load party state");
+        setError(errData?.error || parseErr || "Failed to load party state");
         return;
       }
 
@@ -128,23 +136,24 @@ export function useFocusPartyRealtime(
 
       if (sessionRes.ok) {
         const { data: sessionData } = await parseSafeJson(sessionRes, "Invalid session format");
-        setSession((sessionData as any)?.session || null);
+        setSession(sessionData?.session || null);
       } else {
-        setSession(null);
+        // A transient session read must not erase an accepted running timer.
+        setError("Couldn't refresh the focus room. Reconnecting automatically.");
       }
 
       setLastSyncedAt(new Date());
-    } catch (err: any) {
-      if (isMountedRef.current) {
-        setError(err.message || "Network error loading party state");
+    } catch (err) {
+      if (isMountedRef.current && generation === generationRef.current) {
+        setError(err instanceof Error ? err.message : "Network error loading party state");
       }
     } finally {
-      isSyncingRef.current = false;
-      if (isMountedRef.current) {
+      if (syncingGenerationRef.current === generation) syncingGenerationRef.current = null;
+      if (isMountedRef.current && generation === generationRef.current) {
         setIsLoading(false);
       }
     }
-  }, [partyId]);
+  }, [partyId, currentUserId, enabled]);
 
   const lastRefreshMsRef = useRef(0);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -166,20 +175,48 @@ export function useFocusPartyRealtime(
   // Initial fetch on mount or partyId change
   useEffect(() => {
     isMountedRef.current = true;
-    if (partyId && enabled) {
-      setIsLoading(true);
-      refresh();
-    } else {
+    const generation = ++generationRef.current;
+    queueMicrotask(() => {
+      if (generation !== generationRef.current) return;
       setParty(null);
       setSession(null);
-      setTimerViews({});
-      setCollectiveSeconds(0);
-      setError(null);
-    }
+      if (partyId && enabled) {
+        setIsLoading(true);
+        refresh();
+      } else {
+        setParty(null);
+        setSession(null);
+        setTimerViews({});
+        setCollectiveSeconds(0);
+        setError(null);
+      }
+      });
     return () => {
       isMountedRef.current = false;
+      generationRef.current = generation + 1;
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [partyId, enabled, refresh]);
+  }, [partyId, currentUserId, enabled, refresh]);
+
+  // Keep REST recovery available when Realtime is absent, disconnected, or the
+  // initial read failed. Epoch interpolation still owns the one-second ticks.
+  useEffect(() => {
+    if (!partyId || !enabled || !currentUserId) return;
+    const online = () => { void refresh(); };
+    const visible = () => { if (document.visibilityState === "visible") void refresh(); };
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible" && (connectionState !== "connected" || error)) void refresh();
+    }, 15_000);
+    window.addEventListener("online", online);
+    window.addEventListener("pageshow", online);
+    document.addEventListener("visibilitychange", visible);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("online", online);
+      window.removeEventListener("pageshow", online);
+      document.removeEventListener("visibilitychange", visible);
+    };
+  }, [partyId, currentUserId, enabled, connectionState, error, refresh]);
 
   // ──────────────────────────────────────────────────────────────────────────
   // 2. Pure Local Timer Interpolation (Zero Polling)
@@ -204,7 +241,7 @@ export function useFocusPartyRealtime(
           userId: p.userId,
           timerState: p.timerState,
           accumulatedSeconds: p.accumulatedSeconds,
-          currentStartedAt: p.currentStartedAt ? new Date(p.currentStartedAt).toISOString() : null,
+          currentStartedAt: normalizeFocusTimestamp(p.currentStartedAt),
           joinedAt: p.joinedAt,
           leftAt: p.leftAt,
           liveSeconds: derived.liveSeconds,
@@ -237,20 +274,16 @@ export function useFocusPartyRealtime(
   // ──────────────────────────────────────────────────────────────────────────
   // 3. Supabase Realtime Subscription & Resilience Strategy
   // ──────────────────────────────────────────────────────────────────────────
+  const isAuthorizedMember = Boolean(party && party.party.id === partyId && currentUserId && party.members.some((m) => m.userId === currentUserId));
   useEffect(() => {
-    // SECURITY GATE: Only subscribe if the caller is confirmed to be an active member
-    const isAuthorizedMember =
-      party &&
-      party.party.id === partyId &&
-      (!currentUserId || party.members.some((m) => m.userId === currentUserId));
-
-    if (!partyId || !enabled || !isRealtimeConfigured() || !isAuthorizedMember || error) {
-      setConnectionState("disconnected");
-      return;
-    }
 
     let isCancelled = false;
-    setConnectionState("connecting");
+    if (!partyId || !enabled || !isRealtimeConfigured() || !isAuthorizedMember) {
+      queueMicrotask(() => { if (!isCancelled) setConnectionState("disconnected"); });
+      return () => { isCancelled = true; };
+    }
+
+    queueMicrotask(() => { if (!isCancelled) setConnectionState("connecting"); });
 
     (async () => {
       const sb = await attachRealtimeAuth();
@@ -321,13 +354,14 @@ export function useFocusPartyRealtime(
 
       // Listen for ephemeral broadcast events (instant room notifications)
       channel.on(
-        "broadcast" as any,
+        "broadcast",
         { event: "party_event" },
-        (msg: { payload?: FocusPartyRealtimeEvent }) => {
-          if (isCancelled || !msg.payload) return;
+        (msg) => {
+          const event = msg.payload as FocusPartyRealtimeEvent | undefined;
+          if (isCancelled || !event) return;
           // Validate payload matches current room
-          if (msg.payload.partyId !== partyId) return;
-          if (onEvent) onEvent(msg.payload);
+          if (event.partyId !== partyId) return;
+          onEventRef.current?.(event);
           debouncedRefresh();
         }
       );
@@ -349,30 +383,8 @@ export function useFocusPartyRealtime(
       if (!isCancelled) setConnectionState("disconnected");
     });
 
-    // ────────────────────────────────────────────────────────────────────────
-    // Resync Strategy: Network 'online' & Document 'visibilitychange'
-    // ────────────────────────────────────────────────────────────────────────
-    const handleOnline = () => {
-      if (!isCancelled) {
-        setConnectionState("reconnecting");
-        refresh();
-      }
-    };
-
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible" && !isCancelled) {
-        // Tab brought to foreground: reconcile authoritative timestamps
-        refresh();
-      }
-    };
-
-    window.addEventListener("online", handleOnline);
-    document.addEventListener("visibilitychange", handleVisibility);
-
     return () => {
       isCancelled = true;
-      window.removeEventListener("online", handleOnline);
-      document.removeEventListener("visibilitychange", handleVisibility);
 
       if (channelRef.current) {
         try {
@@ -384,41 +396,42 @@ export function useFocusPartyRealtime(
       }
       setConnectionState("disconnected");
     };
-  }, [partyId, enabled, refresh, onEvent]);
+  }, [partyId, enabled, isAuthorizedMember, refresh, debouncedRefresh]);
 
   // ──────────────────────────────────────────────────────────────────────────
   // 4. Action Dispatchers
   // ──────────────────────────────────────────────────────────────────────────
-  const dispatchTimerAction = async (action: "start" | "pause" | "resume" | "leave") => {
+  const sessionId = session?.id;
+  const dispatchTimerAction = useCallback(async (action: "start" | "pause" | "resume" | "leave") => {
     if (!partyId) return { success: false, error: "No active party" };
     try {
-      const res = await fetch(`/api/focus-party/${partyId}/session/timer`, {
+      const res = await fetchWithTimeout(fetch, `/api/focus-party/${partyId}/session/timer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, sessionId, expectedOwnerId: currentUserId }),
       });
       const { data, error: parseError } = await parseSafeJson(res, "Timer action failed");
       if (!res.ok) {
-        return { success: false, error: (data as any)?.error || parseError || "Timer action failed" };
+        return { success: false, error: data?.error || parseError || "Timer action failed" };
       }
       await refresh();
       return { success: true };
-    } catch (err: any) {
-      return { success: false, error: err.message || "Network error" };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : "Network error" };
     }
-  };
+  }, [partyId, currentUserId, sessionId, refresh]);
 
-  const startTimer = useCallback(() => dispatchTimerAction("start"), [partyId, refresh]);
-  const pauseTimer = useCallback(() => dispatchTimerAction("pause"), [partyId, refresh]);
-  const resumeTimer = useCallback(() => dispatchTimerAction("resume"), [partyId, refresh]);
-  const leaveFocus = useCallback(() => dispatchTimerAction("leave"), [partyId, refresh]);
+  const startTimer = useCallback(() => dispatchTimerAction("start"), [dispatchTimerAction]);
+  const pauseTimer = useCallback(() => dispatchTimerAction("pause"), [dispatchTimerAction]);
+  const resumeTimer = useCallback(() => dispatchTimerAction("resume"), [dispatchTimerAction]);
+  const leaveFocus = useCallback(() => dispatchTimerAction("leave"), [dispatchTimerAction]);
 
   const enterFocus = useCallback(
     async (durationGoalMinutes?: number, title?: string) => {
       if (!partyId) return { success: false, error: "No active party" };
       try {
-        const res = await fetch(`/api/focus-party/${partyId}/session`, {
+        const res = await fetchWithTimeout(fetch, `/api/focus-party/${partyId}/session`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -426,12 +439,12 @@ export function useFocusPartyRealtime(
         });
         const { data, error: parseError } = await parseSafeJson(res, "Enter focus failed");
         if (!res.ok) {
-          return { success: false, error: (data as any)?.error || parseError || "Enter focus failed" };
+          return { success: false, error: data?.error || parseError || "Enter focus failed" };
         }
         await refresh();
         return { success: true };
-      } catch (err: any) {
-        return { success: false, error: err.message || "Network error" };
+      } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : "Network error" };
       }
     },
     [partyId, refresh]
@@ -440,21 +453,21 @@ export function useFocusPartyRealtime(
   const leaveParty = useCallback(async () => {
     if (!partyId) return { success: false, error: "No active party" };
     try {
-      const res = await fetch(`/api/focus-party/${partyId}`, {
+      const res = await fetchWithTimeout(fetch, `/api/focus-party/${partyId}`, {
         method: "DELETE",
         credentials: "include",
       });
       const { data, error: parseError } = await parseSafeJson(res, "Failed to leave party");
       if (!res.ok) {
-        return { success: false, error: (data as any)?.error || parseError || "Failed to leave party" };
+        return { success: false, error: data?.error || parseError || "Failed to leave party" };
       }
       setParty(null);
       setSession(null);
       setTimerViews({});
       setCollectiveSeconds(0);
       return { success: true };
-    } catch (err: any) {
-      return { success: false, error: err.message || "Network error" };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : "Network error" };
     }
   }, [partyId]);
 
@@ -462,18 +475,18 @@ export function useFocusPartyRealtime(
     async (memberId: number) => {
       if (!partyId) return { success: false, error: "No active party" };
       try {
-        const res = await fetch(`/api/focus-party/${partyId}/members/${memberId}`, {
+        const res = await fetchWithTimeout(fetch, `/api/focus-party/${partyId}/members/${memberId}`, {
           method: "DELETE",
           credentials: "include",
         });
         const { data, error: parseError } = await parseSafeJson(res, "Failed to remove member");
         if (!res.ok) {
-          return { success: false, error: (data as any)?.error || parseError || "Failed to remove member" };
+          return { success: false, error: data?.error || parseError || "Failed to remove member" };
         }
         await refresh();
         return { success: true };
-      } catch (err: any) {
-        return { success: false, error: err.message || "Network error" };
+      } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : "Network error" };
       }
     },
     [partyId, refresh]
@@ -483,7 +496,7 @@ export function useFocusPartyRealtime(
     async (friendId: number) => {
       if (!partyId) return { success: false, error: "No active party" };
       try {
-        const res = await fetch(`/api/focus-party/${partyId}/invite`, {
+        const res = await fetchWithTimeout(fetch, `/api/focus-party/${partyId}/invite`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -491,11 +504,11 @@ export function useFocusPartyRealtime(
         });
         const { data, error: parseError } = await parseSafeJson(res, "Failed to send invite");
         if (!res.ok) {
-          return { success: false, error: (data as any)?.error || parseError || "Failed to send invite" };
+          return { success: false, error: data?.error || parseError || "Failed to send invite" };
         }
         return { success: true };
-      } catch (err: any) {
-        return { success: false, error: err.message || "Network error" };
+      } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : "Network error" };
       }
     },
     [partyId]

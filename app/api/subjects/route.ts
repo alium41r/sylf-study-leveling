@@ -47,9 +47,8 @@ export async function GET(req: NextRequest) {
         },
         sessions: {
           where: {
-            startedAt: {
-              gte: todayStart,
-            },
+            OR: [{ executionState: null, startedAt: { gte: todayStart } },
+              { executionState: { not: null }, executionContext: { path: ["actualCivilDate"], equals: TimezoneService.getUserLocalDate(timezone) } }],
           },
           select: {
             durationMinutes: true,
@@ -61,8 +60,8 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "asc" },
     });
 
-    const enriched = subjects.map((sub: any) => {
-      const todaySeconds = sub.sessions.reduce((acc: number, session: any) => {
+    const enriched = subjects.map((sub) => {
+      const todaySeconds = sub.sessions.reduce((acc: number, session) => {
         // Both ended sessions and active (unended) sessions contribute their
         // stored durationSeconds — active sessions keep endedAt = NULL between
         // flushes now, so their flushed progress must still count.

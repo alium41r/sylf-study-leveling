@@ -1,0 +1,7 @@
+{
+  "status": "PASSED",
+  "exitCode": 1,
+  "expectedRejection": "Disabled-thinking qualification preserves every other production option",
+  "externalAttempts": 0,
+  "productionOptionsRequired": true
+}

@@ -27,6 +27,11 @@ const mockUser = {
 const mockLogout = vi.fn();
 const mockOpenSettings = vi.fn();
 const mockOpenProfile = vi.fn();
+const mockToggleCompanion = vi.fn();
+
+vi.mock("@/app/components/system/SystemAIProvider", () => ({
+  useSystemAI: () => ({ companionVisible: true, toggleCompanion: mockToggleCompanion }),
+}));
 
 vi.mock("@/app/components/AuthProvider", () => ({
   useAuth: () => ({
@@ -95,7 +100,11 @@ describe("Sidebar Layout and Animation Tests", () => {
     expect(screen.getByText("Home")).toBeDefined();
     expect(screen.getByText("Timer")).toBeDefined();
     expect(screen.getByText("Social")).toBeDefined();
-    expect(screen.getByText("The System")).toBeDefined();
+    const sylvie = screen.getByRole("link", { name: "Sylvie" });
+    expect(sylvie).toHaveAttribute("href", "/system");
+    expect(sylvie.querySelector("[data-sylvie-icon]")).toBeInTheDocument();
+    expect(screen.queryByText("The System")).toBeNull();
+    expect(screen.queryByText("AI", { exact: true })).toBeNull();
     expect(screen.getByText("Objectives")).toBeDefined();
     expect(screen.getByText("Calendar")).toBeDefined();
     expect(screen.getByText("Locker")).toBeDefined();

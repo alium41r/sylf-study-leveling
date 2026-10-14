@@ -10,11 +10,10 @@ import {
   ABILITY_TIERS,
   INVEST_STEP,
 } from "./cognitive-stats";
-import { FULL_BODY_FORMS } from "./character-traits";
 import { FLOATING_REST_DAY_QUOTA } from "./study-schedule-types";
 
 export type ArchiveCategory =
-  | "The System"
+  | "Progression"
   | "Focus & Study"
   | "Quests & AI"
   | "Economy & Shop"
@@ -62,7 +61,7 @@ function entry(
 export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
   entry(
     "sys_leveling",
-    "The System",
+    "Progression",
     "Levels & Experience",
     ["sys_ranks", "sys_stats", "eco_sylph"],
     p(
@@ -84,7 +83,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
   ),
   entry(
     "sys_ranks",
-    "The System",
+    "Progression",
     "Hunter Ranks & Progression",
     ["sys_leveling", "inv_character"],
     p(
@@ -102,7 +101,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
   ),
   entry(
     "sys_stats",
-    "The System",
+    "Progression",
     "Cognitive Attributes & Investment",
     ["sys_leveling", "focus_streak", "eco_sylph"],
     p(
@@ -174,7 +173,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     heading("At Your Desk"),
     list(
       "Calculator: scientific and STEM calculations.",
-      "AI Assistant: ask study questions and receive formatted explanations.",
+      "Sylvie: ask study questions and receive formatted explanations.",
       "Audio Mixer: manage soundscapes, ambient layers, and your imported tracks.",
       "Scratchpad: keep notes during focus.",
       "Formulas: reference study sheets without leaving the session."
@@ -282,10 +281,10 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
   entry(
     "qst_ai_planner",
     "Quests & AI",
-    "The System AI & Classic Planner",
+    "Sylvie & Classic Planner",
     ["qst_planner_modes", "qst_quick_plan", "focus_tools"],
     p(
-      "The System is Sylf’s AI workspace. Its chat can explain progress, help with study questions, and act on supported goals, quests, and calendar tasks. Quick access also appears in relevant dashboard, objectives, quest, and calendar contexts."
+      "Sylvie is Sylf’s AI companion. Her chat can explain progress, help with study questions, and act on supported goals, quests, and calendar tasks. Quick access also appears in relevant dashboard, objectives, quest, and calendar contexts."
     ),
     p(
       "The Planner tab opens the Classic Planner by default. Planner Modes is a separate choice in the same workspace, so you can use the familiar planner or a more focused Exam, Roadmap, or Mastery workflow."
@@ -294,7 +293,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     list(
       "Review proposed work and workload before committing it.",
       "AI generation and messages follow the quota displayed for your account.",
-      "The in-session AI Assistant helps with study questions while you focus.",
+      "Sylvie helps with study questions while you focus.",
       "A proposal is planning advice; it does not certify knowledge or earn study rewards on its own."
     )
   ),
@@ -304,7 +303,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     "Exam, Roadmap & Mastery Planning",
     ["qst_quick_plan", "qst_overview", "focus_rest"],
     p(
-      "Planner Modes offers three workflows for different kinds of study. Open The System → Planner → Planner Modes and choose the purpose that matches your work."
+      "Planner Modes offers three workflows for different kinds of study. Open Sylvie → Planner → Planner Modes and choose the purpose that matches your work."
     ),
     heading("Choose Your Direction"),
     list(
@@ -412,7 +411,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
     heading("What the Counts Mean"),
     list(
       "Owned items: total positive inventory quantities. The item shelf also shows distinct entries and equipped entries.",
-      "Available styles: Character Studio options you currently meet the requirements for, separate from purchases.",
+      "Available styles: Companion Customizer options you currently meet the requirements for, separate from purchases.",
       "Personal images: backgrounds saved to your account’s personal gallery.",
       "Local tracks: imported audio present on this device.",
       "Recorded profile keepsakes: saved frame, title, and name-color acquisitions, excluding baseline defaults."
@@ -444,13 +443,13 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
   entry(
     "inv_character",
     "Customization",
-    "The Character Studio",
+    "The Companion Customizer",
     ["inv_profile", "inv_equipment", "sys_ranks"],
     p(
-      "Open Locker → Identity to enter Character Studio or Profile Studio. Character Studio selects the visual form, pedestal, and available aura for your study identity."
+      "Open Locker → Identity to enter Companion Customizer or Profile Studio. Companion Customizer selects the visual form, pedestal, and available aura for your study identity."
     ),
     p(
-      `The current baseline Character Studio contains ${FULL_BODY_FORMS.length} full-body forms and its available pedestal. The form catalog is shared with Collection, so names and access requirements stay aligned.`
+      "Choose your own saved artwork. Pixel Studio creates and animates your artwork; the Customizer applies your artwork and Pixel Size. Profile Studio owns your photo, banner and bio."
     ),
     heading("Make a Selection"),
     list(
@@ -460,7 +459,7 @@ export const ARCHIVE_ENTRIES: ArchiveEntry[] = [
       "No Aura and unequipped defaults are settings, not additional acquisitions."
     ),
     p(
-      "Your character style is a visual choice. Its access requirements and selected state are shown in Character Studio and Collection."
+      "Your character style is a visual choice. Its access requirements and selected state are shown in Companion Customizer and Collection."
     )
   ),
   entry(

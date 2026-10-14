@@ -9,7 +9,7 @@ import PlannerTab from "./PlannerTab";
 import { QuotaInfo } from "../../components/AiPlannerPanel";
 import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import { motion } from "framer-motion";
-import { SystemApertureIcon } from "@/app/components/icons";
+import { SylvieIcon } from "@/app/components/icons";
 
 import styles from "../System.module.css";
 
@@ -29,7 +29,7 @@ const SYSTEM_TABS: { id: WorkspaceTab; label: string; icon: React.ReactNode }[] 
 ];
 
 /**
- * System Workspace — the dedicated home of The System.
+ * System Workspace — the dedicated home of Sylvie.
  *
  * Portable extracted component: used by both the Next.js App Router
  * page (`app/system/page.tsx`) and the mobile Vite client
@@ -71,7 +71,7 @@ export function SystemScreen() {
   const [chatQuota, setChatQuota] = useState<QuotaInfo | null>(null);
   const [plannerQuota, setPlannerQuota] = useState<QuotaInfo | null>(null);
 
-  // Developer Debug Mode (hidden by default; toggle by triple-clicking "THE SYSTEM" or ?dev=true)
+  // Developer Debug Mode (hidden by default; toggle by triple-clicking "SYLVIE" or ?dev=true)
   const [isDevMode, setIsDevMode] = useState(false);
   const [devClicks, setDevClicks] = useState(0);
 
@@ -334,56 +334,36 @@ export function SystemScreen() {
           {/* ─── Action / Title Row ──────────────────────────── */}
           <div className={styles.headerTopRow}>
             <div>
-              <div className={styles.eyebrowGroup}>
-                <span
-                  onClick={handleTitleClick}
-                  className={styles.eyebrow}
-                  title="The System AI"
-                >
-                  <span className={styles.eyebrowDot} />
-                  The System
-                </span>
-
-                {/* Live status chip */}
-                <span className={styles.intelligenceChip}>
-                  <span className={styles.radarBeacon}>
-                    <span className={styles.radarPing} />
-                    <span className={styles.radarDot} />
+              {/* Developer AI Mode Inspector & Selector (Only visible in Dev Mode) */}
+              {isDevMode && (
+                <div className={`${styles.eyebrowGroup} flex items-center gap-2 animate-fadeIn`}>
+                  <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                    DEV AI
                   </span>
-                  Intelligence Layer
-                </span>
-
-                {/* Developer AI Mode Inspector & Selector (Only visible in Dev Mode) */}
-                {isDevMode && (
-                  <div className="flex items-center gap-2 animate-fadeIn">
-                    <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                      DEV AI
-                    </span>
-                    <select
-                      value={modelPref}
-                      onChange={(e) => setModelPref(e.target.value as any)}
-                      className="bg-bg-panel text-xs text-text-primary border border-indigo-500/40 rounded px-2 py-0.5 outline-none focus:border-accent-light"
-                      style={{ fontFamily: "'Rajdhani', sans-serif" }}
-                    >
-                      <option value="auto">Auto (DeepSeek → Groq → Gemini)</option>
-                      <option value="deepseek">Force DeepSeek</option>
-                      <option value="gemini">Force Gemini</option>
-                      <option value="groq">Force Groq (GPT OSS 120B)</option>
-                    </select>
-                    <button
-                      onClick={openUsage}
-                      className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 transition-colors"
-                      title="AI token & cost telemetry"
-                    >
-                      AI Costs
-                    </button>
-                  </div>
-                )}
-              </div>
+                  <select
+                    value={modelPref}
+                    onChange={(e) => setModelPref(e.target.value as any)}
+                    className="bg-bg-panel text-xs text-text-primary border border-indigo-500/40 rounded px-2 py-0.5 outline-none focus:border-accent-light"
+                    style={{ fontFamily: "'Rajdhani', sans-serif" }}
+                  >
+                    <option value="auto">Auto (DeepSeek → Groq → Gemini)</option>
+                    <option value="deepseek">Force DeepSeek</option>
+                    <option value="gemini">Force Gemini</option>
+                    <option value="groq">Force Groq (GPT OSS 120B)</option>
+                  </select>
+                  <button
+                    onClick={openUsage}
+                    className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-500/30 transition-colors"
+                    title="AI token & cost telemetry"
+                  >
+                    AI Costs
+                  </button>
+                </div>
+              )}
 
               <h1 className={styles.title}>
-                <SystemApertureIcon size={22} className="text-accent-primary shrink-0" />
-                <span>System <em>Workspace</em></span>
+                <SylvieIcon size={22} className="text-accent-primary shrink-0" />
+                <span onClick={handleTitleClick} title="Sylvie AI">Sylvie</span>
               </h1>
             </div>
 

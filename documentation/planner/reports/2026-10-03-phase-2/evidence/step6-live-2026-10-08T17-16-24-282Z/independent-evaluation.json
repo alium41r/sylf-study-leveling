@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "classification": "Current-source independent inspection of actual provider outputs, durable call metadata/checkpoints and execution; no model approval or successful apply counted as educational acceptance",
+  "run": "step6-live-2026-10-08T17-16-24-282Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "rawSha256": "0c69361aed8f312e68a13e7432b94bb79ce2e105fab44dc5f7a3d25af02122fc",
+  "routeConfiguration": {
+    "temporaryNonGemini": true,
+    "productionPrimaryOptions": true,
+    "temporaryExistingGroq": false,
+    "reasoningEffort": null,
+    "temperature": null,
+    "reviewTemperature": null,
+    "reviewThinking": null,
+    "reviewReasoningEffort": null,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "acceptedCases": 0,
+  "totalCases": 3,
+  "metrics": {
+    "externalCalls": 7,
+    "settledCalls": 6,
+    "unknownSpendCalls": 1,
+    "unknownPricingCalls": 7,
+    "actualInputTokens": 33640,
+    "actualOutputTokens": 32734,
+    "truncatedCalls": 4,
+    "fallbacks": 3,
+    "caseLatencyMs": {
+      "median": 89663,
+      "p90": 233762,
+      "max": 233762
+    },
+    "providerLatencyMs": {
+      "median": 24086,
+      "p90": 233368,
+      "max": 233368
+    },
+    "upstreamFailureCategories": [
+      "network_error"
+    ]
+  },
+  "cases": [
+    {
+      "id": "tiny-roomy-exam",
+      "expected": "Additional capacity alone must not inflate useful work versus tiny-exam.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "OUTPUT_TRUNCATED",
+      "inspection": "Primary generation completes, but strict validation rejects undeclared scopeRefsNote:null. Existing metered fallback returns a complete accepted blueprint. The actual independent reviews both exhaust4096output tokens with zero final content. A generated50-minute teaching/application/demonstration strategy alone is not independent acceptance, and its optional learner-chosen parameters still need achievable matching criteria. No candidate/apply or repair/verification exists.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "status": "FAILED"
+    },
+    {
+      "id": "triage",
+      "expected": "Explicit prioritization and deferred scope; no invented weighting or disappearance.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "OUTPUT_TRUNCATED",
+      "inspection": "Both generation attempts exhaust8192output tokens (first has5767characters of partial JSON, fallback has no final content). Nothing is parsed or reviewed; no scheduling/education/apply acceptance exists.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "status": "FAILED"
+    },
+    {
+      "id": "owned-course-research",
+      "expected": "Actual owned upload/hash, excerpt-backed course outcomes, no official-assessment claim, research then reviewed plan.",
+      "accepted": false,
+      "observedOutcome": "FAILED",
+      "blocker": "BUDGET_EXHAUSTED",
+      "inspection": "One dispatched research call fails with network_error after233.368s; durable metadata closes it earlier as BUDGET_EXHAUSTED with UNKNOWN_SPEND and retains4729input/8192output reserved tokens, without actual usage. No fallback/verification/adoption/blueprint/candidate/apply occurs. The calling turn was interrupted while this call was pending; this is retained failure evidence, not a clean educational result or proof normal owned-document research cannot complete.",
+      "executionCounts": {
+        "quests": 0,
+        "goals": 0
+      },
+      "repairCalls": 0,
+      "verificationCalls": 0,
+      "status": "FAILED"
+    }
+  ],
+  "full17Corpus": "NOT_RUN: conditional subset acceptance gate fails",
+  "naturalRepairVerificationApply": "NOT_OBSERVED",
+  "limitsChanged": false,
+  "defectsOrFindingsInjected": false,
+  "interruptionDuringOwnedCall": true,
+  "selectedRunDirectory": "step6-live-2026-10-08T17-16-24-282Z",
+  "liveCorpusSha256": "0c69361aed8f312e68a13e7432b94bb79ce2e105fab44dc5f7a3d25af02122fc",
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "operationalFailures": 3
+}

@@ -12,8 +12,15 @@ type Node={key:string;planRef:string;activity:Activity;priority:number;charge:nu
 type Edge={before:string;after:string;minimum:number;maximum?:number};
 const key=(plan:string,activity:string)=>`${plan}/${activity}`;
 const gap=(before:string,after:string)=>(Date.parse(after)-Date.parse(before))/86400000;
+/** Necessary bounds from the same domains/capacity owner used by allocation.
+ * These explain a failure; they do not promise that dependent work will fit. */
+export interface BindingConstraint {
+  planRef:string;activityRef:string;approvedMinutes:number;remainingMinutes:number;capacityChargeMinutes:number;
+  alreadyReserved:boolean;sessionMaximumMinutes:number;maximumIndivisibleMinutes:number;
+  eligibleDays:{date:string;dayMinutes:number;weekMinutes:number;goalMinutes:number|null;upperBoundMinutes:number;remainingAfterPlacementsMinutes:number}[];
+}
 /** Remaining/actual/week facts come from the Phase 1 owner, never model output. */
-export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnvelope,rawFacts:AllocationFacts,options:{maximumSearchNodes?:number}={}):AllocationReport {
+export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnvelope,rawFacts:AllocationFacts,options:{maximumSearchNodes?:number;onBindingConstraints?:(constraints:BindingConstraint[])=>void}={}):AllocationReport {
   const snapshot=BlueprintSnapshotSchema.parse(raw),envelope=SchedulingEnvelopeSchema.parse(rawEnvelope),facts=AllocationFactsSchema.parse(rawFacts);
   const limit=options.maximumSearchNodes??20000;if(!Number.isSafeInteger(limit)||limit<1||limit>100000)reject("INVALID_OUTPUT","Invalid bounded allocation search allowance.","ALLOCATION");
   const target=new Map(envelope.targets.map(t=>[t.planRef,t]));
@@ -126,6 +133,19 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
   }
   const placements=[...nodes.values()].filter(n=>assigned.has(n.key)).map(n=>({planRef:n.planRef,activityRef:n.activity.localId,date:assigned.get(n.key)!,minutes:n.activity.timeboxMinutes}));
   const unscheduled=[...nodes.values()].filter(n=>!assigned.has(n.key)).map(n=>({planRef:n.planRef,activityRef:n.activity.localId,minutes:n.activity.timeboxMinutes}));
+  options.onBindingConstraints?.(unscheduled.map(work=>{
+    const node=nodes.get(key(work.planRef,work.activityRef))!;
+    const sessionMaximumMinutes=facts.preferences.find(p=>p.planRef===node.planRef)?.maximumTimeboxMinutes??envelope.timeboxRange.maxMinutes;
+    const eligibleDays=domains.get(node.key)!.map(date=>{
+      const dayMinutes=days.get(date)?.availableMinutes??0,weekMinutes=weekRemaining(weekKey(date)),goal=goalRemaining(node.planRef,weekKey(date));
+      return {date,dayMinutes,weekMinutes,goalMinutes:Number.isFinite(goal)?goal:null,
+        upperBoundMinutes:Math.min(sessionMaximumMinutes,dayMinutes,weekMinutes,goal),remainingAfterPlacementsMinutes:available(node,date)};
+    });
+    return {planRef:node.planRef,activityRef:node.activity.localId,approvedMinutes:node.activity.timeboxMinutes,
+      remainingMinutes:node.pin?.remainingMinutes??node.activity.timeboxMinutes,capacityChargeMinutes:node.charge,
+      alreadyReserved:node.pin?.alreadyReserved??false,sessionMaximumMinutes,
+      maximumIndivisibleMinutes:Math.max(0,...eligibleDays.map(d=>d.upperBoundMinutes)),eligibleDays};
+  }));
   const findings:AllocationReport["findings"]=[];
   const finding=(category:AllocationReport["findings"][number]["category"],consequential:boolean,planRefs:string[],activityRefs:string[],evidence:string,consequence:string)=>findings.push({findingId:`finding_${hash("allocation-finding",{category,planRefs,evidence}).slice(0,20)}`,category,consequential,planRefs,activityRefs:activityRefs.slice(0,60),evidence:evidence.slice(0,1000),consequence});
   if(capacityProof)finding("SHORTFALL",true,capacityProof.planRefs,unscheduled.map(t=>t.activityRef),capacityProof.explanation,"The AI must explain triage, use declared meaningful chunks, or request an explicit constraint decision. No work or timebox was silently removed.");

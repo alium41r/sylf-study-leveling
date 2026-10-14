@@ -1,0 +1,11 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/components/landing/companion/CompanionReview.tsx __tests__/pixel-display __tests__/landing/pixel-companion-layering.test.tsx __tests__/landing/pixel-companion-prototype.test.tsx __tests__/landing/svg-reaction-sequence.test.tsx
+
+/Users/aliumair/Desktop/sylf/__tests__/pixel-display/canvas-renderer.test.ts
+  26:23  warning  '_ratio' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/aliumair/Desktop/sylf/__tests__/pixel-display/pixel-studio.test.ts
+  595:12  warning  'harness' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 2 problems (0 errors, 2 warnings)
+

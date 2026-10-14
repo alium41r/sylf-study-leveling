@@ -4,7 +4,7 @@ import pg from "pg";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { connect, user } from "./database";
-import { PlannerDatabase } from "@/lib/planner/v2/server/database";
+import { PlannerDatabase, DurablePlannerError } from "@/lib/planner/v2/server/database";
 import { AttemptService, newBudget } from "@/lib/planner/v2/server/attempts";
 import { IntentService } from "@/lib/planner/v2/server/intents";
 import { ForegroundAccountingService } from "@/lib/planner/v2/server/accounting";
@@ -125,6 +125,58 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     await attempts.cancel(f.ownerId, f.attempt!.attemptId);
     expect((await connection.query('SELECT id FROM "AiUsageLog" WHERE "userId"=$1', [f.ownerId])).rows).toHaveLength(0);
     expect((await connection.query('SELECT used FROM "UserQuota" WHERE "userId"=$1', [f.ownerId])).rows).toEqual([{ used: 0 }]);
+  });
+  it("bounds five reservations waiting on the same owner without exhausting serialization retries", async () => {
+    const f = await fixture();
+    let release!: () => void; let acquired!: () => void;
+    const held = new Promise<void>(resolve => { release = resolve; });
+    const ready = new Promise<void>(resolve => { acquired = resolve; });
+    const blocker = db.coordinated(f.ownerId, async sql => {
+      acquired(); await held;
+      // A genuine preceding owner write commits after all five waiters have
+      // started. Only its timestamp changes; budget/education remain intact.
+      await sql.query('UPDATE "PlannerAttempt" SET "updatedAt"=clock_timestamp() WHERE id=$1', [f.attempt!.attemptId]);
+    });
+    await ready;
+    const input = { provider: "fixture", model: "unpriced", inputTokens: 1000, outputTokens: 1000, category: "PLANNING" as const, policy };
+    const pending = Promise.allSettled(Array.from({ length: 5 }, () => attempts.reserveCall(f.token!, input)));
+    try {
+      for (let n = 0; n < 100; n++) {
+        const waiters = (await connection.query("SELECT count(*)::int AS count FROM pg_locks WHERE locktype='advisory' AND classid=73641::oid AND objid=$1::oid AND NOT granted", [f.ownerId])).rows[0].count;
+        if (waiters === 5) break;
+        if (n === 99) throw new Error("Five independent reservation connections never entered owner-lock wait");
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+    } finally { release(); await blocker; }
+    const results = await pending;
+    const rejected = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
+    expect(rejected.map(r => r.reason instanceof DurablePlannerError ? r.reason.detail.code : r.reason.code)).toEqual(["BUDGET_EXHAUSTED"]);
+    expect(results.filter(r => r.status === "fulfilled")).toHaveLength(4);
+    expect((await stored(f.attempt!.attemptId)).payload.calls).toHaveLength(4);
+    await attempts.reserveCall(f.token!, { ...input, policy: { purpose: "REVIEW" } });
+    await attempts.cancel(f.ownerId, f.attempt!.attemptId);
+    expect((await connection.query('SELECT used FROM "UserQuota" WHERE "userId"=$1', [f.ownerId])).rows).toEqual([{ used: 0 }]);
+    expect((await connection.query("SELECT count(*)::int AS count FROM pg_locks WHERE locktype='advisory' AND classid=73641::oid AND objid=$1::oid", [f.ownerId])).rows[0].count).toBe(0);
+  });
+  it("returns a clean pooled owner connection after commit and SQL rollback with its original timeout", async () => {
+    const f = await fixture(); const single = new pg.Pool({ connectionString: process.env.PLANNER_TEST_DATABASE_URL, max: 1 });
+    const coordinated = new PlannerDatabase(single);
+    const original = (await connection.query('SELECT username FROM "User" WHERE id=$1', [f.ownerId])).rows[0].username;
+    try {
+      await single.query("SET statement_timeout = '7s'");
+      await coordinated.coordinated(f.ownerId, async sql => {
+        expect((await sql.query("SHOW transaction_isolation")).rows[0].transaction_isolation).toBe("serializable");
+        await sql.query("SELECT planner_v2_assert_coordinated($1)", [f.ownerId]);
+      });
+      await expect(coordinated.coordinated(f.ownerId, async sql => {
+        await sql.query('UPDATE "User" SET username=$2 WHERE id=$1', [f.ownerId, `rollback_${randomUUID()}`]);
+        await sql.query("SELECT 1/0");
+      })).rejects.toMatchObject({ code: "22012" });
+      expect((await single.query("SHOW statement_timeout")).rows[0].statement_timeout).toBe("7s");
+      expect((await single.query("SELECT count(*)::int AS count FROM pg_locks WHERE pid=pg_backend_pid() AND locktype='advisory' AND classid=73641::oid AND objid=$1::oid", [f.ownerId])).rows[0].count).toBe(0);
+      expect((await connection.query('SELECT username FROM "User" WHERE id=$1', [f.ownerId])).rows[0].username).toBe(original);
+      await attempts.cancel(f.ownerId, f.attempt!.attemptId);
+    } finally { await single.end(); }
   });
   it("starts the research sub-window before search/fetch and never renews it through a fenced takeover", async () => {
     const f = await fixture(true, newBudget("RESEARCH")); const first = await attempts.startResearchWindow(f.token!);

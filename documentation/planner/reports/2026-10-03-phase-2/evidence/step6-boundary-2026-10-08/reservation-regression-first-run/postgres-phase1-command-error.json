@@ -1,0 +1,5 @@
+{
+  "signal": null,
+  "stderr": "(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:\n  - ESM syntax in a file loaded as CommonJS (vitest.planner-v2-postgres.config.ts:1:1). Use a `.mjs` extension or set `\"type\": \"module\"` in the closest package.json\nSet `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.\n(node:73308) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n",
+  "stdoutTail": "JSON report written to /var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-v2-pg-Flu5uR/phase1-report.json\n"
+}

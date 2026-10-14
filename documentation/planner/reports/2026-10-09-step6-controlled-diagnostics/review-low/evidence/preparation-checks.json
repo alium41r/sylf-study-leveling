@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "status": "READY_AWAITING_NEW_PAID_APPROVAL",
+  "checkedAtUtc": "2026-10-09T13:56:22.099978+00:00",
+  "paidCallsMade": 0,
+  "interceptedCanonicalCalls": 2,
+  "variantGuardTestsPassed": 12,
+  "originalGuardTestsPassed": 15,
+  "postgresHarness": {
+    "passed": 1,
+    "failed": 0,
+    "requiredSkipped": 0
+  },
+  "typecheck": "PASSED",
+  "targetedLint": "PASSED",
+  "sourceFreezeCheck": "FROZEN_INPUTS_MATCH",
+  "originalSourcePins": 207,
+  "preparedPacketPins": 48,
+  "approvedProtocolArtifactsUnchanged": 40,
+  "priorPaidEvidenceUnchanged": true,
+  "variantFreezeSha256": "79e1036e6557a2491df994d9110644b276922345208c1976e6c774f3b3b466d0",
+  "preflightSha256": "9897d5c2be48465c38d5a184b9c9b38f129f9e25abffe8c9ca0cf0798fa4245a",
+  "independentLabelSignoffSha256": "e88d1ed961881b9994311631b0b0f66a8cf8e6f5a96eed7560eebb26eb900f30",
+  "independentLabelSignoff": "EXISTING_INDEPENDENT_AI_AGENT_SIGNOFF_UNCHANGED_NOT_HUMAN",
+  "maximumFuturePaidCallsSubjectToApproval": 2,
+  "maximumFutureSpendUsdSubjectToApproval": 0.02,
+  "fullPeakUncachedReservationUsd": 0.016803,
+  "caseOrder": [
+    "v09",
+    "v04"
+  ],
+  "soleWireChange": {
+    "reasoning_effort": "low"
+  },
+  "sleepGuardVerifiedAndReleased": true,
+  "referencesChecked": 81,
+  "noApprovedExecutionRecord": true,
+  "noPaidJournalCreated": true,
+  "noProductionChanges": true,
+  "derivedHarnessInputs": {
+    "launch.cjs": {
+      "baselineSha256": "63c5dbf7900005cd6737dda63168bec05108ea32c948ce3bf594f1b3c426bafe",
+      "derivedSha256": "a31f270d782e524db67d13f37e3783587b9669c7e59a3fab3df8fc8934a6a845"
+    },
+    "postgres.test.ts": {
+      "baselineSha256": "d6864b912119e87f9236c4363fc3317523bb0738ce8253f5d9ebde58a80c1b61",
+      "derivedSha256": "0e782ab6390dc73b061d3a684626e13fd1d2b7aaa2c29c13f30cef05e3e16a9b"
+    }
+  },
+  "staticContentAndDiffChecks": "PASSED"
+}

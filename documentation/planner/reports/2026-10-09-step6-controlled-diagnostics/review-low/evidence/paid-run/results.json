@@ -1,0 +1,108 @@
+{
+  "mode": "PAID",
+  "educationalJudgment": "UNASSESSED",
+  "records": [
+    {
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "packetSha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "rootRequestId": "6b6ec762-b624-41df-af59-07cd108c3022",
+      "attemptId": "2baf3b0e-cedf-4dce-90ab-ba1f09b61ac5",
+      "status": "REJECTED",
+      "errorCode": "OUTPUT_TRUNCATED",
+      "finalText": "",
+      "rejected": "",
+      "latencyMs": 21069,
+      "stopped": null
+    },
+    {
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "packetSha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "rootRequestId": "88470373-b8fd-4194-aa57-09321169e226",
+      "attemptId": "d3daf535-ebf0-4cc0-af94-22c744e2c895",
+      "status": "VALIDATED",
+      "result": {
+        "value": {
+          "reports": [
+            {
+              "planRef": "plan_1",
+              "report": {
+                "schemaVersion": 2,
+                "reportId": "0f372488-1cbb-4863-bcd9-6cec2a23b623",
+                "status": "BLOCKED",
+                "evidenceDigest": "59f675978bd39c41caab02584bd6eb5d596f2ed5ce0f35d4693d43a7d4e0c12b",
+                "educationalContentDigest": "2f266baedd400893e844de8e44cde7255ac900ef861dfa6cabae4b8731c8dc66",
+                "issues": [
+                  {
+                    "issueId": "issue_work2_stop_violation",
+                    "category": "STRUCTURAL",
+                    "severity": "BLOCKING",
+                    "affectedRefs": [
+                      "work_2",
+                      "strategy"
+                    ],
+                    "evidence": "The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.",
+                    "consequence": "The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.",
+                    "resolution": "OPEN",
+                    "verification": null
+                  }
+                ],
+                "requiredAcknowledgements": []
+              }
+            }
+          ],
+          "findings": [
+            {
+              "planRef": "plan_1",
+              "finding": {
+                "issueId": "issue_work2_stop_violation",
+                "category": "STRUCTURAL",
+                "severity": "BLOCKING",
+                "affectedRefs": [
+                  "work_2",
+                  "strategy"
+                ],
+                "basis": "CONCRETE_VIOLATION",
+                "grounds": [
+                  {
+                    "ref": "plan_1/accepted",
+                    "excerpt": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match."
+                  },
+                  {
+                    "ref": "plan_1/activity/work_2",
+                    "excerpt": "After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily."
+                  },
+                  {
+                    "ref": "plan_1/activity/work_2",
+                    "excerpt": "All twelve rewrites are done even after checked success."
+                  },
+                  {
+                    "ref": "plan_1/uncertainty",
+                    "excerpt": "Meet the accepted criterion or record the specific unresolved gap."
+                  }
+                ],
+                "evidence": "The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.",
+                "consequence": "The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.",
+                "requestedResolution": "Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.",
+                "requiresAcknowledgement": false
+              }
+            }
+          ]
+        },
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "callId": "98b20261-4cb9-40a3-b281-31847bcb61fc",
+        "attempts": [
+          {
+            "callId": "98b20261-4cb9-40a3-b281-31847bcb61fc",
+            "provider": "deepseek",
+            "model": "deepseek-flash"
+          }
+        ]
+      },
+      "finalText": "{\"plans\":[{\"planRef\":\"plan_1\",\"issues\":[{\"issueId\":\"issue_work2_stop_violation\",\"category\":\"STRUCTURAL\",\"severity\":\"BLOCKING\",\"affectedRefs\":[\"work_2\",\"strategy\"],\"basis\":\"CONCRETE_VIOLATION\",\"grounds\":[{\"ref\":\"plan_1/accepted\",\"excerpt\":\"Produce one citation matching the supplied pattern and stop after the fields and punctuation match.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"After the citation is already correct, rewrite the identical correct citation twelve more times compulsorily.\"},{\"ref\":\"plan_1/activity/work_2\",\"excerpt\":\"All twelve rewrites are done even after checked success.\"},{\"ref\":\"plan_1/uncertainty\",\"excerpt\":\"Meet the accepted criterion or record the specific unresolved gap.\"}],\"evidence\":\"The accepted outcome explicitly requires stopping after one citation matches the pattern. work_2 is a committed activity that mandates twelve identical rewrites after the citation is already correct, and its completion criterion requires continuing even after checked success. This also inflates strategy effort to 40 minutes.\",\"consequence\":\"The learner spends 30 unnecessary minutes on repeated output after the accepted success gate, and the plan contradicts its own stopping condition without educational necessity.\",\"requestedResolution\":\"Remove work_2 and any effort, allocation, or dependency entries tied to it; let checked completion of work_1 satisfy the accepted outcome and stop.\",\"requiresAcknowledgement\":false}]}]}",
+      "latencyMs": 14480
+    }
+  ]
+}

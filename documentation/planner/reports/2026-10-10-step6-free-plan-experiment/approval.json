@@ -1,0 +1,25 @@
+{
+  "status": "HUMAN_APPROVED",
+  "approvedAt": "2026-10-10T17:23:56.967Z",
+  "maximumTotalDispatches": 4,
+  "maximumSpendUsd": 0.2,
+  "matchedStandaloneCapTokens": 32768,
+  "productionChangesAuthorized": false,
+  "manifestSha256": "03b81f6ab8790498f5c3bbed6bb0a84a9788559ae33340c58813702e2ca0af68",
+  "freezeSha256": "930cf17166828e6b206c2038c7147bbb5fa187179e6549a044449bcadb84e73c",
+  "preflightSha256": "2aa8f0313f3f4bdac43b60036ef231a142db1d5bdcb53b9034165be28d6ab7e6",
+  "rateVerifiedAt": "2026-10-10T17:23:56.967Z",
+  "rateSource": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "maximumPeakUsdPerMillion": {
+    "input": 0.3,
+    "output": 1.2
+  },
+  "humanMessage": "I authorize up to 4 DeepSeek V4.1 Flash calls, with a strict $0.20 total spending ceiling, under the frozen experiment protocol. Compare natural, minimally constrained planning against Sylf's compact planning interface using both prepared scenarios. Preserve identical student context and the 32,768-token allowance for both interfaces. Use High reasoning, with no retries, fallbacks or additional calls. Enforce spending ceiling, stopping rules and sleep prevention. Independently evaluate educational quality separately from technical validity and report usage, latency and estimated cost. Do not modify Sylf, tune prompts or proceed with further tests without approval.",
+  "reasoningEffort": "high",
+  "thinking": "enabled",
+  "retries": 0,
+  "fallbacks": 0,
+  "additionalCallsAuthorized": false,
+  "independentEvaluationAuthorized": true,
+  "productionPublication": "FORBIDDEN"
+}

@@ -1,0 +1,23 @@
+{
+  "status": "PASSED",
+  "checkedAt": "2026-10-09T13:51:10.635Z",
+  "paidCalls": 0,
+  "realAccounting": true,
+  "guardTestsPassed": 12,
+  "interceptedDispatches": 2,
+  "reasoning": 0,
+  "independentReview": 2,
+  "worstCaseReservedUsd": 0.016803,
+  "noProductionRoutingMutation": true,
+  "sleepVerified": true,
+  "sourceFreezeSha256": "e7f97f119ab19b684948e7d9a70fac82f000b92088915fa08f81657c90fc6c7f",
+  "toolingSha256": {
+    "block.cjs": "4e3286c4b08f12c8cb95477435c0dd0804d65454e35d9c41f17f1867d967d13f",
+    "guard.cjs": "79a87824c0d97b04d0a6a218ae98b208dbaa68c6bdf73f85c2e6928fe2653cd6",
+    "guard.test.cjs": "ee4bdfe09a487678652632ea32d2d0354e2e63bfc0e1a256f7888f938f647ce9",
+    "launch.cjs": "a31f270d782e524db67d13f37e3783587b9669c7e59a3fab3df8fc8934a6a845",
+    "sleep.cjs": "95a993f01eafc611a87ffdadbc536400a4477ffbdcf9cf8345a9b406e219345c",
+    "postgres.test.ts": "0e782ab6390dc73b061d3a684626e13fd1d2b7aaa2c29c13f30cef05e3e16a9b"
+  },
+  "evidenceDirectory": "review-low/evidence/unpaid-2026-10-09T13-50-58-497Z"
+}

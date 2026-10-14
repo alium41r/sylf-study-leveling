@@ -6,7 +6,7 @@
  * shell architecture:
  *   • NavigationProvider (hash-based mobile router shimming next/navigation)
  *   • ThemeProvider (canonical theme tokens)
- *   • AuthProvider (initialized with development mock user for shell verification)
+ *   • AuthProvider (cookie session; fixture only in explicitly enabled mock mode)
  *   • GlobalSystemWrapper (canonical system provider stack + background wallpaper)
  *   • SylfAppShell (canonical layout container with SidebarWrapper & safe-area insets)
  *   • MobileRouteOutlet (canonical route resolution and placeholders)
@@ -19,14 +19,14 @@ import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { AuthProvider } from "@/app/components/AuthProvider";
 import { GlobalSystemWrapper } from "@/app/components/GlobalSystemWrapper";
 import { SylfAppShell } from "@/app/components/SylfAppShell";
-import { MOCK_STUDENT_USER } from "./adapters/api/mock-api";
+import { MOCK_STUDENT_USER, isMockApiInterceptionActive } from "./adapters/api/mock-api";
 import { MobileRouteOutlet } from "./components/MobileRouteOutlet";
 
 export default function MobileApp() {
   return (
     <NavigationProvider initialPath="/dashboard">
       <ThemeProvider>
-        <AuthProvider initialUser={MOCK_STUDENT_USER}>
+        <AuthProvider initialUser={isMockApiInterceptionActive() ? MOCK_STUDENT_USER : undefined}>
           <GlobalSystemWrapper>
             <SylfAppShell>
               <MobileRouteOutlet />

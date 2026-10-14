@@ -1,6 +1,7 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
+import { FocusTimerLayoutRouter } from "@/app/focus/components/FocusTimerLayoutRouter";
 import { FocusTimerLayoutPreview } from "@/app/focus/components/FocusTimerLayoutPreview";
 import { LandscapeTimerLayout } from "@/app/focus/components/layouts/LandscapeTimerLayout";
 import { AnimeTimerLayout } from "@/app/focus/components/layouts/AnimeTimerLayout";
@@ -71,6 +72,39 @@ function createMockProps(overrides: Partial<FocusTimerLayoutProps> = {}): FocusT
     ...overrides,
   };
 }
+
+describe("Shared focus session bar", () => {
+  it.each(["classic", "anime", "landscape", "fantasy", "unknown-layout"])(
+    "keeps session context and the environment action together in %s",
+    (layoutKey) => {
+      const onOpenBackgroundPicker = vi.fn();
+      render(<FocusTimerLayoutRouter {...createMockProps({ layoutKey, onOpenBackgroundPicker })} />);
+      const bar = screen.getByRole("group", { name: "Focus session" });
+      expect(screen.getAllByTestId("focus-session-bar")).toHaveLength(1);
+      expect(within(bar).getByText("FOCUS")).toBeInTheDocument();
+      expect(within(bar).getByText("Pomodoro")).toBeInTheDocument();
+      expect(within(bar).getByText("Study Session")).toBeInTheDocument();
+      fireEvent.click(within(bar).getByRole("button", { name: "Change Focus Environment: Sakura Lake" }));
+      expect(onOpenBackgroundPicker).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it("preserves quest context and shows paused and break states", () => {
+    const props = createMockProps({
+      questData: { id: 1, title: "Review all of the quantum mechanics practice questions" },
+      subjectName: "Physics",
+      isPaused: true,
+      background: null,
+    });
+    const { rerender } = render(<FocusTimerLayoutRouter {...props} />);
+    const bar = screen.getByRole("group", { name: "Focus session" });
+    expect(within(bar).getByText("Paused")).toBeInTheDocument();
+    expect(within(bar).getByText(props.questData!.title)).toHaveAttribute("title", `${props.questData!.title} · Physics`);
+    expect(within(bar).getByRole("button", { name: "Change Focus Environment: Classic Sylf" })).toBeDisabled();
+    rerender(<FocusTimerLayoutRouter {...props} isPaused={false} isBreak phase="short-break" phaseLabel="SHORT BREAK" />);
+    expect(within(bar).getByText("SHORT BREAK")).toBeInTheDocument();
+  });
+});
 
 describe("Focus Backgrounds — Phase 6.1: Real Timer Preview, Docking & Pause Cleanup", () => {
   // ──────────────────────────────────────────────────────────────────────────

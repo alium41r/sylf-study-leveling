@@ -5,6 +5,7 @@ import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getCognitiveEffects } from "@/lib/cognitive-stats";
+import { storedStudySeconds, studySessionIsRunning } from "@/lib/session-math";
 import { isEmailInAdminBootstrap } from "@/lib/auth-admin";
 
 export async function GET(req: NextRequest) {
@@ -39,6 +40,8 @@ export async function GET(req: NextRequest) {
         activeTitle: true,
         activeAura: true,
         activeNameColor: true,
+        activeTheme: true,
+        activeBackground: true,
         characterConfig: true,
         socialLinks: true,
         hunterRank: true,
@@ -92,54 +95,34 @@ export async function GET(req: NextRequest) {
           { executionState: { not: null }, executionContext: { path: ["actualCivilDate"], equals: TimezoneService.getUserLocalDate(timezone) } }],
       },
       select: {
+        id: true,
+        subjectId: true,
+        questId: true,
         durationMinutes: true,
         durationSeconds: true,
         startedAt: true,
         endedAt: true,
         executionState: true,
       },
-    }).catch(() => []);
+    });
 
     let completedTodaySeconds = 0;
     let todayStudySeconds = 0;
     let activeSessionStartedAt: string | null = null;
-    const now = new Date();
+    const activeTime = todaySessions.find(s => s.executionState === "PAUSED" || studySessionIsRunning(s));
 
     for (const s of todaySessions) {
-      if (s.executionState != null) {
-        todayStudySeconds += s.durationSeconds;
-        if (s.executionState === "ENDED") completedTodaySeconds += s.durationSeconds;
-        if (s.executionState === "RUNNING" && !activeSessionStartedAt) activeSessionStartedAt = s.startedAt.toISOString();
-        continue;
-      }
-      if (!s.endedAt) {
-        // Active (unended) session: count its already-flushed stored seconds.
-        // A session is "live" when it is freshly started (pre-first-flush,
-        // within 3 minutes) or has real flushed progress and is not a zombie
-        // (> 12h since start). Stale 0-second rows are ignored entirely.
-        const started = new Date(s.startedAt);
-        const elapsed = Math.floor((now.getTime() - started.getTime()) / 1000);
-        const stored = (s.durationSeconds || (s.durationMinutes * 60) || 0);
-        const isLive =
-          (elapsed >= 0 && elapsed <= 180) ||
-          (stored > 0 && elapsed > 0 && elapsed <= 12 * 3600);
-        if (isLive) {
-          todayStudySeconds += stored;
-          if (!activeSessionStartedAt) activeSessionStartedAt = s.startedAt.toISOString();
-        }
-      } else {
-        const sec = (s.durationSeconds || (s.durationMinutes * 60) || 0);
-        completedTodaySeconds += sec;
-        todayStudySeconds += sec;
-      }
+      const seconds = storedStudySeconds(s);
+      todayStudySeconds += seconds;
+      if (s.endedAt || s.executionState === "ENDED") completedTodaySeconds += seconds;
+      if (studySessionIsRunning(s) && !activeSessionStartedAt) activeSessionStartedAt = s.startedAt.toISOString();
     }
     const todayStudyMinutes = Math.floor(todayStudySeconds / 60);
 
     const scholarId = user.scholarId || formatScholarId(user.id);
     const xpToNextLevel = xpForNextLevel(user.level);
-    const hasPassword = user.password !== null;
-
-    const { password: _, stats: __stats, ...userStats } = user;
+    const { password, stats: __stats, ...userStats } = user;
+    const hasPassword = password !== null;
 
     // Endurance (Aegis): +5 effective max HP per ability tier.
     const effectiveMaxHp =
@@ -156,6 +139,10 @@ export async function GET(req: NextRequest) {
         todayStudySeconds,
         todayStudyMinutes,
         activeSessionStartedAt,
+        activeSessionId: activeTime?.id ?? null,
+        activeSessionSubjectId: activeTime?.subjectId ?? null,
+        activeSessionQuestId: activeTime?.questId ?? null,
+        activeSessionStudySeconds: activeTime?.durationSeconds ?? 0,
       },
       { status: 200 }
     );

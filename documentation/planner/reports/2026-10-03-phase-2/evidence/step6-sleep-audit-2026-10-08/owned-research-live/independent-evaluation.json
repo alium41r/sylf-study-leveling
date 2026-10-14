@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "assessedAt": "2026-10-08T17:57:06.334925+00:00",
+  "scope": "Independent inspection of the single sleep-overlapped owned-course-research rerun; not a full educational acceptance gate",
+  "liveCorpusSha256": "b1f6b253499cd8e1d0de1e0a0eb85dc010b6e378b85a4d9418735203f2c7921e",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "status": "PASSED_WITH_LIMITATIONS",
+  "cases": [
+    {
+      "id": "owned-course-research",
+      "status": "PASSED",
+      "accepted": true,
+      "expectation": "Actual owned upload/hash, excerpt-backed course outcomes, no official-assessment claim, research then reviewed plan.",
+      "checks": {
+        "realOwnedBytesHash": true,
+        "exactQuotedSupport": true,
+        "noOfficialAuthorityClaim": true,
+        "allResolvedScopeDispositions": true,
+        "addScopeUsesServerIdentity": true,
+        "actualIndependentReviewAccepted": true,
+        "capacitySafe": true,
+        "canonicalApplyObserved": true,
+        "contingentNotExecuted": true
+      },
+      "educationalInspection": [
+        "Actual original note supports CSV rows, totals, explicit malformed-row reasons and a changed-data demonstration; every adopted excerpt was checked against the raw 419-character Document section, not only the verifier answer.",
+        "Accepted blueprint explicitly asks the learner to create numerical CSV data; it does not attribute sample data or a taught-only method repertoire to the note.",
+        "First activity reads and totals the learner-created CSV with hand-sum comparisons. Its dependent activity identifies bad numeric/column rows and demonstrates correct changed data. Their exact completion criteria correspond to the requested project and quoted course outcomes.",
+        "Two committed 35-minute activities occupy distinct days under 60-minute daily capacity; 70 booked minutes lie inside the strategy 40/60/95 estimate range. The 30-minute error fix has a concrete changed-data failure trigger and is absent from execution.",
+        "All three original scope nodes and the server-adopted changed-data requirement have dispositions. Private ownership is verified while issuer authority stays UNKNOWN; no official assessment or mastery is claimed."
+      ],
+      "limitations": [
+        "One live success does not establish reliability: blueprint and review primaries reached their unchanged output limits and each needed the existing configured qualification fallback.",
+        "Starting skill is unknown; duration estimates and sufficiency for a real learner are not measured here.",
+        "No educational adaptation, repair or exact verification occurred. Canonical apply and the empty model review alone are not the basis for this separate assessment.",
+        "Disposable private store and synthetic user only; public research and hosted execution/storage are not qualified by this test."
+      ]
+    }
+  ],
+  "coverage": {
+    "adaptation": [],
+    "repairAndVerification": []
+  },
+  "fullCorpusNotRun": true,
+  "phase2Complete": false
+}

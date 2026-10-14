@@ -1,0 +1,113 @@
+{
+  "status": "PASSED",
+  "startingWorkspaceFiles": 4979,
+  "changedStartingFiles": [
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+    "dist/planner-worker/planner/v2/intelligence/blueprint.js",
+    "dist/planner-worker/planner/v2/intelligence/quality.js",
+    "dist/planner-worker/planner/v2/intelligence/schemas/blueprint-response.js",
+    "dist/planner-worker/planner/v2/intelligence/schemas/quality.js",
+    "dist/planner-worker/planner/v2/server/compiler.js",
+    "documentation/planner/README.md",
+    "lib/planner/v2/intelligence/blueprint.ts",
+    "lib/planner/v2/intelligence/quality.ts",
+    "lib/planner/v2/intelligence/schemas/blueprint-response.ts",
+    "lib/planner/v2/intelligence/schemas/quality.ts",
+    "lib/planner/v2/server/compiler.ts"
+  ],
+  "unexpectedChanges": [],
+  "sourceSha256": {
+    "lib/planner/v2/intelligence/blueprint.ts": "4d4d8eed0a14f9c21809045096c8afd3df7839550dbc1ea9bc8b85ff822082a0",
+    "lib/planner/v2/intelligence/quality.ts": "df851468196c5d7c60a9d78dffa1cd83fde4e3c555ba1276a20d60849c9b7b68",
+    "lib/planner/v2/intelligence/schemas/blueprint-response.ts": "0609a7061f86ace43cc769d32f4a3639ccb78aa486f7e9f8d7355fb74a89719e",
+    "lib/planner/v2/intelligence/schemas/quality.ts": "ef151337c7f23dcceba5b6a10a6b637522470af9222f8b662b7b0d070e85595d",
+    "lib/planner/v2/intelligence/schemas/repair-response.ts": "e20ac364c019f74d814094db8ba8ef67168ec5e4cd4cd6f03bb93fc669d7fc13",
+    "lib/planner/v2/server/compiler.ts": "75751e5dedf83b99b10fdd0a77da5c79e523cda2e310fba93dbd7d6321109d34",
+    "__tests__/planner-v2/intelligence/targeted-repair.test.ts": "9d47c1ce690b2f615e8374a5885f6c232d2be4edfd5972664a5b9ca9470fd257",
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts": "3be5b7848cdb4730a6ea852ef96eb7651e53c19e39f4ca723adeae0894e0e155"
+  },
+  "generatedWorkerSha256": {
+    "dist/planner-worker/planner/v2/intelligence/blueprint.js": "3c77a7e08c16b7fcb1dc1c13defe535b89f392e3402b52d2e176ca3def39c08a",
+    "dist/planner-worker/planner/v2/intelligence/quality.js": "2f7848466511f7ba412b26aae4027982e286aef64f117c9467176550afbafe4f",
+    "dist/planner-worker/planner/v2/intelligence/schemas/blueprint-response.js": "62785ea8c1ac4fc1f27ee153d1a50ace8c9502237213edb984e9526b6ac8986d",
+    "dist/planner-worker/planner/v2/intelligence/schemas/quality.js": "2180fc17ab732cb146b2d17d94cc69299784a219cc806a08ddc750793b3f9673",
+    "dist/planner-worker/planner/v2/intelligence/schemas/repair-response.js": "ac0c913e7f5082078cf3dbc7d6a8399aa5620b4810990c801774e2f2bfb01765",
+    "dist/planner-worker/planner/v2/server/compiler.js": "e0c406c0a8119062616568af75d9697a7088a4264052f0e0dc461cd372731dd1"
+  },
+  "frozenContracts": {
+    "lib/planner/v2/contracts/artifacts.ts": {
+      "expected": "2d28f60affbab80b0b674f1b35e975f63974bccbe45b5dcfd2a42015bba0fd75",
+      "actual": "2d28f60affbab80b0b674f1b35e975f63974bccbe45b5dcfd2a42015bba0fd75",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/blueprint.ts": {
+      "expected": "409fbcaeaa15acb8dc9d1bee80e8612abb4553ecc7381d2e7965536ac649f4ab",
+      "actual": "409fbcaeaa15acb8dc9d1bee80e8612abb4553ecc7381d2e7965536ac649f4ab",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/envelope.ts": {
+      "expected": "3d8bedf93e5d8bf29ad80841f1f11205c576d25f13e7bafe159f0fb3921e382b",
+      "actual": "3d8bedf93e5d8bf29ad80841f1f11205c576d25f13e7bafe159f0fb3921e382b",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/evidence.ts": {
+      "expected": "13aeaad8563bff0d5fcb7c5044ab0c5ca6227ee13664e0c2a02f215de8620f21",
+      "actual": "13aeaad8563bff0d5fcb7c5044ab0c5ca6227ee13664e0c2a02f215de8620f21",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/execution.ts": {
+      "expected": "a45a6d90a8f58c11f1342d05542a7728e3fbe23fe8830bdfda6a32ae2d5fd3cc",
+      "actual": "a45a6d90a8f58c11f1342d05542a7728e3fbe23fe8830bdfda6a32ae2d5fd3cc",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/index.ts": {
+      "expected": "e89a831c07e54720a0c5251310bf3440d81366e5bbeabfcb0aaa8a9b0990172e",
+      "actual": "e89a831c07e54720a0c5251310bf3440d81366e5bbeabfcb0aaa8a9b0990172e",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/intent.ts": {
+      "expected": "474d8847506ab5f3ee886e375ac3390a9b2e5a805c85343e559fe761dded9b51",
+      "actual": "474d8847506ab5f3ee886e375ac3390a9b2e5a805c85343e559fe761dded9b51",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/lineage.ts": {
+      "expected": "4f72e0cbdf879659cc5326e2006dee2827af790cee68faa2592328e3bac5719b",
+      "actual": "4f72e0cbdf879659cc5326e2006dee2827af790cee68faa2592328e3bac5719b",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/operations.ts": {
+      "expected": "22579b5f3f3b3aeee0e5d8c2db5412d9e8b7e31e1c19d38a95a6ebc340e60e8c",
+      "actual": "22579b5f3f3b3aeee0e5d8c2db5412d9e8b7e31e1c19d38a95a6ebc340e60e8c",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/primitives.ts": {
+      "expected": "3d26fa7a94bca8299b0de5c1d787f3c95b67d14e6bf4bc91d84ade2890244f04",
+      "actual": "3d26fa7a94bca8299b0de5c1d787f3c95b67d14e6bf4bc91d84ade2890244f04",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/session.ts": {
+      "expected": "14c2768a4c773fc33d14d4f681746f34c75952cc3363b85128084fa03b4bb4b8",
+      "actual": "14c2768a4c773fc33d14d4f681746f34c75952cc3363b85128084fa03b4bb4b8",
+      "unchanged": true
+    },
+    "lib/planner/v2/contracts/workspace.ts": {
+      "expected": "2abc74a5886e51dacb3f76da3ecdd820db9925e2580d2a4dbd1a8802c80c465c",
+      "actual": "2abc74a5886e51dacb3f76da3ecdd820db9925e2580d2a4dbd1a8802c80c465c",
+      "unchanged": true
+    }
+  },
+  "fullCanonicalProposalValidatorUnchanged": true,
+  "protectedApiPrismaPhase1ProviderFiles": 264,
+  "changedProtectedFiles": [],
+  "historicalReportFiles": 909,
+  "changedHistoricalReports": [],
+  "postgresComparedFiles": 1338,
+  "postgresPrivateCopyChangedDuringRun": [],
+  "postgresFinalSourceDifferences": [],
+  "postgresUnexpectedSourceDifferences": [],
+  "newSourceFiles": [
+    "lib/planner/v2/intelligence/schemas/repair-response.ts",
+    "__tests__/planner-v2/intelligence/targeted-repair.test.ts",
+    "dist/planner-worker/planner/v2/intelligence/schemas/repair-response.js"
+  ]
+}

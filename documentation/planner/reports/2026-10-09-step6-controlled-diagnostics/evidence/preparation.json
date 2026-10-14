@@ -1,0 +1,44 @@
+{
+  "offline": true,
+  "externalCalls": 0,
+  "fixedCandidates": 12,
+  "canonicalValidationPasses": 12,
+  "feasibleAllocations": 12,
+  "groundedRepairFixtures": 4,
+  "staticPackets": 48,
+  "dynamicVerificationPackets": 4,
+  "consequentialStructuredPairInputIdentical": true,
+  "modelLabelsExcluded": true,
+  "counts": {
+    "REASONING": {
+      "calls": 8,
+      "inputReservationUnits": 36508,
+      "outputTokenCapSum": 65536
+    },
+    "REVIEW": {
+      "calls": 12,
+      "inputReservationUnits": 152528,
+      "outputTokenCapSum": 49152
+    },
+    "STRUCTURE": {
+      "calls": 16,
+      "inputReservationUnits": 268868,
+      "outputTokenCapSum": 131072
+    },
+    "REPAIR": {
+      "calls": 4,
+      "inputReservationUnits": 89676,
+      "outputTokenCapSum": 32768
+    },
+    "VERIFICATION": {
+      "calls": 4,
+      "inputReservationUnits": 94282,
+      "outputTokenCapSum": 16384
+    },
+    "CAPACITY": {
+      "calls": 8,
+      "inputReservationUnits": 116456,
+      "outputTokenCapSum": 65536
+    }
+  }
+}

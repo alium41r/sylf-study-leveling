@@ -21,7 +21,7 @@ import {
   GitBranch,
   Search,
 } from "lucide-react";
-import { SystemApertureIcon } from "@/app/components/icons";
+import { SylvieIcon } from "@/app/components/icons";
 
 interface ChatMessage {
   id: string;
@@ -341,7 +341,7 @@ export default function AiAssistantTool() {
         const errMsg =
           err?.message?.includes("Daily AI") || err?.message?.includes("Rate limit")
             ? `⚠️ ${err.message}`
-            : "⚠️ Unable to reach academic AI coach. Please check your connection and try again.";
+            : "⚠️ Unable to reach Sylvie. Please check your connection and try again.";
         setMessages((prev) =>
           prev.map((m) =>
             m.id === aiMsgId
@@ -575,7 +575,7 @@ export default function AiAssistantTool() {
                       : "bg-bg-panel text-text-secondary border border-border-subtle"
                   }`}
                 >
-                  {isAi ? <SystemApertureIcon size={14} className="text-accent-primary-light" /> : <User className="w-3.5 h-3.5" />}
+                  {isAi ? <SylvieIcon size={14} className="text-accent-primary-light" /> : <User className="w-3.5 h-3.5" />}
                 </div>
 
                 <div
@@ -645,7 +645,7 @@ export default function AiAssistantTool() {
       {unlockedSkills.includes("analyst-logic-breakdown") && (
         <div className="px-3 pt-2 pb-1.5 bg-bg-abyss/95 flex items-center gap-1.5 overflow-x-auto border-t border-border-subtle scrollbar-none">
           <span className="text-[10px] font-bold font-['Rajdhani'] text-cyan-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-            <SystemApertureIcon size={12} className="text-cyan-400" />
+            <SylvieIcon size={12} className="text-cyan-400" />
             Analyst:
           </span>
           <button
@@ -689,7 +689,7 @@ export default function AiAssistantTool() {
           placeholder={
             isLocked
               ? "Daily AI limit reached — resets at midnight."
-              : `Ask AI in ${activeSessionTitle}... (Enter to send)`
+              : `Ask Sylvie in ${activeSessionTitle}... (Enter to send)`
           }
           rows={1}
           className="flex-1 bg-bg-panel/90 border border-border-subtle rounded-xl px-3.5 py-2.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary resize-none max-h-28 min-h-[42px] leading-relaxed transition-all disabled:opacity-40 disabled:cursor-not-allowed"

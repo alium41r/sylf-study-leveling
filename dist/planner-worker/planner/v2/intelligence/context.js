@@ -4,6 +4,7 @@ exports.projectPlannerInterviewContext = void 0;
 exports.projectPlannerContext = projectPlannerContext;
 exports.loadPlannerModelContext = loadPlannerModelContext;
 exports.loadPlannerInterviewContext = loadPlannerInterviewContext;
+exports.calendarForModel = calendarForModel;
 const contracts_1 = require("../contracts");
 const database_1 = require("../server/database");
 const intents_1 = require("../server/intents");
@@ -243,4 +244,23 @@ async function loadPlannerModelContext(sql, ownerId, requested, window, options 
 async function loadPlannerInterviewContext(sql, ownerId, requested, window, options = {}) {
     const snapshot = await loadContextSnapshot(sql, ownerId, requested, window, options);
     return { ...(0, exports.projectPlannerInterviewContext)(snapshot.contexts[0].context, snapshot.targets, window, { ...options, academicSources: snapshot.academicSources }), contexts: snapshot.contexts };
+}
+/** Input-only lossless representation shared by generation and quality.
+ * Distinct windows stay distinct; only redundant calendar field names and
+ * identical scalar values are factored out. Durable facts remain unchanged. */
+function modelRecord(value) {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+/** Only repeated field names/identical scalar values are factored out. Unknown
+ * day fields are retained too; irregular records use the original encoding. */
+function calendarForModel(value) {
+    if (!modelRecord(value) || !Array.isArray(value.days) || !value.days.length || !value.days.every(modelRecord))
+        return value;
+    const days = value.days, keys = Object.keys(days[0]);
+    if (days.some(day => Object.keys(day).length !== keys.length || keys.some(key => !Object.hasOwn(day, key) || day[key] === undefined)))
+        return value;
+    const constants = keys.filter(key => (days[0][key] === null || ["string", "number", "boolean"].includes(typeof days[0][key])) && days.every(day => day[key] === days[0][key]));
+    const columns = keys.filter(key => !constants.includes(key));
+    return { ...value, days: { constantFields: Object.fromEntries(constants.map(key => [key, days[0][key]])), columns,
+            rows: days.map(day => columns.map(key => day[key])) } };
 }

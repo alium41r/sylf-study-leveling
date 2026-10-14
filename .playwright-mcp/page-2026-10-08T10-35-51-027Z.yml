@@ -1,0 +1,9 @@
+- generic [active] [ref=f5e1]:
+  - main [ref=f5e5]:
+    - generic [ref=f5e7]:
+      - generic [ref=f5e9]:
+        - button "IDENTITY" [ref=f5e10]
+        - button "ITEMS" [ref=f5e15]
+        - button "ACOUSTICS" [ref=f5e19]
+      - generic [ref=f5e23]: Accessing Scholar Identity Hub...
+  - button "Open Next.js Dev Tools" [ref=f5e30] [cursor=pointer]

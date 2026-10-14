@@ -1,0 +1,15 @@
+2026-10-08 22:57:06 +0500 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   0
+   PreventUserIdleDisplaySleep    1
+   SoftwareUpdateTask             0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 344(powerd): [0x000da5aa0001953a] 00:20:58 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 75074(Google Chrome): [0x000da75500059577] 00:13:51 NoDisplaySleepAssertion named: "Blink Wake Lock"  
+No kernel assertions.

@@ -1,0 +1,13 @@
+# Independent label review brief — no provider calls
+
+Review only the eight generation rubrics and twelve fixed candidates in revision 2. Do not change prompts, facts, labels, production code or the case bank. Do not invoke DeepSeek, Gemini or any paid test command.
+
+First inspect each active packet's accepted goals and complete facts, and the twelve canonical candidate files, without using evaluator labels as an answer key. Record your own case judgments. Then compare them with the authoring rubrics and labels. Inspect real instructions, criteria, dependencies, effort, shared ownership, splits, protection and uncertainty; do not infer quality from schema validity.
+
+For generation, check that each rubric admits valid alternative methods and demands only consequential accepted requirements. For review, determine whether the four serious defects are concrete, the four sound candidates actually satisfy their outcomes, and the preferences/uncertainties do not warrant blockers. Do not accept an author's category merely because it is named that way.
+
+Return twenty case-specific checks, with factual rationale and any ambiguity or disputed label. A material oracle problem means NOT_SIGNED_OFF and a versioned correction before calls; never silently adjust a label to improve results. If all are sound, produce a dated signoff identifying yourself, your independence from the author and tested model, and hashes of cases.cjs, labels.json, RUBRIC.md and all twelve candidate files. Identify an agent review as an agent review, not human approval.
+
+The user explicitly authorized one separate reviewer agent, `/root/independent_label_signoff`. It completed all twenty checks and signed off the unchanged active scope, with no material oracle error. This was independent AI-agent review, not human signoff. Initial judgments preceded the authored answer key, although task descriptions and class mixture were disclosed; fully blinded review is not claimed. No paid provider calls or additional agents were used.
+
+The [report](independent-review-agent.md) and [structured assessment](independent-review-agent.json) preserve each original judgment, authored comparison, optional note and hash. The [disposition](SIGNOFF_RESOLUTION.md) records the case author's resolutions, which the reviewer reviewed and accepted. No mandatory bank correction was needed, and nothing was silently edited. [label-signoff.json](label-signoff.json) binds the final evidence. [The previous pending state](../history/v2-pre-signoff/initial-block/INDEPENDENT_REVIEW.md) is retained. Final human paid approval remains pending and is required before dispatch.

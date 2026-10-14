@@ -1,0 +1,709 @@
+{
+  "description": "Phase 1 performance baseline for the Sylf Pixel Display. Measured in a real browser against the development surface at /dev/pixel-display. These are baselines, not targets, and not guarantees.",
+  "date": "2026-10-07T13:35:21.909Z",
+  "base": "http://localhost:3000",
+  "route": "/dev/pixel-display",
+  "samplesPerCell": 60,
+  "method": [
+    "Headless Chrome (installed build) driven over CDP via scripts/verify-landing-companion.mjs.",
+    "Stage timings collected inside the page with performance.now() around each pipeline stage.",
+    "20 warm-up iterations before sampling so JIT and first-paint costs are excluded.",
+    "Device pixel ratio is forced with Emulation.setDeviceMetricsOverride when the environment permits it; each row records the ratio actually used so a scaled measurement is never mistaken for a genuine high-DPI one. Set SYLF_PIXEL_PERF_NO_DPR_OVERRIDE=1 to measure without forcing it."
+  ],
+  "presentations": [
+    {
+      "label": "card-110",
+      "css": 110,
+      "dpr": 1,
+      "slotPinned": true,
+      "requestedDpr": 1,
+      "effectiveDpr": 1,
+      "dprHonoured": true,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 2.25,
+      "renderedSlotCss": 108,
+      "backingStore": {
+        "width": 108,
+        "height": 108
+      },
+      "presentation": {
+        "cssWidth": 108,
+        "cssHeight": 108,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.013333334525426229
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.10000002384185791,
+        "p95": 0.20000004768371582,
+        "max": 7,
+        "mean": 0.2299999992052714
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.10000002384185791,
+        "p95": 0.2999999523162842,
+        "max": 7,
+        "mean": 0.24500000079472858
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 75
+    },
+    {
+      "label": "card-110@2x",
+      "css": 110,
+      "dpr": 2,
+      "slotPinned": true,
+      "requestedDpr": 2,
+      "effectiveDpr": 1,
+      "dprHonoured": false,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 2.25,
+      "renderedSlotCss": 108,
+      "backingStore": {
+        "width": 108,
+        "height": 108
+      },
+      "presentation": {
+        "cssWidth": 108,
+        "cssHeight": 108,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.009999998410542806
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.10000002384185791,
+        "p95": 0.20000004768371582,
+        "max": 6.700000047683716,
+        "mean": 0.21833333373069763
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.10000002384185791,
+        "p95": 0.20000004768371582,
+        "max": 6.700000047683716,
+        "mean": 0.2299999992052714
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 137
+    },
+    {
+      "label": "card-110@3x",
+      "css": 110,
+      "dpr": 3,
+      "slotPinned": true,
+      "requestedDpr": 3,
+      "effectiveDpr": 1,
+      "dprHonoured": false,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 2.25,
+      "renderedSlotCss": 108,
+      "backingStore": {
+        "width": 108,
+        "height": 108
+      },
+      "presentation": {
+        "cssWidth": 108,
+        "cssHeight": 108,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.010000000397364298
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.19999992847442627,
+        "p95": 0.30000007152557373,
+        "max": 8.199999928474426,
+        "mean": 0.29666666785875956
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.20000004768371582,
+        "p95": 0.30000007152557373,
+        "max": 8.199999928474426,
+        "mean": 0.3100000003973643
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 198
+    },
+    {
+      "label": "small-180",
+      "css": 180,
+      "dpr": 1,
+      "slotPinned": true,
+      "requestedDpr": 1,
+      "effectiveDpr": 1,
+      "dprHonoured": true,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 3.7083333333333335,
+      "renderedSlotCss": 178,
+      "backingStore": {
+        "width": 178,
+        "height": 178
+      },
+      "presentation": {
+        "cssWidth": 178,
+        "cssHeight": 178,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.008333333333333333
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0.09999990463256836,
+        "p50": 0.20000004768371582,
+        "p95": 0.3999999761581421,
+        "max": 10.300000071525574,
+        "mean": 0.3783333341280619
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0.09999990463256836,
+        "p50": 0.20000004768371582,
+        "p95": 0.40000009536743164,
+        "max": 10.300000071525574,
+        "mean": 0.3933333337306976
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 261
+    },
+    {
+      "label": "small-180@2x",
+      "css": 180,
+      "dpr": 2,
+      "slotPinned": true,
+      "requestedDpr": 2,
+      "effectiveDpr": 1,
+      "dprHonoured": false,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 3.7083333333333335,
+      "renderedSlotCss": 178,
+      "backingStore": {
+        "width": 178,
+        "height": 178
+      },
+      "presentation": {
+        "cssWidth": 178,
+        "cssHeight": 178,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0.10000002384185791,
+        "mean": 0.003333332141240438
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0.10000002384185791,
+        "p50": 0.20000004768371582,
+        "p95": 0.2999999523162842,
+        "max": 9.799999952316284,
+        "mean": 0.3666666686534882
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0.10000002384185791,
+        "p50": 0.20000004768371582,
+        "p95": 0.2999999523162842,
+        "max": 9.799999952316284,
+        "mean": 0.37166666785875957
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 324
+    },
+    {
+      "label": "preview-320",
+      "css": 320,
+      "dpr": 1,
+      "slotPinned": true,
+      "requestedDpr": 1,
+      "effectiveDpr": 1,
+      "dprHonoured": true,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 6.625,
+      "renderedSlotCss": 318,
+      "backingStore": {
+        "width": 318,
+        "height": 318
+      },
+      "presentation": {
+        "cssWidth": 318,
+        "cssHeight": 318,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.016666666666666666
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0.09999990463256836,
+        "p50": 0.20000004768371582,
+        "p95": 0.5,
+        "max": 11.899999976158142,
+        "mean": 0.4149999996026357
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0.09999990463256836,
+        "p50": 0.20000004768371582,
+        "p95": 0.5,
+        "max": 11.899999976158142,
+        "mean": 0.43333333333333335
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 388
+    },
+    {
+      "label": "preview-320@2x",
+      "css": 320,
+      "dpr": 2,
+      "slotPinned": true,
+      "requestedDpr": 2,
+      "effectiveDpr": 1,
+      "dprHonoured": false,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 6.625,
+      "renderedSlotCss": 318,
+      "backingStore": {
+        "width": 318,
+        "height": 318
+      },
+      "presentation": {
+        "cssWidth": 318,
+        "cssHeight": 318,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0.10000002384185791,
+        "mean": 0.0016666670640309651
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.01499999761581421
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0.09999990463256836,
+        "mean": 0.0016666650772094727
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0.09999990463256836,
+        "p50": 0.20000004768371582,
+        "p95": 0.30000007152557373,
+        "max": 11.399999976158142,
+        "mean": 0.38333333730697633
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0.09999990463256836,
+        "p50": 0.20000004768371582,
+        "p95": 0.30000007152557373,
+        "max": 11.399999976158142,
+        "mean": 0.401666667064031
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 452
+    },
+    {
+      "label": "desktop-458",
+      "css": 458,
+      "dpr": 2,
+      "slotPinned": true,
+      "requestedDpr": 2,
+      "effectiveDpr": 1,
+      "dprHonoured": false,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 9.5,
+      "renderedSlotCss": 456,
+      "backingStore": {
+        "width": 456,
+        "height": 456
+      },
+      "presentation": {
+        "cssWidth": 456,
+        "cssHeight": 456,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.016666664679845174
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0.09999990463256836,
+        "mean": 0.0016666650772094727
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.20000004768371582,
+        "p95": 0.5,
+        "max": 13.5,
+        "mean": 0.4350000043710073
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.20000004768371582,
+        "p95": 0.5,
+        "max": 13.5,
+        "mean": 0.45666666626930236
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 516
+    },
+    {
+      "label": "hero-640",
+      "css": 640,
+      "dpr": 1,
+      "slotPinned": true,
+      "requestedDpr": 1,
+      "effectiveDpr": 1,
+      "dprHonoured": true,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 12.395833333333334,
+      "renderedSlotCss": 595,
+      "backingStore": {
+        "width": 595,
+        "height": 595
+      },
+      "presentation": {
+        "cssWidth": 595,
+        "cssHeight": 595,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.008333331346511841
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.10000002384185791,
+        "p95": 0.2999999523162842,
+        "max": 13.299999952316284,
+        "mean": 0.38166666626930235
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.19999992847442627,
+        "p95": 0.2999999523162842,
+        "max": 13.299999952316284,
+        "mean": 0.39333333174387614
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 579
+    },
+    {
+      "label": "hero-640@2x",
+      "css": 640,
+      "dpr": 2,
+      "slotPinned": true,
+      "requestedDpr": 2,
+      "effectiveDpr": 1,
+      "dprHonoured": false,
+      "logical": 48,
+      "cells": 2304,
+      "framebufferBytes": 9216,
+      "cellPitch": 12.395833333333334,
+      "renderedSlotCss": 595,
+      "backingStore": {
+        "width": 595,
+        "height": 595
+      },
+      "presentation": {
+        "cssWidth": 595,
+        "cssHeight": 595,
+        "devicePixelRatio": 1
+      },
+      "clear": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "content": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0.10000002384185791,
+        "max": 0.10000002384185791,
+        "mean": 0.008333335320154825
+      },
+      "overlay": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0,
+        "p95": 0,
+        "max": 0.10000002384185791,
+        "mean": 0.0016666670640309651
+      },
+      "draw": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.20000004768371582,
+        "p95": 0.30000007152557373,
+        "max": 15.300000071525574,
+        "mean": 0.4599999984105428
+      },
+      "frame": {
+        "samples": 60,
+        "min": 0,
+        "p50": 0.20000004768371582,
+        "p95": 0.30000007152557373,
+        "max": 15.400000095367432,
+        "mean": 0.4700000007947286
+      },
+      "litCells": 299,
+      "animatingPhase": "running",
+      "animatingFramesAtLeast": 642
+    }
+  ],
+  "idle": [
+    {
+      "label": "static-idle",
+      "phase": "idle",
+      "framesBefore": 669,
+      "framesAfter": 669,
+      "framesProducedWhileIdle": 0,
+      "windowMs": 1500
+    },
+    {
+      "label": "stopped",
+      "phase": "stopped",
+      "framesBefore": 670,
+      "framesAfter": 670,
+      "framesProducedWhileIdle": 0,
+      "windowMs": 1500
+    }
+  ],
+  "notes": [],
+  "environment": {
+    "hydrated": true,
+    "observed": {
+      "ready": "interactive",
+      "probe": "object",
+      "canvases": 5,
+      "scriptsLoaded": 29
+    }
+  },
+  "analysis": {
+    "frameCostIsCommandBoundNotAreaBound": "Frame p50 is effectively flat across a 5.5x change in device pixels per cell (2.25 -> 12.40), so cost tracks the fixed number of per-cell draw commands rather than the physical area filled.",
+    "perFrameStages": "clear, content composite and overlay are each below the 0.05 ms clock granularity at 48x48; the Canvas fill pass dominates the frame.",
+    "maxOutliers": "Occasional 6-16 ms maxima are single-frame spikes, not the steady cost: p95 stays at or below 0.5 ms. They are consistent with GC or compositor contention in a headless CPU-rasterised browser and should not be read as the frame budget.",
+    "dprNote": "The forced device pixel ratio was not honoured in every row (see dprHonoured). Rows where it was not reflect the ambient ratio of 1, so the high-DPI columns describe a 1x rasterised surface of that CSS size rather than a true 2x or 3x one."
+  }
+}

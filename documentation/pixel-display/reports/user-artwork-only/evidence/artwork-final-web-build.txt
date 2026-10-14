@@ -1,0 +1,24 @@
+npm notice run sylf@0.1.0 build
+npm notice run next build --webpack
+▲ Next.js 16.2.9 (webpack)
+- Environments: .env.local, .env
+- Experiments (use with caution):
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 61s
+  Running TypeScript ...
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add '.next-artwork-final/types/**/*.ts'
+  	- include was updated to add '.next-artwork-final/dev/types/**/*.ts'
+
+Failed to type check.
+
+app/api/acoustics/route.ts
+Type error: Route "app/api/acoustics/route.ts" does not match the required types of a Next.js Route.
+  "CURATED_SOUNDSCAPES" is not a valid Route export field.
+
+Next.js build worker exited with code: 1 and signal: null

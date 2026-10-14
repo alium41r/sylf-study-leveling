@@ -26,13 +26,17 @@ export class SessionProtocolV2 {
   private pending: Transition | null = null;
   private queue: Promise<void> = Promise.resolve();
   private readonly request: typeof fetch;
-  constructor(request: typeof fetch = fetch, private readonly storage?: Pick<Storage, "getItem" | "setItem" | "removeItem">) {
+  constructor(request: typeof fetch = fetch, private readonly storage?: Pick<Storage, "getItem" | "setItem" | "removeItem">, private readonly storageKey?: string) {
     // Native browser fetch rejects the protocol instance as its receiver.
     this.request = (input, init) => request(input, init);
   }
-  attach(execution: SessionExecutionV2) { this.execution = StudySessionExecutionV2Schema.parse(execution); }
+  attach(execution: SessionExecutionV2) {
+    this.execution = StudySessionExecutionV2Schema.parse(execution);
+    const raw = this.storage?.getItem(this.key(execution.sessionId));
+    if (raw) this.pending = StudySessionTransitionV2Schema.parse(JSON.parse(raw));
+  }
   accepted(): SessionExecutionV2 | null { return this.execution ? structuredClone(this.execution) : null; }
-  private key(sessionId: number) { return `sylf_session_transition_v2_${sessionId}`; }
+  private key(sessionId: number) { return this.storageKey ?? `sylf_session_transition_v2_${sessionId}`; }
   private remember(transition: Transition | null, sessionId: number): void {
     try { if (transition) this.storage?.setItem(this.key(sessionId), JSON.stringify(transition)); else this.storage?.removeItem(this.key(sessionId)); } catch { /* Server receipts remain authoritative when storage is unavailable. */ }
   }
@@ -49,11 +53,11 @@ export class SessionProtocolV2 {
     }
     return this.execution;
   }
-  transition(sessionId: number, action: SessionActionV2, focus: number, breaks: number): Promise<SessionExecutionV2> {
-    const run = this.queue.then(() => this.perform(sessionId, action, focus, breaks));
+  transition(sessionId: number, action: SessionActionV2, focus: number, breaks: number, occurredAt?: string): Promise<SessionExecutionV2> {
+    const run = this.queue.then(() => this.perform(sessionId, action, focus, breaks, occurredAt));
     this.queue = run.then(() => undefined, () => undefined); return run;
   }
-  private async perform(sessionId: number, action: SessionActionV2, focus: number, breaks: number): Promise<SessionExecutionV2> {
+  private async perform(sessionId: number, action: SessionActionV2, focus: number, breaks: number, occurredAt?: string): Promise<SessionExecutionV2> {
     if (this.execution?.sessionId !== sessionId) await this.restore(sessionId);
     if (this.pending) {
       const pending = this.pending; const recovered = await this.send(pending);
@@ -63,13 +67,13 @@ export class SessionProtocolV2 {
     if (execution.state === "ENDED") return execution;
     if (action === "PAUSE" && execution.state === "PAUSED" || action === "RESUME" && execution.state === "RUNNING") return execution;
     const transition = StudySessionTransitionV2Schema.parse({ schemaVersion: 2, sessionId, action, expectedExecutionVersion: execution.executionVersion,
-      idempotencyKey: crypto.randomUUID(), cumulativeFocusSeconds: focus, cumulativeBreakSeconds: breaks });
+      idempotencyKey: crypto.randomUUID(), cumulativeFocusSeconds: focus, cumulativeBreakSeconds: breaks, ...(occurredAt ? { occurredAt } : {}) });
     this.pending = transition; this.remember(transition, sessionId);
     return this.send(transition);
   }
   private async send(transition: Transition): Promise<SessionExecutionV2> {
     const response = await this.request("/api/sessions", { method: "PATCH", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ executionTransition: transition }), keepalive: true });
+      body: JSON.stringify({ executionTransition: transition, expectedOwnerId: this.execution?.ownerId }), keepalive: true });
     const data = await response.json();
     if (!response.ok) {
       const message = data.detail?.message ?? data.message ?? "The timer changed. Reload its accepted state.";

@@ -1,0 +1,24 @@
+2026-10-08 23:33:36 +0500 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   0
+   PreventUserIdleDisplaySleep    1
+   SoftwareUpdateTask             0
+   PreventSystemSleep             0
+   ExternalMedia                  0
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 344(powerd): [0x000da5aa0001953a] 00:57:28 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 78193(caffeinate): [0x000db28300019643] 00:02:38 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 78193(caffeinate): [0x000db28300059644] 00:02:38 PreventUserIdleDisplaySleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 78193(caffeinate): [0x000db28300079645] 00:02:38 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of 'env' (pid 78192)
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 75074(Google Chrome): [0x000da75500059577] 00:50:21 NoDisplaySleepAssertion named: "Blink Wake Lock"  
+No kernel assertions.

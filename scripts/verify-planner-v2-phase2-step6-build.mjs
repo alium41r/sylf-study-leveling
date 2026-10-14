@@ -11,7 +11,8 @@ const evidence = resolve(root, "documentation/planner/reports/2026-10-03-phase-2
 const startedAt = new Date().toISOString();
 const sources=execFileSync("git",["ls-files","-z","--cached","--others","--exclude-standard"],{cwd:root,encoding:"utf8"}).split("\0").filter(file=>/^(?:app|lib|design-system)\//.test(file)&&/\.(?:ts|tsx|css)$/.test(file));
 sources.push("package.json","package-lock.json","next.config.ts","tsconfig.json","postcss.config.mjs","proxy.ts");
-const pins=Object.fromEntries([...new Set(sources)].sort().map(file=>[file,createHash("sha256").update(readFileSync(join(root,file))).digest("hex")]));
+const fingerprint=file=>existsSync(join(root,file))?createHash("sha256").update(readFileSync(join(root,file))).digest("hex"):null;
+const pins=Object.fromEntries([...new Set(sources)].sort().map(file=>[file,fingerprint(file)]));
 try {
   for (const name of ["app", "lib", "design-system"]) if (existsSync(join(root, name))) cpSync(join(root, name), join(temporary, name), { recursive: true });
   for (const name of ["package.json", "package-lock.json", "tsconfig.json", "next-env.d.ts", "next.config.ts", "proxy.ts", "postcss.config.mjs"]) cpSync(join(root, name), join(temporary, name));
@@ -26,10 +27,10 @@ try {
   output = output.replaceAll(temporary, "[isolated build workspace]");
   writeFileSync(join(evidence, "step6-build.log"), output);
   const known = /CURATED_SOUNDSCAPES|calculateScopeWeight/.test(output) && /not a valid Route export|not assignable to type.*never|does not satisfy the constraint/.test(output);
-  const changedDuringRun=Object.keys(pins).filter(file=>createHash("sha256").update(readFileSync(join(root,file))).digest("hex")!==pins[file]);
+  const changedDuringRun=Object.keys(pins).filter(file=>fingerprint(file)!==pins[file]);
   const status = changedDuringRun.length ? "FAILED" : code === 0 ? "PASSED" : known ? "PRE_EXISTING_ROUTE_EXPORT_BLOCKER" : "FAILED";
   writeFileSync(join(evidence, "step6-build.json"), JSON.stringify({ startedAt, finishedAt: new Date().toISOString(), status, code,
-    sourceSha256:pins,changedDuringRun,
+    sourceSha256:pins,deletedSources:Object.keys(pins).filter(file=>pins[file]===null),changedDuringRun,
     command: "next build --webpack (private source copy)", credentialsLoaded: false,
     baselineRouteErrors: readFileSync(join(evidence, "step1-baseline-typecheck.log"), "utf8").split("\n").filter(s => s.includes("error TS")),
     sharedGeneratedFilesModified: false }, null, 2) + "\n");

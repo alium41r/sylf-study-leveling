@@ -12,9 +12,11 @@ import { useFocusEyeComfort } from "../hooks/useFocusEyeComfort";
 import { useScreenWakeLock } from "../hooks/useScreenWakeLock";
 import { useTimerLeadership } from "../hooks/useTimerLeadership";
 import { SESSION_ENDED_EVENT, SESSION_SUMMARY_KEY } from "@/app/components/SessionEndToast";
-import { Compass } from "lucide-react";
 import { useFocusBackground } from "../hooks/useFocusBackground";
-import { SessionProtocolV2, SessionProtocolConflict, reconcileSessionSnapshot, type SessionActionV2, type SessionExecutionV2 } from "@/lib/planner/v2/session-client";
+import { reconcileSessionSnapshot, type SessionActionV2 } from "@/lib/planner/v2/session-client";
+import { fetchWithTimeout } from "@/lib/api-transport";
+import { TimezoneService } from "@/lib/timezone-service";
+import { getTimerSync, TIMER_SYNC_EVENT, type TimerJournal } from "@/lib/timer-sync";
 import { FocusBackgroundRenderer } from "./FocusBackgroundRenderer";
 import FocusBackgroundPicker from "./FocusBackgroundPicker";
 import { FocusTimerLayoutRouter } from "./FocusTimerLayoutRouter";
@@ -27,7 +29,6 @@ import {
   setCountdownSnapshot,
   transitionSnapshot,
   legacyCacheToSnapshot,
-  isBreakPhase,
   type TimerSnapshot,
   type TimerPhase,
 } from "@/lib/timer-engine";
@@ -56,7 +57,8 @@ function getSetting(mode: ModeConfig, key: string, fallback: number | boolean | 
 function FocusContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { refreshStats } = useAuth();
+  const { user } = useAuth();
+  useEffect(() => { router.prefetch?.("/timer"); }, [router]);
 
   // Eye-Comfort Dimming (Light Mode only) — zero-IOPS client state
   const { isDimActive, isLightMode, toggleDim } = useFocusEyeComfort();
@@ -71,8 +73,9 @@ function FocusContent() {
   const subjectName = searchParams.get("subjectName") || "Focus Session";
   const questId = searchParams.get("questId");
 
-  const cacheKey = `runningTimerState_${subjectId || "general"}_${questId || "none"}`;
-  const timerKey = `runningTimerSeconds_${subjectId || "general"}_${questId || "none"}`;
+  const legacyCacheKey = `runningTimerState_${subjectId || "general"}_${questId || "none"}`;
+  const cacheKey = `${legacyCacheKey}_${user?.id}`;
+  const timerKey = `runningTimerSeconds_${subjectId || "general"}_${questId || "none"}_${user?.id}`;
 
   // Single-writer tab leadership: only the PRIMARY tab creates sessions and
   // flushes; mirror tabs display the synced epoch state read-only. Explicit
@@ -94,6 +97,7 @@ function FocusContent() {
   // Daily totals
   const [initialSubjectSeconds, setInitialSubjectSeconds] = useState(0);
   const [initialTotalSeconds, setInitialTotalSeconds] = useState(0);
+  const [attributedDay, setAttributedDay] = useState(() => TimezoneService.getUserLocalDate(user?.timezone ?? "UTC"));
 
   // Mode-specific state
   const [activeMode, setActiveMode] = useState<ModeConfig | null>(null);
@@ -108,7 +112,6 @@ function FocusContent() {
 
   const questPopupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const sessionStartedRef = useRef(false);
 
   // ─── Epoch-anchored engine state (single source of truth) ───
   // elapsed/break/countdown are DERIVED from these wall-clock anchors on
@@ -116,8 +119,8 @@ function FocusContent() {
   // by tick counters. Backgrounded tabs, throttled intervals, and sleep/
   // wake gaps are therefore credited exactly.
   const snapRef = useRef<TimerSnapshot>(createInitialSnapshot(Date.now()));
-  const transitionFiredRef = useRef(false);
   const lastPersistRef = useRef(0);
+  const lastCheckpointRef = useRef(0);
   const sessionStartPendingRef = useRef(false);
   const bcRef = useRef<BroadcastChannel | null>(null);
   const lastRemoteTsRef = useRef(0);
@@ -126,11 +129,12 @@ function FocusContent() {
   const elapsedSecondsRef = useRef<number>(0);
   const breakSecondsRef = useRef<number>(0);
   const sessionIdRef = useRef<number | null>(null);
-  const sessionProtocolRef = useRef<SessionProtocolV2 | null>(null);
-  const versionedReadyRef = useRef(false);
+  const journalRef = useRef<TimerJournal | null>(null);
+  const endingRef = useRef(false);
+  const startedAtRef = useRef(new Date().toISOString());
   const lastSyncedSecondsRef = useRef<number>(0);
   const lastSyncedBreakSecondsRef = useRef<number>(0);
-  const isSyncingRef = useRef<boolean>(false);
+
   const isPausedRef = useRef<boolean>(false);
   const phaseRef = useRef<TimerPhase>("focus");
   const phaseLabelRef = useRef<string>("FOCUS");
@@ -140,8 +144,8 @@ function FocusContent() {
   // True when a persisted running timer state was restored — the
   // mode-initializer must not clobber the restored phase.
   const restoredStateRef = useRef<boolean>(false);
-  // Holds the in-flight flush promise so overlapping calls serialize.
-  const flushInFlightRef = useRef<Promise<boolean> | null>(null);
+  const modeInitializedRef = useRef(false);
+
   // Set inside the timer tick (no side effects allowed there) and consumed
   // by a dedicated effect so the 3-minute auto-save fires exactly once.
   const autoFlushDueRef = useRef<boolean>(false);
@@ -149,7 +153,7 @@ function FocusContent() {
   const questDataRef = useRef<any>(null);
   const activeModeRef = useRef<ModeConfig | null>(null);
   const tickRef = useRef<() => void>(() => {});
-  const transitionPhaseRef = useRef<() => void>(() => {});
+  const transitionPhaseRef = useRef<(forEnd?: boolean) => void>(() => {});
 
   // Keep refs in sync with React state
   useEffect(() => {
@@ -205,12 +209,11 @@ function FocusContent() {
         const active = parsed.modes?.find((m: ModeConfig) => m.isActive);
         if (active) {
           setActiveMode(active);
-          return;
         }
       }
     } catch { /* default to pomodoro/freeflow */ }
 
-    setActiveMode({
+    setActiveMode(previous => previous ?? {
       id: "pomodoro",
       name: "Pomodoro",
       isActive: true,
@@ -227,9 +230,32 @@ function FocusContent() {
 
     // Load persisted epoch snapshot (new format) or a legacy cache entry.
     try {
-      const savedState = localStorage.getItem(cacheKey);
+      const savedState = localStorage.getItem(cacheKey) ?? localStorage.getItem(legacyCacheKey);
       if (savedState) {
         const parsed = JSON.parse(savedState);
+        if (parsed.ownerId && parsed.ownerId !== user?.id) return;
+        if (parsed.journalKey && user) {
+          const journal = getTimerSync(user.id).journal(parsed.journalKey);
+          if (journal?.endedAt) {
+            localStorage.removeItem(cacheKey);
+            sessionStorage.removeItem(timerKey);
+            return;
+          }
+          journalRef.current = journal;
+        }
+        // An older cache may lack its journal key. A durable END on that row
+        // still wins over the cache, including before the server acknowledges it.
+        if (!parsed.journalKey && parsed.sessionId && user) {
+          const sync = getTimerSync(user.id);
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key?.startsWith(`sylf_timer_journal_v1:${user.id}:`) || !key.endsWith(":meta")) continue;
+            const meta = JSON.parse(localStorage.getItem(key)!);
+            if (meta.sessionId === parsed.sessionId && sync.journal(meta.clientKey)?.endedAt) return;
+          }
+        }
+        startedAtRef.current = parsed.startedAt ?? new Date(parsed.runningSinceMs ?? parsed.timestamp ?? Date.now()).toISOString();
+        setAttributedDay(parsed.attributedDay ?? TimezoneService.getUserLocalDate(user?.timezone ?? "UTC", new Date(startedAtRef.current)));
 
         if (parsed.v === 2 && typeof parsed.focusMs === "number") {
           // New epoch format: anchors restore EXACTLY where the session was.
@@ -238,10 +264,12 @@ function FocusContent() {
           const restoredPhase = VALID_PHASES.includes(parsed.phase)
             ? (parsed.phase as TimerPhase)
             : "focus";
+          const persistedLive = parsed.cacheVersion === 3 || parsed.isPaused || !parsed.runningSinceMs ? 0
+            : Math.max(0, (parsed.timestamp ?? parsed.runningSinceMs) - parsed.runningSinceMs);
           snapRef.current = {
             v: 2,
-            focusMs: parsed.focusMs,
-            breakMs: parsed.breakMs ?? 0,
+            focusMs: Math.max(0, parsed.focusMs - (restoredPhase === "focus" ? persistedLive : 0)),
+            breakMs: Math.max(0, (parsed.breakMs ?? 0) - (restoredPhase !== "focus" && restoredPhase !== "done" ? persistedLive : 0)),
             runningSinceMs: parsed.isPaused
               ? null
               : typeof parsed.runningSinceMs === "number"
@@ -340,20 +368,28 @@ function FocusContent() {
       snapRef.current = createInitialSnapshot(Date.now());
       setElapsedSeconds(0);
     }
-  }, [cacheKey, timerKey]);
+  // This content remounts on account/route changes; stats refreshes must not restore it again.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cacheKey, legacyCacheKey, timerKey, user?.id]);
 
   // ─── Persist Timer State (single writer, exact live values) ────
   const persistTimerState = useCallback(
     () => {
       try {
+        if (!isPrimaryRef.current || endingRef.current || !user) return;
+        if (journalRef.current && getTimerSync(user.id).journal(journalRef.current.clientKey)?.endedAt) return;
         const snap = snapRef.current;
-        const d = deriveTimer(snap, Date.now());
         localStorage.setItem(
           cacheKey,
           JSON.stringify({
             v: 2,
-            focusMs: snap.focusMs + (snap.phase === "focus" ? d.liveMs : 0),
-            breakMs: snap.breakMs + (isBreakPhase(snap.phase) ? d.liveMs : 0),
+            cacheVersion: 3,
+            ownerId: user.id,
+            journalKey: journalRef.current?.clientKey,
+            startedAt: startedAtRef.current,
+            attributedDay,
+            focusMs: snap.focusMs,
+            breakMs: snap.breakMs,
             runningSinceMs: snap.runningSinceMs,
             isPaused: snap.isPaused,
             phase: snap.phase,
@@ -372,7 +408,7 @@ function FocusContent() {
         /* storage full/unavailable — in-memory state is still authoritative */
       }
     },
-    [cacheKey, pauseReason]
+    [cacheKey, pauseReason, user, isPrimaryRef, attributedDay]
   );
 
   // ─── Multi-Tab Synchronization (BroadcastChannel, best-effort) ──
@@ -385,6 +421,7 @@ function FocusContent() {
         ts: Date.now(),
         snap: snapRef.current,
         sessionId: sessionIdRef.current,
+        journalKey: journalRef.current?.clientKey,
       });
     } catch { /* channel closed */ }
   }, [cacheKey]);
@@ -402,12 +439,15 @@ function FocusContent() {
           !msg ||
           msg.key !== cacheKey ||
           typeof msg.ts !== "number" ||
-          msg.ts <= lastRemoteTsRef.current ||
+          (msg.ts <= lastRemoteTsRef.current && msg.snap?.phase !== "done") ||
           !msg.snap
         ) {
           return;
         }
+        if (msg.journalKey && journalRef.current && msg.journalKey !== journalRef.current.clientKey) return;
+        if (endingRef.current) return;
         lastRemoteTsRef.current = msg.ts;
+        if (msg.journalKey && user) journalRef.current = getTimerSync(user.id).journal(msg.journalKey);
         snapRef.current = {
           ...snapRef.current,
           focusMs: typeof msg.snap.focusMs === "number" ? msg.snap.focusMs : snapRef.current.focusMs,
@@ -441,7 +481,7 @@ function FocusContent() {
         bcRef.current = null;
       };
     }
-  }, [cacheKey]);
+  }, [cacheKey, user]);
 
   // ─── Derivation → React state sync (single path) ────────
   const syncStateFromSnapshot = useCallback(() => {
@@ -463,27 +503,6 @@ function FocusContent() {
     }
   }, [timerKey]);
 
-  const acceptSessionExecution = useCallback((execution: SessionExecutionV2) => {
-    snapRef.current = reconcileSessionSnapshot(snapRef.current, execution);
-    setIsPaused(snapRef.current.isPaused); isPausedRef.current = snapRef.current.isPaused;
-    setPhase(snapRef.current.phase); phaseRef.current = snapRef.current.phase;
-    if (execution.state === "ENDED") {
-      setPhaseLabel("SESSION COMPLETE"); phaseLabelRef.current = "SESSION COMPLETE";
-    }
-    lastSyncedSecondsRef.current = execution.acceptedFocusSeconds;
-    lastSyncedBreakSecondsRef.current = execution.acceptedBreakSeconds;
-    versionedReadyRef.current = true;
-    syncStateFromSnapshot(); persistTimerState(); broadcastSnapshot();
-  }, [syncStateFromSnapshot, persistTimerState, broadcastSnapshot]);
-
-  // Restore once for a Quest, rather than again when pause labels/persistence
-  // callbacks change. Those callbacks are read at the time of the response.
-  const restoreCallbacksRef = useRef({ accept: acceptSessionExecution, sync: syncStateFromSnapshot, ensure: null as null | ((seconds: number) => Promise<number | null>) });
-  useEffect(() => {
-    restoreCallbacksRef.current.accept = acceptSessionExecution;
-    restoreCallbacksRef.current.sync = syncStateFromSnapshot;
-  }, [acceptSessionExecution, syncStateFromSnapshot]);
-
   // ─── Countdown setter (banks the live stretch, re-anchors) ──
   const setCountdown = useCallback(
     (sec: number | null) => {
@@ -491,155 +510,118 @@ function FocusContent() {
       const d = deriveTimer(snapRef.current, Date.now());
       remainingSecondsRef.current = d.remainingSec;
       setRemainingSeconds(d.remainingSec);
-      transitionFiredRef.current = false;
       persistTimerState();
       broadcastSnapshot();
     },
     [persistTimerState, broadcastSnapshot]
   );
 
-  // ─── Throttled Flush Helper ────────────────────────
-  const flushSessionProgress = useCallback(
-    async (isFinal: boolean = false, completeQuest: boolean = false, action: SessionActionV2 = isFinal ? "END" : "PROGRESS"): Promise<boolean> => {
-      // Serialize flushes: if one is in flight, the next waits for it instead
-      // of racing. Races could deliver an older durationSeconds after the
-      // final flush, and overlapping retries looked like a dead button.
-      if (flushInFlightRef.current) {
-        try {
-          await flushInFlightRef.current;
-        } catch {
-          // swallow — the new flush below will do the authoritative write
-        }
+  // The same durable journal owns every write, including unload recovery.
+  const ensureJournal = useCallback(() => {
+    if (!user) throw new Error("Sign in before starting a timer.");
+    const sync = getTimerSync(user.id);
+    if (!journalRef.current) {
+      // Adopt a mirror's identity before creating a new one.
+      const saved = localStorage.getItem(cacheKey);
+      const cached = saved ? JSON.parse(saved) : null;
+      if (cached?.ownerId === user.id && cached.journalKey) journalRef.current = sync.journal(cached.journalKey);
+      journalRef.current ??= sync.create({ ownerId: user.id, clientKey: crypto.randomUUID(), startedAt: startedAtRef.current,
+        subjectId: subjectId ? Number(subjectId) : undefined, questId: questId ? Number(questId) : undefined,
+        sessionId: sessionIdRef.current ?? undefined });
+      let recoveredBoundary = false;
+      if (sessionIdRef.current) {
+        const pendingKey = `sylf_session_transition_v2_${sessionIdRef.current}`;
+        const pending = sessionStorage.getItem(pendingKey);
+        if (pending) { sync.importPending(journalRef.current.clientKey, pending); sessionStorage.removeItem(pendingKey); recoveredBoundary = true; }
       }
-
-      const currSeconds = elapsedSecondsRef.current;
-      const currBreakSeconds = breakSecondsRef.current;
-      const currentSessionId = sessionIdRef.current;
-
-      // Mirror tabs never write to the server — only the primary tab flushes.
-      if (!isPrimaryRef.current) return false;
-      if (!currentSessionId) return false;
-      // Skip redundant zero-delta writes if not final (break time is a SET on
-      // the server, so it must still be sent whenever it advanced too).
-      if (
-        !isFinal && action === "PROGRESS" &&
-        currSeconds <= lastSyncedSecondsRef.current &&
-        currBreakSeconds <= lastSyncedBreakSecondsRef.current
-      ) {
-        return true;
+      if (!recoveredBoundary && snapRef.current.isPaused && !cached?.journalKey) {
+        const d = deriveTimer(snapRef.current, Date.now());
+        sync.enqueue(journalRef.current.clientKey, "PAUSE", d.focusSec, d.breakSec);
       }
-      if (isSyncingRef.current && !isFinal) return false;
+      persistTimerState(); broadcastSnapshot();
+    }
+    return journalRef.current;
+  }, [user, cacheKey, subjectId, questId, persistTimerState, broadcastSnapshot]);
 
-      isSyncingRef.current = true;
-      const durationMinutes = Math.floor(currSeconds / 60);
-      const durationSeconds = currSeconds;
-
-      const run = (async () => {
-        try {
-          if (questData?.plannedMinutes != null) {
-            sessionProtocolRef.current ??= new SessionProtocolV2(fetch, sessionStorage);
-            const execution = await sessionProtocolRef.current.transition(currentSessionId, action, currSeconds, currBreakSeconds);
-            acceptSessionExecution(execution);
-            if (completeQuest) {
-              const questResponse = await fetch(`/api/quests/${questId}`);
-              if (!questResponse.ok) return false;
-              const currentQuest = await questResponse.json();
-              const completion = await fetch(`/api/quests/${questId}`, { method: "PATCH", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: "COMPLETED", executionProtocol: 2, expectedExecutionVersion: currentQuest.executionVersion }) });
-              if (!completion.ok) return false;
-            }
-            if (isFinal) {
-              localStorage.removeItem(cacheKey); sessionStorage.removeItem(timerKey); sessionStorage.removeItem("runningTimerSeconds");
-            } else persistTimerState();
-            return true;
-          }
-          const res = await fetch("/api/sessions", {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: currentSessionId,
-              durationMinutes,
-              durationSeconds,
-              breakSeconds: currBreakSeconds,
-              questId: questId ? parseInt(questId) : undefined,
-              completeQuest: completeQuest || undefined,
-              // Only the final flush triggers the single canonical reward award;
-              // the RPC performs exact delta accounting on every flush.
-              final: isFinal || undefined,
-            }),
-            keepalive: true,
-          });
-
-          if (res.ok) {
-            lastSyncedSecondsRef.current = currSeconds;
-            lastSyncedBreakSecondsRef.current = currBreakSeconds;
-            if (isFinal) {
-              // Local Storage Cleanup ONLY after 200 OK
-              localStorage.removeItem(cacheKey);
-              sessionStorage.removeItem(timerKey);
-              sessionStorage.removeItem("runningTimerSeconds");
-            } else {
-              persistTimerState();
-            }
-            return true;
-          }
-          return false;
-        } catch (err) {
-          if (questData?.plannedMinutes != null) {
-            snapRef.current = pauseSnapshot(snapRef.current, Date.now());
-            if (err instanceof SessionProtocolConflict && err.execution) acceptSessionExecution(err.execution);
-            else { setIsPaused(true); isPausedRef.current = true; syncStateFromSnapshot(); }
-            setEndError("The timer could not sync. Its accepted state will be restored when you retry.");
-          }
-          console.error("Failed to flush session progress:", err);
-          return false;
-        } finally {
-          isSyncingRef.current = false;
-        }
-      })();
-
-      flushInFlightRef.current = run;
-      run.finally(() => {
-        if (flushInFlightRef.current === run) flushInFlightRef.current = null;
-      });
-      return run;
-    },
-    [cacheKey, timerKey, questId, questData, persistTimerState, acceptSessionExecution, syncStateFromSnapshot]
-  );
-
-  // ─── Fire-and-forget unload flush (no awaits — keepalive survives) ──
-  const sendBeaconFlush = useCallback(() => {
-    const sid = sessionIdRef.current;
-    // Mirror tabs never write to the server — only the primary tab flushes.
-    if (!isPrimaryRef.current) return;
-    if (!sid) return;
+  const flushSessionProgress = useCallback(async (isFinal = false, completeQuest = false,
+    action: SessionActionV2 = isFinal ? "END" : "PROGRESS"): Promise<boolean> => {
+    if (!user || endingRef.current || !isPrimaryRef.current) return false;
     try {
-      if (questData?.plannedMinutes != null) {
-        // The serialized versioned transport owns retries; an unload cannot
-        // invent a parallel unversioned settlement request.
-        void flushSessionProgress(false);
-        return;
+      const journal = ensureJournal();
+      const d = deriveTimer(snapRef.current, Date.now());
+      const sync = getTimerSync(user.id);
+      if (isFinal) sync.finish(journal.clientKey, d.focusSec, d.breakSec, completeQuest);
+      else sync.enqueue(journal.clientKey, action === "STOP_OTHER_DEVICE" ? "END" : action, d.focusSec, d.breakSec);
+      return true;
+    } catch {
+      setEndError("Couldn't save the timer on this device. Free some device storage and retry."); return false;
+    }
+  }, [user, ensureJournal, isPrimaryRef]);
+
+  const sendBeaconFlush = useCallback(() => {
+    if (isPrimaryRef.current && !endingRef.current) void flushSessionProgress(false);
+  }, [flushSessionProgress, isPrimaryRef]);
+
+  useEffect(() => {
+    if (!user) return;
+    const sync = getTimerSync(user.id);
+    return sync.onAccepted(accepted => {
+      if (accepted.clientKey !== journalRef.current?.clientKey || endingRef.current) return;
+      sessionIdRef.current = accepted.sessionId; setSessionId(accepted.sessionId);
+      if (accepted.execution) setAttributedDay(accepted.execution.actualCivilDate);
+      lastSyncedSecondsRef.current = accepted.focus;
+      lastSyncedBreakSecondsRef.current = accepted.breaks;
+      if (accepted.authoritative && accepted.execution?.state === "PAUSED") {
+        const local = deriveTimer(snapRef.current, Date.now());
+        // Keep sub-second carry from our own pause; another device's accepted
+        // pause remains authoritative when it differs from the local state.
+        if (!snapRef.current.isPaused || local.focusSec !== accepted.focus || local.breakSec !== accepted.breaks)
+          snapRef.current = reconcileSessionSnapshot(snapRef.current, accepted.execution);
+        setIsPaused(true); isPausedRef.current = true; syncStateFromSnapshot();
       }
-      const payload = JSON.stringify({
-        id: sid,
-        durationMinutes: Math.floor(elapsedSecondsRef.current / 60),
-        durationSeconds: elapsedSecondsRef.current,
-        breakSeconds: breakSecondsRef.current,
-        questId: questId ? parseInt(questId) : undefined,
-        final: false,
-      });
-      fetch("/api/sessions", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: payload,
-        keepalive: true,
-      }).catch(() => {});
-    } catch { /* ignore */ }
-  }, [questId, questData, flushSessionProgress]);
+      if (accepted.authoritative && accepted.execution?.state === "RUNNING" && !endError) {
+        const local = deriveTimer(snapRef.current, Date.now());
+        if (snapRef.current.isPaused || accepted.focus > local.focusSec || accepted.breaks > local.breakSec) {
+          snapRef.current = reconcileSessionSnapshot(snapRef.current, accepted.execution);
+          setIsPaused(false); isPausedRef.current = false; syncStateFromSnapshot();
+        }
+      }
+      // An acknowledged old checkpoint must never undo a newer local boundary.
+      // An end accepted on another device remains terminal.
+      if (accepted.execution?.state === "ENDED" || accepted.endedAt) {
+        snapRef.current = pauseSnapshot(snapRef.current, Date.now());
+        snapRef.current.phase = "done"; setPhase("done"); phaseRef.current = "done";
+        setIsPaused(true); isPausedRef.current = true;
+        endingRef.current = true; setIsEnding(true); releaseLeadership(); router.replace("/timer");
+      }
+      persistTimerState(); broadcastSnapshot();
+    });
+  }, [user, persistTimerState, broadcastSnapshot, syncStateFromSnapshot, releaseLeadership, router, endError]);
+
+  // Storage is also the cross-tab fallback when BroadcastChannel is unavailable.
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (!user || endingRef.current) return;
+      if (journalRef.current && getTimerSync(user.id).journal(journalRef.current.clientKey)?.endedAt) {
+        snapRef.current = pauseSnapshot(snapRef.current, Date.now()); snapRef.current.phase = "done";
+        endingRef.current = true; setIsPaused(true); setPhase("done"); releaseLeadership(); router.replace("/timer"); return;
+      }
+      if (event.key !== cacheKey || !event.newValue || isPrimaryRef.current) return;
+      try {
+        const value = JSON.parse(event.newValue);
+        if (value.ownerId !== user.id || value.cacheVersion !== 3) return;
+        snapRef.current = { ...value, v: 2 };
+        if (value.journalKey) journalRef.current = getTimerSync(user.id).journal(value.journalKey);
+        if (value.sessionId) { sessionIdRef.current = value.sessionId; setSessionId(value.sessionId); }
+        setPhase(value.phase); phaseRef.current = value.phase;
+        setIsPaused(value.isPaused); isPausedRef.current = value.isPaused;
+        if (value.phaseLabel) { setPhaseLabel(value.phaseLabel); phaseLabelRef.current = value.phaseLabel; }
+        syncStateFromSnapshot();
+      } catch { /* Keep the last valid snapshot. */ }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [cacheKey, user, isPrimaryRef, router, releaseLeadership, syncStateFromSnapshot]);
 
   // ─── Fetch Quest Data if questId is present ────────
   useEffect(() => {
@@ -655,11 +637,14 @@ function FocusContent() {
   // ─── Initialize Timer Based on Mode ────────────────
   useEffect(() => {
     if (activeMode === null && !questData) return; // wait for mode or quest
+    if (questId && !questData || modeInitializedRef.current) return;
+    if (!isPrimaryRef.current) return;
 
     // A persisted running timer was restored — the exact phase/countdown must
     // win over the mode defaults, otherwise a reload mid-break would silently
     // restart/overwrite the session state.
     if (restoredStateRef.current) return;
+    modeInitializedRef.current = true;
 
     if (questData) {
       const remaining = questData.plannedMinutes != null ? Math.max(0, (questData.remainingMinutesEstimate ?? 0) * 60)
@@ -762,7 +747,7 @@ function FocusContent() {
         // ignore if not allowed by browser
       }
     }
-  }, [activeMode, questData, setCountdown]);
+  }, [activeMode, questData, questId, setCountdown, isPrimary, isPrimaryRef]);
 
   // ─── Notification chime (uses Web Audio API) ───────
   const playChime = useCallback(() => {
@@ -778,23 +763,26 @@ function FocusContent() {
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
       osc.start();
       osc.stop(ctx.currentTime + 0.8);
+      osc.onended = () => { void ctx.close(); };
     } catch { /* audio not available */ }
   }, []);
 
   const acknowledgePhaseState = useCallback((paused: boolean) => {
-    if (questData?.plannedMinutes == null) return;
-    const accepted = sessionProtocolRef.current?.accepted();
-    const action: SessionActionV2 = paused ? "PAUSE" : accepted?.state === "PAUSED" ? "RESUME" : "PROGRESS";
-    if (action === "RESUME") {
-      snapRef.current = pauseSnapshot(snapRef.current, Date.now());
-      setIsPaused(true); isPausedRef.current = true;
-      persistTimerState(); broadcastSnapshot();
-    }
-    void flushSessionProgress(false, false, action);
-  }, [questData?.plannedMinutes, flushSessionProgress, persistTimerState, broadcastSnapshot]);
+    void flushSessionProgress(false, false, paused ? "PAUSE" : "RESUME");
+  }, [flushSessionProgress]);
 
   // ─── Handle Phase Transition (epoch-anchored) ────────
-  const transitionPhase = useCallback(() => {
+  const transitionPhase = useCallback((forEnd = false) => {
+    if (!isPrimaryRef.current && !forEnd || endingRef.current) return;
+    const now = Date.now();
+    const snapshot = snapRef.current;
+    const boundary = snapshot.runningSinceMs !== null && snapshot.remainingMs !== null
+      ? Math.min(now, snapshot.runningSinceMs + snapshot.remainingMs) : now;
+    const phase = phaseRef.current;
+    const currentSession = currentSessionRef.current;
+    const totalSessions = totalSessionsRef.current;
+    const phaseLabel = phaseLabelRef.current;
+    const chimeAtBoundary = () => { if (now - boundary < 1000) playChime(); };
     let nextPhase: TimerPhase;
     let nextRemaining: number | null;
     let nextPaused = false;
@@ -804,11 +792,14 @@ function FocusContent() {
 
     if (questData) {
       if (phase === "focus") {
-        playChime();
+        // Quest overtime starts at the deadline, even if the tab was suspended.
+        snapRef.current = transitionSnapshot(snapshot, boundary, { phase: "focus", remainingSec: null });
+        syncStateFromSnapshot(); persistTimerState(); broadcastSnapshot();
+        chimeAtBoundary();
         setShowQuestPopup(true);
         questPopupTimeoutRef.current = setTimeout(() => {
           setShowQuestPopup(false);
-          setCountdown(null); // switch to stopwatch (Free Flow)
+          // Countdown was cleared at the deadline; the popup never owns time.
           setPhaseLabel("QUEST OVERTIME");
           phaseLabelRef.current = "QUEST OVERTIME";
         }, 15000);
@@ -829,7 +820,7 @@ function FocusContent() {
 
       // End-of-session chime is a per-mode setting (silent modes stay silent).
       const chimeEnabled = getSetting(activeMode, "endChime", true) !== false;
-      if (chimeEnabled) playChime();
+      if (chimeEnabled) chimeAtBoundary();
 
       // Auto-start boundaries: when disabled, the timer pauses at the
       // transition so the next block only begins when the user resumes.
@@ -950,7 +941,7 @@ function FocusContent() {
 
     // Epoch transition: bank the current stretch, switch phase, re-anchor
     // the countdown at the wall clock. No tick arithmetic anywhere.
-    snapRef.current = transitionSnapshot(snapRef.current, Date.now(), {
+    snapRef.current = transitionSnapshot(snapRef.current, boundary, {
       phase: nextPhase,
       remainingSec: nextRemaining,
       paused: nextPaused,
@@ -967,105 +958,61 @@ function FocusContent() {
     setIsPaused(nextPaused);
     isPausedRef.current = nextPaused;
     if (nextPaused) setPauseReason(nextPauseReason);
-    transitionFiredRef.current = false;
+    syncStateFromSnapshot();
     persistTimerState();
     broadcastSnapshot();
-    acknowledgePhaseState(nextPaused);
-  }, [activeMode, phase, currentSession, totalSessions, phaseLabel, questData, playChime, setCountdown, persistTimerState, broadcastSnapshot, acknowledgePhaseState]);
+    acknowledgePhaseState(nextPaused || nextPhase === "done");
+  }, [activeMode, questData, playChime, persistTimerState, broadcastSnapshot, acknowledgePhaseState, isPrimaryRef, syncStateFromSnapshot]);
 
   useEffect(() => {
     transitionPhaseRef.current = transitionPhase;
   }, [transitionPhase]);
 
-  // ─── Session helpers ───────────────────────────────
-  // End/Complete used to silently no-op when the session had failed to start
-  // (sessionIdRef null) — the buttons looked dead. ensureSession() retries the
-  // start so a user can always recover, and returns the live session id.
-  // initialSeconds backdates the new session row so the server-side wall-clock
-  // clamp never truncates legitimate carried-over time.
-  const ensureSession = useCallback(async (initialSeconds: number = 0): Promise<number | null> => {
-    if (sessionIdRef.current) return sessionIdRef.current;
-    try {
-      const res = await fetch("/api/sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subjectId: subjectId ? parseInt(subjectId) : undefined,
-          questId: questId ? parseInt(questId) : undefined,
-          initialSeconds,
-          executionProtocol: 2,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.execution) {
-          sessionProtocolRef.current ??= new SessionProtocolV2(fetch, sessionStorage);
-          sessionProtocolRef.current.attach(data.execution);
-          acceptSessionExecution(data.execution);
-        }
-        if (data?.id) {
-          setSessionId(data.id);
-          sessionIdRef.current = data.id;
-          broadcastSnapshot();
-          return data.id;
-        }
-      }
-    } catch (err) {
-      console.error("Failed to (re)start session:", err);
-    }
-    return null;
-  }, [subjectId, questId, broadcastSnapshot, acceptSessionExecution]);
-
-  useEffect(() => { restoreCallbacksRef.current.ensure = ensureSession; }, [ensureSession]);
+  // Persist creation identity before sending POST. This is retried by the
+  // shell worker even if this page is closed before its response arrives.
+  const ensureSession = useCallback(async (): Promise<number | null> => {
+    try { ensureJournal(); return sessionIdRef.current; }
+    catch { setEndError("Couldn't save the timer on this device. Free some device storage and retry."); return null; }
+  }, [ensureJournal]);
 
   useEffect(() => {
-    if (questData?.plannedMinutes == null) return;
-    let cancelled = false;
-    versionedReadyRef.current = false;
-    snapRef.current = pauseSnapshot(snapRef.current, Date.now());
-    setIsPaused(true); isPausedRef.current = true; restoreCallbacksRef.current.sync();
-    const restore = async () => {
-      try {
-        sessionProtocolRef.current ??= new SessionProtocolV2(fetch, sessionStorage);
-        if (sessionIdRef.current) {
-          const accepted = await sessionProtocolRef.current.restore(sessionIdRef.current);
-          if (!cancelled) restoreCallbacksRef.current.accept(accepted);
-        } else if (isPrimaryRef.current) {
-          // V2 starts protect work at zero seconds. Legacy standalone timers
-          // retain their existing lazy-start policy.
-          await restoreCallbacksRef.current.ensure?.(0);
-        }
-      } catch {
-        if (!cancelled) setEndError("Couldn't restore the timer. Retry when your connection returns.");
-      }
-    };
-    void restore();
-    return () => { cancelled = true; };
-  }, [questData?.id, questData?.plannedMinutes, isPrimaryRef]);
+    if (questId && isPrimary && user) {
+      void ensureSession(); getTimerSync(user.id).wake();
+    }
+  }, [questId, isPrimary, user, ensureSession]);
 
   // ─── Fetch daily baselines on mount (no eager session row!) ────
   // A StudySession row is now created LAZILY — after 15 seconds of real
   // focus — so merely visiting /focus no longer leaks abandoned 0-second
   // rows. A carried-over legacy timer is attached immediately instead.
+  const baselineOwnerId = user?.id;
   useEffect(() => {
-    if (sessionStartedRef.current) return;
-    sessionStartedRef.current = true;
+    if (!baselineOwnerId) return;
+    let cancelled = false;
+    let syncing = false;
 
     async function startSessionAndFetchData() {
+      if (cancelled || syncing) return;
+      syncing = true;
       try {
         const [subRes, statsRes] = await Promise.all([
-          fetch("/api/subjects"),
-          fetch("/api/user/stats"),
+          fetchWithTimeout(fetch, "/api/subjects"),
+          fetchWithTimeout(fetch, "/api/user/stats"),
         ]);
 
+        if (cancelled) return;
         let total = 0;
+        let currentAccepted: number | null = null;
         if (statsRes.ok) {
           const stats = await statsRes.json();
+          if (stats.id !== undefined && stats.id !== baselineOwnerId) return;
           // todayStudySeconds includes this session's already-flushed
           // (stored) seconds; completedTodaySeconds excludes active sessions.
           total = stats.todayStudySeconds ?? stats.completedTodaySeconds ?? 0;
+          const matching = stats.activeSessionId === sessionIdRef.current || !sessionIdRef.current
+            && stats.activeSessionSubjectId === (subjectId ? Number(subjectId) : null)
+            && stats.activeSessionQuestId === (questId ? Number(questId) : null);
+          if ("activeSessionId" in stats) currentAccepted = matching ? stats.activeSessionStudySeconds ?? 0 : 0;
         }
 
         let currentSubjectTime = 0;
@@ -1086,49 +1033,55 @@ function FocusContent() {
         // exactly: completed-earlier + live-elapsed. (This is the correct
         // complement of todayStudySeconds now that active sessions keep
         // endedAt = NULL between flushes.)
-        const alreadyCredited = lastSyncedSecondsRef.current || 0;
+        const alreadyCredited = currentAccepted ?? lastSyncedSecondsRef.current ?? 0;
         setInitialTotalSeconds(Math.max(0, total - alreadyCredited));
         setInitialSubjectSeconds(Math.max(0, currentSubjectTime - alreadyCredited));
 
-        // Legacy carry: seconds restored without a session id → attach now.
-        if (!questId && !sessionIdRef.current && elapsedSecondsRef.current > 0) {
-          void ensureSession(elapsedSecondsRef.current);
-        }
-
-        persistTimerState();
       } catch (err) {
-        console.error("Failed to fetch baseline stats:", err);
-      }
+        if (!cancelled) console.error("Failed to fetch baseline stats:", err);
+      } finally { syncing = false; }
     }
 
-    startSessionAndFetchData();
-  }, [subjectId, questId, cacheKey, persistTimerState, ensureSession]);
+    const refresh = () => { void startSessionAndFetchData(); };
+    const accepted = (event: Event) => {
+      if ((event as CustomEvent<{ ownerId: number }>).detail?.ownerId === baselineOwnerId) refresh();
+    };
+    refresh();
+    window.addEventListener("online", refresh);
+    window.addEventListener(TIMER_SYNC_EVENT, accepted);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("online", refresh);
+      window.removeEventListener(TIMER_SYNC_EVENT, accepted);
+    };
+  }, [subjectId, questId, baselineOwnerId]);
 
   // ─── Main Timer Tick (derivation only — no accumulation) ──
-  const tick = useCallback(() => {
-    const now = Date.now();
-    const snap = snapRef.current;
-    if (questId && !questDataRef.current) return;
-    if (questDataRef.current?.plannedMinutes != null && !versionedReadyRef.current) return;
-    if (snap.isPaused || snap.phase === "done") return;
-    const d = deriveTimer(snap, now);
-
-    // Countdown crossed (possibly while backgrounded/sleeping) → transition
-    // exactly once. Only fires when the mode/quest context is loaded so the
-    // correct next phase can be chosen; it retries every tick until then.
-    if (
-      !transitionFiredRef.current &&
-      snap.remainingMs !== null &&
-      d.remainingRawMs !== null &&
-      d.remainingRawMs <= 0
-    ) {
-      const ready = questDataRef.current !== null || activeModeRef.current !== null;
-      if (ready) {
-        transitionFiredRef.current = true;
-        transitionPhaseRef.current();
-        return;
+  const advanceExpiredPhases = useCallback((forEnd = false) => {
+    if (!isPrimaryRef.current && !forEnd || !(questDataRef.current || activeModeRef.current)) return;
+    // Every phase is anchored to its original deadline. Catch up before deriving
+    // or ending, including several blocks crossed during sleep/navigation.
+    while (!snapRef.current.isPaused && snapRef.current.phase !== "done" &&
+      deriveTimer(snapRef.current, Date.now()).remainingRawMs !== null &&
+      deriveTimer(snapRef.current, Date.now()).remainingRawMs! <= 0) {
+      const previous = snapRef.current;
+      transitionPhaseRef.current(forEnd);
+      const next = snapRef.current;
+      if (next === previous) break;
+      if (next.remainingMs === 0 && next.runningSinceMs === previous.runningSinceMs) {
+        snapRef.current = pauseSnapshot(next, Date.now()); setIsPaused(true); isPausedRef.current = true;
+        setEndError("Choose a study mode with a positive focus and break duration."); break;
       }
     }
+  }, [isPrimaryRef]);
+  const tick = useCallback(() => {
+    const now = Date.now();
+    if (questId && !questDataRef.current) return;
+    if (endingRef.current) return;
+    advanceExpiredPhases();
+    const snap = snapRef.current;
+    if (snap.isPaused || snap.phase === "done") return;
+    const d = deriveTimer(snap, now);
 
     // Derived values → display state (no-op when unchanged).
     syncStateFromSnapshot();
@@ -1144,14 +1097,15 @@ function FocusContent() {
         !sessionStartPendingRef.current
       ) {
         sessionStartPendingRef.current = true;
-        ensureSession(d.focusSec).finally(() => {
+        ensureSession().finally(() => {
           sessionStartPendingRef.current = false;
         });
       }
 
       // Throttled Auto-Save Checkpoint: flush every 3 minutes (180s) of
       // active focus. No side effects inside the tick — just flag it.
-      if (d.focusSec - lastSyncedSecondsRef.current >= 180) {
+      if (d.focusSec - lastSyncedSecondsRef.current >= 180 && now - lastCheckpointRef.current >= 180_000) {
+        lastCheckpointRef.current = now;
         autoFlushDueRef.current = true;
       }
     }
@@ -1160,8 +1114,9 @@ function FocusContent() {
     if (now - lastPersistRef.current >= 1000) {
       lastPersistRef.current = now;
       persistTimerState();
+      if (isPrimaryRef.current) broadcastSnapshot();
     }
-  }, [questId, syncStateFromSnapshot, ensureSession, persistTimerState]);
+  }, [questId, syncStateFromSnapshot, ensureSession, persistTimerState, isPrimaryRef, broadcastSnapshot, advanceExpiredPhases]);
 
   useEffect(() => {
     tickRef.current = tick;
@@ -1187,7 +1142,7 @@ function FocusContent() {
     autoFlushDueRef.current = false;
     if (!isPrimaryRef.current) return;
     flushSessionProgress(false);
-  }, [elapsedSeconds, flushSessionProgress]);
+  }, [elapsedSeconds, flushSessionProgress, isPrimaryRef]);
 
   // ─── Page Lifecycle, Visibility & Unload Sync ─────────
   useEffect(() => {
@@ -1244,11 +1199,9 @@ function FocusContent() {
 
   const handleTogglePause = async () => {
     // A mirror tab takes over leadership before mutating anything.
-    await acquireLeadership();
+    if (!await acquireLeadership()) { setEndError("Couldn't take over this timer. Retry in a moment."); return; }
     const requestedAction: SessionActionV2 = snapRef.current.isPaused ? "RESUME" : "PAUSE";
-    if (questData?.plannedMinutes != null && !sessionIdRef.current && !await ensureSession(0)) {
-      setEndError("Couldn't restore the timer. Check your connection and retry."); return;
-    }
+    if (endingRef.current || snapRef.current.phase === "done") return;
     // Anchor-based pause/resume — immune to stale render closures and
     // rapid double-clicks (each call reads the live snapshot).
     if (snapRef.current.isPaused) {
@@ -1278,84 +1231,42 @@ function FocusContent() {
     persistTimerState();
     broadcastSnapshot();
     // Flush on pause/resume boundary
-    if (questData?.plannedMinutes != null && requestedAction === "RESUME") {
-      snapRef.current = pauseSnapshot(snapRef.current, Date.now());
-      setIsPaused(true); isPausedRef.current = true;
-    }
     if (await flushSessionProgress(false, false, requestedAction)) setEndError(null);
   };
 
-  const handleEndSession = async () => {
-    if (isEnding) return;
-    setIsEnding(true);
-    setEndError(null);
-
+  const finishSession = (completeQuest: boolean) => {
+    if (endingRef.current) return;
+    advanceExpiredPhases(true);
+    endingRef.current = true;
+    setIsEnding(true); setEndError(null);
+    // Freeze at the click, including fractions since the last render/tick.
+    snapRef.current = pauseSnapshot(snapRef.current, Date.now());
+    syncStateFromSnapshot(); setIsPaused(true); isPausedRef.current = true;
     try {
-      // A mirror tab takes over leadership before finalizing.
-      await acquireLeadership();
-      // If the session never started (flaky start request), retry it first —
-      // previously the button silently no-op'd and looked broken.
-      const sid = sessionIdRef.current || (await ensureSession(elapsedSecondsRef.current));
-      if (!sid) {
-        setIsEnding(false);
-        setEndError("Couldn't start the session — check your connection and try again.");
-        return;
-      }
-      // isFinal = true, completeQuest = false (logs time, keeps quest active)
-      const success = await flushSessionProgress(true, false);
-      if (success) {
-        if (document.fullscreenElement) {
-          document.exitFullscreen().catch(() => {});
-        }
-        releaseLeadership();
-        void refreshStats();
-        announceSessionEnd();
-        router.push("/timer");
-      } else {
-        setIsEnding(false);
-        setEndError("Couldn't finish the session — check your connection and try again. Your in-session progress is safe.");
-      }
-    } catch (err) {
-      console.error("Failed to end session:", err);
-      setIsEnding(false);
-      setEndError("Couldn't finish the session — check your connection and try again. Your in-session progress is safe.");
+      const journal = ensureJournal();
+      if (!user) throw new Error("Sign in to save your session.");
+      const d = deriveTimer(snapRef.current, Date.now());
+      getTimerSync(user.id).finish(journal.clientKey, d.focusSec, d.breakSec, completeQuest);
+      snapRef.current.phase = "done"; phaseRef.current = "done"; setPhase("done");
+      broadcastSnapshot();
+    } catch {
+      endingRef.current = false; setIsEnding(false);
+      persistTimerState();
+      setEndError("Couldn't save the ended session on this device. Free some device storage and retry. Your timer is paused.");
+      return;
     }
-  };
-
-  const handleCompleteQuest = async () => {
-    if (isEnding) return;
-    setIsEnding(true);
-    setEndError(null);
-
+    // The journal's terminal marker also protects reloads when cache removal fails.
+    try { localStorage.removeItem(cacheKey); sessionStorage.removeItem(timerKey); sessionStorage.removeItem("runningTimerSeconds"); } catch { /* End remains durable. */ }
     try {
-      // A mirror tab takes over leadership before finalizing.
-      await acquireLeadership();
-      const sid = sessionIdRef.current || (await ensureSession(elapsedSecondsRef.current));
-      if (!sid) {
-        setIsEnding(false);
-        setEndError("Couldn't start the session — check your connection and try again.");
-        return;
-      }
-      // isFinal = true, completeQuest = true (completes quest, credits XP and node progress)
-      const success = await flushSessionProgress(true, true);
-      if (success) {
-        if (document.fullscreenElement) {
-          document.exitFullscreen().catch(() => {});
-        }
-        releaseLeadership();
-        void refreshStats();
-        announceSessionEnd();
-        router.push("/timer");
-      } else {
-        setIsEnding(false);
-        setEndError("Couldn't complete the quest — check your connection and try again. Your in-session progress is safe.");
-      }
-    } catch (err) {
-      console.error("Failed to complete quest:", err);
-      setIsEnding(false);
-      setEndError("Couldn't complete the quest — check your connection and try again. Your in-session progress is safe.");
-    }
+      const raw = localStorage.getItem(legacyCacheKey);
+      const cached = raw ? JSON.parse(raw) : null;
+      if (cached?.ownerId === user?.id && cached.sessionId === sessionIdRef.current) localStorage.removeItem(legacyCacheKey);
+    } catch { /* Legacy recovery data remains available. */ }
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    releaseLeadership(); announceSessionEnd(); if (navigator.onLine !== false) router.replace("/timer");
   };
+  const handleEndSession = () => finishSession(false);
+  const handleCompleteQuest = () => finishSession(true);
 
   /**
    * Broadcast the just-finished session so the global toast can surface the
@@ -1379,7 +1290,8 @@ function FocusContent() {
   };
 
   // ─── On-demand breaks (Free Flow, Flowtime, Quest Overtime) ───
-  const handleTakeFlowBreak = () => {
+  const handleTakeFlowBreak = async () => {
+    if (endingRef.current || !await acquireLeadership()) return;
     if (phaseRef.current !== "focus" && phase !== "focus") return;
 
     const focusMinutes = Math.max(1, Math.round(elapsedSecondsRef.current / 60));
@@ -1416,14 +1328,14 @@ function FocusContent() {
     remainingSecondsRef.current = breakSec;
     setIsPaused(false);
     isPausedRef.current = false;
-    transitionFiredRef.current = false;
     setFlowNudge(false);
     persistTimerState();
     broadcastSnapshot();
     acknowledgePhaseState(false);
   };
 
-  const handleSkipFlowBreak = () => {
+  const handleSkipFlowBreak = async () => {
+    if (endingRef.current || !await acquireLeadership()) return;
     if (activeMode?.id === "flowtime" || activeMode?.id === "freeflow" || questData) {
       snapRef.current = transitionSnapshot(snapRef.current, Date.now(), {
         phase: "focus",
@@ -1443,7 +1355,6 @@ function FocusContent() {
       remainingSecondsRef.current = null;
       setIsPaused(false);
       isPausedRef.current = false;
-      transitionFiredRef.current = false;
       setFlowNudge(false);
       persistTimerState();
       broadcastSnapshot();
@@ -1491,12 +1402,29 @@ function FocusContent() {
 
   // Mode display name
   const modeDisplayName = activeMode?.name || "Free Flow";
+  useEffect(() => {
+    if (!isEnding) return;
+    const connected = () => router.replace("/timer");
+    window.addEventListener("online", connected);
+    return () => window.removeEventListener("online", connected);
+  }, [isEnding, router]);
+
+
+  // Navigation may need an uncached route while offline. The focus room still
+  // closes immediately and gives the student a usable terminal screen.
+  if (isEnding) return (
+    <div className="h-full min-h-[100dvh] flex flex-col items-center justify-center gap-3 px-6 bg-bg-void text-text-primary text-center" role="status">
+      <h1 className="text-2xl font-bold">Session ended</h1>
+      <p className="text-text-muted">Saved on this device. Your progress will sync automatically.</p>
+      <button type="button" className="mt-3 rounded-xl border border-border-subtle bg-bg-panel px-5 py-3 font-semibold text-accent-text" onClick={() => router.replace("/timer")}>Return to Timer</button>
+    </div>
+  );
 
   return (
     <FocusToolsProvider subjectName={subjectName} questTitle={questData?.title}>
       <div
         data-focus-workspace="true"
-        className="h-full w-full max-h-[100dvh] flex flex-col justify-between items-center py-6 sm:py-8 px-4 select-none relative overflow-hidden bg-bg-void text-text-primary transition-colors duration-500 touch-none overscroll-none"
+        className="h-full w-full max-h-[100dvh] flex flex-col justify-between items-center pt-6 pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:py-8 px-4 select-none relative overflow-hidden bg-bg-void text-text-primary transition-colors duration-500 touch-none overscroll-none"
         style={{
           height: "100dvh",
           maxHeight: "100dvh",
@@ -1513,30 +1441,11 @@ function FocusContent() {
         onImageError={focusBg.onImageDeliveryError}
       />
 
-      {/* Environment / Background Atmosphere Trigger (top-right z-30) */}
-      <button
-        onClick={focusBg.openPicker}
-        className="fixed top-4 right-4 z-30 h-8 flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border-subtle dark:border-white/10 bg-slate-900/10 dark:bg-black/40 hover:bg-slate-900/20 dark:hover:bg-black/60 backdrop-blur-xl text-text-secondary hover:text-text-primary transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg group cursor-pointer"
-        title="Change Focus Environment (Alt+B)"
-        aria-label="Change Focus Environment"
-      >
-        <Compass className="w-3.5 h-3.5 text-accent-light group-hover:rotate-45 transition-transform duration-300" />
-        <span
-          className="text-xs font-bold uppercase tracking-wider hidden sm:inline"
-          style={{ fontFamily: "'Rajdhani', sans-serif" }}
-        >
-          {focusBg.isClassic ? "Classic Sylf" : focusBg.activeBackground?.name || "Environment"}
-        </span>
-        <kbd className="hidden md:inline-block text-[10px] px-1.5 py-0.2 rounded bg-slate-900/10 dark:bg-white/10 text-text-muted font-mono">
-          Alt+B
-        </kbd>
-      </button>
-
       {/* Mirror-tab notice: another tab is the single writer for this
           session. Display stays synced; the next explicit action here
           takes over leadership. */}
       {!isPrimary && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full border border-amber-500/40 bg-amber-500/10 backdrop-blur-xl text-amber-300 text-xs font-bold uppercase tracking-wider">
+        <div className="relative z-40 shrink-0 mb-3 max-w-full px-4 py-2 rounded-full border border-amber-500/40 bg-amber-500/10 backdrop-blur-xl text-amber-300 text-xs text-center font-bold uppercase tracking-wider">
           Timer is running in another tab of this browser — your next action will take over
         </div>
       )}
@@ -1551,6 +1460,7 @@ function FocusContent() {
       <FocusTimerLayoutRouter
         formattedDisplayTime={formatTime(displayTime)}
         elapsedSeconds={elapsedSeconds}
+        todayElapsedSeconds={!attributedDay || attributedDay === TimezoneService.getUserLocalDate(user?.timezone ?? "UTC") ? elapsedSeconds : 0}
         breakSeconds={breakSeconds}
         remainingSeconds={remainingSeconds}
         isCountdown={isCountdown}
@@ -1577,6 +1487,7 @@ function FocusContent() {
         isEnding={isEnding}
         endError={endError}
         flowNudge={flowNudge}
+        onOpenBackgroundPicker={focusBg.openPicker}
         onTogglePause={handleTogglePause}
         onEndSession={handleEndSession}
         onCompleteQuest={questData ? handleCompleteQuest : undefined}
@@ -1592,12 +1503,13 @@ function FocusContent() {
       <AnimatePresence>
         {endError && (
           <motion.div
+            role="alert"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="fixed bottom-36 left-1/2 -translate-x-1/2 z-30 max-w-md w-[calc(100%-2rem)] px-4 py-3 rounded-xl border border-amber-500/40 bg-amber-500/10 backdrop-blur-xl text-center"
+            className="fixed bottom-36 left-1/2 -translate-x-1/2 z-30 max-w-md w-[calc(100%-2rem)] px-4 py-3 rounded-xl border border-border-subtle bg-bg-panel backdrop-blur-xl text-center pointer-events-none"
           >
-            <p className="text-xs font-['Rajdhani'] font-semibold text-amber-300 leading-relaxed">
+            <p className="text-xs font-['Rajdhani'] font-semibold text-text-primary leading-relaxed">
               {endError}
             </p>
           </motion.div>
@@ -1701,11 +1613,18 @@ function FocusContent() {
   );
 }
 
+function FocusRoute() {
+  const params = useSearchParams();
+  return <FocusContent key={`${params.get("subjectId") ?? "general"}:${params.get("questId") ?? "none"}`} />;
+}
+
 export function FocusScreen() {
+  const { user } = useAuth();
+  if (!user) return <div className="min-h-screen bg-bg-void" />;
   return (
     <Suspense fallback={<div className="min-h-screen bg-bg-void" />}>
       <AcousticsProvider>
-        <FocusContent />
+        <FocusRoute key={user.id} />
       </AcousticsProvider>
     </Suspense>
   );

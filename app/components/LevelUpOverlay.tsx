@@ -324,7 +324,7 @@ export default function LevelUpOverlay({
                   transition={{ duration: 0.34, ease: MOTION_EASE.sylf, delay: 0.12 }}
                 >
                   <span className={styles.eyebrowRule} aria-hidden="true" />
-                  The System
+                  Sylvie
                   <span className={styles.eyebrowRuleEnd} aria-hidden="true" />
                 </motion.p>
 

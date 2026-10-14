@@ -1,0 +1,42 @@
+{
+  "A01": {
+    "trialId": "d_d5011475b34a9da1",
+    "caseId": "g02",
+    "packet": "model/packets/d_d5011475b34a9da1.json"
+  },
+  "A02": {
+    "trialId": "d_63ea398f0b23e2f0",
+    "caseId": "g03",
+    "packet": "model/packets/d_63ea398f0b23e2f0.json"
+  },
+  "A03": {
+    "trialId": "d_4455ae843acc1082",
+    "caseId": "g01",
+    "packet": "model/packets/d_4455ae843acc1082.json"
+  },
+  "A04": {
+    "trialId": "d_ac6e119faa6748a5",
+    "caseId": "g06",
+    "packet": "model/packets/d_ac6e119faa6748a5.json"
+  },
+  "A05": {
+    "trialId": "d_28b1cf3e53f64ddf",
+    "caseId": "g04",
+    "packet": "model/packets/d_28b1cf3e53f64ddf.json"
+  },
+  "A06": {
+    "trialId": "d_3284c39bab869cee",
+    "caseId": "g05",
+    "packet": "model/packets/d_3284c39bab869cee.json"
+  },
+  "A07": {
+    "trialId": "d_0f51cb688400b89c",
+    "caseId": "g08",
+    "packet": "model/packets/d_0f51cb688400b89c.json"
+  },
+  "A08": {
+    "trialId": "d_2f5488d294f95e29",
+    "caseId": "g07",
+    "packet": "model/packets/d_2f5488d294f95e29.json"
+  }
+}

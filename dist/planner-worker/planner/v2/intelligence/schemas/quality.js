@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CompilerRetrySchema = exports.CompilerIdentitiesSchema = exports.QualitySupportSchema = exports.VerificationResponseSchema = exports.ReviewResponseSchema = exports.GroundedFindingSchema = exports.GroundSchema = void 0;
+exports.CompilerRetrySchema = exports.CompilerIdentitiesSchema = exports.QualitySupportSchema = exports.VerificationResponseSchema = exports.ReviewResponseSchema = exports.ReviewRecoveryReceiptSchema = exports.PendingReviewConcernsSchema = exports.ReviewRecoveryDispositionSchema = exports.GroundedFindingSchema = exports.GroundSchema = void 0;
 const zod_1 = require("zod");
 const contracts_1 = require("../../contracts");
 const scheduling_1 = require("./scheduling");
@@ -14,11 +14,37 @@ exports.GroundedFindingSchema = zod_1.z.strictObject({
     consequence: contracts_1.SummaryV2Schema, requestedResolution: contracts_1.SummaryV2Schema,
     requiresAcknowledgement: zod_1.z.boolean(),
 });
+/** Only configured validation fallbacks may supply this supporting receipt. */
+exports.ReviewRecoveryDispositionSchema = zod_1.z.discriminatedUnion("outcome", [
+    zod_1.z.strictObject({ concernRef: contracts_1.LocalIdV2Schema, outcome: zod_1.z.literal("CORRECTED"), planRef: contracts_1.LocalIdV2Schema, issueId: contracts_1.LocalIdV2Schema }),
+    zod_1.z.strictObject({ concernRef: contracts_1.LocalIdV2Schema, outcome: zod_1.z.literal("WITHDRAWN"), explanation: contracts_1.SummaryV2Schema,
+        grounds: zod_1.z.array(exports.GroundSchema).min(2).max(8) }),
+]);
+const recovery = zod_1.z.array(exports.ReviewRecoveryDispositionSchema).min(1).max(contracts_1.PLANNER_V2_ENVELOPE.qualityIssues).optional();
+const RecoveryConcernSchema = zod_1.z.strictObject({ concernRef: contracts_1.LocalIdV2Schema, responseDigest: contracts_1.DigestV2Schema,
+    findingDigest: contracts_1.DigestV2Schema, sourcePath: zod_1.z.string().min(1).max(100),
+    planRef: contracts_1.LocalIdV2Schema.optional(), issueId: contracts_1.LocalIdV2Schema.optional() });
+exports.PendingReviewConcernsSchema = zod_1.z.array(zod_1.z.strictObject({ ...RecoveryConcernSchema.shape, rejectedFinding: zod_1.z.unknown() }))
+    .min(1).max(contracts_1.PLANNER_V2_ENVELOPE.qualityIssues).superRefine((concerns, ctx) => {
+    if (new TextEncoder().encode(JSON.stringify({ concerns })).byteLength > 16 * 1024 || new Set(concerns.map(c => c.concernRef)).size !== concerns.length)
+        ctx.addIssue({ code: "custom", message: "BOUNDED_UNIQUE_REJECTED_REVIEW_CONCERNS_REQUIRED" });
+});
+exports.ReviewRecoveryReceiptSchema = zod_1.z.strictObject({
+    concerns: zod_1.z.array(RecoveryConcernSchema).min(1).max(contracts_1.PLANNER_V2_ENVELOPE.qualityIssues),
+    dispositions: zod_1.z.array(exports.ReviewRecoveryDispositionSchema).min(1).max(contracts_1.PLANNER_V2_ENVELOPE.qualityIssues),
+}).superRefine((receipt, ctx) => {
+    const refs = receipt.concerns.map(c => c.concernRef), dispositions = receipt.dispositions.map(d => d.concernRef);
+    if (new Set(refs).size !== refs.length || new Set(dispositions).size !== dispositions.length ||
+        refs.length !== dispositions.length || dispositions.some(ref => !refs.includes(ref)))
+        ctx.addIssue({ code: "custom", message: "REJECTED_CONCERNS_REQUIRE_EXACT_DISPOSITIONS" });
+});
 exports.ReviewResponseSchema = (0, contracts_1.withPlannerEnvelope)(zod_1.z.strictObject({
+    recovery,
     plans: zod_1.z.array(zod_1.z.strictObject({ planRef: contracts_1.LocalIdV2Schema,
         issues: zod_1.z.array(exports.GroundedFindingSchema).max(contracts_1.PLANNER_V2_ENVELOPE.qualityIssues) })).min(1).max(contracts_1.PLANNER_V2_ENVELOPE.targets),
 }));
 exports.VerificationResponseSchema = (0, contracts_1.withPlannerEnvelope)(zod_1.z.strictObject({
+    recovery,
     plans: zod_1.z.array(zod_1.z.strictObject({ planRef: contracts_1.LocalIdV2Schema,
         resolutions: zod_1.z.array(zod_1.z.strictObject({ issueId: contracts_1.LocalIdV2Schema,
             result: zod_1.z.enum(["RESOLVED", "UNRESOLVED"]), explanation: contracts_1.SummaryV2Schema,
@@ -29,12 +55,17 @@ exports.QualitySupportSchema = (0, contracts_1.withPlannerEnvelope)(zod_1.z.stri
     phase: zod_1.z.enum(["REVIEW_PENDING", "REVIEWED", "REPAIR_PENDING", "REPAIR_ACCEPTED", "REPAIRED", "VERIFICATION_PENDING", "VERIFIED"]),
     reviewInputDigest: contracts_1.DigestV2Schema, identityDigest: contracts_1.DigestV2Schema,
     findings: zod_1.z.array(zod_1.z.strictObject({ planRef: contracts_1.LocalIdV2Schema, finding: exports.GroundedFindingSchema })).max(contracts_1.PLANNER_V2_ENVELOPE.qualityIssues),
+    reviewRecoveryPending: exports.PendingReviewConcernsSchema.optional(), verificationRecoveryPending: exports.PendingReviewConcernsSchema.optional(),
+    reviewRecovery: exports.ReviewRecoveryReceiptSchema.optional(), verificationRecovery: exports.ReviewRecoveryReceiptSchema.optional(),
     repairInputDigest: contracts_1.DigestV2Schema.optional(), verificationInputDigest: contracts_1.DigestV2Schema.optional(),
+    repairFormat: zod_1.z.literal("TARGETED_V1").optional(),
     acceptedRepair: zod_1.z.string().max(32 * 1024).optional(), acceptedRepairDigest: contracts_1.DigestV2Schema.optional(),
     verificationReserve: zod_1.z.strictObject({ inputTokens: zod_1.z.number().int().positive(), outputTokens: zod_1.z.number().int().positive() }).optional(),
     repairAllocationFailure: scheduling_1.AllocationReportSchema.optional(),
 }).superRefine((support, ctx) => {
     const fail = (message) => ctx.addIssue({ code: 'custom', message });
+    if (support.reviewRecoveryPending && support.phase !== 'REVIEW_PENDING' || support.verificationRecoveryPending && support.phase !== 'VERIFICATION_PENDING')
+        fail('REJECTED_REVIEW_CONCERNS_REQUIRE_PENDING_STAGE');
     if (support.phase === 'REPAIR_ACCEPTED' && (!support.acceptedRepair || !support.acceptedRepairDigest))
         fail('ACCEPTED_REPAIR_RECEIPT_REQUIRED');
     if (support.acceptedRepair && (support.phase !== 'REPAIR_ACCEPTED' || new TextEncoder().encode(support.acceptedRepair).byteLength > 32 * 1024))

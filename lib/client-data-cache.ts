@@ -25,7 +25,7 @@ const MAX_MEMORY_ENTRIES = 200;
 // S3: never persist these endpoints to localStorage — they contain private
 // AI content (daily briefings, insights) that must not outlive the session
 // on a shared device. They still benefit from the in-memory cache.
-const NO_PERSIST_FRAGMENTS = ["briefing", "insights", "ai-memory", "ai-insight", "planner"];
+const NO_PERSIST_FRAGMENTS = ["briefing", "insights", "ai-memory", "ai-insight", "planner", "pixel-creations"];
 
 function isPersistable(key: string): boolean {
   const k = key.toLowerCase();
@@ -33,7 +33,10 @@ function isPersistable(key: string): boolean {
 }
 
 /** Clear every client-side cache key that carries user data (S3 logout hygiene). */
+let sessionEpoch = 0;
+export function getClientSessionEpoch(): number { return sessionEpoch; }
 export function clearClientCache(): void {
+  sessionEpoch++;
   if (typeof window === "undefined") return;
   try {
     const doomed: string[] = [];
@@ -43,7 +46,8 @@ export function clearClientCache(): void {
         key &&
         (key.startsWith("sylf_cache:") ||
           key.startsWith("focus_scratchpad") ||
-          key.startsWith("focus_notes"))
+          key.startsWith("focus_notes") ||
+          key.startsWith("pixel_studio:"))
       ) {
         doomed.push(key);
       }

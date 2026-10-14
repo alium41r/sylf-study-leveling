@@ -1,0 +1,16 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run __tests__/auth/auth-experience.test.tsx __tests__/auth/routes.test.ts __tests__/auth/oauth.test.ts __tests__/auth/password-strength.test.ts
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+(node:10748) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  27 passed (27)
+   Start at  13:59:30
+   Duration  8.78s (transform 1.37s, setup 1.53s, import 3.10s, tests 6.75s, environment 1.84s)
+

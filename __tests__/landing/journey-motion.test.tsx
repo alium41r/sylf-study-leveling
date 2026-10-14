@@ -208,15 +208,15 @@ it("holds Focus while traveling through its section and resumes from the same po
 });
 
 it.each(["pixel", "pixel-layered"])(
-  "preserves idle-on-travel behavior for %s",
+  "ignores the retired %s flag while preserving the SVG journey",
   (variant) => {
     vi.stubEnv("NODE_ENV", "development");
     window.history.replaceState(null, "", `/?companion=${variant}`);
     const { container } = render(<JourneyFixture />);
     scrollTo(1500);
     advance(336);
-    expect(latestMotion()).toEqual(["IDLE", false]);
-    expect(present.mock.lastCall?.[4]).toBe(false);
+    expect(latestMotion()).toEqual(["FOCUSING", false]);
+    expect(present.mock.lastCall?.[4]).toBe(true);
     expect(container.querySelector("[data-journey-traveler]")).toHaveAttribute(
       "data-moving",
       "true"

@@ -37,6 +37,7 @@
 
 .timerContainer {
   min-height: 100%;
+  container-type: inline-size;
 }
 
 :global(html[data-mode="light"]) .timerContainer,
@@ -256,15 +257,9 @@
 /* ─── Two-Column Layout ────────────────────────────────────── */
 .splitLayout {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2rem;
   align-items: start;
-}
-
-@media (min-width: 1024px) {
-  .splitLayout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
 }
 
 .columnArea {
@@ -327,6 +322,8 @@
   color: var(--ink);
   cursor: pointer;
   transition: all 150ms ease;
+  min-height: 44px;
+  justify-content: center;
 }
 
 .btnAddSubject:hover {
@@ -391,6 +388,10 @@
 
 .playIcon {
   margin-left: 2px;
+}
+
+.playLabel {
+  display: none;
 }
 
 .itemContent {
@@ -1404,5 +1405,203 @@
 
 .undoClose:hover {
   color: var(--ink);
+}
+
+/* Adapt to the available page width, including the desktop sidebar. */
+@container (max-width: 1000px) {
+  .splitLayout {
+    gap: clamp(0.75rem, 2.5cqi, 1.5rem);
+  }
+
+  .columnArea {
+    gap: 0.75rem;
+  }
+
+  .sectionHeader {
+    margin-bottom: 0;
+  }
+
+  .sectionTitleGroup {
+    gap: 5px;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .sectionIcon {
+    flex-shrink: 0;
+  }
+
+  .itemList {
+    gap: 0.75rem;
+  }
+
+  .itemCard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 0.65rem 6px;
+    padding: 0.85rem 0.75rem;
+  }
+
+  .itemCard:hover {
+    transform: none;
+  }
+
+  .itemMain,
+  .itemRight {
+    display: contents;
+  }
+
+  .itemContent {
+    grid-area: 1 / 1 / 2 / -1;
+  }
+
+  .itemTitleRow {
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 6px;
+  }
+
+  .itemTitle,
+  .tooltipWrapper {
+    width: 100%;
+  }
+
+  .itemTitle {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+
+  .tooltipPopup {
+    display: none !important;
+  }
+
+  .itemMeta {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .codeBadge,
+  .diffChip {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .timerReadout {
+    grid-area: 2 / 1 / 3 / -1;
+    text-align: left;
+    font-size: 1.3rem;
+    line-height: 1.2;
+  }
+
+  .timerTargetMuted {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 3px;
+  }
+
+  .playBtn {
+    grid-area: 3 / 1 / 4 / -1;
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .playLabel {
+    display: inline;
+  }
+
+  .subjectCard .playBtn {
+    grid-column-end: 2;
+  }
+
+  .menuContainer {
+    grid-area: 3 / 2 / 4 / 3;
+  }
+
+  .btnMenuTrigger {
+    background: var(--elevated);
+    border-color: var(--subtle-line);
+  }
+
+  .menuItem {
+    min-height: 44px;
+  }
+
+  .emptyState {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .emptyLink {
+    min-height: 44px;
+    justify-content: center;
+    padding: 6px 8px;
+    max-width: 100%;
+  }
+
+  .emptyLink svg {
+    flex-shrink: 0;
+  }
+
+  .playBtn:focus-visible,
+  .btnAddSubject:focus-visible,
+  .emptyLink:focus-visible,
+  .btnMenuTrigger:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+@container (max-width: 540px) {
+  .headerArea {
+    margin-bottom: 1.25rem;
+  }
+
+  .subtitle {
+    margin-bottom: 0;
+  }
+
+  .heroTimerCard {
+    padding: 1.5rem 0.75rem;
+    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+  }
+
+  .heroDateBadge {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding-inline: 10px;
+  }
+
+  .heroCaption {
+    font-size: 12px;
+  }
+
+  .expandedLabel {
+    display: none;
+  }
+
+  .sectionTitle {
+    font-size: 1.125rem;
+    letter-spacing: 0;
+  }
+
+  .countChip {
+    padding-inline: 5px;
+  }
+
+  .itemCard {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .itemMeta {
+    font-size: 11px;
+  }
 }
 

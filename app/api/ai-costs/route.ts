@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
  * Diagnostic token/cost telemetry for the authenticated user's AI usage
  * (today + last 7 days), grouped by model and feature. Costs are estimates
  * derived from the AI_COST_USD_PER_1M rate table — approximate only.
- * Used by the System workspace's Dev Mode usage panel.
+ * Used by the Sylvie workspace's Dev Mode usage panel.
  */
 export async function GET(req: NextRequest) {
   try {

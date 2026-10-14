@@ -1,0 +1,49 @@
+{
+  "status": "UNPAID_PREFLIGHT_PASS_SIGNOFF_PENDING",
+  "externalCalls": 0,
+  "calls": 4,
+  "reservedUpperBoundUsd": 0.180462,
+  "sourcePinsChecked": 207,
+  "inputBytes": [
+    {
+      "trialId": "probability_exam_natural",
+      "inputReservationUnits": 9286
+    },
+    {
+      "trialId": "probability_exam_structured",
+      "inputReservationUnits": 28577
+    },
+    {
+      "trialId": "sql_project_structured",
+      "inputReservationUnits": 29474
+    },
+    {
+      "trialId": "sql_project_natural",
+      "inputReservationUnits": 9915
+    }
+  ],
+  "checkedAt": "2026-10-10T16:10:31.053Z",
+  "paidCalls": 0,
+  "checks": [
+    "Four native adapter bodies recaptured, no transport; complete student context identical within each pair",
+    "Probability key independently recalculated; all four SQL expected tables executed locally",
+    "Existing compact/canonical validation and allocation pass unassessed stubs; invented scope and incorrect capacity rejected",
+    "Exclusive persisted reservations, exact wire/model/cap/effort hashes, four-call scope, no retries/restart",
+    "Missing reasoning/cache/usage counters halt next dispatch; reservation retained",
+    "One-nanodollar insufficient allowance refuses reservation before wire",
+    "Owned macOS caffeinate sleep assertion acquired, verified and released"
+  ],
+  "sleepEvidence": {
+    "pid": 4371,
+    "ownerPid": 4369,
+    "assertions": [
+      "pid 4371(caffeinate): [0x000eb3f8000198fc] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+      "pid 4371(caffeinate): [0x000eb3f8000598fd] 00:00:00 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+      "pid 4371(caffeinate): [0x000eb3f8000798fe] 00:00:00 PreventSystemSleep named: \"caffeinate command-line tool\""
+    ],
+    "verifiedAt": "2026-10-10T16:10:31.053Z"
+  },
+  "independentSignoffComplete": false,
+  "productionWrites": 0,
+  "note": "32,768-token standalone diagnostic bypasses the production dispatcher cap. No canonical Attempt/Apply or live compiler workflow was exercised."
+}

@@ -1,0 +1,42 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - button "Open navigation menu" [ref=e6]
+        - button "View Profile Card" [ref=e9] [cursor=pointer]:
+          - generic "Scholar" [ref=e11]: S
+          - generic [ref=e13]:
+            - paragraph [ref=e14]: Scholar
+            - paragraph [ref=e15]: E-Rank • Lv. 1
+      - generic [ref=e16]:
+        - 'generic "Weekly Streak: 0 weeks" [ref=e17]': "0"
+        - 'generic "HP: 0/100" [ref=e21]': 0/100
+        - 'generic "Sylph: 0" [ref=e25]': "0"
+    - main [ref=e29]:
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e34]:
+            - button "CONVERSATION" [ref=e35] [cursor=pointer]
+            - button "PLANNER" [ref=e41] [cursor=pointer]
+          - generic [ref=e46]:
+            - heading "Sylvie" [level=1] [ref=e48]:
+              - generic "Sylvie AI" [ref=e56]: Sylvie
+            - button "Open Archives" [ref=e58] [cursor=pointer]:
+              - generic [ref=e63]: Archives
+              - generic [ref=e64]: "0"
+        - generic [ref=e67]:
+          - generic [ref=e70]:
+            - heading "How can Sylvie assist you?" [level=2] [ref=e79]
+            - generic [ref=e80]:
+              - button "Syllabus Breakdown" [ref=e81] [cursor=pointer]
+              - button "Concept Deep-Dive" [ref=e88] [cursor=pointer]
+              - button "Active Recall Quiz" [ref=e93] [cursor=pointer]
+              - button "Study Habit Audit" [ref=e105] [cursor=pointer]
+          - generic [ref=e112]:
+            - textbox "Ask anything... (Enter to send, Shift+Enter for new line)" [ref=e113]
+            - generic [ref=e114]:
+              - button "Attach syllabus, notes, or image" [ref=e116] [cursor=pointer]
+              - generic [ref=e119]:
+                - 'generic "Daily AI Messages: 15/15 remaining" [ref=e120]': "15"
+                - button "Send" [disabled] [ref=e124]
+  - button "Open Next.js Dev Tools" [ref=e134] [cursor=pointer]

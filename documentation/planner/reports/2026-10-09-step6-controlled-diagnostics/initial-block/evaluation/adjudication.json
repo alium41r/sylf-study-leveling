@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 1,
+  "status": "ASSESSMENT_COMPLETE_WITH_ONE_PENDING_OUTPUT_JUDGMENT",
+  "recordedAtUtc": "2026-10-09T13:08:16.373034+00:00",
+  "assessors": [
+    "Root case-author-side Codex AI agent /root",
+    "Separate independent AI-agent /root/independent_label_signoff"
+  ],
+  "humanEvaluation": false,
+  "externalJudgeModelCalls": 0,
+  "method": "Separate locked primary scores, then explicit discussion of disputed evidence/severity and a valid-alternative stress-test; original scores and disagreements remain unchanged. Independent agent reports retain final acceptance/disposition.",
+  "lockedPrimarySha256": {
+    "locked-primary-root.json": "df1998ff3c3ec5f2a423149893599a1f4dc1f9c5987ee70fd92536ae4a930819",
+    "locked-primary-agent.json": "b10caed9057114caab7b9289787a13f6e01919bbcfec369ec5f8e00acaa790c3"
+  },
+  "reasoning": {
+    "completeAndEnvelopeValid": 8,
+    "confirmedPasses": 6,
+    "confirmedFailures": 1,
+    "pendingJudgments": 1,
+    "confirmedSeriousDefects": 0,
+    "pendingSeriousnessJudgment": "A05/g04",
+    "allEightEducationalGate": "FAILED_CONFIRMED_EVIDENCE_ERROR",
+    "gateRationale": "A03/g01 has evidence score 3 for both final assessors. Pending A05 must not be counted as passed; its disposition cannot restore an all-eight pass."
+  },
+  "review": {
+    "operationalDeliveryGate": "FAILED",
+    "attempted": 2,
+    "deliveredVerdicts": 0,
+    "truncatedBlank": 2,
+    "skipped": 10,
+    "semanticAccuracy": "UNASSESSABLE",
+    "sensitivity": "UNASSESSABLE",
+    "precision": "UNASSESSABLE",
+    "falsePositiveRate": "UNASSESSABLE",
+    "trueNegativesNotInferredFromBlankOutputs": true,
+    "groundingValidation": "NOT_REACHED_ON_AVAILABLE_REVIEWS"
+  },
+  "checks": [
+    {
+      "assessmentId": "A01",
+      "caseId": "g02",
+      "initialRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "initialRootDecision": "PASS",
+      "initialIndependentDecision": "PASS",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "PASS",
+      "seriousDefectConfirmed": false,
+      "finalRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "finalIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "resolution": "Both pass all three thresholds without a serious defect. Nonconsequential 4/5 score differences remain separate; no averaging or altered threshold."
+    },
+    {
+      "assessmentId": "A02",
+      "caseId": "g03",
+      "initialRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 5
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "initialRootDecision": "PASS",
+      "initialIndependentDecision": "PASS",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "PASS",
+      "seriousDefectConfirmed": false,
+      "finalRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 5
+      },
+      "finalIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "resolution": "Both pass all three thresholds without a serious defect. Nonconsequential 4/5 score differences remain separate; no averaging or altered threshold."
+    },
+    {
+      "assessmentId": "A03",
+      "caseId": "g01",
+      "initialRootScores": {
+        "goalCorrespondence": 4,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 3
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 4
+      },
+      "initialRootDecision": "FAIL",
+      "initialIndependentDecision": "PASS",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "FAIL",
+      "seriousDefectConfirmed": false,
+      "finalRootScores": {
+        "goalCorrespondence": 4,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 3
+      },
+      "finalIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 3
+      },
+      "resolution": "Both confirm a material non-serious unsupported learner-readiness claim used in prioritization/practice rationale. Independent assessor changes initial evidence score 4 to 3 after adjudication, retaining initial record. Complete final checks prevent serious outcome omission but do not ground the earlier claim."
+    },
+    {
+      "assessmentId": "A04",
+      "caseId": "g06",
+      "initialRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "initialRootDecision": "PASS",
+      "initialIndependentDecision": "PASS",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "PASS",
+      "seriousDefectConfirmed": false,
+      "finalRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "finalIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "resolution": "Both pass all three thresholds without a serious defect. Nonconsequential 4/5 score differences remain separate; no averaging or altered threshold."
+    },
+    {
+      "assessmentId": "A05",
+      "caseId": "g04",
+      "initialRootScores": {
+        "goalCorrespondence": 3,
+        "educationalUsefulnessAndProportion": 3,
+        "evidenceAndUncertainty": 3
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 3,
+        "educationalUsefulnessAndProportion": 3,
+        "evidenceAndUncertainty": 4
+      },
+      "initialRootDecision": "FAIL",
+      "initialIndependentDecision": "FAIL",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "PENDING_OUTPUT_ADJUDICATION",
+      "seriousDefectConfirmed": null,
+      "finalRootScores": null,
+      "finalIndependentScores": null,
+      "resolution": "Both initial assessments failed the placeholder/present-alt gate and initially concurred on a serious defect. Valid-alternative stress-test withdraws the categorical inference that a placeholder must mean an ordinary text container. An image-based fallback is plausible; a prose strategy need not enumerate every method or supply every implementation detail. The future-image explanation/present-alt gate remains ambiguous. Do not claim a conclusively confirmed serious violation or manufacture a pass/final numeric score.",
+      "initialConcernRetained": true,
+      "withdrawnInference": "The output necessarily teaches alt on a div or ordinary text container.",
+      "alternativeInterpretation": "An explicit placeholder could be an img-based fallback.",
+      "remainingQuestion": "Which placeholder branch is intended and how its present-alt completion check is feasible with no supplied image resource?"
+    },
+    {
+      "assessmentId": "A06",
+      "caseId": "g05",
+      "initialRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 4
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 4,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 5
+      },
+      "initialRootDecision": "PASS",
+      "initialIndependentDecision": "PASS",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "PASS",
+      "seriousDefectConfirmed": false,
+      "finalRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 4
+      },
+      "finalIndependentScores": {
+        "goalCorrespondence": 4,
+        "educationalUsefulnessAndProportion": 4,
+        "evidenceAndUncertainty": 5
+      },
+      "resolution": "Both pass all three thresholds without a serious defect. Nonconsequential 4/5 score differences remain separate; no averaging or altered threshold."
+    },
+    {
+      "assessmentId": "A07",
+      "caseId": "g08",
+      "initialRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "initialRootDecision": "PASS",
+      "initialIndependentDecision": "PASS",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "PASS",
+      "seriousDefectConfirmed": false,
+      "finalRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "finalIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "resolution": "Both pass all three thresholds without a serious defect. Nonconsequential 4/5 score differences remain separate; no averaging or altered threshold."
+    },
+    {
+      "assessmentId": "A08",
+      "caseId": "g07",
+      "initialRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "initialIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "initialRootDecision": "PASS",
+      "initialIndependentDecision": "PASS",
+      "finalScoresNotAveraged": true,
+      "finalDecision": "PASS",
+      "seriousDefectConfirmed": false,
+      "finalRootScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 5
+      },
+      "finalIndependentScores": {
+        "goalCorrespondence": 5,
+        "educationalUsefulnessAndProportion": 5,
+        "evidenceAndUncertainty": 4
+      },
+      "resolution": "Both pass all three thresholds without a serious defect. Nonconsequential 4/5 score differences remain separate; no averaging or altered threshold."
+    }
+  ],
+  "technicalSources": [
+    {
+      "url": "https://html.spec.whatwg.org/multipage/embedded-content.html#attr-img-alt",
+      "use": "Unpaid post-run adjudication: image alt fallback semantics and conforming resource requirements; never sent to tested provider."
+    }
+  ],
+  "frozenBankOrRubricChanged": false,
+  "furtherCallsAuthorized": false
+}

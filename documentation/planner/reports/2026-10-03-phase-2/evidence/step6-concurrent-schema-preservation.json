@@ -1,0 +1,42 @@
+{
+  "status": "PRESERVED_UNRELATED_SCHEMA_CHANGE",
+  "observedAt": "2026-10-08T14:16:44.228472+00:00",
+  "source": "Existing concurrent companion work, inspected but not edited by Planner continuation",
+  "semanticComparison": "Strip comments/whitespace from each Prisma model block and compare actual declarations against last committed source. Full original files retained in Git.",
+  "protectedModelCorrespondence": {
+    "Goal": true,
+    "Subject": true,
+    "Quest": true,
+    "StudySession": true,
+    "SubjectNode": true,
+    "UserStats": true,
+    "PlannerPlan": true,
+    "PlannerRevision": true,
+    "PlannerQuestLink": true,
+    "PlannerCheckResult": true,
+    "PlannerPreference": true,
+    "PlannerFrictionEvent": true,
+    "PlannerIntakeSession": true,
+    "PlannerIntentVersion": true,
+    "PlannerAttempt": true
+  },
+  "userChangeOnlyPixelRelation": true,
+  "changedExistingModels": [
+    "User"
+  ],
+  "addedModels": [
+    "PixelCreation"
+  ],
+  "poolChangeOnlySchemaVersion": true,
+  "poolChange": "SCHEMA_BUILD_VERSION 27 to 29 only; connection/transaction owner unchanged",
+  "preservedSources": {
+    "prisma/schema.prisma": "f5fbe318b2134a743ef35624f1b35d4b33e530e87c93fdf8ce2fe63da212d588",
+    "lib/prisma.ts": "b56ce3bb8168eb65842cb5a09f0210a4e4fb2870bf252ae41764e5a7ab96dc3c",
+    "prisma/migrations/20261005000000_pixel_creations/migration.sql": "ada06ed1f5a0c58316a89c1e5142295cd77986e72b2590fda194c41cc09292a9",
+    "prisma/migrations/20261007000000_pixel_companion_consolidation/migration.sql": "4481f04dc17e8be77c9df8b925385c8e80a6f6e455e35c11750267fe9f270ba2"
+  },
+  "migrationsTouchedByPlanner": false,
+  "limitations": [
+    "Records source preservation, not companion qualification or hosted migration deployment."
+  ]
+}

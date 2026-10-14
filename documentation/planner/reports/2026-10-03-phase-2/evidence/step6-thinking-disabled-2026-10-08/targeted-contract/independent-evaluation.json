@@ -1,0 +1,67 @@
+{
+  "assessedAt": "2026-10-08T18:36:36.469Z",
+  "method": "Manual independent inspection of actual raw outputs, final checkpoint, findings, declared expectations, workload arithmetic and canonical apply receipts; no model self-approval/apply shortcut.",
+  "status": "FAILED",
+  "accepted": 1,
+  "total": 3,
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "accepted": false,
+      "reasons": [
+        "Both configured blueprint attempts encounter awake network errors. No education/candidate is available to assess. Unknown spend remains unknown."
+      ],
+      "limits": [
+        "This is an environment/provider interruption, not a demonstrated educational rejection."
+      ]
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "accepted": true,
+      "reasons": [
+        "One30-minute integrated task supplies correct worked series values, explicit learner-selected or supplied changed givens, voltage-sum consistency, explanation and immediate stopping. It is self-contained, within its own25/40/60range and has no booked extension or future resource."
+      ],
+      "limits": [
+        "Same-run control failed before generation, so paired capacity invariance is unqualified in this run; earlier control cannot substitute current-source qualification."
+      ]
+    },
+    {
+      "id": "triage",
+      "accepted": false,
+      "reasons": [
+        "It strictly generates/reviews/applies50minutes with complete scope and deferred mixed depth, correct self-contained mixed-circuit check and no future quiz-sheet dependency. However trade-offs say base methods are where most quiz marks usually sit despite explicitly unknown weights. Model review misses this invented assessment importance; apply is not educational acceptance."
+      ],
+      "limits": []
+    }
+  ],
+  "metrics": {
+    "externalAttempts": 6,
+    "settledCalls": 4,
+    "unknownSpendCalls": 2,
+    "knownInputTokens": 23265,
+    "knownOutputTokens": 2963,
+    "unknownReservedInputTokens": 43604,
+    "unknownReservedOutputTokens": 16384,
+    "unknownPricingReceipts": 6,
+    "truncatedResponses": 0,
+    "completeSTOPReplies": 4,
+    "providerErrors": [
+      "network_error",
+      "network_error"
+    ],
+    "fallbackDispatches": 1,
+    "repairCalls": 0,
+    "verificationCalls": 0,
+    "caseLatencyMs": {
+      "median": 11129,
+      "maximum": 21329
+    },
+    "upstreamLatencyMs": {
+      "median": 7812,
+      "maximum": 10551
+    }
+  },
+  "naturalAcceptedRepairVerificationApplyWitness": false,
+  "productionConfigurationChanged": false
+}

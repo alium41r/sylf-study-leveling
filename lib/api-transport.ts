@@ -69,3 +69,25 @@ export async function apiFetch(input: string, init?: RequestInit): Promise<Respo
   }
   return fetch(url, { ...init, headers });
 }
+
+/** Bound connection AND body reads. A timeout is an uncertain acknowledgment;
+ * callers with durable mutations must retry their original request identity. */
+export async function fetchWithTimeout(request: typeof fetch, input: RequestInfo | URL, init?: RequestInit, timeoutMs = 15_000): Promise<Response> {
+  const controller = new AbortController();
+  const cancel = () => controller.abort();
+  if (init?.signal?.aborted) cancel();
+  init?.signal?.addEventListener("abort", cancel, { once: true });
+  let timer: ReturnType<typeof setTimeout>;
+  const deadline = new Promise<Response>((_resolve, reject) => {
+    timer = setTimeout(() => { cancel(); reject(new Error("Request timed out")); }, timeoutMs);
+  });
+  try {
+    return await Promise.race([deadline, (async () => {
+      const response = await request(input, { ...init, signal: controller.signal });
+      const body = await response.text();
+      return new Response(response.status === 204 ? null : body, { status: response.status, headers: response.headers });
+    })()]);
+  } finally {
+    clearTimeout(timer!); init?.signal?.removeEventListener("abort", cancel);
+  }
+}

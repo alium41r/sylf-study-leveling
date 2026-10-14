@@ -28,7 +28,8 @@
     "android:run:mock": "npm run android:sync:mock && cap run android",
     "planner:worker:build": "node scripts/build-planner-worker.mjs",
     "planner:worker": "node dist/planner-worker/main.js",
-    "planner:dev": "npm run planner:worker:build && node scripts/dev-planner.mjs"
+    "planner:dev": "npm run planner:worker:build && node scripts/dev-planner.mjs",
+    "typecheck:engine": "tsc -p tsconfig.pixel-engine.json"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.1",

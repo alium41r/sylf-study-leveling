@@ -1,0 +1,15 @@
+{
+  "status": "PENDING",
+  "protocolVersion": "2026-10-09-step6-controlled-diagnostics-v2",
+  "independentLabelSignoff": "initial-block/label-signoff.json",
+  "paidAuthorization": "initial-block/approval-template.json",
+  "executionMockPreflightEvidence": "initial-block/evidence/preflight.json",
+  "approvedMaximumDispatches": 0,
+  "approvedMaximumRecoveries": 0,
+  "approvedMaximumSpendUsd": 0,
+  "primaryAssessor": null,
+  "secondAssessor": null,
+  "notes": [
+    "Only eight reasoning and twelve independent-review cases are in scope; later diagnostic labels and gates are deferred."
+  ]
+}

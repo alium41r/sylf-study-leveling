@@ -1,0 +1,19 @@
+{
+  "method": "Exact runtime system-instruction UTF-8 bytes from pre-Changeset-2 source and current source; not provider token counts. No evidence omitted and no model calls.",
+  "beforeSourceSha256": "59cd5d65c1e84cc3e4540892f9c0e12774d6b2b3531db481f2e6b0ef5261da41",
+  "afterSourceSha256": "b037ea8b85d3d40511ff9525d9c9a5717ad3bf61243cdacdac3d3254528d5c0a",
+  "metrics": [
+    {
+      "name": "qualityInstruction",
+      "beforeUtf8Bytes": 7142,
+      "afterUtf8Bytes": 4071,
+      "reductionPercent": 42.9991598991879
+    },
+    {
+      "name": "verificationInstruction",
+      "beforeUtf8Bytes": 7935,
+      "afterUtf8Bytes": 4609,
+      "reductionPercent": 41.91556395715186
+    }
+  ]
+}

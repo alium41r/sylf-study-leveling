@@ -12,7 +12,7 @@ import CompanionReview from "@/app/components/landing/companion/CompanionReview"
 import JourneyCompanion, {
   type JourneyCompanionHandle,
 } from "@/app/components/landing/companion/JourneyCompanion";
-import { setPixelCompanionVariant } from "@/app/components/landing/companion/pixel-preview";
+import { setPixelCompanionVariant } from "./fixtures/retired-pixel-preview";
 
 // Router prefetch timers are independent of the companion timeline under test.
 vi.mock("next/link", () => ({
@@ -131,34 +131,16 @@ it.each(["base", "eye", "reaction", "pause"])(
 );
 
 it.each(["pixel", "pixel-layered"] as const)(
-  "switching to %s cancels playback and leaves existing controls usable",
+  "the retired %s flag never reinstates character pixels in the study",
   (variant) => {
     const { container } = render(<CompanionReview />);
     play();
     advance(1400);
-    advance(800);
     act(() => setPixelCompanionVariant(variant));
     act(() => vi.runAllTicks());
-    expect(screen.queryByText("Play SVG reaction sequence")).toBeNull();
-    expect(actor(container)).toHaveAttribute("data-sylf-companion", "pixel");
-    expect(actor(container)).not.toHaveAttribute("data-svg-sequence");
-    expect(vi.getTimerCount()).toBe(0);
-    if (variant === "pixel-layered") {
-      fireEvent.click(screen.getByText("Test blink"));
-      advance(100);
-      expect(
-        actor(container).querySelector("[data-pixel-expression]")
-      ).toHaveAttribute("data-pixel-expression", "blink");
-      advance(140);
-      expect(
-        actor(container).querySelector("[data-pixel-expression]")
-      ).toHaveAttribute("data-pixel-expression", "neutral");
-    }
-    act(() => setPixelCompanionVariant("svg"));
-    expect(actor(container)).toHaveAttribute("data-state", "IDLE");
-    expect(
-      actor(container).querySelector('[data-part="eyes"]')
-    ).not.toHaveAttribute("data-blink");
+    expect(actor(container)).toHaveAttribute("data-sylf-companion", "original");
+    expect(actor(container).querySelector('[data-pixel-layer]')).toBeNull();
+    expect(screen.queryByText('Layered pixel companion')).toBeNull();
   }
 );
 

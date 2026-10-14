@@ -1,0 +1,2 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/login/page.tsx app/register/page.tsx app/components/OAuthButtons.tsx app/components/auth/AuthSplitLayout.tsx app/components/auth/AuthHeader.tsx app/components/auth/ObservatoryScene.tsx app/components/auth/ObservatoryIllustration.tsx __tests__/auth/auth-experience.test.tsx

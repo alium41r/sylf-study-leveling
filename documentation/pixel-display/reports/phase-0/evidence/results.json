@@ -1,0 +1,159 @@
+{
+  "description": "Phase 0 verification evidence for the Sylf Pixel Display. Recorded from the development surface on 2026-10-07. Commands and observations are recorded as run; visual captures live beside this file.",
+  "date": "2026-10-07",
+  "phase": 0,
+
+  "gates": {
+    "typecheck": {
+      "command": "npx tsc --noEmit",
+      "result": "clean",
+      "errors": 0,
+      "note": "No errors anywhere in the repository, including the new pixel-display tree. See typecheck.log."
+    },
+    "lint": {
+      "command": "npx eslint lib/pixel-display app/dev proxy.ts",
+      "result": "clean",
+      "errors": 0,
+      "warnings": 0
+    },
+    "tests": {
+      "command": "npm run test -- --run __tests__/pixel-display",
+      "files": 8,
+      "tests": 115,
+      "failed": 0,
+      "note": "See tests.log for the per-file breakdown."
+    },
+    "build": {
+      "command": "npm run build",
+      "result": "success",
+      "note": "89 static pages generated. /dev/pixel-display reported as dynamic (server-rendered on demand)."
+    },
+    "production_inaccessibility": {
+      "command": "curl -s -o body -w '%{http_code}' http://localhost:3111/dev/pixel-display",
+      "status": 404,
+      "body_bytes": 9,
+      "dev_control_markers_found": 0,
+      "other_routes_checked": {
+        "/": 200,
+        "/login": 200,
+        "/companion-prototype": 200,
+        "/dev": 404,
+        "/dev/anything": 404
+      }
+    }
+  },
+
+  "pre_existing_failures": {
+    "note": "A full-suite run reports 43 failures across 14 files in unrelated domains (ai, planner, auth, economy, settings, security, surface, mobile). These are NOT caused by this work. Verified by stashing the only tracked file this phase changed (proxy.ts) and re-running three of the failing suites: identical failures with and without the change.",
+    "unrelated_domains": [
+      "__tests__/ai/*",
+      "__tests__/planner/*",
+      "__tests__/auth/account-settings.test.ts",
+      "__tests__/economy/cognitive-stats.test.ts",
+      "__tests__/settings/system-achievements-api.test.ts",
+      "__tests__/security/s4-ai-tool-clamps.test.ts",
+      "__tests__/surface/shop-surface.test.ts",
+      "__tests__/mobile/settings-navigation.test.tsx"
+    ]
+  },
+
+  "runtime_behaviour": {
+    "method": "Development probe read from a real browser session against `next dev`.",
+    "automatic_blink": {
+      "policy": "Full motion profile",
+      "frames_start": 110,
+      "frames_after_2_5s": 236,
+      "advanced": true,
+      "settled_running": false
+    },
+    "zero_work_idle": {
+      "policy": "Static motion profile, or system reduced-motion",
+      "frames_at_settle": 237,
+      "frames_after_further_2s": 237,
+      "frozen": true,
+      "scheduled_work_readout": "none",
+      "runtime_readout": "active",
+      "note": "The runtime reports 'active' (a session exists) while scheduling nothing at all. Both states are shown live in the readout."
+    },
+    "explicit_stop": {
+      "frames_at_stop": 224,
+      "frames_after_2_5s": 224,
+      "frozen": true,
+      "scheduled_work_readout": "none"
+    },
+    "direct_pixel_edit": {
+      "cell": [8, 43],
+      "lit_before": 299,
+      "lit_after_click": 300,
+      "survives_four_content_repaints": true,
+      "note": "Painted through the viewer overlay layer, which is composited after content. An edit is NOT part of the character's authored data."
+    },
+    "out_of_bounds_write": {
+      "coordinate": [48, 0],
+      "returned": false,
+      "framebuffer_changed": false
+    }
+  },
+
+  "presentation_candidates": {
+    "logical_resolution": 48,
+    "resolutions_compared": [32, 40, 48, 64],
+    "cell_gap": 0.12,
+    "inactive_opacity": 0.0,
+    "lit_opacity": 1.0,
+    "character_fill": 0.63,
+    "backdrop": "#0b1220",
+    "backdrops_compared": ["#0b1220", "#05070d", "#000000"]
+  },
+
+  "device_pixel_handling": {
+    "browser_measurement": {
+      "device_pixel_ratio": 1,
+      "css_size_px": 458,
+      "backing_store_px": 458,
+      "device_px_per_cell": 9.542
+    },
+    "note": "The connected browser reports DPR 1, so a live check at 2x/3x was not possible. Snapping to whole device pixels is covered by canvas-renderer.test.ts at devicePixelRatio 1, 2 and 3, including a 110 px slot where naive maths would produce fractional edges.",
+    "unverified": ["Live rendering above DPR 1 (automated coverage only)"]
+  },
+
+  "visual_captures": [
+    {
+      "file": "phase0-1440-dark-full.png",
+      "viewport": "1440x1200",
+      "device_scale_factor": 2,
+      "mode": "dark",
+      "accent": "default",
+      "shows": "Primary display, all four resolutions compared at identical art and fill, readouts, controls"
+    },
+    {
+      "file": "phase0-820-dark-full.png",
+      "viewport": "820x1100",
+      "mode": "dark",
+      "accent": "default",
+      "shows": "Single-column layout; resolution comparison wraps to 3+1"
+    },
+    {
+      "file": "phase0-390-dark-full.png",
+      "viewport": "390x900",
+      "mode": "dark",
+      "accent": "default",
+      "shows": "Mobile layout; resolution comparison 2x2; no horizontal overflow"
+    },
+    {
+      "file": "phase0-390-light-accent-full.png",
+      "viewport": "390x900",
+      "mode": "light",
+      "accent": "#0f766e",
+      "shows": "Light mode with a custom accent; the matrix keeps its dark screen by design while surrounding UI uses semantic tokens"
+    }
+  ],
+
+  "visual_findings": {
+    "resolution": "At 32 the eye ink merges and the face stops reading. At 40 it is legible but tight. At 48 the silhouette, eyes and ground all read clearly. At 64 shading is richest but each cell is small at real card sizes.",
+    "gap": "0.12 reads as an ordered matrix of lit squares without resembling a debugging overlay. Above ~0.25 the cells separate into a dotted grid and the character stops reading as a solid form.",
+    "inactive_cells": "0.0 keeps the display clean and premium. Visible inactive cells reintroduced a graph-paper feel at every value tried.",
+    "fill": "0.63 leaves deliberate margin above the sprout and below the ground. Above ~0.75 the leaves approach the top edge; below ~0.5 the character floats in the matrix.",
+    "backdrop": "Deep navy #0b1220 (sampled from the reference) reads as a powered screen. OLED black #000000 reads as a hole and loses the impression of a physical display."
+  }
+}

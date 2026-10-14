@@ -199,16 +199,10 @@ export function QuestsTab() {
       {/* Action Header */}
       <div className="mb-6 flex flex-wrap justify-between items-center gap-2">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className={styles.eyebrowDot} />
-            <span className={styles.eyebrow}>
-              Scholar Tasks
-            </span>
-          </div>
-          <h2 className={styles.title}>
+          <h1 className={styles.title}>
             <QuestEmblemIcon size={24} className="text-accent-primary shrink-0" />
-            <span>Quest <em>Log</em></span>
-          </h2>
+            <span>Objectives</span>
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           {isSelectMode ? (
@@ -319,7 +313,7 @@ export function QuestsTab() {
             </div>
             <h3 className={styles.emptyTitle}>No Active Quests</h3>
             <p className={styles.emptySubtitle}>
-              The System has not issued any quests yet. Establish an Objective to generate quests or dispatch a custom quest.
+              Sylvie has not issued any quests yet. Establish an Objective to generate quests or dispatch a custom quest.
             </p>
             <button
               type="button"

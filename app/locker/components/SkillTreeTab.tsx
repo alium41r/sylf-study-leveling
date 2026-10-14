@@ -26,7 +26,7 @@ import {
 import {
   QuestEmblemIcon,
   SystemInsightsIcon,
-  SystemApertureIcon,
+  SylvieIcon,
   StreakFlameIcon,
   FocusClockIcon,
 } from "@/app/components/icons";
@@ -469,7 +469,7 @@ export function SkillTreeTab() {
                   </>
                 ) : (
                   <>
-                    <SystemApertureIcon size={14} />
+                    <SylvieIcon size={14} />
                     <span>Compile Syllabus (AI)</span>
                   </>
                 )}

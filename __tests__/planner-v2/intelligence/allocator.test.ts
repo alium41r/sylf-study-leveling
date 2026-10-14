@@ -51,3 +51,21 @@ describe('deterministic educational allocation',()=>{
  });
  it('does not invent splits or split protected work and rejects adjacent micro-chunks',()=>{const f=planningFixture([90],[30,30,30]);expect(expandDeclaredSplits(f.snapshot,f.envelope).splits).toEqual([]);f.snapshot.plans[0].blueprint.activities[0].splitPoints=[{afterMinutes:30,completionCriterion:'A useful output'},{afterMinutes:32,completionCriterion:'Another output'}];expect(()=>expandDeclaredSplits(f.snapshot,f.envelope)).toThrow(/bounded timeboxes/);expect(expandDeclaredSplits(f.snapshot,f.envelope,new Set(['physics/work_0'])).splits).toEqual([]);});
 });
+
+it('explains indivisible bounds from exact hard-valid dates rather than aggregate free time',()=>{
+ const f=planningFixture([80],[120,50,120]);
+ f.snapshot.plans[0].blueprint.activities[0].learningWindow={anchorActivityId:'external_anchor',minimumGapDays:1,maximumGapDays:1,strength:'HARD',reason:'Exact accepted window'};
+ f.facts.externalActivities=[{ref:'external_anchor',date:dateAt(0),available:true,contentDigest:digest()}];
+ let constraints:import('@/lib/planner/v2/intelligence/allocator').BindingConstraint[]=[];
+ const explained=allocateLearning(f.snapshot,f.envelope,f.facts,{onBindingConstraints:value=>{constraints=value;}});
+ expect(explained).toEqual(allocateLearning(f.snapshot,f.envelope,f.facts));
+ expect(constraints).toMatchObject([{activityRef:'work_0',approvedMinutes:80,capacityChargeMinutes:80,maximumIndivisibleMinutes:50,eligibleDays:[{date:dateAt(1),upperBoundMinutes:50}]}]);
+ expect(constraints[0].eligibleDays).toHaveLength(1);
+});
+it('exposes weekly and per-goal binding capacity, not a fresh daily reservation',()=>{
+ const f=planningFixture([40],[120]);f.envelope.weeklyCeilingMinutes=80;f.facts.weeks[0].otherCommittedMinutes=30;
+ f.envelope.targets[0].perGoalWeeklyCeilingMinutes=60;f.facts.weeks[0].perGoalCommittedMinutes[0].minutes=35;
+ let constraints:import('@/lib/planner/v2/intelligence/allocator').BindingConstraint[]=[];
+ allocateLearning(f.snapshot,f.envelope,f.facts,{onBindingConstraints:value=>{constraints=value;}});
+ expect(constraints[0]).toMatchObject({maximumIndivisibleMinutes:25,eligibleDays:[{dayMinutes:120,weekMinutes:50,goalMinutes:25,upperBoundMinutes:25,remainingAfterPlacementsMinutes:25}]});
+});

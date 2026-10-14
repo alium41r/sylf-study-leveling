@@ -1,3 +1,4 @@
+import { compactProposal } from '../intelligence/compact-blueprint-fixture';
 import { beforeAll, afterAll, afterEach, it, expect, vi } from "vitest";
 import { randomUUID } from "node:crypto";
 import pg from "pg";
@@ -21,7 +22,8 @@ import { RevisionService } from "@/lib/planner/v2/server/revisions";
 import { CompilerCheckpointSchema } from "@/lib/planner/v2/intelligence/schemas/checkpoint";
 import type { CompilerCheckpoint } from "@/lib/planner/v2/intelligence/schemas/checkpoint";
 import { PlannerRevisionV2Schema } from "@/lib/planner/v2/contracts";
-import type { LLMAdapter } from "@/lib/ai/providers/types";
+import { AssistantService } from "@/lib/planner/v2/server/assistant";
+import type { LLMAdapter, NormalizedMessage } from "@/lib/ai/providers/types";
 
 let connection: pg.Client, pool: pg.Pool, db: PlannerDatabase, attempts: AttemptService;
 const owners: number[] = [];
@@ -53,6 +55,12 @@ function proposal(input: ReturnType<typeof JSON.parse>, repaired = false, minute
       return { planRef: p.planRef, blueprint: b };
     }), sharedDependencies: [] as Extract<CompilerCheckpoint["payload"], {stage:"ALLOCATION"}>["blueprints"]["sharedDependencies"] };
 }
+function targetedRepair(input: ReturnType<typeof JSON.parse>, minutes = 30) {
+  return {corrections:input.groundedFindings.map((owned:{planRef:string;finding:{issueId:string;affectedRefs:string[]}})=>{
+    const original=input.context.proposal.blueprints.plans.find((p:{planRef:string})=>p.planRef===owned.planRef).blueprint.activities.find((a:{localId:string})=>owned.finding.affectedRefs.includes(a.localId));
+    return {kind:"ACTIVITY_REPLACE",planRef:owned.planRef,issueIds:[owned.finding.issueId],reason:"Replace the recall gate with independent choice, application and correction",activity:{...original,timeboxMinutes:minutes,effort:[minutes,minutes,minutes],completionCriterion:"Choose and apply the circuit law independently, then correct each method error."}};
+  })};
+}
 function reviewed(input: ReturnType<typeof JSON.parse>, blocking = false, preference = false) {
   return { plans: input.goals.map((g: { planRef: string }, i: number) => ({ planRef: g.planRef, issues: blocking ? [{ issueId: `criterion_${i + 1}`, category: "WEAK_CRITERION", severity: "BLOCKING", affectedRefs: [`method_${i + 1}`], basis: preference ? "PREFERENCE" : "CONCRETE_VIOLATION",
     grounds: [{ ref: `${g.planRef}/goal`, excerpt: "Solve electricity questions confidently" }, { ref: `${g.planRef}/activity/method_${i + 1}`, excerpt: "State the relevant law." }],
@@ -63,14 +71,14 @@ function verified(input: ReturnType<typeof JSON.parse>, result = "RESOLVED") {
   return { plans: input.goals.map((g: { planRef: string }, i: number) => ({ planRef: g.planRef,
     resolutions: input.repairIssueIds.filter((id: string) => id === `criterion_${i + 1}`).map((issueId: string) => ({ issueId, result,
       explanation: result === "RESOLVED" ? "The repaired criterion checks independent application in the actual allocated activity" : "The criterion still does not test independent application",
-      grounds: [{ ref: `${g.planRef}/activity/method_${i + 1}`, excerpt: input.proposal.blueprints.plans[i].blueprint.activities[0].completionCriterion }] })), newIssues: [] })) };
+      grounds: [{ ref: `${g.planRef}/activity/method_${i + 1}`, excerpt: input.proposal.blueprints.plans[i].blueprint.activities.find((a:{localId:string})=>a.localId===`method_${i+1}`).completionCriterion }] })), newIssues: [] })) };
 }
 const signal = () => new AbortController().signal;
-function compiler(reply: (input: ReturnType<typeof JSON.parse>, n: number) => unknown | Promise<unknown> = input => input.stage === "REVIEW" ? reviewed(input) : proposal(input)) {
+function compiler(reply: (input: ReturnType<typeof JSON.parse>, n: number, messages: NormalizedMessage[]) => unknown | Promise<unknown> = input => input.stage === "REVIEW" ? reviewed(input) : proposal(input)) {
   let calls = 0;
   const service = new PlannerCompilerService(attempts, { provider: { adapter: () => ({ generateResponse: async messages => {
-    const input = JSON.parse(messages[0].content!), value = await reply(input, ++calls);
-    return { text: JSON.stringify(value), finishReason: "STOP" as const, usage: { promptTokens: 150, completionTokens: 100, totalTokens: 250 } };
+    const input = JSON.parse(messages[0].content!), value = await reply(input, ++calls, messages);
+    return { text: JSON.stringify(input.stage==='BLUEPRINT'||input.stage==='ADAPTATION'?compactProposal(value):value), finishReason: "STOP" as const, usage: { promptTokens: 150, completionTokens: 100, totalTokens: 250 } };
   } }) as LLMAdapter } }); return { service, calls: () => calls };
 }
 async function stored(q: Awaited<ReturnType<typeof queue>>) { return db.coordinated(q.attempt.ownerId, sql => loadAttempt(sql, q.attempt.ownerId, q.attempt.attemptId)); }
@@ -86,7 +94,7 @@ it("seals a known-scope candidate after independent review with two calls and no
   await c.service.run(q.token, signal()); expect(c.calls()).toBe(2); expect(await candidates(f.ownerId)).toBe(1);
 });
 it("one named repair is independently verified on its actual new allocation before sealing", async () => {
-  const f = await fixture(), q = await queue(f), c = compiler(input => input.stage === "REVIEW" ? reviewed(input, true) : input.stage === "REPAIR" ? proposal(input, true, 20) : input.stage === "VERIFICATION" ? verified(input) : proposal(input));
+  const f = await fixture(), q = await queue(f), c = compiler(input => input.stage === "REVIEW" ? reviewed(input, true) : input.stage === "REPAIR" ? targetedRepair(input, 20) : input.stage === "VERIFICATION" ? verified(input) : proposal(input));
   await c.service.run(q.token, signal()); const { attempt, payload } = await stored(q), checkpoint = CompilerCheckpointSchema.parse(payload.checkpoint);
   expect(attempt.state).toBe("SUCCEEDED"); expect(c.calls()).toBe(4); expect(checkpoint).toMatchObject({ repairs: 1, repairIssueIds: ["criterion_1"], payload: { stage: "VERIFICATION", reviewSupport: { phase: "VERIFIED" } } });
   if (!("quality" in checkpoint.payload)) throw new Error(); expect(checkpoint.payload.quality[0].report).toMatchObject({ status: "PASSED", issues: [{ issueId: "criterion_1", resolution: "REPAIRED", verification: { result: "RESOLVED" } }] });
@@ -99,7 +107,7 @@ it("vague more-practice preference cannot add workload, trigger repair or block 
   if (!("quality" in checkpoint.payload)) throw new Error(); expect(checkpoint.payload.quality[0].report.issues[0].severity).toBe("ADVISORY"); expect(checkpoint.payload.allocation.report.committedMinutes).toBe(30);
 });
 it("an unresolved exact verification remains unconfirmable with no second repair", async () => {
-  const f = await fixture(), q = await queue(f), c = compiler(input => input.stage === "REVIEW" ? reviewed(input, true) : input.stage === "REPAIR" ? proposal(input, true) : input.stage === "VERIFICATION" ? verified(input, "UNRESOLVED") : proposal(input));
+  const f = await fixture(), q = await queue(f), c = compiler(input => input.stage === "REVIEW" ? reviewed(input, true) : input.stage === "REPAIR" ? targetedRepair(input) : input.stage === "VERIFICATION" ? verified(input, "UNRESOLVED") : proposal(input));
   await expect(c.service.run(q.token, signal())).rejects.toMatchObject({ detail: { code: "QUALITY_BLOCKED", stage: "VERIFICATION" } });
   expect(await candidates(f.ownerId)).toBe(0); const before = c.calls(); await expect(c.service.run(q.token, signal())).rejects.toMatchObject({ detail: { code: "QUALITY_BLOCKED" } }); expect(c.calls()).toBe(before);
 });
@@ -123,7 +131,7 @@ it("takeover resumes a cleared review without model calls or deadline renewal", 
   expect(c.calls()).toBe(2); expect((await stored(q)).attempt.budget.executionDeadlineAt).toBe(deadline); expect(await candidates(f.ownerId)).toBe(1);
 });
 it("takeover uses an accepted saved repair instead of repeating the repair call", async () => {
-  const f = await fixture(), q = await queue(f), c = compiler(input => input.stage === "REVIEW" ? reviewed(input, true) : input.stage === "REPAIR" ? proposal(input, true) : input.stage === "VERIFICATION" ? verified(input) : proposal(input));
+  const f = await fixture(), q = await queue(f), c = compiler(input => input.stage === "REVIEW" ? reviewed(input, true) : input.stage === "REPAIR" ? targetedRepair(input) : input.stage === "VERIFICATION" ? verified(input) : proposal(input));
   const save = c.service.learning.saveCheckpoint.bind(c.service.learning); let crashed = false;
   vi.spyOn(c.service.learning, "saveCheckpoint").mockImplementation(async (...args) => { const checkpoint = await save(...args); if (!crashed && "reviewSupport" in checkpoint.payload && checkpoint.payload.reviewSupport?.phase === "REPAIR_ACCEPTED") { crashed = true; throw new Error("Crash after saved repair"); } return checkpoint; });
   await expect(c.service.run(q.token, signal())).rejects.toThrow(/Crash/); expect(c.calls()).toBe(3); await attempts.release(q.token);
@@ -172,7 +180,7 @@ it('an explicit linked retry resumes a failed review on a new root without regen
 it('an explicit linked new root can retry a lost repair while ordinary takeover cannot',async()=>{
  const f=await fixture(),q=await queue(f),first=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?{invalid:true}:proposal(input));
  await expect(first.service.run(q.token,signal())).rejects.toThrow();await attempts.fail(q.token,new DurablePlannerError('PROVIDER_FAILURE','Lost repair response','REPAIR'));
- const next=await retry(f,q.attempt.attemptId),second=compiler(input=>input.stage==='REPAIR'?proposal(input,true):verified(input));await second.service.run(next.token,signal());
+ const next=await retry(f,q.attempt.attemptId),second=compiler(input=>input.stage==='REPAIR'?targetedRepair(input):verified(input));await second.service.run(next.token,signal());
  expect(second.calls()).toBe(2);expect((await stored(next)).attempt.state).toBe('SUCCEEDED');expect(CompilerCheckpointSchema.parse((await stored(next)).payload.checkpoint).repairs).toBe(1);
 });
 it('takeover meters a repeated review when the accepted response was lost before its checkpoint',async()=>{
@@ -181,17 +189,17 @@ it('takeover meters a repeated review when the accepted response was lost before
  await expect(c.service.run(q.token,signal())).rejects.toThrow(/Lost review/);expect(c.calls()).toBe(2);await attempts.release(q.token);const next=await attempts.claim(`review_recovery_${randomUUID()}`,['PLAN']);await c.service.run(next!,signal());expect(c.calls()).toBe(3);expect((await stored(q)).attempt.budget.consumed.modelCalls).toBe(3);
 });
 it('takeover reestablishes verification hold and meters verification whose response was lost',async()=>{
- const f=await fixture(),q=await queue(f),c=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?proposal(input,true):input.stage==='VERIFICATION'?verified(input):proposal(input));
+ const f=await fixture(),q=await queue(f),c=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?targetedRepair(input):input.stage==='VERIFICATION'?verified(input):proposal(input));
  const save=c.service.learning.saveCheckpoint.bind(c.service.learning);let crash=true;vi.spyOn(c.service.learning,'saveCheckpoint').mockImplementation(async(...args)=>{const p=args[1].payload;if(crash&&'reviewSupport' in p&&p.reviewSupport?.phase==='VERIFIED'){crash=false;throw new Error('Lost verification response');}return save(...args);});
  await expect(c.service.run(q.token,signal())).rejects.toThrow(/Lost verification/);expect(c.calls()).toBe(4);await attempts.release(q.token);const next=await attempts.claim(`verification_recovery_${randomUUID()}`,['PLAN']);await c.service.run(next!,signal());expect(c.calls()).toBe(5);expect((await stored(q)).attempt.state).toBe('SUCCEEDED');
 });
 it('repair infeasibility retains its accepted education and feedback without another adaptation',async()=>{
- const f=await fixture(1,30),q=await queue(f),c=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?proposal(input,true,60):proposal(input));
+ const f=await fixture(1,30),q=await queue(f),c=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?targetedRepair(input,60):proposal(input));
  await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'QUALITY_BLOCKED',stage:'REPAIR'}});const checkpoint=CompilerCheckpointSchema.parse((await stored(q)).payload.checkpoint);
  if(!('reviewSupport' in checkpoint.payload))throw new Error();expect(checkpoint.payload.reviewSupport).toMatchObject({phase:'REPAIR_ACCEPTED',repairAllocationFailure:{status:'CAPACITY_SHORTFALL'}});expect(checkpoint.payload.reviewSupport?.acceptedRepair).toContain('independently');const calls=c.calls();await expect(c.service.run(q.token,signal())).rejects.toThrow();expect(c.calls()).toBe(calls);expect(await candidates(f.ownerId)).toBe(0);
 });
 it('new concrete verification blockers cannot publish even when original issues resolve',async()=>{
- const f=await fixture(),q=await queue(f),c=compiler(input=>{if(input.stage==='REVIEW')return reviewed(input,true);if(input.stage==='REPAIR')return proposal(input,true);if(input.stage==='VERIFICATION'){const result=verified(input),finding=reviewed(input,true).plans[0].issues[0];finding.issueId='new_concrete_issue';finding.grounds[1].excerpt=input.proposal.blueprints.plans[0].blueprint.activities[0].completionCriterion;result.plans[0].newIssues=[finding];return result;}return proposal(input);});
+ const f=await fixture(),q=await queue(f),c=compiler(input=>{if(input.stage==='REVIEW')return reviewed(input,true);if(input.stage==='REPAIR')return targetedRepair(input);if(input.stage==='VERIFICATION'){const result=verified(input),finding=reviewed(input,true).plans[0].issues[0];finding.issueId='new_concrete_issue';finding.grounds[1].excerpt=input.proposal.blueprints.plans[0].blueprint.activities[0].completionCriterion;result.plans[0].newIssues=[finding];return result;}return proposal(input);});
  await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'QUALITY_BLOCKED'}});expect(c.calls()).toBe(4);expect(await candidates(f.ownerId)).toBe(0);
 });
 it('publication rejects changes to the reviewed execution date and durable activity identity',async()=>{
@@ -201,7 +209,7 @@ it('publication rejects changes to the reviewed execution date and durable activ
 });
 it('actual supervised compiler failure retains stage and review artifact with zero candidates',async()=>{
  const f=await fixture(),q=await queue(f);await attempts.release(q.token);
- const worker=new PlannerWorker(attempts,createCompilerHandlers(attempts,{provider:{adapter:()=>({generateResponse:async messages=>{const input=JSON.parse(messages[0].content!);return {text:JSON.stringify(input.stage==='REVIEW'?{invalid:true}:proposal(input)),finishReason:'STOP',usage:{promptTokens:150,completionTokens:100,totalTokens:250}};}}) as LLMAdapter}}),()=>{});
+ const worker=new PlannerWorker(attempts,createCompilerHandlers(attempts,{provider:{adapter:()=>({generateResponse:async messages=>{const input=JSON.parse(messages[0].content!);return {text:JSON.stringify(input.stage==='REVIEW'?{invalid:true}:compactProposal(proposal(input))),finishReason:'STOP',usage:{promptTokens:150,completionTokens:100,totalTokens:250}};}}) as LLMAdapter}}),()=>{});
  await worker.tick();for(let i=0;i<500;i++){if((await connection.query('SELECT state FROM "PlannerAttempt" WHERE id=$1',[q.attempt.attemptId])).rows[0].state==='FAILED')break;await new Promise(resolve=>setTimeout(resolve,10));}await worker.shutdown();
  const result=await stored(q);expect(result.attempt.state).toBe('FAILED');expect(result.attempt.checkpoint?.stage).toBe('REVIEW');expect(result.attempt.error?.code).toBe('INVALID_OUTPUT');expect(await candidates(f.ownerId)).toBe(0);
 });
@@ -248,6 +256,142 @@ it('review checkpoint pins the execution identity registry against tampering aft
  await attempts.mutate(q.token,async(sql,attempt,payload)=>{const ids=structuredClone(payload.compilerIdentities!);ids[0].activityKey=randomUUID();await persistAttempt(sql,attempt,attempt,{...payload,compilerIdentities:ids});});await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'STALE_CONTEXT'}});expect(await candidates(f.ownerId)).toBe(0);
 });
 it('insufficient actual verification growth retains the repaired allocation without publishing or another repair',async()=>{
- const f=await fixture(),q=await queue(f),c=compiler(input=>{if(input.stage==='REVIEW')return reviewed(input,true);const p=proposal(input,input.stage==='REPAIR');if(input.stage==='REPAIR'){const original=p.plans[0].blueprint.activities[0];for(let n=0;n<20;n++)p.plans[0].blueprint.activities.push({...original,localId:`specific_method_${n}`,title:`Apply circuit variant ${n}`,instructions:`Analyze the distinct circuit variant ${n}, document its method selection and corrections. ${'Explain the justification in the actual circuit. '.repeat(12)}`,timeboxMinutes:5,effort:{lowMinutes:5,likelyMinutes:5,highMinutes:5}});}return p;});
+ const f=await fixture(),q=await queue(f),c=compiler(input=>{if(input.stage==='REVIEW')return reviewed(input,true);if(input.stage==='REPAIR'){const r=targetedRepair(input),original=r.corrections[0].activity;for(let n=0;n<20;n++)r.corrections.push({...r.corrections[0],kind:'ACTIVITY_ADD',activity:{...original,localId:input.authority.plans[0].additionActivityRefs[n],title:`Apply circuit variant ${n}`,instructions:`Analyze the distinct circuit variant ${n}, document its method selection and corrections. ${'Explain the justification in the actual circuit. '.repeat(12)}`,timeboxMinutes:5,effort:[5,5,5]}});return r;}return proposal(input);});
  await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'BUDGET_EXHAUSTED',stage:'VERIFICATION'}});const checkpoint=CompilerCheckpointSchema.parse((await stored(q)).payload.checkpoint);if(!('reviewSupport' in checkpoint.payload))throw new Error();expect(checkpoint.payload.reviewSupport?.phase).toBe('REPAIRED');expect(checkpoint.payload.allocation.report.status).toBe('FEASIBLE');expect(c.calls()).toBe(3);expect(await candidates(f.ownerId)).toBe(0);
+});
+
+
+it("never publishes an empty fallback review that silently discards a rejected concern",async()=>{
+  const f=await fixture(),q=await queue(f);let reviews=0;
+  const c=compiler(input=>{
+    if(input.stage!=="REVIEW")return proposal(input);
+    if(reviews++)return reviewed(input);
+    const rejected=reviewed(input,true);rejected.plans[0].issues[0].grounds[0].excerpt="Invented required question bank";return {findings:rejected.plans.flatMap((plan:{planRef:string;issues:unknown[]})=>plan.issues.map(finding=>({planRef:plan.planRef,finding})))};
+  });
+  await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:"INVALID_OUTPUT"}});
+  expect(await candidates(f.ownerId)).toBe(0);const {payload}=await stored(q),checkpoint=CompilerCheckpointSchema.parse(payload.checkpoint);
+  expect(checkpoint.repairs).toBe(0);expect(checkpoint.payload).toMatchObject({stage:"REVIEW",reviewSupport:{phase:"REVIEW_PENDING"}});
+  expect(payload.providerGuard?.reviewCompleted).not.toBe(true);
+});
+it("persists grounded withdrawal of an unsupported objection without repair or execution",async()=>{
+  const f=await fixture(),q=await queue(f);let reviews=0;
+  const c=compiler((input,_n,messages)=>{
+    if(input.stage!=="REVIEW")return proposal(input);
+    if(!reviews++){const bad=reviewed(input,true);bad.plans[0].issues[0].grounds[0].excerpt="Unsupported external tutor mandate";return bad;}
+    const feedback=JSON.parse(messages.at(-1)!.content!);expect(feedback.requirements.concerns).toHaveLength(1);
+    expect(feedback.rejectedOutput.kind).toBe("UNTRUSTED_MODEL_OUTPUT");
+    return {...reviewed(input),recovery:[{concernRef:feedback.requirements.concerns[0].concernRef,outcome:"WITHDRAWN",
+      explanation:"No external tutor is required by the accepted goal or actual task; the objection was unsupported.",
+      grounds:[{ref:`${input.goals[0].planRef}/goal`,excerpt:"Solve electricity questions confidently"},
+        {ref:`${input.goals[0].planRef}/activity/method_1`,excerpt:"Solve the target 1 circuit and explain the method."}]}]};
+  });
+  await c.service.run(q.token,signal());const {attempt,payload}=await stored(q),checkpoint=CompilerCheckpointSchema.parse(payload.checkpoint);
+  expect(attempt.state).toBe("SUCCEEDED");expect(c.calls()).toBe(3);expect(checkpoint.repairs).toBe(0);
+  expect(checkpoint.payload).toMatchObject({reviewSupport:{reviewRecovery:{concerns:[{issueId:"criterion_1"}],dispositions:[{outcome:"WITHDRAWN"}]}},quality:[{report:{status:"PASSED",issues:[]}}]});
+  expect(JSON.stringify(checkpoint)).not.toContain("Unsupported external tutor mandate");
+  expect(await candidates(f.ownerId)).toBe(1);expect((await connection.query('SELECT count(*) FROM "Quest" WHERE "userId"=$1',[f.ownerId])).rows[0].count).toBe("0");
+  await c.service.run(q.token,signal());expect(c.calls()).toBe(3);
+});
+it.each([1,2])("headless accepted conversational recommendation reaches generation and independent review for %i owned targets",async count=>{
+  const f=await fixture(count),text='Use one short unaided circuit-method diagnostic.\nStop after “correct, explained and checked” success — retain honest uncertainty.';
+  const assistant=new AssistantService(db,{adapter:()=>({generateResponse:async()=>({text:JSON.stringify({pass:"RESPONSE",response:{kind:"PROPOSAL",message:"A focused diagnostic is appropriate",planRefs:f.created.map((_p,i)=>`plan_${i+1}`),change:text,researchRequested:false},questions:[]}),finishReason:"STOP",usage:{promptTokens:100,completionTokens:100,totalTokens:200}})}) as LLMAdapter});
+  const planIds=f.created.map(p=>p.plan.id),anchor=planIds[0];
+  const conversation=await assistant.respond(f.ownerId,anchor,{key:randomUUID(),text:"Recommend a smaller useful strategy",readPlanIds:planIds,expectedConversationVersion:0,mode:"PLAN_ACTION",researchRequested:false});
+  expect((await connection.query('SELECT count(*) FROM "PlannerAttempt" WHERE "userId"=$1',[f.ownerId])).rows[0].count).toBe("0");
+  const attempt=await assistant.prepare(f.ownerId,anchor,{key:randomUUID(),recommendationId:conversation.recommendationId!,selectedPlanIds:planIds,researchRequested:false});
+  expect(attempt.acceptedRequest.text).toBe(text);
+  const token=await attempts.claim(`handoff_${randomUUID()}`,[attempt.kind]);if(!token||token.attemptId!==attempt.attemptId)throw new Error("Fixture not isolated");
+  const c=compiler(input=>{
+    expect(input.acceptedRequest).toEqual({text,authorization:"PLAN_ACTION"});
+    if(input.stage==="REVIEW"){
+      expect(input.grounding).toContainEqual({ref:"accepted_request",kind:"REQUIREMENT",path:"acceptedRequest.text"});
+      expect(input.proposal.blueprints.plans.every((p:{blueprint:{activities:{instructions:string}[]}})=>p.blueprint.activities[0].instructions===text)).toBe(true);
+      return reviewed(input);
+    }
+    const result=proposal(input);result.plans.forEach((p:{blueprint:{activities:{instructions:string}[]}})=>{p.blueprint.activities[0].instructions=input.acceptedRequest.text;});return result;
+  });
+  await c.service.run(token,signal());expect(c.calls()).toBe(2);
+  const done=await attempts.read(f.ownerId,attempt.attemptId);expect(done.state).toBe("SUCCEEDED");expect(done.budget.consumed.modelCalls).toBe(3);
+  const revisions=(await connection.query('SELECT "v2Artifact" FROM "PlannerRevision" r JOIN "PlannerPlan" p ON p.id=r."planId" WHERE p."userId"=$1',[f.ownerId])).rows;
+  expect(revisions).toHaveLength(count);for(const revision of revisions)expect(revision.v2Artifact.blueprint.activities[0].instructions).toBe(text);
+  expect((await connection.query('SELECT count(*) FROM "Quest" WHERE "userId"=$1',[f.ownerId])).rows[0].count).toBe("0");
+});
+
+it("takeover retains rejected concerns and the original deadline before accepting a grounded withdrawal",async()=>{
+  const f=await fixture(),q=await queue(f);let reviews=0,reservations=0;
+  const original=attempts.reserveCall.bind(attempts);
+  vi.spyOn(attempts,'reserveCall').mockImplementation(async(...args)=>{
+    if(args[1].policy?.purpose==='REVIEW' && ++reservations===2)throw new DurablePlannerError('LEASE_EXPIRED','Simulated stop after saving the rejected concern','REVIEW');
+    return original(...args);
+  });
+  const c=compiler((input,_n,messages)=>{
+    if(input.stage!=='REVIEW')return proposal(input);
+    if(!reviews++){const bad=reviewed(input,true);bad.plans[0].issues[0].grounds[0].excerpt='Unsupported external key';return bad;}
+    const saved=messages.map(m=>JSON.parse(m.content!)).find(m=>m.kind==='REJECTED_REVIEW_CONCERNS');
+    expect(saved.requirements.concerns[0]).toMatchObject({issueId:'criterion_1',rejectedFinding:{grounds:[{excerpt:'Unsupported external key'},{excerpt:'State the relevant law.'}]}});
+    return {...reviewed(input),recovery:[{concernRef:saved.requirements.concerns[0].concernRef,outcome:'WITHDRAWN',explanation:'The accepted task does not require an external key.',
+      grounds:[{ref:`${input.goals[0].planRef}/goal`,excerpt:'Solve electricity questions confidently'},{ref:`${input.goals[0].planRef}/activity/method_1`,excerpt:'Solve the target 1 circuit and explain the method.'}]}]};
+  });
+  await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'LEASE_EXPIRED'}});
+  const stopped=await stored(q),checkpoint=CompilerCheckpointSchema.parse(stopped.payload.checkpoint);
+  expect(checkpoint.payload).toMatchObject({reviewSupport:{phase:'REVIEW_PENDING',reviewRecoveryPending:[{issueId:'criterion_1'}]}});
+  const deadline=stopped.attempt.budget.executionDeadlineAt;await attempts.release(q.token);
+  const next=await attempts.claim(`rejected_concern_takeover_${randomUUID()}`,['PLAN']);expect(next).not.toBeNull();
+  await c.service.run(next!,signal());const accepted=await stored(q);expect(accepted.attempt.state).toBe('SUCCEEDED');
+  expect(accepted.attempt.budget.executionDeadlineAt).toBe(deadline);expect(accepted.attempt.budget.consumed.modelCalls).toBe(3);
+  expect(c.calls()).toBe(3);const result=CompilerCheckpointSchema.parse(accepted.payload.checkpoint);
+  if(!('reviewSupport' in result.payload))throw new Error();expect(result.payload.reviewSupport?.reviewRecoveryPending).toBeUndefined();
+  expect(result.payload.reviewSupport?.reviewRecovery?.dispositions[0].outcome).toBe('WITHDRAWN');
+});
+
+it.each([1,2])('targeted repair preserves untouched education and joint ownership for %s selected Plans',async count=>{
+ const f=await fixture(count),q=await queue(f);let original:Extract<CompilerCheckpoint['payload'],{stage:'ALLOCATION'}>['blueprints'];
+ const c=compiler(input=>{
+  if(input.stage==='BLUEPRINT'){
+   const p=proposal(input);for(const plan of p.plans)plan.blueprint.activities.push({...plan.blueprint.activities[0],localId:`untouched_${plan.planRef}`,instructions:'Given a 12 V supply and 6 ohm resistor, calculate 2 A and check 2 times 6 equals 12.',completionCriterion:'Compute and check the supplied circuit correctly.'});return p;
+  }
+  if(input.stage==='REVIEW'){original=structuredClone(input.proposal.blueprints);return reviewed(input,true);}
+  if(input.stage==='REPAIR')return targetedRepair(input,20);
+  for(const [i,plan] of input.proposal.blueprints.plans.entries())expect(plan.blueprint.activities[1]).toEqual(original.plans[i].blueprint.activities[1]);
+  return verified(input);
+ });
+ await c.service.run(q.token,signal());expect(c.calls()).toBe(4);const {attempt,payload}=await stored(q),checkpoint=CompilerCheckpointSchema.parse(payload.checkpoint);
+ expect(attempt.state).toBe('SUCCEEDED');expect(checkpoint.repairs).toBe(1);expect(await candidates(f.ownerId)).toBe(count);
+ if(!('reviewSupport' in checkpoint.payload))throw new Error();expect(checkpoint.payload.reviewSupport?.repairFormat).toBe('TARGETED_V1');
+ expect(checkpoint.payload.allocation.report.committedMinutes).toBe(count*50);
+});
+it('previously missed serious defects block targeted repair publication after the original issue resolves',async()=>{
+ const f=await fixture(),q=await queue(f),c=compiler(input=>{
+  if(input.stage==='BLUEPRINT'){const p=proposal(input);p.plans[0].blueprint.activities.push({...p.plans[0].blueprint.activities[0],localId:'unreviewed_repetition',instructions:'After independent correct checked success, repeat the same circuit forty times compulsorily.'});return p;}
+  if(input.stage==='REVIEW')return reviewed(input,true);
+  if(input.stage==='REPAIR')return targetedRepair(input);
+  const result=verified(input),issue=reviewed(input,true).plans[0].issues[0];
+  result.plans[0].newIssues=[{...issue,issueId:'missed_excess_work',category:'UNREALISTIC_WORKLOAD',affectedRefs:['unreviewed_repetition'],grounds:[issue.grounds[0],{ref:'plan_1/activity/unreviewed_repetition',excerpt:'repeat the same circuit forty times compulsorily'}],evidence:'The remaining task still forces extensive identical repetition after checked success.',consequence:'Completion of the original repair does not justify the remaining unnecessary work.',requestedResolution:'Remove unsupported compulsory repetition.'}];return result;
+ });
+ await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'QUALITY_BLOCKED',stage:'VERIFICATION'}});expect(await candidates(f.ownerId)).toBe(0);expect(c.calls()).toBe(4);
+ const checkpoint=CompilerCheckpointSchema.parse((await stored(q)).payload.checkpoint);if(!('quality' in checkpoint.payload))throw new Error();
+ expect(checkpoint.payload.quality[0].report.issues).toEqual(expect.arrayContaining([expect.objectContaining({issueId:'criterion_1',resolution:'REPAIRED'}),expect.objectContaining({issueId:'missed_excess_work',severity:'BLOCKING',resolution:'OPEN'})]));
+});
+it('rejects a legacy full-proposal repair response rather than accepting it as targeted corrections',async()=>{
+ const f=await fixture(),q=await queue(f),c=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?proposal(input,true):proposal(input));
+ await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'INVALID_OUTPUT'}});expect(await candidates(f.ownerId)).toBe(0);
+ const checkpoint=CompilerCheckpointSchema.parse((await stored(q)).payload.checkpoint);expect(checkpoint.repairs).toBe(1);
+});
+it('legacy pending repair interpretation fails explicitly and a linked retry uses the new protocol',async()=>{
+ const f=await fixture(),q=await queue(f),c=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?{invalid:true}:proposal(input));
+ await expect(c.service.run(q.token,signal())).rejects.toThrow();
+ await attempts.mutate(q.token,async(sql,attempt,payload)=>{const cp=CompilerCheckpointSchema.parse(payload.checkpoint);if(!('reviewSupport' in cp.payload)||!cp.payload.reviewSupport)throw new Error();delete cp.payload.reviewSupport.repairFormat;await persistAttempt(sql,attempt,{...attempt,checkpoint:{...attempt.checkpoint!,digest:(await import('@/lib/planner/v2/server/database')).hash('checkpoint',cp)}},{...payload,checkpoint:cp});});
+ await expect(c.service.run(q.token,signal())).rejects.toMatchObject({detail:{code:'INVALID_OUTPUT',stage:'REPAIR'}});
+ await attempts.fail(q.token,new DurablePlannerError('INVALID_OUTPUT','Legacy repair requires linked retry','REPAIR'));
+ const next=await retry(f,q.attempt.attemptId),second=compiler(input=>input.stage==='REPAIR'?targetedRepair(input):verified(input));
+ await second.service.run(next.token,signal());expect(second.calls()).toBe(2);expect((await stored(next)).attempt.state).toBe('SUCCEEDED');
+});
+it('targeted correction preserves actual running execution and its durable identity',async()=>{
+ const f=await fixture(),today=await db.coordinated(f.ownerId,async sql=>(await loadExecutionContext(sql,f.ownerId,[await ownedPlan(sql,f.ownerId,f.created[0].plan.id)],f.created[0].intent.intent)).today);
+ const initial=await prepareProposal(db,f.ownerId,[f.created[0].plan.id],specs=>{specs[0].placement.date=today;});await new ApplyService(db).apply(f.ownerId,initial.request);
+ const quest=(await connection.query('SELECT id FROM "Quest" WHERE "userId"=$1',[f.ownerId])).rows[0];await new SessionService(db).start(f.ownerId,quest.id);const before=(await connection.query('SELECT * FROM "Quest" WHERE id=$1',[quest.id])).rows[0],q=await queue(f);
+ const c=compiler(input=>input.stage==='REVIEW'?reviewed(input,true):input.stage==='REPAIR'?targetedRepair(input,20):input.stage==='VERIFICATION'?verified(input):proposal(input));
+ await c.service.run(q.token,signal());expect(c.calls()).toBe(4);expect((await connection.query('SELECT * FROM "Quest" WHERE id=$1',[quest.id])).rows[0]).toEqual(before);
+ const result=(await stored(q)).attempt.result;if(result?.kind!=='REVISIONS')throw new Error();const row=(await connection.query('SELECT "v2Artifact" FROM "PlannerRevision" WHERE id=$1',[result.revisions[0].revisionId])).rows[0];
+ expect(row.v2Artifact.executable.find((s:{activityKey:string})=>s.activityKey===initial.revisions[0].executable[0].activityKey)).toEqual(initial.revisions[0].executable[0]);
 });

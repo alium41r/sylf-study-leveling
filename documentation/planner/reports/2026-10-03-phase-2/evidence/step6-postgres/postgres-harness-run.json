@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "startedAt": "2026-10-05T16:14:38.660Z",
-  "status": "PASSED",
+  "startedAt": "2026-10-08T17:34:05.243Z",
+  "status": "FAILED",
   "database": "generated disposable loopback database",
   "runtime": "native",
   "requiredSkippedTests": 0,
@@ -10,19 +10,17 @@
       "label": "phase1",
       "files": 14,
       "passed": 181,
-      "failed": 0,
+      "failed": 1,
       "requiredSkipped": 0,
       "optionalProviderExcluded": 0,
-      "failures": []
-    },
-    {
-      "label": "current",
-      "files": 17,
-      "passed": 225,
-      "failed": 0,
-      "requiredSkipped": 0,
-      "optionalProviderExcluded": 1,
-      "failures": []
+      "failures": [
+        {
+          "name": "an explicit linked new root can retry a lost repair while ordinary takeover cannot",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/aliumair/Desktop/sylf/__tests__/planner-v2/postgres/compiler-quality.postgres.ts:172:1\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at VitestModuleEvaluator._runInlinedModule (file:///Users/aliumair/Desktop/sylf/node_modules/vitest/dist/module-evaluator.js:206:4)\n    at VitestModuleRunner.directRequest (file:///Users/aliumair/Desktop/sylf/node_modules/vite/dist/node/module-runner.js:1270:59)\n    at VitestModuleRunner.cachedRequest (file:///Users/aliumair/Desktop/sylf/node_modules/vite/dist/node/module-runner.js:1177:73)\n    at VitestModuleRunner.import (file:///Users/aliumair/Desktop/sylf/node_modules/vite/dist/node/module-runner.js:1132:10)"
+          ]
+        }
+      ]
     }
   ],
   "migrations": [
@@ -133,13 +131,14 @@
       "sha256": "db42757a23580d1a59da96fa6aa78d47611a0dd4dc4dff1a637d50830445b7dd"
     }
   ],
-  "schemaDigest": "4f5753252e806f7ab2dd894b8c4ab64e3b0863b63999580f11514b764da678fb",
+  "schemaDigest": "f5fbe318b2134a743ef35624f1b35d4b33e530e87c93fdf8ce2fe63da212d588",
   "runtimeIdentity": {
     "databaseMatches": true,
     "address": "127.0.0.1",
     "version": 180004
   },
   "postgresVersion": 180004,
+  "error": "phase1: required PostgreSQL gate failed (1 failures, 0 required skips).",
   "cleanup": "Disposable server stopped; cluster/container removed.",
-  "finishedAt": "2026-10-05T16:17:13.069Z"
+  "finishedAt": "2026-10-08T17:36:36.524Z"
 }

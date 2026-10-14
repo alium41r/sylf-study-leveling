@@ -3,7 +3,7 @@
   · optimizePackageImports
 
   Creating an optimized production build ...
-✓ Compiled successfully in 36.9s
+✓ Compiled successfully in 25.3s
   Running TypeScript ...
 Failed to type check.
 

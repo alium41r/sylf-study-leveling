@@ -16,6 +16,29 @@
 /** Server-side grace window added on top of wall-clock elapsed time. */
 export const SESSION_GRACE_SECONDS = 60;
 
+export interface StoredStudyTime {
+  durationSeconds?: number | null;
+  durationMinutes?: number | null;
+  executionState?: string | null;
+  startedAt: Date | string;
+  endedAt?: Date | string | null;
+}
+
+/** Accepted time only. Wall-clock age includes pauses/breaks and is not study. */
+export function storedStudySeconds(session: StoredStudyTime): number {
+  const seconds = session.executionState != null ? session.durationSeconds ?? 0
+    : session.durationSeconds || (session.durationMinutes ?? 0) * 60;
+  return Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
+}
+
+/** New timers have an explicit state; retain the existing legacy zombie guard. */
+export function studySessionIsRunning(session: StoredStudyTime, now = Date.now()): boolean {
+  if (session.executionState != null) return session.executionState === "RUNNING";
+  if (session.endedAt) return false;
+  const elapsed = (now - new Date(session.startedAt).getTime()) / 1000;
+  return elapsed >= 0 && (elapsed <= 180 || storedStudySeconds(session) > 0 && elapsed <= 12 * 3600);
+}
+
 /**
  * Server-side timestamp clamping: the claimed duration can never exceed
  * (now - startedAt) plus a small grace window. Prevents client spoofing

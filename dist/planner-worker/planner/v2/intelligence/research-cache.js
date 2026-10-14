@@ -7,7 +7,7 @@ const redis_1 = require("../../../redis");
 const documents_1 = require("../server/documents");
 const database_1 = require("../server/database");
 function researchResultCacheKey(ownerId, intents, sources, extraction) {
-    return `planner:v2:research:owner:${ownerId}:${(0, database_1.hash)("research-cache-v1", { intents, extraction, sources: sources.map(s => ({ location: s.source.location, contentHash: s.source.contentHash, sectionsDigest: (0, database_1.hash)("selected-source-text", s.sections), extraction: s.source.extraction })) })}`;
+    return `planner:v2:research:owner:${ownerId}:${(0, database_1.hash)("research-cache-v2-bound-scope", { intents, extraction, sources: sources.map(s => ({ location: s.source.location, contentHash: s.source.contentHash, sectionsDigest: (0, database_1.hash)("selected-source-text", s.sections), extraction: s.source.extraction })) })}`;
 }
 /** Keep individual values bounded even in the existing in-process fallback. */
 async function boundedResearchCache(key, ttl, load) {

@@ -1,0 +1,65 @@
+{
+  "status": "PASSED_WITH_PRE_EXISTING_BUILD_BLOCKER",
+  "scope": "Only Changeset 1; compact blueprint transport and canonical assembly. Phase 2 educational qualification remains incomplete.",
+  "node": "v26.7.0",
+  "unitFiles": 44,
+  "unitPassed": 582,
+  "unitFailed": 0,
+  "unitRequiredSkipped": 0,
+  "postgres": [
+    {
+      "label": "phase1",
+      "files": 14,
+      "passed": 184,
+      "failed": 0,
+      "requiredSkipped": 0,
+      "optionalProviderExcluded": 0,
+      "failures": []
+    },
+    {
+      "label": "current",
+      "files": 17,
+      "passed": 225,
+      "failed": 0,
+      "requiredSkipped": 0,
+      "optionalProviderExcluded": 1,
+      "failures": []
+    }
+  ],
+  "postgresFinalSourceDrift": [],
+  "staticChecks": [
+    {
+      "name": "full-typecheck",
+      "status": "PASSED",
+      "exitCode": 0
+    },
+    {
+      "name": "worker-build",
+      "status": "PASSED",
+      "exitCode": 0
+    },
+    {
+      "name": "lint",
+      "status": "PASSED",
+      "exitCode": 0
+    },
+    {
+      "name": "isolated-typecheck",
+      "status": "PASSED",
+      "exitCode": 0
+    }
+  ],
+  "productionBuild": {
+    "status": "PRE_EXISTING_ROUTE_EXPORT_BLOCKER",
+    "bundleCompiled": true,
+    "blocker": "Unchanged app/api/acoustics/route.ts export CURATED_SOUNDSCAPES",
+    "sharedGeneratedFilesModified": false,
+    "changedDuringRun": []
+  },
+  "frozenContracts": 12,
+  "existingExecutionServerSchemaAndApiFilesUnchanged": 217,
+  "historicalEvidencePreserved": true,
+  "liveModelCalls": 0,
+  "changesets2And3Started": false,
+  "phase3Started": false
+}

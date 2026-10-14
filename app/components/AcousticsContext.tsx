@@ -81,7 +81,7 @@ export function AcousticsProvider({ children }: { children: React.ReactNode }) {
     if (activeTrack) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: activeTrack.title,
-        artist: `The System • ${activeTrack.frequency || activeTrack.category}`,
+        artist: `Sylf • ${activeTrack.frequency || activeTrack.category}`,
         album: "Neural Study Entrainment",
         artwork: [
           { src: "/icon-192.png", sizes: "192x192", type: "image/png" },

@@ -1,0 +1,92 @@
+[
+  {
+    "name": "opened saved three-frame animation",
+    "editor": {
+      "hash": 1554284149,
+      "lit": 20
+    },
+    "preview": {
+      "hash": 3467567276,
+      "lit": 1
+    },
+    "baseId": "user:audit-line",
+    "previewFrames": 3,
+    "documentFrames": 3
+  },
+  {
+    "name": "deleted two frames but preview keeps old three",
+    "editor": {
+      "hash": 1554284149,
+      "lit": 20
+    },
+    "preview": {
+      "hash": 3467567276,
+      "lit": 1
+    },
+    "baseId": "user:audit-line",
+    "previewFrames": 3,
+    "documentFrames": 1
+  },
+  {
+    "name": "edited same name; preview still old",
+    "editor": {
+      "hash": 3116454301,
+      "lit": 40
+    },
+    "preview": {
+      "hash": 3467567276,
+      "lit": 1
+    },
+    "baseId": "user:audit-line",
+    "previewFrames": 3,
+    "documentFrames": 1
+  },
+  {
+    "name": "rename forces preview to accept latest drawing",
+    "editor": {
+      "hash": 3116454301,
+      "lit": 40
+    },
+    "preview": {
+      "hash": 1216909753,
+      "lit": 54
+    },
+    "baseId": "user:audit-pattern",
+    "previewFrames": 1,
+    "documentFrames": 1
+  },
+  {
+    "name": "new same-name dot editor changes preview does not",
+    "editor": {
+      "hash": 886670384,
+      "lit": 41
+    },
+    "preview": {
+      "hash": 1216909753,
+      "lit": 54
+    },
+    "baseId": "user:audit-pattern",
+    "previewFrames": 1,
+    "documentFrames": 1
+  },
+  {
+    "name": "another rename refreshes preview",
+    "editor": {
+      "hash": 886670384,
+      "lit": 41
+    },
+    "preview": {
+      "hash": 1225253025,
+      "lit": 58
+    },
+    "baseId": "user:audit-pattern-x",
+    "previewFrames": 1,
+    "documentFrames": 1
+  },
+  {
+    "name": "static drawing saved",
+    "status": 200,
+    "slug": "audit-pattern",
+    "sourceLit": 41
+  }
+]

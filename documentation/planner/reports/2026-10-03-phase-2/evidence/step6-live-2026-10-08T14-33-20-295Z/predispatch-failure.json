@@ -1,0 +1,6 @@
+{
+  "status": "FAILED_BEFORE_DISPATCH",
+  "externalAttempts": 0,
+  "reason": "Unsupported harness argument combination: live-review-temperature 0.2 is supported only with generation 0.7; no disposable database or external call started.",
+  "command": "node scripts/test-planner-v2-phase2-live.mjs --native-bin <approved local runtime> --live-non-gemini --live-temperature 0.2 --live-review-temperature 0.2"
+}

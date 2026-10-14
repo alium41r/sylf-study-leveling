@@ -87,7 +87,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     await tx.systemMessage.create({
       data: {
         userId: session.userId,
-        content: `[TIMELINE COMPRESSED]\n\nGoal: "${goal.title}"\nNew Timeline: ${newWeeks} weeks\nNew Effort Level: ${newEffortLevelStr}\n\nThe System has re-evaluated your timeline. Please talk to The System in the chat to regenerate your quests.`,
+        content: `[TIMELINE COMPRESSED]\n\nGoal: "${goal.title}"\nNew Timeline: ${newWeeks} weeks\nNew Effort Level: ${newEffortLevelStr}\n\nSylvie has re-evaluated your timeline. Please talk to Sylvie in the chat to regenerate your quests.`,
         type: "WARNING",
       },
     });

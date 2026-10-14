@@ -123,7 +123,7 @@ const progressionShots: ProductShot[] = [
   },
   {
     label: "Collection",
-    title: "Collection · The System collection",
+    title: "Collection · Sylf collection",
     file: "collection view",
     alt: "Sylf collection view showing owned items, styles, personal images, and local tracks",
   },
@@ -131,19 +131,19 @@ const progressionShots: ProductShot[] = [
 const aiShots: ProductShot[] = [
   {
     label: "AI chat",
-    title: "The System · AI conversation",
+    title: "Sylvie · AI conversation",
     file: "ai chat view",
     alt: "Sylf AI chat view showing study support conversations, workspace tools, and syllabus breakdown",
   },
   {
     label: "Planner",
-    title: "The System · AI study planner",
+    title: "Sylvie · AI study planner",
     file: "planner view",
     alt: "Sylf AI study planner view with adaptive syllabus tracking and quest generation",
   },
   {
     label: "Calendar",
-    title: "The System · Study calendar",
+    title: "Calendar · Study schedule",
     file: "calender view",
     alt: "Sylf study calendar view with schedule planning and monthly study stats",
   },

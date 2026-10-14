@@ -174,6 +174,7 @@ export function FocusPartyRoom() {
         username: profile?.username || `user_${p.userId}`,
         hunterRank: profile?.hunterRank,
         characterConfig: profile?.characterConfig,
+        companion: profile?.companion,
         avatarUrl: profile?.avatarUrl,
         timerState: state,
         liveSeconds,

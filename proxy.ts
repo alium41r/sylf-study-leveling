@@ -11,6 +11,17 @@ import { isPrelaunchMode } from "./lib/prelaunch";
 
 const GUEST_ONLY_ROUTES = ["/login", "/register"];
 
+/**
+ * Development-only route prefixes. These surfaces exist to validate work in
+ * progress and must never be reachable in a production deployment.
+ *
+ * The route itself also refuses to render in production (a server-side
+ * `notFound()`), and this check is deliberately independent of that one: it is
+ * evaluated per request, so a prerendered or cached artifact cannot expose the
+ * surface even if the page-level gate were bypassed.
+ */
+const DEV_ONLY_ROUTE_PREFIXES = ["/dev"];
+
 const PROTECTED_ROUTES = [
   "/dashboard",
   "/timer",
@@ -29,6 +40,17 @@ const PROTECTED_ROUTES = [
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+
+  // Development-only surfaces are invisible in production: answer as if the
+  // route did not exist rather than redirecting to it, which would confirm it.
+  if (
+    process.env.NODE_ENV === "production" &&
+    DEV_ONLY_ROUTE_PREFIXES.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`)
+    )
+  ) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
 
   const isGuestRoute = GUEST_ONLY_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)

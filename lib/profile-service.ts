@@ -1,3 +1,5 @@
+import { selectedCompanionsForUsers } from "./pixel-companion-service";
+import { storedStudySeconds, studySessionIsRunning } from "./session-math";
 import { prisma } from "@/lib/prisma";
 import { getRelationship, isVisible } from "@/lib/privacy";
 import { Relationship } from "@/lib/privacy-types";
@@ -235,13 +237,15 @@ export async function getProfileDossier(
       ? prisma.studySession.findMany({
           where: {
             userId: targetUser.id,
-            startedAt: { gte: todayStart },
+            OR: [{ executionState: null, startedAt: { gte: todayStart } },
+              { executionState: { not: null }, executionContext: { path: ["actualCivilDate"], equals: TimezoneService.getUserLocalDate(targetTimezone) } }],
           },
           select: {
             durationMinutes: true,
             durationSeconds: true,
             startedAt: true,
             endedAt: true,
+            executionState: true,
           },
         }).catch(() => [])
       : Promise.resolve([]),
@@ -253,6 +257,13 @@ export async function getProfileDossier(
   const now = new Date();
 
   for (const s of todaySessions) {
+    if (s.executionState != null) {
+      const seconds = storedStudySeconds(s);
+      todayStudySeconds += seconds;
+      if (s.executionState === "ENDED") completedTodaySeconds += seconds;
+      if (studySessionIsRunning(s, now.getTime()) && !activeSessionStartedAt) activeSessionStartedAt = s.startedAt.toISOString();
+      continue;
+    }
     if (!s.endedAt) {
       // Active (unended) session: count its already-flushed stored seconds.
       // Live = freshly started (≤3 min) OR has flushed progress and is not a
@@ -419,8 +430,10 @@ export async function getProfileDossier(
       const showAchievements = isSelf || isVisible(privacy.showAchievements, baseRelationship);
       const showOnline = isSelf || isVisible(privacy.showOnlineStatus, baseRelationship);
 
+      const companions = await selectedCompanionsForUsers([targetUser.id], viewerId, baseRelationship === Relationship.FRIEND || isSelf ? "friends" : "public", false);
       finalProfile = {
         ...rawProfileData,
+        companion: companions.get(targetUser.id),
         hunterRank: showRank ? rawProfileData.hunterRank : undefined,
         level: showRank ? rawProfileData.level : undefined,
         currentXP: showRank ? rawProfileData.currentXP : undefined,

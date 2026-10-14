@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../components/AuthProvider";
@@ -8,8 +8,8 @@ import OAuthButtons from "../components/OAuthButtons";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { AuthSplitLayout } from "../components/auth/AuthSplitLayout";
 import styles from "../components/auth/AuthLayout.module.css";
-import { motion } from "framer-motion";
 import {
+  ArrowRight,
   Eye,
   EyeOff,
   User,
@@ -17,16 +17,21 @@ import {
   Mail,
   Lock,
 } from "lucide-react";
-import { SystemApertureIcon } from "@/app/components/icons";
 import { z } from "zod";
 
 const registerSchema = z.object({
-  name: z.string().min(1, "Display name is required.").max(30, "Name cannot exceed 30 characters."),
+  name: z
+    .string()
+    .min(1, "Display name is required.")
+    .max(30, "Name cannot exceed 30 characters."),
   username: z
     .string()
     .min(3, "Username must be at least 3 characters.")
     .max(20, "Username must be at most 20 characters.")
-    .regex(/^[a-z0-9_]+$/, "Username can only contain lowercase letters, numbers, and underscores."),
+    .regex(
+      /^[a-z0-9_]+$/,
+      "Username can only contain lowercase letters, numbers, and underscores."
+    ),
   email: z.string().email("Please provide a valid email address."),
   password: z.string().min(6, "Password must be at least 6 characters."),
 });
@@ -40,62 +45,61 @@ function RegisterForm() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Live Username Availability State
-  const [usernameStatus, setUsernameStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">("idle");
-  const [usernameMsg, setUsernameMsg] = useState("");
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [usernameCheck, setUsernameCheck] = useState<{
+    value: string;
+    status: "idle" | "available" | "taken";
+    message: string;
+  } | null>(null);
+  const usernameInvalid =
+    username.length > 0 &&
+    (username.length < 3 || !/^[a-z0-9_]+$/.test(username));
+  const usernameStatus = !username
+    ? "idle"
+    : usernameInvalid
+      ? "invalid"
+      : usernameCheck?.value === username
+        ? usernameCheck.status
+        : "checking";
+  const usernameMsg = !username
+    ? ""
+    : usernameInvalid
+      ? "Use at least 3 lowercase letters, numbers, or underscores."
+      : usernameCheck?.value === username
+        ? usernameCheck.message
+        : "Checking availability…";
 
   const router = useRouter();
   const { login } = useAuth();
 
-  // Debounced check username availability
+  // Cancel stale lookups so a previous username can never update the current field.
   useEffect(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    if (!username) {
-      setUsernameStatus("idle");
-      setUsernameMsg("");
-      return;
-    }
-
-    if (username.length < 3) {
-      setUsernameStatus("invalid");
-      setUsernameMsg("Username must be at least 3 characters.");
-      return;
-    }
-
-    if (!/^[a-z0-9_]+$/.test(username)) {
-      setUsernameStatus("invalid");
-      setUsernameMsg("Only lowercase letters, numbers, and underscores allowed.");
-      return;
-    }
-
-    setUsernameStatus("checking");
-    setUsernameMsg("Checking availability...");
-
-    debounceTimerRef.current = setTimeout(async () => {
+    if (!username || usernameInvalid) return;
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`);
+        const res = await fetch(
+          `/api/auth/check-username?username=${encodeURIComponent(username)}`,
+          { signal: controller.signal }
+        );
         const data = await res.json();
-        if (data.available) {
-          setUsernameStatus("available");
-          setUsernameMsg("✓ Username is available");
-        } else {
-          setUsernameStatus("taken");
-          setUsernameMsg(data.error || "This username is already taken.");
-        }
+        if (controller.signal.aborted) return;
+        setUsernameCheck({
+          value: username,
+          status: data.available ? "available" : "taken",
+          message: data.available
+            ? "✓ Username is available"
+            : data.error || "This username is already taken.",
+        });
       } catch {
-        setUsernameStatus("idle");
-        setUsernameMsg("");
+        if (!controller.signal.aborted)
+          setUsernameCheck({ value: username, status: "idle", message: "" });
       }
     }, 350);
-
     return () => {
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      clearTimeout(timer);
+      controller.abort();
     };
-  }, [username]);
+  }, [username, usernameInvalid]);
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const cleanVal = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
@@ -113,7 +117,12 @@ function RegisterForm() {
 
     setIsLoading(true);
 
-    const validation = registerSchema.safeParse({ name, username, email, password });
+    const validation = registerSchema.safeParse({
+      name,
+      username,
+      email,
+      password,
+    });
     if (!validation.success) {
       setError(validation.error.issues[0].message);
       setIsLoading(false);
@@ -143,33 +152,30 @@ function RegisterForm() {
   };
 
   return (
-    <AuthSplitLayout>
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full flex flex-col"
-      >
-        {/* Subtle System Badge */}
-        <div className={styles.systemBadge}>
-          <SystemApertureIcon size={13} className="text-cyan-400" />
-          <span>THE SYSTEM • REGISTRATION</span>
-        </div>
-
-        {/* Editorial Heading */}
+    <AuthSplitLayout greeting="A little curiosity goes a long way.">
+      <div className={styles.formContent}>
         <h1 className={styles.headline}>
-          <span className={styles.headlinePrimary}>Create your account.</span>
-          <span className={styles.headlineAccent}>Begin your next chapter.</span>
+          <span className={styles.headlinePrimary}>A new chapter.</span>
         </h1>
-        <p className={styles.subheadline}>
-          Start your journey to calmer, more focused study sessions.
-        </p>
 
         {/* Error notification */}
         {error && (
-          <div className="p-3 mb-4 rounded-xl border text-xs flex items-center gap-2.5 bg-red-500/10 border-red-500/30 text-red-400">
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          <div
+            className={`${styles.notice} ${styles.errorNotice}`}
+            role="alert"
+          >
+            <svg
+              className="w-4 h-4 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
             </svg>
             <span>{error}</span>
           </div>
@@ -186,11 +192,15 @@ function RegisterForm() {
         {/* Hairline Divider */}
         <div className={styles.credentialsDivider}>
           <div className={styles.dividerLine} />
-          <span className={styles.dividerPill}>OR CREDENTIALS</span>
+          <span className={styles.dividerPill}>or continue with email</span>
         </div>
 
         {/* Registration Form */}
-        <form onSubmit={handleRegister} className={styles.formGroup}>
+        <form
+          onSubmit={handleRegister}
+          className={styles.formGroup}
+          aria-busy={isLoading}
+        >
           <div>
             <label className={styles.fieldLabel} htmlFor="displayName">
               Display Name
@@ -213,24 +223,9 @@ function RegisterForm() {
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className={styles.fieldLabel} htmlFor="username">
-                Scholar Username
-              </label>
-              {username && (
-                <span
-                  className={`text-[10px] font-mono tracking-wider font-semibold ${
-                    usernameStatus === "available"
-                      ? "text-emerald-400"
-                      : usernameStatus === "taken" || usernameStatus === "invalid"
-                      ? "text-red-400"
-                      : "text-slate-400"
-                  }`}
-                >
-                  {usernameMsg}
-                </span>
-              )}
-            </div>
+            <label className={styles.fieldLabel} htmlFor="username">
+              Username
+            </label>
             <div className={styles.inputWrapper}>
               <AtSign className={styles.inputIcon} />
               <input
@@ -245,10 +240,24 @@ function RegisterForm() {
                 className={styles.inputField}
                 disabled={isLoading}
                 autoComplete="username"
+                autoCapitalize="none"
+                spellCheck={false}
+                aria-describedby="username-hint username-status"
+                aria-invalid={
+                  usernameStatus === "taken" || usernameStatus === "invalid"
+                }
               />
             </div>
-            <p className="text-[10px] text-slate-400 mt-1">
-              3-20 characters: lowercase letters, numbers, and underscores only.
+            <p
+              id="username-status"
+              className={styles.usernameStatus}
+              data-status={usernameStatus}
+              role="status"
+            >
+              {usernameMsg}
+            </p>
+            <p id="username-hint" className={styles.fieldHint}>
+              3–20 characters. Letters, numbers, and underscores.
             </p>
           </div>
 
@@ -276,7 +285,7 @@ function RegisterForm() {
             <label className={styles.fieldLabel} htmlFor="password">
               Password
             </label>
-            <div className={styles.inputWrapper}>
+            <div className={styles.inputWrapper} data-private-field>
               <Lock className={styles.inputIcon} />
               <input
                 id="password"
@@ -294,13 +303,20 @@ function RegisterForm() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className={styles.passwordToggle}
-                tabIndex={-1}
+                aria-pressed={showPassword}
+                disabled={isLoading}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
-            <PasswordStrengthMeter password={password} />
+            <div className={styles.strengthMeter}>
+              <PasswordStrengthMeter password={password} />
+            </div>
           </div>
 
           <button
@@ -310,13 +326,16 @@ function RegisterForm() {
           >
             {isLoading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>INITIALIZING SCHOLAR...</span>
+                <div
+                  aria-hidden="true"
+                  className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"
+                />
+                <span>Creating your account…</span>
               </>
             ) : (
               <>
-                <SystemApertureIcon size={16} />
-                <span>INITIALIZE SCHOLAR</span>
+                <span>Create account</span>
+                <ArrowRight aria-hidden="true" />
               </>
             )}
           </button>
@@ -324,12 +343,12 @@ function RegisterForm() {
 
         {/* Footer Link */}
         <p className={styles.footerText}>
-          Already have an active link?{" "}
+          Already have an account?{" "}
           <Link href="/login" className={styles.footerLink}>
-            ACCESS SYSTEM
+            Sign in
           </Link>
         </p>
-      </motion.div>
+      </div>
     </AuthSplitLayout>
   );
 }
@@ -338,8 +357,8 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#070913]">
-          <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+        <div className={styles.loadingPage} role="status">
+          Opening your sanctuary…
         </div>
       }
     >

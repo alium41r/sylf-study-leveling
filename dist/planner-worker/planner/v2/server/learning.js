@@ -256,7 +256,7 @@ class LearningCompilerService {
             return next;
         };
         const meter = (0, provider_1.workerProviderMeter)(this.attempts, token);
-        const input = { plans: owned.targets, context: owned.view, envelope: owned.envelope, sharedDependencies: owned.sharedDependencies };
+        const input = { acceptedRequest: { text: owned.attempt.acceptedRequest.text, authorization: "PLAN_ACTION" }, plans: owned.targets, context: owned.view, envelope: owned.envelope, sharedDependencies: owned.sharedDependencies };
         if (!checkpoint)
             await save({ stage: 'PREFLIGHT', research: owned.research, envelope: owned.envelope });
         if (checkpoint.payload.stage === 'PREFLIGHT') {
@@ -287,7 +287,11 @@ class LearningCompilerService {
             if (owned.dispatchedAdaptation)
                 (0, database_1.reject)('PROVIDER_FAILURE', 'The single adaptation was dispatched without a durable accepted result. Use an explicit linked retry; it cannot be repeated on takeover.', 'ADAPTATION');
             const p = checkpoint.payload;
-            const response = await (0, blueprint_1.generateLearningBlueprint)(meter, { ...input, envelope: p.envelope, previous: p.blueprints, feedback: p.allocation.report }, signal, this.dependencies.provider, true);
+            let bindingConstraints = [];
+            const explained = (0, allocator_1.allocateLearning)(p.blueprints, p.envelope, owned.facts, { maximumSearchNodes: this.dependencies.maximumSearchNodes, onBindingConstraints: constraints => { bindingConstraints = constraints; } });
+            if ((0, database_1.hash)('allocation', explained) !== p.allocation.digest)
+                (0, database_1.reject)('STALE_CONTEXT', 'Allocation facts changed before educational adaptation.', 'ADAPTATION');
+            const response = await (0, blueprint_1.generateLearningBlueprint)(meter, { ...input, envelope: p.envelope, previous: p.blueprints, feedback: p.allocation.report, bindingConstraints, splitReceipts: p.planning?.splits }, signal, this.dependencies.provider, true);
             if (response.decision === 'KEEP') {
                 const report = (0, allocator_1.allocateLearning)(p.blueprints, p.envelope, owned.facts, { maximumSearchNodes: this.dependencies.maximumSearchNodes });
                 await save({ ...p, stage: 'ALLOCATION', allocation: { report, digest: (0, database_1.hash)('allocation', report) }, planning: { ...p.planning, adaptation: 'KEPT', adaptationReason: response.reason } }, 1);

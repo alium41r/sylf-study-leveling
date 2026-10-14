@@ -1,0 +1,12 @@
+{
+  "path": "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+  "change": "One callback parameter type annotation added after PostgreSQL gate to satisfy strict full repository typecheck.",
+  "testedSourceSha256": "0b41e5329cacdb5eb3d03a4353e8814c658ebf9c5f7103a1e919b37c5202983a",
+  "finalSourceSha256": "6f1858bf924bfe76f63aca84a446f7ad321be6149e1d036c017d4f35a971ff45",
+  "testedEmittedJavaScriptSha256": "63c8c3439cf8de0a3316466c4b3a20a070926181e7b621651118d5846f637699",
+  "finalEmittedJavaScriptSha256": "2b727f02e0352c4159ab1060398472585221bfc602094629d8bbfeeaa7e9bfbc",
+  "emittedJavaScriptIdentical": false,
+  "sourceDiffOnlyTypeAnnotation": true,
+  "runtimeEquivalent": true,
+  "emissionDifference": "The annotation causes TypeScript to emit optional parentheses around the single arrow parameter; exact emitted text otherwise matches."
+}

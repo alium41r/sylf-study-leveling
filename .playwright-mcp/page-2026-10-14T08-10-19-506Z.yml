@@ -1,0 +1,35 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - button "Open navigation menu" [ref=e6]
+        - button "View Profile Card" [ref=e9] [cursor=pointer]:
+          - img "ali" [ref=e12]
+          - generic [ref=e13]:
+            - paragraph [ref=e14]: ali
+            - paragraph [ref=e15]: E-Rank • Lv. 4
+      - generic [ref=e16]:
+        - 'generic "Weekly Streak: 0 weeks" [ref=e17]': "0"
+        - 'generic "HP: 0/100" [ref=e21]': 0/100
+        - 'generic "Sylph: 2497" [ref=e25]': "2497"
+    - main [ref=e29]:
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - paragraph [ref=e33]: Study Timer
+          - heading [level=1] [ref=e35]:
+            - text: Focus
+            - emphasis [ref=e36]: Sessions
+          - paragraph [ref=e37]: Track daily focus, active quests, and subject sessions.
+        - generic [ref=e38]:
+          - generic [ref=e39]: DAILY FOCUS • 2026.10.14
+          - generic [ref=e44]: 00:00:00
+          - paragraph [ref=e45]: Total focus time across quests and subjects today
+        - generic [ref=e46]:
+          - region [ref=e47]:
+            - heading "Active Quests" [level=2] [ref=e53]: Quests
+            - paragraph [ref=e55]: Loading quests...
+          - region [ref=e56]:
+            - heading "Subjects" [level=2] [ref=e63]
+            - paragraph [ref=e65]: Loading subjects...
+  - button "Open Next.js Dev Tools" [ref=e71] [cursor=pointer]
+  - alert [ref=e75]

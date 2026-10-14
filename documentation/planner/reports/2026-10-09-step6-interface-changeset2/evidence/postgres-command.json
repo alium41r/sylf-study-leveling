@@ -1,0 +1,26 @@
+{
+  "cwd": "/private/tmp/sylf-changeset2-pg-source",
+  "command": [
+    "node",
+    "scripts/test-planner-v2-phase1-postgres.mjs",
+    "--native-bin",
+    "/private/tmp/sylf-planner-phase2-runtime-18-4/package/native/bin",
+    "--evidence-dir",
+    "/private/tmp/sylf-changeset2-pg-source/documentation/planner/reports/2026-10-09-step6-interface-changeset2/evidence/postgres",
+    "--extra-suite",
+    "__tests__/planner-v2/postgres/intelligence-boundary.postgres.ts",
+    "--extra-suite",
+    "__tests__/planner-v2/postgres/assistant-research.postgres.ts",
+    "--extra-suite",
+    "__tests__/planner-v2/postgres/learning-allocation.postgres.ts",
+    "--extra-suite",
+    "__tests__/planner-v2/postgres/compiler-quality.postgres.ts",
+    "--extra-suite",
+    "__tests__/planner-v2/postgres/generation-integration.postgres.ts",
+    "--extra-suite",
+    "__tests__/planner-v2/postgres/research-limits.postgres.ts",
+    "--extra-suite",
+    "__tests__/planner-v2/postgres/maximum-envelope.postgres.ts"
+  ],
+  "sourcePreparation": "Copy app/lib/prisma/tests/scripts and root TypeScript/package/Vitest configs; link node_modules and existing archive/public/design-system; create report evidence directories. Source hashes are in postgres-source-snapshot.json. No dotenv files copied. The existing harness prefers available Docker before the supplied native fallback."
+}

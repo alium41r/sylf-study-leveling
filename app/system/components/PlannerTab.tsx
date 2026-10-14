@@ -28,7 +28,7 @@ interface PlannerTabProps {
  * - **Planner Modes** — the Exam / Roadmap / Mastery family, reached deliberately from
  *   the header button. Quick Plan stays the default creation flow inside a mode.
  *
- * The view is client state rather than routes, because the System workspace is itself
+ * The view is client state rather than routes, because the Sylvie workspace is itself
  * tab state: adding URLs here would be routing complexity with no navigation benefit.
  * The consequence is deliberate and documented: a refresh returns to Classic, and
  * nothing half-persisted is ever shown. Saved Planner Modes plans are reached by

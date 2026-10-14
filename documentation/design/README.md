@@ -1,5 +1,7 @@
 # Design documentation entry points
 
+The [authentication experience](../authentication/README.md) describes the current login/signup Floating Sanctuary, including the canonical companion, native SVG scenery, responsive layouts, appearance tokens, and motion controls.
+
 The existing `design-system/` structure is retained. [Dashboard](../../design-system/pages/dashboard.md), [Goals/Quests](../../design-system/pages/goals.md), [Timer](../../design-system/pages/timer.md), and [Study Sanctuary](../../design-system/pages/study-sanctuary.md) provide scoped page/art directions. Treat them as design guidance and check current source for implementation details; housekeeping does not certify every design statement as current behavior.
 
 Two documents need qualification:
@@ -10,3 +12,7 @@ Two documents need qualification:
 The [Focus background content specification](../../specifications/features/focus-backgrounds-content-spec.md) remains the existing asset/content standard. The [Planner frontend design input](../planner/archive/frontend-redesign/PLANNER_FRONTEND_UX_GUIDE_AND_REDESIGN_SPEC.md) is archived separately from later implementation reports.
 
 Root reference artwork, eye sheets, login SVG/design images, and the `landing screenshots/` and `login design/` directories are preserved as source/reference assets. They have no established report association that justifies moving them.
+
+## Main page headings
+
+Sidebar destinations use a single short page heading: Dashboard, Timer, Social, Sylvie, Objectives, Calendar, Locker, and Shop. The admin-only background studio uses Studio. Omit decorative eyebrow text, greetings, protocol labels, and introductory taglines from these page headers. Keep functional controls, metrics, tab labels, and section content. Both Objectives tabs retain the Objectives page heading; Locker owns its page heading above the tabs, with the immersive Pixel Studio retaining its own toolbar.

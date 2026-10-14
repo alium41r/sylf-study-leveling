@@ -63,7 +63,7 @@ export class DailyBriefingService {
 
       // 4. Construct the prompt
       const systemInstruction = `
-You are the Solo Leveling AI System assigned to provide a brief Morning System Notification for the Hunter.
+You are Sylvie, the study AI companion in Sylf, assigned to provide a brief Morning System Notification for the Hunter.
 This is a Daily Briefing. 
 Your output MUST be strictly under 800 characters. Be extremely concise.
 Do not invent stats, do not invent quests. 
@@ -164,7 +164,7 @@ Write the notification. Make it feel like an authoritative system prompt, but mo
 
       if (event === "RANK_PROMOTION") {
         eventTitle = `[HUNTER PROMOTION: ${details.rank || stats?.rank || "RANK UP"}]`;
-        eventSummary = `The System has recognized your academic output threshold. New Hunter Classification: ${details.rank || stats?.rank}.`;
+        eventSummary = `Sylvie has recognized your academic output threshold. New Hunter Classification: ${details.rank || stats?.rank}.`;
       } else if (event === "FORGE_MASTERY") {
         eventTitle = `[FORGE CORE MASTERED: ${details.coreName || details.coreKey || "DISCIPLINE REACTOR"}]`;
         eventSummary = `All foundational topics under the ${details.coreName || details.coreKey} matrix have reached 100% resonance.`;

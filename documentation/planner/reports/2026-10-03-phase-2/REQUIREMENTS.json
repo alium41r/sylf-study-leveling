@@ -1239,7 +1239,21 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (407 current-source tests, zero required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json (544 units in 43 files and independent technical checks; live/certification failed).",
+        "disabledThinkingContinuation": {
+          "report": "THINKING_DISABLED_QUALIFICATION.md",
+          "technical": "evidence/step6-thinking-disabled-2026-10-08/technical/gate.json",
+          "postgres": "evidence/step6-thinking-disabled-2026-10-08/full-postgres/postgres-harness-run.json",
+          "live": "evidence/step6-thinking-disabled-2026-10-08/targeted-importance/independent-evaluation.json",
+          "unitsPassed": 551,
+          "postgresPassed": 409,
+          "requiredSkipped": 0,
+          "targetedAccepted": 0,
+          "targetedTotal": 3,
+          "full17CaseStatus": "NOT_RUN_TARGETED_GATE_FAILED",
+          "naturalAcceptedRepairWitness": false,
+          "productionConfigurationChanged": false
+        }
       }
     },
     {
@@ -1277,7 +1291,21 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (407 current-source tests, zero required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json (544 units in 43 files and independent technical checks; live/certification failed).",
+        "disabledThinkingContinuation": {
+          "report": "THINKING_DISABLED_QUALIFICATION.md",
+          "technical": "evidence/step6-thinking-disabled-2026-10-08/technical/gate.json",
+          "postgres": "evidence/step6-thinking-disabled-2026-10-08/full-postgres/postgres-harness-run.json",
+          "live": "evidence/step6-thinking-disabled-2026-10-08/targeted-importance/independent-evaluation.json",
+          "unitsPassed": 551,
+          "postgresPassed": 409,
+          "requiredSkipped": 0,
+          "targetedAccepted": 0,
+          "targetedTotal": 3,
+          "full17CaseStatus": "NOT_RUN_TARGETED_GATE_FAILED",
+          "naturalAcceptedRepairWitness": false,
+          "productionConfigurationChanged": false
+        }
       }
     },
     {
@@ -1314,7 +1342,21 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (407 current-source tests, zero required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json (544 units in 43 files and independent technical checks; live/certification failed).",
+        "disabledThinkingContinuation": {
+          "report": "THINKING_DISABLED_QUALIFICATION.md",
+          "technical": "evidence/step6-thinking-disabled-2026-10-08/technical/gate.json",
+          "postgres": "evidence/step6-thinking-disabled-2026-10-08/full-postgres/postgres-harness-run.json",
+          "live": "evidence/step6-thinking-disabled-2026-10-08/targeted-importance/independent-evaluation.json",
+          "unitsPassed": 551,
+          "postgresPassed": 409,
+          "requiredSkipped": 0,
+          "targetedAccepted": 0,
+          "targetedTotal": 3,
+          "full17CaseStatus": "NOT_RUN_TARGETED_GATE_FAILED",
+          "naturalAcceptedRepairWitness": false,
+          "productionConfigurationChanged": false
+        }
       }
     },
     {
@@ -1354,7 +1396,40 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "LIVE_QUALIFICATION.md; evidence/step6-live-evaluation.json (FAILED: 14/17 separately assessed cases pass; actual owned adoption/public decision and two REVISE/re-allocation decisions, but no successful live compiler repair/verification); evidence/step6-live-observations.json; COMPLETION.md remains INCOMPLETE."
+        "runtimeEvidence": "LIVE_QUALIFICATION.md; STEP_6_BOUNDARY_FIXES.md; SLEEP_INVESTIGATION.md. Latest full3-case subset remains FAILED in its historical record; tiny/triage fail before sleep. Separate awake owned-only rerun succeeds and independently meets its registered expectation, while two primaries truncate. Four selected regressions pass on both runtimes; no fresh full407 gate or17-case acceptance. COMPLETION.md remains INCOMPLETE; no natural repair/verification/apply witness.",
+        "disabledThinkingContinuation": {
+          "report": "THINKING_DISABLED_QUALIFICATION.md",
+          "technical": "evidence/step6-thinking-disabled-2026-10-08/technical/gate.json",
+          "postgres": "evidence/step6-thinking-disabled-2026-10-08/full-postgres/postgres-harness-run.json",
+          "live": "evidence/step6-thinking-disabled-2026-10-08/targeted-importance/independent-evaluation.json",
+          "unitsPassed": 551,
+          "postgresPassed": 409,
+          "requiredSkipped": 0,
+          "targetedAccepted": 0,
+          "targetedTotal": 3,
+          "full17CaseStatus": "NOT_RUN_TARGETED_GATE_FAILED",
+          "naturalAcceptedRepairWitness": false,
+          "productionConfigurationChanged": false
+        }
+      },
+      "boundaryContinuation": "STEP_6_BOUNDARY_FIXES.md",
+      "currentLiveAcceptedCases": 0,
+      "currentLiveSelectedCases": 3,
+      "fullCorpusRerun": "NOT_RUN",
+      "naturalRepairVerificationApply": "NOT_OBSERVED",
+      "sleepInvestigation": {
+        "report": "SLEEP_INVESTIGATION.md",
+        "summary": "evidence/step6-sleep-audit-2026-10-08/SUMMARY.json",
+        "implementationAndProviderConfigurationChanged": false,
+        "selectedDatabaseTestsPassed": 8,
+        "selectedDatabaseTestsFailed": 0,
+        "fullDatabaseGateRerun": false,
+        "singleOwnedCaseAccepted": 1,
+        "singleOwnedCaseSelected": 1,
+        "researchNetworkDeadlineFailureReproduced": false,
+        "truncationsInSuccessfulOwnedCase": 2,
+        "naturalRepairVerificationApply": "NOT_OBSERVED",
+        "priorSubsetCountsAreHistorical": true
       }
     },
     {
@@ -1390,7 +1465,21 @@
           "relevant existing regressions and Phase 2 completion report"
         ],
         "step1Suites": [],
-        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (required 406 current-source tests, no required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json records independent checks and failed Phase 2 certification."
+        "runtimeEvidence": "STEP_6.md; evidence/step6-postgres/postgres-harness-run.json (407 current-source tests, zero required skips); evidence/step6-maximum-postgres.json; evidence/step6-gate.json (544 units in 43 files and independent technical checks; live/certification failed).",
+        "disabledThinkingContinuation": {
+          "report": "THINKING_DISABLED_QUALIFICATION.md",
+          "technical": "evidence/step6-thinking-disabled-2026-10-08/technical/gate.json",
+          "postgres": "evidence/step6-thinking-disabled-2026-10-08/full-postgres/postgres-harness-run.json",
+          "live": "evidence/step6-thinking-disabled-2026-10-08/targeted-importance/independent-evaluation.json",
+          "unitsPassed": 551,
+          "postgresPassed": 409,
+          "requiredSkipped": 0,
+          "targetedAccepted": 0,
+          "targetedTotal": 3,
+          "full17CaseStatus": "NOT_RUN_TARGETED_GATE_FAILED",
+          "naturalAcceptedRepairWitness": false,
+          "productionConfigurationChanged": false
+        }
       }
     }
   ]

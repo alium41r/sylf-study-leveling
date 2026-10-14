@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   Loader2,
 } from "lucide-react";
-import { SystemApertureIcon } from "@/app/components/icons";
+import { SylvieIcon } from "@/app/components/icons";
 
 // ============================================================================
 // Route-Level Lazy Loading
@@ -287,7 +287,7 @@ function RoutePlaceholder({
           </div>
 
           <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-accent-primary/30 bg-accent-primary/10 text-accent-primary-light text-xs font-['Rajdhani'] font-bold uppercase tracking-wider">
-            <SystemApertureIcon size={14} />
+            <SylvieIcon size={14} />
             <span>Canonical Shell Active</span>
           </span>
         </div>

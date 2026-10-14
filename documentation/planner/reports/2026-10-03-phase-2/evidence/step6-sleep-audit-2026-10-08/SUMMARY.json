@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "status": "INVESTIGATION_COMPLETE",
+  "noImplementationOrProviderConfigurationChange": true,
+  "unchangedSourceFiles": 3530,
+  "changedDuringRun": [],
+  "awakeWindow": {
+    "startUtc": "2026-10-08T17:51:44.467Z",
+    "endUtc": "2026-10-08T17:54:26.663Z",
+    "sleepEventsDuringReruns": [],
+    "caffeinateAssertionsVerifiedAtStartAndEnd": true,
+    "caffeinateReleasedAfterReruns": true
+  },
+  "historicalSleepIntervals": [
+    {
+      "startLocal": "2026-10-08 22:21:50 +0500",
+      "endLocal": "2026-10-08 22:25:41 +0500",
+      "seconds": 231,
+      "overlap": "Owned research dispatched 22:21:47.788; case ended 22:25:41.387. Research/network result environment-contaminated."
+    },
+    {
+      "startLocal": "2026-10-08 22:31:03 +0500",
+      "endLocal": "2026-10-08 22:31:36 +0500",
+      "seconds": 33,
+      "overlap": "Second full Docker regression, 22:28:30.969-22:31:44.650."
+    },
+    {
+      "startLocal": "2026-10-08 22:35:55 +0500",
+      "endLocal": "2026-10-08 22:36:07 +0500",
+      "seconds": 12,
+      "overlap": "Full native regression, 22:34:05.243-22:36:36.524; sleep exceeds unchanged 10-second test timeout, but prior per-test timestamps/actionable timeout diagnostics were not preserved."
+    }
+  ],
+  "regressions": {
+    "selectedTests": 4,
+    "docker": {
+      "passed": 4,
+      "failed": 0
+    },
+    "native": {
+      "passed": 4,
+      "failed": 0
+    },
+    "full407GateRerun": false,
+    "reservationClassification": "Intermittent failure already occurred 22:06:19-22:09:47, without recorded sleep; not reproduced in either awake rerun, cannot blame sleep alone."
+  },
+  "ownedResearch": {
+    "outcome": "SUCCEEDED",
+    "apply": "APPLIED",
+    "caseLatencyMs": 132453,
+    "researchElapsedMs": 28024,
+    "externalCalls": 6,
+    "settledCalls": 6,
+    "unknownSpendCalls": 0,
+    "inputTokens": 32907,
+    "outputTokens": 26931,
+    "unknownPricedCalls": 6,
+    "truncations": 2,
+    "fallbacks": 2,
+    "reviewFindings": 0,
+    "repairs": 0,
+    "verificationCalls": 0,
+    "networkFailureReproduced": false,
+    "researchDeadlineFailureReproduced": false,
+    "upstreamLatencyMs": [
+      14432,
+      13453,
+      38707,
+      24205,
+      21148,
+      19485
+    ]
+  },
+  "unaffectedFailures": {
+    "tiny-roomy-exam": "Both 4096-token reviews truncate; case completed 22:20:32.971, before 22:21:50 sleep. Not rerun.",
+    "triage": "Both 8192-token generations truncate; case completed 22:21:47.565, before 22:21:50 sleep. Not rerun."
+  },
+  "interpretationLimits": [
+    "Exact historical SDK cancellation/network cause is not available; temporal overlap and successful awake rerun support sleep as a cause rather than prove it was the sole cause.",
+    "Historical owned provider metadata completed at DB 17:21:52.805Z while host case finished 17:25:41.387Z. Suspension-related VM clock lag is a plausible inference, not a directly sampled historical offset.",
+    "8 passing selective test executions are not a new full 407-test gate; original full-run failures remain immutable.",
+    "Prior UNKNOWN_SPEND reservation stays unknown; fresh usage does not settle or refund the old call.",
+    "No full 17-case rerun or natural repair witness; Phase 2 remains incomplete."
+  ]
+}

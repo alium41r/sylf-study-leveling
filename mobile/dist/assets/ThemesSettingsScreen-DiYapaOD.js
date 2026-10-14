@@ -1,0 +1,1 @@
+import{a as e}from"./vendor-motion-D-n_FYJU.js";import{AppearanceSettingsScreen as t}from"./AppearanceSettingsScreen-BYEqGql_.js";var n=e();function r(){return(0,n.jsx)(t,{})}export{r as ThemesSettingsScreen,r as default};

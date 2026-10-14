@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED",
+  "evaluatedAt": "2026-10-08T15:39:27.675061+00:00",
+  "selectedRunDirectory": "step6-live-2026-10-08T15-28-59-317Z",
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "liveCorpusSha256": "85b27703388bd4c39928fcc7438abd8866fbecce1452c0399d52e9c6cc5f52c6",
+  "method": "Separate inspection of actual goals, full scope, instructions/criteria, provenance, allocation and apply. Model approval and execution are not educational acceptance. All trials/failures retained.",
+  "route": {
+    "temporaryNonGemini": true,
+    "thinking": "disabled",
+    "reasoningEffort": null,
+    "temperature": 0.7,
+    "reviewTemperature": 0.2,
+    "reviewThinking": null,
+    "reviewReasoningEffort": null,
+    "primary": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "fallback": {
+      "provider": "deepseek",
+      "model": "deepseek-flash"
+    },
+    "productionConfigurationChanged": false
+  },
+  "coverage": {
+    "adaptation": [
+      "mastery-open",
+      "infeasible-zero-capacity",
+      "indivisible-checkpoint"
+    ],
+    "repairAndVerification": []
+  },
+  "externalAttempts": 37,
+  "usage": {
+    "reportedInputTokens": 225975,
+    "reportedOutputTokens": 34504,
+    "settledCalls": 37,
+    "unknownSpendCalls": 0,
+    "unknownPricedCalls": 37
+  },
+  "latency": {
+    "basis": "actual upstream response latency",
+    "medianMs": 3729,
+    "p90Ms": 9196,
+    "maximumMs": 16979
+  },
+  "passed": 14,
+  "total": 17,
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "trial": 1,
+      "attemptId": "d7d33017-65a4-4a28-a0df-a7fac988dde4",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute integrated simple-series changed solve with expressly learner-chosen values, correct Ohm/series rules, units and valid checks; unaided criterion and no extra committed teaching stage. Timebox generosity remains a proportion limitation.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "trial": 1,
+      "attemptId": "56c5fcbe-5d59-4859-89b6-94cb679c414b",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "FAIL: same bounded goal and readiness as the ordinary case, but the roomy output adds a supported example before the changed demonstration and books90 rather than60 minutes. Its own whole-strategy estimate is30/45/75, below the90-minute commitment, while the instructions budget about10 plus25-35 minutes. No distinct evidence justifies the extra compulsory example/reservation. Empty review/apply cannot qualify the explicit no-inflation expectation.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "secure-topic",
+      "trial": 1,
+      "attemptId": "9b443ff5-c00f-41a3-91c6-15ba03ed9b61",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One45-minute simple-series diagnostic with complete numeric resistor/source givens and formulas/checks; confidence remains self-report, not CREDITED mastery. Power item and diagnostic breadth are retained scope/proportion concerns; no further committed lesson.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "zero-new-work",
+      "trial": 1,
+      "attemptId": "1318bffe-4c4d-412d-9ca4-78d85e5cb3b4",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Explicit strategy-only opt-out preserves scope dispositions and canonical zero-activity/zero-Quest apply without a readiness claim.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 0
+    },
+    {
+      "id": "concept-foundation",
+      "trial": 1,
+      "attemptId": "e7951990-3bb6-4fc1-b98e-8878ab6f1cbd",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Current/potential distinction and conservation rules receive an explained annotated example, guided course problems, then changed unaided problems. Distinct supported versus independent evidence is retained, no timed-paper substitution or time-based mastery. Fixed problem counts and180-minute intensity remain proportion/scaffolding limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "method-weakness",
+      "trial": 1,
+      "attemptId": "9429fae8-ef3e-4d9e-9630-eb7103255cec",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Three changed circuits are selected/created within the actual taught methods/topologies, with explicit chosen givens, valid reason, correct solution and independent check. Criterion does not require matching a reference method or invent advanced categories; concrete failure triggers unbooked targeted work.90-minute estimate and repeated contingent drill remain limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "triage",
+      "trial": 1,
+      "attemptId": "dd73b974-7eff-4c6c-9a8f-c2b8f50b3fbc",
+      "status": "FAILED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "FAIL in education despite valid structured output: a future teacher quiz preparation goal is treated as an assignment of already available actual quiz questions. The sole committed task requires obtaining the actual quiz/exact teacher-provided items, prohibits substitute practice, and demands every actual quiz item completed before the future quiz. No exact questions/access were supplied. It therefore replaces defensible topic-based preparation with an unavailable assumed assessment deliverable. All four scope nodes and50-minute hard calendar survive, but empty review/apply miss the goal-correspondence issue.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "roadmap-open",
+      "trial": 1,
+      "attemptId": "577f2f22-56f7-483c-9419-18950b2bef06",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "A single declared90-minute CSV artifact split45/45 keeps full original instructions and cumulative criteria. First piece reads raw rows; final piece actually includes per-row conversion/error handling before requiring a clean run on malformed input, avoiding the previous impossible prerequisite. Correct totals/explanation and unbooked later scope; no invented deadline. Error-catching placement and introductory support remain limitations.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "mastery-open",
+      "trial": 1,
+      "attemptId": "af8d302e-a35f-489f-bcd0-55459a78e2c7",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Bayes term explanation and a complete learner-selected prevalence/sensitivity/specificity example, followed by a changed correctly computed and independently cross-checked example. No missing forced datum or current mastery certification. Explicit assistance separation is weak and further contingent drill retains proportion uncertainty.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "general-homework",
+      "trial": 1,
+      "attemptId": "d5fd2573-14ed-431f-acf0-a7bb5c869bb7",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Only the three actual assigned equations are committed, with negative-factor explanation, correct answers and substitution checks. Missing exact sheet is retrieved; invented replacements expressly excluded. Extra practice OPTIONAL and unresolved actual-error response CONTINGENT/unbooked, no compulsory added homework.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 1
+    },
+    {
+      "id": "joint-prerequisite",
+      "trial": 1,
+      "attemptId": "6165c423-1a06-4a0f-bd9e-32d13f048b0a",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "One60-minute owned loops/dictionary workbook counts once with correct20/30/20 category totals and70 grand total. Actual45-minute JSON task reuses the shared prerequisite through a real cross-Plan HARD edge; CSV scope remains explicitly strategic/unbooked rather than invented immediate activity. Both target applies retain collective ownership. This first-checkpoint plan does not yet complete the future CSV deliverable.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "infeasible-zero-capacity",
+      "trial": 1,
+      "attemptId": "baa0e4c6-e041-43ea-b96c-30b838d1a81f",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Positive required learning and deterministic hard zero-capacity proof survive one bounded adaptation to NEEDS_DECISION; zero candidate/apply/execution, no falsely feasible empty workload.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "indivisible-checkpoint",
+      "trial": 1,
+      "attemptId": "e5c40279-a112-40e0-8408-0df5fa4f7726",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Authentic45 uninterrupted minutes remain against30-minute slots through one adaptation; truthful decision and zero execution, no split or substitution.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "owned-course-research",
+      "trial": 1,
+      "attemptId": "accfe58a-9b3f-4ae9-ae7a-5f343be05e91",
+      "status": "FAILED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "FAIL: actual owned hash/content, four course outcomes and scope bindings are verified/adopted with UNKNOWN issuer authority, but initial120-minute work splits55/65 against60-minute slots. Its one adaptation repeats the same boundary while falsely claiming each piece fits. Deterministic allocation preserves CAPACITY_SHORTFALL and NEEDS_DECISION, with no review/candidate/apply. The instructions also revert to already-taught-only methods despite an outcome-only note and unknown repertoire; this is not a qualifying repair.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    },
+    {
+      "id": "contradictory-readiness",
+      "trial": 1,
+      "attemptId": "dbab6b39-6bb1-4a16-922e-90449184b8a9",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "Five changed taught-method circuits reconcile prior self-reported failure with claimed mastery, using correct justification/solutions/checks and no confidence credit. Declared60/60/60 continuation preserves one task, effort and final gate; only actual failures trigger unbooked remediation.180-minute intensity and weak separation of assisted correction from initial independent evidence remain limitations, no current mastery is claimed.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 3
+    },
+    {
+      "id": "roadmap-large",
+      "trial": 1,
+      "attemptId": "02b676a8-8b98-4415-bd10-4256b180e860",
+      "status": "PASSED",
+      "observedOutcome": "SUCCEEDED",
+      "assessment": "All40 dispositions/contributions survive; useful next beginner variables/arithmetic/f-string/branching program and a distinct independent changed program are detailed, later work remains unbooked with no deadline. No adaptation is needed in this output; both fit existing slots and pass canonical apply. Inline if/else syntax shorthand and absent explicit syntax reference are teaching limitations, not proof that the entire strategic goal is achieved.",
+      "error": null,
+      "applied": true,
+      "actualQuests": 2
+    },
+    {
+      "id": "public-assessment-research",
+      "trial": 1,
+      "attemptId": "a7d00e6b-da5a-4feb-86bc-aaaaadef682a",
+      "status": "PASSED",
+      "observedOutcome": "NEEDS_DECISION",
+      "assessment": "Actual public retrieval and excerpt verification still do not establish complete applicable assessment scope; server-authoritative NEEDS_DECISION prevents unverified publication/apply.",
+      "error": null,
+      "applied": false,
+      "actualQuests": 0
+    }
+  ],
+  "operationalFailures": 1,
+  "historicalSourceOnly": false,
+  "sourceCurrentAtAssessment": true
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "verifiedAtUtc": "2026-10-09T13:50:25.360288+00:00",
+  "externalModelCalls": 0,
+  "sources": [
+    "https://api-docs.deepseek.com/api/create-chat-completion/",
+    "https://api-docs.deepseek.com/quick_start/pricing/"
+  ],
+  "model": "deepseek-flash",
+  "modelVersion": "DeepSeek-V4.1-Flash",
+  "reasoningEffort": {
+    "supported": [
+      "none",
+      "low",
+      "high",
+      "max"
+    ],
+    "selected": "low",
+    "default": "high",
+    "lowEnablesThinking": true
+  },
+  "thinking": "OMITTED_ENABLED_DEFAULT",
+  "peakUsdPerMillion": {
+    "cacheHitInput": 0.006,
+    "cacheMissInput": 0.3,
+    "completionIncludingReasoning": 1.2
+  },
+  "offPeakUsdPerMillion": {
+    "cacheHitInput": 0.003,
+    "cacheMissInput": 0.15,
+    "completionIncludingReasoning": 0.6
+  },
+  "metadataReverificationRequiredAfterHours": 24,
+  "accountInvoiceVerified": false
+}

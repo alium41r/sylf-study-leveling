@@ -10,6 +10,7 @@ import {
   mapFocusPartyError,
 } from "@/lib/focus-party-service";
 import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 /**
  * POST /api/focus-party/[id]/session/timer
@@ -34,16 +35,25 @@ export async function POST(
 
     let action: string | undefined;
     let sessionId: number | undefined;
+    let boundary: { joinedAt: string; endedAt: string } | undefined;
 
     try {
       const body = await req.json();
+      if (body.expectedOwnerId !== undefined && body.expectedOwnerId !== payload.userId)
+        return NextResponse.json({ error: "Sign in to the original account to sync this saved session.", code: "ACCOUNT_CHANGED" }, { status: 409 });
       action = body.action;
       if (typeof body.sessionId === "number") {
         sessionId = body.sessionId;
       }
+      if (body.joinedAt !== undefined || body.endedAt !== undefined) {
+        const parsed = z.object({ joinedAt: z.string().datetime(), endedAt: z.string().datetime() }).safeParse(body);
+        if (!parsed.success) return NextResponse.json({ error: "Invalid focus room exit time", code: "VALIDATION_FAILED" }, { status: 400 });
+        boundary = parsed.data;
+      }
     } catch {
       return NextResponse.json({ error: "Request body required", code: "VALIDATION_FAILED" }, { status: 400 });
     }
+
 
     if (!action || !["start", "pause", "resume", "leave"].includes(action)) {
       return NextResponse.json(
@@ -54,7 +64,7 @@ export async function POST(
 
     let targetSessionId = sessionId;
     if (!targetSessionId) {
-      let activeSession = await getActiveSession(partyId, payload.userId);
+      const activeSession = await getActiveSession(partyId, payload.userId);
       if (!activeSession) {
         if (action === "start") {
           const entry = await enterFocus(partyId, payload.userId);
@@ -69,6 +79,9 @@ export async function POST(
         targetSessionId = activeSession.id;
       }
     }
+
+    const target = await prisma.focusSession.findUnique({ where: { id: targetSessionId }, select: { partyId: true } });
+    if (!target || target.partyId !== partyId) return NextResponse.json({ error: "Focus session not found in this party", code: "SESSION_NOT_FOUND" }, { status: 404 });
 
     if (action === "start") {
       const isMemberOfSession = await prisma.focusSessionMember.findFirst({
@@ -91,7 +104,7 @@ export async function POST(
         result = await resumeTimer(targetSessionId, payload.userId);
         break;
       case "leave":
-        result = await leaveFocus(targetSessionId, payload.userId);
+        result = await leaveFocus(targetSessionId, payload.userId, boundary);
         break;
       default:
         return NextResponse.json({ error: "Unsupported action", code: "VALIDATION_FAILED" }, { status: 400 });

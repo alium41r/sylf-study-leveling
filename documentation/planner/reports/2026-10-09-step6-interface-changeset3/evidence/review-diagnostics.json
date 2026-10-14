@@ -1,0 +1,105 @@
+{
+  "method": "Twelve separately labelled deterministic candidates; labels are hidden from the request. Scripted adapters exercise the review boundary, not live model reasoning accuracy. No paid calls.",
+  "results": [
+    {
+      "id": "authentic_items_missing",
+      "label": "DEFECTIVE",
+      "status": "BLOCKED",
+      "severities": [
+        "BLOCKING"
+      ],
+      "calls": 1
+    },
+    {
+      "id": "unrequested_scope",
+      "label": "DEFECTIVE",
+      "status": "BLOCKED",
+      "severities": [
+        "BLOCKING"
+      ],
+      "calls": 1
+    },
+    {
+      "id": "recall_gate",
+      "label": "DEFECTIVE",
+      "status": "BLOCKED",
+      "severities": [
+        "BLOCKING"
+      ],
+      "calls": 1
+    },
+    {
+      "id": "unnecessary_repetition",
+      "label": "DEFECTIVE",
+      "status": "BLOCKED",
+      "severities": [
+        "BLOCKING"
+      ],
+      "calls": 1
+    },
+    {
+      "id": "self_created_givens",
+      "label": "SOUND",
+      "status": "PASSED",
+      "severities": [],
+      "calls": 1
+    },
+    {
+      "id": "alternative_check",
+      "label": "SOUND",
+      "status": "PASSED",
+      "severities": [],
+      "calls": 1
+    },
+    {
+      "id": "honest_unavailable_deliverable",
+      "label": "SOUND",
+      "status": "PASSED",
+      "severities": [],
+      "calls": 1
+    },
+    {
+      "id": "valid_intermediate_teaching",
+      "label": "SOUND",
+      "status": "PASSED",
+      "severities": [],
+      "calls": 1
+    },
+    {
+      "id": "format_preference",
+      "label": "PREFERENCE",
+      "status": "PASSED",
+      "severities": [
+        "ADVISORY"
+      ],
+      "calls": 1
+    },
+    {
+      "id": "extra_practice_preference",
+      "label": "PREFERENCE",
+      "status": "PASSED",
+      "severities": [
+        "ADVISORY"
+      ],
+      "calls": 1
+    },
+    {
+      "id": "unknown_prior_readiness",
+      "label": "UNCERTAINTY",
+      "status": "PASSED",
+      "severities": [
+        "WARNING"
+      ],
+      "calls": 1
+    },
+    {
+      "id": "unknown_assessment_weight",
+      "label": "UNCERTAINTY",
+      "status": "PASSED",
+      "severities": [
+        "WARNING"
+      ],
+      "calls": 1
+    }
+  ]
+}

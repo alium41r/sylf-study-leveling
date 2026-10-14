@@ -1,0 +1,64 @@
+{
+  "assessedAt": "2026-10-08T18:36:36.463Z",
+  "method": "Manual independent inspection of actual raw outputs, final checkpoint, findings, declared expectations, workload arithmetic and canonical apply receipts; no model self-approval/apply shortcut.",
+  "status": "FAILED",
+  "accepted": 2,
+  "total": 3,
+  "corpusSha256": "e63997ebbe7702938d8564a5eb63cfc7687ee39622346e19a7dbd026af52df9a",
+  "cases": [
+    {
+      "id": "tiny-exam",
+      "accepted": true,
+      "reasons": [
+        "One integrated task supplies correct 12 V/200 Ω/400 Ω worked values, a 9 V/100 Ω/200 Ω unaided changed circuit, a voltage-sum check and own-words explanation. The stopping condition ends at correct explained changed work and permits faster progress. The60-minute timebox matches stated20+20–30+10instructional minutes and stays within its own estimate."
+      ],
+      "limits": [
+        "Part C self-recomputation is weaker than a supplied independent solution and may duplicate checking; no external solution dependency is invented. A reviewer warning overlooks the already supplied voltage-sum constraint. Single-run educational acceptance is not demonstrated learner mastery."
+      ]
+    },
+    {
+      "id": "tiny-roomy-exam",
+      "accepted": true,
+      "reasons": [
+        "Two30-minute tasks have distinct teaching/application and unaided changed-demonstration contributions, correct supplied numeric checks, exact stopping and no unverified resources.60minutes equals the paired control; more capacity does not increase booked work in this pair."
+      ],
+      "limits": [
+        "Two supported examples add instructional practice but no compulsory work after independent success; small single-pair evidence is not reliability certification."
+      ]
+    },
+    {
+      "id": "triage",
+      "accepted": false,
+      "reasons": [
+        "Primary duplicates the selected Plan and emits activitiesExtra/contribution2; fallback omits contribution on EXCLUDED scope. Strict rejection prevents publication. Its rejected fallback also provides an incorrect parallel-current answer."
+      ],
+      "limits": []
+    }
+  ],
+  "metrics": {
+    "externalAttempts": 6,
+    "settledCalls": 6,
+    "unknownSpendCalls": 0,
+    "knownInputTokens": 31754,
+    "knownOutputTokens": 8051,
+    "unknownReservedInputTokens": 0,
+    "unknownReservedOutputTokens": 0,
+    "unknownPricingReceipts": 6,
+    "truncatedResponses": 0,
+    "completeSTOPReplies": 6,
+    "providerErrors": [],
+    "fallbackDispatches": 1,
+    "repairCalls": 0,
+    "verificationCalls": 0,
+    "caseLatencyMs": {
+      "median": 10039,
+      "maximum": 24922
+    },
+    "upstreamLatencyMs": {
+      "median": 6858.5,
+      "maximum": 14436
+    }
+  },
+  "naturalAcceptedRepairVerificationApplyWitness": false,
+  "productionConfigurationChanged": false
+}

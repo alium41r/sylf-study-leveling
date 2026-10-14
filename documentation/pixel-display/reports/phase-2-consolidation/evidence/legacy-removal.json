@@ -1,0 +1,103 @@
+{
+  "removedSource": [
+    "app/components/character/CharacterRenderer.tsx",
+    "app/locker/components/identity/CharacterStudioView.tsx",
+    "scripts/download_and_normalize_canary.mjs",
+    "scripts/normalize_base_canary.mjs"
+  ],
+  "removedAssets": [
+    {
+      "path": "public/sprites/character/forms/form_shinobu.png",
+      "bytes": 19996,
+      "sha256": "fa7156ab210229e023b47d42dc324f2be9e1b2d6e839abd0d15f067a17f4bf86"
+    },
+    {
+      "path": "public/sprites/character/forms/form_spiderman.png",
+      "bytes": 20759,
+      "sha256": "642f9b668c6808a0a22b625f8832271b612dbc297ed0a6afc861ba673e7dbabb"
+    },
+    {
+      "path": "public/sprites/character/forms/form_megumi.png",
+      "bytes": 17921,
+      "sha256": "a8a80395fb30c50649bf8a4691693009fa1e1663c2a2705c7345b538a148ec78"
+    },
+    {
+      "path": "public/sprites/character/forms/form_itadori.png",
+      "bytes": 24815,
+      "sha256": "1addacbf0eb94fa70d6f49628f8faa3c2e80a8c404dc53230e085827e4ba2211"
+    },
+    {
+      "path": "public/sprites/character/forms/form_gojo.png",
+      "bytes": 19125,
+      "sha256": "de5d0d94ed1a7c840f8f18df939617f337de3d6ddf5d41027ccb0ac8fbe38423"
+    },
+    {
+      "path": "public/sprites/character/forms/form_nezuko.png",
+      "bytes": 30601,
+      "sha256": "ade7a5687d3614d86fd78284313fc5964434f3184d19c58d0b98e73049112d65"
+    },
+    {
+      "path": "public/sprites/character/forms/form_nobara.png",
+      "bytes": 20615,
+      "sha256": "1f2683c19970764145a2f2ccc745f31bea77d044a276ea9d643ae88d487d5194"
+    },
+    {
+      "path": "public/sprites/character/forms/form_choso.png",
+      "bytes": 19417,
+      "sha256": "c95ff142f6193654a2acf34c042c8407b503e8fdb2cf3b053d379919fd449ff2"
+    },
+    {
+      "path": "public/sprites/character/forms/form_tanjiro.png",
+      "bytes": 18933,
+      "sha256": "28b057554c17e7fb9aa52815f1c38c1e382d8bb568668dc2d5ed86252de8d6ff"
+    },
+    {
+      "path": "public/sprites/character/forms/form_venom.png",
+      "bytes": 31530,
+      "sha256": "6011b3199201354eadb124f5106a79b7f6998f241769fc4ad1be6922838539b8"
+    },
+    {
+      "path": "public/sprites/character/forms/form_uzui.png",
+      "bytes": 30267,
+      "sha256": "6bacb17ad2bba9010f35e6bfa3c8462301224a229335e9f9513ec1db320b47fe"
+    },
+    {
+      "path": "public/sprites/character/forms/form_mitsuri.png",
+      "bytes": 31970,
+      "sha256": "20f433968cc13b6f9ed394ad00088057ed77c3e4a869bd166d0c881de6c5ba82"
+    },
+    {
+      "path": "public/sprites/character/forms/form_deadpool.png",
+      "bytes": 36949,
+      "sha256": "dd4eab5fe28a149b41d9c38143a1ad438f5aaf1643e94474a6cc6ef90604b59d"
+    },
+    {
+      "path": "public/sprites/character/forms/form_eren.png",
+      "bytes": 4704,
+      "sha256": "5a8e69bd8b95501b9c991287b6f9cae7734381b7535d0c9b30f7d08e2c7b8342"
+    },
+    {
+      "path": "public/sprites/character/forms/form_rengoku.png",
+      "bytes": 30761,
+      "sha256": "f7c216add8471cb988fdd06386ffd3c0fa5ca5234150e9f3d6577d0f67f3293e"
+    },
+    {
+      "path": "public/sprites/character/forms/form_megumin.png",
+      "bytes": 21775,
+      "sha256": "4c938e97886d46970e1d7c4e2bf5805cd0fde5e11ff52331007e84afecc3319b"
+    },
+    {
+      "path": "public/sprites/character/body/test_hunter_base.png",
+      "bytes": 776,
+      "sha256": "054b31c31bd64a68a4325a7870f5efb897f780e1cf23815e489e69278b367c25"
+    }
+  ],
+  "totalRemovedAssetBytes": 380914,
+  "retainedInventoryIcons": [
+    "/Users/aliumair/Desktop/sylf/public/sprites/character/forms/form_monarch_tier5.png",
+    "/Users/aliumair/Desktop/sylf/public/sprites/character/forms/form_scholar_tier3.png",
+    "/Users/aliumair/Desktop/sylf/public/sprites/character/forms/form_paladin_tier4.png",
+    "/Users/aliumair/Desktop/sylf/public/sprites/character/forms/form_shadow_tier2.png"
+  ],
+  "landingChanged": []
+}

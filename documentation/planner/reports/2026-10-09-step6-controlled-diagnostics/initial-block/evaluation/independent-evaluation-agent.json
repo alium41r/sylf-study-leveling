@@ -1,0 +1,2699 @@
+{
+  "schemaVersion": 1,
+  "status": "INDEPENDENT_AI_EVALUATION_COMPLETE_WITH_A05_PENDING",
+  "finalizedAtUtc": "2026-10-09T13:14:24.964888+00:00",
+  "reviewer": "Independent AI-agent /root/independent_label_signoff",
+  "humanEvaluation": false,
+  "independentOfCaseAuthor": true,
+  "independentOfTestedProvider": true,
+  "providerCallsMadeByReviewer": 0,
+  "externalJudgeModelCalls": 0,
+  "subagentsSpawned": 0,
+  "furtherCallsAuthorized": false,
+  "frozenBankChanged": false,
+  "method": {
+    "sequence": "Read reasoning-blind.json, frozen evaluator/RUBRIC.md and SIGNOFF_RESOLUTION.md; record independent A01–A08 scores before execution mapping, raw paid evidence and parent assessment; lock at 2026-10-09T12:56:14.333764+00:00; then read mapping/evidence/root locked scores and adjudicate explicitly.",
+    "primaryLock": {
+      "path": "initial-block/evaluation/locked-primary-agent.json",
+      "sha256": "b10caed9057114caab7b9289787a13f6e01919bbcfec369ec5f8e00acaa790c3",
+      "lockedAtUtc": "2026-10-09T12:56:14.333764+00:00"
+    },
+    "preVerdictCandidateJudgments": {
+      "path": "initial-block/independent-review-agent.json",
+      "sha256": "1bc8bddf6156599aea3436ba42aadef66f678bb1f09e1f30dfab47346c0251a4",
+      "initialJudgmentsRecordedAtUtc": "2026-10-09T12:11:45.370771+00:00"
+    },
+    "scoring": "Three dimensions separately, every score ≥4 and no serious defect for pass; no averaging, invented output, timebox floor or compulsory preferred method. Completed STOP responses assessed verbatim. Missing/capped reviews remain unassessable.",
+    "blindingLimitation": "Neutral A01–A08 IDs conceal execution mapping and per-case provider/config labels until lock. The reviewer previously signed the original tasks and gold mixture, and knows from the task authorization that the run used DeepSeek only. This is not full blinding."
+  },
+  "summary": {
+    "reasoningCompleteStop": 8,
+    "reasoningEnvelopeValid": 8,
+    "confirmedReasoningPasses": 6,
+    "confirmedReasoningFailures": 1,
+    "pendingReasoningJudgments": 1,
+    "confirmedSeriousReasoningDefects": 0,
+    "confirmedMaterialNonSeriousReasoningFailures": 1,
+    "pendingCase": "A05/g04",
+    "allEightReasoningGate": "FAIL_CONFIRMED_A03_EVIDENCE_ERROR",
+    "pendingCaseAdjudicationGate": "PENDING_NOT_PASSED",
+    "reviewPlanned": 12,
+    "reviewAttempted": 2,
+    "reviewDelivered": 0,
+    "reviewBlankCapped": 2,
+    "reviewSkipped": 10,
+    "reviewOperationalDeliveryGate": "FAIL",
+    "reviewSemanticAccuracy": "UNASSESSABLE",
+    "reviewSensitivity": "UNASSESSABLE",
+    "reviewPrecision": "UNASSESSABLE",
+    "reviewFalsePositiveRate": "UNASSESSABLE",
+    "invalidParseableConcernsObserved": 0,
+    "invalidConcernRate": null,
+    "overallQualification": "NOT_QUALIFIED",
+    "noFurtherExecutionAuthorization": true
+  },
+  "reasoning": [
+    {
+      "assessmentId": "A01",
+      "trialId": "d_d5011475b34a9da1",
+      "caseId": "g02",
+      "packet": "model/packets/d_d5011475b34a9da1.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A01",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "PASS",
+        "meetsAllThreeScoreThresholds": true,
+        "hasSeriousDefect": false,
+        "rationale": "The actual totals and known overclaim are addressed without reteaching secure value reading or requiring a climate archive. A bounded near-transfer check, explicit unsupported claim and independent stopping gate are useful. The claim about comparisons across stations is broader than needed for a local station trend but does not require unavailable work.",
+        "representativeOutputQuote": "Then make limits of trend inference the main effort: have the learner write one claim that the three one-year, one-station values do support",
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "Prepare to read monthly rainfall totals and explain what the data can and cannot establish about a longer-term trend.",
+            "outputQuote": "a climate trend requires multi-year data, appropriate comparison across years and stations",
+            "consequence": "The wording can imply multiple stations are always needed for a local station trend; that geographic generalization is unnecessary here. It does not compel an archive or alter the correct conclusion about the three supplied months.",
+            "resolution": "Qualify comparisons as appropriate to the claim's geographic scope; multi-year observations of the same station can address a local long-term question."
+          }
+        ],
+        "stoppingGate": "Stop when learner independently interprets data, rejects unsupported trend, states missing evidence and passes one transfer item.",
+        "resources": "Supplied 40/70/50 mm data, labels and explicitly created practice; no archive/forecasting.",
+        "admissibleAlternatives": "Any valid comparisons and justified data-limited claims remain possible; no compulsory multi-station archive.",
+        "finalTextSha256": "9abe2e04c1d0930d10131bbcf2d38ef984e03ef9817993913829c0e25524817c",
+        "acceptedInputSha256": "663139582bf80151b43509583b1c82742ce9c36981b670727f3805f32ff82eec",
+        "verbatimFinalText": "{\"strategy\":\"Work backward from the accepted outcome: justified interpretation of monthly rainfall data, and the fixed deadline. Because the learner already reads values correctly, do not spend primary effort on basic value reading. First, briefly verify graph units and comparisons: confirm the unit is millimetres and make the supplied comparisons from January 40 mm, February 70 mm and March 50 mm (February highest; March between January and February). Then make limits of trend inference the main effort: have the learner write one claim that the three one-year, one-station values do support ('this year at this station, February was the wettest of these three months') and one they do not support ('the climate is getting wetter'). Require an explicit reason: a climate trend requires multi-year data, appropriate comparison across years and stations, and separation of short-term variation from longer-term change. Correctness checks: units and labels; correct month order and differences; claim wording limited to the data; identification of the missing evidence; no archive fetching or meteorological forecasting. Use supplied or explicitly created practice values for one near-transfer item with a different pattern and ask for one justified and one overclaim. Dependencies: accurate reading and comparison precede the limits-of-inference work; do not move on if comparisons are wrong. Effort: no official weighting is supplied, so priority rests on the observed overclaim and its direct link to the outcome; use about the preferred 15 minutes, not a broad climate project. Uncertainty: exam importance and mark weight are unknown; do not claim typical frequency or marks. Stop when the learner independently gives a defensible interpretation, correctly labels the overclaim as unsupported, states the missing evidence, and passes one transfer item. Defer historical archive retrieval, forecasting, and broad climate science.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A01",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "decision": "PASS",
+        "rationale": "Targets the observed unsupported climate inference, checks supplied values and limits, and uses one bounded changed-pattern check. No archive fetching or invented exam weights.",
+        "stoppingGate": "Stop on independent defensible interpretation, missing evidence and transfer check.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [
+          "The reference to comparisons across stations overstates what is necessary for a local long-term trend; the decisive missing multi-year evidence is correct."
+        ],
+        "defects": [],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "PASS",
+        "hasSeriousDefect": false,
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "Prepare to read monthly rainfall totals and explain what the data can and cannot establish about a longer-term trend.",
+            "outputQuote": "a climate trend requires multi-year data, appropriate comparison across years and stations",
+            "consequence": "The wording can imply multiple stations are always needed for a local station trend; that geographic generalization is unnecessary here. It does not compel an archive or alter the correct conclusion about the three supplied months.",
+            "resolution": "Qualify comparisons as appropriate to the claim's geographic scope; multi-year observations of the same station can address a local long-term question."
+          }
+        ],
+        "adjudicationStatus": "CONFIRMED",
+        "rationale": "The actual totals and known overclaim are addressed without reteaching secure value reading or requiring a climate archive. A bounded near-transfer check, explicit unsupported claim and independent stopping gate are useful. The claim about comparisons across stations is broader than needed for a local station trend but does not require unavailable work."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "COMPARISON",
+          "disposition": "Both assessors pass; any 4/5 differences remain separately recorded and do not change the thresholds."
+        }
+      ]
+    },
+    {
+      "assessmentId": "A02",
+      "trialId": "d_63ea398f0b23e2f0",
+      "caseId": "g03",
+      "packet": "model/packets/d_63ea398f0b23e2f0.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A02",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 5
+        },
+        "judgment": "PASS",
+        "meetsAllThreeScoreThresholds": true,
+        "hasSeriousDefect": false,
+        "rationale": "The strategy targets the consent-aware outline, includes an open question, concrete-event follow-up and correction invitation, checks all four supplied brief requirements, and preserves recording/editing/account checking as later unbooked scope. The learner drafts/self-checks rather than merely attends.",
+        "representativeOutputQuote": "Meaningful stopping point: a checked question outline that can elicit one concrete remembered event and includes consent and correction.",
+        "issues": [],
+        "stoppingGate": "Stop at a checked outline with consent/correction that can elicit a remembered event; revise once if initial check fails and do not claim a failing outline passed.",
+        "resources": "Supplied project brief and willing interviewee; no interview date, recording or software needed now.",
+        "admissibleAlternatives": "Different non-leading questions, outline formats or self-check/optional verbal test can satisfy the gate. One page is a modest format suggestion, not an additional educational milestone.",
+        "finalTextSha256": "9061077313156fe086248c12baabfda3609103372c1f528fe534e425bb48d948",
+        "acceptedInputSha256": "84b57f7244048e0569f4506295437b28f27f157478c38430a813313d2d850a14",
+        "verbatimFinalText": "{\"strategy\":\"Treat this as a beginner, consent-first question-design checkpoint, not the whole oral history project. Use a short, comfortable work period, ideally around the preferred 15 minutes: briefly model oral-history ethics and question types, then have the learner draft and self-check a one-page outline aimed at eliciting one specific remembered event. Prioritize permission language, one non-leading open lead question, at least one follow-up asking for a concrete time, place, action, or sensory detail, and an explicit invitation for the speaker to correct or clarify the account. Correctness checks should verify the outline against the brief's four requirements, screen for leading or compound questions, and confirm wording stays speaker-centered. If the outline fails, revise once; if it passes, stop. Dependencies: a willing interviewee is identified but no date or recording exists, so no recording, editing, or software is needed now. Recording, selecting/editing audio, and full account-checking remain later strategic scope, unbooked unless fresh evidence and an explicit request justify them. Uncertainty: the learner has never designed an interview and the chosen event may need calibration, so keep the outline simple and optionally test it verbally. Meaningful stopping point: a checked question outline that can elicit one concrete remembered event and includes consent and correction. Do not schedule the interview or begin recording or editing at this checkpoint.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A02",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 4,
+          "evidenceAndUncertainty": 5
+        },
+        "decision": "PASS",
+        "rationale": "Preserves the recording/editing/speaker-checking scope but books only a consent-aware outline, with all four brief checks. Brief modeling could be more concrete, without requiring a literal interview script.",
+        "stoppingGate": "Checked concrete-event question outline containing permission, open question, follow-up and correction opportunity.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [],
+        "defects": [],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 5
+        },
+        "judgment": "PASS",
+        "hasSeriousDefect": false,
+        "issues": [],
+        "adjudicationStatus": "CONFIRMED",
+        "rationale": "The strategy targets the consent-aware outline, includes an open question, concrete-event follow-up and correction invitation, checks all four supplied brief requirements, and preserves recording/editing/account checking as later unbooked scope. The learner drafts/self-checks rather than merely attends."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "COMPARISON",
+          "disposition": "Both assessors pass; any 4/5 differences remain separately recorded and do not change the thresholds."
+        }
+      ]
+    },
+    {
+      "assessmentId": "A03",
+      "trialId": "d_4455ae843acc1082",
+      "caseId": "g01",
+      "packet": "model/packets/d_4455ae843acc1082.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A03",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 4,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "PASS",
+        "meetsAllThreeScoreThresholds": true,
+        "hasSeriousDefect": false,
+        "rationale": "It uses supplied and unfamiliar passages, requires three-way classification and textual justification, prioritizes the actually reported plausibility error, and does not invent exam weights. The claim that inference has already been demonstrated/partly performed is not grounded as learner evidence; however, the independent gate still checks inference alongside both other categories, so this attribution does not remove required work or certify false readiness.",
+        "representativeOutputQuote": "Stop when the learner independently classifies and justifies all three categories across two unseen passages with no overreach into background assumptions",
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "The learner can find a direct quotation but treats plausible background stories as established facts.",
+            "outputQuote": "Evidence shows literal quotation is already partly secure, inferential reading is demonstrated in the sample passage",
+            "additionalOutputQuote": "Inference practice focuses on the evidence-to-conclusion link already partly performed.",
+            "consequence": "The supplied correct passage classification is an instructional example, not a demonstrated learner inference performance. This overstates readiness, but final independent checks still cover inference and priority remains the real unsupported-claim weakness.",
+            "resolution": "Describe supplied inference as a model/example and treat learner inference readiness as unverified pending the first check."
+          }
+        ],
+        "stoppingGate": "Independently classify/justify all three categories across two unseen passages without background overreach.",
+        "resources": "Supplied library passage plus unfamiliar short passages can be explicitly created; no external answer resource required.",
+        "admissibleAlternatives": "Quoted or paraphrased evidence and an explanation of what is missing are valid; the exercise count and preferred timeboxes are a bounded approach rather than a universal floor.",
+        "finalTextSha256": "8d5690d27a3a0055ed9b6a6f509c1c8c734cc78eb1e98cb56b33e830f65404db",
+        "acceptedInputSha256": "f7bf82d7bd844fa0760153d594c233b8c00cfb427310c9619875b254622d7738",
+        "verbatimFinalText": "{\"strategy\":\"Work backwards from the fixed 2026-10-14 assessment and the accepted task (passage-based distinction and explanation checks, no grammar drills, no mark predictions). Because assessment weights are unknown, do not rank topics by assumed marks; rank by actual readiness and dependency. Evidence shows literal quotation is already partly secure, inferential reading is demonstrated in the sample passage, but unsupported claims are conflated with background assumptions — that is the priority. Plan roughly two 15-minute timeboxes on 12–13 Oct (comfortable-early, moderate), leaving exam day for a short confidence warm-up only if the learner wants it; this stays well under available capacity, since nothing justifies saturation. Session shape: use the supplied library passage first, then one or two unfamiliar short passages. For each candidate statement, the learner must (a) label it stated, defensible inference, or unsupported, and (b) justify with a quoted or paraphrased line, or state what the passage would need to say to support it. Literal reading gets only one quick verification check rather than re-teaching. Inference practice focuses on the evidence-to-conclusion link already partly performed. Unsupported claims get the most repetitions, especially plausible-sounding additions such as invented waiting, motives, or timelines. Correctness check: require text-anchored justification every time, and correct any label justified only by plausibility. Stop when the learner independently classifies and justifies all three categories across two unseen passages with no overreach into background assumptions — then stop rather than adding volume. Uncertainty to state plainly: skill importance and relative weighting are unverified, so time is allocated by dependency and observed weakness, not by predicted exam return.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A03",
+        "scores": {
+          "goalCorrespondence": 4,
+          "educationalUsefulnessAndProportion": 4,
+          "evidenceAndUncertainty": 3
+        },
+        "decision": "FAIL",
+        "rationale": "All three categories are practiced and independently checked, but the strategy credits inferential reading as already partly performed without supplied learner evidence for that ability. Unknown weights remain honestly disclosed.",
+        "stoppingGate": "Independent classification and justification across two unseen passages, not timer attendance.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [],
+        "defects": [
+          {
+            "severity": "MATERIAL_NON_SERIOUS",
+            "dimension": "evidenceAndUncertainty",
+            "acceptedExcerpt": "The learner can find a direct quotation but treats plausible background stories as established facts.",
+            "outputExcerpt": "Inference practice focuses on the evidence-to-conclusion link already partly performed.",
+            "additionalOutputExcerpt": "Evidence shows literal quotation is already partly secure, inferential reading is demonstrated in the sample passage",
+            "consequence": "The supplied classification examples are credited as partly demonstrated learner ability, supporting reduced inference emphasis without actual performance evidence. The credit needs correction or an initial diagnostic; final all-category checks prevent this from being a serious omission of the outcome."
+          }
+        ],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 4,
+          "evidenceAndUncertainty": 3
+        },
+        "judgment": "FAIL",
+        "hasSeriousDefect": false,
+        "issues": [
+          {
+            "severity": "MATERIAL_NON_SERIOUS",
+            "serious": false,
+            "requirementQuote": "The learner can find a direct quotation but treats plausible background stories as established facts.",
+            "outputQuote": "Evidence shows literal quotation is already partly secure, inferential reading is demonstrated in the sample passage",
+            "additionalOutputQuote": "Inference practice focuses on the evidence-to-conclusion link already partly performed.",
+            "consequence": "The output credits the supplied correct inference example as demonstrated learner ability and explicitly uses actual readiness to rank practice. That unsupported credit drives its reduced inference emphasis and rationale. The all-category unseen stopping check preserves the outcome, but cannot ground the earlier evidence claim.",
+            "resolution": "Treat the sample inference as instructional material; establish learner inference ability through a diagnostic before using readiness to allocate emphasis."
+          }
+        ],
+        "adjudicationStatus": "CONFIRMED",
+        "rationale": "Initial Evidence=4 treated the credit as minor because all categories remained in the stopping gate. Reapplying the separate evidence dimension shows a consequential unsupported assumption used in prioritization, requiring Evidence=3. Root's Goal=4 versus independent Goal=5 remains a nonblocking score difference; scores are not averaged."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "LOCKED_PRIMARY",
+          "independent": "PASS 5/4/4; unsupported credit minor because all-category unseen check remains",
+          "root": "FAIL 4/4/3; unsupported readiness credit drives practice emphasis"
+        },
+        {
+          "stage": "RECONSIDERATION",
+          "disposition": "Both assessors confirm Evidence=3 FAIL, MATERIAL_NON_SERIOUS. Final checking prevents serious outcome omission but does not cure unsupported reasoning."
+        }
+      ]
+    },
+    {
+      "assessmentId": "A04",
+      "trialId": "d_ac6e119faa6748a5",
+      "caseId": "g06",
+      "packet": "model/packets/d_ac6e119faa6748a5.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A04",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "PASS",
+        "meetsAllThreeScoreThresholds": true,
+        "hasSeriousDefect": false,
+        "rationale": "Correctly distinguishes valid modus-ponens form from converse, gives P=false,Q=true counterexample, seeks unfamiliar valid/invalid decisions and bounded explanations, allows either table or counterexample, and makes remediation conditional. It falsely states that no formal assessment exists, rather than saying none is supplied; no consequential choice depends on that absence claim.",
+        "representativeOutputQuote": "Accept any correct bounded justification; do not require symbols or formal proof machinery.",
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "The learner knows these words but has not evaluated an unfamiliar argument.",
+            "outputQuote": "no prior learning evidence and no formal assessment exist",
+            "consequence": "No formal assessment is supplied, but that does not prove none exists. The bounded method/check does not depend on that categorical absence.",
+            "resolution": "Say no formal-assessment details are supplied rather than asserting none exists."
+          }
+        ],
+        "stoppingGate": "Independent correct decision plus bounded justification on a new mixed item; retention check is conditional on later revisiting, not a scheduled quota.",
+        "resources": "Supplied truth conditions and self-created concrete arguments; no proof notation, external tutor/key or formal assessment needed.",
+        "admissibleAlternatives": "Any bounded valid justification, four-row table or explicit counterexample is admitted.",
+        "finalTextSha256": "a57bdf67b3bd0759c84732da7bb0099a5e3613dd5ae459b13e8d13461c069cf0",
+        "acceptedInputSha256": "92aea533a9b31820d3b652a6c3f89a87a5ee57a1d294d86fb33ac382c8811e91",
+        "verbatimFinalText": "{\"strategy\":\"Treat this as a short mastery-oriented reasoning task. Begin with a brief diagnostic using a concrete if-then statement to surface the learner’s current rule, then restate the operative truth condition: P implies Q is false only when P is true and Q is false. Prioritize two linked capabilities: applying truth conditions to test when a conditional is false, and distinguishing valid inference (from P implies Q and P, conclude Q) from the invalid converse (from P implies Q and Q, infer P). Learner actions: for each unfamiliar simple argument, identify P and Q, state the premises, then try to make the premises true and the conclusion false; for the converse, give the explicit counterexample P=false, Q=true; for the valid form, explain why no counterexample exists under the truth conditions. Accept any correct bounded justification; do not require symbols or formal proof machinery. Correctness checks: the learner independently decides at least one fresh valid item and one fresh invalid or converse item, compares justifications to the truth conditions, and resolves any contradiction. Proportionate effort: fit within the preferred 15-minute window at moderate intensity, comfortable early; stop when the learner can independently transfer the method to a new mixed item and explain the decision, with no fixed practice quota or stage ceremony. Dependencies: truth conditions before converse analysis, with a four-row table or P=false, Q=true example as concrete remediation if the converse error persists. Uncertainty: no prior learning evidence and no formal assessment exist, so treat explanations as evidence and do not let timers or self-report certify mastery. A meaningful stopping point is an independent correct decision plus bounded justification on a new item, with a brief retention check when the topic is revisited.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A04",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "decision": "PASS",
+        "rationale": "Correctly distinguishes valid implication from converse and requires unfamiliar independent decisions with counterexamples or truth conditions. Formal proof notation and a fixed quota are not required.",
+        "stoppingGate": "Independent decision and bounded justification on fresh items; revisited retention check remains informative.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [
+          "No formal assessment exists is stronger than not supplied, but no assessment weight, readiness or essential resource is invented."
+        ],
+        "defects": [],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "PASS",
+        "hasSeriousDefect": false,
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "The learner knows these words but has not evaluated an unfamiliar argument.",
+            "outputQuote": "no prior learning evidence and no formal assessment exist",
+            "consequence": "No formal assessment is supplied, but that does not prove none exists. The bounded method/check does not depend on that categorical absence.",
+            "resolution": "Say no formal-assessment details are supplied rather than asserting none exists."
+          }
+        ],
+        "adjudicationStatus": "CONFIRMED",
+        "rationale": "Correctly distinguishes valid modus-ponens form from converse, gives P=false,Q=true counterexample, seeks unfamiliar valid/invalid decisions and bounded explanations, allows either table or counterexample, and makes remediation conditional. It falsely states that no formal assessment exists, rather than saying none is supplied; no consequential choice depends on that absence claim."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "COMPARISON",
+          "disposition": "Both assessors pass; any 4/5 differences remain separately recorded and do not change the thresholds."
+        }
+      ]
+    },
+    {
+      "assessmentId": "A05",
+      "trialId": "d_28b1cf3e53f64ddf",
+      "caseId": "g04",
+      "packet": "model/packets/d_28b1cf3e53f64ddf.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A05",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 3,
+          "educationalUsefulnessAndProportion": 3,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "FAIL",
+        "meetsAllThreeScoreThresholds": false,
+        "hasSeriousDefect": true,
+        "rationale": "The first-card strategy is otherwise bounded and locally feasible, preserves supplied description and future scope, and acknowledges no image exists. Its explicit present/nonempty alt-attribute correctness gate nevertheless applies to the selected placeholder route. The accepted facts allow a text placeholder plus explanation of future-image alternative text; a normal text placeholder has no image alt attribute. The gate rejects that allowed artifact and can teach meaningless alt markup on text containers. This needs substantive criterion/instruction correction.",
+        "representativeOutputQuote": "Correctness checks: file opens without error in a browser; exactly one heading for the card; description matches source wording; alt attribute is present and descriptive, not empty or decorative;",
+        "issues": [
+          {
+            "severity": "SERIOUS",
+            "serious": true,
+            "adjudicationRequired": true,
+            "category": "WEAK_CRITERION",
+            "requirementQuote": "No object image file is supplied. The first card may use a text placeholder and explain the alternative text that an actual image would need.",
+            "outputQuote": "an image element — or an explicit placeholder — carrying a meaningful alt attribute",
+            "additionalOutputQuote": "alt attribute is present and descriptive, not empty or decorative",
+            "consequence": "The accepted text-placeholder branch can meet the goal with visible text and explanation, yet it fails the mandatory attribute gate. A beginner can be taught that alt on an arbitrary text placeholder provides image accessibility semantics. The first-card completion check is therefore incorrect for an expressly allowed route.",
+            "resolution": "Apply present/descriptive alt only when a real img element is used. For a text placeholder, check the readable placeholder and a separate explanation/sentence of the alternative text a future image would need. Do not require a missing image asset.",
+            "severityRationale": "This is a substantive instruction/criterion defect against a consequential accepted alternative, rather than a preference for one tag, format or timebox. It requires adjudication; a permissible image-placeholder implementation does not repair the output's unconditional gate for text placeholders."
+          }
+        ],
+        "stoppingGate": "The strategy ends at independent rebuilding plus alt explanation, but its mandatory alt-attribute gate incorrectly governs a permitted text-placeholder card. The coherent smaller artifact is a resume checkpoint, not a claim of completion.",
+        "resources": "Text editor/browser and supplied description are available/feasible; no image asset required. Future image-alt sentence is feasible; alt attribute applies to an actual image element, not arbitrary text.",
+        "admissibleAlternatives": "Plain text placeholder with a separate meaningful future-image alternative-text explanation must remain admissible. Semantic article/section or heading choices are not the reason for failure.",
+        "finalTextSha256": "c27d7a0b3d6ab04fea53439dfab5c0847e90db9b34742083d39ce395d90063fc",
+        "acceptedInputSha256": "f71a9c91346d87a3b2f3a8fb150cbfe980dfe86100ba9ee057c1c510131a2834",
+        "verbatimFinalText": "{\"strategy\":\"Treat the accepted request as a single learn-by-doing prerequisite checkpoint, not the exhibit itself: producing one locally opened HTML file that renders an accessible object card for the blue ceramic bowl. Approach: brief worked demonstration of the minimum semantic skeleton, then guided practice where the learner types and adjusts it themselves and reopens the file in a browser to see the effect. Priorities in order: (1) a valid HTML document container that opens locally by double-click; (2) one card region (article or section) with a single correct heading; (3) the supplied description reproduced faithfully as body text (\\\"Blue bowl with a chipped rim.\\\"); (4) an image element — or an explicit placeholder — carrying a meaningful alt attribute, with a short explanation of why alt text must describe the object rather than repeat the caption or filename. Because no image file is supplied, teach the placeholder route and have the learner write the exact alt sentence a real photo would need (e.g. a blue ceramic bowl with a chipped rim). Defer navigation, visual/CSS polish, and publication: these are included strategic scope but unbooked and require no activity now, so record them as later milestones only. Correctness checks: file opens without error in a browser; exactly one heading for the card; description matches source wording; alt attribute is present and descriptive, not empty or decorative; learner can state, unaided, what would break for a screen-reader user if alt were missing. Effort is small and should finish promptly — one comfortable session of about 15 minutes within the ample daily capacity — with the stopping point being the learner independently rebuilding the card without copying and explaining the alt-text choice. If time runs short, stop at a coherent smaller artifact (document plus heading and description) and resume there. Dependencies: a plain text editor and any browser; no framework, JavaScript, hosting, account or image asset. Uncertainty is low about scope and mechanics but higher about transfer to the next object, so later expansion (second/third card, navigation, styling, publication) should wait for fresh evidence and an explicit request.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A05",
+        "scores": {
+          "goalCorrespondence": 3,
+          "educationalUsefulnessAndProportion": 3,
+          "evidenceAndUncertainty": 3
+        },
+        "decision": "FAIL",
+        "rationale": "The strategy retains future scope and the actual description, but applies a mandatory image-alt attribute check even on the explicitly allowed text-placeholder route; this narrows the accepted checkpoint without support.",
+        "stoppingGate": "Independent local card rebuild and alt explanation, but the stated attribute gate excludes an allowed text placeholder.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [
+          "Unaided rebuild without copying is a stricter demonstration than the stated first-card outcome; treat it as a proportion/clarity concern rather than a separate serious blocker."
+        ],
+        "defects": [
+          {
+            "severity": "SERIOUS",
+            "dimension": "goalCorrespondenceAndUsefulness",
+            "acceptedExcerpt": "No object image file is supplied. The first card may use a text placeholder and explain the alternative text that an actual image would need.",
+            "outputExcerpt": "alt attribute is present and descriptive, not empty or decorative",
+            "additionalOutputExcerpt": "an image element — or an explicit placeholder — carrying a meaningful alt attribute",
+            "consequence": "A readable heading/description card using the allowed text placeholder and explanation can meet every accepted requirement yet fail the mandatory alt-attribute gate. A text placeholder is not an image element with an alt attribute. The strategy needs conditional checks for the two permitted routes instead of an image requirement on both."
+          }
+        ],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": null,
+        "judgment": "PENDING_OUTPUT_ADJUDICATION",
+        "hasSeriousDefect": null,
+        "adjudicationStatus": "PENDING",
+        "confirmedFailure": false,
+        "confirmedPass": false,
+        "rationale": "The future-photo explanation and mandatory present-alt gate remain ambiguous, but the prose does not conclusively identify an ordinary text container rather than an img-based placeholder/fallback. A valid chosen implementation need not support every permitted method. Omission of an explicit resource in a prose strategy alone does not prove the resource is unavailable or that alt is applied to a text element. No final numeric score or categorical serious finding is manufactured."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "LOCKED_PRIMARY",
+          "independent": "FAIL 3/3/4; serious unconditional alt gate inferred on text placeholder",
+          "root": "FAIL 3/3/3; same initial criterion concern"
+        },
+        {
+          "stage": "INITIAL_CONCURRENCE",
+          "disposition": "Both initially agreed on a serious criterion failure; this history remains preserved."
+        },
+        {
+          "stage": "VALID_ALTERNATIVE_CHALLENGE",
+          "challenge": "The strategy may choose one valid implementation. Could an explicit placeholder carrying alt reasonably mean an img-based fallback? Failure to enumerate every permitted route is not itself a defect."
+        },
+        {
+          "stage": "WITHDRAWAL_AND_FINAL_DISPOSITION",
+          "withdrawnInference": "The output necessarily teaches alt on a div or ordinary text container.",
+          "remainingConcern": "Future-image alt explanation versus unconditional present-alt completion gate; intended placeholder branch and feasible source treatment are not explicit.",
+          "disposition": "PENDING_OUTPUT_ADJUDICATION accepted by both assessors; original failed scores unchanged; no final numeric score, confirmed serious consequence or fabricated pass."
+        }
+      ],
+      "pendingConcern": {
+        "severity": "UNRESOLVED_MATERIALITY_AND_SERIOUSNESS",
+        "requirementQuote": "No object image file is supplied. The first card may use a text placeholder and explain the alternative text that an actual image would need.",
+        "outputQuotes": [
+          "an image element — or an explicit placeholder — carrying a meaningful alt attribute",
+          "alt attribute is present and descriptive, not empty or decorative"
+        ],
+        "conditionalConsequence": "If ordinary text plus future-image explanation is the intended route, mandatory present alt can reject a valid artifact or teach incorrect attribute semantics. If a valid img-based fallback is intended, the attribute gate can be legitimate. The output does not conclusively select between these readings.",
+        "neededClarification": "Which placeholder element/route is intended, and what source handling makes its completion check feasible? No follow-up provider request or repair is authorized."
+      },
+      "technicalReference": {
+        "url": "https://html.spec.whatwg.org/multipage/embedded-content.html#attr-img-alt",
+        "use": "Official unpaid post-run technical reference, never included in tested provider requests. The img alt attribute supports equivalent/fallback content; a conforming img must have src or srcset, with src a nonempty valid URL referencing an image resource. These semantics alone do not establish which placeholder the prose intends or that a source is impossible."
+      }
+    },
+    {
+      "assessmentId": "A06",
+      "trialId": "d_3284c39bab869cee",
+      "caseId": "g05",
+      "packet": "model/packets/d_3284c39bab869cee.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A06",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 4,
+          "educationalUsefulnessAndProportion": 4,
+          "evidenceAndUncertainty": 5
+        },
+        "judgment": "PASS",
+        "meetsAllThreeScoreThresholds": true,
+        "hasSeriousDefect": false,
+        "rationale": "Independent changed production/explanation, es/está accents, conditional bounded help and honest unknown retention all match the task. A few fresh sentences and mixed contexts can be proportionate here. The optional different-pronouns example should be kept to third-person singular compatible with supplied forms; other persons would create an unsupported conjugation dependency, but the output also offers valid different-name/same-form contexts.",
+        "representativeOutputQuote": "Apply bounded remediation only if the distinction actually fails: restate the supplied rule, show one minimal contrast pair built from the learner's own chosen name, then ask for one new sentence plus re-explanation.",
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "Names and occupations may be learner-chosen; use supplied forms es/está. No external tutor or exercise key is available.",
+            "outputQuote": "a couple of fresh contexts such as different people, pronouns, or a person who is both a teacher and currently tired",
+            "consequence": "Unqualified pronoun variation could invite forms outside es/está. The examples are alternatives and third-person-singular variation is valid, so this does not compel unavailable conjugation learning.",
+            "resolution": "Keep names/pronouns compatible with es/está and do not introduce a new conjugation dependency."
+          }
+        ],
+        "stoppingGate": "Novel correct sentences covering both uses, accurate explanations and one transfer item; if one remediation cycle still fails, record not mastered and stop. Retention suggestion is optional/unfixed.",
+        "resources": "Supplied teacher rule/models and learner-chosen names/occupations; self-check acknowledged unverified, no tutor/key claimed.",
+        "admissibleAlternatives": "Different names or third-person-singular pronouns with es/está; no requirement to use first/second person, other tenses or every ser/estar use.",
+        "finalTextSha256": "6a0a113d2009003521f98fe3e515667054a7407eb3a8aa5228767c0886f5a379",
+        "acceptedInputSha256": "4a78765c9316fdc037577fbaeffe44ecdc809f42a5b4510cc769c2185dfe262a",
+        "verbatimFinalText": "{\"strategy\":\"Target demonstrated mastery of only the two bounded items — occupation with \\\"es\\\" and current tiredness with \\\"está\\\" — within the learner's stated comfortable-early, moderate, ~15-minute preference, not coverage of other ser/estar uses. Spend the first minutes on a quick recall of the two supplied models, then move almost all time to the core evidence: the learner independently produces changed sentences, using self-chosen names, occupations and tiredness statements, and must not reuse \\\"Ana es profesora\\\" or \\\"Ana está cansada.\\\" Treat three things as separate evidence rather than one: (1) changed production with the correct verb and preserved \\\"está\\\"; (2) an accurate rule explanation (occupation → ser; current state/tiredness → estar); (3) transfer, i.e., a couple of fresh contexts such as different people, pronouns, or a person who is both a teacher and currently tired. A correct verb with a wrong explanation, a right explanation over a recycled sentence, or a correct sentence on the known models only does not count as mastery. Apply bounded remediation only if the distinction actually fails: restate the supplied rule, show one minimal contrast pair built from the learner's own chosen name, then ask for one new sentence plus re-explanation. Cap this at a single cycle; if it still fails, stop and record the distinction as not yet mastered instead of drilling. Because no external tutor or exercise key exists, every check is self-checked against the stated rule and the accented \\\"está\\\"; record self-report as evidence but acknowledge it is unverified and cannot certify readiness. Keep effort proportionate: one or two short sittings across the available window only if needed, no stage ceremony and no practice quota. Meaningful stopping point: the learner has produced several independent, novel correct sentences covering both scope items, explained each choice accurately, and passed one transfer item — then stop, optionally noting that a brief retention re-check on a later day would be informative, without fixing a date. Priorities if time is short: changed production first, explanation second, transfer third. Known uncertainties: the learner currently only recognizes the models; retention and durability beyond the session are unknown.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A06",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 4,
+          "evidenceAndUncertainty": 4
+        },
+        "decision": "PASS",
+        "rationale": "Uses only the occupation/current-tiredness distinction, changed production and explanation, conditional bounded correction and honest unknown retention. No claimed readiness from self-report.",
+        "stoppingGate": "Novel correct production for both uses, explanations and a bounded transfer item; stop after a failed correction rather than drill.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [
+          "Different pronouns should stay within supplied es/está forms; the explicit opening scope restriction permits that reading, so do not invent a compulsory conjugation expansion.",
+          "Several novel sentences and one transfer item are a modest bounded check, not evidence of a serious fixed quota."
+        ],
+        "defects": [],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": {
+          "goalCorrespondence": 4,
+          "educationalUsefulnessAndProportion": 4,
+          "evidenceAndUncertainty": 5
+        },
+        "judgment": "PASS",
+        "hasSeriousDefect": false,
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "Names and occupations may be learner-chosen; use supplied forms es/está. No external tutor or exercise key is available.",
+            "outputQuote": "a couple of fresh contexts such as different people, pronouns, or a person who is both a teacher and currently tired",
+            "consequence": "Unqualified pronoun variation could invite forms outside es/está. The examples are alternatives and third-person-singular variation is valid, so this does not compel unavailable conjugation learning.",
+            "resolution": "Keep names/pronouns compatible with es/está and do not introduce a new conjugation dependency."
+          }
+        ],
+        "adjudicationStatus": "CONFIRMED",
+        "rationale": "Independent changed production/explanation, es/está accents, conditional bounded help and honest unknown retention all match the task. A few fresh sentences and mixed contexts can be proportionate here. The optional different-pronouns example should be kept to third-person singular compatible with supplied forms; other persons would create an unsupported conjugation dependency, but the output also offers valid different-name/same-form contexts."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "COMPARISON",
+          "disposition": "Both assessors pass; any 4/5 differences remain separately recorded and do not change the thresholds."
+        }
+      ]
+    },
+    {
+      "assessmentId": "A07",
+      "trialId": "d_0f51cb688400b89c",
+      "caseId": "g08",
+      "packet": "model/packets/d_0f51cb688400b89c.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A07",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 5
+        },
+        "judgment": "PASS",
+        "meetsAllThreeScoreThresholds": true,
+        "hasSeriousDefect": false,
+        "rationale": "It computes all actual bars correctly, repairs the two-eighths misconception, offers all expressly allowed counting modalities and stops after actual worksheet explanation/check. No invented worksheet, recording/attendance or broad mastery claim.",
+        "representativeOutputQuote": "B = q e e q q = 1 + 1/2 + 1/2 + 1 + 1 = 4; C = e e e e q q = 1/2+1/2+1/2+1/2+1+1 = 4",
+        "issues": [],
+        "stoppingGate": "Learner explains each assigned bar and each sums to four; only error-triggered corrective recount.",
+        "resources": "Supplied q/e key and all three assigned bars; no external resources.",
+        "admissibleAlternatives": "Written, spoken or clapped counting remain equally valid; equivalent sum notation is accepted.",
+        "finalTextSha256": "9773fd624613d080cf2efe7ff3679c926024d50c6ef55adfbd0f61fef3efa74f",
+        "acceptedInputSha256": "b0f25f5808c33a521ea6d9277432275c4f1fb844c33432b5b9bd1d35dfb6959a",
+        "verbatimFinalText": "{\"strategy\":\"Use brief direct instruction plus guided practice: confirm the supplied note values (q = one beat; e = half a beat) and that a 4/4 bar totals four, then have the learner count aloud, write, or clap each assigned bar and explain each note's contribution. Priority is correcting the known misconception that two eighth notes are two whole beats; prompt the learner to group each e-e pair as one beat. Check correctness by summing each bar: A = q q q q = 4; B = q e e q q = 1 + 1/2 + 1/2 + 1 + 1 = 4; C = e e e e q q = 1/2+1/2+1/2+1/2+1+1 = 4, and by asking the learner to re-explain any bar that does not total four. Proportionate effort: use about 10–15 minutes, comfortable early, with no recording or teacher attendance required; do not invent extra exercises or claim broader mastery. If the learner still treats eighths as whole beats, give one concrete correction and re-count that bar; otherwise stop. Dependencies are the supplied note values and the three assigned bars only. Stopping point: after the learner explains the three bars using the supplied note values and each bar checks as four beats; add no more unless an error triggers the single corrective re-count.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A07",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 5
+        },
+        "decision": "PASS",
+        "rationale": "Correctly totals all real bars at four, addresses the two-eighths misconception and stops after actual worksheet explanation/checking. Modalities are alternatives; no recording, new bars or broad mastery claim.",
+        "stoppingGate": "All three assigned bars explained and checked as four; single error-triggered recount.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [],
+        "defects": [],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 5
+        },
+        "judgment": "PASS",
+        "hasSeriousDefect": false,
+        "issues": [],
+        "adjudicationStatus": "CONFIRMED",
+        "rationale": "It computes all actual bars correctly, repairs the two-eighths misconception, offers all expressly allowed counting modalities and stops after actual worksheet explanation/check. No invented worksheet, recording/attendance or broad mastery claim."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "COMPARISON",
+          "disposition": "Both assessors pass; any 4/5 differences remain separately recorded and do not change the thresholds."
+        }
+      ]
+    },
+    {
+      "assessmentId": "A08",
+      "trialId": "d_2f5488d294f95e29",
+      "caseId": "g07",
+      "packet": "model/packets/d_2f5488d294f95e29.json",
+      "initialIndependentAssessment": {
+        "assessmentId": "A08",
+        "finishReason": "stop",
+        "assessability": "ASSESSABLE_COMPLETE_STOP",
+        "envelopeValidity": "VALID_ONE_STRING_FIELD",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "PASS",
+        "meetsAllThreeScoreThresholds": true,
+        "hasSeriousDefect": false,
+        "rationale": "Directly performs the four actual annotation moves, distinguishes observation from opinion, quotes source text and gives a specific limit without invented sources/attendees/extra annotations. It overstates that uncertainty is necessarily resolved by one checking pass; the actual stopping gate still requires a correct annotation and the revision path does not automatically certify failure as success.",
+        "representativeOutputQuote": "Stop when the annotation contains all four requirements, the quote matches the source, and the interpretation is worded as the author's view, not a count of everyone's opinion.",
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "Complete and check the actual annotation; stop when all four assigned requirements are satisfied.",
+            "outputQuote": "both are resolved by the checking pass itself",
+            "consequence": "A checking pass can reveal a persisting misconception rather than resolve it automatically. The separate final gate requires actual correct annotation, so the statement does not certify an incorrect product.",
+            "resolution": "Say the pass tests these uncertainties; record/revise an unresolved distinction instead of promising resolution."
+          }
+        ],
+        "stoppingGate": "All four requirements present, quote matches source and interpretation remains the author's view rather than everyone's opinions.",
+        "resources": "Complete supplied diary entry and assignment; no other source needed/claimed.",
+        "admissibleAlternatives": "Any grounded evidential limit remains admissible; two-line distinction and draft/check order are useful methods, not exclusive requirements.",
+        "finalTextSha256": "5138c580227a2afa0fc7251c8bf02cf61bda9ad46ac5e10bb3257b93a4af4bd8",
+        "acceptedInputSha256": "b5458bcb53f142e5efb15d05deefd2c89ee3e81ebf49166fb498f425747b0389",
+        "verbatimFinalText": "{\"strategy\":\"Treat this as bounded homework completion, not a study project: work directly on the four assigned moves and stop as soon as all four are present and checked. Sequence them in the order given — (1) name the observed event (six people leaving before the vote), (2) name the interpretation ('I think everyone disliked the proposal'), (3) quote the supporting words verbatim from the diary, (4) state one evidential limit — because each move depends on the one before it. The critical correctness risk is the learner's habit of reading the author's inference as a headcount of all attendees' opinions; pre-empt this by having the learner keep two labelled lines, 'what the author saw' versus 'what the author concluded', and check that the second line still says 'thinks' or 'believes' rather than stating a fact about every attendee. Verify quotes character-for-character against the supplied sentence, and verify the limit is genuinely about this source (single participant's diary, no other source supplied, so it cannot establish what all attendees felt) rather than a generic disclaimer. If the learner collapses the distinction, do not add new sources or invented attendees; re-ask only which words are observation and which are inference, then let them revise. Effort is proportionate to a 15-minute comfortable-early block at moderate intensity: one pass to draft all four elements, one pass to check quotes and the observation/interpretation split. Uncertainty is limited to whether the learner can hold the distinction unaided and whether a stated limit is specific enough; both are resolved by the checking pass itself. Stop when the annotation contains all four requirements, the quote matches the source, and the interpretation is worded as the author's view, not a count of everyone's opinion.\"}"
+      },
+      "initialRootAssessment": {
+        "assessmentId": "A08",
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 5
+        },
+        "decision": "PASS",
+        "rationale": "Keeps all four actual annotation requirements and correct observation/interpretation distinction, checks literal quotes and a specific source limit, with no essay or extra sources.",
+        "stoppingGate": "All four annotation requirements, matching quote and author-view wording rather than universal opinion count.",
+        "resources": "Accepted supplied material; no external resource requirement except the disputed image gate in A05.",
+        "minorNotes": [],
+        "defects": [],
+        "completeStopResponse": true,
+        "envelopeValid": true
+      },
+      "finalScoresAveraged": false,
+      "verbatimOutputPreserved": true,
+      "finalIndependentAssessment": {
+        "scores": {
+          "goalCorrespondence": 5,
+          "educationalUsefulnessAndProportion": 5,
+          "evidenceAndUncertainty": 4
+        },
+        "judgment": "PASS",
+        "hasSeriousDefect": false,
+        "issues": [
+          {
+            "severity": "MINOR",
+            "serious": false,
+            "requirementQuote": "Complete and check the actual annotation; stop when all four assigned requirements are satisfied.",
+            "outputQuote": "both are resolved by the checking pass itself",
+            "consequence": "A checking pass can reveal a persisting misconception rather than resolve it automatically. The separate final gate requires actual correct annotation, so the statement does not certify an incorrect product.",
+            "resolution": "Say the pass tests these uncertainties; record/revise an unresolved distinction instead of promising resolution."
+          }
+        ],
+        "adjudicationStatus": "CONFIRMED",
+        "rationale": "Directly performs the four actual annotation moves, distinguishes observation from opinion, quotes source text and gives a specific limit without invented sources/attendees/extra annotations. It overstates that uncertainty is necessarily resolved by one checking pass; the actual stopping gate still requires a correct annotation and the revision path does not automatically certify failure as success."
+      },
+      "adjudicationHistory": [
+        {
+          "stage": "COMPARISON",
+          "disposition": "Both assessors pass; any 4/5 differences remain separately recorded and do not change the thresholds."
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "caseId": "v01",
+      "trialId": "d_162f3a5840b6d145",
+      "packet": "model/packets/d_162f3a5840b6d145.json",
+      "packetSha256": "82d737934947194602386660a434ff32e0442c991b6c6cf4d20e80aca9810e27",
+      "candidate": "evaluator/candidates/v01.json",
+      "candidateSha256": "fb1fa1644815755cee2a8a9a6d1e69ac3095885956728522fe273bdda2cb4486",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "CONCRETE_VIOLATION",
+        "initialSeverity": "BLOCKING",
+        "initialRationale": "Goal and teacher rule require mean of middle two; (4+6)/2=5. work_1 instead teaches upper middle 6 and makes that wrong rule the pass criterion, so it certifies an incorrect method and answer.",
+        "admissibleAlternatives": "Any correct mean-of-middle calculation and explanatory check; no extra mastery quota.",
+        "effortAndDependencies": "10 minutes booked on Oct 12 fits 60/day but feasibility cannot cure factual error; no dependencies/splits/protection.",
+        "initialAmbiguity": "",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Median of an even sample",
+              "outcome": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Teacher rule: for four ordered values, average positions two and three. The assigned values are 2, 4, 6, 12."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Grounded blocker for the wrong rule/result; not merely a formatting preference.",
+          "Repair must change both instructions and criterion if needed."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_1",
+            "category": "WEAK_CRITERION",
+            "requirement": "Find the median of four ordered numbers using the mean of the middle two, and explain the check.",
+            "excerpt": "Pass only if the median is 6 and the learner says the upper middle rule is correct.",
+            "reason": "The required even-sample median is (4+6)/2 = 5. Instructions and criterion incorrectly require 6.",
+            "resolution": "Correct the rule, worked result and observable correctness check."
+          }
+        ]
+      },
+      "priorComparison": "AGREE. A serious wrong-result/wrong-method blocker is warranted. WEAK_CRITERION is an admissible author category; a well-grounded PEDAGOGICAL formulation finding the same wrong rule also remains admissible under the rubric.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v02",
+      "trialId": "d_39bd912910b6cdc4",
+      "packet": "model/packets/d_39bd912910b6cdc4.json",
+      "packetSha256": "4e94bb8b47cdfde922865fbdeb7dab33a5248c581e7645aefc00b115c2a60c07",
+      "candidate": "evaluator/candidates/v02.json",
+      "candidateSha256": "0ee3ebc8bba39bfde3b93e100493f23ca9d0442d9981fcb5b8af6808b80b5390",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "CONCRETE_VIOLATION",
+        "initialSeverity": "BLOCKING",
+        "initialRationale": "Actual letter scan and contents are absent. work_1 instructs inventing a nineteenth-century letter and submitting it as the authentic transcription, then marks the real assignment complete. This directly defeats authenticity and uncertainty preservation.",
+        "admissibleAlternatives": "Honest prerequisite/gap path: obtain actual scan before transcription; invented text may only be explicitly optional/preparatory practice, never authentic completion.",
+        "effortAndDependencies": "10 minutes within 60/day; no missing sibling source, split or protected work.",
+        "initialAmbiguity": "Missing scan alone permits preparation; the blocker is false authentic substitution/completion.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "An archive transcription assignment",
+              "outcome": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+              "policy": "GENERAL",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "The assignment requires the actual letter; its contents and image have not been provided. The learner has no copy."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "GENERAL",
+        "expectations": [
+          "Block the dishonest authentic completion.",
+          "A repair may honestly defer or request the actual scan, rather than invent a substitute."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_1",
+            "category": "MISSING_PREREQUISITE",
+            "requirement": "Transcribe the actual assigned archive letter accurately, preserving uncertain words. The scan is currently unavailable.",
+            "excerpt": "Mark the authentic assigned transcription complete once the invented text is written.",
+            "reason": "Invented content cannot transcribe the unavailable authentic document.",
+            "resolution": "Represent the unavailable dependency honestly; do not claim invented content completes the assignment."
+          }
+        ]
+      },
+      "priorComparison": "AGREE. A serious authenticity/prerequisite blocker is warranted, specifically against representing invented text as the unavailable actual assignment. The missing document does not forbid honest preparation or deferral.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v03",
+      "trialId": "d_e9c5b907ca74eaa2",
+      "packet": "model/packets/d_e9c5b907ca74eaa2.json",
+      "packetSha256": "e250b2d07ae8f70fee5bb41752a12fa0101d788bf792f66b74489f39a1f7662b",
+      "candidate": "evaluator/candidates/v03.json",
+      "candidateSha256": "031e35636fbda59de395fa97384f42c17af44aec883949f52e49215dd9877636",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "CONCRETE_VIOLATION",
+        "initialSeverity": "BLOCKING",
+        "initialRationale": "Catalogue says maker unknown and circa 1900. Original work_1 and last split gate require Elena Ruiz and exact 1900. This contaminates the single source check supporting both English and Spanish label goals. First split criterion merely copies bowl/place; later last criterion is false. Preserve the paused accent-copy exercise, which is neither changed nor mastery evidence.",
+        "admissibleAlternatives": "Correct source uncertainty in owned shared prerequisite and final gate; English and Spanish downstream labels must use unknown/approximate facts. No duplicate source check or new accent mastery test needed.",
+        "effortAndDependencies": "20-minute original check split into 10+10 preserves effort under 15-minute maximum; plan_1 35 includes protected 5 plus new 30, plan_2 10, total 45 within 90/day. Shared hard edge to plan_2 exists.",
+        "initialAmbiguity": "One well-grounded source-owner blocker that explicitly explains both goals can suffice; separate downstream blocker under plan_2 is permissible if owned and grounded, but not mechanically necessary just to duplicate the same discrepancy.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Museum labels",
+              "outcome": "Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date.",
+              "policy": "ROADMAP",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15,
+                "maximumTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Catalogue facts: blue ceramic bowl; maker unknown; date circa 1900; place Córdoba.",
+              "For this task the supplied Spanish phrases are cuenco azul, autor desconocido, hacia 1900, Córdoba.",
+              "A separate paused accent-copy exercise already exists and must remain unchanged. It is not evidence of mastery."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          },
+          {
+            "planRef": "plan_2",
+            "resolvedGoal": {
+              "title": "Museum labels",
+              "outcome": "Prepare a Spanish label from the same checked catalogue facts; preserve unknown maker and approximate date.",
+              "policy": "ROADMAP",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15,
+                "maximumTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Catalogue facts: blue ceramic bowl; maker unknown; date circa 1900; place Córdoba.",
+              "For this task the supplied Spanish phrases are cuenco azul, autor desconocido, hacia 1900, Córdoba.",
+              "A separate paused accent-copy exercise already exists and must remain unchanged. It is not evidence of mastery."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "ROADMAP",
+        "expectations": [
+          "Detect the fabricated catalogue claims even though the strategy describes source checking.",
+          "Repair complete split parent; rebind shared dependency and retain the paused work identically.",
+          "Both labels must preserve unknown/approximate information."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_1",
+            "category": "PEDAGOGICAL",
+            "requirement": "Prepare an English label from the supplied catalogue facts, preserving uncertainty about the maker and date.",
+            "excerpt": "Checked facts must name Elena Ruiz and exact 1900.",
+            "reason": "The prerequisite fabricates a maker and converts an approximate date to exact; both labels depend on it.",
+            "resolution": "Correct the complete shared prerequisite and any necessary dependent wording while preserving the protected exercise."
+          }
+        ]
+      },
+      "priorComparison": "AGREE. A serious source-fabrication blocker is warranted at the owned split parent or offending split piece. The bad prerequisite affects both goals; one grounded source-owner issue that explains shared impact can suffice. Existing validator permits the split originalRef work_1. Preserve kept_1 and valid split/shared lineage. Repair execution is deferred; the active reviewer need only request a specific correction.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v04",
+      "trialId": "d_6de45b407ca18e60",
+      "packet": "model/packets/d_6de45b407ca18e60.json",
+      "packetSha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "candidate": "evaluator/candidates/v04.json",
+      "candidateSha256": "042331d15688d7f2c89cb85cfb82aed1868e88003af78734f51aee02508db7ed",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "CONCRETE_VIOLATION",
+        "initialSeverity": "BLOCKING",
+        "initialRationale": "Explicit goal says one matching citation then stop. work_1 correctly writes/checks Lee. River Walk. 2020.; work_2 compels twelve identical rewrites after success for another 30 minutes. This contradicts the accepted stopping point, regardless of 120/day availability or matching 40-minute recommendation.",
+        "admissibleAlternatives": "Delete/unbook compulsory post-success rewrites or make targeted correction contingent on an actual error; no need to forbid all repetition categorically.",
+        "effortAndDependencies": "10+30=40 on Oct 12 fits capacity but educational necessity fails; dependency makes rewrites occur only after successful first task; no splits/protected work.",
+        "initialAmbiguity": "",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Citation punctuation",
+              "outcome": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Pattern: Author. Title. Year. Supplied item: Lee; River Walk; 2020. One accurate checked citation meets the requested goal."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "DEFECTIVE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Block unsupported compulsory repetition; preserve the valid first task."
+        ],
+        "blockingIssues": [
+          {
+            "affected": "work_2",
+            "category": "UNREALISTIC_WORKLOAD",
+            "requirement": "Produce one citation matching the supplied pattern and stop after the fields and punctuation match.",
+            "excerpt": "All twelve rewrites are done even after checked success.",
+            "reason": "Mandatory identical rewrites after success contradict the accepted stopping gate and add no required contribution.",
+            "resolution": "Remove or make explicitly unbooked the unsupported repetition without degrading the valid first check."
+          }
+        ]
+      },
+      "priorComparison": "AGREE. A serious unnecessary compulsory-work blocker is warranted. It follows the explicit stop-after-one-success requirement, not a made-up maximum-minute rule. Keep the valid first task.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "ATTEMPTED_REJECTED_OUTPUT_TRUNCATED",
+      "assessability": "UNASSESSABLE_CAP_AND_BLANK",
+      "operationalDelivery": "FAIL",
+      "verbatimFinalText": "",
+      "verbatimRejectedText": "",
+      "rawFinishReason": "length",
+      "normalizedFinishReason": "MAX_TOKENS",
+      "errorCode": "OUTPUT_TRUNCATED",
+      "strictValidationStatus": "NOT_REACHED_NO_COMPLETE_REVIEW",
+      "usage": {
+        "prompt_tokens": 2860,
+        "completion_tokens": 4096,
+        "total_tokens": 6956,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4096
+        },
+        "prompt_cache_hit_tokens": 768,
+        "prompt_cache_miss_tokens": 2092
+      },
+      "latencyMs": 20975,
+      "consequence": "No verdict or grounded concern was delivered. The operational review requirement fails. Empty final text cannot be counted as sound judgment, true negative, semantic false negative or an invalid concern; raw reasoning text was not retained."
+    },
+    {
+      "caseId": "v05",
+      "trialId": "d_ea74e8dff125fb1c",
+      "packet": "model/packets/d_ea74e8dff125fb1c.json",
+      "packetSha256": "79145a4b225630aa4c44eefb511fe9ef7e853e849c28bbfe4ecaf97e3190306d",
+      "candidate": "evaluator/candidates/v05.json",
+      "candidateSha256": "04c1e7e3f7f5c35e319d8fe769a55e683f8c19a39dfeca236a171394062ca110",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER",
+        "initialSeverity": "NONE",
+        "initialRationale": "Supplied atom rule and solution are available. Learner covers solution, balances real H2+O2→H2O and counts H/O on both sides. Criterion checks equality and explanation rather than merely timer attendance. Correct 2:1:2 yields 4 H,2 O each side.",
+        "admissibleAlternatives": "Any correct nonzero balancing coefficients with atom check; no requirement to add unrelated equations, examinations or chemistry topics.",
+        "effortAndDependencies": "10 minutes within 45/day; task includes instruction and independent check; no missing prerequisite/sibling/split/protected work.",
+        "initialAmbiguity": "Do not invent an advanced chemistry or long-term-retention requirement from the MASTERY label alone.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Balancing a supplied equation",
+              "outcome": "Balance the supplied hydrogen/oxygen equation and verify equal atoms on each side.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Equation H2 + O2 → H2O. A coefficient multiplies all atoms in its formula. Solution 2 H2 + 1 O2 → 2 H2O gives four H and two O on each side."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "MASTERY",
+        "expectations": [
+          "The supplied equation and atom-count check suffice; no external answer key or advanced chemistry is necessary."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Sound against this bounded balancing goal; a separate unfamiliar equation, external key or retained-mastery demonstration is not a consequential accepted requirement.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v06",
+      "trialId": "d_d4791a8b4cdede65",
+      "packet": "model/packets/d_d4791a8b4cdede65.json",
+      "packetSha256": "f21771d2444166d245cbbcc8b59e85f416d3253f17ce63a1338fe40ea077cf51",
+      "candidate": "evaluator/candidates/v06.json",
+      "candidateSha256": "2e205fa22e3628eb011dc036194214f805abce483c4c1d965e7eaf5d438669cf",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER",
+        "initialSeverity": "NONE",
+        "initialRationale": "Actual A/B accounts both say speech began noon; full vs seats empty disagrees. Task quotes both, explains evidence limit, and criterion forbids unsupported truth verdict. This meets bounded actual assignment without needing novel sources/transfer.",
+        "admissibleAlternatives": "Equivalent accurate quotations/comparison; no requirement for oral debate, essay or witness credibility ranking.",
+        "effortAndDependencies": "10 minutes within 45/day; no dependencies/splits/protection.",
+        "initialAmbiguity": "Treat the stated hall descriptions as the intended contrasting claims; no demand to resolve possible semantic nuances beyond assignment.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Comparing two eyewitness accounts",
+              "outcome": "Complete the assigned comparison: identify one agreement and one disagreement between the two supplied accounts without deciding who is truthful.",
+              "policy": "GENERAL",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Account A: “The hall was full. The speech began at noon.” Account B: “Several seats were empty. The speech began at noon.”",
+              "Assignment asks only for agreement and disagreement, with quotations. No other evidence is available."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "GENERAL",
+        "expectations": [
+          "This meets the actual limited assignment; independent invented sources or a longer essay are unnecessary."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Sound against this actual limited assignment. A respondent may note that full is colloquial, but that does not invalidate the intended disagreement comparison or warrant a blocker; no independent truth verdict is justified.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v07",
+      "trialId": "d_aa0fdce6c965934e",
+      "packet": "model/packets/d_aa0fdce6c965934e.json",
+      "packetSha256": "da7d98966b3e63950a6d442e4a0e33e5ec9d1ab199b11e458284290a114f9ca6",
+      "candidate": "evaluator/candidates/v07.json",
+      "candidateSha256": "524a5bf48630c0e3a3c6ac7c9bd6ea2493dc200af97e2749a9faea914d1e6a7e",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER",
+        "initialSeverity": "NONE",
+        "initialRationale": "One supplied relationship/convention check supports chain diagram and possible fewer-rabbit effects via explicit shared hard dependency. Grass→rabbit→fox is correct food-to-consumer direction; possible less fox food and less grazing are qualified, no magnitudes or whole-ecosystem certainty claimed.",
+        "admissibleAlternatives": "Either suitable qualitative effect meets the one-effect outcome; supporting source check need not repeat in plan_2.",
+        "effortAndDependencies": "Plan_1 5+10=15, plan_2 10, total25 within60/day; no splits/protected work; shared dependency explicitly exists.",
+        "initialAmbiguity": "Instructions mention two short possible effects although accepted outcome requires one. That is modest explanatory breadth, not evidence of a serious workload defect or forced unrelated scope.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "A shared food-web source check",
+              "outcome": "Draw the supplied three-organism feeding chain with an explained arrow convention.",
+              "policy": "ROADMAP",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Supplied relationships: rabbits eat grass; foxes eat rabbits. Arrows in this task point from food to consumer.",
+              "Other species and population counts are unknown. The effect’s size cannot be predicted."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          },
+          {
+            "planRef": "plan_2",
+            "resolvedGoal": {
+              "title": "A shared food-web source check",
+              "outcome": "Explain one possible effect of fewer rabbits using the same supplied feeding relationships, with uncertainty about magnitude.",
+              "policy": "ROADMAP",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Supplied relationships: rabbits eat grass; foxes eat rabbits. Arrows in this task point from food to consumer.",
+              "Other species and population counts are unknown. The effect’s size cannot be predicted."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "ROADMAP",
+        "expectations": [
+          "One owned prerequisite supports both goals; it must not be duplicated or objected to for being sibling-owned.",
+          "Appropriately qualified possible effects are sound."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Sound with a real owned shared prerequisite. Qualified possible effects and modest explanation meet goals; duplicated preparation in plan_2 is unnecessary. One requested possible effect need not become a quota of ecosystem analysis.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v08",
+      "trialId": "d_23cb1deab0819ac1",
+      "packet": "model/packets/d_23cb1deab0819ac1.json",
+      "packetSha256": "2ccea2aa936e8967f5363a694a8c5c4d391cb6083a1b1408a91be5378d4cd1d0",
+      "candidate": "evaluator/candidates/v08.json",
+      "candidateSha256": "3e4a9151e1cbec3981f2be5ef5af7cc2a56a33721f56a4ed5c71cc990290fcd6",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER",
+        "initialSeverity": "NONE",
+        "initialRationale": "=SUM(A1:A3) gives15 for2,5,8; changingA2 to6 gives16. Supplied syntax, manual total and changed-cell check support formula understanding; criterion checks both totals and changed cell. No charts/macros/pivots added.",
+        "admissibleAlternatives": "Write/simulate formula and manual check if no spreadsheet app is specified; no mandated external resource or particular software.",
+        "effortAndDependencies": "10 minutes within45/day; one small changed-value check is proportionate to formula understanding; no dependencies/splits/protection.",
+        "initialAmbiguity": "The changed prompt discloses total16 but still asks independent manual verification; the accepted goal does not independently require unseen formula transfer or retention proof.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Using a spreadsheet sum",
+              "outcome": "Write a SUM formula for three supplied cells and verify it against a manual total.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "A1=2, A2=5, A3=8. Teacher syntax: =SUM(A1:A3). The expected total is 15. This goal does not require charts, macros or pivot tables."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "SOUND",
+        "policy": "MASTERY",
+        "expectations": [
+          "Supported learning followed by a changed-input independent check is appropriate; no larger spreadsheet curriculum is required."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Sound for formula plus manual verification. The supplied changed answer 16 means this is not evidence of unseen transfer merely because the oracle calls the check independent; independent recomputation is still useful and meets the accepted goal.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v09",
+      "trialId": "d_21da0ca3d648bd22",
+      "packet": "model/packets/d_21da0ca3d648bd22.json",
+      "packetSha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "candidate": "evaluator/candidates/v09.json",
+      "candidateSha256": "f89020597a86caebf906175445dd3bd418874287bddfe445ee02e5c7bd178a5d",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER_PREFERENCE_ALLOWED",
+        "initialSeverity": "NONE",
+        "initialRationale": "Written morning/evening greeting selection and explanation are the explicit outcome. Supplied Japanese terms and covered-key new prompts provide the requested bounded work. Pronunciation or conversation drills would expand the accepted goal.",
+        "admissibleAlternatives": "Written check or optional oral suggestion; never blocker for omitted pronunciation.",
+        "effortAndDependencies": "10 minutes within30/day; no dependency/split/protected objects.",
+        "initialAmbiguity": "Criterion mentions matching written choices but does not explicitly re-state explanation; instruction does require explanation. Nonblocking wording-strengthening suggestion is possible, not a serious defect absent an explicit waiver of explanation.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Japanese greeting choice",
+              "outcome": "Select the supplied Japanese greeting appropriate to the stated time of day and explain the match in writing.",
+              "policy": "MASTERY",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "For this bounded task, おはよう is the morning greeting and こんばんは the evening greeting. The accepted goal requires written choice, not pronunciation."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "PREFERENCE",
+        "policy": "MASTERY",
+        "expectations": [
+          "Preferring an audio/pronunciation exercise does not justify blocking the accepted written outcome."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Nondefective written task; pronunciation preference may be advisory, and empty issues are acceptable. Instructions require explanation although the short criterion mentions matching choices. This abbreviation supports an optional wording clarification, not a serious defect.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "ATTEMPTED_REJECTED_OUTPUT_TRUNCATED",
+      "assessability": "UNASSESSABLE_CAP_AND_BLANK",
+      "operationalDelivery": "FAIL",
+      "verbatimFinalText": "",
+      "verbatimRejectedText": "",
+      "rawFinishReason": "length",
+      "normalizedFinishReason": "MAX_TOKENS",
+      "errorCode": "OUTPUT_TRUNCATED",
+      "strictValidationStatus": "NOT_REACHED_NO_COMPLETE_REVIEW",
+      "usage": {
+        "prompt_tokens": 2689,
+        "completion_tokens": 4096,
+        "total_tokens": 6785,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 4096
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 2689
+      },
+      "latencyMs": 20487,
+      "consequence": "No verdict or grounded concern was delivered. The operational review requirement fails. Empty final text cannot be counted as sound judgment, true negative, semantic false negative or an invalid concern; raw reasoning text was not retained."
+    },
+    {
+      "caseId": "v10",
+      "trialId": "d_2c793f9cde3e05f1",
+      "packet": "model/packets/d_2c793f9cde3e05f1.json",
+      "packetSha256": "59e5cef794a763f6eb20bfffab4cf9990cab475eac27680d626d2aa04feb7bb1",
+      "candidate": "evaluator/candidates/v10.json",
+      "candidateSha256": "914fe738addb60696bde92927516beb0679b565ab2aae7d57505dde374036d64",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER_PREFERENCE_ALLOWED",
+        "initialSeverity": "NONE",
+        "initialRationale": "Instructions give gate→two north→one east→museum and check order/distances; criterion covers directions/distances/destination. Written description is explicitly accepted and colored drawing optional.",
+        "admissibleAlternatives": "Equivalent written route or optional drawing; no mandatory map-art artifact.",
+        "effortAndDependencies": "10 minutes within30/day; no dependency/split/protected work.",
+        "initialAmbiguity": "Arrow-separated words are a written description consistent with the supplied goal, not a requirement to produce prose sentences.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Describing a map route",
+              "outcome": "Describe the given route in words using the supplied north/east directions.",
+              "policy": "GENERAL",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Route: start at the gate, go two blocks north, then one block east to the museum. A written description is explicitly acceptable; a colored drawing is optional."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "PREFERENCE",
+        "policy": "GENERAL",
+        "expectations": [
+          "A preferred colored diagram can be advisory, never a blocker for the correct accepted verbal route."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Nondefective correct written route; colored drawing is optional, not a missing deliverable. Empty issues are acceptable; no advisory concern must be invented.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v11",
+      "trialId": "d_b949be4c907cfe4b",
+      "packet": "model/packets/d_b949be4c907cfe4b.json",
+      "packetSha256": "c0948231682d81d299578c41f4335c9da4bdee5f5f3252c5993b9cfca49c6de1",
+      "candidate": "evaluator/candidates/v11.json",
+      "candidateSha256": "c515206a003f387000fea534564b3b020119083321a86174822b4d212e1d108f",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER_REASONABLE_UNCERTAINTY",
+        "initialSeverity": "NONE",
+        "initialRationale": "Classifies supplied standalone/dependent examples, creates a because version and checks standalone test. Actual gap may be recorded honestly; unknown weight/prior accuracy are disclosed and do not make a bounded first check infeasible. No unsupported exam marks/readiness certainty claimed.",
+        "admissibleAlternatives": "Success demonstration or specific honest gap record; no blocker merely because assessment weights/prior accuracy unknown.",
+        "effortAndDependencies": "10 minutes booked before Oct14 deadline within30/day; no extra committed remediation quota, shared/split/protected work.",
+        "initialAmbiguity": "A gap path completes this bounded check, not the exam-readiness claim; the allocation finding expressly distinguishes booked finish from readiness.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Identifying sentence clauses",
+              "outcome": "Prepare to identify one independent and one dependent clause using the supplied classroom definitions.",
+              "policy": "EXAM",
+              "deadline": {
+                "kind": "FIXED",
+                "date": "2026-10-14",
+                "examDayStudyAllowed": true
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "Independent clause: can stand alone as a complete sentence. Dependent clause: cannot stand alone. Examples: “The bell rang.” and “Because the bell rang”.",
+              "Assessment weight and the learner’s prior accuracy are unknown."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "UNCERTAINTY",
+        "policy": "EXAM",
+        "expectations": [
+          "Unknown importance/readiness remains nonblocking uncertainty; it is not evidence of compulsory extensive remediation."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Unknown weights/readiness are nonblocking here. Bounded demonstration or honest gap record is useful; a gap record does not certify overall exam readiness.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    },
+    {
+      "caseId": "v12",
+      "trialId": "d_edc200cbc63de947",
+      "packet": "model/packets/d_edc200cbc63de947.json",
+      "packetSha256": "cb1fb320cdea149f3b80466c0b19857a55bb0a33b429d15f6efff833ce10afc8",
+      "candidate": "evaluator/candidates/v12.json",
+      "candidateSha256": "3ca67a5f6c8e1880de9c09a2578b11e16007ea684993d3297ad7e276672d99a3",
+      "preVerdictIndependentJudgment": {
+        "initialJudgment": "NO_CONCRETE_BLOCKER_REASONABLE_UNCERTAINTY",
+        "initialSeverity": "NONE",
+        "initialRationale": "Blank date/observation/uncertainty columns can be created before specimen exists. Criterion requires all three and forbids invented data. Specimen selection/observations remain later; growth unknown is honest future uncertainty, not a dependency of log design.",
+        "admissibleAlternatives": "Paper/text/spreadsheet blank log equally valid; no specimen acquisition or actual growth measurement needed now.",
+        "effortAndDependencies": "10 minutes within30/day; no dependencies/splits/protected work.",
+        "initialAmbiguity": "Do not require publication or a populated log to pass the explicitly blank-log checkpoint.",
+        "acceptedFacts": [
+          {
+            "planRef": "plan_1",
+            "resolvedGoal": {
+              "title": "Planning a plant observation log",
+              "outcome": "Prepare the first checkpoint of a future plant observation project: a blank log with date, observation and uncertainty fields.",
+              "policy": "ROADMAP",
+              "deadline": {
+                "kind": "NONE"
+              },
+              "preferences": {
+                "pacing": "COMFORTABLE_EARLY",
+                "desiredIntensity": "MODERATE",
+                "preferredTimeboxMinutes": 15
+              },
+              "scope": [
+                {
+                  "ref": "scope_1",
+                  "title": "Accepted outcome",
+                  "inclusion": "REQUESTED",
+                  "sourceClaimIds": []
+                }
+              ]
+            },
+            "facts": [
+              "No plant specimen has been obtained and its growth rate is unknown. A blank observation-log design is possible now.",
+              "The later project must record actual observations; it cannot promise a particular amount of growth."
+            ],
+            "learningEvidence": [],
+            "provenance": {
+              "kind": "SYNTHETIC_USER_SUPPLIED_PACKET",
+              "asOf": "2026-10-12",
+              "authority": "Case facts only; no official assessment or externally verified readiness is implied."
+            }
+          }
+        ]
+      },
+      "authoredJudgment": {
+        "label": "UNCERTAINTY",
+        "policy": "ROADMAP",
+        "expectations": [
+          "A future specimen is not a missing prerequisite for the accepted blank-log checkpoint.",
+          "Do not block the usable first checkpoint or require fabricated observations."
+        ],
+        "blockingIssues": []
+      },
+      "priorComparison": "AGREE. Specimen/growth uncertainty concerns later execution, not blank-log construction. The current product, criterion and no-fabrication check are feasible now.",
+      "semanticScore": null,
+      "correctVerdict": null,
+      "rawIdentifiedIssues": null,
+      "strictAcceptedFindings": null,
+      "groundingValidity": null,
+      "falseBlockerCount": null,
+      "missedBlockerCount": null,
+      "trueNegative": null,
+      "falseNegative": null,
+      "executionStatus": "NOT_DISPATCHED_ARM_STOP",
+      "assessability": "NOT_EVALUATED_NO_OUTPUT",
+      "operationalDelivery": null,
+      "verbatimFinalText": null,
+      "verbatimRejectedText": null,
+      "rawFinishReason": null,
+      "normalizedFinishReason": null,
+      "errorCode": null,
+      "strictValidationStatus": "NOT_RUN",
+      "usage": null,
+      "latencyMs": null,
+      "consequence": "Not dispatched after the review arm reached its two operational-failure threshold. No model verdict, score, concern, usage or semantic outcome exists for this case."
+    }
+  ],
+  "operationalVerification": [
+    {
+      "id": "V01",
+      "status": "PASS",
+      "finding": "All 35 pre-run label-review hash pins match: cases, labels, rubric, 12 canonical candidates and 20 active packets."
+    },
+    {
+      "id": "V02",
+      "status": "PASS",
+      "finding": "All 207 frozen source pins, 48 prepared packet pins, 40 approved protocol artifact pins and 6 execution-tool pins match."
+    },
+    {
+      "id": "V03",
+      "status": "PASS",
+      "finding": "Locked primary hash unchanged; all eight blind final texts exactly equal raw results and locked verbatim text; accepted-input and output hashes match."
+    },
+    {
+      "id": "V04",
+      "status": "PASS",
+      "finding": "Ten unique trial IDs are exactly the first ten manifest dispatches, each with one wire and SETTLED raw and canonical counters; no retry/fallback/recovery is recorded."
+    },
+    {
+      "id": "V05",
+      "status": "PASS",
+      "finding": "Raw integer usage, prompt cache split, total and reasoning-subset counters are internally consistent and within input/output/currency reservations."
+    },
+    {
+      "id": "V06",
+      "status": "PASS",
+      "finding": "Conservative currency counters independently recomputed using prompt×300 plus completion×1200 nanodollars; each actual estimate remains below its reservation."
+    },
+    {
+      "id": "V07",
+      "status": "PASS",
+      "finding": "Snapshot-rate/cache-adjusted off-peak arithmetic independently equals USD 0.013504704; dispatch times are outside both peak UTC windows. Invoice not inspected."
+    },
+    {
+      "id": "V08",
+      "status": "PASS_WITH_LIMITATION",
+      "finding": "All returned model aliases are deepseek-flash and all retained fingerprints match aeb56401ca74e127821c4f9126dcb669. Alias/fingerprint do not independently freeze remote weights."
+    },
+    {
+      "id": "V09",
+      "status": "PASS",
+      "finding": "Dispatch timestamps and network latencies show sequential calls; each next dispatch follows completion of the prior transport."
+    },
+    {
+      "id": "V10",
+      "status": "PASS_WITH_LIMITATION",
+      "finding": "All ten canonical attempts are CANCELLED, with one SETTLED call each and no apply receipt. Canonical pricing remains UNKNOWN/costUsd=null; paid evidence is the PAID wire journal, despite generic PREFLIGHT stage labels."
+    },
+    {
+      "id": "V11",
+      "status": "FAIL_DELIVERY",
+      "finding": "Both reviews have length/MAX_TOKENS, blank final/rejected strings and 4096 completion tokens entirely recorded as reasoning. No strict semantic/grounding review can be assessed."
+    },
+    {
+      "id": "V12",
+      "status": "PASS_STOP_BEHAVIOR",
+      "finding": "Two REJECTED review records activate the unchanged same-arm stop rule, skipping all remaining ten review dispatches. Spending stopped=null means no spending hard-stop, not completion of all twenty cases."
+    },
+    {
+      "id": "V13",
+      "status": "PASS_WITH_LIMITATION",
+      "finding": "Retained launcher and executor receipts show owned sleep assertions at start/end. Source checks assertAwake before each wire; separate per-wire assertion receipts were not retained."
+    },
+    {
+      "id": "V14",
+      "status": "PASS_WITH_LIMITATION",
+      "finding": "Disposable PostgreSQL diagnostic harness reports one passing technical test and cleanup. Audited schema bootstrap, not complete historical migration replay; the technical test is not twenty educational passes."
+    },
+    {
+      "id": "V15",
+      "status": "PASS_WITH_LIMITATION",
+      "finding": "Source/packet/tool hashes, cancelled attempts and publication-forbidden receipts support unchanged production routing and no published diagnostic result. This evaluation does not authorize any further model calls."
+    }
+  ],
+  "metrics": {
+    "reasoning": {
+      "calls": 8,
+      "inputTokens": 8315,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 8315,
+      "completionTokensIncludingReasoning": 11038,
+      "reasoningTokensSubset": 8137,
+      "nonReasoningCompletionTokens": 2901,
+      "reservedPeakCacheMissUsd": "0.0895956",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0157401",
+      "estimatedOffPeakCacheAdjustedUsd": "0.00787005",
+      "networkLatencyMs": {
+        "sum": 68117,
+        "min": 4966,
+        "median": 7978.0,
+        "p90NearestRank": 16130,
+        "max": 16130
+      }
+    },
+    "review": {
+      "calls": 2,
+      "inputTokens": 5549,
+      "inputCacheHitTokens": 768,
+      "inputCacheMissTokens": 4781,
+      "completionTokensIncludingReasoning": 8192,
+      "reasoningTokensSubset": 8192,
+      "nonReasoningCompletionTokens": 0,
+      "reservedPeakCacheMissUsd": "0.016803",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0114951",
+      "estimatedOffPeakCacheAdjustedUsd": "0.005634654",
+      "networkLatencyMs": {
+        "sum": 41462,
+        "min": 20487,
+        "median": 20731.0,
+        "p90NearestRank": 20975,
+        "max": 20975
+      }
+    },
+    "total": {
+      "calls": 10,
+      "inputTokens": 13864,
+      "inputCacheHitTokens": 768,
+      "inputCacheMissTokens": 13096,
+      "completionTokensIncludingReasoning": 19230,
+      "reasoningTokensSubset": 16329,
+      "nonReasoningCompletionTokens": 2901,
+      "reservedPeakCacheMissUsd": "0.1063986",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0272352",
+      "estimatedOffPeakCacheAdjustedUsd": "0.013504704",
+      "networkLatencyMs": {
+        "sum": 109579,
+        "min": 4966,
+        "median": 8175.0,
+        "p90NearestRank": 20487,
+        "max": 20975
+      }
+    }
+  },
+  "perCallMetrics": [
+    {
+      "caseId": "g01",
+      "trialId": "d_4455ae843acc1082",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:42:10.640Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 6020,
+      "calls": 1,
+      "inputTokens": 1091,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 1091,
+      "completionTokensIncludingReasoning": 764,
+      "reasoningTokensSubset": 415,
+      "nonReasoningCompletionTokens": 349,
+      "reservedPeakCacheMissUsd": "0.011283",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0012441",
+      "estimatedOffPeakCacheAdjustedUsd": "0.00062205",
+      "networkLatencyMs": {
+        "sum": 6020,
+        "min": 6020,
+        "median": 6020,
+        "p90NearestRank": 6020,
+        "max": 6020
+      }
+    },
+    {
+      "caseId": "g08",
+      "trialId": "d_0f51cb688400b89c",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:42:17.017Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 7949,
+      "calls": 1,
+      "inputTokens": 961,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 961,
+      "completionTokensIncludingReasoning": 1364,
+      "reasoningTokensSubset": 1066,
+      "nonReasoningCompletionTokens": 298,
+      "reservedPeakCacheMissUsd": "0.0110871",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0019251",
+      "estimatedOffPeakCacheAdjustedUsd": "0.00096255",
+      "networkLatencyMs": {
+        "sum": 7949,
+        "min": 7949,
+        "median": 7949,
+        "p90NearestRank": 7949,
+        "max": 7949
+      }
+    },
+    {
+      "caseId": "g02",
+      "trialId": "d_d5011475b34a9da1",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:42:25.236Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 16130,
+      "calls": 1,
+      "inputTokens": 1010,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 1010,
+      "completionTokensIncludingReasoning": 2848,
+      "reasoningTokensSubset": 2483,
+      "nonReasoningCompletionTokens": 365,
+      "reservedPeakCacheMissUsd": "0.0112029",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0037206",
+      "estimatedOffPeakCacheAdjustedUsd": "0.0018603",
+      "networkLatencyMs": {
+        "sum": 16130,
+        "min": 16130,
+        "median": 16130,
+        "p90NearestRank": 16130,
+        "max": 16130
+      }
+    },
+    {
+      "caseId": "g06",
+      "trialId": "d_ac6e119faa6748a5",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:42:41.712Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 10066,
+      "calls": 1,
+      "inputTokens": 994,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 994,
+      "completionTokensIncludingReasoning": 1701,
+      "reasoningTokensSubset": 1349,
+      "nonReasoningCompletionTokens": 352,
+      "reservedPeakCacheMissUsd": "0.0110793",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0023394",
+      "estimatedOffPeakCacheAdjustedUsd": "0.0011697",
+      "networkLatencyMs": {
+        "sum": 10066,
+        "min": 10066,
+        "median": 10066,
+        "p90NearestRank": 10066,
+        "max": 10066
+      }
+    },
+    {
+      "caseId": "g03",
+      "trialId": "d_63ea398f0b23e2f0",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:42:52.134Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 8343,
+      "calls": 1,
+      "inputTokens": 1162,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 1162,
+      "completionTokensIncludingReasoning": 1390,
+      "reasoningTokensSubset": 1109,
+      "nonReasoningCompletionTokens": 281,
+      "reservedPeakCacheMissUsd": "0.0113745",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0020166",
+      "estimatedOffPeakCacheAdjustedUsd": "0.0010083",
+      "networkLatencyMs": {
+        "sum": 8343,
+        "min": 8343,
+        "median": 8343,
+        "p90NearestRank": 8343,
+        "max": 8343
+      }
+    },
+    {
+      "caseId": "g04",
+      "trialId": "d_28b1cf3e53f64ddf",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:43:00.801Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 6636,
+      "calls": 1,
+      "inputTokens": 1153,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 1153,
+      "completionTokensIncludingReasoning": 1041,
+      "reasoningTokensSubset": 606,
+      "nonReasoningCompletionTokens": 435,
+      "reservedPeakCacheMissUsd": "0.0113508",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0015951",
+      "estimatedOffPeakCacheAdjustedUsd": "0.00079755",
+      "networkLatencyMs": {
+        "sum": 6636,
+        "min": 6636,
+        "median": 6636,
+        "p90NearestRank": 6636,
+        "max": 6636
+      }
+    },
+    {
+      "caseId": "g07",
+      "trialId": "d_2f5488d294f95e29",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:43:07.767Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 4966,
+      "calls": 1,
+      "inputTokens": 950,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 950,
+      "completionTokensIncludingReasoning": 699,
+      "reasoningTokensSubset": 333,
+      "nonReasoningCompletionTokens": 366,
+      "reservedPeakCacheMissUsd": "0.0111315",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0011238",
+      "estimatedOffPeakCacheAdjustedUsd": "0.0005619",
+      "networkLatencyMs": {
+        "sum": 4966,
+        "min": 4966,
+        "median": 4966,
+        "p90NearestRank": 4966,
+        "max": 4966
+      }
+    },
+    {
+      "caseId": "g05",
+      "trialId": "d_3284c39bab869cee",
+      "category": "REASONING",
+      "dispatchedAtUtc": "2026-10-09T12:43:13.060Z",
+      "rawFinishReason": "stop",
+      "latencyMs": 8007,
+      "calls": 1,
+      "inputTokens": 994,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 994,
+      "completionTokensIncludingReasoning": 1231,
+      "reasoningTokensSubset": 776,
+      "nonReasoningCompletionTokens": 455,
+      "reservedPeakCacheMissUsd": "0.0110865",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0017754",
+      "estimatedOffPeakCacheAdjustedUsd": "0.0008877",
+      "networkLatencyMs": {
+        "sum": 8007,
+        "min": 8007,
+        "median": 8007,
+        "p90NearestRank": 8007,
+        "max": 8007
+      }
+    },
+    {
+      "caseId": "v09",
+      "trialId": "d_21da0ca3d648bd22",
+      "category": "REVIEW",
+      "dispatchedAtUtc": "2026-10-09T12:43:21.426Z",
+      "rawFinishReason": "length",
+      "latencyMs": 20487,
+      "calls": 1,
+      "inputTokens": 2689,
+      "inputCacheHitTokens": 0,
+      "inputCacheMissTokens": 2689,
+      "completionTokensIncludingReasoning": 4096,
+      "reasoningTokensSubset": 4096,
+      "nonReasoningCompletionTokens": 0,
+      "reservedPeakCacheMissUsd": "0.0083061",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0057219",
+      "estimatedOffPeakCacheAdjustedUsd": "0.00286095",
+      "networkLatencyMs": {
+        "sum": 20487,
+        "min": 20487,
+        "median": 20487,
+        "p90NearestRank": 20487,
+        "max": 20487
+      }
+    },
+    {
+      "caseId": "v04",
+      "trialId": "d_6de45b407ca18e60",
+      "category": "REVIEW",
+      "dispatchedAtUtc": "2026-10-09T12:43:42.284Z",
+      "rawFinishReason": "length",
+      "latencyMs": 20975,
+      "calls": 1,
+      "inputTokens": 2860,
+      "inputCacheHitTokens": 768,
+      "inputCacheMissTokens": 2092,
+      "completionTokensIncludingReasoning": 4096,
+      "reasoningTokensSubset": 4096,
+      "nonReasoningCompletionTokens": 0,
+      "reservedPeakCacheMissUsd": "0.0084969",
+      "guardActualPeakCacheMissUpperEstimateUsd": "0.0057732",
+      "estimatedOffPeakCacheAdjustedUsd": "0.002773704",
+      "networkLatencyMs": {
+        "sum": 20975,
+        "min": 20975,
+        "median": 20975,
+        "p90NearestRank": 20975,
+        "max": 20975
+      }
+    }
+  ],
+  "costMethod": {
+    "recordedPricingSourceUrl": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "metadataCheckedAtUtc": "2026-10-09T12:41:40.009469+00:00",
+    "offPeakPerMillionUsd": {
+      "inputCacheHitUsd": 0.003,
+      "inputCacheMissUsd": 0.15,
+      "outputUsd": 0.6
+    },
+    "peakUtcWindowsRecorded": "01:00–04:00 and 06:00–10:00 Monday–Friday, excluding Chinese public holidays",
+    "dispatchesOutsideRecordedPeakWindows": true,
+    "firstDispatchUtc": "2026-10-09T12:42:10.640Z",
+    "lastTransportCompletionUtc": "2026-10-09T12:44:03.259000+00:00",
+    "formula": "(13096×0.15 + 768×0.003 + 19230×0.60)/1000000 = 0.013504704 USD",
+    "reasoningIncludedOnceInCompletion": true,
+    "invoiceVerified": false,
+    "canonicalCostUsd": null,
+    "guardRemainsAtConservativePeakCacheMissRates": true,
+    "reservationSavingsAuthorizeMoreCalls": false
+  },
+  "sleepEvidence": {
+    "launcher": {
+      "pid": 94090,
+      "ownerPid": 94089,
+      "assertions": [
+        "pid 94090(caffeinate): [0x000e291e0001a278] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\""
+      ],
+      "verifiedAt": "2026-10-09T12:42:01.533Z"
+    },
+    "executor": {
+      "start": {
+        "pid": 94163,
+        "ownerPid": 94162,
+        "assertions": [
+          "pid 94163(caffeinate): [0x000e29270001a27b] 00:00:00 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\""
+        ],
+        "verifiedAt": "2026-10-09T12:42:10.390Z"
+      },
+      "end": {
+        "pid": 94163,
+        "ownerPid": 94162,
+        "assertions": [
+          "pid 94163(caffeinate): [0x000e29270001a27b] 00:01:53 PreventUserIdleSystemSleep named: \"caffeinate command-line tool\"",
+          "pid 94163(caffeinate): [0x000e29270005a27c] 00:01:53 PreventUserIdleDisplaySleep named: \"caffeinate command-line tool\"",
+          "pid 94163(caffeinate): [0x000e29270007a27d] 00:01:53 PreventSystemSleep named: \"caffeinate command-line tool\""
+        ],
+        "verifiedAt": "2026-10-09T12:44:03.437Z"
+      }
+    },
+    "perWireCheckSource": "initial-block/guard.cjs executeTrial global.fetch awaits assertAwake before guard.wire",
+    "perWireAssertionReceiptsRetained": false
+  },
+  "parentDispositionReview": {
+    "files": [
+      "initial-block/evaluation/adjudication.json",
+      "initial-block/evaluation/results-final.json",
+      "initial-block/EXECUTION_REPORT.md",
+      "initial-block/execution-status.json"
+    ],
+    "status": "AGREE_WITH_FINAL_SUBSTANTIVE_DISPOSITION",
+    "remainingDisagreements": [],
+    "pendingA05Acknowledged": true,
+    "rootAuthorshipLimitationPreserved": true
+  },
+  "frozenEvidenceVerification": {
+    "bankPinCount": 35,
+    "sourcePinCount": 207,
+    "preparedPacketPinCount": 48,
+    "protocolArtifactPinCount": 40,
+    "executionToolPinCount": 6,
+    "allMatch": true
+  },
+  "hashAlgorithm": "SHA256",
+  "frozenBankHashes": [
+    {
+      "path": "evaluator/cases.cjs",
+      "sha256": "21345bd78e1dd784c36df402ba16a44a2ad067b694b60ef03173e730ab9faed6",
+      "bytes": 24802
+    },
+    {
+      "path": "evaluator/labels.json",
+      "sha256": "e5c949fad59e7ba3d5bea2b2244b772bec5df4176a6812e8d456f52304a322ec",
+      "bytes": 18970
+    },
+    {
+      "path": "evaluator/RUBRIC.md",
+      "sha256": "8dd0ad4d74a1deb7e165972a3b4635cf271a831310200838bbf07ad1a4b13c7d",
+      "bytes": 6999
+    },
+    {
+      "path": "evaluator/candidates/v01.json",
+      "sha256": "fb1fa1644815755cee2a8a9a6d1e69ac3095885956728522fe273bdda2cb4486",
+      "bytes": 20973
+    },
+    {
+      "path": "evaluator/candidates/v02.json",
+      "sha256": "0ee3ebc8bba39bfde3b93e100493f23ca9d0442d9981fcb5b8af6808b80b5390",
+      "bytes": 21582
+    },
+    {
+      "path": "evaluator/candidates/v03.json",
+      "sha256": "031e35636fbda59de395fa97384f42c17af44aec883949f52e49215dd9877636",
+      "bytes": 54065
+    },
+    {
+      "path": "evaluator/candidates/v04.json",
+      "sha256": "042331d15688d7f2c89cb85cfb82aed1868e88003af78734f51aee02508db7ed",
+      "bytes": 24196
+    },
+    {
+      "path": "evaluator/candidates/v05.json",
+      "sha256": "04c1e7e3f7f5c35e319d8fe769a55e683f8c19a39dfeca236a171394062ca110",
+      "bytes": 21072
+    },
+    {
+      "path": "evaluator/candidates/v06.json",
+      "sha256": "2e205fa22e3628eb011dc036194214f805abce483c4c1d965e7eaf5d438669cf",
+      "bytes": 22192
+    },
+    {
+      "path": "evaluator/candidates/v07.json",
+      "sha256": "524a5bf48630c0e3a3c6ac7c9bd6ea2493dc200af97e2749a9faea914d1e6a7e",
+      "bytes": 40223
+    },
+    {
+      "path": "evaluator/candidates/v08.json",
+      "sha256": "3e4a9151e1cbec3981f2be5ef5af7cc2a56a33721f56a4ed5c71cc990290fcd6",
+      "bytes": 21044
+    },
+    {
+      "path": "evaluator/candidates/v09.json",
+      "sha256": "f89020597a86caebf906175445dd3bd418874287bddfe445ee02e5c7bd178a5d",
+      "bytes": 21403
+    },
+    {
+      "path": "evaluator/candidates/v10.json",
+      "sha256": "914fe738addb60696bde92927516beb0679b565ab2aae7d57505dde374036d64",
+      "bytes": 20848
+    },
+    {
+      "path": "evaluator/candidates/v11.json",
+      "sha256": "c515206a003f387000fea534564b3b020119083321a86174822b4d212e1d108f",
+      "bytes": 22587
+    },
+    {
+      "path": "evaluator/candidates/v12.json",
+      "sha256": "3ca67a5f6c8e1880de9c09a2578b11e16007ea684993d3297ad7e276672d99a3",
+      "bytes": 22014
+    },
+    {
+      "path": "model/packets/d_4455ae843acc1082.json",
+      "sha256": "dcc02ea0ced4a7eadadd2b65674b9a314e5fd6897110b16e08653deec34dcf8e",
+      "bytes": 4977
+    },
+    {
+      "path": "model/packets/d_d5011475b34a9da1.json",
+      "sha256": "9b88ab43dd7c9e35d29cce2f38d8df0452e367df05937f50f3274e966f920f2f",
+      "bytes": 4710
+    },
+    {
+      "path": "model/packets/d_63ea398f0b23e2f0.json",
+      "sha256": "cc1a9477590972458031fce41534c83b2dba50e40fe0f80d286410f45723af84",
+      "bytes": 5282
+    },
+    {
+      "path": "model/packets/d_28b1cf3e53f64ddf.json",
+      "sha256": "80432668033ed9ec240edfe93940e2554fdf67cb705f5d241555a8b37c5c6cdc",
+      "bytes": 5203
+    },
+    {
+      "path": "model/packets/d_3284c39bab869cee.json",
+      "sha256": "e0c6dcaf4aa0c75467cf4e83e6fc53c843756674b000bc04aa377500d725f07f",
+      "bytes": 4322
+    },
+    {
+      "path": "model/packets/d_ac6e119faa6748a5.json",
+      "sha256": "4ac1a1ab2fc41689ec1d6acb9ee4091fda7febf50c62d6bae4fd15ecb1e86344",
+      "bytes": 4298
+    },
+    {
+      "path": "model/packets/d_2f5488d294f95e29.json",
+      "sha256": "bd3bf65747f52c03f8c90076c23851c0b86121959bc42b229089fc2bad5125a5",
+      "bytes": 4472
+    },
+    {
+      "path": "model/packets/d_0f51cb688400b89c.json",
+      "sha256": "e7e003aee91b5b5d429640b36b391342839b487fd0cfc8a3b2f19d4f2ff5cfed",
+      "bytes": 4324
+    },
+    {
+      "path": "model/packets/d_162f3a5840b6d145.json",
+      "sha256": "82d737934947194602386660a434ff32e0442c991b6c6cf4d20e80aca9810e27",
+      "bytes": 11133
+    },
+    {
+      "path": "model/packets/d_39bd912910b6cdc4.json",
+      "sha256": "4e94bb8b47cdfde922865fbdeb7dab33a5248c581e7645aefc00b115c2a60c07",
+      "bytes": 11375
+    },
+    {
+      "path": "model/packets/d_e9c5b907ca74eaa2.json",
+      "sha256": "e250b2d07ae8f70fee5bb41752a12fa0101d788bf792f66b74489f39a1f7662b",
+      "bytes": 21090
+    },
+    {
+      "path": "model/packets/d_6de45b407ca18e60.json",
+      "sha256": "6dd2030dcdd3c7277e6f3958a0cf96e49766f949240ff27d192d579f8671af30",
+      "bytes": 11962
+    },
+    {
+      "path": "model/packets/d_ea74e8dff125fb1c.json",
+      "sha256": "79145a4b225630aa4c44eefb511fe9ef7e853e849c28bbfe4ecaf97e3190306d",
+      "bytes": 11181
+    },
+    {
+      "path": "model/packets/d_d4791a8b4cdede65.json",
+      "sha256": "f21771d2444166d245cbbcc8b59e85f416d3253f17ce63a1338fe40ea077cf51",
+      "bytes": 11679
+    },
+    {
+      "path": "model/packets/d_aa0fdce6c965934e.json",
+      "sha256": "da7d98966b3e63950a6d442e4a0e33e5ec9d1ab199b11e458284290a114f9ca6",
+      "bytes": 17490
+    },
+    {
+      "path": "model/packets/d_23cb1deab0819ac1.json",
+      "sha256": "2ccea2aa936e8967f5363a694a8c5c4d391cb6083a1b1408a91be5378d4cd1d0",
+      "bytes": 11157
+    },
+    {
+      "path": "model/packets/d_21da0ca3d648bd22.json",
+      "sha256": "1ecded5082c2b278bef9afec8c48a1109ad5da2148881b7be92230722416053b",
+      "bytes": 11326
+    },
+    {
+      "path": "model/packets/d_2c793f9cde3e05f1.json",
+      "sha256": "59e5cef794a763f6eb20bfffab4cf9990cab475eac27680d626d2aa04feb7bb1",
+      "bytes": 11103
+    },
+    {
+      "path": "model/packets/d_b949be4c907cfe4b.json",
+      "sha256": "c0948231682d81d299578c41f4335c9da4bdee5f5f3252c5993b9cfca49c6de1",
+      "bytes": 11741
+    },
+    {
+      "path": "model/packets/d_edc200cbc63de947.json",
+      "sha256": "cb1fb320cdea149f3b80466c0b19857a55bb0a33b429d15f6efff833ce10afc8",
+      "bytes": 11567
+    }
+  ],
+  "evaluationSourceHashes": [
+    {
+      "path": "initial-block/evaluation/reasoning-blind.json",
+      "sha256": "4f9dda1bc03e2168e38670fe195a8d8ad0b285105fa8b3c7d58ad1d24f0b8a79",
+      "bytes": 63752
+    },
+    {
+      "path": "initial-block/evaluation/mapping-private.json",
+      "sha256": "f7f40d996f9a39b66a8f627008d6669b5f1ebe345aa59046f9f91b0257a9ddd8",
+      "bytes": 1027
+    },
+    {
+      "path": "initial-block/evaluation/locked-primary-agent.json",
+      "sha256": "b10caed9057114caab7b9289787a13f6e01919bbcfec369ec5f8e00acaa790c3",
+      "bytes": 35974
+    },
+    {
+      "path": "initial-block/evaluation/locked-primary-root.json",
+      "sha256": "df1998ff3c3ec5f2a423149893599a1f4dc1f9c5987ee70fd92536ae4a930819",
+      "bytes": 9888
+    },
+    {
+      "path": "initial-block/independent-review-agent.json",
+      "sha256": "1bc8bddf6156599aea3436ba42aadef66f678bb1f09e1f30dfab47346c0251a4",
+      "bytes": 98200
+    },
+    {
+      "path": "initial-block/independent-review-agent.md",
+      "sha256": "5ead1d744db51c994bf2d7552c1eb950bef37c16719eab6e02552a7e9178e04f",
+      "bytes": 40843
+    },
+    {
+      "path": "initial-block/SIGNOFF_RESOLUTION.md",
+      "sha256": "1c8c05763ccc686e236871cfe89a33d9b0a855860d9df4c269db6d035de9e638",
+      "bytes": 4838
+    },
+    {
+      "path": "initial-block/run-manifest.json",
+      "sha256": "5fe009b58bf43a2eb302a43998d95a234593d95ff99bf760378efd3a3b712533",
+      "bytes": 6192
+    },
+    {
+      "path": "protocol-manifest.json",
+      "sha256": "500a7bc44741b43d12d6953ab122198e2f114d838b88edf42b9d1848e039b291",
+      "bytes": 5592
+    },
+    {
+      "path": "freeze.json",
+      "sha256": "e7f97f119ab19b684948e7d9a70fac82f000b92088915fa08f81657c90fc6c7f",
+      "bytes": 35064
+    },
+    {
+      "path": "initial-block/evidence/public-metadata-2026-10-09.json",
+      "sha256": "f925057bf392a7c04d360b6b16a80e8140f989a89915480e03f88292aa21dc02",
+      "bytes": 1454
+    },
+    {
+      "path": "initial-block/evidence/paid-run/results.json",
+      "sha256": "daaa16bf3ff10170c42ee28741413fa03212eb107c1c69b49f13e63127edf3e6",
+      "bytes": 36461
+    },
+    {
+      "path": "initial-block/evidence/paid-run/spending.json",
+      "sha256": "5772766b6f36a6a2ebfdc50f3c7380ceea75de8155344b0945bdc1e1020d7469",
+      "bytes": 12414
+    },
+    {
+      "path": "initial-block/evidence/paid-run/summary.json",
+      "sha256": "2b9781ea3435a6f199960a1ce6269131f909855621dbadbcaa1a32223fcc2ca6",
+      "bytes": 1095
+    },
+    {
+      "path": "initial-block/evidence/paid-run/postgres-harness-run.json",
+      "sha256": "573e9d9ee834119ab91ed813b534431084858c2238b6254a5b8ce7a4864dfdea",
+      "bytes": 4864
+    },
+    {
+      "path": "initial-block/evidence/paid-run/postgres-diagnostic-results.json",
+      "sha256": "9b5c8b5388ac9987641ab9ac4b95edb3a28d6e18780d990a6a117fe7d40b2b40",
+      "bytes": 500
+    },
+    {
+      "path": "initial-block/evidence/paid-run/launcher-sleep.json",
+      "sha256": "857df4718a8c5fa37e951e00a57e225759d3d4f9e5d2908bf8817fe5bd4cf623",
+      "bytes": 233
+    },
+    {
+      "path": "initial-block/evaluation/adjudication.json",
+      "sha256": "c93cdf386e9fc2f515d9b91f0418c57cf67b705ca71e62b176ec46a356e1cd03",
+      "bytes": 11237
+    },
+    {
+      "path": "initial-block/evaluation/results-final.json",
+      "sha256": "3ceb75dd5e78288d2f55529d8c06dd182183a284cc7157df9f482ee9a76ee0fc",
+      "bytes": 11355
+    },
+    {
+      "path": "initial-block/EXECUTION_REPORT.md",
+      "sha256": "4c2b9327b838a0366c6c7ae92748a4a93f5968f61a68b900f7f2f9b864f8bed6",
+      "bytes": 9496
+    },
+    {
+      "path": "initial-block/execution-status.json",
+      "sha256": "ac525f47c0df4e311e419f87fd75d741d267493b3554f082a354eb6832a64083",
+      "bytes": 1791
+    },
+    {
+      "path": "initial-block/block.cjs",
+      "sha256": "ce598c29653ecad3332b8b7aed52c7b1cf86a51b0823e6d0ff2d3396e9181f12",
+      "bytes": 7437
+    },
+    {
+      "path": "initial-block/guard.cjs",
+      "sha256": "ad710da27f599aa092e6e2cf5866588a22593f4b759e97556ccb1b9feba16aa3",
+      "bytes": 10458
+    },
+    {
+      "path": "initial-block/guard.test.cjs",
+      "sha256": "0472b330dfe19e329ffe4f11a109e768665d2144e5e846577cb50ba1e8db6309",
+      "bytes": 9951
+    },
+    {
+      "path": "initial-block/launch.cjs",
+      "sha256": "63c5dbf7900005cd6737dda63168bec05108ea32c948ce3bf594f1b3c426bafe",
+      "bytes": 6112
+    },
+    {
+      "path": "initial-block/sleep.cjs",
+      "sha256": "6cbc6c52f146473b6c49c147198d6db1eb59d16ce697d33736d35be74e4e3233",
+      "bytes": 1445
+    },
+    {
+      "path": "initial-block/postgres.test.ts",
+      "sha256": "d6864b912119e87f9236c4363fc3317523bb0738ce8253f5d9ebde58a80c1b61",
+      "bytes": 8488
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_4455ae843acc1082.json",
+      "sha256": "079b3c15520d7985dcc655ff2ce643a6013a4c479d1923b945cd729f5bce0126",
+      "bytes": 3498
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_0f51cb688400b89c.json",
+      "sha256": "317bff0d7bc5e3e0e4fb3c737eb5c73195056dcab2d7d23ffd5f5038e4a5faac",
+      "bytes": 3498
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_d5011475b34a9da1.json",
+      "sha256": "ae70022f48b78a91068e012ba50ad301d67907ffa0b9a17a0ce6fd3925632d36",
+      "bytes": 3500
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_ac6e119faa6748a5.json",
+      "sha256": "f38e7e3cfc6e38ead3672c83b4376b44d083fbeaa353ea5b6387f62b4bc544b1",
+      "bytes": 3498
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_63ea398f0b23e2f0.json",
+      "sha256": "ae09613b416312425a31ba2c783e02ed7b4c30c749495fde526157a51ed3e43f",
+      "bytes": 3500
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_28b1cf3e53f64ddf.json",
+      "sha256": "58969be2c17d0f927406b2f2b12576007708dc0d4499aad63f1d96b948d67366",
+      "bytes": 3500
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_2f5488d294f95e29.json",
+      "sha256": "f12a9593d9ce6f7051ffed63246a728e8815d48c1141a806c9edcd89becd2da2",
+      "bytes": 3496
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_3284c39bab869cee.json",
+      "sha256": "31b8c16efe976b1ef9c3a44cd40c4841776de85d3d088dde55afd652f8fb7ae1",
+      "bytes": 3498
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_21da0ca3d648bd22.json",
+      "sha256": "793ba9ab188baca7c05d4efd87981e0bf30ebabd4c472277bdddacaa6a60300b",
+      "bytes": 3546
+    },
+    {
+      "path": "initial-block/evidence/paid-run/canonical-d_6de45b407ca18e60.json",
+      "sha256": "820559e87af0b841288fa87973dccc2db455f049137cc099fbfb04d8625a3de9",
+      "bytes": 3548
+    }
+  ],
+  "limitations": [
+    "Independent AI-agent review, not human educational evaluation or human approval to spend. Root is case-author-side; the separate reviewer did not author the cases or tested outputs.",
+    "Neutral IDs and hidden execution mapping were used until the independent primary lock at 2026-10-09T12:56:14.333764+00:00. Prior review of the original task/gold mixture and knowledge of the authorized DeepSeek-only run prevent full blinding.",
+    "One complete response per eight bounded synthetic reasoning scenarios does not establish population reliability, inter-rater reliability, broad curriculum coverage or general model intelligence.",
+    "A05 remains an unresolved output interpretation/criterion question. No final score or categorical serious failure is inferred; it is not counted as a pass.",
+    "Zero usable review verdicts means semantic accuracy, precision, sensitivity, false-positive rate and grounding ability are unmeasurable. Neither blank nor skipped cases is a true negative.",
+    "Raw reasoning token counts are retained but private reasoning text is not; cap exhaustion cannot establish internal educational judgments or attribute a unique cause to model, prompts or output demands.",
+    "Official pricing/default metadata is the retained pre-dispatch snapshot at 2026-10-09T12:41:40.009469+00:00. Arithmetic and UTC eligibility were independently verified; invoice/balance was not inspected. Canonical cost remains null.",
+    "Transport latency excludes reservation/database bootstrap, durable finishing and evaluation; these small samples do not establish population latency.",
+    "Structure/compact blueprint serialization, recovery, repair, verification, capacity comparison and live repair → verification → ApplyService qualification remain deferred and untested in this block."
+  ],
+  "recommendationsWithinEvaluationOnly": [
+    "Correct A03 learner-evidence attribution in any separately authorized future work; do not infer observed inference mastery from the supplied teaching example.",
+    "Retain A05 as pending, clarify chosen placeholder semantics without requiring every possible implementation or inventing an unavailable resource.",
+    "Treat review cap exhaustion as an operational budget-fit observation. No automatic budget increase, prompt/model change, recovery, rerun or production publication is authorized."
+  ]
+}

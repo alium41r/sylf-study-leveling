@@ -1,0 +1,40 @@
+{
+  "status": "PASSED",
+  "paidCalls": 0,
+  "checks": [
+    {
+      "command": "node prepare.cjs",
+      "scope": "Offline frozen packet preparation, canonical fixture and grounding validation",
+      "exitCode": 0
+    },
+    {
+      "command": "node prepare.cjs check",
+      "scope": "Frozen source, configuration, authoring/tool and packet hashes",
+      "exitCode": 0
+    },
+    {
+      "command": "node --check prepare.cjs and evaluator/cases.cjs",
+      "exitCode": 0
+    },
+    {
+      "command": "npx eslint documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/prepare.cjs documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/evaluator/cases.cjs --max-warnings 0",
+      "exitCode": 0
+    },
+    {
+      "command": "npx tsc --noEmit --incremental false",
+      "scope": "Whole repository",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check -- documentation/planner/README.md",
+      "exitCode": 0
+    }
+  ],
+  "notRun": [
+    "Paid diagnostics",
+    "Unit/PostgreSQL regression gate",
+    "Production build",
+    "Phase 3",
+    "Paid execution adapter/experiment-guard mock preflight (required at execution integration)"
+  ]
+}

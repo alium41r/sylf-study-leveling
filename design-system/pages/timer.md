@@ -48,3 +48,20 @@ This page-specific design direction overrides `MASTER.md` for `/timer`. It harmo
 - Circular play action button, subject name, syllabus code badge, exam board & academic level, and today's accumulated focus time.
 - Inline/expandable "Add Subject" card with styled form controls (name, syllabus code, board, level, syllabus details, color swatches).
 - Clean empty state when no subjects exist yet.
+
+### Responsive Session Choices
+- Quests and subjects remain in two equal columns at every supported width, including phone viewports. Each section keeps its own list, count, loading state, and empty state.
+- At a page container width of 1,000px or less, cards place wrapping titles and metadata above time readouts, followed by labeled Focus buttons. Subject management stays beside the Focus button. Interactive controls are at least 44px tall.
+- At 540px or less, compact labels and a shorter daily-focus card leave more room for the two lists. Complete action names remain available to assistive technology.
+- Add Subject appears below a populated subject list; an empty list uses its own add action. Menus and the existing create/edit/delete dialogs retain their behavior.
+- Container queries measure the space left by the shared sidebar. Surface, text, and accent colors use the app's semantic appearance tokens, including custom backgrounds.
+- See the [responsive layout verification](../../documentation/design/reports/timer-mobile-columns/report.md) for the checked viewports and states.
+
+
+### Active Focus Session Bar (`/focus`)
+
+- `FocusTimerLayoutRouter` owns one shared `FocusSessionBar` above Classic, Anime, Landscape, and Fantasy timer layouts. The bar combines phase/paused state, mode, subject or quest title, and the existing environment picker action.
+- Keep the bar centered and compact, with a subdued translucent semantic surface, fine dividers, small regular text, and a steady status dot. Avoid animated dots, glow, shadows, bold uppercase environment labels, and a visible shortcut badge. The existing Alt+B shortcut remains available.
+- Below 640px, hide the mode and environment name to leave room for the subject; keep the environment icon button at least 44px square. Long titles truncate with full context in their title attributes. Keyboard focus remains visible.
+- Use the same presentation in inert environment previews. Timer engines, layout docking positions, shared party docks, and background preferences retain their existing owners. The mirror-tab notice reserves space above the bar.
+- See the [session bar verification](../../documentation/design/reports/focus-session-bar/report.md) for viewport and appearance evidence.

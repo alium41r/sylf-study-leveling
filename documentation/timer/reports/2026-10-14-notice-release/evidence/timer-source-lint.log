@@ -1,0 +1,2 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/components/TimerSyncWorker.tsx lib/planner/v2/server/database.ts __tests__/timer/coordinator-pooler.test.ts __tests__/timer/sync-notice.test.tsx app/api/acoustics/route.ts app/api/quests/route.ts lib/ai/scope-evaluator.ts app/goals/page.tsx scripts/verify-timer-build.mjs

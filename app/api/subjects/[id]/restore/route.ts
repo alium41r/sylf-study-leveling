@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { revalidateTag } from "next/cache";
 
-type RouteParams = { params: Promise<{ id: string }> | { id: string } };
+type RouteParams = { params: Promise<{ id: string }> };
 
 async function getUserId(req: NextRequest): Promise<number | null> {
   const session = await getSession(req);

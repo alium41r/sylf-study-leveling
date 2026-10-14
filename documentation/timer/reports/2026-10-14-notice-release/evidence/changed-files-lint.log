@@ -1,0 +1,56 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/components/TimerSyncWorker.tsx lib/planner/v2/server/database.ts __tests__/timer/coordinator-pooler.test.ts __tests__/timer/sync-notice.test.tsx app/api/acoustics/route.ts app/api/quests/route.ts app/api/subjects/[id]/compile/route.ts app/api/subjects/[id]/forge-apex/route.ts app/api/subjects/[id]/nodes/route.ts app/api/subjects/[id]/restore/route.ts app/api/subjects/[id]/route.ts app/api/user/focus-backgrounds/route.ts app/goals/page.tsx lib/ai/scope-evaluator.ts __tests__/subjects/quest-progress-reconciliation.test.ts __tests__/ai/syllabus-compiler.test.ts
+
+/Users/aliumair/Desktop/sylf/__tests__/ai/syllabus-compiler.test.ts
+   33:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   52:74  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  141:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  156:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  180:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  182:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/aliumair/Desktop/sylf/__tests__/subjects/quest-progress-reconciliation.test.ts
+   88:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   88:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  227:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  245:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  266:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  267:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  297:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  307:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  375:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  385:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  451:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  461:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  528:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  538:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  607:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  615:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  635:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  661:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  664:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  677:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  709:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  717:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  727:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  729:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/aliumair/Desktop/sylf/app/api/subjects/[id]/forge-apex/route.ts
+  141:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/aliumair/Desktop/sylf/app/api/subjects/[id]/restore/route.ts
+  3:10  warning  'prisma' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/aliumair/Desktop/sylf/app/api/subjects/[id]/route.ts
+  4:10  warning  'prisma' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/aliumair/Desktop/sylf/app/api/user/focus-backgrounds/route.ts
+   84:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  226:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  276:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 40 problems (38 errors, 2 warnings)

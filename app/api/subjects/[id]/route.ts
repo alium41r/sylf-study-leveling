@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth-server";
 import { getSubjectDependencySummary } from "@/lib/subject-service";
 import { revalidateTag } from "next/cache";
 
-type RouteParams = { params: Promise<{ id: string }> | { id: string } };
+type RouteParams = { params: Promise<{ id: string }> };
 
 async function getUserId(req: NextRequest): Promise<number | null> {
   const session = await getSession(req);

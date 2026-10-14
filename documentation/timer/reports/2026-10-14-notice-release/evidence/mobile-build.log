@@ -1,0 +1,201 @@
+npm notice run sylf@0.1.0 mobile:build
+npm notice run vite build mobile --outDir /private/tmp/sylf-timer-mobile-dist
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vite.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.0 building client environment for production...
+transforming...
+
+fonts/KaTeX_AMS-Regular.woff2 referenced in fonts/KaTeX_AMS-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Bold.woff2 referenced in fonts/KaTeX_Caligraphic-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Regular.woff2 referenced in fonts/KaTeX_Caligraphic-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Bold.woff2 referenced in fonts/KaTeX_Fraktur-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Regular.woff2 referenced in fonts/KaTeX_Fraktur-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Bold.woff2 referenced in fonts/KaTeX_Main-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-BoldItalic.woff2 referenced in fonts/KaTeX_Main-BoldItalic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Italic.woff2 referenced in fonts/KaTeX_Main-Italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Regular.woff2 referenced in fonts/KaTeX_Main-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-BoldItalic.woff2 referenced in fonts/KaTeX_Math-BoldItalic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-Italic.woff2 referenced in fonts/KaTeX_Math-Italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Bold.woff2 referenced in fonts/KaTeX_SansSerif-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Italic.woff2 referenced in fonts/KaTeX_SansSerif-Italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Regular.woff2 referenced in fonts/KaTeX_SansSerif-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Script-Regular.woff2 referenced in fonts/KaTeX_Script-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size1-Regular.woff2 referenced in fonts/KaTeX_Size1-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size2-Regular.woff2 referenced in fonts/KaTeX_Size2-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size3-Regular.woff2 referenced in fonts/KaTeX_Size3-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size4-Regular.woff2 referenced in fonts/KaTeX_Size4-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Typewriter-Regular.woff2 referenced in fonts/KaTeX_Typewriter-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_AMS-Regular.woff referenced in fonts/KaTeX_AMS-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Bold.woff referenced in fonts/KaTeX_Caligraphic-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Regular.woff referenced in fonts/KaTeX_Caligraphic-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Bold.woff referenced in fonts/KaTeX_Fraktur-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Regular.woff referenced in fonts/KaTeX_Fraktur-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Bold.woff referenced in fonts/KaTeX_Main-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-BoldItalic.woff referenced in fonts/KaTeX_Main-BoldItalic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Italic.woff referenced in fonts/KaTeX_Main-Italic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Regular.woff referenced in fonts/KaTeX_Main-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-BoldItalic.woff referenced in fonts/KaTeX_Math-BoldItalic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-Italic.woff referenced in fonts/KaTeX_Math-Italic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Bold.woff referenced in fonts/KaTeX_SansSerif-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Italic.woff referenced in fonts/KaTeX_SansSerif-Italic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Regular.woff referenced in fonts/KaTeX_SansSerif-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Script-Regular.woff referenced in fonts/KaTeX_Script-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size1-Regular.woff referenced in fonts/KaTeX_Size1-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size2-Regular.woff referenced in fonts/KaTeX_Size2-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size3-Regular.woff referenced in fonts/KaTeX_Size3-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size4-Regular.woff referenced in fonts/KaTeX_Size4-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Typewriter-Regular.woff referenced in fonts/KaTeX_Typewriter-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_AMS-Regular.ttf referenced in fonts/KaTeX_AMS-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Bold.ttf referenced in fonts/KaTeX_Caligraphic-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Regular.ttf referenced in fonts/KaTeX_Caligraphic-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Bold.ttf referenced in fonts/KaTeX_Fraktur-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Regular.ttf referenced in fonts/KaTeX_Fraktur-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Bold.ttf referenced in fonts/KaTeX_Main-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-BoldItalic.ttf referenced in fonts/KaTeX_Main-BoldItalic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Italic.ttf referenced in fonts/KaTeX_Main-Italic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Regular.ttf referenced in fonts/KaTeX_Main-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-BoldItalic.ttf referenced in fonts/KaTeX_Math-BoldItalic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-Italic.ttf referenced in fonts/KaTeX_Math-Italic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Bold.ttf referenced in fonts/KaTeX_SansSerif-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Italic.ttf referenced in fonts/KaTeX_SansSerif-Italic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Regular.ttf referenced in fonts/KaTeX_SansSerif-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Script-Regular.ttf referenced in fonts/KaTeX_Script-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size1-Regular.ttf referenced in fonts/KaTeX_Size1-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size2-Regular.ttf referenced in fonts/KaTeX_Size2-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size3-Regular.ttf referenced in fonts/KaTeX_Size3-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size4-Regular.ttf referenced in fonts/KaTeX_Size4-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Typewriter-Regular.ttf referenced in fonts/KaTeX_Typewriter-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+✓ 2935 modules transformed.
+rendering chunks...
+computing gzip size...
+../../../../private/tmp/sylf-timer-mobile-dist/.mock-manifest.json                                  0.10 kB │ gzip:   0.10 kB
+../../../../private/tmp/sylf-timer-mobile-dist/index.html                                           2.27 kB │ gzip:   0.86 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/FocusTimerLayoutRouter-B_VXpkIZ.css           2.33 kB │ gzip:   0.83 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/PixelCompanion-CSwG4Q57.css                   3.24 kB │ gzip:   1.11 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/CalendarScreen-CXtjh_4H.css                   8.20 kB │ gzip:   2.27 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/CustomAudioTab-BGg4AEmL.css                   9.36 kB │ gzip:   2.40 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/ShopScreen-BN_jtln2.css                       9.95 kB │ gzip:   2.47 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/GoalsScreen-CrK7AVmf.css                     11.76 kB │ gzip:   2.89 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SystemLibrary-ChneleLc.css                   13.13 kB │ gzip:   3.22 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SocialScreen-BNMXIcXM.css                    15.58 kB │ gzip:   3.45 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/ArchiveSettingsScreen-DCA9xmgC.css           24.04 kB │ gzip:   5.36 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/TimerScreen-D8u5cdFy.css                     26.43 kB │ gzip:   5.98 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/DashboardScreen-CkMSkpC7.css                 27.10 kB │ gzip:   5.92 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/LockerScreen-CPu7j03a.css                    29.45 kB │ gzip:   5.56 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SystemScreen-CS34TaZw.css                    52.59 kB │ gzip:  10.21 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/index-BpFDzZDs.css                          428.48 kB │ gzip:  58.76 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/ThemesSettingsScreen-DS1hsEs2.js              0.22 kB │ gzip:   0.17 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/BackgroundsSettingsScreen-DvoPVOtP.js         0.22 kB │ gzip:   0.17 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SyncRedirectController-BBAgL2bQ.js            0.29 kB │ gzip:   0.23 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/BadgesRedirectController-DUPZEmWH.js          0.45 kB │ gzip:   0.33 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/ProfileRedirectController-BCK1LpLF.js         0.47 kB │ gzip:   0.34 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/BackToSettings-BALZ5Cff.js                    0.55 kB │ gzip:   0.40 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/useSystemAppearance-m1sRkfgZ.js               0.68 kB │ gzip:   0.42 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/QuestsScreen-3T06qkPJ.js                      0.74 kB │ gzip:   0.44 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/next-link-JigVB6_B.js                         0.82 kB │ gzip:   0.54 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/game-engine-BqysJqqr.js                       0.85 kB │ gzip:   0.39 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SettingsIndexController-DZFovmMZ.js           0.89 kB │ gzip:   0.55 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/rolldown-runtime-B0Z9INg1.js                  0.90 kB │ gzip:   0.51 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/next-image-BjYVttvw.js                        1.01 kB │ gzip:   0.59 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/OwnCompanionPreview-Boh-n3i-.js               1.57 kB │ gzip:   0.87 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/study-systems-B70xCxGN.js                     1.77 kB │ gzip:   0.69 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/goal-theme-Dx0woI-7.js                        1.81 kB │ gzip:   0.85 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/NavigationContext-ON6l_Y45.js                 1.85 kB │ gzip:   0.66 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/CalendarSettingsScreen-BrgTxfRv.js            2.05 kB │ gzip:   0.98 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/FocusTimerLayoutRouter--kJW_UYh.js            2.07 kB │ gzip:   0.97 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SystemLibrary-BNTSw5dM.js                     2.70 kB │ gzip:   1.06 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/client-data-cache-DztMMk_o.js                 3.17 kB │ gzip:   1.45 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/custom-audio-store-Dav7lbX7.js                4.28 kB │ gzip:   1.80 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SystemIcons-BaA6mKSd.js                       5.07 kB │ gzip:   1.04 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/timezone-service-QfVII2oV.js                  6.59 kB │ gzip:   2.17 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/AchievementsSettingsScreen-C7aGLT1H.js        8.73 kB │ gzip:   3.16 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/RankingsSettingsScreen-D616LqTP.js           10.76 kB │ gzip:   2.95 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/NotificationsSettingsScreen-D25e5KO2.js      11.00 kB │ gzip:   3.28 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/AuthProvider-F9k50vIb.js                     13.93 kB │ gzip:   5.50 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/CollectionSettingsScreen-BYqu2rwC.js         14.57 kB │ gzip:   4.74 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/CustomAudioTab-CaPnAtY0.js                   15.63 kB │ gzip:   4.39 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/ModesSettingsScreen-ao9cqSdD.js              16.30 kB │ gzip:   4.89 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/ShopScreen-Dz6eaOBC.js                       22.89 kB │ gzip:   6.29 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/TimerScreen-IWUP0leU.js                      24.43 kB │ gzip:   6.70 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/DashboardScreen-DXY-b-XJ.js                  28.13 kB │ gzip:   8.17 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/StatsSettingsScreen-BxsAPHWM.js              32.42 kB │ gzip:   7.32 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/FocusBackgroundPicker-6R7F5Q7j.js            33.18 kB │ gzip:   8.47 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/FocusBackgroundsSettingsScreen-xPdYReZ4.js   33.50 kB │ gzip:   8.17 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/AppearanceSettingsScreen-CsPmeOVp.js         35.74 kB │ gzip:   7.68 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/GoalsScreen-COqvhQoU.js                      36.41 kB │ gzip:   8.66 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/ArchiveSettingsScreen-DdFidKhN.js            39.70 kB │ gzip:  13.53 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/PixelCompanion-sPbASTfk.js                   40.43 kB │ gzip:  13.37 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/CalendarScreen-B8n-USvw.js                   41.09 kB │ gzip:  10.33 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/vendor-icons-ClwpxTMO.js                     48.23 kB │ gzip:  15.86 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/FantasyTimerLayout-Br2lliTs.js               53.08 kB │ gzip:  10.73 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/AccountSettingsScreen-BqhGaVQt.js            57.01 kB │ gzip:  13.63 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/schemas-DUMEdW5_.js                          70.31 kB │ gzip:  18.73 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/LockerScreen-Dki-bwUN.js                    124.89 kB │ gzip:  30.83 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/vendor-motion-BE09T1qV.js                   125.74 kB │ gzip:  41.03 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/FocusScreen-CJeJN__M.js                     176.10 kB │ gzip:  46.77 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/vendor-react-5rVsvZ8K.js                    181.75 kB │ gzip:  57.16 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SocialScreen-C5cSt73S.js                    315.51 kB │ gzip:  76.76 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/SystemScreen-bVKs-3l3.js                    346.20 kB │ gzip:  94.61 kB
+../../../../private/tmp/sylf-timer-mobile-dist/assets/index-405WzkA_.js                           771.13 kB │ gzip: 219.79 kB
+
+✓ built in 4.58s

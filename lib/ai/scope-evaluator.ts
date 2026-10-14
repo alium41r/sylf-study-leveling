@@ -27,6 +27,24 @@ export interface ScopeEvaluationResult {
 }
 
 /**
+ * Calculates deterministic AI scope completion weight W_scope in [0.10, 1.00]
+ */
+export function calculateScopeWeight(
+  node: { title: string; description: string; tier: number },
+  quest: { title: string; description?: string | null; targetMinutes: number }
+): number {
+  const result = calculateSemanticScopeWeight({
+    nodeTitle: node.title,
+    nodeDescription: node.description,
+    nodeTier: node.tier,
+    questTitle: quest.title,
+    planDescription: quest.description || "",
+    targetMinutes: quest.targetMinutes,
+  });
+  return result.scopeWeight;
+}
+
+/**
  * High-precision semantic NLP syllabus scope evaluator.
  * Accurately analyzes what fraction of the chapter syllabus is planned by the student.
  */
@@ -36,7 +54,6 @@ export function calculateSemanticScopeWeight(
   const targetMinutes = Number(input.targetMinutes) > 0 ? Number(input.targetMinutes) : 45;
   const plan = (input.planDescription || "").trim();
   const planLower = plan.toLowerCase();
-  const title = (input.questTitle || "").trim().toLowerCase();
   const syllabusDesc = (input.nodeDescription || "").toLowerCase();
 
   // If plan is completely empty, estimate purely by duration and default quest scope

@@ -32,7 +32,11 @@ vi.mock("@/lib/prisma", () => {
       $queryRawUnsafe: vi.fn(),
       $transaction: vi.fn(async (input: any) => {
         if (typeof input === "function") {
-          return input({ subjectNode: { updateMany: updateManyMock } });
+          return input({
+            $queryRaw: vi.fn().mockResolvedValue([]),
+            subject: { findFirst: prisma.subject.findFirst, update: prisma.subject.update },
+            subjectNode: { updateMany: updateManyMock },
+          });
         }
         return input;
       }),

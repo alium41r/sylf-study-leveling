@@ -63,47 +63,43 @@ export class PlannerDatabase {
   constructor(readonly pool: Pool) {}
   async coordinated<T>(ownerId: number, work: (sql: Sql) => Promise<T>): Promise<T> {
     if (!Number.isSafeInteger(ownerId) || ownerId <= 0) reject("REFERENCE_NOT_OWNED", "An authenticated owner is required.");
-    for (let retry = 0; ; retry++) {
+    const lockDeadline = Date.now() + 10_000;
+    let serializationRetries = 0;
+    for (;;) {
       const sql = await this.pool.connect();
-      let ownerLocked = false; let lockAttempted = false; let previousTimeout: string | undefined; let discard = false;
+      let discard = false;
+      let retryDelay: number | undefined;
       try {
-        // Waiting in a SELECT inside SERIALIZABLE would pin its snapshot before
-        // the preceding owner commits. Wait on the same key before BEGIN, then
-        // keep the transaction-scoped lock required by the existing SQL guards.
-        previousTimeout = (await sql.query("SHOW statement_timeout")).rows[0].statement_timeout;
-        await sql.query("SET statement_timeout = '10s'");
-        lockAttempted = true;
-        await sql.query("SELECT pg_advisory_lock(73641, $1::int)", [ownerId]);
-        ownerLocked = true;
-        await sql.query("SELECT set_config('statement_timeout',$1,false)", [previousTimeout]);
+        // A session lock acquired before BEGIN leaks across backend connections
+        // on transaction poolers. Only transaction-scoped state belongs here.
+        // Never wait inside SERIALIZABLE with a snapshot pinned before another
+        // owner commits: a busy nonblocking attempt rolls back and starts fresh.
         await sql.query("BEGIN ISOLATION LEVEL SERIALIZABLE");
         await sql.query("SET LOCAL TIME ZONE 'UTC'");
         await sql.query("SET LOCAL statement_timeout = '10s'");
         await sql.query("SET LOCAL idle_in_transaction_session_timeout = '15s'");
-        await sql.query("SELECT pg_advisory_xact_lock(73641, $1::int)", [ownerId]);
+        const locked = (await sql.query("SELECT pg_try_advisory_xact_lock(73641, $1::int) AS locked", [ownerId])).rows[0]?.locked;
+        if (locked !== true) throw Object.assign(new Error("The account is busy. Please retry shortly."), { code: "55P03" });
         await sql.query("SELECT set_config('sylf.planner_v2_core_owner',$1,true)", [String(ownerId)]);
         const result = await work(sql);
         await sql.query("COMMIT");
         return result;
       } catch (error) {
         await sql.query("ROLLBACK").catch(() => { discard = true; });
-        if (["40001", "40P01"].includes(String((error as { code?: string }).code)) && retry < 2) {
-          await new Promise(resolve => setTimeout(resolve, 10 + Math.floor(Math.random() * 20)));
-          continue;
+        const code = String((error as { code?: string }).code);
+        if (code === "55P03" && Date.now() < lockDeadline) {
+          retryDelay = 50 + Math.floor(Math.random() * 25);
+        } else if (["40001", "40P01"].includes(code) && serializationRetries++ < 2) {
+          retryDelay = 10 + Math.floor(Math.random() * 20);
+        } else {
+          throw error;
         }
-        throw error;
       } finally {
-        try {
-          if (lockAttempted) {
-            const unlocked = (await sql.query("SELECT pg_advisory_unlock(73641, $1::int) AS unlocked", [ownerId])).rows[0].unlocked;
-            if (ownerLocked && !unlocked) discard = true;
-          }
-          if (previousTimeout !== undefined) await sql.query("SELECT set_config('statement_timeout',$1,false)", [previousTimeout]);
-        } catch { discard = true; }
-        // Destroying an uncertain backend releases session locks instead of
-        // leaking them into the pool. A known committed result stays replayable.
+        // COMMIT/ROLLBACK releases every coordination lock. Destroy a client
+        // with an uncertain rollback; return healthy clients before waiting.
         sql.release(discard);
       }
+      if (retryDelay !== undefined) await new Promise(resolve => setTimeout(resolve, retryDelay));
     }
   }
 }

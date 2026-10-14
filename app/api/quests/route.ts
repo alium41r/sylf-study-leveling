@@ -15,24 +15,6 @@ import { calculateQuestRewards } from "@/lib/difficulty-engine";
 import { projectQuestDuration } from "@/lib/planner/v2/quest-read";
 
 /**
- * Calculates deterministic AI scope completion weight W_scope in [0.10, 1.00]
- */
-export function calculateScopeWeight(
-  node: { title: string; description: string; tier: number },
-  quest: { title: string; description?: string | null; targetMinutes: number }
-): number {
-  const result = calculateSemanticScopeWeight({
-    nodeTitle: node.title,
-    nodeDescription: node.description,
-    nodeTier: node.tier,
-    questTitle: quest.title,
-    planDescription: quest.description || "",
-    targetMinutes: quest.targetMinutes,
-  });
-  return result.scopeWeight;
-}
-
-/**
  * GET /api/quests
  * List quests for the authenticated user.
  */
@@ -124,7 +106,8 @@ export async function GET(req: NextRequest) {
 
     const now = new Date();
     const enriched = quests.map((q) => {
-      const sessionSeconds = (q.sessions || []).reduce((acc: number, s: any) => {
+      const { sessions, ...rest } = q;
+      const sessionSeconds = (sessions || []).reduce((acc, s) => {
         if (s.executionState != null) return acc + (s.durationSeconds || 0);
         if (!s.endedAt) {
           const started = new Date(s.startedAt);
@@ -135,7 +118,6 @@ export async function GET(req: NextRequest) {
       }, 0);
 
       const todaySeconds = sessionSeconds;
-      const { sessions: _, ...rest } = q;
       return {
         ...projectQuestDuration(rest),
         todaySeconds,
@@ -282,7 +264,7 @@ export async function POST(req: NextRequest) {
             targetMinutes,
           });
           scopeWeight = evalResult.scopeWeight;
-        } catch (err) {
+        } catch {
           await releaseQuota(userId, "scope").catch(() => {});
           scopeWeight = calculateSemanticScopeWeight({
             nodeTitle: node.title,

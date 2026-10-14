@@ -1,0 +1,44 @@
+[
+  {
+    "file": "__tests__/ai/syllabus-compiler.test.ts",
+    "baselineErrors": 6,
+    "baselineWarnings": 0,
+    "currentErrors": 6,
+    "currentWarnings": 0
+  },
+  {
+    "file": "__tests__/subjects/quest-progress-reconciliation.test.ts",
+    "baselineErrors": 28,
+    "baselineWarnings": 0,
+    "currentErrors": 28,
+    "currentWarnings": 0
+  },
+  {
+    "file": "app/api/subjects/[id]/forge-apex/route.ts",
+    "baselineErrors": 1,
+    "baselineWarnings": 0,
+    "currentErrors": 1,
+    "currentWarnings": 0
+  },
+  {
+    "file": "app/api/user/focus-backgrounds/route.ts",
+    "baselineErrors": 3,
+    "baselineWarnings": 0,
+    "currentErrors": 3,
+    "currentWarnings": 0
+  },
+  {
+    "file": "app/api/subjects/[id]/restore/route.ts",
+    "baselineErrors": 0,
+    "baselineWarnings": 1,
+    "currentErrors": 0,
+    "currentWarnings": 1
+  },
+  {
+    "file": "app/api/subjects/[id]/route.ts",
+    "baselineErrors": 0,
+    "baselineWarnings": 1,
+    "currentErrors": 0,
+    "currentWarnings": 1
+  }
+]

@@ -12,7 +12,7 @@ async function getUserId(req: NextRequest): Promise<number | null> {
 
 export async function GET(
   req: NextRequest,
-  props: { params: Promise<{ id: string }> | { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
   const userId = await getUserId(req);
   if (!userId) {

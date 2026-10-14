@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export const CURATED_SOUNDSCAPES = [
+const CURATED_SOUNDSCAPES = [
   // ─── NATURE & WEATHER ─────────────────────────────────────
   {
     id: 1,
@@ -204,7 +203,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ tracks });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ tracks: CURATED_SOUNDSCAPES });
   }
 }

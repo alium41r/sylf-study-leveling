@@ -1,6 +1,6 @@
 # Timer lifecycle and synchronization
 
-Current owners and guarantees for study timers and Focus Party timers. Source, tests, schema and configuration resolve discrepancies; the [2026-10-14 audit](reports/2026-10-14-lifecycle/report.md) records verification and deployment limitations.
+Current owners and guarantees for study timers and Focus Party timers. Source, tests, schema and configuration resolve discrepancies; the [2026-10-14 audit](reports/2026-10-14-lifecycle/report.md) records its original verification. The [notice and release follow-up](reports/2026-10-14-notice-release/report.md) records deployment checks and the transaction-pooler repair.
 
 ## Owners
 
@@ -31,7 +31,11 @@ Requests bound both connection and body reads to 15 seconds. Network errors, los
 
 Storage is device/origin scoped. Closing the app pauses delivery until it is opened and authenticated again. Signing out never converts saved timer data into another user's session. Clearing browser data, uninstalling the app or device loss destroys data that has not reached the server; there is no remote copy of a fully offline intent. Invalid/removed resources or conflicting active work produce a visible error and retain the journal for resolution.
 
+The shell shows a pending-delivery notice once per failure episode. It disappears after six seconds, can be dismissed immediately, and clears when accepted. Repeated retry ticks do not reopen it or extend its lifetime. Hiding the notice never stops delivery or removes saved operations. User-facing wording describes saving to the account rather than requiring students to understand synchronization.
+
 ## Server invariants
+
+Owner coordination uses the existing SERIALIZABLE transaction and a nonblocking transaction advisory lock. A busy attempt rolls back, releases its connection and retries with a fresh snapshot. Lock waits are bounded; transaction-local settings and locks end at COMMIT/ROLLBACK. No session-level advisory lock or global connection setting may escape a transaction through the hosted transaction pooler.
 
 - Keyed creation uses a `TimerSessionStart` receipt bound to authenticated owner, request hash and session. Retrying after a lost POST response or after END returns the same row. Recovery cannot predate account creation or overlap already ended work. Another subject's active session is protected rather than silently closed.
 - Ordinary timers and manual quests now use the existing versioned execution overlay alongside Planner timers. Original boundary timestamps preserve offline pause/resume/end intervals; paused time cannot become focus. Stored focus and break share one bounded wall-clock budget.

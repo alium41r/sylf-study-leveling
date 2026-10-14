@@ -1,6 +1,7 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { calculateScopeWeight, POST as createQuestPOST } from "@/app/api/quests/route";
+import { POST as createQuestPOST } from "@/app/api/quests/route";
+import { calculateScopeWeight } from "@/lib/ai/scope-evaluator";
 import { POST as evaluateScopePOST } from "@/app/api/quests/evaluate-scope/route";
 import { PATCH as endSessionPATCH } from "@/app/api/sessions/route";
 import { POST as forgeApexPOST } from "@/app/api/subjects/[id]/forge-apex/route";

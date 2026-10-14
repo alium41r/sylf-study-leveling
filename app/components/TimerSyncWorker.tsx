@@ -2,23 +2,34 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
-import { getTimerSync, type TimerSyncStatus } from "@/lib/timer-sync";
+import { getTimerSync } from "@/lib/timer-sync";
 import { invalidateClientCache } from "@/lib/client-data-cache";
 import { usePathname } from "next/navigation";
+import { X } from "lucide-react";
 
 /** Mounted by the shared web/mobile shell, so navigation never owns delivery. */
 export default function TimerSyncWorker() {
   const { user, refreshStats } = useAuth();
-  const [status, setStatus] = useState<TimerSyncStatus>({ pending: 0, error: null });
+  const [notice, setNotice] = useState<{ ownerId: number; message: string } | null>(null);
   const ownerId = user?.id;
   const focus = usePathname()?.startsWith("/focus");
   useEffect(() => {
     if (!ownerId) return;
     const sync = getTimerSync(ownerId);
     let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+    let noticeTimer: ReturnType<typeof setTimeout> | undefined;
+    let lastNotice: string | null = null;
     let authError: string | null = null;
     const unsubscribe = sync.subscribe(() => {
-      const status = sync.status(); setStatus(status);
+      const status = sync.status();
+      const message = status.pending > 0 ? status.error : null;
+      if (!message) {
+        lastNotice = null; clearTimeout(noticeTimer); setNotice(null);
+      } else if (message !== lastNotice) {
+        lastNotice = message; clearTimeout(noticeTimer);
+        setNotice({ ownerId, message });
+        noticeTimer = setTimeout(() => setNotice(null), 6000);
+      }
       if (status.error?.startsWith("Sign in") && authError !== status.error) { authError = status.error; void refreshStats(); }
       if (!status.error) authError = null;
     });
@@ -36,16 +47,24 @@ export default function TimerSyncWorker() {
     window.addEventListener("storage", storage);
     document.addEventListener("visibilitychange", visibility);
     return () => {
-      sync.stop(); unsubscribe(); accepted(); clearInterval(retry); clearTimeout(refreshTimer);
+      sync.stop(); unsubscribe(); accepted(); clearInterval(retry); clearTimeout(refreshTimer); clearTimeout(noticeTimer);
       window.removeEventListener("online", wake); window.removeEventListener("pageshow", wake);
       window.removeEventListener("storage", storage); document.removeEventListener("visibilitychange", visibility);
     };
   }, [ownerId, refreshStats]);
-  if (!ownerId || !status.error) return null;
+  if (!ownerId || notice?.ownerId !== ownerId) return null;
+  const message = notice.message === "Your session is saved on this device. Sync will retry automatically."
+    ? "Your session is saved on this device. We'll update your account automatically."
+    : notice.message.startsWith("Sign in")
+    ? "Sign in to the original account to finish saving your session."
+    : notice.message.replace(/\bsync\b/gi, "save to your account");
   return (
     <div role="status" className={`fixed ${focus ? "top-28 sm:top-4 sm:right-4 sm:left-auto sm:translate-x-0" : "bottom-4"} left-1/2 -translate-x-1/2 z-[90] w-[calc(100%-2rem)] max-w-sm rounded-xl border border-border-subtle bg-bg-panel p-3 text-sm text-text-primary shadow-lg pointer-events-none`}>
-      <p>{status.error}</p>
-      <button type="button" className="mt-2 text-accent-text font-semibold pointer-events-auto" onClick={() => getTimerSync(ownerId).wake()}>Retry sync</button>
+      <div className="flex items-start gap-3">
+        <p className="flex-1">{message}</p>
+        <button type="button" aria-label="Dismiss session notification" className="shrink-0 rounded-md p-1 text-text-muted hover:text-text-primary pointer-events-auto" onClick={() => setNotice(null)}><X size={18} aria-hidden="true" /></button>
+      </div>
+      <button type="button" className="mt-2 text-accent-text font-semibold pointer-events-auto" onClick={() => getTimerSync(ownerId).wake()}>Try again</button>
     </div>
   );
 }

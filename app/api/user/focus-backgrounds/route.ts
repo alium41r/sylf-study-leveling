@@ -26,7 +26,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export const MAX_USER_BACKGROUNDS_QUOTA = 10;
+const MAX_USER_BACKGROUNDS_QUOTA = 10;
 
 export async function GET(req: NextRequest) {
   try {

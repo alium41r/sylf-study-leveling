@@ -1,0 +1,121 @@
+{
+  "tables": {
+    "timer_start_receipts": true,
+    "party_timeline": true,
+    "versioned_sessions": true
+  },
+  "migrations": [
+    {
+      "migration_name": "20261014000000_timer_durable_completion",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261007000000_pixel_companion_consolidation",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261005000000_pixel_creations",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261004000000_planner_v2_assistant_documents",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20261002000000_planner_v2_durable_core",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260927100000_planner_reoffer_state",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260927090000_planner_user_released_disposition",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260926030000_subject_archived_at",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260926020000_planner_intake_session",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260926010000_planner_preference_friction",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260925152657_planner_check_result",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260924010000_planner_foundation",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260909060000_user_focus_background_layout_key",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260909050000_focus_background_preference_source",
+      "applied": true,
+      "rolled_back": false
+    },
+    {
+      "migration_name": "20260909040001_storage_restrictive_isolation",
+      "applied": true,
+      "rolled_back": false
+    }
+  ],
+  "permissions": [
+    {
+      "proname": "leave_focus_session",
+      "arguments": "p_session_id integer, p_user_id integer",
+      "backend_can_execute": true,
+      "browser_can_execute": false,
+      "supports_original_end": false
+    },
+    {
+      "proname": "leave_focus_session",
+      "arguments": "p_session_id integer, p_user_id integer, p_joined_at timestamp without time zone, p_ended_at timestamp without time zone",
+      "backend_can_execute": true,
+      "browser_can_execute": false,
+      "supports_original_end": false
+    },
+    {
+      "proname": "pause_focus_timer",
+      "arguments": "p_session_id integer, p_user_id integer",
+      "backend_can_execute": true,
+      "browser_can_execute": false,
+      "supports_original_end": false
+    },
+    {
+      "proname": "settle_study_session_atomic",
+      "arguments": "p_user_id integer, p_session_id integer, p_duration_seconds integer, p_break_seconds integer, p_quest_id integer, p_subject_id integer, p_complete_quest boolean, p_is_final boolean, p_user_local_date text",
+      "backend_can_execute": true,
+      "browser_can_execute": false,
+      "supports_original_end": true
+    },
+    {
+      "proname": "start_study_session",
+      "arguments": "p_user_id integer, p_quest_id integer, p_subject_id integer, p_initial_seconds integer",
+      "backend_can_execute": true,
+      "browser_can_execute": false,
+      "supports_original_end": false
+    }
+  ]
+}

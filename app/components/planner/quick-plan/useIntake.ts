@@ -161,9 +161,10 @@ export interface IntakeSession {
 
 export function useIntakeSession(
   mode: IntakeView["mode"],
-  options: { enabled?: boolean; onQuotaRefresh?: () => void } = {}
+  options: { enabled?: boolean; onQuotaRefresh?: () => void; clientKey?: string } = {}
 ): IntakeSession {
   const enabled = options.enabled ?? true;
+  const isolatedKey = options.clientKey;
   const [view, setView] = useState<IntakeView | null>(null);
   const [restoring, setRestoring] = useState(true);
   const [notice, setNotice] = useState("");
@@ -186,10 +187,11 @@ export function useIntakeSession(
   const apply = useCallback((next: IntakeView) => {
     viewRef.current = next;
     setView(next);
-    writeMirror(next);
+    // A chat handoff is its own draft. Keep the normal unfinished brief available.
+    if (!isolatedKey) writeMirror(next);
     if (next.id && started.current)
       intakeReadinessChanged(next.id, next.mode, next.readiness.canGenerate, next.readiness.missing.length);
-  }, []);
+  }, [isolatedKey]);
 
   /** Turn a server error into one sentence a student can act on. */
   const describe = useCallback((error: unknown): string => {
@@ -215,7 +217,7 @@ export function useIntakeSession(
   const restore = useCallback(async () => {
     setRestoring(true);
     setNotice("");
-    const mirror = readMirror(mode);
+    const mirror = isolatedKey ? null : readMirror(mode);
     try {
       let next: IntakeView;
       if (mirror?.id) {
@@ -225,10 +227,10 @@ export function useIntakeSession(
           // A mirror pointing at a deleted or expired session is not a failure to
           // restore: it is a reason to create the session the student expects.
           if (intakeErrorCode(error) === "INTAKE_EXPIRED") setExpired(true);
-          next = await createOrResumeIntake(mode);
+          next = await createOrResumeIntake(mode, isolatedKey ? { clientKey: isolatedKey } : undefined);
         }
       } else {
-        next = await createOrResumeIntake(mode);
+        next = await createOrResumeIntake(mode, isolatedKey ? { clientKey: isolatedKey } : undefined);
       }
       apply(next);
       if (!started.current) {
@@ -241,7 +243,7 @@ export function useIntakeSession(
     } finally {
       setRestoring(false);
     }
-  }, [apply, describe, mode]);
+  }, [apply, describe, isolatedKey, mode]);
 
   useEffect(() => {
     if (!enabled) return;

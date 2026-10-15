@@ -129,6 +129,8 @@ const hoursLabel = (minutes: number): string => {
 /** One deterministic consequence sentence, derived from state plus the proposed value. */
 function consequenceOf(command: CopilotCommand, brief: PlanBriefV1): string {
   switch (command.command) {
+    case "SET_GOAL":
+      return brief.goal.title ? `Study goal: ${brief.goal.title} → ${command.title}.` : `Study goal set to ${command.title}.`;
     case "SET_WEEKLY_HOURS": {
       const before = brief.budget.weeklyMinutes;
       const after = Math.round(command.hours * 60);
@@ -256,6 +258,10 @@ export function mapCommands(input: {
     for (const code of confirmationsFor(command)) requires.add(code);
     const base = { command: command.command, consequence: consequenceOf(command, input.brief) };
     switch (command.command) {
+      case "SET_GOAL":
+        mapped.push({ kind: "ACTION", action: { action: "setGoal", title: command.title } });
+        preview.push(base);
+        break;
       case "SET_WEEKLY_HOURS": {
         const minutes = Math.round(command.hours * 60);
         if (command.hard) {

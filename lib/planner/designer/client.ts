@@ -73,14 +73,18 @@ export const sendDesignerMessage = async (
     expectedVersion: number;
     message: string;
     recent: DesignerRecentTurn[];
+    proposalOnly?: boolean;
+    signal?: AbortSignal;
   }
 ): Promise<DesignerTurnPayload> =>
   plannerFetch<DesignerTurnPayload>(`/intake/${encodeURIComponent(sessionId)}/designer`, {
+    signal: input.signal,
     ...postJson({
       schemaVersion: 1,
       expectedVersion: input.expectedVersion,
       message: input.message,
       recent: input.recent.slice(-8),
+      ...(input.proposalOnly ? { proposalOnly: true } : {}),
     }),
   });
 

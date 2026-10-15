@@ -31,14 +31,18 @@ export const sendCopilotMessage = async (
     message: string;
     recent: CopilotRecentTurn[];
     clarificationAnswer?: string | null;
+    proposalOnly?: boolean;
+    signal?: AbortSignal;
   }
 ): Promise<CopilotTurnPayload> =>
   plannerFetch<CopilotTurnPayload>(`/intake/${encodeURIComponent(sessionId)}/copilot`, {
+    signal: input.signal,
     ...postJson({
       schemaVersion: 1,
       expectedVersion: input.expectedVersion,
       message: input.message,
       recent: input.recent.slice(-8),
+      ...(input.proposalOnly ? { proposalOnly: true } : {}),
       ...(input.clarificationAnswer ? { clarificationAnswer: input.clarificationAnswer } : {}),
     }),
   });

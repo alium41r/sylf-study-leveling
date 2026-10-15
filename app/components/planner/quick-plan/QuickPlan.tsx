@@ -19,6 +19,7 @@ import { Sparkles, Edit3, ChevronDown, ChevronUp, X } from "lucide-react";
 import base from "../ExamPlanner.module.css";
 import copilotStyles from "../copilot/copilot.module.css";
 import s from "./quick-plan.module.css";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 /**
  * Quick Plan — Guided 3-Step Flow with Unified Sylf Assistant.
@@ -81,7 +82,9 @@ export default function QuickPlan({
   onQuotaRefresh,
   onSwitchMode,
   prefill,
+  handoff,
 }: {
+  handoff?: SylviePlannerHandoff;
   mode: IntakeView["mode"];
   /** Switch to the existing detailed setup ("Fine-tune first"). */
   onAdvanced: () => void;
@@ -95,7 +98,10 @@ export default function QuickPlan({
   };
 }) {
   const copy = COPY[mode];
-  const session = useIntakeSession(mode, { onQuotaRefresh });
+  const session = useIntakeSession(mode, {
+    onQuotaRefresh,
+    ...(handoff?.kind === "NEW_PLAN" ? { clientKey: `sylvie_${handoff.id}` } : {}),
+  });
   const view = session.view;
 
   const [goal, setGoal] = useState("");
@@ -109,7 +115,20 @@ export default function QuickPlan({
   const [pastedText, setPastedText] = useState("");
   const [highlightedSources, setHighlightedSources] = useState<string[]>([]);
   const [copilotNotice, setCopilotNotice] = useState("");
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(Boolean(handoff));
+  const [desktopAssistant, setDesktopAssistant] = useState(false);
+  const [assistantBusy, setAssistantBusy] = useState(false);
+  const closeAssistant = () => { if (!assistantBusy) setIsAssistantOpen(false); };
+
+  useEffect(() => {
+    const resize = () => setDesktopAssistant(window.innerWidth >= 1024);
+    resize();
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, []);
+
+  // Replanning must name an existing plan; a new empty brief cannot stand in for it.
+  const handoffRequest = handoff && (handoff.kind === "NEW_PLAN" || view?.planId) ? handoff : undefined;
 
   const sylfInputRef = useRef<HTMLInputElement | null>(null);
   const hydrated = useRef(false);
@@ -254,6 +273,19 @@ export default function QuickPlan({
 
   return (
     <section className={`${base.root} ${s.surface}`} aria-label="Quick Plan">
+      {handoff && (
+        <details className="my-3 rounded-2xl border border-border-subtle bg-surface-2 p-4 text-text-primary">
+          <summary className="text-text-secondary cursor-pointer">Request from your conversation</summary>
+          <p className="text-text-primary whitespace-pre-wrap">{handoff.request}</p>
+        </details>
+      )}
+      {handoff?.kind === "REPLAN" && view && !view.planId && (
+        <div className="my-3 rounded-2xl border border-border-subtle bg-surface-2 p-4 text-text-primary" role="status">
+          <p className="text-text-primary">Your request: {handoff.request}</p>
+          <p className="text-text-secondary">Choose the saved plan to adjust. Its review controls will show a proposal before you apply changes.</p>
+          <button type="button" onClick={onAdvanced} className="text-accent-text-light underline">Open saved plans</button>
+        </div>
+      )}
       {/* Compact Header with On-Demand Assistant trigger */}
       <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-white/[0.08]">
         <div>
@@ -265,11 +297,13 @@ export default function QuickPlan({
         <button
           type="button"
           onClick={() => {
+            if (assistantBusy) return;
             setIsAssistantOpen((open) => !open);
             setTimeout(() => sylfInputRef.current?.focus(), 150);
           }}
           aria-label={isAssistantOpen ? "Close Sylf Assistant" : "Ask Sylf Assistant"}
           aria-expanded={isAssistantOpen}
+          disabled={assistantBusy}
           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold font-['Rajdhani'] uppercase tracking-wider transition-all active:scale-95 ${
             isAssistantOpen
               ? "border-accent-primary bg-accent-primary/20 text-accent-text-light shadow-[0_0_12px_rgba(124,58,237,0.3)]"
@@ -855,111 +889,71 @@ export default function QuickPlan({
           </p>
         </div>
 
-        {/* Desktop Drawer (Slide-Over, On-Demand) */}
+        {/* One assistant instance preserves its request and reply across viewport changes. */}
         {isAssistantOpen && (
-          <div className="hidden lg:block">
+          <>
             <div
-              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-opacity"
-              onClick={() => setIsAssistantOpen(false)}
+              className={desktopAssistant ? "fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-opacity" : copilotStyles.mobileBackdrop}
+              onClick={closeAssistant}
               aria-hidden="true"
             />
             <aside
-              className="fixed top-0 right-0 h-full w-[420px] max-w-[90vw] z-50 bg-[#0c101c] border-l border-white/10 shadow-[-12px_0_36px_rgba(0,0,0,0.5)] flex flex-col"
+              className={desktopAssistant
+                ? "fixed top-0 right-0 h-full w-[420px] max-w-[90vw] z-50 bg-bg-card border-l border-border-subtle shadow-[-12px_0_36px_rgba(0,0,0,0.5)] flex flex-col"
+                : copilotStyles.mobileSheet}
               role="dialog"
               aria-modal="true"
               aria-label="Sylf Assistant"
             >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/[0.02] shrink-0">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-violet-300" />
-                  <span className="font-['Rajdhani'] font-bold text-sm uppercase tracking-wider text-text-primary">
-                    Sylf Assistant
-                  </span>
+              {desktopAssistant ? (
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle shrink-0">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-accent-primary" />
+                    <span className="font-['Rajdhani'] font-bold text-sm uppercase tracking-wider text-text-primary">Sylf Assistant</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeAssistant}
+                    disabled={assistantBusy}
+                    aria-label="Close assistant"
+                    className="p-1 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-shadow transition-colors"
+                  ><X className="w-4 h-4" /></button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsAssistantOpen(false)}
-                  aria-label="Close assistant"
-                  className="p-1 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/10 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+              ) : <div className={copilotStyles.sheetHandleBar} />}
               <div className="flex-1 min-h-0">
                 <PlannerCopilot
+                  initialRequest={handoffRequest}
+                  onBusyChange={setAssistantBusy}
                   view={view}
-                  lifecycle={
-                    view.planId
-                      ? view.readiness.canGenerate
-                        ? "DRAFT_REVIEW"
-                        : "PRE_GENERATION"
-                      : "PRE_GENERATION"
-                  }
-                  onView={() => void session.reload()}
+                  lifecycle={view.planId ? view.readiness.canGenerate ? "DRAFT_REVIEW" : "PRE_GENERATION" : "PRE_GENERATION"}
+                  onView={(next) => {
+                    setGoal(next.brief.goal.title);
+                    setSubject(next.brief.subject.name ?? "");
+                    setDate(next.brief.target.examDate ?? next.brief.target.endDate ?? "");
+                    void session.reload();
+                  }}
                   onRoute={handleCopilotRoute}
                   onPrerequisite={handleCopilotPrerequisite}
                   onViewRefresh={() => void session.reload()}
                   onSwitchMode={onSwitchMode}
-                  onCloseMobile={() => setIsAssistantOpen(false)}
+                  isMobileSheet={!desktopAssistant}
+                  onCloseMobile={closeAssistant}
                   inputRef={sylfInputRef}
                 />
               </div>
             </aside>
-          </div>
+          </>
         )}
-
-        {/* Mobile FAB and Bottom Sheet (<1024px) */}
         <div className="lg:hidden">
           <button
             type="button"
             className={copilotStyles.mobileFab}
-            onClick={() => {
-              setIsAssistantOpen(true);
-              setTimeout(() => sylfInputRef.current?.focus(), 150);
-            }}
+            onClick={() => { setIsAssistantOpen(true); setTimeout(() => sylfInputRef.current?.focus(), 150); }}
             aria-label="Open Sylf Assistant"
           >
-            <Sparkles className="w-4 h-4 text-violet-200" />
+            <Sparkles className="w-4 h-4 text-accent-primary" />
             <span>Sylf</span>
           </button>
-
-          {isAssistantOpen && (
-            <>
-              <div
-                className={copilotStyles.mobileBackdrop}
-                onClick={() => setIsAssistantOpen(false)}
-                aria-hidden="true"
-              />
-              <div
-                className={copilotStyles.mobileSheet}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Sylf Assistant"
-              >
-                <div className={copilotStyles.sheetHandleBar} />
-                <div className="flex-1 min-h-0">
-                  <PlannerCopilot
-                    view={view}
-                    lifecycle={
-                      view.planId
-                        ? view.readiness.canGenerate
-                          ? "DRAFT_REVIEW"
-                          : "PRE_GENERATION"
-                        : "PRE_GENERATION"
-                    }
-                    onView={() => void session.reload()}
-                    onRoute={handleCopilotRoute}
-                    onPrerequisite={handleCopilotPrerequisite}
-                    onViewRefresh={() => void session.reload()}
-                    onSwitchMode={onSwitchMode}
-                    isMobileSheet
-                    onCloseMobile={() => setIsAssistantOpen(false)}
-                    inputRef={sylfInputRef}
-                  />
-                </div>
-              </div>
-            </>
-          )}
         </div>
         </>
       )}

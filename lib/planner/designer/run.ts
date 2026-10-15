@@ -254,7 +254,9 @@ export async function runDesignerTurn(input: DesignerTurnInput): Promise<{
    * that follows can carry it without any of them deciding it for themselves.
    */
   const materialQuestion: DesignerQuestion | null = questionFor({
-    missing: summary.missing,
+    // A handed-off first message can already name the goal. Its proposed title
+    // remains reviewable; asking the student to type it again adds no information.
+    missing: summary.missing.filter((code) => code !== "GOAL" || !interpretation.commands.some((command) => command.command === "SET_GOAL")),
     modelCode: interpretation.questionCode,
     modelQuestion: interpretation.question,
     modelOptions: interpretation.questionOptions,
@@ -636,6 +638,7 @@ export async function runDesignerTurn(input: DesignerTurnInput): Promise<{
    * will have, applied atomically on one confirmation (§12, §13).
    */
   const directEligible =
+    !body.proposalOnly &&
     unresolved.length === 0 &&
     briefCommands.length === 1 &&
     commands.length === 1 &&

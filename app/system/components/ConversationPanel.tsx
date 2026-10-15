@@ -21,6 +21,9 @@ import { QuotaInfo } from "../../components/AiPlannerPanel";
 import { SystemChatSession } from "./SessionSidebar";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 import styles from "../System.module.css";
+import SylvieResponseActions from "@/app/components/system/SylvieResponseActions";
+import type { PendingSylvieAction } from "@/lib/ai/sylvie/action";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 interface SystemMsg {
   id: number;
@@ -33,6 +36,8 @@ interface SystemMsg {
   failed?: boolean;
   fileObj?: File;
   modelUsed?: string;
+  pendingAction?: PendingSylvieAction;
+  plannerHandoff?: SylviePlannerHandoff;
 }
 
 function getMessageModelBadge(msg: SystemMsg, currentModelPref?: string): string {
@@ -163,7 +168,7 @@ export default function ConversationPanel({
     textareaRef.current?.focus();
   };
 
-  const sendMessage = async (text: string, file: File | null) => {
+  const sendMessage = async (text: string, file: File | null, confirmationToken?: string) => {
     if (!text.trim() && !file) return;
 
     const optimisticUserMsg: SystemMsg = {
@@ -185,7 +190,9 @@ export default function ConversationPanel({
     if (text.trim()) formData.append("message", text);
     if (file) formData.append("file", file);
     formData.append("modelPreference", modelPref);
+    formData.append("pageContext", JSON.stringify({ path: "/system" }));
     if (sessionId) formData.append("sessionId", sessionId.toString());
+    if (confirmationToken) formData.append("confirmationToken", confirmationToken);
 
     try {
       const res = await fetch("/api/system-messages/chat", {
@@ -202,7 +209,7 @@ export default function ConversationPanel({
             ...updated,
             {
               id: Date.now() + 1,
-              content: `**Daily Limit Reached**\n\nYou've used all ${data.limit || 15} AI messages for today. Your quota resets at midnight.`,
+              content: `**Daily AI message limit reached**\n\n${data.message || "Your quota resets at midnight."} Planner requests and confirmations are still available.`,
               type: "INFO",
               read: true,
               createdAt: new Date().toISOString(),
@@ -253,7 +260,11 @@ export default function ConversationPanel({
 
         setMessages((prev) => {
           const withoutOptimistic = prev.filter((m) => m.id !== optimisticUserMsg.id);
-          return [...withoutOptimistic, data.userMessage, data.aiMessage];
+          return [...withoutOptimistic, data.userMessage, {
+            ...data.aiMessage,
+            pendingAction: data.aiMessage?.pendingAction ?? data.pendingAction,
+            plannerHandoff: data.aiMessage?.plannerHandoff ?? data.plannerHandoff,
+          }];
         });
         scrollToBottom();
         onQuotaRefresh();
@@ -332,7 +343,7 @@ export default function ConversationPanel({
   };
 
   const handleTriggerSend = async () => {
-    if (isSending || (!inputText.trim() && !selectedFile) || quotaExhausted) return;
+    if (isSending || (!inputText.trim() && !selectedFile)) return;
     const currentInput = inputText;
     const currentFile = selectedFile;
     setInputText("");
@@ -340,9 +351,11 @@ export default function ConversationPanel({
     await sendMessage(currentInput, currentFile);
   };
 
-  // An unlimited account is never locked out (`remaining` is null there).
+  // The server enforces model quota; basic help, Planner requests and confirmations remain available.
   const quotaExhausted =
     chatQuota !== null && !chatQuota.unlimited && chatQuota.remaining === 0;
+  const latestAssistantId = messages.reduce<number | null>((latest, message) =>
+    message.type !== "USER" ? message.id : latest, null);
 
   return (
     <div className="flex-1 flex flex-col min-h-0 select-none overflow-hidden relative">
@@ -353,7 +366,7 @@ export default function ConversationPanel({
             <div className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-bg-panel/90 border border-border-subtle shadow-xl">
               <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin shadow-sm" />
               <span className="text-xs font-['Rajdhani'] uppercase tracking-wider text-accent-text-light font-bold">
-                Synchronizing Memory...
+                Loading conversation...
               </span>
             </div>
           </div>
@@ -369,7 +382,7 @@ export default function ConversationPanel({
               </div>
 
               <h2 className="text-xs font-bold font-['Rajdhani'] uppercase tracking-widest text-text-muted mb-4">
-                How can Sylvie assist you?
+                What can I help you with?
               </h2>
 
               {/* Minimalist Prompt Chips */}
@@ -505,6 +518,12 @@ export default function ConversationPanel({
                       ) : (
                         <div className="text-sm leading-relaxed">
                           <MarkdownRenderer content={msg.content} />
+                          <SylvieResponseActions
+                            pendingAction={msg.id === latestAssistantId ? msg.pendingAction : undefined}
+                            plannerHandoff={msg.plannerHandoff}
+                            busy={isSending}
+                            onConfirm={(token) => sendMessage("Confirm change", null, token)}
+                          />
                         </div>
                       )}
                     </div>
@@ -555,7 +574,7 @@ export default function ConversationPanel({
             <div className="flex items-center gap-2">
               <Lock className="w-4 h-4 text-rose-400 shrink-0" />
               <span>
-                Daily prompt limit reached ({chatQuota?.limit || 15}/{chatQuota?.limit || 15} messages). Quota resets at midnight.
+                Daily AI message limit reached ({chatQuota?.limit || 15}/{chatQuota?.limit || 15} messages). Planner requests and confirmations are still available.
               </span>
             </div>
             <span className="font-mono text-[11px] text-rose-400 font-bold hidden sm:inline-block">
@@ -592,12 +611,8 @@ export default function ConversationPanel({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={isSending || quotaExhausted}
-            placeholder={
-              quotaExhausted
-                ? "Daily chat quota reached..."
-                : "Ask anything... (Enter to send, Shift+Enter for new line)"
-            }
+            disabled={isSending}
+            placeholder="Ask anything... (Enter to send, Shift+Enter for new line)"
             className="w-full bg-transparent border-none text-xs sm:text-sm font-['Rajdhani'] text-text-primary placeholder:text-text-muted focus:outline-none resize-none leading-relaxed px-1 disabled:opacity-50"
           />
 
@@ -614,7 +629,7 @@ export default function ConversationPanel({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={quotaExhausted || isSending}
+                disabled={isSending}
                 className="p-2 sm:p-1.5 rounded-lg text-text-muted hover:text-accent-primary-light hover:bg-white/5 transition-colors disabled:opacity-40 flex items-center gap-1 text-xs font-['Rajdhani'] cursor-pointer"
                 title="Attach syllabus, notes, or image"
               >
@@ -723,16 +738,11 @@ export default function ConversationPanel({
               <button
                 type="button"
                 onClick={handleTriggerSend}
-                disabled={isSending || (!inputText.trim() && !selectedFile) || quotaExhausted}
+                disabled={isSending || (!inputText.trim() && !selectedFile)}
                 className={`py-2 px-4 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer ${styles.btnPrimaryAction}`}
               >
                 {isSending ? (
                   <span className="animate-pulse">Thinking...</span>
-                ) : quotaExhausted ? (
-                  <>
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Locked</span>
-                  </>
                 ) : (
                   <>
                     <Send className="w-3.5 h-3.5" />

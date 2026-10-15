@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-15",
+  "runtime": "Shared Sylf screens in the Vite mobile preview with VITE_ENABLE_MOCK_API=true; chat action responses supplied by a browser-local fixture.",
+  "views": [
+    {
+      "viewport": [
+        1440,
+        960
+      ],
+      "mode": "dark",
+      "state": "Blank conversation greeting",
+      "screenshot": "desktop-dark-greeting.png",
+      "horizontalOverflowPx": 0
+    },
+    {
+      "viewport": [
+        1440,
+        960
+      ],
+      "mode": "light",
+      "accent": "#0f766e",
+      "background": "#f1f5f9",
+      "state": "Blank conversation greeting",
+      "screenshot": "desktop-light-custom-greeting.png"
+    },
+    {
+      "viewport": [
+        1440,
+        960
+      ],
+      "mode": "light",
+      "accent": "#0f766e",
+      "background": "#f1f5f9",
+      "state": "Pending mutation preview with Confirm change and Cancel",
+      "screenshot": "desktop-light-custom-confirmation.png"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "mode": "light",
+      "accent": "#0f766e",
+      "background": "#f1f5f9",
+      "state": "Pending mutation preview with reachable controls and composer",
+      "screenshot": "mobile-light-custom-confirmation.png",
+      "horizontalOverflowPx": 0,
+      "confirmationButtonHeightPx": 34
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "mode": "dark",
+      "accent": "#ec4899",
+      "background": "#101820",
+      "state": "Planner review action",
+      "screenshot": "mobile-dark-custom-planner-review.png",
+      "horizontalOverflowPx": 0
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "mode": "dark",
+      "state": "Planner Quick Plan with carried conversation request expanded; typed intake unavailable in development mock",
+      "screenshot": "mobile-dark-planner-intake.png",
+      "horizontalOverflowPx": 0
+    },
+    {
+      "viewport": [
+        1440,
+        960
+      ],
+      "mode": "light",
+      "accent": "#0f766e",
+      "background": "#f1f5f9",
+      "state": "Planner Quick Plan with carried conversation request expanded; typed intake unavailable in development mock",
+      "screenshot": "desktop-light-custom-planner-intake.png",
+      "horizontalOverflowPx": 0
+    }
+  ],
+  "checks": [
+    "Inspected screenshots for wrapping, clipping, spacing, control visibility, and contrast.",
+    "All three chat surfaces covered by automated context and confirmation tests.",
+    "Shared response controls covered by confirmation, cancellation, in-progress, and explicit Planner review tests.",
+    "Quota-refusal followed by a Planner request remains possible on all three chat surfaces.",
+    "Account switch/logout clears the carried Planner request and remounts the child intake; unconsumed request context is discarded."
+  ],
+  "limitations": [
+    "These screenshots verify rendering, not live model quality or authenticated production API execution.",
+    "Populated screenshots contain existing historical mock chat text; the new blank conversation greeting is shown separately.",
+    "The development mock does not implement heartbeat, notification, and invite endpoints, so unrelated polling errors appear in the preview console.",
+    "Focus assistant action layout and floating overlay action layout were covered by component tests; they were not separately screenshotted in this pass.",
+    "Planner handoff destination was inspected. The mobile development mock has no typed Planner intake response, so screenshots stop at Restoring your brief; no generated plan or proposal is claimed."
+  ]
+}

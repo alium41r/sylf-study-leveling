@@ -58,6 +58,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Disposable browser qualification must not replace a concurrent dev build.
   distDir: process.env.SYLF_TEST_DIST_DIR || ".next",
+  outputFileTracingIncludes: {
+    "/api/system-messages/chat": ["./lib/ai/sylvie/{persona,knowledge,capabilities}.md"],
+  },
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },

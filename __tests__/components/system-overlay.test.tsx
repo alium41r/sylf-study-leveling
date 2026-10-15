@@ -41,7 +41,7 @@ describe("Minimal floating conversation", () => {
     fireEvent.change(input(), { target: { value: "Help with my goal" } });
     fireEvent.keyDown(input(), { key: "Enter" });
     expect(fetch).toHaveBeenCalledWith("/api/system-messages/chat", expect.objectContaining({
-      method: "POST", body: JSON.stringify({ message: "Help with my goal" }),
+      method: "POST", body: JSON.stringify({ message: "Help with my goal", pageContext: { path: "/goals" } }),
     }));
     expect(screen.getByText("Help with my goal")).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText("A useful answer.")).toBeInTheDocument());
@@ -62,7 +62,7 @@ describe("Minimal floating conversation", () => {
     expect(fetch).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Goal progress" }));
     await waitFor(() => expect(screen.getByText("A useful answer.")).toBeInTheDocument());
-    expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ body: JSON.stringify({ message: "Goal progress" }) }));
+    expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ body: JSON.stringify({ message: "Goal progress", pageContext: { path: "/goals" } }) }));
   });
 
   it("uses the current greeting before chatting and preserves a thread after a context change", async () => {
@@ -74,9 +74,23 @@ describe("Minimal floating conversation", () => {
     fireEvent.change(input(), { target: { value: "My schedule" } });
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     await waitFor(() => expect(screen.getByText("A useful answer.")).toBeInTheDocument());
+    expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
+      body: JSON.stringify({ message: "My schedule", pageContext: { path: "/calendar" } }),
+    }));
     view.rerender(<SystemOverlay {...callbacks} presence={goals} />);
     expect(screen.getByText("My schedule")).toBeInTheDocument();
     expect(screen.getByText(/Now viewing/)).toBeInTheDocument();
+  });
+
+  it("preserves the selected quests tab as minimal page context", async () => {
+    const quests = resolvePresence("/goals", "tab=quests")!;
+    render(<SystemOverlay {...props()} presence={quests} sessionId={42} />);
+    fireEvent.change(input(), { target: { value: "Help with this task" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
+      body: JSON.stringify({ message: "Help with this task", sessionId: 42, pageContext: { path: "/goals?tab=quests" } }),
+    }));
+    await waitFor(() => expect(screen.getByText("A useful answer.")).toBeInTheDocument());
   });
 
   it("keeps planner/workspace actions accessible through minimal controls", () => {
@@ -110,12 +124,49 @@ describe("Minimal floating conversation", () => {
     expect(document.documentElement.style.overflow).not.toBe("hidden");
   });
 
-  it("shows readable limit feedback and blocks sending when quota is exhausted", () => {
+  it("keeps the composer usable at exhausted model quota and leaves enforcement to the server", async () => {
     render(<SystemOverlay {...props()} chatQuota={{ remaining: 0, unlimited: false } as QuotaInfo} />);
-    expect(input()).toBeDisabled();
-    expect(screen.getByRole("status")).toHaveTextContent("Daily limit reached");
-    expect(screen.queryByRole("button", { name: "Goal progress" })).not.toBeInTheDocument();
+    expect(input()).toBeEnabled();
+    expect(screen.getByRole("status")).toHaveTextContent("Planner requests and confirmations are still available");
+    expect(screen.getByRole("button", { name: "Goal progress" })).toBeInTheDocument();
     expect(fetch).not.toHaveBeenCalled();
+    fireEvent.change(input(), { target: { value: "Help me plan my study week" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    await waitFor(() => expect(screen.getByText("A useful answer.")).toBeInTheDocument());
+    expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
+      body: JSON.stringify({ message: "Help me plan my study week", pageContext: { path: "/goals" } }),
+    }));
+
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: false, status: 429, json: async () => ({ message: "Daily AI message limit reached." }),
+    })));
+    fireEvent.change(input(), { target: { value: "Explain quantum mechanics in detail" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    await waitFor(() => expect(screen.getByText(/⚠️ Daily AI message limit reached/)).toBeInTheDocument());
+    expect(input()).toBeEnabled();
+    fireEvent.change(input(), { target: { value: "Introduce Sylf briefly" } });
+    expect(screen.getByRole("button", { name: "Send message" })).toBeEnabled();
+  });
+
+  it("previews a mutation and confirms it after ordinary chat quota is exhausted", async () => {
+    const callbacks = props();
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: true, status: 200, json: async () => ({
+        sessionId: 42, reply: "Please review this change.",
+        pendingAction: { token: "signed-action", summary: "Move Biology review to Friday." },
+      }),
+    })));
+    const view = render(<SystemOverlay {...callbacks} sessionId={42} />);
+    fireEvent.change(input(), { target: { value: "Move my review" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Confirm change" })).toBeEnabled());
+    expect(fetch).toHaveBeenCalledTimes(1);
+    view.rerender(<SystemOverlay {...callbacks} sessionId={42} chatQuota={{ remaining: 0, unlimited: false } as QuotaInfo} />);
+    expect(input()).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm change" }));
+    expect(fetch).toHaveBeenLastCalledWith(expect.any(String), expect.objectContaining({
+      body: JSON.stringify({ message: "Confirm change", sessionId: 42, pageContext: { path: "/goals" }, confirmationToken: "signed-action" }),
+    }));
   });
 
   it("allows stopping an in-flight reply and keeps error feedback visible", async () => {

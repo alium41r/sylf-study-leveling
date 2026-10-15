@@ -19,6 +19,7 @@ import QuickPlan from "./quick-plan/QuickPlan";
 import type { PlannerCapabilities } from "@/lib/planner/transport";
 import { plannerTelemetry } from "@/lib/planner/telemetry";
 import s from "./ExamPlanner.module.css";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 type Mode = "EXAM" | "ROADMAP" | "MASTERY";
 
@@ -159,7 +160,9 @@ export default function PlannerWorkspace({
   initialMode,
   onExitToClassic,
   onQuotaRefresh,
+  handoff,
 }: {
+  handoff?: SylviePlannerHandoff;
   capabilities: PlannerCapabilities;
   /** The mode the caller already chose, so this component does not ask again. */
   initialMode?: Mode;
@@ -170,6 +173,7 @@ export default function PlannerWorkspace({
   const [mode, setMode] = useState<Mode | null>(initialMode ?? null);
   const [advanced, setAdvanced] = useState(false);
   const [prefill, setPrefill] = useState<PrefillData | undefined>(undefined);
+  const [copyNotice, setCopyNotice] = useState("");
 
   // Setup Designer entry state
   const [entryQuery, setEntryQuery] = useState("");
@@ -284,10 +288,24 @@ export default function PlannerWorkspace({
 
         {/* Active planner body */}
         <div className="relative">
+          {advanced && handoff && (
+            <div className="mx-4 sm:mx-6 mt-4 rounded-2xl border border-border-subtle bg-surface-2 p-4 text-text-primary">
+              <p className="text-text-primary whitespace-pre-wrap">{handoff.request}</p>
+              <p className="text-text-secondary">Choose your saved plan and use its review controls. This setup cannot read the prepared request automatically; no plan has been changed.</p>
+              <button type="button" className="text-accent-text-light underline" onClick={() => {
+                const text = [...handoff.recent.map((turn) => turn.text), handoff.request].join("\n\n");
+                if (!navigator.clipboard?.writeText) { setCopyNotice("Select the request text to copy it."); return; }
+                void navigator.clipboard.writeText(text).then(() => setCopyNotice("Request copied."), () => setCopyNotice("Select the request text to copy it."));
+              }}>Copy prepared request</button>
+              {copyNotice && <p role="status" className="text-text-secondary">{copyNotice}</p>}
+            </div>
+          )}
           {advanced ? (
             planner
           ) : (
             <QuickPlan
+              key={`${mode}:${handoff?.id ?? "normal"}`}
+              handoff={handoff}
               mode={mode}
               onAdvanced={() => setAdvanced(true)}
               onQuotaRefresh={onQuotaRefresh}

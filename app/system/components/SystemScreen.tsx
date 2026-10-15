@@ -10,6 +10,8 @@ import { QuotaInfo } from "../../components/AiPlannerPanel";
 import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import { motion } from "framer-motion";
 import { SylvieIcon } from "@/app/components/icons";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
+import { consumePlannerHandoff, discardPlannerHandoff, PLANNER_HANDOFF_EVENT } from "@/lib/ai/sylvie/planner-handoff-client";
 
 import styles from "../System.module.css";
 
@@ -44,12 +46,36 @@ const SYSTEM_TABS: { id: WorkspaceTab; label: string; icon: React.ReactNode }[] 
  */
 export function SystemScreen() {
   const { user } = useAuth();
+  const handoffUserId = user?.id;
 
   // Multi-session state
   const [sessions, setSessions] = useState<SystemChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
 
   const [tab, setTab] = useState<WorkspaceTab>("conversation");
+  const [plannerHandoffState, setPlannerHandoff] = useState<{ userId: number | undefined; handoff: SylviePlannerHandoff | null }>(
+    { userId: user?.id, handoff: null },
+  );
+  if (plannerHandoffState.userId !== user?.id) {
+    setPlannerHandoff({ userId: user?.id, handoff: null });
+  }
+  const plannerHandoff = plannerHandoffState.userId === user?.id ? plannerHandoffState.handoff : null;
+
+  useEffect(() => {
+    if (!handoffUserId) {
+      discardPlannerHandoff();
+      return;
+    }
+    const receive = () => {
+      const handoff = consumePlannerHandoff(handoffUserId);
+      if (!handoff) return;
+      setPlannerHandoff({ userId: handoffUserId, handoff });
+      setTab("planner");
+    };
+    receive();
+    window.addEventListener(PLANNER_HANDOFF_EVENT, receive);
+    return () => window.removeEventListener(PLANNER_HANDOFF_EVENT, receive);
+  }, [handoffUserId]);
   // The neutral state on initial load is closed on all viewports;
   // users can open and close the Archives drawer via the toolbar toggle.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -404,6 +430,8 @@ export function SystemScreen() {
           />
         ) : (
           <PlannerTab
+            key={`${user?.id ?? "signed-out"}:${plannerHandoff?.id ?? "planner-tab"}`}
+            handoff={plannerHandoff ?? undefined}
             plannerQuota={plannerQuota}
             sessionId={activeSessionId}
             onQuotaRefresh={() => fetchQuotas(true)}

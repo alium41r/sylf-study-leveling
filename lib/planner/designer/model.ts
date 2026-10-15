@@ -57,6 +57,7 @@ INTENT, exactly one of:
 SETUP (describing what to study and when), EDIT (changing something already set), SCOPE (about what the plan covers), RESEARCH (asking you to look something up), COMPARISON (asking about their background curriculum), EXPLAIN (a question about the planner), MODE (asking which Planner fits), IMPORT (wants to use a document they have), UNKNOWN (not about this study plan)
 
 COMMANDS (0 to 5). Each is one object with a "command" field and ONLY the fields listed:
+- {"command":"SET_GOAL","title":"..."} The exam, course or topic the student explicitly wants to study. Use it when the goal is empty or the student changes it; do not copy availability or instructions into the title.
 - {"command":"SET_WEEKLY_HOURS","hours":N,"hard":true|false}   hard=true ONLY when the student states a limit they cannot exceed.
 - {"command":"SET_TARGET_DATE","date":"YYYY-MM-DD"|null,"shiftDays":N|null}
 - {"command":"SET_BACKGROUND_CURRICULUM","label":"...","level":null|"...","board":null|"...","subjects":["..."]}

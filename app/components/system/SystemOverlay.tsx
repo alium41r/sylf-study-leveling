@@ -21,6 +21,9 @@ import type { PagePresence } from "./page-presence";
 import type { QuotaInfo } from "../AiPlannerModal";
 import { lockPageScroll } from "@/lib/scroll-lock";
 import styles from "./SystemOverlay.module.css";
+import SylvieResponseActions from "./SylvieResponseActions";
+import type { PendingSylvieAction } from "@/lib/ai/sylvie/action";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 interface OverlayMessage {
   id: string;
@@ -28,6 +31,8 @@ interface OverlayMessage {
   content: string;
   failed?: boolean;
   contextNotice?: boolean;
+  pendingAction?: PendingSylvieAction;
+  plannerHandoff?: SylviePlannerHandoff;
 }
 
 interface SystemOverlayProps {
@@ -75,9 +80,11 @@ export default function SystemOverlay({
   const contextIdRef = useRef<string | null>(null);
   const revealingRef = useRef<{ id: string; full: string } | null>(null);
 
-  // An unlimited account is never locked out (`remaining` is null there).
+  // The server enforces model quota; basic help, Planner requests and confirmations remain available.
   const quotaExhausted =
     chatQuota !== null && !chatQuota.unlimited && chatQuota.remaining === 0;
+  const latestAssistantId = messages.reduce<string | null>((latest, message) =>
+    message.role === "assistant" && !message.contextNotice ? message.id : latest, null);
 
   // ── Context seeding ─────────────────────────────────────────
   // First visit to a context seeds its greeting. Navigating into a new
@@ -220,9 +227,9 @@ export default function SystemOverlay({
     step();
   }, []);
 
-  const handleSend = async (raw?: string) => {
+  const handleSend = async (raw?: string, confirmationToken?: string) => {
     const text = (raw ?? input).trim();
-    if (!text || sending || quotaExhausted) return;
+    if (!text || sending) return;
 
     const userMsg: OverlayMessage = { id: `u-${Date.now()}`, role: "user", content: text };
     setMessages((prev) => [...prev, userMsg]);
@@ -241,6 +248,8 @@ export default function SystemOverlay({
         body: JSON.stringify({
           message: text,
           sessionId: sessionId ?? undefined,
+          pageContext: presence ? { path: presence.path } : undefined,
+          confirmationToken,
         }),
         signal: controller.signal,
       });
@@ -252,7 +261,7 @@ export default function SystemOverlay({
           {
             id: `quota-${Date.now()}`,
             role: "assistant",
-            content: `⚠️ ${data.message || "Daily AI limit reached. Your quota resets at midnight."}`,
+            content: `⚠️ ${data.message || "Daily AI message limit reached. Your quota resets at midnight."} Planner requests and confirmations are still available.`,
             failed: true,
           },
         ]);
@@ -275,7 +284,11 @@ export default function SystemOverlay({
         "I couldn't process that. Could you try again?";
 
       const aiMsgId = `a-${Date.now()}`;
-      setMessages((prev) => [...prev, { id: aiMsgId, role: "assistant", content: "" }]);
+      setMessages((prev) => [...prev, {
+        id: aiMsgId, role: "assistant", content: "",
+        pendingAction: data.aiMessage?.pendingAction ?? data.pendingAction,
+        plannerHandoff: data.aiMessage?.plannerHandoff ?? data.plannerHandoff,
+      }]);
       // revealText keeps `sending` true until the reply finishes rendering,
       // so the Stop control stays available during the reveal.
       revealText(aiMsgId, reply);
@@ -410,6 +423,12 @@ export default function SystemOverlay({
                 ) : (
                   <div key={message.id} className={styles.assistantMessage} data-failed={message.failed}>
                     <MarkdownRenderer content={message.content} className={styles.markdown} />
+                    <SylvieResponseActions
+                      pendingAction={message.id === latestAssistantId ? message.pendingAction : undefined}
+                      plannerHandoff={message.plannerHandoff}
+                      busy={sending}
+                      onConfirm={(token) => handleSend("Confirm change", token)}
+                    />
                     {message.content && !sending && !message.failed && !message.id.startsWith("greet-") && (
                       <button
                         type="button"
@@ -433,7 +452,7 @@ export default function SystemOverlay({
               <div ref={endRef} />
             </div>
 
-            {showSuggestions && !quotaExhausted && (
+            {showSuggestions && (
               <div className={styles.suggestions}>
                 {presence.suggestions.map(suggestion => (
                   <button key={suggestion} type="button" onClick={() => handleSend(suggestion)}>
@@ -445,7 +464,7 @@ export default function SystemOverlay({
             {quotaExhausted && (
               <p className={styles.quotaNotice} role="status">
                 <Lock size={14} aria-hidden="true" />
-                <span>Daily limit reached. Resets at midnight{chatQuota?.resetsAt ? ` (${new Date(chatQuota.resetsAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})` : ""}.</span>
+                <span>Daily AI message limit reached. Planner requests and confirmations are still available. Resets at midnight{chatQuota?.resetsAt ? ` (${new Date(chatQuota.resetsAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})` : ""}.</span>
               </p>
             )}
             <div className={styles.composerArea}>
@@ -461,17 +480,16 @@ export default function SystemOverlay({
                     }
                   }}
                   rows={1}
-                  disabled={quotaExhausted}
                   aria-label="Message Sylvie"
-                  placeholder={quotaExhausted ? "Daily limit reached" : "Ask anything…"}
+                  placeholder="Ask anything…"
                 />
                 {sending ? (
                   <button type="button" onClick={stopGeneration} aria-label="Stop generation" title="Stop generation" className={styles.sendButton}>
                     <StopCircle size={18} aria-hidden="true" />
                   </button>
                 ) : (
-                  <button type="submit" disabled={!input.trim() || quotaExhausted} aria-label="Send message" title="Send (Enter)" className={styles.sendButton}>
-                    {quotaExhausted ? <Lock size={15} aria-hidden="true" /> : <ArrowUp size={19} aria-hidden="true" />}
+                  <button type="submit" disabled={!input.trim()} aria-label="Send message" title="Send (Enter)" className={styles.sendButton}>
+                    <ArrowUp size={19} aria-hidden="true" />
                   </button>
                 )}
               </form>

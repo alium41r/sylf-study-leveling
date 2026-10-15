@@ -464,7 +464,8 @@ export async function runCopilotTurn(input: {
     );
 
   // ── Lifecycle legality, from the table rather than from prose ──────────────
-  if (!COPILOT_INTENT_LIFECYCLE[interpretation.intent].includes(context.lifecycle))
+  if (!COPILOT_INTENT_LIFECYCLE[interpretation.intent].includes(context.lifecycle) ||
+    (commands.some((command) => command.command === "SET_GOAL") && context.lifecycle !== "PRE_GENERATION"))
     return finish(
       {
         outcome: "REFUSED",
@@ -575,6 +576,7 @@ export async function runCopilotTurn(input: {
    * the student's trust in the surface.
    */
   const directEligible =
+    !body.proposalOnly &&
     briefCommands.length === 1 &&
     commands.length === 1 &&
     interpretation.confidence === "HIGH" &&

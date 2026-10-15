@@ -1291,11 +1291,10 @@ export async function executeGoogleSearch(args: {
     }
   }
 
-  // Graceful fallback snippet if live API is offline or without key
+  // An unavailable search is not evidence. Never fabricate findings for callers.
   return {
     query,
     qualification: qualification || undefined,
-    source: "Academic Curriculum Knowledge Engine",
-    summary: `Curriculum and syllabus structure for "${query}": Found standard qualification chapter breakdown with sequential unit progression.`,
+    error: "Live web search is unavailable. No search results were retrieved.",
   };
 }

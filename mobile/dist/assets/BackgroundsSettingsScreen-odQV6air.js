@@ -1,0 +1,1 @@
+import{a as e}from"./vendor-motion-BE09T1qV.js";import{AppearanceSettingsScreen as t}from"./AppearanceSettingsScreen-vGu0ULL1.js";var n=e();function r(){return(0,n.jsx)(t,{})}export{r as BackgroundsSettingsScreen,r as default};

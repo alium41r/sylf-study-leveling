@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { parseSylvieAction } from "@/lib/ai/sylvie/action-server";
+import { stripSylvieAction } from "@/lib/ai/sylvie/action";
+import { parsePlannerHandoff } from "@/lib/ai/sylvie/planner-message";
 
 /**
  * GET /api/system-messages
@@ -48,7 +51,13 @@ export async function GET(req: NextRequest) {
       where: { userId: session.userId, read: false },
     });
 
-    return NextResponse.json({ messages, unreadCount }, { status: 200 });
+    return NextResponse.json({ messages: messages.map((message) => ({
+      ...message,
+      content: stripSylvieAction(message.content),
+      pendingAction: message.type === "INFO"
+        ? parseSylvieAction(message.content, session.userId, message.sessionId, message.id) : undefined,
+      plannerHandoff: message.type === "INFO" ? parsePlannerHandoff(message.content) : undefined,
+    })), unreadCount }, { status: 200 });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

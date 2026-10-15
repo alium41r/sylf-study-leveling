@@ -107,11 +107,11 @@ export function clearMirror(mode: PlanBriefV1["mode"]): void {
 /** Create or resume this browser's intake for a mode. Idempotent by `clientKey`. */
 export const createOrResumeIntake = async (
   mode: PlanBriefV1["mode"],
-  options: { fresh?: boolean } = {}
+  options: { fresh?: boolean; clientKey?: string } = {}
 ): Promise<IntakeView> =>
   assertIntakeView(
     await plannerFetch<unknown>("/intake", {
-      ...postJson({ schemaVersion: 1, clientKey: clientKeyFor(mode, options.fresh), mode }),
+      ...postJson({ schemaVersion: 1, clientKey: options.clientKey ?? clientKeyFor(mode, options.fresh), mode }),
     })
   );
 

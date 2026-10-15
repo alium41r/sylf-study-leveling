@@ -161,6 +161,8 @@ export const COPILOT_LIMITS = {
  * preparedness.
  */
 export const CopilotCommandSchema = z.discriminatedUnion("command", [
+  /** The goal the student actually named, including the first message from Sylvie. */
+  z.strictObject({ command: z.literal("SET_GOAL"), title: z.string().trim().min(1).max(200) }),
   /** A weekly *target*: what the student is aiming for, not a ceiling. */
   z.strictObject({
     command: z.literal("SET_WEEKLY_HOURS"),
@@ -268,6 +270,7 @@ export type CopilotCommandName = CopilotCommand["command"];
 
 /** The commands that only change the working brief, and so can be batched atomically. */
 export const BRIEF_COMMANDS: readonly CopilotCommandName[] = [
+  "SET_GOAL",
   "SET_WEEKLY_HOURS",
   "SET_TARGET_DATE",
   "SET_BACKGROUND_CURRICULUM",
@@ -558,6 +561,8 @@ export const CopilotTurnRequestSchema = z.strictObject({
   schemaVersion: z.literal(1),
   expectedVersion: z.number().int().nonnegative(),
   message: z.string().trim().min(1).max(COPILOT_LIMITS.maxMessageChars),
+  /** Chat handoffs must show the consequences before even a single intake edit. */
+  proposalOnly: z.boolean().optional(),
   /**
    * The recent turns, as the client holds them. Accepted here because the client has always
    * sent them and the route has always forwarded them — the schema simply did not describe

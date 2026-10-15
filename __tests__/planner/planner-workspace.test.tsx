@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import PlannerWorkspace from "@/app/components/planner/PlannerWorkspace";
 import { emptyComparisonView } from "@/lib/planner/intake/actions";
 import { emptyBrief } from "@/lib/planner/intake/brief";
+import { preparePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 /**
  * The workspace owns two things the rest of the planner relies on: the outcome-based
@@ -106,6 +107,16 @@ const capabilities = {
 };
 
 describe("Planner Modes workspace", () => {
+  it("keeps the prepared replan request visible when opening the existing saved-plan controls", async () => {
+    const handoff = preparePlannerHandoff({ id: "workspace-replan-1", message: "Rebalance my physics exam plan" });
+    render(<PlannerWorkspace capabilities={capabilities} initialMode="EXAM" handoff={handoff} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Open saved plans" }));
+    expect(screen.getByText("Exam review flow")).toBeInTheDocument();
+    expect(screen.getByText(handoff.request)).toBeInTheDocument();
+    expect(screen.getByText(/This setup cannot read the prepared request automatically/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copy prepared request" })).toBeInTheDocument();
+  });
+
   it("offers an outcome-based mode choice before any planner", () => {
     render(<PlannerWorkspace capabilities={capabilities} />);
     expect(screen.getByRole("heading", { name: "What are you planning?" })).toBeInTheDocument();

@@ -3,15 +3,30 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import fs from "fs/promises";
 import path from "path";
-import { getToolsForAgent, getSimpleToolsForAgent, AgentType, ALLOWED_HANDOFFS } from "@/lib/ai/chat-tools";
 import { executeChatTool } from "@/lib/ai/chat-tool-executor";
 import { LLMFactory } from "@/lib/ai/providers/factory";
-import { NormalizedMessage, LLMUsage } from "@/lib/ai/providers/types";
+import { LLMProviderError, NormalizedMessage, LLMUsage } from "@/lib/ai/providers/types";
 import { reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
 import { validateUpload } from "@/lib/upload-security";
 import { AI_LIMITS, DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "@/lib/ai/config";
 import { resolveCheapAnswer } from "@/lib/ai/cheap-answers";
 import { logAiUsage } from "@/lib/ai/usage-logger";
+import { TimezoneService } from "@/lib/timezone-service";
+import { getUserTimezone } from "@/lib/timezone-server";
+import { buildSystemInstruction, buildVerbosityDirective } from "@/lib/ai/prompts";
+import { normalizeSylviePage, formatSylviePage, boundSylvieHistory, selectSylvieTools } from "@/lib/ai/sylvie/turn-context";
+import { retrieveSylvieKnowledge, formatSylvieKnowledge } from "@/lib/ai/sylvie/knowledge";
+import { isPlanningRequest, preparePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
+import { MUTATION_TOOLS, stageSylvieAction, readSylvieAction, attachSylvieAction, parseSylvieAction, type SylvieOperation } from "@/lib/ai/sylvie/action-server";
+import { stripSylvieAction } from "@/lib/ai/sylvie/action";
+import { shortSylfIntroduction } from "@/lib/ai/sylvie/quick-replies";
+import { attachPlannerHandoff } from "@/lib/ai/sylvie/planner-message";
+import { signConfirmationToken } from "@/lib/ai/tool-confirmation";
+
+import type { ChatSession } from "@prisma/client";
+import type { IntentParams } from "@/lib/ai/intents/registry";
+
+const errorMessage = (error: unknown): string => error instanceof Error ? error.message : String(error);
 
 const MAX_TOOL_ITERATIONS = AI_LIMITS.maxToolIterations;
 
@@ -21,7 +36,7 @@ const MAX_TOOL_ITERATIONS = AI_LIMITS.maxToolIterations;
 //    follow-up falls through to the LLM. ──
 const cheapContextMemory = new Map<
   string,
-  { intentId: string; params: any; at: number }
+  { intentId: string; params: IntentParams; at: number }
 >();
 const CHEAP_CONTEXT_TTL_MS = 10 * 60 * 1000;
 const CHEAP_CONTEXT_MAX = 500;
@@ -34,7 +49,7 @@ function rememberCheapContext(
   userId: number,
   sessionIdStr: string | null,
   intentId: string,
-  params: any
+  params: IntentParams
 ) {
   const entry = { intentId, params, at: Date.now() };
   cheapContextMemory.set(cheapContextKey(userId, sessionIdStr), entry);
@@ -57,7 +72,7 @@ function recallCheapContext(userId: number, sessionIdStr: string | null) {
 
 /** Strip any legacy `<!-- model: X -->` marker so it never reaches the model. */
 function stripModelMarkers(text: string): string {
-  return (text || "").replace(/\s*<!--\s*model:[^>]*-->\s*/gi, "").trim();
+  return stripSylvieAction(text || "").replace(/\s*<!--\s*model:[^>]*-->\s*/gi, "").trim();
 }
 
 class RouteError extends Error {
@@ -76,10 +91,10 @@ async function resolveChatSession(
   sessionIdStr: string | null,
   userId: number,
   fallbackTitle: string
-): Promise<{ sessionId: number; newSession: any }> {
+): Promise<{ sessionId: number; newSession: ChatSession | null }> {
   if (sessionIdStr) {
-    const sessionId = parseInt(sessionIdStr);
-    if (isNaN(sessionId)) throw new RouteError("Invalid session id", 400);
+    const sessionId = Number(sessionIdStr);
+    if (!Number.isSafeInteger(sessionId) || sessionId <= 0) throw new RouteError("Invalid session id", 400);
 
     const sessionRecord = await prisma.chatSession.findUnique({
       where: { id: sessionId },
@@ -99,6 +114,7 @@ async function resolveChatSession(
 
 export async function POST(req: NextRequest) {
   let sessionUserId: number | null = null;
+  let quotaReserved = false;
   try {
     const session = await getSession(req);
     if (!session) {
@@ -114,7 +130,9 @@ export async function POST(req: NextRequest) {
     let file: File | null = null;
     let sessionIdStr: string | null = null;
     let modelPreference = "auto";
-    let contextOverride: any = null;
+    let contextOverride: Record<string, unknown> | null = null;
+    let pageInput: unknown;
+    let confirmationToken: unknown;
 
     const contentType = req.headers.get("content-type") || "";
 
@@ -124,10 +142,16 @@ export async function POST(req: NextRequest) {
       file = formData.get("file") as File | null;
       sessionIdStr = formData.get("sessionId") as string | null;
       modelPreference = (formData.get("modelPreference") as string) || "auto";
+      confirmationToken = formData.get("confirmationToken");
+      const pageStr = formData.get("pageContext");
+      if (typeof pageStr === "string" && pageStr.length <= 500) {
+        try { pageInput = JSON.parse(pageStr); } catch {}
+      }
       const overrideStr = formData.get("contextOverride") as string | null;
       if (overrideStr) {
         try {
-          contextOverride = JSON.parse(overrideStr);
+          const value: unknown = JSON.parse(overrideStr);
+          if (value && typeof value === "object" && !Array.isArray(value)) contextOverride = value as Record<string, unknown>;
         } catch {}
       }
     } else {
@@ -135,7 +159,65 @@ export async function POST(req: NextRequest) {
       messageText = body.message || "";
       sessionIdStr = body.sessionId ? String(body.sessionId) : null;
       modelPreference = body.modelPreference || "auto";
-      contextOverride = body.contextOverride || null;
+      contextOverride = body.contextOverride && typeof body.contextOverride === "object" && !Array.isArray(body.contextOverride) ? body.contextOverride : null;
+      pageInput = body.pageContext;
+      confirmationToken = body.confirmationToken;
+    }
+
+    if (typeof messageText !== "string" || typeof modelPreference !== "string") {
+      return NextResponse.json({ error: "Invalid message." }, { status: 400 });
+    }
+    // Legacy focus clients may supply a subject, never a trusted instruction.
+    const page = normalizeSylviePage(pageInput ?? (contextOverride?.mode === "focus"
+      ? { path: "/focus", subject: contextOverride.subject } : undefined));
+
+    if (confirmationToken) {
+      if (!sessionIdStr) throw new RouteError("A chat session is required to confirm a change.", 400);
+      const resolved = await resolveChatSession(sessionIdStr, userId, "");
+      const action = readSylvieAction(confirmationToken, userId, resolved.sessionId);
+      if (!action) throw new RouteError("This confirmation is invalid or expired. Please request the change again.", 409);
+      const proposal = await prisma.systemMessage.findFirst({
+        where: { id: action.messageId, userId, sessionId: resolved.sessionId, type: "INFO" },
+      });
+      const pending = proposal && parseSylvieAction(proposal.content, userId, resolved.sessionId, proposal.id);
+      if (!pending || pending.token !== confirmationToken) throw new RouteError("This change was already confirmed or is no longer available.", 409);
+      // Claim the stored proposal once BEFORE executing; concurrent/retried clicks cannot replay it.
+      const claimed = await prisma.systemMessage.updateMany({
+        where: { id: proposal.id, userId, sessionId: resolved.sessionId, content: proposal.content },
+        data: { content: stripSylvieAction(proposal.content) },
+      });
+      if (claimed.count !== 1) throw new RouteError("This change was already confirmed.", 409);
+      const outcomes: string[] = [];
+      for (const operation of action.operations) {
+        const args = { ...operation.args };
+        // Preserve the existing executor's bulk-deletion handshake behind the signed exact preview.
+        let legacyAction: string | undefined;
+        if (operation.name === "deleteAllTasks") legacyAction = "DELETE_ALL_TASKS";
+        if (operation.name === "deleteGoal" && (args.deleteAll === true || (Array.isArray(args.searchTitles) && args.searchTitles.length > 1)))
+          legacyAction = args.deleteAll === true ? "DELETE_ALL_GOALS" : "DELETE_GOALS_BATCH";
+        if (operation.name === "deleteQuest" && (args.deleteAll === true || (Array.isArray(args.searchTitles) && args.searchTitles.length > 1)))
+          legacyAction = args.deleteAll === true ? "DELETE_ALL_QUESTS" : "DELETE_QUESTS_BATCH";
+        if (legacyAction) args.confirmationToken = signConfirmationToken(legacyAction, userId);
+        let result;
+        try { result = await executeChatTool(operation.name, args, userId); }
+        catch { result = { error: "The change could not be completed. Please check the current data before trying again." }; }
+        outcomes.push(result.error ? `Couldn’t apply ${operation.name}: ${String(result.error)}`
+          : result.status === "REQUIRES_CONFIRMATION" ? String(result.message)
+          : typeof result.message === "string" ? result.message
+          : `Applied ${operation.name}.`);
+        if (result.error || result.status === "REQUIRES_CONFIRMATION") {
+          if (outcomes.length < action.operations.length) outcomes.push("The remaining changes were not attempted.");
+          break;
+        }
+      }
+      const userMessage = await prisma.systemMessage.create({ data: {
+        userId, sessionId: resolved.sessionId, content: "Confirm change", type: "USER", read: true,
+      } });
+      const reply = outcomes.join("\n");
+      const aiMessage = await prisma.systemMessage.create({ data: {
+        userId, sessionId: resolved.sessionId, content: reply, type: "INFO", read: false, modelUsed: "Confirmed action (no LLM)",
+      } });
+      return NextResponse.json({ userMessage, aiMessage, reply, message: reply, sessionId: resolved.sessionId, modelUsed: "DETERMINISTIC", modelDisplayName: "Confirmed action (no LLM)" });
     }
 
     // S4: bounded prompt input — prevents multi-MB messages being injected
@@ -203,32 +285,13 @@ export async function POST(req: NextRequest) {
             },
             { status: 200 }
           );
-        } catch (e: any) {
+        } catch (e: unknown) {
           if (e instanceof RouteError) {
             return NextResponse.json({ error: e.message }, { status: e.status });
           }
           console.error("[CheapAnswer] failed — falling through to AI:", e);
         }
       }
-    }
-
-    // ── Quota enforcement (shared 10-prompt daily pool for General Chat + Focus Drawer) ──
-    // S4: RESERVE the unit atomically BEFORE any LLM call; release on failure.
-    // A configured owner account is entitled to unlimited chat: the reservation
-    // is bypassed (charged === false) and `unlimited` carries the permission.
-    const quota = await reserveQuota(userId, "chat");
-    let quotaReserved = quota.charged;
-    if (!quota.charged && !quota.unlimited) {
-      return NextResponse.json(
-        {
-          error: "DAILY_QUOTA_EXHAUSTED",
-          limit: quota.limit,
-          used: quota.used,
-          message: `Daily AI limit reached (${quota.used}/${quota.limit} prompts). Resets at midnight UTC.`,
-          resetsAt: quota.resetsAt,
-        },
-        { status: 429 }
-      );
     }
 
     let sessionId: number | null = null;
@@ -240,6 +303,71 @@ export async function POST(req: NextRequest) {
       const resolved = await resolveChatSession(sessionIdStr, userId, fallbackTitle);
       sessionId = resolved.sessionId;
       newSession = resolved.newSession;
+    }
+
+    // ── Context window: the 20 MOST RECENT messages (desc + reverse),
+    //    scoped to this user AND session, before saving the current message.
+    const rawHistory = await prisma.systemMessage.findMany({
+      where: { sessionId, userId },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: { id: true, type: true, content: true, createdAt: true },
+    });
+    const conversationHistory = rawHistory.reverse();
+
+    // ── Build normalized history for adapter (legacy model markers stripped) ──
+    const normalizedHistory: NormalizedMessage[] = conversationHistory
+      .map((m) => ({
+        role: m.type === "USER" ? "user" : "assistant",
+        content: stripModelMarkers(m.content),
+      }));
+
+    // A tiny, stable answer for the explicit short-introduction regression.
+    const introduction = !file ? shortSylfIntroduction(messageText) : null;
+    if (introduction) {
+      const reply = introduction;
+      const userMessage = await prisma.systemMessage.create({ data: { userId, sessionId, content: messageText, type: "USER", read: true } });
+      const aiMessage = await prisma.systemMessage.create({ data: { userId, sessionId, content: reply, type: "INFO", read: false, modelUsed: "Sylf overview (no LLM)" } });
+      return NextResponse.json({ userMessage, aiMessage, reply, message: reply, sessionId, session: newSession, deterministic: true, modelUsed: "DETERMINISTIC", modelDisplayName: "Sylf overview (no LLM)" });
+    }
+
+    // Resolve planning before any general-chat model: the Planner owns its reasoning.
+    const planning = !file && isPlanningRequest(messageText, normalizedHistory);
+    if (planning) {
+      const userMessage = await prisma.systemMessage.create({ data: {
+        userId, sessionId, content: messageText, type: "USER", read: true,
+      } });
+      const preferences = /\b(?:saved|remember(?:ed)?)\b.{0,35}\b(?:preferences?|availability|study habits)\b|\b(?:preferences?|availability|study habits)\b.{0,35}\b(?:saved|remember)\b/i.test(messageText)
+        ? await prisma.aiMemory.findMany({ where: { userId, source: "user_stated" }, select: { key: true, value: true, source: true }, orderBy: { updatedAt: "desc" }, take: 10 }).catch(() => [])
+        : [];
+      const plannerHandoff = preparePlannerHandoff({ message: messageText, history: normalizedHistory, preferences });
+      const reply = plannerHandoff.kind === "REPLAN"
+        ? "I’ve prepared your replanning request. Review it in Planner to choose the plan and confirm changes."
+        : "I’ve prepared your request for Planner. Review it there to prepare a draft; nothing has been applied.";
+      const aiMessage = await prisma.systemMessage.create({ data: {
+        userId, sessionId, content: attachPlannerHandoff(`${reply}\n\n[Open Planner](/system?tab=planner)`, plannerHandoff),
+        type: "INFO", read: false, modelUsed: "Planner handoff (no LLM)",
+      } });
+      return NextResponse.json({ userMessage, aiMessage: { ...aiMessage, content: stripSylvieAction(aiMessage.content), plannerHandoff }, plannerHandoff, reply, message: reply, sessionId, session: newSession, modelUsed: "DETERMINISTIC", modelDisplayName: "Planner handoff (no LLM)" });
+    }
+
+    // ── Quota enforcement (shared 10-prompt daily pool for General Chat + Focus Drawer) ──
+    // S4: RESERVE the unit atomically BEFORE any LLM call; release on failure.
+    // A configured owner account is entitled to unlimited chat: the reservation
+    // is bypassed (charged === false) and `unlimited` carries the permission.
+    const quota = await reserveQuota(userId, "chat");
+    quotaReserved = quota.charged;
+    if (!quota.charged && !quota.unlimited) {
+      return NextResponse.json(
+        {
+          error: "DAILY_QUOTA_EXHAUSTED",
+          limit: quota.limit,
+          used: quota.used,
+          message: `Daily AI limit reached (${quota.used}/${quota.limit} prompts). Resets at midnight UTC.`,
+          resetsAt: quota.resetsAt,
+        },
+        { status: 429 }
+      );
     }
 
     // ── Handle file upload ──────────────────────────────────
@@ -266,7 +394,7 @@ export async function POST(req: NextRequest) {
         await fs.writeFile(path.join(uploadDir, validation.filename), buffer);
         attachmentUrl = `/uploads/${validation.filename}`;
       } catch (err) {
-        console.warn("[chat] attachment persistence skipped:", (err as any)?.message ?? err);
+        console.warn("[chat] attachment persistence skipped:", errorMessage(err));
         attachmentUrl = null;
       }
     }
@@ -284,70 +412,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // ── Context window: the 20 MOST RECENT messages (desc + reverse),
-    //    scoped to this user AND session. The previously saved user message
-    //    is excluded because it is appended again as currentUserMsg below.
-    const rawHistory = await prisma.systemMessage.findMany({
-      where: { sessionId, userId },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: { id: true, type: true, content: true, createdAt: true },
-    });
-    const conversationHistory = rawHistory.reverse();
-
-    // ── Build normalized history for adapter (legacy model markers stripped) ──
-    const normalizedHistory: NormalizedMessage[] = conversationHistory
-      .filter((m) => m.id !== userMessage.id)
-      .map((m) => ({
-        role: m.type === "USER" ? "user" : "assistant",
-        content: stripModelMarkers(m.content),
-      }));
-
-    // ── Build tiered AI context and route to specialist agent & workload ──
-    const { buildCoreContext, buildRelevantContext, formatCoreContext, formatRelevantContext } = await import("@/lib/ai/context-engine");
-    const core = await buildCoreContext(userId);
-    const coreString = formatCoreContext(core);
-
+    // No profile/progression/memory queries by default. Only the local date is shared.
+    const timezone = await getUserTimezone(userId);
+    const localDate = TimezoneService.getUserLocalDate(timezone);
     const { classifyWorkload } = await import("@/lib/ai/agent-router");
-    const routerCtx = {
-      user: { hp: core.user.hp, maxHp: core.user.maxHp },
-      today: { overdueCount: core.today.overdueCount },
-    };
-
-    const hasMedia = !!(base64Data && mimeType);
-    const workloadResult = classifyWorkload(messageText || "", routerCtx, {
-      hasMedia,
-      isFocusMode: !!contextOverride,
+    const workloadResult = classifyWorkload(messageText || "", undefined, {
+      hasMedia: !!(base64Data && mimeType), isFocusMode: page?.path === "/focus",
     });
-
     const currentAgent = workloadResult.agent;
-    // Simple-tier requests skip the heavyweight dynamic context entirely:
-    // core context only, the model pulls anything else via tools.
-    const isSimpleWorkload = workloadResult.workload === "simple";
-    const relevant = isSimpleWorkload
-      ? {}
-      : await buildRelevantContext(userId, currentAgent, [], messageText);
-    const relevantString = formatRelevantContext(relevant);
-
-    const { buildSystemInstruction, buildVerbosityDirective, buildSimpleSystemInstruction } = await import("@/lib/ai/prompts");
-    // Router → verbosity escalation: reasoner-routed queries get Tier 3,
-    // focus sessions get flow-protecting Tier 1 guidance. The simple tier
-    // gets a ~250-token condensed instruction instead of the full persona.
-    const verbosityDirective = buildVerbosityDirective(workloadResult.workload);
-    const buildActiveInstruction = isSimpleWorkload
-      ? (agent: AgentType, core: string, date: string) =>
-          buildSimpleSystemInstruction(agent, core, date)
-      : (agent: AgentType, core: string, date: string) =>
-          buildSystemInstruction(agent, core, date, relevantString) + `\n\n${verbosityDirective}`;
-    const systemInstruction = buildActiveInstruction(
-      currentAgent,
-      coreString,
-      core.localTimeContext.localDate
-    );
-    console.log(
-      `[Agent Router] → Workload: ${workloadResult.workload} | Agent: ${workloadResult.agent} | Primary: ${workloadResult.route.primary.provider}/${workloadResult.route.primary.model}`
-    );
-
+    const knowledge = retrieveSylvieKnowledge({ message: messageText, page, recentUserMessages: normalizedHistory.filter((turn) => turn.role === "user").map((turn) => turn.content ?? "") });
+    const reference = [formatSylviePage(page), formatSylvieKnowledge(knowledge)].filter(Boolean).join("\n\n");
+    const toolsForTurn = selectSylvieTools(currentAgent, messageText, normalizedHistory);
+    const verbosityDirective = buildVerbosityDirective(workloadResult.workload, messageText);
+    const systemInstruction = buildSystemInstruction(currentAgent, `Local timezone: ${timezone}`, localDate, reference) + `\n\n${verbosityDirective}`;
+    const pendingOperations: SylvieOperation[] = [];
     // ── Build the user's current message ──────────────
     const currentUserMsg: NormalizedMessage = {
       role: "user",
@@ -356,9 +434,8 @@ export async function POST(req: NextRequest) {
     };
     normalizedHistory.push(currentUserMsg);
 
-    // Simple actions don't need the full conversation window — the last 6
-    // turns of fresh context are plenty and keep input tokens minimal.
-    const historyForRun = isSimpleWorkload ? normalizedHistory.slice(-6) : normalizedHistory;
+    // Keep recent conversational continuity within a fixed character budget.
+    const historyForRun = boundSylvieHistory(normalizedHistory);
 
     // ── Function-calling loop via LLMFactory with Multi-Engine Fallback ──────────────
     let aiResponseText = "";
@@ -370,7 +447,8 @@ export async function POST(req: NextRequest) {
     // Per-workload generation budget: hard output cap + optional DeepSeek
     // thinking toggle (disabled tiers skip reasoning-token spend).
     const genOptions = {
-      maxTokens: workloadResult.route.outputTokenCap,
+      maxTokens: /\b(?:in detail|detailed|thorough|in depth|comprehensive|full explanation)\b/i.test(messageText)
+        ? Math.max(workloadResult.route.outputTokenCap, 2048) : workloadResult.route.outputTokenCap,
       thinking: workloadResult.route.thinking,
     };
 
@@ -380,20 +458,8 @@ export async function POST(req: NextRequest) {
       signal?: AbortSignal
     ): Promise<{ text: string; usage: LLMUsage }> => {
       const adapter = LLMFactory.getAdapter(provider, modelOverride);
-      let activeAgent = currentAgent as AgentType;
-      let tools = isSimpleWorkload
-        ? getSimpleToolsForAgent(activeAgent)
-        : getToolsForAgent(activeAgent);
-      let activeSystemInstruction = buildActiveInstruction(
-        activeAgent,
-        coreString,
-        core.localTimeContext.localDate
-      );
-
-      if (contextOverride?.instruction) {
-        activeSystemInstruction += `\n\n### IN-SESSION ACADEMIC STUDY TUTOR DIRECTIVE\n${contextOverride.instruction}\nActive Subject: ${contextOverride.subject || "General Focus"}\nActive Quest: ${contextOverride.quest || "Focus Session"}\nAlways format mathematical expressions with KaTeX LaTeX ($inline$ and $$display$$). Be direct and concise: answer first, step-by-step only when needed.`;
-      }
-
+      const tools = toolsForTurn;
+      const activeSystemInstruction = systemInstruction;
       // Deep copy history for this execution attempt so retries start with fresh history
       const runHistory: NormalizedMessage[] = JSON.parse(JSON.stringify(historyForRun));
 
@@ -407,7 +473,8 @@ export async function POST(req: NextRequest) {
       };
 
       let iterations = 0;
-      let handoffs = 0;
+      const readCache = new Map<string, unknown>();
+      const allowedToolNames = new Set(tools.map((tool) => tool.name));
       let response = await adapter.generateResponse(runHistory, activeSystemInstruction, tools, {
         ...genOptions,
         signal,
@@ -428,32 +495,26 @@ export async function POST(req: NextRequest) {
           toolResults: []
         };
 
-        let didHandoff = false;
-
         for (const tc of response.toolCalls) {
-          console.log(`[${provider.toUpperCase()}] Tool call: ${tc.name}(${JSON.stringify(tc.args)})`);
           let result;
-
-          if (tc.name === "handoff") {
-            const targetAgent = tc.args.target_agent as AgentType;
-            const allowedTargets = ALLOWED_HANDOFFS[activeAgent] || [];
-
-            if (!allowedTargets.includes(targetAgent)) {
-              result = { error: `Unauthorized handoff. You cannot handoff to ${targetAgent}.` };
-            } else if (handoffs >= 1) { // MAX_HANDOFFS = 1
-              result = { error: "Handoff failed. Maximum number of handoffs reached for this request." };
-            } else {
-              handoffs++;
-              activeAgent = targetAgent;
-              didHandoff = true;
-              result = { success: true, message: `Handoff successful. You are now the ${targetAgent} agent.` };
+          if (!allowedToolNames.has(tc.name)) {
+            result = { error: "This tool is not available for the current request." };
+          } else if (MUTATION_TOOLS.has(tc.name)) {
+            const args = { ...tc.args };
+            delete args.confirmationToken; // A model can never authorize its own proposal.
+            if (pendingOperations.length >= 8) result = { error: "Please request fewer changes at a time." };
+            else {
+              const operation = { name: tc.name, args };
+              if (!pendingOperations.some((item) => JSON.stringify(item) === JSON.stringify(operation))) pendingOperations.push(operation);
+              result = { status: "REQUIRES_CONFIRMATION", message: "Proposed only. The user must confirm the exact preview before any change is applied." };
             }
           } else {
-            try {
-              result = await executeChatTool(tc.name, tc.args, userId);
-            } catch (err: any) {
-              console.error(`[${provider.toUpperCase()}] Tool execution failed:`, err);
-              result = { error: "Failed to execute tool.", details: err.message };
+            const key = `${tc.name}:${JSON.stringify(tc.args)}`;
+            if (readCache.has(key)) result = readCache.get(key);
+            else {
+              try { result = await executeChatTool(tc.name, tc.args, userId); }
+              catch { result = { error: "This information is temporarily unavailable." }; }
+              readCache.set(key, result);
             }
           }
           toolResultsMsg.toolResults!.push({ toolCallId: tc.id, name: tc.name, result });
@@ -461,12 +522,10 @@ export async function POST(req: NextRequest) {
 
         runHistory.push(toolResultsMsg);
 
-        if (didHandoff) {
-          const newRelevant = await buildRelevantContext(userId, activeAgent, [], messageText);
-          const newRelevantString = formatRelevantContext(newRelevant);
-          activeSystemInstruction = buildSystemInstruction(activeAgent, coreString, core.localTimeContext.localDate, newRelevantString) + `\n\n${verbosityDirective}`;
-          tools = getToolsForAgent(activeAgent);
-        }
+        // A proposal ends this turn. It cannot be self-confirmed by another model call.
+        if (pendingOperations.length > 0) return {
+          text: "Review the proposed change below. Nothing has been changed yet.", usage,
+        };
 
         response = await adapter.generateResponse(runHistory, activeSystemInstruction, tools, {
           ...genOptions,
@@ -489,10 +548,10 @@ export async function POST(req: NextRequest) {
           );
           addUsage(forced.usage);
           response = forced;
-        } catch (forcedErr: any) {
+        } catch (forcedErr: unknown) {
           console.warn(
             `[${provider.toUpperCase()}] Forced final response failed:`,
-            forcedErr?.message
+            errorMessage(forcedErr)
           );
         }
       }
@@ -503,7 +562,7 @@ export async function POST(req: NextRequest) {
           (iterations >= MAX_TOOL_ITERATIONS
             ? "Failed to complete task."
             : iterations > 0
-            ? "Action completed successfully!"
+            ? "I couldn’t finish this request. No changes were applied."
             : "I couldn't process that request. Could you try again?"),
         usage,
       };
@@ -586,13 +645,13 @@ export async function POST(req: NextRequest) {
           const loopResult = await executeAttempt("gemini", geminiModel);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
-        } catch (geminiErr: any) {
+        } catch (geminiErr: unknown) {
           // Gemini can stall on image workloads (SDK call hangs). Prefer the
           // dedicated DeepSeek vision tier over surfacing "temporarily
           // unavailable" when a working fallback exists.
           if (!isVisionWorkload) throw geminiErr;
           console.warn(
-            `[Chat Route] Gemini vision model failed (${geminiErr.message || geminiErr}). Falling back to ${DEEPSEEK_MODELS.vision}.`
+            `[Chat Route] Gemini vision model failed (${errorMessage(geminiErr)}). Falling back to ${DEEPSEEK_MODELS.vision}.`
           );
           const fallbackModel = DEEPSEEK_MODELS.vision;
           actualModelUsed = "DEEPSEEK";
@@ -620,10 +679,10 @@ export async function POST(req: NextRequest) {
           const loopResult = await executeAttempt(primarySpec.provider, primarySpec.model);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
-        } catch (primaryErr: any) {
+        } catch (primaryErr: unknown) {
           console.warn(
             `[Chat Route] Primary model ${primarySpec.provider}/${primarySpec.model} failed. Trying fallback ${fallbackSpec.provider}/${fallbackSpec.model}:`,
-            primaryErr.message
+            errorMessage(primaryErr)
           );
           actualModelUsed = fallbackSpec.provider.toUpperCase();
           actualModelDisplayName = `${fallbackSpec.provider.toUpperCase()} (${fallbackSpec.model})`;
@@ -633,11 +692,11 @@ export async function POST(req: NextRequest) {
             const loopResult = await executeAttempt(fallbackSpec.provider, fallbackSpec.model);
             aiResponseText = loopResult.text;
             totalUsage = loopResult.usage;
-          } catch (fallbackErr: any) {
+          } catch (fallbackErr: unknown) {
             if (secondarySpec) {
               console.warn(
                 `[Chat Route] Fallback model ${fallbackSpec.provider}/${fallbackSpec.model} failed. Trying secondary fallback ${secondarySpec.provider}/${secondarySpec.model}:`,
-                fallbackErr.message
+                errorMessage(fallbackErr)
               );
               actualModelUsed = secondarySpec.provider.toUpperCase();
               actualModelDisplayName = `${secondarySpec.provider.toUpperCase()} (${secondarySpec.model})`;
@@ -653,16 +712,16 @@ export async function POST(req: NextRequest) {
       }
 
       generationSucceeded = true;
-    } catch (apiError: any) {
+    } catch (apiError: unknown) {
       console.error("API Error:", apiError);
       let friendlyError = "The AI service is temporarily unavailable. Please try again later.";
 
-      if (apiError.name === "LLMProviderError") {
-        const pErr = apiError as any;
+      if (apiError instanceof LLMProviderError) {
+        const pErr = apiError;
         if (pErr.originalError?.status === 429 || pErr.originalError?.status === 503 || pErr.code === "rate_limit_exceeded") {
           friendlyError = "The AI is currently overloaded with requests. Please wait a moment and try again.";
         }
-      } else if (apiError.name === "AbortError" || attemptRef.controller?.signal.aborted) {
+      } else if ((apiError instanceof Error && apiError.name === "AbortError") || attemptRef.controller?.signal.aborted) {
         friendlyError = req.signal?.aborted
           ? "The request was cancelled."
           : "The AI took too long to respond. Please try a simpler question or try again later.";
@@ -675,6 +734,7 @@ export async function POST(req: NextRequest) {
 
     if (quotaReserved && !generationSucceeded) {
       await releaseQuota(userId, "chat");
+      quotaReserved = false;
     }
 
     // ── Save AI response to DB ──────────────────────────────
@@ -688,6 +748,18 @@ export async function POST(req: NextRequest) {
         modelUsed: actualModelDisplayName,
       },
     });
+
+    let pendingAction;
+    if (pendingOperations.length > 0) {
+      try {
+        pendingAction = stageSylvieAction(userId, sessionId!, aiMessage.id, pendingOperations);
+        await prisma.systemMessage.update({ where: { id: aiMessage.id }, data: { content: attachSylvieAction(aiMessage.content, pendingAction) } });
+      } catch {
+        aiResponseText = "I couldn’t prepare a secure confirmation. Nothing was changed. Please try the action from its app page.";
+        pendingAction = undefined;
+        await prisma.systemMessage.update({ where: { id: aiMessage.id }, data: { content: aiResponseText } });
+      }
+    }
 
     // ── S4 reservation lifecycle: reserved BEFORE generation, refunded on
     //    failure/timeout/abort. Successful generations keep the charge. ──
@@ -705,26 +777,27 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ 
-      userMessage, 
-      aiMessage: { ...aiMessage, modelUsed: actualModelDisplayName }, 
+    return NextResponse.json({
+      userMessage,
+      aiMessage: { ...aiMessage, content: aiResponseText, modelUsed: actualModelDisplayName, pendingAction },
+      pendingAction,
       reply: aiResponseText,
       message: aiResponseText,
-      sessionId, 
-      session: newSession, 
+      sessionId,
+      session: newSession,
       modelUsed: actualModelUsed,
       modelDisplayName: actualModelDisplayName,
     }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Chat API Error:", error);
     // S4: refund any outstanding reservation when the request fails outside
     // the generation pipeline (the guarded decrement is safe to call once).
     try {
-      if (sessionUserId !== null) await releaseQuota(sessionUserId, "chat");
+      if (sessionUserId !== null && quotaReserved) await releaseQuota(sessionUserId, "chat");
     } catch {}
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { error: error instanceof RouteError ? error.message : "Internal server error" },
+      { status: error instanceof RouteError ? error.status : 500 }
     );
   }
 }

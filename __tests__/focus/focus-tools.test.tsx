@@ -853,7 +853,7 @@ describe("Focus Tools Dock & Expandable Window System", () => {
       expect(screen.getAllByText(/Organic Chemistry/i).length).toBeGreaterThanOrEqual(1);
 
       // Verify streamlined greeting
-      expect(screen.getByText(/Greetings, Scholar. I'm ready to assist with your active subject/i)).toBeDefined();
+      expect(screen.getByText("What can I help you with?")).toBeDefined();
     });
 
     it("allows typing queries and provides reset functionality", async () => {
@@ -872,7 +872,84 @@ describe("Focus Tools Dock & Expandable Window System", () => {
       const resetButton = screen.getByTitle(/Reset Active Chat/i);
       fireEvent.click(resetButton);
 
-      expect(screen.getByText(/Greetings, Scholar. I'm ready to assist with your active subject/i)).toBeDefined();
+      expect(screen.getByText("What can I help you with?")).toBeDefined();
+    });
+
+    it("sends only the relevant subject and page reference without changing Sylvie's instructions", async () => {
+      await act(async () => {
+        render(
+          <FocusToolsProvider subjectName="Physics" questTitle="Reflection">
+            <AiAssistantTool />
+          </FocusToolsProvider>
+        );
+      });
+
+      const input = screen.getByPlaceholderText(/Ask Sylvie/i);
+      fireEvent.change(input, { target: { value: "Explain Snell's law briefly" } });
+      await act(async () => {
+        fireEvent.click(screen.getByTitle("Send Message (Enter)"));
+      });
+
+      expect(fetch).toHaveBeenCalledWith("/api/system-messages/chat", expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          message: "Explain Snell's law briefly",
+          pageContext: { path: "/focus", subject: "Physics" },
+        }),
+      }));
+    });
+
+    it("previews a proposed change and keeps confirmation tied to its conversation", async () => {
+      const originalFetch = global.fetch;
+      global.fetch = vi.fn(async (url, options) => {
+        if (String(url) === "/api/system-messages/chat") return {
+          ok: true, status: 200, json: async () => ({
+            sessionId: 42, reply: "Please review this change.",
+            pendingAction: { token: "signed-action", summary: "Move Biology review to Friday." },
+          }),
+        } as Response;
+        return originalFetch(url, options);
+      });
+      await act(async () => {
+        render(<FocusToolsProvider subjectName="Biology"><AiAssistantTool /></FocusToolsProvider>);
+      });
+      fireEvent.change(screen.getByPlaceholderText(/Ask Sylvie/i), { target: { value: "Move my review" } });
+      fireEvent.click(screen.getByTitle("Send Message (Enter)"));
+      await waitFor(() => expect(screen.getByRole("button", { name: "Confirm change" })).toBeEnabled());
+      const chatCalls = () => vi.mocked(fetch).mock.calls.filter(([url]) => String(url) === "/api/system-messages/chat");
+      expect(chatCalls()).toHaveLength(1);
+      fireEvent.click(screen.getByRole("button", { name: "Confirm change" }));
+      expect(JSON.parse(String(chatCalls()[1][1]?.body))).toEqual({
+        message: "Confirm change", sessionId: 42,
+        pageContext: { path: "/focus", subject: "Biology" }, confirmationToken: "signed-action",
+      });
+    });
+
+    it("keeps Planner requests available after the server reports exhausted model quota", async () => {
+      const originalFetch = global.fetch;
+      let attempts = 0;
+      global.fetch = vi.fn(async (url, options) => {
+        if (String(url) !== "/api/system-messages/chat") return originalFetch(url, options);
+        attempts += 1;
+        return attempts === 1 ? {
+          ok: false, status: 429, json: async () => ({ error: "DAILY_QUOTA_EXHAUSTED", message: "Daily AI message limit reached." }),
+        } as Response : {
+          ok: true, status: 200, json: async () => ({ sessionId: 42, modelUsed: "DETERMINISTIC", reply: "Your request is ready for Planner." }),
+        } as Response;
+      });
+      await act(async () => {
+        render(<FocusToolsProvider subjectName="Biology"><AiAssistantTool /></FocusToolsProvider>);
+      });
+      const input = screen.getByPlaceholderText(/Ask Sylvie/i);
+      fireEvent.change(input, { target: { value: "Explain a difficult concept" } });
+      fireEvent.click(screen.getByTitle("Send Message (Enter)"));
+      await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Planner requests and confirmations are still available"));
+      expect(input).toBeEnabled();
+      fireEvent.change(input, { target: { value: "Help me plan my study week" } });
+      fireEvent.click(screen.getByTitle("Send Message (Enter)"));
+      await waitFor(() => expect(screen.getByText("Your request is ready for Planner.")).toBeInTheDocument());
+      expect(attempts).toBe(2);
+      expect(screen.getByRole("status")).toHaveTextContent("Daily AI message limit reached");
     });
 
     it("renders conversation history switcher, toggles drawer, and loads session", async () => {

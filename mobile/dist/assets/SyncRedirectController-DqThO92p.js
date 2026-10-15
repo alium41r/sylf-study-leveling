@@ -1,1 +1,0 @@
-import{a as e}from"./rolldown-runtime-B0Z9INg1.js";import{fr as t}from"./vendor-icons-Cqee6HW5.js";import{$ as n}from"./index-Dfsj4KuI.js";var r=e(t());function i(){let e=n();return(0,r.useEffect)(()=>{e.replace(`/settings/account`)},[e]),null}export{i as SyncRedirectController,i as default};

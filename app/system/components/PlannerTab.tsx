@@ -8,8 +8,10 @@ import { Calendar, LayoutGrid } from "lucide-react";
 import AiPlannerPanel, { QuotaInfo } from "../../components/AiPlannerPanel";
 import { plannerTelemetry, type PlannerSurface } from "@/lib/planner/telemetry";
 import styles from "../System.module.css";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 interface PlannerTabProps {
+  handoff?: SylviePlannerHandoff;
   plannerQuota: QuotaInfo | null;
   sessionId: number | null;
   onQuotaRefresh: () => void;
@@ -37,6 +39,7 @@ interface PlannerTabProps {
 type View = { surface: "CLASSIC" } | { surface: "MODES"; mode?: PlannerSurfaceMode | null };
 
 export default function PlannerTab({
+  handoff,
   plannerQuota,
   sessionId,
   onQuotaRefresh,
@@ -44,7 +47,7 @@ export default function PlannerTab({
   onViewConversation,
 }: PlannerTabProps) {
   const capabilities = useExamCapabilities();
-  const [view, setView] = useState<View>({ surface: "CLASSIC" });
+  const [view, setView] = useState<View>(handoff ? { surface: "MODES", mode: handoff.mode } : { surface: "CLASSIC" });
 
   // One event per surface actually opened, so Classic and Planner Modes usage can be
   // compared without either being inferred from the other.
@@ -95,6 +98,8 @@ export default function PlannerTab({
     return (
       <div className="flex-1 min-h-0 overflow-y-auto chat-scroll">
         <PlannerWorkspace
+          key={handoff?.id ?? "planner-workspace"}
+          handoff={handoff}
           capabilities={capabilities}
           initialMode={view.mode ?? undefined}
           onExitToClassic={backToClassic}

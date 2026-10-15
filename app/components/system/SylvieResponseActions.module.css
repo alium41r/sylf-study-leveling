@@ -1,0 +1,11 @@
+.actions { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 12px; }
+.proposal { width: 100%; padding: 12px; border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--surface-2); }
+.summary { margin: 0 0 10px; color: var(--text-primary); font: 400 13px/1.5 'Inter', sans-serif; overflow-wrap: anywhere; }
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.primary, .secondary { min-height: 34px; padding: 7px 12px; border: 1px solid var(--border-subtle); border-radius: 9px; font: 500 12px/1.4 'Inter', sans-serif; cursor: pointer; }
+.primary { color: var(--accent-foreground); background: var(--accent-primary); border-color: var(--accent-primary); }
+.secondary { color: var(--text-primary); background: var(--surface-2); }
+.primary:hover, .secondary:hover { filter: brightness(0.96); }
+.primary:focus-visible, .secondary:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
+.primary:disabled, .secondary:disabled { opacity: 0.5; cursor: default; }
+.status { margin: 0; color: var(--text-secondary); font: 400 12px/1.5 'Inter', sans-serif; }

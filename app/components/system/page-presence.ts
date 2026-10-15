@@ -14,6 +14,8 @@ export type PresenceIcon = "command" | "calendar" | "target" | "scroll";
 export interface PagePresence {
   /** Stable id — used to detect context changes. */
   id: string;
+  /** Canonical page reference sent with a question; it contains no user data. */
+  path: string;
   /** Short label shown on the floating trigger and overlay header. */
   label: string;
   /** Longer eyebrow describing what the AI can do here. */
@@ -30,9 +32,10 @@ export interface PagePresence {
 const PRESENCE: Record<string, PagePresence> = {
   command: {
     id: "command",
-    label: "Command Center",
+    path: "/dashboard",
+    label: "Dashboard",
     eyebrow: "OVERVIEW",
-    greeting: "Ready, Scholar. What's on your agenda today?",
+    greeting: "What can I help you with?",
     suggestions: [
       "Today's briefing",
       "Next priority",
@@ -44,9 +47,10 @@ const PRESENCE: Record<string, PagePresence> = {
   },
   calendar: {
     id: "calendar",
+    path: "/calendar",
     label: "Calendar",
     eyebrow: "SCHEDULE",
-    greeting: "Schedule loaded. Need a check-in or planning help?",
+    greeting: "How can I help with your schedule?",
     suggestions: [
       "Weekly overview",
       "Overloaded days",
@@ -58,9 +62,10 @@ const PRESENCE: Record<string, PagePresence> = {
   },
   objectives: {
     id: "objectives",
+    path: "/goals",
     label: "Objectives",
     eyebrow: "GOALS",
-    greeting: "Objectives loaded. Where shall we direct focus?",
+    greeting: "How can I help with your goals?",
     suggestions: [
       "Goal progress",
       "Create new goal",
@@ -72,9 +77,10 @@ const PRESENCE: Record<string, PagePresence> = {
   },
   quests: {
     id: "quests",
+    path: "/goals?tab=quests",
     label: "Quests",
     eyebrow: "QUESTS",
-    greeting: "Quest log ready. What are we completing today?",
+    greeting: "How can I help with your tasks?",
     suggestions: [
       "Due today",
       "Create quest",

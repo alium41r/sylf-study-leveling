@@ -12,6 +12,7 @@ Start with the current contracts and feature indexes below. Reports describe a p
 | Timer lifecycle | [Timer contract and audit](timer/README.md) | Epoch accounting, immediate local ending, durable recovery, atomic settlement, party timers and deployment evidence. |
 | Focus backgrounds | [Content specification](../specifications/features/focus-backgrounds-content-spec.md) | Asset/content standards, retained in the existing specifications directory. |
 | Planner and research/search | [Planner index](planner/README.md) | Current source entry points, phase sequences, design inputs, and evidence. No comprehensive current prose specification was established by this pass. |
+| Sylvie assistant | [Sylvie runtime contract](sylvie/README.md) | Shared persona, selective Archive retrieval, page context, confirmed tools and existing Planner handoff. |
 | Landing, SVG, and companion | [Landing index](landing-companion/README.md), [SVG index](svg-companion/README.md) | Current source entry points and distinct historical rig/capability work. |
 | Onboarding | [Onboarding index](onboarding/README.md) | Current implementation entry points and pre-/post-redesign history. |
 | Authentication | [Authentication experience](authentication/README.md) | Login/signup owners, responsive SVG floating island and canonical companion, appearance, accessibility, and motion. |

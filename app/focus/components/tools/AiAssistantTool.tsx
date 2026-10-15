@@ -14,7 +14,6 @@ import {
   Plus,
   History,
   MessageSquare,
-  ChevronDown,
   Trash2,
   X,
   Lock,
@@ -22,6 +21,9 @@ import {
   Search,
 } from "lucide-react";
 import { SylvieIcon } from "@/app/components/icons";
+import SylvieResponseActions from "@/app/components/system/SylvieResponseActions";
+import type { PendingSylvieAction } from "@/lib/ai/sylvie/action";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 interface ChatMessage {
   id: string;
@@ -29,6 +31,8 @@ interface ChatMessage {
   text: string;
   timestamp: string;
   isStreaming?: boolean;
+  pendingAction?: PendingSylvieAction;
+  plannerHandoff?: SylviePlannerHandoff;
 }
 
 interface ChatSessionItem {
@@ -38,11 +42,10 @@ interface ChatSessionItem {
   updatedAt: string;
 }
 
-const INITIAL_GREETING =
-  "Greetings, Scholar. I'm ready to assist with your active subject. What concept, formula, or problem should we tackle?";
+const INITIAL_GREETING = "What can I help you with?";
 
 export default function AiAssistantTool() {
-  const { subjectName, questTitle, openTool } = useFocusTools();
+  const { subjectName, openTool } = useFocusTools();
 
   const [input, setInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
@@ -61,7 +64,7 @@ export default function AiAssistantTool() {
   const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [unlockedSkills, setUnlockedSkills] = useState<string[]>([]);
-  const [isLocked, setIsLocked] = useState<boolean>(false); // Daily 10-prompt quota exhausted
+  const [quotaReached, setQuotaReached] = useState<boolean>(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -139,6 +142,8 @@ export default function AiAssistantTool() {
               id: String(m.id),
               sender: m.type === "USER" ? "user" : "ai",
               text: m.content,
+              pendingAction: m.pendingAction,
+              plannerHandoff: m.plannerHandoff,
               timestamp: new Date(m.createdAt).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -241,9 +246,9 @@ export default function AiAssistantTool() {
     streamNext();
   }, []);
 
-  const handleSend = async (customPrompt?: string) => {
+  const handleSend = async (customPrompt?: string, confirmationToken?: string) => {
     const textToSend = customPrompt || input.trim();
-    if (!textToSend || isLoading || isStreaming || isLocked) return;
+    if (!textToSend || isLoading || isStreaming) return;
 
     const userMsgId = Math.random().toString(36).substring(2, 9);
     const userMsg: ChatMessage = {
@@ -271,12 +276,6 @@ export default function AiAssistantTool() {
     try {
       abortControllerRef.current = new AbortController();
 
-      const hasAdvancedSynthesis = unlockedSkills.includes("researcher-literature-synthesis");
-
-      const dynamicInstruction = hasAdvancedSynthesis
-        ? "You are an expert in-session academic tutor with Comprehensive Literature Synthesis enabled. No-yap: answer the actual question directly, 1-3 sentences for simple questions. When the user asks for a derivation or proof, provide rigorous step-by-step math using KaTeX ($inline$ and $$display$$ math) with historical academic provenance. Never pad, never restate the question."
-        : "You are an expert in-session academic study tutor and STEM coach. No-yap: answer the actual question directly in 1-3 sentences; break formulas down step-by-step using KaTeX ($inline$ and $$display$$ math) only when the problem or an explicit request needs it. Keep tone encouraging and scholarly, zero filler.";
-
       const res = await fetch("/api/system-messages/chat", {
         method: "POST",
         headers: {
@@ -285,12 +284,11 @@ export default function AiAssistantTool() {
         body: JSON.stringify({
           message: textToSend,
           sessionId: sessionId || undefined,
-          contextOverride: {
-            mode: "academic_assistant",
-            subject: subjectName || "General Focus",
-            quest: questTitle || "Focus Session",
-            instruction: dynamicInstruction,
+          pageContext: {
+            path: "/focus",
+            subject: subjectName || undefined,
           },
+          confirmationToken,
         }),
         signal: abortControllerRef.current.signal,
       });
@@ -299,10 +297,10 @@ export default function AiAssistantTool() {
         const errData = await res.json().catch(() => ({}));
         const lockedMessage =
           errData?.error === "DAILY_QUOTA_EXHAUSTED" || errData?.error === "quota_exceeded"
-            ? (errData?.message || "Daily AI limit reached. Your quota resets at midnight!")
+            ? `${errData?.message || "Daily AI message limit reached. Your quota resets at midnight."} Planner requests and confirmations are still available.`
             : "Rate limit exceeded. Please wait a moment.";
         if (errData?.error === "DAILY_QUOTA_EXHAUSTED" || errData?.error === "quota_exceeded") {
-          setIsLocked(true);
+          setQuotaReached(true);
         }
         throw new Error(lockedMessage);
       }
@@ -312,7 +310,8 @@ export default function AiAssistantTool() {
       }
 
       const data = await res.json();
-      setIsLocked(false); // A successful generation means quota was available again
+      // Deterministic replies remain available after quota runs out.
+      if (data.modelUsed && data.modelUsed !== "DETERMINISTIC") setQuotaReached(false);
       if (data?.sessionId) {
         setSessionId(data.sessionId);
         if (data.session) {
@@ -326,7 +325,13 @@ export default function AiAssistantTool() {
         data?.reply ||
         data?.aiMessage?.content ||
         data?.message ||
-        "I've processed your query. Let me know what other concept you'd like to explore!";
+        "No answer came through. Please try again.";
+
+      setMessages((prev) => prev.map((message) => message.id === aiMsgId ? {
+        ...message,
+        pendingAction: data.aiMessage?.pendingAction ?? data.pendingAction,
+        plannerHandoff: data.aiMessage?.plannerHandoff ?? data.plannerHandoff,
+      } : message));
 
       streamResponseText(fullReply, aiMsgId);
     } catch (err: any) {
@@ -403,6 +408,8 @@ export default function AiAssistantTool() {
   const activeSessionTitle =
     sessions.find((s) => s.id === sessionId)?.title ||
     (sessionId ? `Chat #${sessionId}` : "New Session");
+  const latestAssistantId = messages.reduce<string | null>((latest, message) =>
+    message.sender === "ai" ? message.id : latest, null);
 
   return (
     <div className="flex flex-col h-full text-text-primary font-sans text-xs bg-bg-void/40 select-none relative">
@@ -423,10 +430,10 @@ export default function AiAssistantTool() {
 
         {/* Right Side: + New Chat, History Drawer Toggle & Reset */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {isLocked && (
+          {quotaReached && (
             <span
               className="px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider"
-              title="Daily AI prompt limit reached — resets at midnight"
+              title="Daily AI message limit reached. Planner requests and confirmations remain available."
             >
               <Lock className="w-3 h-3" />
               Daily Limit
@@ -602,6 +609,15 @@ export default function AiAssistantTool() {
                     )}
                   </div>
 
+                  {isAi && (
+                    <SylvieResponseActions
+                      pendingAction={m.id === latestAssistantId ? m.pendingAction : undefined}
+                      plannerHandoff={m.plannerHandoff}
+                      busy={isLoading || isStreaming}
+                      onConfirm={(token) => handleSend("Confirm change", token)}
+                    />
+                  )}
+
                   <div
                     className={`flex items-center justify-between gap-2 mt-1.5 text-[10px] ${
                       isAi ? "text-text-muted" : "text-white/70"
@@ -674,23 +690,23 @@ export default function AiAssistantTool() {
       )}
 
       {/* Input Bar (Auto-expanding, with Enter to Send / Shift+Enter for Newline) */}
+      {quotaReached && (
+        <p className="px-3 py-2 border-t border-border-subtle text-[10px] leading-relaxed text-text-secondary" role="status">
+          Daily AI message limit reached. Planner requests and confirmations are still available.
+        </p>
+      )}
       <div className="p-3 border-t border-border-subtle bg-bg-abyss flex items-end gap-2">
         <textarea
           ref={inputRef}
           value={input}
           onChange={handleInputChange}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey && !isLocked) {
+            if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               handleSend();
             }
           }}
-          disabled={isLocked}
-          placeholder={
-            isLocked
-              ? "Daily AI limit reached — resets at midnight."
-              : `Ask Sylvie in ${activeSessionTitle}... (Enter to send)`
-          }
+          placeholder={`Ask Sylvie in ${activeSessionTitle}... (Enter to send)`}
           rows={1}
           className="flex-1 bg-bg-panel/90 border border-border-subtle rounded-xl px-3.5 py-2.5 text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary resize-none max-h-28 min-h-[42px] leading-relaxed transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           style={{ height: "42px" }}
@@ -707,11 +723,11 @@ export default function AiAssistantTool() {
         ) : (
           <button
             onClick={() => handleSend()}
-            disabled={!input.trim() || isLocked}
+            disabled={!input.trim()}
             className="w-10 h-10 rounded-xl bg-accent-primary hover:bg-accent-primary-light text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-accent-primary/30 flex items-center justify-center shrink-0"
-            title={isLocked ? "Daily AI limit reached" : "Send Message (Enter)"}
+            title="Send Message (Enter)"
           >
-            {isLocked ? <Lock className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+            <Send className="w-4 h-4" />
           </button>
         )}
       </div>

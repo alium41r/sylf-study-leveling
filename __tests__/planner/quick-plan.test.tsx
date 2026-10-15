@@ -4,6 +4,9 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 import QuickPlan from "@/app/components/planner/quick-plan/QuickPlan";
 import { emptyComparisonView } from "@/lib/planner/intake/actions";
 import { emptyBrief, type PlanBriefV1, type ScopeNode } from "@/lib/planner/intake/brief";
+import { createOrResumeIntake, readMirror, writeMirror } from "@/lib/planner/intake/client";
+import * as designerClient from "@/lib/planner/designer/client";
+import { preparePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 
 /**
  * Quick Plan, against a scripted server.
@@ -242,6 +245,70 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   vi.clearAllMocks();
+  vi.restoreAllMocks();
+});
+
+describe("a request carried from Sylvie", () => {
+  it("uses an isolated draft, sends stated context once and requests review before edits", async () => {
+    const handoff = preparePlannerHandoff({
+      id: "quick-handoff-once-1", message: "Plan my physics exam preparation",
+      history: [{ role: "user", content: "I have four hours a week" }],
+    });
+    const send = vi.spyOn(designerClient, "sendDesignerMessage").mockResolvedValue({
+      outcome: "DESIGNER_QUESTION", intent: "SETUP", summary: "What should the plan cover?",
+      question: { code: "SCOPE", question: "What should the plan cover?", options: [] },
+      designer: { summary: null, mode: null, guidance: [], unresolved: [], question: null },
+      view: state.view,
+    } as unknown as designerClient.DesignerTurnPayload);
+    render(<React.StrictMode><QuickPlan mode="EXAM" onAdvanced={() => {}} handoff={handoff} /></React.StrictMode>);
+    await waitFor(() => expect(send).toHaveBeenCalledOnce());
+    expect(createOrResumeIntake).toHaveBeenCalledWith("EXAM", { clientKey: "sylvie_quick-handoff-once-1" });
+    expect(readMirror).not.toHaveBeenCalled();
+    expect(writeMirror).not.toHaveBeenCalled();
+    expect(send).toHaveBeenCalledWith("session-1", expect.objectContaining({
+      message: handoff.request, recent: handoff.recent, proposalOnly: true,
+    }));
+    fireEvent(window, new Event("resize"));
+    await waitFor(() => expect(screen.getByRole("heading", { name: "What should the plan cover?" })).toBeInTheDocument());
+    expect(send).toHaveBeenCalledOnce();
+  });
+
+  it("asks the user to choose an existing plan before forwarding a replan request", async () => {
+    const handoff = preparePlannerHandoff({ id: "quick-handoff-replan-1", message: "Rebalance my physics exam plan" });
+    const onAdvanced = vi.fn();
+    const send = vi.spyOn(designerClient, "sendDesignerMessage");
+    render(<QuickPlan mode="EXAM" onAdvanced={onAdvanced} handoff={handoff} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Open saved plans" }));
+    expect(onAdvanced).toHaveBeenCalledOnce();
+    expect(send).not.toHaveBeenCalled();
+    expect(screen.getByText(/Your request: Rebalance my physics exam plan/)).toBeInTheDocument();
+  });
+
+  it("offers an explicit retry after a failed transfer without looping automatically", async () => {
+    const handoff = preparePlannerHandoff({ id: "quick-handoff-retry-1", message: "Plan my physics exam preparation" });
+    const send = vi.spyOn(designerClient, "sendDesignerMessage").mockRejectedValue(new Error("Offline"));
+    render(<QuickPlan mode="EXAM" onAdvanced={() => {}} handoff={handoff} />);
+    const retry = await screen.findByRole("button", { name: "Retry prepared request" });
+    expect(send).toHaveBeenCalledOnce();
+    fireEvent.click(retry);
+    await waitFor(() => expect(send).toHaveBeenCalledTimes(2));
+    await screen.findByRole("button", { name: "Retry prepared request" });
+    expect(send).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps the assistant open while a transferred request is pending and releases cancelled work on navigation", async () => {
+    const handoff = preparePlannerHandoff({ id: "quick-handoff-pending-1", message: "Plan my physics exam preparation" });
+    const send = vi.spyOn(designerClient, "sendDesignerMessage").mockImplementation(() => new Promise(() => {}));
+    const rendered = render(<QuickPlan mode="EXAM" onAdvanced={() => {}} handoff={handoff} />);
+    await waitFor(() => expect(send).toHaveBeenCalledOnce());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Close Sylf Assistant" })).toBeDisabled());
+    const signal = send.mock.calls[0][1].signal;
+    expect(signal?.aborted).toBe(false);
+    rendered.unmount();
+    expect(signal?.aborted).toBe(true);
+    render(<QuickPlan mode="EXAM" onAdvanced={() => {}} handoff={handoff} />);
+    await waitFor(() => expect(send).toHaveBeenCalledTimes(2));
+  });
 });
 
 const renderQuickPlan = (props: Partial<{ onAdvanced: () => void }> = {}) =>

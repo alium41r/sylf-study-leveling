@@ -127,6 +127,7 @@ INTENT, exactly one of:
 INTAKE_UPDATE, SCOPE_UPDATE, PREPAREDNESS_UPDATE, BACKGROUND_UPDATE, AVAILABILITY_UPDATE, PREFERENCE_UPDATE, CONSTRAINT_UPDATE, RESEARCH_REQUEST, COMPARISON_REQUEST, EXPLAIN, DRAFT_EDIT, CONFIRMED_PLAN_CHANGE, RELEASE_GENERATED_ITEM, REPLAN_REQUEST, UNKNOWN
 
 COMMANDS (0 to 5). Each is one object with a "command" field and ONLY the fields listed:
+- {"command":"SET_GOAL","title":"..."} The student's own stated study goal, only before generation.
 - {"command":"SET_WEEKLY_HOURS","hours":N,"hard":true|false}   hard=true ONLY when the student states a limit they cannot exceed.
 - {"command":"SET_TARGET_DATE","date":"YYYY-MM-DD"|null,"shiftDays":N|null}
 - {"command":"SET_BACKGROUND_CURRICULUM","label":"...","level":null|"...","board":null|"...","subjects":["..."]}

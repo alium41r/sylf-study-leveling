@@ -29,6 +29,8 @@ import { reofferDisclosure, type ReofferOffer } from "@/lib/planner/reoffer";
 import { Sparkles, X, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import base from "../ExamPlanner.module.css";
 import s from "./copilot.module.css";
+import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
+import { claimPlannerHandoff, releasePlannerHandoff } from "@/lib/ai/sylvie/planner-handoff-client";
 
 /**
  * Sylf Unified Assistant
@@ -83,6 +85,8 @@ interface ProposalState {
 }
 
 export interface SylfAssistantProps {
+  initialRequest?: SylviePlannerHandoff;
+  onBusyChange?: (busy: boolean) => void;
   view: IntakeView;
   onView: (next: IntakeView) => void;
   onRoute: (
@@ -111,10 +115,24 @@ export default function PlannerCopilot({
   isMobileSheet = false,
   onCloseMobile,
   inputRef,
+  initialRequest,
+  onBusyChange,
 }: SylfAssistantProps) {
   const [message, setMessage] = useState("");
   const [turns, setTurns] = useState<CopilotRecentTurn[]>([]);
   const [busy, setBusy] = useState(false);
+  const [failedTransfer, setFailedTransfer] = useState<SylviePlannerHandoff | null>(null);
+  const autoSent = useRef<string | null>(null);
+  const activeTransfer = useRef<{ id: string; abort: AbortController } | null>(null);
+
+  useEffect(() => { onBusyChange?.(busy); }, [busy, onBusyChange]);
+  useEffect(() => () => {
+    const active = activeTransfer.current;
+    if (active) {
+      active.abort.abort();
+      releasePlannerHandoff(active.id);
+    }
+  }, []);
   const [notice, setNotice] = useState("");
   const [proposal, setProposal] = useState<ProposalState | null>(null);
   const [unresolved, setUnresolved] = useState<string[]>([]);
@@ -205,10 +223,13 @@ export default function PlannerCopilot({
   );
 
   const send = useCallback(
-    async (text: string, clarificationAnswer?: string) => {
+    async (text: string, clarificationAnswer?: string, transferred?: SylviePlannerHandoff) => {
       const trimmed = text.trim();
       if (!trimmed) return;
+      const transferAbort = transferred ? new AbortController() : undefined;
+      if (transferred && transferAbort) activeTransfer.current = { id: transferred.id, abort: transferAbort };
       setBusy(true);
+      setFailedTransfer(null);
       setNotice("");
       setProposal(null);
       setUnresolved([]);
@@ -223,8 +244,15 @@ export default function PlannerCopilot({
           const payload: DesignerTurnPayload = await sendDesignerMessage(view.id, {
             expectedVersion: view.version,
             message: trimmed,
-            recent: turns,
+            recent: transferred?.recent ?? turns,
+            proposalOnly: Boolean(transferred),
+            signal: transferAbort?.signal,
           });
+
+          if (transferred && payload.outcome === "DESIGNER_REFUSED" && ["MODEL_UNAVAILABLE", "MODEL_TIMEOUT", "COPILOT_BAD_OUTPUT"].includes(payload.code)) {
+            releasePlannerHandoff(transferred.id);
+            setFailedTransfer(transferred);
+          }
 
           setDesignerSummary(payload.designer.summary);
           setModeRecommendation(payload.designer.mode);
@@ -302,9 +330,16 @@ export default function PlannerCopilot({
           const payload = await sendCopilotMessage(view.id, {
             expectedVersion: view.version,
             message: trimmed,
-            recent: turns,
+            recent: transferred?.recent ?? turns,
+            proposalOnly: Boolean(transferred),
+            signal: transferAbort?.signal,
             clarificationAnswer: clarificationAnswer ?? null,
           });
+
+          if (transferred && payload.outcome === "REFUSED" && ["MODEL_UNAVAILABLE", "MODEL_TIMEOUT", "COPILOT_BAD_OUTPUT"].includes(payload.code)) {
+            releasePlannerHandoff(transferred.id);
+            setFailedTransfer(transferred);
+          }
 
           const said =
             payload.outcome === "REFUSED"
@@ -340,6 +375,10 @@ export default function PlannerCopilot({
           }
         }
       } catch (error) {
+        if (transferred) {
+          releasePlannerHandoff(transferred.id);
+          setFailedTransfer(transferred);
+        }
         const code = (error as { code?: string }).code ?? "";
         setNotice(
           code === "COPILOT_PROPOSAL_STALE" || code === "INTAKE_STALE"
@@ -347,12 +386,23 @@ export default function PlannerCopilot({
             : "Sylf could not reach the planner assistant just now. The structured controls still work."
         );
       } finally {
+        if (activeTransfer.current?.abort === transferAbort) activeTransfer.current = null;
         setBusy(false);
         setMessage("");
       }
     },
     [onPrerequisite, onRoute, onView, preGen, turns, view.id, view.version]
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled || !initialRequest || autoSent.current === initialRequest.id || !claimPlannerHandoff(initialRequest.id)) return;
+      autoSent.current = initialRequest.id;
+      void send(initialRequest.request, undefined, initialRequest);
+    });
+    return () => { cancelled = true; };
+  }, [initialRequest, send]);
 
   const confirmProposal = useCallback(async () => {
     if (!proposal) return;
@@ -365,6 +415,7 @@ export default function PlannerCopilot({
       });
       onView(applied.view);
       setProposal(null);
+      setDesignerQuestion(null);
       setUnresolved([]);
       setResearchRoute(null);
       setNotice(applied.summary);
@@ -433,6 +484,7 @@ export default function PlannerCopilot({
             type="button"
             className={s.closeBtn}
             onClick={onCloseMobile}
+            disabled={busy}
             aria-label="Close Sylf"
           >
             <X className="w-5 h-5" />
@@ -657,6 +709,11 @@ export default function PlannerCopilot({
             <p className={s.notice} role="status" aria-live="polite">
               {notice}
             </p>
+          )}
+          {failedTransfer && (
+            <button type="button" disabled={busy} className="text-accent-primary underline" onClick={() => {
+              if (claimPlannerHandoff(failedTransfer.id)) void send(failedTransfer.request, undefined, failedTransfer);
+            }}>Retry prepared request</button>
           )}
         </div>
 

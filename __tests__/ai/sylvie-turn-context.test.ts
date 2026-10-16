@@ -41,6 +41,15 @@ describe("Sylvie minimal page references", () => {
 });
 
 describe("Sylvie conversational bounds", () => {
+  it("retains the end of long answers for explicit continuation within the same context budget", () => {
+    const answer = "Opening assumptions" + "x".repeat(20_000) + "Last unfinished equation";
+    const bounded = boundSylvieHistory([{ role: "assistant", content: answer }, { role: "user", content: "Continue from there" }]);
+    expect(bounded[0].content).toContain("Opening assumptions");
+    expect(bounded[0].content).toContain("Middle of this earlier answer omitted");
+    expect(bounded[0].content).toContain("Last unfinished equation");
+    expect(bounded[0].content!.length).toBeLessThanOrEqual(4000);
+    expect(bounded[1].content).toBe("Continue from there");
+  });
   it("bounds count and characters while retaining the current request", () => {
     const history: NormalizedMessage[] = Array.from({ length: 40 }, (_, index) => ({ role: index % 2 ? "assistant" : "user", content: `${index}: ${"x".repeat(5000)}` }));
     history.push({ role: "user", content: "The exact latest request" });

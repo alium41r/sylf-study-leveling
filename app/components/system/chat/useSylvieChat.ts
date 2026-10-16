@@ -11,7 +11,7 @@ import { useComposerImages } from "./useComposerImages";
 export interface ChatMessage {
   id: string; serverId?: number; role: "user" | "assistant"; content: string; createdAt?: string;
   attachmentUrl?: string; attachmentName?: string; modelUsed?: string;
-  status?: "pending" | "streaming" | "complete" | "stopped" | "error"; error?: string;
+  status?: "pending" | "streaming" | "complete" | "stopped" | "error" | "incomplete"; error?: string;
   pendingAction?: PendingSylvieAction; plannerHandoff?: SylviePlannerHandoff;
   attachments?: Array<ChatImage | ComposerImage>;
 }
@@ -20,7 +20,7 @@ interface Options {
   enabled?: boolean; onSession?: (value: ChatReply) => void; onQuotaRefresh?: () => void;
 }
 const fromStored = (message: StoredChatMessage): ChatMessage => ({ ...message,
-  id: `stored-${message.id}`, serverId: message.id, role: message.type === "USER" ? "user" : "assistant", status: "complete" });
+  id: `stored-${message.id}`, serverId: message.id, role: message.type === "USER" ? "user" : "assistant", status: message.truncated ? "incomplete" : "complete" });
 
 /** One conversation owner for requests, history, session adoption and cancellation. */
 export function useSylvieChat(options: Options) {
@@ -142,7 +142,7 @@ export function useSylvieChat(options: Options) {
       adoptSession(reply);
       const content = reply.aiMessage?.content || reply.reply || reply.message || "No answer came through. Refresh the conversation before trying again.";
       setMessages(previous => previous.map(message => message.id === userId ? { ...message, serverId: reply.userMessage?.id, attachmentUrl: reply.userMessage?.attachmentUrl, attachments: reply.userMessage?.attachments, createdAt: reply.userMessage?.createdAt }
-        : message.id === aiId ? { ...message, content, status: "complete", serverId: reply.aiMessage?.id, createdAt: reply.aiMessage?.createdAt,
+        : message.id === aiId ? { ...message, content, status: reply.aiMessage?.truncated ? "incomplete" : "complete", serverId: reply.aiMessage?.id, createdAt: reply.aiMessage?.createdAt,
           modelUsed: reply.aiMessage?.modelUsed || reply.modelUsed,
           pendingAction: reply.aiMessage?.pendingAction ?? reply.pendingAction, plannerHandoff: reply.aiMessage?.plannerHandoff ?? reply.plannerHandoff } : message));
       invalidateClientCache("/api/system-messages"); invalidateClientCache("/api/chats");

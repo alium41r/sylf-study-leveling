@@ -12,6 +12,17 @@ function streamText(text: string, bytes = 3) {
   return new Response(new ReadableStream({ start(controller) { for (let i = 0; i < encoded.length; i += bytes) controller.enqueue(encoded.slice(i, i + bytes)); controller.close(); } }), { headers: { "Content-Type": "text/event-stream" } });
 }
 describe("genuine chat delivery protocol", () => {
+  it("accepts a long authoritative reply exceeding the old 256 KiB frame limit", async () => {
+    const long = "Beginning " + "x".repeat(90_000) + " Complete final equation.";
+    vi.stubGlobal("fetch", vi.fn(async () => streamText(`event: result\ndata: ${JSON.stringify({ aiMessage: { content: long }, reply: long, message: long })}\n\n`, 400_000)));
+    try {
+      const reply = await requestSylvieChat({ message: "Solve the whole problem", signal: new AbortController().signal, onDelta: vi.fn(), onReset: vi.fn(), onSession: vi.fn() });
+      expect(reply.aiMessage?.content).toBe(long);
+    } finally { vi.unstubAllGlobals(); }
+  });
+  it("still rejects an oversized individual response frame", async () => {
+    await expect(readEventStream(streamText('data: ' + 'x'.repeat(2 * 1024 * 1024 + 1) + '\n\n', 3_000_000), () => {})).rejects.toThrow("frame too large");
+  });
   it("decodes split Unicode, CRLF, comments and multiline SSE data", async () => {
     const events: string[] = [];
     await readEventStream(streamText(': heartbeat\r\n\r\nevent: delta\r\ndata: 你好 🌙\r\ndata: next\r\n\r\n', 1), (event, data) => events.push(`${event}:${data}`));

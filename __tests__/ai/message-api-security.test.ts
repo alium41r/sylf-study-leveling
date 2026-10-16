@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { GET, POST } from "@/app/api/system-messages/route";
 import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
+import { markOutputLimit } from "@/lib/ai/sylvie/completion";
 vi.mock("@/lib/auth-server", () => ({ getSession: vi.fn() }));
 vi.mock("@/lib/prisma", () => ({ prisma: {
   chatSession: { findFirst: vi.fn(), create: vi.fn() },
@@ -18,6 +19,13 @@ beforeEach(() => {
   vi.mocked(prisma.systemMessage.count).mockResolvedValue(0);
 });
 describe("direct message ownership and bounds", () => {
+  it("restores incomplete-response metadata without exposing its storage marker", async () => {
+    vi.mocked(prisma.systemMessage.findMany).mockResolvedValue([{ id: 91, sessionId: 123, type: "INFO", content: markOutputLimit("Partial answer"), attachmentUrl: null }] as never);
+    const response = await GET(new NextRequest("http://localhost/api/system-messages?sessionId=123"));
+    const reply = await response.json();
+    expect(reply.messages[0]).toMatchObject({ content: "Partial answer", truncated: true });
+    expect(JSON.stringify(reply)).not.toContain("sylvie-incomplete");
+  });
   it("rejects foreign or missing conversations before writing", async () => {
     expect((await POST(request({ content: "Fixture", sessionId: 123 }))).status).toBe(404);
     expect(prisma.chatSession.findFirst).toHaveBeenCalledWith({ where: { id: 123, userId: 7 }, select: { id: true } });

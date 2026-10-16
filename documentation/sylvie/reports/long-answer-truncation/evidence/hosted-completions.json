@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-10-16T05:41:52.572Z",
+  "source": "configured hosted database, last 24h chat dispatch metadata only",
+  "providerCalls": 0,
+  "rows": [
+    {
+      "createdAt": "2026-10-16T00:39:21.962Z",
+      "workload": "sylvie",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "stage": "sylvie",
+      "finishReason": "length",
+      "outcome": "SUCCEEDED",
+      "accountingState": "SETTLED",
+      "usageKnown": true,
+      "promptTokens": 1140,
+      "completionTokens": 1024,
+      "reasoningTokens": 881,
+      "cacheHitTokens": 0,
+      "latencyMs": 12549,
+      "dispatchTracked": true
+    }
+  ]
+}

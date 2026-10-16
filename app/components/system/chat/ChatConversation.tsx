@@ -10,6 +10,7 @@ import SylvieResponseActions from "../SylvieResponseActions";
 import type { ChatMessage } from "./useSylvieChat";
 import styles from "./Chat.module.css";
 import { resolveApiUrl } from "@/lib/api-transport";
+import { OUTPUT_LIMIT_NOTICE } from "@/lib/ai/sylvie/completion";
 
 const Message = memo(function Message({ message, latest, busy, onConfirm, onSave, showModel, onReuse }: {
   message: ChatMessage; latest: boolean; busy: boolean; onConfirm: (token: string) => void;
@@ -21,7 +22,7 @@ const Message = memo(function Message({ message, latest, busy, onConfirm, onSave
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
   const assistant = message.role === "assistant", pending = message.status === "pending" && !message.content;
-  const incomplete = message.status === "streaming" || message.status === "stopped" || message.status === "error";
+  const incomplete = message.status === "streaming" || message.status === "stopped" || message.status === "error" || message.status === "incomplete";
   return <article className={`${styles.message} ${assistant ? styles.assistant : styles.user}`} data-message-id={message.id} data-status={message.status}>
     <div className={styles.messageMeta}>
       <span>{assistant && <SylvieIcon size={15} />}{assistant ? "Sylvie" : "You"}</span>
@@ -38,9 +39,10 @@ const Message = memo(function Message({ message, latest, busy, onConfirm, onSave
       : <ChatText content={message.content} />}
     {message.status === "streaming" && message.content && <span className={styles.streamIndicator} aria-label="Receiving reply" />}
     {message.error && <p className={styles.error} role="alert">{message.error}</p>}
+    {message.status === "incomplete" && <p className={styles.notice} role="status">{OUTPUT_LIMIT_NOTICE}</p>}
     {assistant && message.modelUsed?.includes("Gemini unavailable") && <p className={styles.mediaStatus}>Gemini was unavailable. DeepSeek answered this image instead.</p>}
     {assistant && !incomplete && <SylvieResponseActions pendingAction={latest ? message.pendingAction : undefined} plannerHandoff={message.plannerHandoff} busy={busy} onConfirm={onConfirm} />}
-    {assistant && message.content && !incomplete && <div className={styles.messageActions}>
+    {assistant && message.content && (!incomplete || message.status === "incomplete") && <div className={styles.messageActions}>
       <button type="button" className={styles.iconButton} aria-label={copied ? "Reply copied" : "Copy reply"} title="Copy reply" onClick={async () => {
         try { await navigator.clipboard.writeText(message.content); setCopied(true); setCopyError(false); clearTimeout(timer.current); timer.current = setTimeout(() => setCopied(false), 1800); }
         catch { setCopyError(true); }

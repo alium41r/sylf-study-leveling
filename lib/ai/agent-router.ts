@@ -175,6 +175,8 @@ const QUEST_LOOKUP_QUESTION =
 
 // ─── Workload Routing Configuration Matrix ───────────────────
 
+// Completion ceilings include reasoning where billed. Concise wording belongs
+// to the shared persona; a low ceiling must not cut off a valid explanation.
 export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> = {
   multimodal_vision: {
     workload: "multimodal_vision",
@@ -182,7 +184,7 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     primary: { provider: "deepseek", model: DEEPSEEK_MODELS.vision },
     fallback: { provider: "gemini", model: GEMINI_MODELS.vision },
     description: "Multimodal Vision & Diagram Ingestion Engine",
-    outputTokenCap: 1024,
+    outputTokenCap: 32768,
   },
   planner: {
     workload: "planner",
@@ -193,7 +195,7 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "In-Chat Goal & Quest Structuring (CRUD via tools)",
-    outputTokenCap: 1024,
+    outputTokenCap: 8192,
     thinking: "disabled",
   },
   syllabus: {
@@ -209,14 +211,14 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.stemFallback },
     description: "Complex STEM Derivations & Algorithmic Proof Engine",
-    outputTokenCap: 4096,
+    outputTokenCap: 32768,
   },
   focus_chat: {
     workload: "focus_chat",
     primary: { provider: "deepseek", model: DEEPSEEK_MODELS.focus },
     fallback: { provider: "gemini", model: GEMINI_MODELS.focus },
     description: "Focus Timer In-Session Assistant",
-    outputTokenCap: 512,
+    outputTokenCap: 8192,
     thinking: "disabled",
   },
   general_chat: {
@@ -225,7 +227,7 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "General System Chat & Companion Assistant",
-    outputTokenCap: 768,
+    outputTokenCap: 8192,
     thinking: "disabled",
   },
   calendar: {
@@ -234,7 +236,7 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "Calendar & Schedule Adjustment Specialist",
-    outputTokenCap: 640,
+    outputTokenCap: 8192,
     thinking: "disabled",
   },
   coach: {
@@ -243,7 +245,7 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "Progress Coach & Burnout Detection Specialist",
-    outputTokenCap: 768,
+    outputTokenCap: 16384,
   },
   analyst: {
     workload: "analyst",
@@ -251,18 +253,18 @@ export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> =
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "Study Analytics & Performance Trend Specialist",
-    outputTokenCap: 1024,
+    outputTokenCap: 16384,
   },
   simple: {
     workload: "simple",
     // Lightweight tier: short imperative CRUD/factual requests. Same cheap
     // model as general chat, but with core-only context, no reasoning
-    // tokens (thinking disabled) and a tiny output budget.
+    // tokens (thinking disabled), with room for complete lists and answers.
     primary: { provider: "deepseek", model: DEEPSEEK_MODELS.chat },
     fallback: { provider: "groq", model: GROQ_MODELS.chatFallback },
     secondaryFallback: { provider: "gemini", model: GEMINI_MODELS.default },
     description: "Simple Action & Quick Fact Tier (no reasoning tokens)",
-    outputTokenCap: 384,
+    outputTokenCap: 4096,
     thinking: "disabled",
   },
 };

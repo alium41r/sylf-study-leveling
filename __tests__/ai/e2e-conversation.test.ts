@@ -1,7 +1,7 @@
 /** @vitest-environment node */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { POST } from "@/app/api/system-messages/chat/route";
+import { POST, maxDuration } from "@/app/api/system-messages/chat/route";
 import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { LLMFactory } from "@/lib/ai/providers/factory";
@@ -12,6 +12,8 @@ import { saveChatImages, readChatImage, signedChatImage, encodeStoredImages } fr
 import { DEEPSEEK_MODELS } from "@/lib/ai/config";
 import { resolveCheapAnswer } from "@/lib/ai/cheap-answers";
 import sharp from "sharp";
+import { hasOutputLimit } from "@/lib/ai/sylvie/completion";
+import { SYLVIE_CLIENT_TIMEOUT_MS, SYLVIE_SERVER_TIMEOUT_MS, SYLVIE_REASONING_TIMEOUT_MS } from "@/lib/ai/client-budget";
 
 vi.mock("@/lib/ai/sylvie/image-storage", async importOriginal => ({
   ...await importOriginal<typeof import("@/lib/ai/sylvie/image-storage")>(),
@@ -106,6 +108,35 @@ afterEach(() => {
 });
 
 describe("Sylvie conversation integration with the real tool executor", () => {
+  it("keeps longer reasoning within the shared deadline and Vercel execution allowance", () => {
+    expect(SYLVIE_REASONING_TIMEOUT_MS).toBeGreaterThan(45_000);
+    expect(SYLVIE_REASONING_TIMEOUT_MS).toBeLessThan(SYLVIE_SERVER_TIMEOUT_MS);
+    expect(SYLVIE_CLIENT_TIMEOUT_MS).toBeGreaterThan(SYLVIE_SERVER_TIMEOUT_MS);
+    expect(SYLVIE_CLIENT_TIMEOUT_MS).toBeLessThan(maxDuration * 1000);
+  });
+  it("gives image solutions room for reasoning and persists an honest truncation flag", async () => {
+    const form = new FormData(); form.append("message", "can you solve this further maths mechanics question for me"); form.append("sessionId", String(SESSION_ID));
+    const png = await sharp({ create: { width: 20, height: 20, channels: 3, background: "white" } }).png().toBuffer();
+    form.append("images", new File([new Uint8Array(png)], "question.png", { type: "image/png" }));
+    generate.mockResolvedValueOnce({ text: "Hence $$ (u cos", finishReason: "MAX_TOKENS", usage: { promptTokens: 1140, completionTokens: 1024, reasoningTokens: 881, totalTokens: 2164 } });
+    const response = await POST(new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: form }));
+    const reply = await response.json();
+    expect(generate.mock.calls[0][3]).toMatchObject({ maxTokens: 32768 });
+    expect(reply.aiMessage).toMatchObject({ content: "Hence $$ (u cos", truncated: true });
+    expect(reply.reply).not.toContain("sylvie-incomplete");
+    const saved = vi.mocked(prisma.systemMessage.create).mock.calls.at(-1)?.[0].data.content as string;
+    expect(hasOutputLimit(saved)).toBe(true);
+    expect(generate).toHaveBeenCalledOnce(); // No paid continuation/retry without the user asking.
+  });
+
+  it("does not execute a tool response cut off by its token budget", async () => {
+    generate.mockResolvedValueOnce({ ...callsTool("createGoal", { title: "Partial proposal" }), finishReason: "MAX_TOKENS" });
+    const reply = await (await POST(request("Create a goal called Partial proposal"))).json();
+    expect(reply.aiMessage.truncated).toBe(true);
+    expect(reply.pendingAction).toBeUndefined();
+    expect(prisma.goal.create).not.toHaveBeenCalled();
+    expect(generate).toHaveBeenCalledOnce();
+  });
   it("retains cheap-answer continuity only in the adopted conversation", async () => {
     vi.mocked(resolveCheapAnswer).mockResolvedValueOnce({ content: "Fixture summary", reason: "fixture", intentId: "fixture", params: { timeScope: null }, confidence: 1 });
     const fresh = () => new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: JSON.stringify({ message: "Fixture question", modelPreference: "auto" }) });

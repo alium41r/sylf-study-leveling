@@ -36,7 +36,15 @@ export function boundSylvieHistory(history: NormalizedMessage[], maxChars = 18_0
   let remaining = maxChars;
   for (const message of history.slice(-20).reverse()) {
     if (remaining <= 0) break;
-    const content = message.content?.slice(0, Math.min(4000, remaining));
+    const limit = Math.min(4000, remaining);
+    const full = message.content;
+    const omission = "\n[Middle of this earlier answer omitted]\n";
+    // Retain the stopping point of long answers so an explicit continuation
+    // does not restart from their opening paragraphs. User requests stay verbatim.
+    const head = Math.floor(limit / 4);
+    const content = message.role === "assistant" && full && full.length > limit && limit > 256
+      ? full.slice(0, head) + omission + full.slice(-(limit - head - omission.length))
+      : full?.slice(0, limit);
     result.unshift({ ...message, content });
     remaining -= content?.length ?? 0;
   }

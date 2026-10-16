@@ -3,6 +3,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ConversationPanel from "@/app/system/components/ConversationPanel";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { OUTPUT_LIMIT_NOTICE } from "@/lib/ai/sylvie/completion";
 vi.mock("@/lib/client-data-cache", () => ({ fetchCachedJSON: vi.fn(), invalidateClientCache: vi.fn() }));
 const encoder = new TextEncoder();
 const props = { sessionId: null, sessionTitle: "New chat", chatQuota: null, modelPref: "auto" as const, isDevMode: false, onSessionCreated: vi.fn(), onQuotaRefresh: vi.fn(), onOpenPlanner: vi.fn() };
@@ -16,6 +17,18 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("shared conversation continuity", () => {
+  it("labels a capped reply outside incomplete math markup and restores the notice from history", async () => {
+    const view = render(<ConversationPanel {...props} />); begin();
+    await act(async () => { emit("result", { sessionId: 9, aiMessage: { id: 7, content: "Hence $$ (u cos", truncated: true } }); controller.close(); });
+    await screen.findByText(OUTPUT_LIMIT_NOTICE);
+    expect(document.querySelector('[data-status="incomplete"]')).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Copy reply" })).toBeEnabled();
+    view.unmount();
+    vi.mocked(fetchCachedJSON).mockResolvedValue({ messages: [{ id: 7, type: "INFO", content: "Hence $$ (u cos", truncated: true, createdAt: new Date().toISOString() }] });
+    render(<ConversationPanel {...props} sessionId={9} />);
+    await screen.findByText(OUTPUT_LIMIT_NOTICE);
+    expect(document.querySelector('[data-status="incomplete"]')).not.toBeNull();
+  });
   it("restores a failed prompt but preserves a newer draft", async () => {
     render(<ConversationPanel {...props} />); begin();
     expect(screen.getByRole("textbox")).toHaveValue("");

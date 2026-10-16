@@ -1,0 +1,24 @@
+npm notice run sylf@0.1.0 mobile:verify
+npm notice run node scripts/verify-mobile-bundle.mjs
+
+==================================================
+MOBILE BUNDLE AUDIT & INTEGRITY VERIFICATION
+==================================================
+Total Bundled Files: 239
+Total JavaScript Size: 2712.28 KB
+Total CSS Size: 650.87 KB
+Key Chunks:
+  • sprites/3d-avatars/scholar-elena.png           8577.89 KB
+  • sprites/3d-avatars/space-explorer-orion.png    8161.24 KB
+  • landing/screenshots/focus timer view.png       5854.52 KB
+  • landing/screenshots/focus-timer-view.png       5854.52 KB
+  • landing/screenshots/focus party timer view.png  5289.68 KB
+  • landing/screenshots/focus-party-timer-view.png  5289.68 KB
+  • sprites/3d-avatars/celestial-mage-lyra.png     5250.53 KB
+  • audio/ambient/stream.ogg                       4907.69 KB
+
+Mock Mode Status: FAIL-CLOSED (Mocks Disabled, Production-Ready)
+
+verify-mobile-bundle: PASSED. Zero server-only symbols or secrets found in mobile/dist.
+==================================================
+

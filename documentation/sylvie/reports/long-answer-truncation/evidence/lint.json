@@ -1,0 +1,250 @@
+[
+  {
+    "file": "__tests__/ai/chat-streaming.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/e2e-conversation.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/message-api-security.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/multi-engine-router.test.ts",
+    "current": {
+      "errors": 3,
+      "warnings": 1,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 3,
+        "1:@typescript-eslint/no-unused-vars": 1
+      }
+    },
+    "baseline": {
+      "errors": 3,
+      "warnings": 1,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 3,
+        "1:@typescript-eslint/no-unused-vars": 1
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/sylvie-turn-context.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/system/chat-interactions.test.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/api/system-messages/chat/route.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/api/system-messages/route.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/system/chat/ChatConversation.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/system/chat/useSylvieChat.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/agent-router.ts",
+    "current": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 5
+      }
+    },
+    "baseline": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 5
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/client-budget.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/sylvie/action.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/sylvie/chat-client.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/sylvie/event-stream.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/sylvie/turn-context.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/sylvie/completion.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  }
+]

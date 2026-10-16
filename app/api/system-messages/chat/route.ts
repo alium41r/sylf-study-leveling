@@ -1,5 +1,5 @@
 import { boundSylvieToolResult } from "@/lib/ai/sylvie/tool-context";
-import { SYLVIE_SERVER_TIMEOUT_MS } from "@/lib/ai/client-budget";
+import { SYLVIE_SERVER_TIMEOUT_MS, SYLVIE_REASONING_TIMEOUT_MS } from "@/lib/ai/client-budget";
 import { withAiRequest, setAiUser, aiRequestSignal } from "@/lib/ai/telemetry";
 import { streamChat, type ChatStreamSink } from "@/lib/ai/sylvie/chat-stream-server";
 import { NextRequest, NextResponse } from "next/server";
@@ -25,6 +25,10 @@ import { stripSylvieAction } from "@/lib/ai/sylvie/action";
 import { shortSylfIntroduction } from "@/lib/ai/sylvie/quick-replies";
 import { attachPlannerHandoff } from "@/lib/ai/sylvie/planner-message";
 import { signConfirmationToken } from "@/lib/ai/tool-confirmation";
+import { markOutputLimit } from "@/lib/ai/sylvie/completion";
+
+// Covers the shared deadline plus final persistence/telemetry on Vercel.
+export const maxDuration = 300;
 
 import type { ChatSession } from "@prisma/client";
 import type { IntentParams } from "@/lib/ai/intents/registry";
@@ -460,13 +464,14 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
     let actualModelDisplayName = "DeepSeek v4 Flash";
     let actualModelId: string = DEEPSEEK_MODELS.chat;
     let totalUsage: LLMUsage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+    let responseTruncated = false;
 
     // Per-workload generation budget: hard output cap + optional DeepSeek
     // thinking toggle (disabled tiers skip reasoning-token spend).
     const genOptions = {
       singleAttempt: true, // The route owns provider fallbacks and the shared deadline.
       maxTokens: /\b(?:in detail|detailed|thorough|in depth|comprehensive|full explanation)\b/i.test(messageText)
-        ? Math.max(workloadResult.route.outputTokenCap, 2048) : workloadResult.route.outputTokenCap,
+        ? Math.max(workloadResult.route.outputTokenCap, 16384) : workloadResult.route.outputTokenCap,
       thinking: workloadResult.route.thinking,
     };
 
@@ -476,7 +481,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       provider: "deepseek" | "gemini" | "groq",
       modelOverride?: string,
       signal?: AbortSignal
-    ): Promise<{ text: string; usage: LLMUsage }> => {
+    ): Promise<{ text: string; usage: LLMUsage; truncated?: boolean }> => {
       const adapter = LLMFactory.getAdapter(provider, modelOverride);
       const tools = toolsForTurn;
       const activeSystemInstruction = systemInstruction;
@@ -504,6 +509,8 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       addUsage(response.usage);
 
       while (response.toolCalls && response.toolCalls.length > 0 && iterations < MAX_TOOL_ITERATIONS) {
+        // A capped tool response may contain only part of the requested actions.
+        if (response.finishReason === "MAX_TOKENS") break;
         iterations++;
 
         runHistory.push({
@@ -565,7 +572,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       // calling tools until the iteration cap): force ONE final text-only
       // generation with tools disabled so the user always gets a real reply
       // instead of "Failed to complete task."
-      if (!response.text && iterations > 0) {
+      if (!response.text && iterations > 0 && response.finishReason !== "MAX_TOKENS") {
         try {
           const forced = await adapter.generateResponse(
             runHistory,
@@ -583,12 +590,15 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       return {
         text:
           response.text ||
-          (iterations >= MAX_TOOL_ITERATIONS
+          (response.finishReason === "MAX_TOKENS"
+            ? "I reached the response limit before finishing this answer."
+            : iterations >= MAX_TOOL_ITERATIONS
             ? "Failed to complete task."
             : iterations > 0
             ? "I couldn’t finish this request. No changes were applied."
             : "I couldn't process that request. Could you try again?"),
         usage,
+        truncated: response.finishReason === "MAX_TOKENS",
       };
     };
 
@@ -634,10 +644,9 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
         inlineImagesLoaded = true;
       }
       attemptRef.controller = new AbortController();
-      // Vision attempts get a tighter per-attempt budget so the DeepSeek
-      // fallback engages quickly when Gemini stalls instead of waiting the
-      // full 90s chat budget.
-      const attemptBudget = isVisionWorkload ? 45_000 : AI_LIMITS.chatTimeoutMs;
+      // Long reasoning/image solutions need time to use their completion budget.
+      // All attempts still share the request deadline; ordinary turns stay bounded.
+      const attemptBudget = genOptions.thinking !== "disabled" ? SYLVIE_REASONING_TIMEOUT_MS : AI_LIMITS.chatTimeoutMs;
       attemptRef.timeout = setTimeout(
         () => attemptRef.controller?.abort(),
         attemptBudget
@@ -664,6 +673,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
         const loopResult = await executeAttempt("groq", groqModel);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
+        responseTruncated = loopResult.truncated ?? false;
       } else if (modelPreference === "gemini") {
         const geminiModel = isVisionWorkload ? GEMINI_MODELS.vision : GEMINI_MODELS.default;
         actualModelUsed = "GEMINI";
@@ -673,6 +683,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
           const loopResult = await executeAttempt("gemini", geminiModel);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
+          responseTruncated = loopResult.truncated ?? false;
         } catch (error) {
           if (!isVisionWorkload) throw error;
           // Preserve the working image fallback, with a persisted, visible disclosure.
@@ -682,6 +693,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
           const loopResult = await executeAttempt("deepseek", DEEPSEEK_MODELS.vision);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
+          responseTruncated = loopResult.truncated ?? false;
         }
       } else if (modelPreference === "deepseek") {
         const deepseekModel = isVisionWorkload ? DEEPSEEK_MODELS.vision : primarySpec.model;
@@ -691,6 +703,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
         const loopResult = await executeAttempt("deepseek", deepseekModel);
         aiResponseText = loopResult.text;
         totalUsage = loopResult.usage;
+        responseTruncated = loopResult.truncated ?? false;
       } else {
         // Multi-Engine Auto Mode with Cascade Fallbacks
         actualModelUsed = primarySpec.provider.toUpperCase();
@@ -701,6 +714,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
           const loopResult = await executeAttempt(primarySpec.provider, primarySpec.model);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
+          responseTruncated = loopResult.truncated ?? false;
         } catch {
           console.warn("[AI] operation unavailable");
           actualModelUsed = fallbackSpec.provider.toUpperCase();
@@ -711,6 +725,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
             const loopResult = await executeAttempt(fallbackSpec.provider, fallbackSpec.model);
             aiResponseText = loopResult.text;
             totalUsage = loopResult.usage;
+            responseTruncated = loopResult.truncated ?? false;
           } catch (fallbackErr: unknown) {
             if (secondarySpec) {
               console.warn("[AI] operation unavailable");
@@ -720,6 +735,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
               const loopResult = await executeAttempt(secondarySpec.provider, secondarySpec.model);
               aiResponseText = loopResult.text;
               totalUsage = loopResult.usage;
+              responseTruncated = loopResult.truncated ?? false;
             } else {
               throw fallbackErr;
             }
@@ -759,7 +775,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       data: {
         userId,
         sessionId,
-        content: aiResponseText,
+        content: responseTruncated ? markOutputLimit(aiResponseText) : aiResponseText,
         type: "INFO",
         read: false,
         modelUsed: actualModelDisplayName,
@@ -796,7 +812,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
 
     return NextResponse.json({
       userMessage: exposeChatImages(userMessage),
-      aiMessage: { ...aiMessage, content: aiResponseText, modelUsed: actualModelDisplayName, pendingAction },
+      aiMessage: { ...aiMessage, content: aiResponseText, modelUsed: actualModelDisplayName, pendingAction, truncated: responseTruncated },
       pendingAction,
       reply: aiResponseText,
       message: aiResponseText,

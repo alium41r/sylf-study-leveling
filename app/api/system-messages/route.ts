@@ -6,6 +6,7 @@ import { stripSylvieAction } from "@/lib/ai/sylvie/action";
 import { parsePlannerHandoff } from "@/lib/ai/sylvie/planner-message";
 import { exposeChatImages } from "@/lib/ai/sylvie/image-storage";
 import { z } from "zod";
+import { hasOutputLimit } from "@/lib/ai/sylvie/completion";
 
 const directMessage = z.object({
   sessionId: z.number().int().positive().safe().optional(),
@@ -65,6 +66,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ messages: messages.map((message) => ({
       ...exposeChatImages(message),
       content: stripSylvieAction(message.content),
+      truncated: message.type === "INFO" && hasOutputLimit(message.content),
       pendingAction: message.type === "INFO"
         ? parseSylvieAction(message.content, session.userId, message.sessionId, message.id) : undefined,
       plannerHandoff: message.type === "INFO" ? parsePlannerHandoff(message.content) : undefined,

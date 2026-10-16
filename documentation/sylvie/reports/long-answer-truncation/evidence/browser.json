@@ -1,0 +1,22 @@
+{
+  "source": "actual components with synthetic responses",
+  "cases": 18,
+  "surfaces": [
+    "main",
+    "popup",
+    "focus"
+  ],
+  "widths": [
+    1440,
+    390
+  ],
+  "appearances": [
+    "dark",
+    "light",
+    "custom"
+  ],
+  "incompleteNoticeOutsideMarkdown": true,
+  "copyAvailable": true,
+  "horizontalOverflow": false,
+  "paidCalls": 0
+}

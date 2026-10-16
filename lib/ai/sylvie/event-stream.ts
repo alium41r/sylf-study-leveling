@@ -13,15 +13,18 @@ export async function readEventStream(response: Response, onEvent: (event: strin
       signal?.throwIfAborted();
       buffer += decoder.decode(value, { stream: !done });
       buffer = buffer.replace(/\r\n/g, "\n");
-      if (buffer.length > 262144) throw new Error("Response frame too large");
       let boundary: number;
       while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+        if (boundary > 2 * 1024 * 1024) throw new Error("Response frame too large");
         const frame = buffer.slice(0, boundary); buffer = buffer.slice(boundary + 2);
         const lines = frame.split("\n");
         const data = lines.filter(line => line.startsWith("data:")).map(line => line.slice(5).replace(/^ /, "")).join("\n");
         const event = lines.find(line => line.startsWith("event:"))?.slice(6).trim() || "message";
         if (data) onEvent(event, data);
       }
+      // Bound each frame, not a network chunk containing many valid frames.
+      // The final chat result can contain long text in legacy-compatible fields.
+      if (buffer.length > 2 * 1024 * 1024) throw new Error("Response frame too large");
       if (done) {
         if (buffer.trim() && !buffer.startsWith(":")) throw new Error("Response stream interrupted");
         break;

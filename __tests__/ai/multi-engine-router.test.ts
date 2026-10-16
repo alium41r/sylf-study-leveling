@@ -11,6 +11,13 @@ import { DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "../../lib/ai/config
 import { NormalizedMessage } from "../../lib/ai/providers/types";
 
 describe("Multi-Engine AI Architecture & Dynamic Router Tests", () => {
+  it("allows full educational answers while preserving smaller lightweight ceilings", () => {
+    expect(WORKLOAD_ROUTING_TABLE.multimodal_vision.outputTokenCap).toBe(32768);
+    expect(WORKLOAD_ROUTING_TABLE.complex_stem.outputTokenCap).toBe(32768);
+    expect(WORKLOAD_ROUTING_TABLE.focus_chat.outputTokenCap).toBeGreaterThanOrEqual(8192);
+    expect(WORKLOAD_ROUTING_TABLE.general_chat.outputTokenCap).toBeGreaterThanOrEqual(8192);
+    expect(WORKLOAD_ROUTING_TABLE.simple.outputTokenCap).toBeLessThan(WORKLOAD_ROUTING_TABLE.general_chat.outputTokenCap);
+  });
   const originalEnv = process.env;
 
   beforeEach(() => {

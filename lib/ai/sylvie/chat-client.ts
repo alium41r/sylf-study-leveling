@@ -9,6 +9,7 @@ export interface StoredChatMessage {
   id: number; content: string; type: string; createdAt: string; attachmentUrl?: string;
   modelUsed?: string; pendingAction?: PendingSylvieAction; plannerHandoff?: SylviePlannerHandoff;
   attachments?: ChatImage[];
+  truncated?: boolean;
 }
 export interface ChatSessionSummary { id: number; title: string; createdAt?: string; updatedAt?: string }
 export interface ChatReply {

@@ -67,3 +67,9 @@ Behavior tests are in `__tests__/ai/sylvie-*`, [conversation E2E](../../__tests_
 [Final cross-phase audit](reports/final-audit/report.md) records subsequent fixes, hosted telemetry qualification with synthetic rollback, current test results and remaining provider/device limits. Daily briefings now use task summaries and workload hints without the broad profile dump or forced gaming language. Deterministic follow-up context belongs to the adopted chat ID and never carries into a new conversation.
 
 [Long-answer truncation fix](reports/long-answer-truncation/report.md) records the production `length` receipt, higher completion/timeout allowances and regression coverage.
+
+## Mathematical formatting
+
+All chat surfaces, Planner text, Focus formulas and Scratchpad previews use [MarkdownRenderer](../../app/components/MarkdownRenderer.tsx). The renderer and stylesheet use one pinned KaTeX installation through the package override; keep them aligned when upgrading. [Math normalization](../../lib/markdown-math.ts) accepts dollar and bracket delimiters while preserving Markdown code. It gives same-line double-dollar equations display layout and preserves multiline equations/list indentation. Recovery of an orphan dollar is deliberately limited to complete vector/accent/symbol atoms; it does not guess missing mathematical arguments or rewrite saved answers. Shared scoped CSS preserves formula spacing and contains wide equations in horizontal scrollers. Unrenderable expressions remain visible with a neutral fallback; HTML/URL trust is disabled and macro expansion/size are bounded.
+
+[Math rendering fix and verification](reports/math-rendering/report.md) documents the mismatched KaTeX versions, malformed-delimiter regression and desktop/mobile evidence.

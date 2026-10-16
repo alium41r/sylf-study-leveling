@@ -5,6 +5,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import { normalizeMathMarkdown, remarkRecoverMath } from "@/lib/markdown-math";
+import styles from "./MarkdownRenderer.module.css";
+
+const remarkPlugins = [remarkGfm, remarkMath, remarkRecoverMath];
+const katexOptions = { trust: false, strict: "ignore" as const, maxExpand: 1000, maxSize: 20, errorColor: "var(--text-secondary)" };
 
 interface MarkdownRendererProps {
   content: string;
@@ -12,48 +17,26 @@ interface MarkdownRendererProps {
   compact?: boolean;
 }
 
-/**
- * Preprocesses text to ensure inline/block LaTeX formulas wrapped in brackets
- * \[ ... \] or \( ... \) or raw unescaped math expressions are properly recognized
- * by remark-math ($ ... $ and $$ ... $$).
- */
-function preprocessLatex(text: string): string {
-  if (!text) return "";
-
-  let formatted = text;
-
-  // Sweep any legacy `<!-- model: X -->` comments before rendering so they
-  // never appear as visible text (model identity is a data field now).
-  formatted = formatted.replace(/\s*<!--[\s\S]*?-->\s*/g, "");
-
-  // Replace \[ ... \] with $$ ... $$
-  formatted = formatted.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => `\n$$\n${math.trim()}\n$$\n`);
-
-  // Replace \( ... \) with $ ... $
-  formatted = formatted.replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => `$${math.trim()}$`);
-
-  return formatted;
-}
-
 export default function MarkdownRenderer({
   content,
   className = "",
   compact = false,
 }: MarkdownRendererProps) {
-  const processedContent = preprocessLatex(content);
+  const processedContent = normalizeMathMarkdown(content);
 
   if (compact) {
     return (
-      <div className={`text-xs text-text-primary leading-relaxed break-words ${className}`}>
+      <div className={`${styles.content} text-xs text-text-primary leading-relaxed break-words ${className}`}>
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeKatex]}
+          remarkPlugins={remarkPlugins}
+          rehypePlugins={[[rehypeKatex, katexOptions]]}
+          skipHtml
           components={{
             h1: ({ children }) => <span className="block font-bold text-sm text-text-primary mb-1">{children}</span>,
             h2: ({ children }) => <span className="block font-bold text-xs text-text-primary mb-1">{children}</span>,
             h3: ({ children }) => <span className="block font-bold text-xs text-accent-text-light mb-1">{children}</span>,
             h4: ({ children }) => <span className="block font-bold text-xs text-accent-text-light mb-0.5">{children}</span>,
-            p: ({ children }) => <span className="block mb-1.5 last:mb-0">{children}</span>,
+            p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
             ul: ({ children }) => <ul className="list-disc list-inside space-y-0.5 my-1 text-[11px]">{children}</ul>,
             ol: ({ children }) => <ol className="list-decimal list-inside space-y-0.5 my-1 text-[11px]">{children}</ol>,
             li: ({ children }) => <li className="text-text-secondary">{children}</li>,
@@ -74,7 +57,7 @@ export default function MarkdownRenderer({
 
   return (
     <div
-      className={`text-sm leading-relaxed text-text-primary break-words max-w-none 
+      className={`${styles.content} text-sm leading-relaxed text-text-primary break-words max-w-none
         prose dark:prose-invert prose-sm 
         prose-p:my-1.5 prose-p:leading-relaxed 
         prose-ul:my-1.5 prose-ul:pl-4 prose-ol:my-1.5 prose-ol:pl-4 
@@ -92,8 +75,9 @@ export default function MarkdownRenderer({
         ${className}`}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeKatex]}
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={[[rehypeKatex, katexOptions]]}
+        skipHtml
       >
         {processedContent}
       </ReactMarkdown>

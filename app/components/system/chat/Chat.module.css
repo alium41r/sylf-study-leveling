@@ -24,7 +24,6 @@
 .markdown :is(th,td) { padding:9px 12px; border:1px solid var(--border-subtle); text-align:left; }
 .markdown blockquote { border-left:2px solid var(--accent-primary-mid); padding-left:14px; color:var(--text-secondary); }
 .markdown a { color:var(--accent-text); text-decoration:underline; text-underline-offset:3px; }
-.markdown :global(.katex-display) { max-width:100%; overflow-x:auto; overflow-y:hidden; padding:4px 0; }
 .messageActions { display:flex; align-items:center; gap:6px; min-height:28px; margin:8px 0 -8px; }
 .model { margin-left:auto; max-width:50%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted); font:10px/1.4 monospace; }
 .iconButton, .textButton { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-width:32px; min-height:32px; padding:6px; border:0; border-radius:8px; background:transparent; color:var(--text-secondary); cursor:pointer; font:inherit; }

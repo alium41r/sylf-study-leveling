@@ -17,6 +17,23 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("shared conversation continuity", () => {
+  it("renders an incomplete vector during streaming and the final formula without replacing the message", async () => {
+    render(<ConversationPanel {...props} />); begin();
+    await act(async () => emit("delta", { text: String.raw`Take $\mathbf j along the normal.` }));
+    await waitFor(() => expect(document.querySelector('[data-status="streaming"] annotation')?.textContent).toBe(String.raw`\mathbf j`));
+    const article = document.querySelector('[data-status="streaming"]');
+    expect(article?.querySelector("annotation")?.textContent).toBe(String.raw`\mathbf j`);
+    const answer = String.raw`Take $\mathbf{j}$ along the normal.
+
+$$e=\cot^2\alpha$$`;
+    await act(async () => { emit("result", { sessionId: 9, aiMessage: { id: 7, content: answer } }); controller.close(); });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Copy reply" })).toBeEnabled());
+    expect(article).toBeInTheDocument();
+    expect(article?.getAttribute("data-status")).toBe("complete");
+    expect(article?.querySelectorAll(".katex")).toHaveLength(2);
+    expect(article?.querySelectorAll(".katex-display")).toHaveLength(1);
+    expect(article?.querySelector(".katex-error")).toBeNull();
+  });
   it("labels a capped reply outside incomplete math markup and restores the notice from history", async () => {
     const view = render(<ConversationPanel {...props} />); begin();
     await act(async () => { emit("result", { sessionId: 9, aiMessage: { id: 7, content: "Hence $$ (u cos", truncated: true } }); controller.close(); });

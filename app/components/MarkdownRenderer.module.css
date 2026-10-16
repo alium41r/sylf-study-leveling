@@ -1,0 +1,11 @@
+.content { min-width:0; max-width:100%; }
+
+/* Keep KaTeX's mathematical spacing and fonts independent of prose/code rules. */
+.content :global(.katex) { display:inline-block; max-width:100%; padding:0.15em 0.12em; overflow-x:auto; overflow-y:hidden; vertical-align:middle; font-size:1.08em; line-height:1.2; text-indent:0; white-space:nowrap; overflow-wrap:normal; word-break:normal; }
+.content :global(.katex-display) { display:block; max-width:100%; margin:0.85em 0; padding:0.3em 0.15em; overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain; }
+.content :global(.katex-display > .katex) { display:block; width:max-content; min-width:100%; max-width:none; padding:0; overflow:visible; text-align:center; }
+.content :global(.katex-error) { color:var(--text-secondary) !important; font:0.9em/1.6 ui-monospace,monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+
+/* Compact previews and chat share safe horizontal scrolling for code/tables. */
+.content pre { max-width:100%; overflow-x:auto; }
+.content table { max-width:100%; }

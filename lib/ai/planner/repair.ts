@@ -236,7 +236,7 @@ export async function runPatchCall<P>(args: {
         maxTokens: REPAIR_MAX_TOKENS,
         thinking: "disabled",
         signal: args.signal,
-        singleAttempt: true,
+        singleAttempt: true, telemetryStage: "planner_repair",
       }
     );
     if (result.usage) args.onUsage?.(result);

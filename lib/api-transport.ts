@@ -73,19 +73,28 @@ export async function apiFetch(input: string, init?: RequestInit): Promise<Respo
 /** Bound connection AND body reads. A timeout is an uncertain acknowledgment;
  * callers with durable mutations must retry their original request identity. */
 export async function fetchWithTimeout(request: typeof fetch, input: RequestInfo | URL, init?: RequestInit, timeoutMs = 15_000): Promise<Response> {
+  return consumeResponseWithTimeout(request, input, init, timeoutMs, async response => {
+    const body = await response.text();
+    return new Response(response.status === 204 ? null : body, { status: response.status, headers: response.headers });
+  });
+}
+
+/** Keep cancellation/deadline active for the entire body, including streaming consumers. */
+export async function consumeResponseWithTimeout<T>(request: typeof fetch, input: RequestInfo | URL, init: RequestInit | undefined, timeoutMs: number, consume: (response: Response, signal: AbortSignal) => Promise<T>): Promise<T> {
   const controller = new AbortController();
   const cancel = () => controller.abort();
   if (init?.signal?.aborted) cancel();
   init?.signal?.addEventListener("abort", cancel, { once: true });
   let timer: ReturnType<typeof setTimeout>;
-  const deadline = new Promise<Response>((_resolve, reject) => {
+  const deadline = new Promise<T>((_resolve, reject) => {
     timer = setTimeout(() => { cancel(); reject(new Error("Request timed out")); }, timeoutMs);
   });
   try {
     return await Promise.race([deadline, (async () => {
       const response = await request(input, { ...init, signal: controller.signal });
-      const body = await response.text();
-      return new Response(response.status === 204 ? null : body, { status: response.status, headers: response.headers });
+      const result = await consume(response, controller.signal);
+      controller.signal.throwIfAborted();
+      return result;
     })()]);
   } finally {
     clearTimeout(timer!); init?.signal?.removeEventListener("abort", cancel);

@@ -13,11 +13,11 @@ describe("Exam provider attempt controls", () => {
     generateContent.mockRejectedValue({ status:503 });
     await expect(adapter.generateResponse([],"JSON",[],{ singleAttempt:true })).rejects.toThrow(); expect(generateContent).toHaveBeenCalledTimes(2);
   });
-  it("does not add the Exam thinking or retry settings to legacy Gemini calls", async () => {
+  it("honors disabled thinking and explicit wire accounting in legacy Gemini calls", async () => {
     const adapter = new GeminiAdapter("synthetic-key", "gemini-2.5-flash"); const generateContent = vi.fn().mockResolvedValue({ text:"{}" });
     Object.assign(adapter,{ ai:{ models:{ generateContent } } });
     await adapter.generateResponse([],"JSON",[],{ thinking:"disabled" });
-    expect(generateContent.mock.calls[0][0].config).not.toHaveProperty("thinkingConfig"); expect(generateContent.mock.calls[0][0].config).not.toHaveProperty("httpOptions");
+    expect(generateContent.mock.calls[0][0].config).toMatchObject({ thinkingConfig: { thinkingBudget: 0 }, httpOptions: { retryOptions: { attempts: 1 } } });
   });
   it("suppresses the DeepSeek thinking-parameter retry for a single-attempt caller", async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response("thinking not supported",{ status:400 })); vi.stubGlobal("fetch",fetcher);

@@ -1,3 +1,7 @@
+import { DEEPSEEK_MODELS } from "../config";
+import { aiSignal, observeAiDispatch } from "../telemetry";
+import { openAIUsage } from "./usage";
+import { collectHttpTextStream } from "./text-stream";
 import {
   LLMAdapter,
   NormalizedMessage,
@@ -9,14 +13,15 @@ import {
 import crypto from "crypto";
 
 export interface DeepSeekAdapterOptions {
+  onTextDelta?: (text: string) => void;
   responseFormat?: "json_object" | "text";
   temperature?: number;
   maxTokens?: number;
   /**
    * Toggles DeepSeek's thinking/reasoning mode for models that support it
    * (deepseek-chat / deepseek-reasoner, V3.1+). "disabled" skips generating
-   * and billing reasoning tokens — used for simple/fast tiers. If the API
-   * rejects the param, the request retries automatically without it.
+   * and billing reasoning tokens — used for simple/fast tiers. Rejected policies fail explicitly;
+   * callers own recovery instead of silently restoring default reasoning.
    */
   thinking?: "enabled" | "disabled";
   /** Omission preserves existing routing/provider defaults. */
@@ -25,6 +30,9 @@ export interface DeepSeekAdapterOptions {
   signal?: AbortSignal;
   /** Caller owns the bounded repair/fallback budget. */
   singleAttempt?: boolean;
+  telemetry?: boolean;
+  telemetryStage?: string;
+  retryIndex?: number;
 }
 
 export class DeepSeekAdapter implements LLMAdapter {
@@ -34,7 +42,7 @@ export class DeepSeekAdapter implements LLMAdapter {
 
   constructor(
     apiKey: string,
-    model: string = "deepseek-v4-flash",
+    model: string = DEEPSEEK_MODELS.default,
     baseURL: string = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com"
   ) {
     // Sanitize API key and baseURL against zero-width spaces (\u200B) or non-ASCII characters
@@ -52,9 +60,7 @@ export class DeepSeekAdapter implements LLMAdapter {
 
   public resolveModelName(requested: string): string {
     if (process.env.DEEPSEEK_MODEL) return process.env.DEEPSEEK_MODEL;
-    if (requested.includes("vision")) return "deepseek-v4-flash-vision-exp";
-    if (requested.includes("reasoner")) return "deepseek-reasoner";
-    return requested || "deepseek-v4-flash";
+    return requested || DEEPSEEK_MODELS.default;
   }
 
   private mapTool(tool: NormalizedTool): any {
@@ -70,7 +76,8 @@ export class DeepSeekAdapter implements LLMAdapter {
 
   private mapMessages(
     messages: NormalizedMessage[],
-    systemInstruction: string
+    systemInstruction: string,
+    includeReasoning = false
   ): any[] {
     const deepSeekMessages: any[] = [];
 
@@ -91,7 +98,7 @@ export class DeepSeekAdapter implements LLMAdapter {
       }
 
       if (msg.role === "user") {
-        const hasMedia = msg.parts?.some((p) => !!p.inlineData);
+        const hasMedia = msg.parts?.some((p) => !!(p.inlineData || p.imageUrl));
 
         if (hasMedia && msg.parts) {
           const contentParts: any[] = [];
@@ -99,11 +106,12 @@ export class DeepSeekAdapter implements LLMAdapter {
             if (p.text) {
               contentParts.push({ type: "text", text: p.text });
             }
-            if (p.inlineData) {
+            if (p.inlineData || p.imageUrl) {
               contentParts.push({
                 type: "image_url",
                 image_url: {
-                  url: `data:${p.inlineData.mimeType};base64,${p.inlineData.data}`,
+                  url: p.imageUrl ?? `data:${p.inlineData!.mimeType};base64,${p.inlineData!.data}`,
+                  detail: "original",
                 },
               });
             }
@@ -126,9 +134,15 @@ export class DeepSeekAdapter implements LLMAdapter {
           deepSeekMessages.push({ role: "user", content: text || " " });
         }
       } else if (msg.role === "assistant") {
+        // Thinking tool rounds require the provider's reasoning on the next wire
+        // request. Keep it in memory only; never expose or persist it in chat.
+        const reasoning = includeReasoning ? { reasoning_content: (msg.rawParts ?? [])
+          .filter(part => part.type === "reasoning" && typeof part.text === "string")
+          .map(part => part.text).join("") } : {};
         if (msg.toolCalls && msg.toolCalls.length > 0) {
           deepSeekMessages.push({
             role: "assistant",
+            ...reasoning,
             content: msg.content || null,
             tool_calls: msg.toolCalls.map((tc) => ({
               id: tc.id || `call_${crypto.randomUUID().slice(0, 8)}`,
@@ -145,6 +159,7 @@ export class DeepSeekAdapter implements LLMAdapter {
         } else {
           deepSeekMessages.push({
             role: "assistant",
+            ...reasoning,
             content: msg.content || "",
           });
         }
@@ -183,16 +198,20 @@ export class DeepSeekAdapter implements LLMAdapter {
       );
     }
 
-    const deepSeekMessages = this.mapMessages(messages, systemInstruction);
+    const deepSeekMessages = this.mapMessages(messages, systemInstruction, tools.length > 0 && options?.thinking !== "disabled");
     const deepSeekTools =
       tools.length > 0 ? tools.map((t) => this.mapTool(t)) : undefined;
 
     const targetModel = this.resolveModelName(this.model);
+    if (messages.some(message => message.parts?.some(part => part.inlineData || part.imageUrl)) && !/^(?:deepseek-flash|deepseek-v4-flash(?:-vision-exp)?)$/.test(targetModel)) {
+      throw new LLMProviderError("deepseek", "The selected DeepSeek model does not support images. Choose DeepSeek Flash or Auto.", null, "unsupported_media");
+    }
     const payload: Record<string, any> = {
       model: targetModel,
       messages: deepSeekMessages,
-      stream: false,
+      stream: Boolean(options?.onTextDelta && !tools.length && options.responseFormat !== "json_object"),
     };
+    if (payload.stream) payload.stream_options = { include_usage: true };
 
     if (deepSeekTools && deepSeekTools.length > 0) {
       payload.tools = deepSeekTools;
@@ -207,16 +226,14 @@ export class DeepSeekAdapter implements LLMAdapter {
       payload.temperature = options.temperature;
     }
 
-    if (typeof options?.maxTokens === "number") {
-      payload.max_tokens = options.maxTokens;
-    }
+    payload.max_tokens = options?.maxTokens ?? 16384;
 
     if (options?.thinking) {
       payload.thinking = { type: options.thinking };
     }
     if (options?.reasoningEffort) payload.reasoning_effort = options.reasoningEffort;
 
-    const doRequest = async (reqPayload: Record<string, any>): Promise<any> => {
+    const doRequest = async (reqPayload: Record<string, any>): Promise<any> => observeAiDispatch("deepseek", targetModel, async () => {
       const endpoint = `${this.baseURL}/chat/completions`;
       const response = await fetch(endpoint, {
         method: "POST",
@@ -225,7 +242,7 @@ export class DeepSeekAdapter implements LLMAdapter {
           Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify(reqPayload),
-        signal: options?.signal,
+        signal: aiSignal(options?.signal),
       });
 
       if (!response.ok) {
@@ -244,7 +261,7 @@ export class DeepSeekAdapter implements LLMAdapter {
 
         const err = new LLMProviderError(
           "deepseek",
-          `DeepSeek API responded with HTTP ${statusCode}: ${errorBody || response.statusText}`,
+          `DeepSeek API responded with HTTP ${statusCode}`,
           errorBody,
           errorCode
         ) as LLMProviderError & { status: number };
@@ -252,30 +269,13 @@ export class DeepSeekAdapter implements LLMAdapter {
         throw err;
       }
 
-      return response.json();
-    };
+      return payload.stream && options?.onTextDelta
+        ? collectHttpTextStream(response, options.onTextDelta, aiSignal(options.signal))
+        : response.json();
+    }, data => ({ model: data.model, usage: openAIUsage(data.usage), finishReason: data.choices?.[0]?.finish_reason }), options?.telemetry !== false, { stage: options?.telemetryStage, retryIndex: options?.retryIndex });
 
     try {
-      let data: any;
-      try {
-        data = await doRequest(payload);
-      } catch (err: any) {
-        // If the deployed model doesn't accept the `thinking` param, retry
-        // once without it instead of cascading to fallback providers.
-        if (
-          !options?.singleAttempt && options?.thinking &&
-          err instanceof LLMProviderError &&
-          (err as any).status === 400 &&
-          typeof err.originalError === "string" &&
-          /thinking/i.test(err.originalError)
-        ) {
-          console.warn("[DeepSeek] 'thinking' param rejected by the API — retrying without it.");
-          delete payload.thinking;
-          data = await doRequest(payload);
-        } else {
-          throw err;
-        }
-      }
+      const data = await doRequest(payload);
 
       const choice = data.choices?.[0];
       const message = choice?.message;
@@ -318,7 +318,7 @@ export class DeepSeekAdapter implements LLMAdapter {
       const rawText = message.content || "";
       const reasoningContent = message.reasoning_content;
 
-      // If reasoning_content exists (DeepSeek Reasoner), log or preserve reasoning
+      // Retained only for in-memory tool continuation, never logs or user text.
       const text = rawText ? rawText.trim() : undefined;
 
       return {
@@ -330,14 +330,7 @@ export class DeepSeekAdapter implements LLMAdapter {
         rawCandidateParts: reasoningContent
           ? [{ text: reasoningContent, type: "reasoning" }]
           : undefined,
-        usage: data.usage
-          ? {
-              promptTokens: data.usage.prompt_tokens || 0,
-              completionTokens: data.usage.completion_tokens || 0,
-              totalTokens: data.usage.total_tokens || 0,
-              cacheHitTokens: data.usage.prompt_cache_hit_tokens || 0,
-            }
-          : undefined,
+        usage: openAIUsage(data.usage),
       };
     } catch (err: any) {
       if (err instanceof LLMProviderError) {
@@ -345,7 +338,7 @@ export class DeepSeekAdapter implements LLMAdapter {
       }
       throw new LLMProviderError(
         "deepseek",
-        `DeepSeek network or execution error: ${err.message || String(err)}`,
+        "DeepSeek network or execution error",
         err,
         "network_error"
       );

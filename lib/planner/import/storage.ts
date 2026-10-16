@@ -8,7 +8,7 @@ import { getStorageClient } from "@/lib/supabase-storage";
  * delivery URLs only, and no public URL anywhere. The client filename is never a path
  * component, and every read/delete re-asserts ownership rather than trusting a caller.
  *
- * Logs carry a path or an error code only — never file contents and never a title.
+ * Logs use fixed operational labels; file paths, titles, signed URLs and raw errors stay out.
  */
 
 export const PLANNER_INTAKE_BUCKET = "planner-intake";
@@ -70,12 +70,12 @@ export async function uploadIntakeFile(input: {
       upsert: false,
     });
     if (error) {
-      console.warn(`[planner-import] Upload failed for '${path}':`, error.message);
+      console.warn("[planner-import] upload unavailable");
       return { error: error.message };
     }
     return { path };
   } catch (err: any) {
-    console.warn("[planner-import] Upload error:", err?.message || String(err));
+    console.warn("[planner-import] Upload error:");
     return { error: err?.message || String(err) };
   }
 }
@@ -87,7 +87,7 @@ export async function getIntakeFileSignedUrl(
 ): Promise<{ signedUrl: string | null; error?: string }> {
   const owned = ownedPath(userId, path);
   if (!owned) {
-    console.warn(`[planner-import] Signed URL denied: path not owned by user ${userId}`);
+    console.warn("[planner-import] access denied");
     return { signedUrl: null, error: "Access denied" };
   }
 
@@ -97,12 +97,12 @@ export async function getIntakeFileSignedUrl(
       .from(PLANNER_INTAKE_BUCKET)
       .createSignedUrl(owned, expiresInSeconds);
     if (error || !data?.signedUrl) {
-      console.warn(`[planner-import] Signed URL failed for '${owned}':`, error?.message);
+      console.warn("[planner-import] signing unavailable");
       return { signedUrl: null, error: error?.message || "Failed to generate signed URL" };
     }
     return { signedUrl: data.signedUrl };
   } catch (err: any) {
-    console.warn("[planner-import] Signed URL error:", err?.message || String(err));
+    console.warn("[planner-import] Signed URL error:");
     return { signedUrl: null, error: err?.message || String(err) };
   }
 }
@@ -118,12 +118,12 @@ export async function deleteIntakeFile(
     const client = await getStorageClient();
     const { error } = await client.storage.from(PLANNER_INTAKE_BUCKET).remove([owned]);
     if (error) {
-      console.warn(`[planner-import] Delete failed for '${owned}':`, error.message);
+      console.warn("[planner-import] deletion unavailable");
       return { ok: false, error: error.message };
     }
     return { ok: true };
   } catch (err: any) {
-    console.warn("[planner-import] Delete error:", err?.message || String(err));
+    console.warn("[planner-import] Delete error:");
     return { ok: false, error: err?.message || String(err) };
   }
 }
@@ -164,7 +164,7 @@ export async function deleteSessionFiles(
       .from(PLANNER_INTAKE_BUCKET)
       .list(prefix, { limit: LIST_LIMIT, sortBy: { column: "name", order: "asc" } });
     if (error) {
-      console.warn(`[planner-import] List failed for '${prefix}':`, error.message);
+      console.warn("[planner-import] listing unavailable");
       return { ok: false, deletedCount: 0, error: error.message };
     }
 
@@ -181,7 +181,7 @@ export async function deleteSessionFiles(
     if (removeError) return { ok: false, deletedCount: 0, error: removeError.message };
     return { ok: true, deletedCount: names.length };
   } catch (err: any) {
-    console.warn("[planner-import] Session delete error:", err?.message || String(err));
+    console.warn("[planner-import] Session delete error:");
     return { ok: false, deletedCount: 0, error: err?.message || String(err) };
   }
 }

@@ -211,6 +211,7 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
 
       {/* ── Quick conversational overlay ── */}
       <SystemOverlay
+        key={userId ?? "signed-out"}
         open={overlayOpen && !!presence}
         presence={presence}
         chatQuota={chatQuota}

@@ -1,0 +1,53 @@
+- generic [ref=f76e3]:
+  - banner [ref=f76e4]: Sylvie
+  - generic [ref=f76e5]:
+    - log "Conversation" [ref=f76e7]:
+      - generic [ref=f76e8]:
+        - article [ref=f76e9]:
+          - generic [ref=f76e10]:
+            - generic [ref=f76e11]: You
+            - time [ref=f76e12]: 14:00
+          - paragraph [ref=f76e14]: Explain energy transfer with a simple example.
+        - article [ref=f76e15]:
+          - generic [ref=f76e16]:
+            - generic [ref=f76e17]: Sylvie
+            - time [ref=f76e25]: 14:00
+          - generic [ref=f76e26]:
+            - paragraph [ref=f76e27]:
+              - text: Energy moves between systems through
+              - strong [ref=f76e28]: work
+              - text: and
+              - strong [ref=f76e29]: heat
+              - text: .
+            - paragraph [ref=f76e30]: "For a closed system:"
+            - paragraph [ref=f76e31]:
+              - generic [ref=f76e32]:
+                - math [ref=f76e34]:
+                  - generic [ref=f76e36]:
+                    - generic [ref=f76e37]: Δ
+                    - generic [ref=f76e38]: U
+                    - generic [ref=f76e39]: =
+                    - generic [ref=f76e40]: Q
+                    - generic [ref=f76e41]: −
+                    - generic [ref=f76e42]: W
+                - generic [aria-hidden] [ref=f76e43]:
+                  - generic [ref=f76e44]: ΔU =
+                  - generic [ref=f76e45]: Q −
+                  - generic [ref=f76e46]: W
+            - list [ref=f76e47]:
+              - listitem [ref=f76e48]:
+                - strong [ref=f76e49]: Heat
+                - text: adds energy because of a temperature difference.
+              - listitem [ref=f76e50]:
+                - strong [ref=f76e51]: Work
+                - text: transfers energy through a force acting over a distance.
+            - paragraph [ref=f76e52]: For example, a warm cup of tea transfers heat to the room. Its internal energy decreases as it cools.
+          - button "Copy reply" [ref=f76e54] [cursor=pointer]
+    - generic [ref=f76e59]:
+      - generic [ref=f76e60]:
+        - textbox "Message Sylvie" [ref=f76e61]:
+          - /placeholder: Ask anything…
+        - generic [ref=f76e62]:
+          - button "Attach file" [ref=f76e64] [cursor=pointer]
+          - button "Send" [disabled] [ref=f76e67]
+      - generic [ref=f76e70]: 9 messages left

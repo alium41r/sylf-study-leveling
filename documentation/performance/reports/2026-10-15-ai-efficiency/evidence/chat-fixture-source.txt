@@ -1,0 +1,40 @@
+## main.tsx
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import ConversationPanel from '../../app/system/components/ConversationPanel';
+import '../../app/globals.css';
+import { getBackgroundTokens, getAccentTokens } from '../../lib/color-utils';
+const query = new URLSearchParams(location.search), light = query.get('mode') === 'light';
+const mode = light ? 'light' : 'dark';
+document.documentElement.classList.toggle('dark', !light);
+document.documentElement.setAttribute('data-mode', mode);
+const bg = getBackgroundTokens(query.has('custom') ? (light ? '#eaf5ee' : '#17251f') : (light ? '#f8fafc' : '#000000'), mode);
+const tokens = {...bg, ...getAccentTokens(query.has('custom') ? '#26a89d' : '#7c3aed', bg['--surface-1'])};
+for (const [key, value] of Object.entries(tokens)) document.documentElement.style.setProperty(key, value);
+const messages = [{id:1,type:'USER',content:'Give me a short introduction to Sylf.',createdAt:'2026-10-15T00:00:00Z',sessionId:1},{id:2,type:'AI',content:'Sylf helps you plan your studies, stay focused, and track your progress.',createdAt:'2026-10-15T00:00:01Z',sessionId:1}];
+// No application or model call is sent from this synthetic component fixture.
+globalThis.fetch = async () => new Response(JSON.stringify({messages}));
+const quota={allowed:true,remaining:10,used:0,limit:10,resetsAt:'2026-10-16T00:00:00Z'};
+createRoot(document.getElementById('root')!).render(<div style={{height:'100vh',display:'flex',background:tokens['--bg-void']}}><ConversationPanel sessionId={query.has('filled') ? 1 : null} sessionTitle="Study chat" chatQuota={quota as never} modelPref="auto" isDevMode={false} onSessionCreated={()=>{}} onQuotaRefresh={()=>{}} onOpenPlanner={()=>{}} /></div>);
+
+
+## auth.tsx
+export const useAuth = () => ({user:{id:7},refreshStats:async()=>{},fetchStats:async()=>{}});
+
+
+## navigation.ts
+export const useRouter = () => ({ push() {}, replace() {}, refresh() {} });
+export const usePathname = () => '/locker';
+export const useSearchParams = () => new URLSearchParams();
+
+
+## index.html
+<!doctype html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module" src="/main.tsx"></script></body></html>
+
+
+## vite.config.mjs
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'node:path';
+export default defineConfig({root: path.resolve('scratch/ai-efficiency-ui'), plugins:[{name:"synthetic-auth",resolveId(source){if(source.endsWith("/AuthProvider"))return path.resolve("scratch/ai-efficiency-ui/auth.tsx");}},react()], resolve:{alias:{'@':process.cwd(),'next/navigation':path.resolve('scratch/ai-efficiency-ui/navigation.ts')}},server:{host:'127.0.0.1',port:4310,strictPort:true,fs:{allow:[process.cwd()]}}});

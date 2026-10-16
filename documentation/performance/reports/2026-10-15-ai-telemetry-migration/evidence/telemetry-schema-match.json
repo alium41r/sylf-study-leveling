@@ -1,0 +1,9 @@
+{
+  "source": "Current Prisma schema scalar fields versus hosted information_schema; generated-client integration verified separately",
+  "expectedScalarFields": 29,
+  "actualColumns": 29,
+  "problems": [],
+  "indexesPreserved": true,
+  "constraintsPreserved": true,
+  "permissionsPreserved": true
+}

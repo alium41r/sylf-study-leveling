@@ -51,6 +51,7 @@ export function SystemScreen() {
   // Multi-session state
   const [sessions, setSessions] = useState<SystemChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
+  const [newChatVersion, setNewChatVersion] = useState(0);
 
   const [tab, setTab] = useState<WorkspaceTab>("conversation");
   const [plannerHandoffState, setPlannerHandoff] = useState<{ userId: number | undefined; handoff: SylviePlannerHandoff | null }>(
@@ -222,6 +223,7 @@ export function SystemScreen() {
 
   const createNewChat = () => {
     autoSelectRef.current = false;
+    setNewChatVersion(version => version + 1);
     setActiveSessionId(null);
     setTab("conversation");
   };
@@ -419,6 +421,7 @@ export function SystemScreen() {
         {/* ── Tab Content ── */}
         {tab === "conversation" ? (
           <ConversationPanel
+            key={`${user?.id ?? "signed-out"}:${newChatVersion}`}
             sessionId={activeSessionId}
             sessionTitle={activeSessionTitle}
             chatQuota={chatQuota}
@@ -502,7 +505,7 @@ export function SystemScreen() {
             ) : (
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-2">
-                  <StatBox label="Requests (today)" value={String(usageData.today?.totalRequests ?? 0)} />
+                  <StatBox label="Dispatches (today)" value={String(usageData.today?.totalRequests ?? 0)} />
                   <StatBox
                     label="Tokens (today)"
                     value={String(
@@ -510,7 +513,7 @@ export function SystemScreen() {
                         (usageData.today?.completionTokens ?? 0)
                     )}
                   />
-                  <StatBox label="Est. cost (today)" value={`$${usageData.today?.costUsd ?? 0}`} />
+                  <StatBox label="Est. cost (today)" value={usageData.today?.costUsd == null ? "Unknown" : `$${usageData.today.costUsd}`} />
                 </div>
 
                 {/* Cache-aware note: stable prompt prefixes are billed at ~10% */}
@@ -552,7 +555,7 @@ export function SystemScreen() {
                               {m.promptTokens + m.completionTokens}
                             </td>
                             <td className="py-1 text-right text-accent-text-light">
-                              ${m.costUsd}
+                              {m.costUsd == null ? "Unknown" : `$${m.costUsd}`}
                             </td>
                           </tr>
                         ))}
@@ -564,8 +567,7 @@ export function SystemScreen() {
                 <div className="flex items-center justify-between text-[10px] font-['Rajdhani'] text-text-muted border-t border-border-subtle pt-3">
                   <span>Last 7 days</span>
                   <span>
-                    {usageData.last7Days?.totalRequests ?? 0} requests · $
-                    {usageData.last7Days?.costUsd ?? 0}
+                    {usageData.last7Days?.totalRequests ?? 0} dispatches · {usageData.last7Days?.costUsd == null ? "Unknown cost" : `$${usageData.last7Days.costUsd}`}
                   </span>
                 </div>
               </div>

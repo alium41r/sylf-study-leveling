@@ -1,0 +1,26 @@
+[
+  {
+    "surface": "main",
+    "width": 320,
+    "horizontalOverflow": false,
+    "inputVisible": true
+  },
+  {
+    "surface": "popup",
+    "width": 320,
+    "horizontalOverflow": false,
+    "inputVisible": true
+  },
+  {
+    "surface": "focus",
+    "width": 320,
+    "horizontalOverflow": false,
+    "inputVisible": true
+  },
+  {
+    "surface": "planner",
+    "width": 320,
+    "horizontalOverflow": false,
+    "inputVisible": true
+  }
+]

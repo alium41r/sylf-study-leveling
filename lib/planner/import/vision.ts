@@ -1,4 +1,5 @@
 import "server-only";
+import { generateGeminiContent } from "@/lib/ai/providers/gemini-dispatch";
 import { z } from "zod";
 import { GEMINI_MODELS } from "@/lib/ai/config";
 import { extractJsonValue } from "@/lib/ai/json-extractor";
@@ -103,7 +104,7 @@ export async function extractOutlineFromImage(input: {
   try {
     const { GoogleGenAI } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
+    const response = await generateGeminiContent(ai, {
       model: GEMINI_MODELS.vision,
       contents: [
         {
@@ -117,10 +118,12 @@ export async function extractOutlineFromImage(input: {
       config: {
         responseMimeType: "application/json",
         temperature: 0.1,
+        maxOutputTokens: 16384,
         abortSignal: controller.signal,
       },
     });
 
+    if (response.candidates?.[0]?.finishReason === "MAX_TOKENS") return empty("NO_OUTLINE_DETECTED");
     const raw = response.text ?? "";
     const parsed = OutlinePayloadSchema.safeParse(extractJsonValue(raw));
     if (!parsed.success) return empty("NO_OUTLINE_DETECTED");

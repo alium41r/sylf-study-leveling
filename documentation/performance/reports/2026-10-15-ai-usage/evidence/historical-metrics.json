@@ -1,0 +1,119 @@
+{
+  "research_thinking": {
+    "source": "documentation/performance/phase-0/artifacts/research-thinking-cost.json",
+    "disabled": {
+      "thinking": "disabled",
+      "outputTokens": 3199,
+      "inputTokens": 9033,
+      "elapsedMs": 9508,
+      "scopeNodes": 44,
+      "proposedClaims": 10,
+      "acceptedClaims": 6,
+      "rejectedClaims": 4,
+      "objectivesClaimed": 2
+    },
+    "enabled": {
+      "thinking": "enabled",
+      "outputTokens": 14836,
+      "inputTokens": 9058,
+      "elapsedMs": 54681,
+      "scopeNodes": 44,
+      "proposedClaims": 10,
+      "acceptedClaims": 8,
+      "rejectedClaims": 2,
+      "objectivesClaimed": 2
+    },
+    "qualification": "Historical one paired extraction over four fixed pages; not a current production average or randomized repeated experiment."
+  },
+  "fetch_concurrency": {
+    "source": "documentation/performance/phase-0/artifacts/research-fetch-concurrency.json",
+    "pages": 6,
+    "concurrency": 3,
+    "sequentialMs": 16736,
+    "wavedMs": 6151,
+    "savedMs": 10585,
+    "sameOutcome": true,
+    "qualification": "Historical already-implemented optimization, not a new available saving."
+  },
+  "v2_initial": {
+    "source": "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/evidence/execution-metrics.json",
+    "reasoning": {
+      "calls": 8,
+      "promptTokens": 8315,
+      "cacheHitPromptTokens": 0,
+      "cacheMissPromptTokens": 8315,
+      "completionTokensIncludingReasoning": 11038,
+      "reasoningTokens": 8137,
+      "completionTokensExcludingReasoning": 2901,
+      "reservedUsd": 0.0895956,
+      "actualPeakUncachedUpperUsd": 0.0157401,
+      "offPeakCacheAdjustedEstimateUsd": 0.00787005,
+      "latencyMs": {
+        "median": 7978.0,
+        "p90NearestRank": 16130,
+        "max": 16130,
+        "sum": 68117
+      }
+    },
+    "review": {
+      "calls": 2,
+      "promptTokens": 5549,
+      "cacheHitPromptTokens": 768,
+      "cacheMissPromptTokens": 4781,
+      "completionTokensIncludingReasoning": 8192,
+      "reasoningTokens": 8192,
+      "completionTokensExcludingReasoning": 0,
+      "reservedUsd": 0.016803,
+      "actualPeakUncachedUpperUsd": 0.0114951,
+      "offPeakCacheAdjustedEstimateUsd": 0.005634654,
+      "latencyMs": {
+        "median": 20731.0,
+        "p90NearestRank": 20975,
+        "max": 20975,
+        "sum": 41462
+      }
+    },
+    "total": {
+      "calls": 10,
+      "promptTokens": 13864,
+      "cacheHitPromptTokens": 768,
+      "cacheMissPromptTokens": 13096,
+      "completionTokensIncludingReasoning": 19230,
+      "reasoningTokens": 16329,
+      "completionTokensExcludingReasoning": 2901,
+      "reservedUsd": 0.1063986,
+      "actualPeakUncachedUpperUsd": 0.0272352,
+      "offPeakCacheAdjustedEstimateUsd": 0.013504704,
+      "latencyMs": {
+        "median": 8175.0,
+        "p90NearestRank": 20487,
+        "max": 20975,
+        "sum": 109579
+      }
+    },
+    "invoiceVerified": false,
+    "qualification": "Existing controlled diagnostic receipts, separate from production usage; no new dispatch."
+  },
+  "v2_low": {
+    "source": "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/review-low/evidence/execution-metrics.json",
+    "totalLow": {
+      "inputTokens": 5549,
+      "cacheHitInputTokens": 768,
+      "cacheMissInputTokens": 4781,
+      "completionTokensIncludingReasoning": 6944,
+      "reasoningTokens": 6627,
+      "nonReasoningCompletionTokens": 317,
+      "transportLatencyMs": {
+        "sum": 35549,
+        "median": 17774.5,
+        "min": 14480,
+        "max": 21069
+      },
+      "estimatedChargeUsd": "0.004885854",
+      "conservativePeakUncachedEstimateUsd": 0.0099975,
+      "retainedReservationsUsd": 0.016803
+    },
+    "invoiceVerified": false,
+    "qualification": "Existing controlled diagnostic receipts, separate from production usage; no new dispatch."
+  }
+}

@@ -1,0 +1,760 @@
+{
+  "checkedAt": "2026-10-15T09:22:19.384Z",
+  "method": "Supabase session-pool PostgreSQL read-only transaction",
+  "target": "gjkwkdqdoekzllmnsejo.supabase.co",
+  "data": {
+    "migrations": [
+      {
+        "migration_name": "20260808000000_init",
+        "checksum": "5f28a80ffaccad12a9b66e5e7d7d2d2ca1920146991a36af82e1feb0185d6c83",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260808010000_add_ai_models",
+        "checksum": "10c260802053ef51d3c8e89debad807a5178bf2c6783c490a38f3a799307bede",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260808083947_update_effort_level",
+        "checksum": "7b2b4bc5784a2c2e0ae67d168765fc38eb62a35cb806459efe2701e91beee5f6",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260808084000_add_daily_briefing",
+        "checksum": "5a90e3afcf215abf728a7a9cdb71073ff9795babbc17a6e565f82ef8a2cb7204",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260820000000_add_achievement_ledger_source",
+        "checksum": "e20fe6dccc28a1377a4116deed3aa8663100c1523f8e4c1a1e54a99334f8ac88",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260821000000_add_user_stats_and_progression_rpc",
+        "checksum": "4a9c854e2b969fc2081e9e9de5c568b81c0ecd3534f43619fecb2a18e1c18b6f",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260821010000_add_economy_and_inventory_rpcs",
+        "checksum": "b86481e7e44a862643c9398661f300ec600d866a49447c634666c2386eda5541",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260821020000_add_skill_tree_rpc",
+        "checksum": "65bb1ee03c970614a25bdc491e2d77bb2be7cc7f24cddb6f53ab198795030af2",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260821030000_add_concept_forge_rpc",
+        "checksum": "db42757a23580d1a59da96fa6aa78d47611a0dd4dc4dff1a637d50830445b7dd",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260822000000_atomic_apex_forge_and_skill_unlock_rpcs",
+        "checksum": "c2217daf94ef2353bb0a6cfbffee992c29cca8e40cd0539d44934ad8ab7f70ea",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260822010000_atomic_session_and_achievement_rpcs",
+        "checksum": "f6a71c3ff0370ebd30bf4d911cb5268576f0dab0eb3eddcc5053bb687bf2fc0d",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260822020000_usage_quota_table",
+        "checksum": "defed486f6bac578ebeabf68a1a58a5052f643b4680cf1c815726a66bc03bb20",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260822030000_subject_compilation_cooldown",
+        "checksum": "ab1ec3777e87696ed380323fb70494706c848b1b7e1928e66f9d77c3ccb71a6d",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260823000000_add_goal_color_and_quest_linking",
+        "checksum": "f77b871b1b8e02a12da603315a0405f1bbec47e90dd24a3ab067d9155ef4acf3",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260823000000_irregular_rest_days_and_quest_cascade",
+        "checksum": "d4a121cf1d82da420924b87655e2b53fdf4d485d916572463ef3e60e70845e8c",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260823020000_fix_session_duration_inflation",
+        "checksum": "4d02de13302fe46a5566b64df0ebb65eafd54e527c18a2ae4e42a811b520cfec",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260824000000_ai_usage_telemetry",
+        "checksum": "c3b54caeee037e5fbbd3918cbb70a70a5a8eec072bc91c58a2ff43655b80416d",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260824010000_ai_usage_cache_hit_tokens",
+        "checksum": "16f8ddd89ea3ccceca3b5673267d002bc14f77b591aa8be77b8d81263d1f07dd",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260824020000_system_message_model_used",
+        "checksum": "be9592b0569881b3eab28658c9b8554c428b574ab396abb923ed9b7d96ae2a67",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260824120000_add_subject_syllabus_note",
+        "checksum": "dea23c70cd42b07868aa8dcf501d6d4d1b740cbc3f4e66f259beec5c18759516",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260825000000_add_session_break_seconds",
+        "checksum": "52963e5184d5ddd0ff33d60c6cf5bf3d99764fad44d78eea0694720f5e124613",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826000000_fix_level1_xp_bucket",
+        "checksum": "38f478f363c3bc6d8f137229b08856f5505c950e2af199921552d1a9718d1cb8",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826010000_add_waitlist_entry",
+        "checksum": "c32a5e39000e6f7ded54ef2d5f6d01294e7202268845f46cd3dadb89099498b9",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826030000_reconcile_levels_from_lifetime_xp",
+        "checksum": "868b664ecb26d53e908707f1abc120bb70c50c9f06bfcbde40acd29c7c38cdc7",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826040000_timer_settlement_and_lifecycle",
+        "checksum": "bd8a07adc2d79c6a3938f010a628133b20613fe716fe8e23ab00f2a6f1b622f6",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826050000_drop_legacy_start_study_session_overload",
+        "checksum": "b6b0c5e4d95537c326758eb7cf5433768fba1cdf42e9a2ef6faa4f08a0ac4901",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826060000_fix_settle_record_guards",
+        "checksum": "48f01d38cf45f03b6b828ac1fb3be4b15a6856abd5c0ef9d2e378aebfb1e78e6",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826070000_fix_settle_nested_quest_guard",
+        "checksum": "cdf2e6ad4c6bf702a1db8e06ae78948f2d495c085f09b05335e0f55786830cc8",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826080000_start_session_zero_duration",
+        "checksum": "3c58135091c03f8212f9a495b8b394378703f4e163c81841b7669b14ed311082",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826090000_timer_trust_boundaries",
+        "checksum": "e5968db34baadfb70fbfc8916a35d67535af3ade3cba9220f1f193c04c554476",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826100000_t3_trust_hardening",
+        "checksum": "1f5c7d56f201831266eb594fa75c913c66f848aef236541a452f2821ffd8cab4",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826110000_t3_settle_insert_wall_clamp",
+        "checksum": "3975946805708e20ea1ba993c478550222132f255d458e9c9ef9183003e736d1",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260827000000_s2_security_hardening",
+        "checksum": "f2da293979c30bb64242481b675b928160bea7c434bd166b29b359d030ef9ce6",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260827010000_s2_policy_jwt_semantics",
+        "checksum": "55cec2bb379f206a897705ef138a62de38d0a34056721713f05ff01ed84e5c24",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260827020000_s2_policy_recursion_fix",
+        "checksum": "3be28fcf215acb8114bf2e48ef81d7e699d6571c9a7da9f89a7b6596f59a7730",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260826040000_cognitive_stats_invest",
+        "checksum": "e477c167a0ca0f2fb4cb0e0a4732a37433d376f134e2748a7085fb03b938cc68",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260827030000_cognitive_stats_effects",
+        "checksum": "0bbb91e1936abe2428d3f0741f6ad53feecb7168b309e30b5c9bf8e00e5ae463",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260827040000_fix_apex_synthesis_threshold",
+        "checksum": "368c43a22baef6e81811c19518f59d3791c40e2a646389372c26e96ae8caada5",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260827050000_sp_stipend_level_rank_ups",
+        "checksum": "a4c9971fcff9cc57c1ce47be3235eb21b72201373a6838fd723e871bd181f455",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260907000000_focus_party_foundation",
+        "checksum": "1bd5ae3326a07bbfef305031ad0fa5e6017ecabeb91aaabab26ad6551c2f5dd6",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260907010000_focus_party_security_hardening",
+        "checksum": "038aa914ea2dbc39fd365006c44b47995eb1577966908b9e8558d6d9f8f5420f",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260907020000_focus_party_realtime_security",
+        "checksum": "52d866c71fdb83f4d053f477eea1b3fbaf0e7e3444b9df626998526ada581a50",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260907030000_focus_party_single_active_membership",
+        "checksum": "95542aa4b38fa4aec39fd5425cb363b730dc1fc17ede1008e2423f72f156df04",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909000000_focus_background_catalog",
+        "checksum": "c226c654bbe558e99351d859a316a0c682d5d61cf71dc282c64bfde17e3e5937",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909010000_focus_background_rls",
+        "checksum": "4ae38361d6bc178bfa0383151b1a9d732f8ee77086ad62c6e1b3a85346469d62",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909020000_focus_background_timer_position",
+        "checksum": "6858de6cabd5438bd17aaff175de7c5d464ff618588e1b38116e6cd6a8f2d785",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909030000_focus_background_user_preference",
+        "checksum": "2146cff15f823c1dec414482aaac382b73addcb66adf927e79780d06131ced75",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909040000_user_focus_background",
+        "checksum": "5d52d7c820e3b094590e6680cd2436d226e86f3f56a49238139bc1cf6fbf30ad",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909040001_storage_restrictive_isolation",
+        "checksum": "154c93f0a09bc286f4d921f083124be15d53eb7f5ea80cbb2176117989fbd0a1",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909050000_focus_background_preference_source",
+        "checksum": "9c26ebce3150026870900e64d3ecd1b8faf2a2f15a7626ea197ef038ad434bbf",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260909060000_user_focus_background_layout_key",
+        "checksum": "9f1ba283a0a08548c0bc08481f062818e68f90ab7c44f7c0c46e4eeeea5c58e5",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260924010000_planner_foundation",
+        "checksum": "808f2d27d5395ab3aec95d7ee980c088d9274f52a051c8fe75b266b951b8a7e2",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260925152657_planner_check_result",
+        "checksum": "021be3a218ee4eb0fc3b1bfebfa70f266b9fe0b8efe292b19cd0f26dadc6f717",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260926010000_planner_preference_friction",
+        "checksum": "253727d0f3683a3dbb73bae29fcea39eb777ea4b303ac4bfd986b5252f2522fc",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260926020000_planner_intake_session",
+        "checksum": "529f47786c7b5fe4664d7a6eef9bd60349f57cd13643196d999214c04a59c4f2",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260926030000_subject_archived_at",
+        "checksum": "f936519df158f4beac595472818ae34d33f3b1ff03572dcf3fc3b2d24a2dfe81",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260927090000_planner_user_released_disposition",
+        "checksum": "f26f63bbfe29801c197c2b29efdd272a90057094b77b8bda7648383c2992a324",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20260927100000_planner_reoffer_state",
+        "checksum": "3915a9ce650cd8fbef1d8460558831c9d99f04b2d41cd7b40201c7950590bff6",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20261002000000_planner_v2_durable_core",
+        "checksum": "7a616952c7d9a04192b85ec381942ec604d7c0ac5fce7474ef39ce5513777722",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20261004000000_planner_v2_assistant_documents",
+        "checksum": "fdf44d5ee6e1424319736051f89e6a7afce75fdfea21cc990dd7e4214cbb0711",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20261005000000_pixel_creations",
+        "checksum": "ada06ed1f5a0c58316a89c1e5142295cd77986e72b2590fda194c41cc09292a9",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      },
+      {
+        "migration_name": "20261007000000_pixel_companion_consolidation",
+        "checksum": "4481f04dc17e8be77c9df8b925385c8e80a6f6e455e35c11750267fe9f270ba2",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 0
+      },
+      {
+        "migration_name": "20261014000000_timer_durable_completion",
+        "checksum": "5c310882f6b324b0cb7a82883ad1eda63fcf68c1a20a718587d7b26b9fa094b0",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 0
+      },
+      {
+        "migration_name": "20261015130000_ai_dispatch_telemetry",
+        "checksum": "6943a6fee8a22cfb044e06eb43fb18e0e7be684feae83d136aa9652f122b5fed",
+        "applied": true,
+        "rolled_back": false,
+        "applied_steps_count": 1
+      }
+    ],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": "nextval('\"AiUsageLog_id_seq\"'::regclass)"
+      },
+      {
+        "column_name": "userId",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "column_name": "feature",
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "column_name": "workload",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "provider",
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "column_name": "model",
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": null
+      },
+      {
+        "column_name": "promptTokens",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "column_name": "completionTokens",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "column_name": "estimatedCostUsd",
+        "data_type": "double precision",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "createdAt",
+        "data_type": "timestamp without time zone",
+        "is_nullable": "NO",
+        "column_default": "CURRENT_TIMESTAMP"
+      },
+      {
+        "column_name": "cacheHitTokens",
+        "data_type": "integer",
+        "is_nullable": "NO",
+        "column_default": "0"
+      },
+      {
+        "column_name": "requestId",
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "rootRequestId",
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "reservation",
+        "data_type": "jsonb",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "attemptId",
+        "data_type": "uuid",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "stage",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "accountingState",
+        "data_type": "text",
+        "is_nullable": "NO",
+        "column_default": "'SETTLED'::text"
+      },
+      {
+        "column_name": "requestedModel",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "modelVerified",
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "usageKnown",
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "cacheUsageKnown",
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "reasoningTokens",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "latencyMs",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "dispatchIndex",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "retryIndex",
+        "data_type": "integer",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "outcome",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "finishReason",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "pricingVersion",
+        "data_type": "text",
+        "is_nullable": "YES",
+        "column_default": null
+      },
+      {
+        "column_name": "grounding",
+        "data_type": "boolean",
+        "is_nullable": "YES",
+        "column_default": null
+      }
+    ],
+    "indexes": [
+      {
+        "indexname": "AiUsageLog_feature_createdAt_idx",
+        "indexdef": "CREATE INDEX \"AiUsageLog_feature_createdAt_idx\" ON public.\"AiUsageLog\" USING btree (feature, \"createdAt\")"
+      },
+      {
+        "indexname": "AiUsageLog_pkey",
+        "indexdef": "CREATE UNIQUE INDEX \"AiUsageLog_pkey\" ON public.\"AiUsageLog\" USING btree (id)"
+      },
+      {
+        "indexname": "AiUsageLog_requestId_key",
+        "indexdef": "CREATE UNIQUE INDEX \"AiUsageLog_requestId_key\" ON public.\"AiUsageLog\" USING btree (\"requestId\")"
+      },
+      {
+        "indexname": "AiUsageLog_userId_createdAt_idx",
+        "indexdef": "CREATE INDEX \"AiUsageLog_userId_createdAt_idx\" ON public.\"AiUsageLog\" USING btree (\"userId\", \"createdAt\")"
+      }
+    ],
+    "constraints": [
+      {
+        "conname": "AiUsageLog_accountingState_check",
+        "contype": "c",
+        "definition": "CHECK ((\"accountingState\" = ANY (ARRAY['DISPATCHED'::text, 'UNKNOWN_SPEND'::text, 'SETTLED'::text])))"
+      },
+      {
+        "conname": "AiUsageLog_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "conname": "AiUsageLog_userId_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (\"userId\") REFERENCES \"User\"(id) ON UPDATE CASCADE ON DELETE CASCADE"
+      }
+    ],
+    "access": [
+      {
+        "rls": true,
+        "backend_access": true,
+        "anon_read": false,
+        "browser_read": false
+      }
+    ],
+    "legacy": [
+      {
+        "total_rows": 122,
+        "legacy_zero_cost_rows": 0,
+        "unknown_cost_rows": 63
+      }
+    ],
+    "chatSchema": [
+      {
+        "table_name": "ChatSession",
+        "column_name": "id",
+        "data_type": "integer"
+      },
+      {
+        "table_name": "ChatSession",
+        "column_name": "userId",
+        "data_type": "integer"
+      },
+      {
+        "table_name": "ChatSession",
+        "column_name": "title",
+        "data_type": "text"
+      },
+      {
+        "table_name": "ChatSession",
+        "column_name": "createdAt",
+        "data_type": "timestamp without time zone"
+      },
+      {
+        "table_name": "ChatSession",
+        "column_name": "updatedAt",
+        "data_type": "timestamp without time zone"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "id",
+        "data_type": "integer"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "userId",
+        "data_type": "integer"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "sessionId",
+        "data_type": "integer"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "content",
+        "data_type": "text"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "type",
+        "data_type": "USER-DEFINED"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "read",
+        "data_type": "boolean"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "attachmentUrl",
+        "data_type": "text"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "createdAt",
+        "data_type": "timestamp without time zone"
+      },
+      {
+        "table_name": "SystemMessage",
+        "column_name": "modelUsed",
+        "data_type": "text"
+      }
+    ]
+  },
+  "errors": [],
+  "pending": [],
+  "checksumMismatches": [],
+  "failed": [],
+  "appliedNotInRepository": []
+}

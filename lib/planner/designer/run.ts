@@ -1,3 +1,4 @@
+import type { NormalizedMessagePart } from "@/lib/ai/providers/types";
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
@@ -87,6 +88,7 @@ export interface DesignerTurnInput {
   userId: number;
   sessionId: string;
   raw: unknown;
+  images?: NormalizedMessagePart[];
   recent?: { role: "STUDENT" | "SYLF"; text: string }[];
   signal?: AbortSignal;
   deps?: {
@@ -137,7 +139,7 @@ export async function runDesignerTurn(input: DesignerTurnInput): Promise<{
   metrics: DesignerTurnOutcome["metrics"];
 }> {
   const started = Date.now();
-  const body = CopilotTurnRequestSchema.parse(input.raw);
+  const body = CopilotTurnRequestSchema.parse(input.images?.length ? { ...(input.raw as Record<string, unknown>), proposalOnly: true } : input.raw);
   const session = await readSession(input.userId, input.sessionId);
   if (isExpired(session)) throw new PlannerError(409, "INTAKE_EXPIRED");
   const view = await readIntake(input.userId, input.sessionId);
@@ -216,6 +218,7 @@ export async function runDesignerTurn(input: DesignerTurnInput): Promise<{
       message: body.message,
       factIds: facts.map((fact) => fact.id),
       signal: input.signal,
+      images: input.images,
     });
     interpretation = interpreted.interpretation;
     modelPasses += 1;

@@ -1,0 +1,52 @@
+[*] Changed the `FocusBackground` table
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+  [*] Altered column `timerPosition` (changed from Required to Nullable)
+
+[*] Changed the `FocusBackgroundCategory` table
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+
+[*] Changed the `FocusParty` table
+  [*] Altered column `updatedAt` (default changed from `Some(Now)` to `None`)
+
+[*] Changed the `FocusPartyMember` table
+  [*] Renamed index `FocusPartyMember_party_joined_idx` to `FocusPartyMember_partyId_joinedAt_idx`
+
+[*] Changed the `FocusSession` table
+  [*] Renamed index `FocusSession_party_started_idx` to `FocusSession_partyId_startedAt_idx`
+
+[*] Changed the `FocusSessionMember` table
+  [*] Renamed index `FocusSessionMember_session_state_idx` to `FocusSessionMember_sessionId_timerState_idx`
+
+[*] Changed the `PlannerFrictionEvent` table
+  [*] Renamed index `PlannerFrictionEvent_userId_planId_revisionId_itemKey_reasonCod` to `PlannerFrictionEvent_userId_planId_revisionId_itemKey_reaso_key`
+
+[*] Changed the `PlannerIntentVersion` table
+  [-] Removed foreign key on columns (parentId, planId)
+
+[*] Changed the `PlannerPlan` table
+  [-] Removed foreign key on columns (activeRevisionId, id)
+  [-] Removed foreign key on columns (latestDraftRevisionId, id)
+  [-] Removed foreign key on columns (workingIntentVersionId, id)
+
+[*] Changed the `PlannerQuestLink` table
+  [-] Removed foreign key on columns (appliedRevisionId, planId)
+  [-] Removed foreign key on columns (createdRevisionId, planId)
+
+[*] Changed the `PlannerRevision` table
+  [-] Removed foreign key on columns (baseRevisionId, planId)
+  [-] Removed foreign key on columns (requestedIntentVersionId, planId)
+  [-] Removed foreign key on columns (resolvedIntentVersionId, planId)
+
+[*] Changed the `StatInvestLedger` table
+  [*] Altered column `amount` (default changed from `Some(Value(Int(0)))` to `None`)
+  [*] Altered column `cost` (default changed from `Some(Value(Int(0)))` to `None`)
+  [*] Altered column `statValueAfter` (default changed from `Some(Value(Int(0)))` to `None`)
+
+[*] Changed the `TimerSessionStart` table
+  [-] Removed foreign key on columns (sessionId)
+  [-] Removed foreign key on columns (userId)
+  [+] Added foreign key on columns (userId)
+  [+] Added foreign key on columns (sessionId)
+
+[*] Changed the `User` table
+  [-] Removed index on columns (isAdmin)

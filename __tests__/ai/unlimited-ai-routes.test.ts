@@ -26,6 +26,9 @@ vi.mock("../../lib/auth-server", () => ({ getSession: vi.fn() }));
 
 vi.mock("../../lib/prisma", () => ({
   prisma: {
+    plannerPlan: { findFirst: vi.fn().mockResolvedValue(null) },
+    $queryRaw: vi.fn().mockResolvedValue([]),
+    $transaction: vi.fn(async (run) => run(prisma)),
     user: { findUnique: vi.fn(), update: vi.fn() },
     goal: { findMany: vi.fn(), findFirst: vi.fn(), update: vi.fn(), create: vi.fn() },
     quest: {
@@ -280,6 +283,50 @@ describe("Classic Planner (/api/ai-planner) — the owner is never blocked", () 
 });
 
 describe("Classic Planner — an ordinary account is unchanged", () => {
+  it("validates before charging quota or dispatching a model", async () => {
+    expect((await plannerPost(plannerRequest({ topic: "", effortHours: -2 }))).status).toBe(400);
+    expect(prisma.$queryRawUnsafe).not.toHaveBeenCalled();
+    expect(AiStudyOrchestrator.generatePlan).not.toHaveBeenCalled();
+  });
+
+  it("refunds a failed database commit after the materialization callback returns", async () => {
+    vi.mocked(prisma.$transaction).mockImplementationOnce(async run => {
+      await (run as (tx: typeof prisma) => Promise<unknown>)(prisma);
+      throw new Error("FIXTURE_COMMIT_FAILED");
+    });
+    const events = await readSse(await plannerPost(plannerRequest()));
+    expect(events.some(event => event.type === "result")).toBe(false);
+    expect(events.some(event => event.type === "error")).toBe(true);
+    expect(vi.mocked(prisma.$queryRawUnsafe).mock.calls.filter(([sql]) => String(sql).startsWith('UPDATE "UserQuota"'))).toHaveLength(1);
+  });
+
+  it("does not save an aborted generation even if the model returns a late result", async () => {
+    const abort = new AbortController();
+    const fixture = { goalTitle: "Fixture", goalDescription: "Fixture", quests: [] };
+    vi.mocked(AiStudyOrchestrator.generatePlan).mockImplementationOnce(async () => { abort.abort(); return fixture; });
+    const request = new NextRequest("http://localhost/api/ai-planner", { method: "POST", body: JSON.stringify({ topic: "maths", effortHours: 5 }), signal: abort.signal });
+    await readSse(await plannerPost(request));
+    expect(prisma.goal.create).not.toHaveBeenCalled();
+    expect(prisma.quest.createMany).not.toHaveBeenCalled();
+    expect(vi.mocked(prisma.$queryRawUnsafe).mock.calls.filter(([sql]) => String(sql).startsWith('UPDATE "UserQuota"'))).toHaveLength(1);
+  });
+
+  it("aborts upstream when the response reader is cancelled", async () => {
+    let finish!: () => void;
+    let upstream: AbortSignal | undefined;
+    vi.mocked(AiStudyOrchestrator.generatePlan).mockImplementationOnce(async (...args) => {
+      upstream = args[6];
+      await new Promise<void>(resolve => { finish = resolve; });
+      return { goalTitle: "Fixture", goalDescription: "Fixture", quests: [] };
+    });
+    const response = await plannerPost(plannerRequest());
+    await vi.waitFor(() => expect(upstream).toBeDefined());
+    await response.body!.cancel();
+    expect(upstream!.aborted).toBe(true);
+    finish();
+    await vi.waitFor(() => expect(vi.mocked(prisma.$queryRawUnsafe).mock.calls.filter(([sql]) => String(sql).startsWith('UPDATE "UserQuota"'))).toHaveLength(1));
+    expect(prisma.goal.create).not.toHaveBeenCalled();
+  });
   it("rejects with the same 429 and the same error body when the week is spent", async () => {
     exhaustQuota(1);
     quotaRefusesReservation();

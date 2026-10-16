@@ -26,7 +26,7 @@ vi.mock("../../lib/prisma", () => ({
       findFirst: vi.fn(),
     },
     floatingRestDay: {
-      findMany: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
     },
   }
 }));

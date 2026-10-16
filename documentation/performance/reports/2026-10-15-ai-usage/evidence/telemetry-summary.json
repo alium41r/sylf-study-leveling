@@ -1,0 +1,258 @@
+{
+  "byFeature": {
+    "chat": {
+      "rows": 14,
+      "input": 51467,
+      "output": 2320,
+      "cached": 3712,
+      "stored_usd": 0.000993,
+      "zero_rows": 13,
+      "avg_input": 3676.21,
+      "avg_output": 165.71
+    },
+    "planner": {
+      "rows": 28,
+      "input": 72669,
+      "output": 90420,
+      "cached": 10240,
+      "stored_usd": 0,
+      "zero_rows": 28,
+      "avg_input": 2595.32,
+      "avg_output": 3229.29
+    }
+  },
+  "byWorkload": {
+    "general_chat": {
+      "rows": 10,
+      "input": 35390,
+      "output": 570,
+      "cached": 640,
+      "stored_usd": 0.000993,
+      "zero_rows": 9,
+      "avg_input": 3539,
+      "avg_output": 57
+    },
+    "planner": {
+      "rows": 6,
+      "input": 23681,
+      "output": 39729,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 6,
+      "avg_input": 3946.83,
+      "avg_output": 6621.5
+    },
+    "exam_critic": {
+      "rows": 2,
+      "input": 10833,
+      "output": 1272,
+      "cached": 256,
+      "stored_usd": 0,
+      "zero_rows": 2,
+      "avg_input": 5416.5,
+      "avg_output": 636
+    },
+    "exam": {
+      "rows": 7,
+      "input": 10382,
+      "output": 36374,
+      "cached": 5248,
+      "stored_usd": 0,
+      "zero_rows": 7,
+      "avg_input": 1483.14,
+      "avg_output": 5196.29
+    },
+    "focus_chat": {
+      "rows": 3,
+      "input": 11103,
+      "output": 726,
+      "cached": 3072,
+      "stored_usd": 0,
+      "zero_rows": 3,
+      "avg_input": 3701,
+      "avg_output": 242
+    },
+    "analyst": {
+      "rows": 1,
+      "input": 4974,
+      "output": 1024,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 4974,
+      "avg_output": 1024
+    },
+    "exam_repair": {
+      "rows": 1,
+      "input": 4685,
+      "output": 2454,
+      "cached": 128,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 4685,
+      "avg_output": 2454
+    },
+    "mastery": {
+      "rows": 2,
+      "input": 3695,
+      "output": 3922,
+      "cached": 2176,
+      "stored_usd": 0,
+      "zero_rows": 2,
+      "avg_input": 1847.5,
+      "avg_output": 1961
+    },
+    "rebalance": {
+      "rows": 1,
+      "input": 3404,
+      "output": 2652,
+      "cached": 1152,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 3404,
+      "avg_output": 2652
+    },
+    "mastery_repair": {
+      "rows": 2,
+      "input": 3393,
+      "output": 1019,
+      "cached": 256,
+      "stored_usd": 0,
+      "zero_rows": 2,
+      "avg_input": 1696.5,
+      "avg_output": 509.5
+    },
+    "mastery_critic": {
+      "rows": 2,
+      "input": 3251,
+      "output": 245,
+      "cached": 512,
+      "stored_usd": 0,
+      "zero_rows": 2,
+      "avg_input": 1625.5,
+      "avg_output": 122.5
+    },
+    "rebalance_repair": {
+      "rows": 1,
+      "input": 2722,
+      "output": 623,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 2722,
+      "avg_output": 623
+    },
+    "rebalance_critic": {
+      "rows": 1,
+      "input": 2225,
+      "output": 10,
+      "cached": 128,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 2225,
+      "avg_output": 10
+    },
+    "roadmap_repair": {
+      "rows": 1,
+      "input": 1806,
+      "output": 640,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 1806,
+      "avg_output": 640
+    },
+    "roadmap_critic": {
+      "rows": 1,
+      "input": 1333,
+      "output": 265,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 1333,
+      "avg_output": 265
+    },
+    "roadmap": {
+      "rows": 1,
+      "input": 1259,
+      "output": 1215,
+      "cached": 384,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 1259,
+      "avg_output": 1215
+    }
+  },
+  "byModel": {
+    "gemini-2.5-flash": {
+      "rows": 8,
+      "input": 30778,
+      "output": 3258,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 8,
+      "avg_input": 3847.25,
+      "avg_output": 407.25
+    },
+    "DeepSeek (deepseek-flash)": {
+      "rows": 4,
+      "input": 15778,
+      "output": 29931,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 4,
+      "avg_input": 3944.5,
+      "avg_output": 7482.75
+    },
+    "deepseek-flash": {
+      "rows": 26,
+      "input": 61198,
+      "output": 48687,
+      "cached": 13952,
+      "stored_usd": 0,
+      "zero_rows": 26,
+      "avg_input": 2353.77,
+      "avg_output": 1872.58
+    },
+    "Gemini (gemini-2.5-flash)": {
+      "rows": 1,
+      "input": 6528,
+      "output": 7069,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 6528,
+      "avg_output": 7069
+    },
+    "openai/gpt-oss-120b": {
+      "rows": 1,
+      "input": 4974,
+      "output": 1024,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 4974,
+      "avg_output": 1024
+    },
+    "deepseek-v4-flash": {
+      "rows": 1,
+      "input": 3505,
+      "output": 42,
+      "cached": 0,
+      "stored_usd": 0.000993,
+      "zero_rows": 0,
+      "avg_input": 3505,
+      "avg_output": 42
+    },
+    "Gemini 3.7 Flash": {
+      "rows": 1,
+      "input": 1375,
+      "output": 2729,
+      "cached": 0,
+      "stored_usd": 0,
+      "zero_rows": 1,
+      "avg_input": 1375,
+      "avg_output": 2729
+    }
+  }
+}

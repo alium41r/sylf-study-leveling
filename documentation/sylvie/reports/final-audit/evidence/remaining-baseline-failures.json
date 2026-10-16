@@ -1,0 +1,16 @@
+{
+  "source": "final broad run",
+  "failures": [
+    "__tests__/planner/classic-coexistence.test.ts > Classic Planner coexistence > leaves the Classic Planner as the default surface of the Planner tab",
+    "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > uses both surfaces in one session with no configuration change",
+    "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > keeps every Planner Modes capability the phase before this one established",
+    "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > reports each surface it opens, and the return to Classic",
+    "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > returns to Classic from Advanced setup as well as from Quick Plan",
+    "__tests__/planner/exam-entry.test.tsx > Planner surfaces > offers Planner modes from the header and opens the chooser",
+    "__tests__/planner/exam-entry.test.tsx > Planner surfaces > enters the chosen mode directly, without asking again",
+    "__tests__/planner/exam-entry.test.tsx > Planner surfaces > routes each mode to its own surface",
+    "__tests__/planner/exam-entry.test.tsx > Planner surfaces > closes the chooser on Escape and returns focus to its trigger"
+  ],
+  "classification": "Older Planner entry/chooser expectations, matching prior Phase 1 evidence; no Planner entry implementation was changed in this audit.",
+  "transient": "The first broad run also timed out once in quick-plan-research; its isolated 8-test rerun and final broad run passed."
+}

@@ -1,0 +1,25 @@
+{
+  "syntheticOnly": true,
+  "providerCalls": 0,
+  "signaturesOrCredentialsLogged": false,
+  "checks": {
+    "restrictivePolicyInstalled": true,
+    "privateBucket": true,
+    "backendUpload": true,
+    "backendDownload": true,
+    "anonymous": {
+      "listDenied": true,
+      "downloadDenied": true,
+      "signingDenied": true,
+      "uploadDenied": true
+    },
+    "authenticated": {
+      "listDenied": true,
+      "downloadDenied": true,
+      "signingDenied": true,
+      "uploadDenied": true
+    },
+    "shortLivedProviderAccess": true
+  },
+  "cleanupComplete": true
+}

@@ -47,8 +47,8 @@ export async function matchDeterministic(
       params: match.params,
       confidence: match.confidence,
     };
-  } catch (e) {
-    console.error(`[Deterministic] executor '${match.intent.id}' failed — escalating to LLM:`, e);
+  } catch {
+    console.error("[Deterministic] executor unavailable");
     return null;
   }
 }

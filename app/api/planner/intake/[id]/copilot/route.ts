@@ -1,4 +1,6 @@
-import { plannerRoute, readBody } from "@/lib/planner/server/http";
+import { readPlannerChatTurn } from "@/lib/planner/copilot/image-input";
+import { ChatImageError } from "@/lib/ai/sylvie/images-server";
+import { plannerRoute } from "@/lib/planner/server/http";
 import { runCopilotTurn } from "@/lib/planner/copilot/run";
 import { PlannerError } from "@/lib/planner/errors";
 
@@ -18,12 +20,19 @@ export const maxDuration = 60;
 export function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   return plannerRoute(req, async (userId) => {
     const { id } = await ctx.params;
-    const body = (await readBody(req)) as { recent?: { role: "STUDENT" | "SYLF"; text: string }[] } | null;
+    let parsed;
+    try { parsed = await readPlannerChatTurn(req); }
+    catch (error) {
+      if (error instanceof ChatImageError) return Response.json({ error: { code: "INVALID_IMAGE", message: error.message } }, { status: error.status, headers: { "Cache-Control": "private, no-store" } });
+      throw error;
+    }
+    const body = parsed.body as { recent?: { role: "STUDENT" | "SYLF"; text: string }[] } | null;
     if (!body || typeof body !== "object") throw new PlannerError(400, "INVALID_REQUEST");
     const outcome = await runCopilotTurn({
       userId,
       sessionId: id,
       raw: body,
+      images: parsed.images,
       recent: Array.isArray(body.recent) ? body.recent.slice(-8) : [],
       signal: req.signal,
     });

@@ -1,6 +1,6 @@
 /**
  * AI Configuration Module
- * 
+ *
  * Centralized config for AI quotas, limits, model IDs, and multi-engine routing.
  */
 
@@ -77,8 +77,8 @@ export const AI_LIMITS = {
  *
  * `deepseek-flash` is the provider's own canonical name: its API reports the
  * supported models as `deepseek-flash` and `deepseek-v4-pro`, accepts the repository's
- * older `deepseek-v4-flash` alias, and answers every non-pro alias — including
- * `deepseek-reasoner` and the vision experiment id — with `"model":"deepseek-flash"`.
+ * older Flash/vision aliases. Flash supports reasoning and vision; do not route
+ * STEM through an unverified legacy Reasoner alias. Explicit environment pins remain authoritative.
  * There is no `deepseek-v4.1-flash` identifier to use: the Flash line IS the V4.1
  * Flash model this migration targets.
  */
@@ -89,10 +89,10 @@ export const DEEPSEEK_MODELS = {
   flash: DEEPSEEK_FLASH,
   planner: DEEPSEEK_FLASH,
   compiler: DEEPSEEK_FLASH,
-  stem: "deepseek-reasoner",
+  stem: DEEPSEEK_FLASH,
   chat: DEEPSEEK_FLASH,
   focus: DEEPSEEK_FLASH,
-  vision: "deepseek-v4-flash-vision-exp",
+  vision: DEEPSEEK_FLASH,
   default: DEEPSEEK_FLASH,
 } as const;
 
@@ -117,35 +117,24 @@ export const PROVIDER_ENDPOINTS = {
   deepseek: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
 } as const;
 
-/**
- * Approximate USD cost per 1M tokens, used ONLY for usage telemetry
- * (the /api/ai-costs diagnostic). Defaults track DeepSeek's published
- * deepseek-chat / deepseek-reasoner pricing tiers; override per model via
- * env vars if your plan differs. DeepSeek's automatic context cache bills
- * cache-hit input tokens at ~10% of the normal input price — we model that
- * with `inputCached` so telemetry reflects the REAL spend. Providers not
- * listed here (Groq/Gemini free keys) are treated as $0.
- */
-export const AI_COST_USD_PER_1M: Record<
-  string,
-  { input: number; output: number; inputCached?: number }
-> = {
-  "deepseek-v4-flash": {
-    input: Number(process.env.DEEPSEEK_FLASH_IN_PER_1M ?? 0.27),
-    output: Number(process.env.DEEPSEEK_FLASH_OUT_PER_1M ?? 1.1),
-    inputCached: Number(process.env.DEEPSEEK_FLASH_IN_CACHED_PER_1M ?? 0.027),
-  },
-  "deepseek-v4-flash-vision-exp": {
-    input: Number(process.env.DEEPSEEK_FLASH_IN_PER_1M ?? 0.27),
-    output: Number(process.env.DEEPSEEK_FLASH_OUT_PER_1M ?? 1.1),
-    inputCached: Number(process.env.DEEPSEEK_FLASH_IN_CACHED_PER_1M ?? 0.027),
-  },
-  "deepseek-reasoner": {
-    input: Number(process.env.DEEPSEEK_PRO_IN_PER_1M ?? 0.55),
-    output: Number(process.env.DEEPSEEK_PRO_OUT_PER_1M ?? 2.19),
-    inputCached: Number(process.env.DEEPSEEK_PRO_IN_CACHED_PER_1M ?? 0.055),
-  },
-} as const;
+/** Published 2026-10-15 standard paid rates. DeepSeek peak rates are a
+ * conservative upper estimate (including holidays); never an invoice. */
+export const AI_PRICING_VERSION = "2026-10-15-paid-peak-upper";
+const FLASH_RATE = {
+  input: Number(process.env.DEEPSEEK_FLASH_IN_PER_1M ?? 0.30),
+  output: Number(process.env.DEEPSEEK_FLASH_OUT_PER_1M ?? 1.20),
+  inputCached: Number(process.env.DEEPSEEK_FLASH_IN_CACHED_PER_1M ?? 0.006),
+};
+export const AI_COST_USD_PER_1M: Record<string, { input: number; output: number; inputCached?: number }> = {
+  "deepseek-flash": FLASH_RATE,
+  "deepseek-v4-flash": FLASH_RATE,
+  "deepseek-v4-flash-vision-exp": FLASH_RATE,
+  "gemini-2.5-flash": { input: 0.30, output: 2.50, inputCached: 0.03 },
+  "gemini-3.6-flash": { input: 0.75, output: 3.75, inputCached: 0.075 },
+  "openai/gpt-oss-120b": { input: 0.15, output: 0.60, inputCached: 0.075 },
+  "openai/gpt-oss-20b": { input: 0.075, output: 0.30, inputCached: 0.0375 },
+  "qwen/qwen3.8-27b": { input: 0.80, output: 4.00 },
+};
 
 /**
  * Pricing for models Sylf no longer selects, kept only so the cost diagnostic can
@@ -163,5 +152,3 @@ export const HISTORICAL_MODEL_COST_USD_PER_1M: Record<
     inputCached: Number(process.env.DEEPSEEK_PRO_IN_CACHED_PER_1M ?? 0.055),
   },
 } as const;
-
-

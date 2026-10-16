@@ -1,0 +1,27 @@
+[
+  {
+    "test": "first session delivery",
+    "stableNodes": true,
+    "historyOverlay": 0,
+    "reply": "You\n14:00\n\nGive me a very short introduction to Sylf.\n\nSylvie\n14:00\n\nSylf helps you plan your studies, stay focused, and track your progress."
+  },
+  {
+    "test": "focus switches during stream",
+    "oldMessages": 0,
+    "composerEnabled": true
+  },
+  {
+    "test": "popup stop",
+    "stopped": "Stopped. An incomplete reply may not be saved.",
+    "partialRetained": true
+  },
+  {
+    "test": "network failure",
+    "feedback": "Network unavailable. Please try again.",
+    "composerEnabled": true
+  },
+  {
+    "test": "reduced motion",
+    "dialogVisible": true
+  }
+]

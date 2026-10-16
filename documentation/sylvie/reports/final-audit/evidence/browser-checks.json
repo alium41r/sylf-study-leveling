@@ -1,0 +1,60 @@
+{
+  "source": "Playwright rendering actual shared components in isolated synthetic fixture; no user data or provider calls",
+  "appearanceCases": 24,
+  "surfaces": [
+    "main",
+    "popup",
+    "focus",
+    "planner"
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "appearances": [
+    "dark",
+    "light",
+    "custom dark background and accent"
+  ],
+  "assertions": {
+    "noHorizontalOverflow": true,
+    "composerVisible": true,
+    "syntheticDictationAppend": true,
+    "dictationCancelRestoresTypedPrefix": true
+  },
+  "failureRecovery": {
+    "allFourSurfacesRetainPrompt": true,
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "appearance": "custom light"
+  },
+  "imageChecks": {
+    "allFourSurfacesAcceptNativeImage": true,
+    "plannerProposalOnly": true,
+    "sharedChatsCancelStreamAndRetainStableUserRow": true,
+    "mainFollowupFiles": 0,
+    "mainFollowupReferences": 1
+  },
+  "syntheticStreamRendering": {
+    "fixtureChunkIntervalMs": 180,
+    "waitStartedAfterClickReturned": true,
+    "firstVisibleObservationMs": {
+      "main": 189,
+      "popup": 280,
+      "focus": 281
+    },
+    "providerLatencyMeasurement": false
+  },
+  "limitations": [
+    "Synthetic recognition is not real microphone/device testing.",
+    "Mocked responses do not qualify real vision quality, provider latency or production proxy streaming."
+  ]
+}

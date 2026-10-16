@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { fetchWithTimeout } from "@/lib/api-transport";
+import { SYLVIE_CLIENT_TIMEOUT_MS } from "@/lib/ai/client-budget";
+
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import MarkdownRenderer from "@/app/components/MarkdownRenderer";
 import {
   Search,
@@ -334,6 +337,8 @@ export default function FormulasTool() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"latex" | "plain" | null>(null);
   const [aiGeneratedFormulas, setAiGeneratedFormulas] = useState<FormulaItem[]>([]);
+  const formulaRequest = useRef<AbortController | null>(null);
+  useEffect(() => () => { formulaRequest.current?.abort(); }, []);
   const [isGeneratingAi, setIsGeneratingAi] = useState<boolean>(false);
   const [pageLimit, setPageLimit] = useState<number>(50);
 
@@ -416,12 +421,14 @@ export default function FormulasTool() {
 
   // AI Dynamic Fallback Generator for unlisted formulas
   const handleGenerateAiFormula = async () => {
-    if (!search.trim() || isGeneratingAi) return;
+    if (!search.trim() || isGeneratingAi || formulaRequest.current) return;
+    const controller = new AbortController();
+    formulaRequest.current = controller;
     setIsGeneratingAi(true);
 
     try {
-      const res = await fetch("/api/system-messages/chat", {
-        method: "POST",
+      const res = await fetchWithTimeout(fetch, "/api/system-messages/chat", {
+        method: "POST", signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
         },
@@ -432,13 +439,14 @@ export default function FormulasTool() {
             instruction: "You are a scientific KaTeX LaTeX formula engine. Provide mathematically accurate LaTeX and variable breakdown in JSON.",
           },
         }),
-      });
+      }, SYLVIE_CLIENT_TIMEOUT_MS);
 
       if (!res.ok) {
         throw new Error("API request failed");
       }
 
       const data = await res.json();
+      if (controller.signal.aborted) return;
       const replyText = data?.reply || data?.aiMessage?.content || data?.message || "";
 
       // Extract JSON if wrapped in markdown
@@ -464,6 +472,7 @@ export default function FormulasTool() {
 
       setAiGeneratedFormulas((prev) => [newFormula, ...prev]);
     } catch (e) {
+      if (controller.signal.aborted) return;
       // Intelligent local synthesis fallback
       const synthesized: FormulaItem = {
         id: `ai-${Date.now().toString(36)}`,
@@ -479,6 +488,7 @@ export default function FormulasTool() {
       };
       setAiGeneratedFormulas((prev) => [synthesized, ...prev]);
     } finally {
+      formulaRequest.current = null;
       setIsGeneratingAi(false);
     }
   };

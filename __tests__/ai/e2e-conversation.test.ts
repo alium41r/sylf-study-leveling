@@ -7,6 +7,19 @@ import { prisma } from "@/lib/prisma";
 import { LLMFactory } from "@/lib/ai/providers/factory";
 import { releaseQuota } from "@/lib/ai/usage-limiter";
 import type { LLMAdapter, LLMResponse, NormalizedMessage, NormalizedTool } from "@/lib/ai/providers/types";
+import { readEventStream } from "@/lib/ai/sylvie/event-stream";
+import { saveChatImages, readChatImage, signedChatImage, encodeStoredImages } from "@/lib/ai/sylvie/image-storage";
+import { DEEPSEEK_MODELS } from "@/lib/ai/config";
+import { resolveCheapAnswer } from "@/lib/ai/cheap-answers";
+import sharp from "sharp";
+
+vi.mock("@/lib/ai/sylvie/image-storage", async importOriginal => ({
+  ...await importOriginal<typeof import("@/lib/ai/sylvie/image-storage")>(),
+  saveChatImages: vi.fn(async (userId: number, sessionId: number, images: { name: string; mimeType: string }[]) => images.map((image, index) => ({ path: `${userId}/${sessionId}/00000000-0000-4000-8000-${String(index).padStart(12, "0")}.png`, name: image.name, mimeType: image.mimeType }))),
+  readChatImage: vi.fn(async () => ({ buffer: Buffer.from("already-validated-private-image"), mimeType: "image/png", name: "Previous image" })),
+  signedChatImage: vi.fn(async () => "https://synthetic.invalid/short-lived-image"),
+  removeChatImages: vi.fn(async () => {}),
+}));
 
 vi.mock("@/lib/auth-server", () => ({ getSession: vi.fn() }));
 vi.mock("@/lib/prisma", () => ({
@@ -93,6 +106,105 @@ afterEach(() => {
 });
 
 describe("Sylvie conversation integration with the real tool executor", () => {
+  it("retains cheap-answer continuity only in the adopted conversation", async () => {
+    vi.mocked(resolveCheapAnswer).mockResolvedValueOnce({ content: "Fixture summary", reason: "fixture", intentId: "fixture", params: { timeScope: null }, confidence: 1 });
+    const fresh = () => new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: JSON.stringify({ message: "Fixture question", modelPreference: "auto" }) });
+    await POST(fresh());
+    await POST(request("And yesterday?", "auto"));
+    expect(vi.mocked(resolveCheapAnswer).mock.calls[1][2]).toMatchObject({ intentId: "fixture" });
+    await POST(fresh());
+    expect(vi.mocked(resolveCheapAnswer).mock.calls[2][2]).toBeNull();
+  });
+  it("does not mistake image feature documentation for a private image follow-up", async () => {
+    expect((await POST(request("How does the image feature work?"))).status).toBe(200);
+    expect(generate).toHaveBeenCalledTimes(1);
+    expect(readChatImage).not.toHaveBeenCalled();
+    expect(signedChatImage).not.toHaveBeenCalled();
+  });
+  it("routes multiple native images to Flash, streams visible text and returns private history references", async () => {
+    const form = new FormData(); form.append("message", "Solve the equations in these screenshots"); form.append("sessionId", String(SESSION_ID));
+    for (const background of ["white", "black"]) {
+      const png = await sharp({ create: { width: 1000, height: 600, channels: 3, background } }).png().toBuffer();
+      form.append("images", new File([new Uint8Array(png)], `${background}.png`, { type: "image/png" }));
+    }
+    generate.mockImplementation(async (_messages, _system, _tools, options) => { options?.onTextDelta?.("The solutions are "); return { text: "The solutions are 2 and 4.", usage: { promptTokens: 2100, completionTokens: 10, totalTokens: 2110 } }; });
+    const req = new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: form, headers: { accept: "text/event-stream" } });
+    const events: { event: string; data: Record<string, unknown> }[] = [];
+    await readEventStream(await POST(req), (event, raw) => events.push({ event, data: JSON.parse(raw) }));
+    expect(LLMFactory.getAdapter).toHaveBeenCalledWith("deepseek", DEEPSEEK_MODELS.vision);
+    expect(generate).toHaveBeenCalledOnce(); expect(generate.mock.calls[0][0].at(-1)?.parts).toHaveLength(2);
+    expect(events.some(event => event.event === "status" && event.data.phase === "uploading")).toBe(true);
+    expect(events.some(event => event.event === "delta")).toBe(true);
+    const user = events.at(-1)?.data.userMessage as { attachments: { url: string }[] };
+    expect(user.attachments).toHaveLength(2); expect(user.attachments[0].url).toMatch(/^\/api\/system-messages\/\d+\/images\/0$/);
+    expect(JSON.stringify(user)).not.toContain("short-lived");
+  });
+  it("reuses only an explicitly referenced private image and never uploads its bytes again", async () => {
+    const stored = encodeStoredImages([{ path: "1/100/00000000-0000-4000-8000-000000000000.png", name: "Equation", mimeType: "image/png" }]);
+    vi.mocked(prisma.systemMessage.findMany).mockResolvedValue([{ id: 31, type: "USER", content: "An equation", attachmentUrl: stored, createdAt: new Date() }] as never);
+    const form = new FormData(); form.append("message", "Explain the second step"); form.append("sessionId", String(SESSION_ID)); form.append("imageReferences", JSON.stringify([{ messageId: 31, index: 0 }]));
+    expect((await POST(new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: form }))).status).toBe(200);
+    expect(readChatImage).not.toHaveBeenCalled(); expect(saveChatImages).toHaveBeenCalledWith(USER_ID, SESSION_ID, [], expect.any(AbortSignal));
+    expect(generate.mock.calls[0][0].at(-1)?.parts).toEqual([{ imageUrl: "https://synthetic.invalid/short-lived-image" }]); expect(prisma.systemMessage.findMany).toHaveBeenCalledOnce();
+  });
+  it("does not retrieve past image bytes for an unrelated conversation turn", async () => {
+    vi.mocked(prisma.systemMessage.findMany).mockResolvedValue([{ id: 31, type: "USER", content: "An equation", attachmentUrl: encodeStoredImages([{ path: "1/100/00000000-0000-4000-8000-000000000000.png", name: "Equation", mimeType: "image/png" }]), createdAt: new Date() }] as never);
+    expect((await POST(request("What is a good way to understand gravity?", "auto"))).status).toBe(200);
+    expect(readChatImage).not.toHaveBeenCalled(); expect(signedChatImage).not.toHaveBeenCalled();
+    expect(generate.mock.calls[0][0].every(message => !message.parts?.length)).toBe(true);
+  });
+  it("tries an explicit Gemini image selection first and discloses its existing Flash fallback", async () => {
+    const stored = encodeStoredImages([{ path: "1/100/00000000-0000-4000-8000-000000000000.png", name: "Equation", mimeType: "image/png" }]);
+    vi.mocked(prisma.systemMessage.findMany).mockResolvedValue([{ id: 31, type: "USER", content: "An equation", attachmentUrl: stored, createdAt: new Date() }] as never);
+    generate.mockRejectedValueOnce(new Error("synthetic unavailable"));
+    const form = new FormData(); form.append("message", "Explain the image"); form.append("sessionId", String(SESSION_ID)); form.append("modelPreference", "gemini"); form.append("imageReferences", JSON.stringify([{ messageId: 31, index: 0 }]));
+    const response = await POST(new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: form }));
+    expect(response.status).toBe(200);
+    expect(LLMFactory.getAdapter).toHaveBeenNthCalledWith(1, "gemini", expect.any(String));
+    expect(LLMFactory.getAdapter).toHaveBeenNthCalledWith(2, "deepseek", DEEPSEEK_MODELS.vision);
+    expect((await response.json()).aiMessage.modelUsed).toContain("Gemini unavailable");
+  });
+  it("rejects foreign image references and unsupported explicit models before provider execution", async () => {
+    const form = new FormData(); form.append("message", "Read this"); form.append("sessionId", String(SESSION_ID)); form.append("imageReferences", JSON.stringify([{ messageId: 999, index: 0 }]));
+    expect((await POST(new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: form }))).status).toBe(404);
+    expect(generate).not.toHaveBeenCalled(); expect(readChatImage).not.toHaveBeenCalled();
+    expect(prisma.systemMessage.findMany).toHaveBeenLastCalledWith(expect.objectContaining({ where: { id: { in: [999] }, userId: USER_ID, sessionId: SESSION_ID, type: "USER" } }));
+    form.set("modelPreference", "groq");
+    const unsupported = await POST(new NextRequest("http://localhost/api/system-messages/chat", { method: "POST", body: form }));
+    expect(unsupported.status).toBe(400); expect((await unsupported.json()).error).toContain("Choose Auto, DeepSeek or Gemini"); expect(generate).not.toHaveBeenCalled();
+  });
+  it("streams a tool-free reply before completion and persists the authoritative final answer", async () => {
+    let finish!: () => void;
+    const gate = new Promise<void>(resolve => { finish = resolve; });
+    generate.mockImplementation(async (_history, _system, tools, options) => {
+      expect(tools).toHaveLength(0);
+      options?.onTextDelta?.("Energy transfers ");
+      await gate;
+      options?.onTextDelta?.("between systems.");
+      return { text: "Energy transfers between systems.", usage: { promptTokens: 10, completionTokens: 5, totalTokens: 15 } };
+    });
+    const req = request("Explain energy transfer briefly"); req.headers.set("accept", "text/event-stream");
+    const response = await POST(req), events: { event: string; data: Record<string, unknown> }[] = [];
+    const reading = readEventStream(response, (event, data) => events.push({ event, data: JSON.parse(data) }));
+    await vi.waitFor(() => expect(events.some(item => item.event === "delta")).toBe(true));
+    expect(events.some(item => item.event === "result")).toBe(false);
+    expect(prisma.systemMessage.create).toHaveBeenCalledTimes(1);
+    finish(); await reading;
+    expect(events.at(-1)?.data.reply).toBe("Energy transfers between systems.");
+    expect(prisma.systemMessage.create).toHaveBeenCalledTimes(2);
+    expect(generate).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps tool execution and confirmation metadata out of provisional deltas", async () => {
+    generate.mockResolvedValueOnce(callsTool("createQuest", { title: "Review energy", requiredMinutes: 30 }));
+    const req = request("Create a task to review energy for 30 minutes"); req.headers.set("accept", "text/event-stream");
+    const events: { event: string; data: Record<string, unknown> }[] = [];
+    await readEventStream(await POST(req), (event, data) => events.push({ event, data: JSON.parse(data) }));
+    expect(generate.mock.calls[0][3]?.onTextDelta).toBeUndefined();
+    expect(events.some(item => item.event === "delta")).toBe(false);
+    expect(events.at(-1)?.data.pendingAction).toBeDefined();
+    expect(prisma.quest.create).not.toHaveBeenCalled();
+  });
   it("requires the authenticated cookie session before provider or account access", async () => {
     vi.mocked(getSession).mockResolvedValue(null);
     expect((await POST(request("Show my stats"))).status).toBe(401);

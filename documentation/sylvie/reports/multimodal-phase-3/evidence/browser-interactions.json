@@ -1,0 +1,59 @@
+[
+  {
+    "surface": "main",
+    "deliveredImages": 2,
+    "reusedDraftImages": 1,
+    "payload": {
+      "images": 0,
+      "refs": 1
+    }
+  },
+  {
+    "surface": "popup",
+    "deliveredImages": 2,
+    "reusedDraftImages": 1,
+    "payload": {
+      "images": 2,
+      "refs": 0
+    }
+  },
+  {
+    "surface": "focus",
+    "deliveredImages": 2,
+    "reusedDraftImages": 1,
+    "payload": {
+      "images": 2,
+      "refs": 0
+    }
+  },
+  {
+    "surface": "planner",
+    "deliveredImages": 2,
+    "reusedDraftImages": 1,
+    "payload": {
+      "images": 2,
+      "refs": 0,
+      "plannerReview": true
+    }
+  },
+  {
+    "scenario": "new-unsaved-conversation-stops-dictation",
+    "aborted": true,
+    "microphoneIdle": true
+  },
+  {
+    "scenario": "popup-close-stops-dictation",
+    "aborted": true,
+    "beforeExitAnimation": true
+  },
+  {
+    "scenario": "unsupported-browser",
+    "disabled": true,
+    "keyboardFallback": true
+  },
+  {
+    "scenario": "upload-network-failure",
+    "draftImagesKept": 2,
+    "error": "Network unavailable. Please try again."
+  }
+]

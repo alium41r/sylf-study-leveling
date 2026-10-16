@@ -1,0 +1,53 @@
+{
+  "fixture": "Synthetic actual active ConversationPanel; no production API calls",
+  "checks": [
+    {
+      "name": "chat-desktop-dark",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "hasComposer": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "chat-desktop-light",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "hasComposer": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "chat-desktop-custom",
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440,
+      "hasComposer": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "chat-mobile-dark",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "hasComposer": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "chat-mobile-light",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "hasComposer": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "chat-mobile-custom",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "hasComposer": true,
+      "horizontalOverflow": false
+    }
+  ]
+}

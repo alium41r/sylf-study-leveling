@@ -982,7 +982,7 @@ model AiUsageLog {
   promptTokens     Int      @default(0)
   completionTokens Int      @default(0)
   cacheHitTokens   Int      @default(0) // input tokens served from DeepSeek's context cache
-  estimatedCostUsd Float?   @default(0)
+  estimatedCostUsd Float?
   // One durable provider dispatch. Null retains compatibility with old logs.
   requestId        String?  @unique @db.Uuid
   rootRequestId    String?  @db.Uuid
@@ -990,6 +990,18 @@ model AiUsageLog {
   attemptId        String?  @db.Uuid
   stage            String?
   accountingState  String   @default("SETTLED")
+  requestedModel   String?
+  modelVerified    Boolean?
+  usageKnown       Boolean?
+  cacheUsageKnown  Boolean?
+  reasoningTokens Int?
+  latencyMs        Int?
+  dispatchIndex    Int?
+  retryIndex       Int?
+  outcome          String?
+  finishReason     String?
+  pricingVersion  String?
+  grounding       Boolean?
   createdAt        DateTime @default(now())
 
   @@index([userId, createdAt])

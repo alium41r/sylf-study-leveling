@@ -1,0 +1,354 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run --maxWorkers=2 __tests__/ai __tests__/system __tests__/components/system-overlay.test.tsx __tests__/focus/focus-tools.test.tsx __tests__/planner/quick-plan.test.tsx __tests__/planner/sylvie-planner-delegation.test.ts __tests__/planner/exam-provider-options.test.ts __tests__/planner/designer.test.ts __tests__/planner/copilot-contract.test.ts
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+(node:90462) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ __tests__/ai/planning-engine.test.ts (28 tests | 4 failed) 48ms
+       × returns full budget when no quests exist 5ms
+       × subtracts scheduled minutes from budget 1ms
+       × floors capacity at 0 if overloaded 1ms
+       × does not silently stack burnout and overload reductions (prioritizes burnout 50%) 1ms
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > generates even though the weekly planner bucket is exhausted
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > reports the quota as unlimited so the UI shows ∞ rather than a fake number
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > never consumes capacity across repeated generations
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > still validates the request body
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner — an ordinary account is unchanged > rejects with the same 429 and the same error body when the week is spent
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner — an ordinary account is unchanged > still generates normally while capacity remains
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner — an ordinary account is unchanged > still reports finite numeric capacity to the UI
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > ignores a spoofed owner userId on the Classic Planner body
+Planner API wrapper error:
+
+stderr | __tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > gives a different authenticated account no access to the owner's entitlement
+Planner API wrapper error:
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts (23 tests | 9 failed) 74ms
+     × generates even though the weekly planner bucket is exhausted 14ms
+     × reports the quota as unlimited so the UI shows ∞ rather than a fake number 2ms
+     × never consumes capacity across repeated generations 1ms
+     × still validates the request body 1ms
+     × rejects with the same 429 and the same error body when the week is spent 1ms
+     × still generates normally while capacity remains 1ms
+     × still reports finite numeric capacity to the UI 1ms
+     × ignores a spoofed owner userId on the Classic Planner body 1ms
+     × gives a different authenticated account no access to the owner's entitlement 1ms
+stderr | __tests__/ai/planner-api.test.ts > Planner API Integration Test > should successfully generate a goal and quests
+Planner API wrapper error:
+
+ ❯ __tests__/ai/planner-api.test.ts (1 test | 1 failed) 18ms
+     × should successfully generate a goal and quests 17ms
+(node:90472) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+(node:90475) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90483) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90484) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90485) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90488) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90492) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90495) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90499) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90500) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90501) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90505) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90506) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90509) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90510) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90512) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90515) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90517) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90519) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90520) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90521) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90522) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90525) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90526) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90527) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90528) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90530) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90531) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90532) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/ai/planner-api.test.ts > Planner API Integration Test > should successfully generate a goal and quests
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ __tests__/ai/planner-api.test.ts:144:29
+    142|
+    143|     const response = await POST(req);
+    144|     expect(response.status).toBe(200);
+       |                             ^
+    145|
+    146|     const body = response.body as any;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  __tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > returns full budget when no quests exist
+TypeError: Cannot read properties of undefined (reading 'map')
+ ❯ Module.calculateDailyCapacity lib/ai/planning-engine.ts:121:37
+    119|       select: { dateKey: true },
+    120|     });
+    121|   const floatingRestDays = floating.map((r) => r.dateKey);
+       |                                     ^
+    122|   const floatingRestSet = new Set(floatingRestDays);
+    123|
+ ❯ __tests__/ai/planning-engine.test.ts:203:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  __tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > subtracts scheduled minutes from budget
+TypeError: Cannot read properties of undefined (reading 'map')
+ ❯ Module.calculateDailyCapacity lib/ai/planning-engine.ts:121:37
+    119|       select: { dateKey: true },
+    120|     });
+    121|   const floatingRestDays = floating.map((r) => r.dateKey);
+       |                                     ^
+    122|   const floatingRestSet = new Set(floatingRestDays);
+    123|
+ ❯ __tests__/ai/planning-engine.test.ts:222:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  __tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > floors capacity at 0 if overloaded
+TypeError: Cannot read properties of undefined (reading 'map')
+ ❯ Module.calculateDailyCapacity lib/ai/planning-engine.ts:121:37
+    119|       select: { dateKey: true },
+    120|     });
+    121|   const floatingRestDays = floating.map((r) => r.dateKey);
+       |                                     ^
+    122|   const floatingRestSet = new Set(floatingRestDays);
+    123|
+ ❯ __tests__/ai/planning-engine.test.ts:240:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  __tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > does not silently stack burnout and overload reductions (prioritizes burnout 50%)
+TypeError: Cannot read properties of undefined (reading 'map')
+ ❯ Module.calculateDailyCapacity lib/ai/planning-engine.ts:121:37
+    119|       select: { dateKey: true },
+    120|     });
+    121|   const floatingRestDays = floating.map((r) => r.dateKey);
+       |                                     ^
+    122|   const floatingRestSet = new Set(floatingRestDays);
+    123|
+ ❯ __tests__/ai/planning-engine.test.ts:253:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > generates even though the weekly planner bucket is exhausted
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:241:29
+    239|
+    240|     const response = await plannerPost(plannerRequest());
+    241|     expect(response.status).toBe(200);
+       |                             ^
+    242|
+    243|     const events = await readSse(response);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > reports the quota as unlimited so the UI shows ∞ rather than a fake number
+TypeError: Cannot read properties of undefined (reading 'quota')
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:254:19
+    252|     const result = events.find((e) => e.type === "result");
+    253|
+    254|     expect(result.quota.unlimited).toBe(true);
+       |                   ^
+    255|     expect(result.quota.allowed).toBe(true);
+    256|     expect(result.quota.limit).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > never consumes capacity across repeated generations
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:265:60
+    263|     exhaustQuota(1);
+    264|     for (let i = 0; i < 3; i += 1) {
+    265|       expect((await plannerPost(plannerRequest())).status).toBe(200);
+       |                                                            ^
+    266|     }
+    267|     // No reservation was ever written.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) — the owner is never blocked > still validates the request body
+AssertionError: expected 500 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 500
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:278:29
+    276|   it("still validates the request body", async () => {
+    277|     const response = await plannerPost(plannerRequest({ topic: "", eff…
+    278|     expect(response.status).toBe(400);
+       |                             ^
+    279|   });
+    280| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner — an ordinary account is unchanged > rejects with the same 429 and the same error body when the week is spent
+AssertionError: expected 500 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 500
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:288:29
+    286|
+    287|     const response = await plannerPost(plannerRequest());
+    288|     expect(response.status).toBe(429);
+       |                             ^
+    289|
+    290|     const body = await response.json();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner — an ordinary account is unchanged > still generates normally while capacity remains
+AssertionError: expected 500 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 500
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:301:29
+    299|     quotaGrantsReservation(1);
+    300|     const response = await plannerPost(plannerRequest());
+    301|     expect(response.status).toBe(200);
+       |                             ^
+    302|     expect(prisma.$queryRawUnsafe).toHaveBeenCalled();
+    303|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Classic Planner — an ordinary account is unchanged > still reports finite numeric capacity to the UI
+TypeError: Cannot read properties of undefined (reading 'quota')
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:310:19
+    308|     const result = events.find((e) => e.type === "result");
+    309|
+    310|     expect(result.quota.unlimited).toBe(false);
+       |                   ^
+    311|     expect(result.quota.limit).toBe(1);
+    312|     expect(result.quota.remaining).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > ignores a spoofed owner userId on the Classic Planner body
+AssertionError: expected 500 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 500
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:393:29
+    391|   it("ignores a spoofed owner userId on the Classic Planner body", asy…
+    392|     const response = await plannerPost(plannerRequest({ userId: OWNER,…
+    393|     expect(response.status).toBe(429);
+       |                             ^
+    394|   });
+    395|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯
+
+ FAIL  __tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > gives a different authenticated account no access to the owner's entitlement
+AssertionError: expected 500 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 500
+
+ ❯ __tests__/ai/unlimited-ai-routes.test.ts:419:58
+    417|     vi.mocked(getSession).mockResolvedValue({ userId: OWNER + 1, email…
+    418|     expect((await chatPost(chatRequest())).status).toBe(429);
+    419|     expect((await plannerPost(plannerRequest())).status).toBe(429);
+       |                                                          ^
+    420|   });
+    421| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/14]⎯
+
+
+ Test Files  3 failed | 47 passed | 1 skipped (51)
+      Tests  14 failed | 679 passed | 2 skipped (695)
+   Start at  20:53:35
+   Duration  26.17s (transform 3.06s, setup 3.69s, import 11.40s, tests 13.86s, environment 16.13s)
+

@@ -1,0 +1,148 @@
+{
+  "verifiedOn": "2026-10-15",
+  "phase": "Unified AI chat architecture and UI",
+  "paidAiCalls": 0,
+  "databaseOperations": 0,
+  "deployed": false,
+  "unfinishedFeaturesActivated": false,
+  "focusedTests": {
+    "command": "npm run test -- --run --maxWorkers=2 [13 paths listed in evidence README]",
+    "filesPassed": 13,
+    "testsPassed": 144,
+    "failures": 0,
+    "providerCallsMocked": true,
+    "timingQualification": "An earlier default-worker run had one timeout in the unchanged Quick Plan typed-action-on-blur assertion (143 passed). The file passed independently (19/19), and the entire focused suite passed with two workers without changing that assertion or behavior."
+  },
+  "broaderSelectedSuite": {
+    "selection": "--run __tests__/ai __tests__/system __tests__/components/system-overlay.test.tsx __tests__/focus/focus-tools.test.tsx __tests__/planner/quick-plan.test.tsx __tests__/planner/sylvie-planner-delegation.test.ts __tests__/planner/exam-provider-options.test.ts __tests__/planner-v2/intelligence/provider.test.ts",
+    "filesPassed": 44,
+    "filesFailed": 3,
+    "filesSkipped": 1,
+    "testsPassed": 592,
+    "testsFailed": 14,
+    "testsSkipped": 2,
+    "allFailuresPresentInOriginalBaseline": true,
+    "failureTitles": [
+      "__tests__/ai/planner-api.test.ts > Planner API Integration Test > should successfully generate a goal and quests",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > returns full budget when no quests exist",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > subtracts scheduled minutes from budget",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > floors capacity at 0 if overloaded",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > does not silently stack burnout and overload reductions (prioritizes burnout 50%)",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > generates even though the weekly planner bucket is exhausted",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > reports the quota as unlimited so the UI shows \u221e rather than a fake number",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > never consumes capacity across repeated generations",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > still validates the request body",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > rejects with the same 429 and the same error body when the week is spent",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > still generates normally while capacity remains",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > still reports finite numeric capacity to the UI",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > ignores a spoofed owner userId on the Classic Planner body",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > gives a different authenticated account no access to the owner's entitlement"
+    ],
+    "skipReason": "Two hosted telemetry tests are explicitly opt-in; no database test was enabled in this phase."
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "passed": true,
+    "productionBuildTypecheckAlsoPassed": true
+  },
+  "webBuild": {
+    "command": "npx next build --webpack",
+    "passed": true
+  },
+  "mobileBuild": {
+    "command": "npm run mobile:build",
+    "passed": true,
+    "generatedArtifactsRestored": true
+  },
+  "mobileBoundaryAudit": {
+    "command": "npm run mobile:verify",
+    "passed": true,
+    "serverOnlySymbolsOrSecretsFound": 0
+  },
+  "lint": {
+    "sharedComponentsTransportsNewTestsAndWrappers": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "updatedUiAndRouteTests": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "legacyTouchedFiles": {
+      "checkedFiles": [
+        "app/api/system-messages/chat/route.ts",
+        "app/components/planner/copilot/PlannerCopilot.tsx",
+        "app/components/planner/quick-plan/QuickPlan.tsx",
+        "app/components/system/SystemAIProvider.tsx",
+        "app/system/components/SystemScreen.tsx",
+        "lib/ai/providers/deepseek.ts",
+        "lib/ai/providers/gemini-dispatch.ts",
+        "lib/ai/providers/gemini.ts",
+        "lib/ai/providers/groq.ts",
+        "lib/ai/providers/types.ts",
+        "lib/api-transport.ts"
+      ],
+      "changed": {
+        "errors": 45,
+        "warnings": 16
+      },
+      "beforeThisPhase": {
+        "errors": 45,
+        "warnings": 16
+      },
+      "increasedErrorOrWarningRuleCounts": [],
+      "newSharedFilesAndWrappers": "zero ESLint errors or warnings in targeted final run"
+    }
+  },
+  "browser": {
+    "environment": "Actual React components, synthetic authentication/API/streaming/proposal fixtures; no account/database/model connections",
+    "surfaces": [
+      "Sylvie workspace",
+      "Quick popup",
+      "Focus assistant",
+      "Active Planner Designer/Copilot"
+    ],
+    "standardLayoutChecks": 24,
+    "additionalNarrowChecks": 4,
+    "finalScopedPlannerChecks": 7,
+    "viewports": [
+      [
+        1440,
+        1000
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        320,
+        740
+      ]
+    ],
+    "appearances": [
+      "dark",
+      "light",
+      "custom light",
+      "custom dark (narrow)"
+    ],
+    "horizontalOverflowObserved": false,
+    "transcriptFilterOrBackdropBlurObserved": false,
+    "interactionEvidence": "browser-interactions.json",
+    "screenshots": 31
+  },
+  "preservation": {
+    "telemetryMigrationChecksumUnchanged": true,
+    "modelSelectionAndBudgetsChanged": false,
+    "plannerV2ChangedDuringThisPhase": false,
+    "abandonedNodeSystemChangedDuringThisPhase": false,
+    "noNewDependencies": true
+  },
+  "limitations": [
+    "Live provider latency/billing and hosted proxy buffering were not tested; paid provider calls were prohibited.",
+    "Tool-enabled turns, Planner structured proposals, and non-GPT-OSS custom Groq models stay buffered.",
+    "Visual verification is a component fixture, not a deployed authenticated end-to-end release or real-device test.",
+    "Stopped or disconnected partial replies can be unsaved; refresh reconciles persisted history and no automatic resend occurs.",
+    "Image capture and speech transcription are prepared extension boundaries, not enabled features.",
+    "Broader test failures and legacy lint debt above remain outside this phase."
+  ]
+}

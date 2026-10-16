@@ -1,22 +1,8 @@
-// ============================================================
-// AI Usage Logger — request-level cost telemetry
-// ============================================================
-// Every successful LLM generation is recorded to AiUsageLog with
-// token counts and an estimated USD cost so the owner can see where
-// the DeepSeek balance actually goes (chat vs planner vs research).
-//
-// DeepSeek's automatic context cache bills cache-hit input tokens at
-// ~10% of the normal input price, so telemetry splits input into
-// cached vs fresh and prices each at its real rate. (DeepSeek caches
-// the stable prompt prefix automatically — keeping the system prompt
-// stable across requests is what makes the cache hit.)
-//
-// Logging is best-effort and NEVER throws into the chat flow: if the
-// table or client is unavailable, the request still succeeds.
-// ============================================================
-
 import { prisma } from "@/lib/prisma";
-import { AI_COST_USD_PER_1M, HISTORICAL_MODEL_COST_USD_PER_1M } from "./config";
+import { AI_COST_USD_PER_1M, AI_PRICING_VERSION } from "./config";
+
+import { hasAiRequest } from "./telemetry";
+import type { LLMUsage } from "./providers/types";
 
 export interface AiUsageEntry {
   userId: number;
@@ -29,17 +15,17 @@ export interface AiUsageEntry {
   cacheHitTokens?: number;
 }
 
-/** Rough USD estimate; returns 0 for providers without a configured rate. */
+/** Versioned list-price estimate. Unknown models stay unknown. */
 export function estimateCostUsd(
   model: string,
   promptTokens: number,
   completionTokens: number,
   cacheHitTokens = 0
-): number {
-  // Active rates first; the historical table only prices usage recorded before
-  // the V4.1 Flash migration, so old rows still report what they cost.
-  const rate = AI_COST_USD_PER_1M[model] ?? HISTORICAL_MODEL_COST_USD_PER_1M[model];
-  if (!rate) return 0;
+): number | null {
+  // New dispatches use current rates only. Historical rows retain stored estimates.
+  const canonical = model.startsWith("gemini-2.5-flash-") && !model.includes("lite") ? "gemini-2.5-flash" : model;
+  const rate = AI_COST_USD_PER_1M[canonical];
+  if (!rate || !Object.values(rate).every(value => Number.isFinite(value) && value >= 0)) return null;
 
   const totalInput = Math.max(0, promptTokens);
   const hit = Math.min(Math.max(0, cacheHitTokens), totalInput);
@@ -54,6 +40,7 @@ export function estimateCostUsd(
 }
 
 export async function logAiUsage(entry: AiUsageEntry, quiet = false): Promise<void> {
+  if (hasAiRequest()) return; // Per-dispatch receipts replace legacy aggregate writes.
   try {
     // Guard: if the AiUsageLog table isn't available (older DB, test mocks),
     // skip silently — telemetry must never affect the chat flow.
@@ -77,8 +64,34 @@ export async function logAiUsage(entry: AiUsageEntry, quiet = false): Promise<vo
         ),
       },
     });
-  } catch (e) {
+  } catch {
     // Telemetry must never break the conversation.
-    if (!quiet) console.error("[AI Usage Logger] Failed to record usage:", e);
+    if (!quiet) console.warn("[AI telemetry] receipt unavailable");
   }
+}
+
+export interface AiDispatchEntry {
+  userId: number; feature: "chat" | "planner" | "syllabus" | "other"; workload: string;
+  provider: string; model: string; requestedModel: string; requestId: string; rootRequestId: string;
+  dispatchIndex: number; latencyMs: number; outcome: string; modelVerified: boolean;
+  retryIndex?: number; stage?: string;
+  usage?: LLMUsage; finishReason?: string; grounding: boolean;
+}
+export async function logAiDispatch(entry: AiDispatchEntry, phase: "start" | "settle" = "settle"): Promise<void> {
+  try {
+    const { usage, ...metadata } = entry;
+    const known = Boolean(usage);
+    const data = {
+      ...metadata, finishReason: entry.finishReason?.slice(0, 32),
+      latencyMs: phase === "start" ? null : entry.latencyMs,
+      promptTokens: usage?.promptTokens ?? 0, completionTokens: usage?.completionTokens ?? 0,
+      cacheHitTokens: usage?.cacheHitTokens ?? 0, reasoningTokens: usage?.reasoningTokens ?? null,
+      usageKnown: known, cacheUsageKnown: usage?.cacheHitTokens !== undefined,
+      accountingState: phase === "start" ? "DISPATCHED" : known ? "SETTLED" : "UNKNOWN_SPEND",
+      // Grounding fees/account credits are not inferable from token receipts.
+      estimatedCostUsd: usage && !entry.grounding ? estimateCostUsd(entry.model, usage.promptTokens, usage.completionTokens, usage.cacheHitTokens) : null,
+      pricingVersion: AI_PRICING_VERSION,
+    };
+    await prisma.aiUsageLog.upsert({ where: { requestId: entry.requestId }, create: data, update: phase === "start" ? {} : data });
+  } catch { console.warn("[AI telemetry] receipt unavailable"); }
 }

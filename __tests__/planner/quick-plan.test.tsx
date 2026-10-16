@@ -249,6 +249,31 @@ afterEach(() => {
 });
 
 describe("a request carried from Sylvie", () => {
+  it("keeps the editable prompt after a failed assistant request", async () => {
+    vi.spyOn(designerClient, "sendDesignerMessage").mockRejectedValueOnce(new Error("Fixture outage"));
+    render(<QuickPlan mode="EXAM" onAdvanced={() => {}} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Ask Sylf Assistant" }));
+    const input = await screen.findByRole("textbox", { name: "Ask Sylf about this plan" });
+    fireEvent.change(input, { target: { value: "I can study six hours a week" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message to Sylf" }));
+    await screen.findByText("Sylf could not reach the planner assistant just now. The structured controls still work.");
+    expect(input).toHaveValue("I can study six hours a week");
+  });
+  it("cancels an ordinary assistant request on navigation as well as transferred requests", async () => {
+    const send = vi.spyOn(designerClient, "sendDesignerMessage").mockImplementation(() => new Promise(() => {}));
+    const rendered = render(<QuickPlan mode="EXAM" onAdvanced={() => {}} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Ask Sylf Assistant" }));
+    const input = await screen.findByRole("textbox", { name: "Ask Sylf about this plan" });
+    fireEvent.change(input, { target: { value: "I can study six hours a week" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message to Sylf" }));
+    await waitFor(() => expect(send).toHaveBeenCalledOnce());
+    const signal = send.mock.calls[0][1].signal;
+    expect(signal?.aborted).toBe(false);
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(input).toBeInTheDocument();
+    rendered.unmount();
+    expect(signal?.aborted).toBe(true);
+  });
   it("uses an isolated draft, sends stated context once and requests review before edits", async () => {
     const handoff = preparePlannerHandoff({
       id: "quick-handoff-once-1", message: "Plan my physics exam preparation",

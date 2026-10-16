@@ -1,0 +1,37 @@
+{
+  "paidAiCalls": 0,
+  "applicationDeployed": false,
+  "schemaOrMigrationChangesThisAudit": false,
+  "broad": {
+    "files": 189,
+    "passed": 2156,
+    "failed": 9,
+    "skipped": 257,
+    "remainingFailures": "remaining-baseline-failures.json"
+  },
+  "focusedProvider": {
+    "passed": 41
+  },
+  "focusedFinalBoundaries": {
+    "passed": 52
+  },
+  "hostedDatabase": {
+    "passed": 3,
+    "syntheticRollback": true,
+    "providerAndExternalFetchBlocked": true
+  },
+  "typescript": "passed; standalone noEmit and latest production build",
+  "productionBuild": "next build --webpack passed",
+  "mobileBuild": "passed",
+  "mobileBundleVerification": "passed; no server-only symbols/secrets",
+  "generatedMobileArtifactsRestored": true,
+  "lint": {
+    "currentErrors": 113,
+    "baselineErrors": 114,
+    "currentWarnings": 16,
+    "baselineWarnings": 18,
+    "increasedFileRuleCounts": 0
+  },
+  "browser": "24 appearance/dictation checks plus failure/image/stream/reuse interactions; synthetic only",
+  "diffCheck": "passed"
+}

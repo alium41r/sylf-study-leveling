@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         { status: 503 }
       );
     }
-    
+
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -57,10 +57,10 @@ export async function GET(req: NextRequest) {
     // 3. Fetch a bounded batch of eligible users
     // We only process users seen in the last 7 days
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    
+
     const BATCH_SIZE = parseInt(process.env.BRIEFING_BATCH_SIZE || "50");
     const CONCURRENCY_LIMIT = parseInt(process.env.BRIEFING_CONCURRENCY || "5");
-    
+
     const eligibleUsers = await prisma.user.findMany({
       where: {
         timezone: { in: activeTimezones },
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     }
 
     let processedCount = 0;
-    const promises = [];
+    const running = new Set<Promise<void>>();
 
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
         const formatter = new Intl.DateTimeFormat("en-CA", { timeZone: safeTz, year: "numeric", month: "2-digit", day: "2-digit" });
         dateKey = formatter.format(new Date());
       } catch (e) {
-        console.error(`Unexpected date formatting error for timezone ${safeTz} on user ${user.id}`);
+        console.error("[DailyBriefing Cron] date formatting unavailable");
         continue;
       }
 
@@ -152,25 +152,16 @@ export async function GET(req: NextRequest) {
         });
       };
 
-      promises.push(task());
-
-      // Respect concurrency limit
-      if (promises.length >= CONCURRENCY_LIMIT) {
-        await Promise.all(promises);
-        processedCount += promises.length;
-        promises.length = 0;
-      }
+      const pending = task().finally(() => { running.delete(pending); processedCount++; });
+      running.add(pending);
+      // Refill a free slot immediately; a slow member no longer stalls a whole batch.
+      if (running.size >= CONCURRENCY_LIMIT) await Promise.race(running);
     }
-
-    // Wait for remaining promises
-    if (promises.length > 0) {
-      await Promise.all(promises);
-      processedCount += promises.length;
-    }
+    await Promise.all(running);
 
     return NextResponse.json({ message: `Processed ${processedCount} briefings.` });
-  } catch (error: any) {
-    console.error("[DailyBriefing Cron] Failed:", error);
+  } catch {
+    console.error("[DailyBriefing Cron] operation unavailable");
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

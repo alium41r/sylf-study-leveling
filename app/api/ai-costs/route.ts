@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
         completionTokens: true,
         cacheHitTokens: true,
         estimatedCostUsd: true,
-        requestId: true,
+        requestId: true, rootRequestId: true, reasoningTokens: true, latencyMs: true, outcome: true, usageKnown: true, cacheUsageKnown: true,
         createdAt: true,
       },
       orderBy: { createdAt: "asc" },
@@ -72,11 +72,19 @@ export async function GET(req: NextRequest) {
       let totalCacheHit = 0;
       let totalCost = 0;
       let unknownCostRequests = 0;
+      let reasoningTokens = 0, latencyTotalMs = 0, timedDispatches = 0, failedDispatches = 0, unknownUsageRequests = 0, unknownCacheRequests = 0;
+      const roots = new Set<string>();
 
       for (const r of slice) {
         // Old logs used zero for missing prices. Retain their stored value,
         // but do not certify it as a priced durable-dispatch receipt.
         const costUnknown = r.estimatedCostUsd === null || r.requestId === null && r.estimatedCostUsd === 0;
+        roots.add(r.rootRequestId ?? `legacy-${totalRequests}`);
+        if (r.reasoningTokens != null) reasoningTokens += r.reasoningTokens;
+        if (r.latencyMs != null) { latencyTotalMs += r.latencyMs; timedDispatches++; }
+        if (r.outcome === "FAILED" || r.outcome === "CANCELLED") failedDispatches++;
+        if (r.usageKnown !== true) unknownUsageRequests++;
+        if (r.cacheUsageKnown !== true) unknownCacheRequests++;
         totalRequests += 1;
         totalPrompt += r.promptTokens;
         totalCompletion += r.completionTokens;
@@ -117,32 +125,33 @@ export async function GET(req: NextRequest) {
 
       const round = (n: number) => Math.round(n * 1_000_000) / 1_000_000;
       return {
-        totalRequests,
+        totalRequests, logicalRequests: roots.size, reasoningTokens, failedDispatches, unknownUsageRequests, unknownCacheRequests,
+        averageDispatchLatencyMs: timedDispatches ? Math.round(latencyTotalMs / timedDispatches) : null, timedDispatches,
         promptTokens: totalPrompt,
         completionTokens: totalCompletion,
         cacheHitTokens: totalCacheHit,
-        costUsd: round(totalCost),
+        costUsd: unknownCostRequests ? null : round(totalCost), knownCostUsd: round(totalCost),
         unknownCostRequests,
         costComplete: unknownCostRequests === 0,
         byModel: Object.entries(byModel)
-          .map(([model, v]) => ({ model, ...v, costUsd: round(v.costUsd) }))
-          .sort((a, b) => b.costUsd - a.costUsd),
+          .map(([model, v]) => ({ model, ...v, knownCostUsd: round(v.costUsd), costUsd: v.unknownCostRequests ? null : round(v.costUsd) }))
+          .sort((a, b) => b.knownCostUsd - a.knownCostUsd),
         byFeature: Object.entries(byFeature)
-          .map(([feature, v]) => ({ feature, ...v, costUsd: round(v.costUsd) }))
-          .sort((a, b) => b.costUsd - a.costUsd),
+          .map(([feature, v]) => ({ feature, ...v, knownCostUsd: round(v.costUsd), costUsd: v.unknownCostRequests ? null : round(v.costUsd) }))
+          .sort((a, b) => b.knownCostUsd - a.knownCostUsd),
       };
     };
 
     return NextResponse.json(
       {
-        note: "Estimated costs (AI_COST_USD_PER_1M rate table, cache-aware). Deterministic replies are not LLM calls and are not logged here.",
+        note: "Per-dispatch estimates at versioned paid list prices; DeepSeek peak upper bound. Unknown usage, prices and grounding charges remain unknown. Known subtotal excludes unknown charges. Historical rows can be logical aggregates. Deterministic replies make no model call.",
         today: aggregate(dayStart),
         last7Days: aggregate(weekStart),
       },
       { status: 200 }
     );
-  } catch (error) {
-    console.error("GET /api/ai-costs error:", error);
+  } catch {
+    console.error("GET /api/ai-costs unavailable");
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

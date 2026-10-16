@@ -1,4 +1,5 @@
 "use client";
+import { plannerChatBody } from "../copilot/image-client";
 import { plannerFetch, postJson } from "../transport";
 import type { IntakeView } from "../intake/actions";
 import type { CopilotTurnResult } from "./contracts";
@@ -29,6 +30,7 @@ export const sendCopilotMessage = async (
   input: {
     expectedVersion: number;
     message: string;
+    images?: File[];
     recent: CopilotRecentTurn[];
     clarificationAnswer?: string | null;
     proposalOnly?: boolean;
@@ -37,14 +39,14 @@ export const sendCopilotMessage = async (
 ): Promise<CopilotTurnPayload> =>
   plannerFetch<CopilotTurnPayload>(`/intake/${encodeURIComponent(sessionId)}/copilot`, {
     signal: input.signal,
-    ...postJson({
+    ...plannerChatBody({
       schemaVersion: 1,
       expectedVersion: input.expectedVersion,
       message: input.message,
-      recent: input.recent.slice(-8),
+      recent: input.recent.slice(-8).map(({ role, text }) => ({ role, text })),
       ...(input.proposalOnly ? { proposalOnly: true } : {}),
       ...(input.clarificationAnswer ? { clarificationAnswer: input.clarificationAnswer } : {}),
-    }),
+    }, input.images),
   });
 
 export interface CopilotApplyPayload {

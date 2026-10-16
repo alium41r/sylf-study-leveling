@@ -36,7 +36,7 @@ describe("shared metered provider dispatch", () => {
     const result = await dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: generate }) });
     expect(result.value).toEqual({ ok: true }); expect(result.attempts).toHaveLength(2); expect(generate).toHaveBeenCalledTimes(2);
     expect(m.closed[0]).toMatchObject({ result: { errorCode: "PROVIDER_FAILURE" } }); expect(JSON.stringify(result)).not.toContain("Private");
-    expect(m.settled).toHaveLength(1); expect(m.settled[0]).toMatchObject({ usage: { costUsd: null } });
+    expect(m.settled).toHaveLength(1); expect(m.settled[0]).toMatchObject({ usage: { costUsd: expect.any(Number) } });
   });
   it("settles truncation/malformed output before fallback and never accepts an unknown finish reason", async () => {
     const m = fakeMeter(); let n = 0;

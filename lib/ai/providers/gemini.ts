@@ -1,3 +1,5 @@
+import { generateGeminiContent } from "./gemini-dispatch";
+import { geminiUsage } from "./usage";
 import { GoogleGenAI, Type, FunctionDeclaration, Content, Part } from "@google/genai";
 import { LLMAdapter, NormalizedMessage, NormalizedTool, LLMResponse, LLMProviderError, NormalizedToolCall } from "./types";
 import crypto from "crypto";
@@ -112,14 +114,14 @@ export class GeminiAdapter implements LLMAdapter {
     const geminiTools = tools.length > 0 ? [{ functionDeclarations: tools.map(this.mapTool) }] : undefined;
 
     const candidateModels = options?.singleAttempt ? [this.model] : Array.from(
-      new Set([this.model, "gemini-2.5-flash", "gemini-3.7-flash"].filter(Boolean))
+      new Set([this.model, "gemini-2.5-flash"].filter(Boolean))
     );
 
     let lastError: any = null;
 
-    for (const modelToTry of candidateModels) {
+    for (const [retryIndex, modelToTry] of candidateModels.entries()) {
       try {
-        const response = await this.ai.models.generateContent({
+        const response = await generateGeminiContent(this.ai, {
           model: modelToTry,
           contents,
           config: {
@@ -129,13 +131,13 @@ export class GeminiAdapter implements LLMAdapter {
               options?.responseFormat === "json_object"
                 ? "application/json"
                 : undefined,
-            maxOutputTokens: options?.maxTokens,
+            maxOutputTokens: options?.maxTokens ?? 16384,
             temperature: options?.temperature,
             abortSignal: options?.signal,
-            ...(options?.singleAttempt && options.thinking === "disabled" && modelToTry === "gemini-2.5-flash" ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+            ...(options?.thinking === "disabled" && modelToTry === "gemini-2.5-flash" ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
             ...(options?.singleAttempt ? { httpOptions: { retryOptions: { attempts: 1 } } } : {}),
           }
-        });
+        }, options?.telemetry !== false, { stage: options?.telemetryStage, retryIndex: (options?.retryIndex ?? 0) + retryIndex }, options?.onTextDelta);
 
         const candidateParts = response.candidates?.[0]?.content?.parts || [];
         const toolCalls: NormalizedToolCall[] = [];
@@ -154,15 +156,10 @@ export class GeminiAdapter implements LLMAdapter {
 
         return {
           text: response.text || undefined,
-          ...(options?.singleAttempt ? { finishReason: response.candidates?.[0]?.finishReason === "MAX_TOKENS" ? "MAX_TOKENS" as const : response.candidates?.[0]?.finishReason === "STOP" ? "STOP" as const : "OTHER" as const } : {}),
+          finishReason: response.candidates?.[0]?.finishReason === "MAX_TOKENS" ? "MAX_TOKENS" : response.candidates?.[0]?.finishReason === "STOP" ? "STOP" : "OTHER",
           toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
           rawCandidateParts: candidateParts.length > 0 ? candidateParts : undefined,
-          usage: response.usageMetadata ? {
-            promptTokens: response.usageMetadata.promptTokenCount || 0,
-            // The SDK reports reasoning separately; both are generated output.
-            completionTokens: (response.usageMetadata.candidatesTokenCount || 0) + (response.usageMetadata.thoughtsTokenCount || 0),
-            totalTokens: response.usageMetadata.totalTokenCount || 0,
-          } : undefined,
+          usage: geminiUsage(response.usageMetadata as unknown as Record<string, unknown>),
         };
       } catch (error: any) {
         lastError = error;

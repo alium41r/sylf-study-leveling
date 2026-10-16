@@ -9,6 +9,9 @@ import { NextRequest } from "next/server";
 // Mock Prisma
 vi.mock("../../lib/prisma", () => ({
   prisma: {
+    plannerPlan: { findFirst: vi.fn().mockResolvedValue(null) },
+    $queryRaw: vi.fn().mockResolvedValue([]),
+    $transaction: vi.fn(async (run) => run(prisma)),
     user: {
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -34,6 +37,7 @@ vi.mock("../../lib/prisma", () => ({
       create: vi.fn(),
       count: vi.fn(),
     },
+    floatingRestDay: { findMany: vi.fn().mockResolvedValue([]) },
     userQuota: {
       findUnique: vi.fn(),
     },
@@ -64,6 +68,7 @@ vi.mock("../../lib/timezone-server", () => ({
 describe("Planner API Integration Test", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({ restDays: [], timezone: "UTC" } as never);
   });
 
   it("should successfully generate a goal and quests", async () => {

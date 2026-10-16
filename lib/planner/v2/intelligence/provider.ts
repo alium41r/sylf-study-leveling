@@ -229,7 +229,7 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       upstream = Promise.resolve().then(() => {
         if (controller.signal.aborted) throw controller.signal.reason;
         return adapter.generateResponse(messages, request.systemInstruction, [], {
-          maxTokens: request.outputTokens, responseFormat: "json_object", thinking: config.thinking, singleAttempt: true, signal: controller.signal,
+          maxTokens: request.outputTokens, responseFormat: "json_object", thinking: config.thinking, singleAttempt: true, telemetry: false, signal: controller.signal,
         });
       });
       void upstream.then(response => {

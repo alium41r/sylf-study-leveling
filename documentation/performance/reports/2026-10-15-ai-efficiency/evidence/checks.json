@@ -1,0 +1,253 @@
+{
+  "date": "2026-10-15",
+  "method": "Offline/provider-mocked verification; no model generation or paid diagnostics",
+  "paidDiagnosticCalls": 0,
+  "newProviders": 0,
+  "liveDatabaseMigrationApplied": false,
+  "excludedByUser": [
+    "Abandoned node/constellation evaluation and page",
+    "Legacy syllabus compiler direct implementation"
+  ],
+  "scopeFilesUnchanged": true,
+  "focused": {
+    "filesPassed": 10,
+    "testsPassed": 48
+  },
+  "broad": {
+    "files": 175,
+    "filesPassed": 140,
+    "filesFailed": 6,
+    "filesSkipped": 29,
+    "testsPassed": 2008,
+    "testsFailed": 23,
+    "testsSkipped": 255,
+    "allFailureTitlesReproducedOnOriginalHead": true,
+    "failureTitles": [
+      "__tests__/ai/planner-api.test.ts > Planner API Integration Test > should successfully generate a goal and quests",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > does not silently stack burnout and overload reductions (prioritizes burnout 50%)",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > floors capacity at 0 if overloaded",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > returns full budget when no quests exist",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > subtracts scheduled minutes from budget",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > generates even though the weekly planner bucket is exhausted",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > never consumes capacity across repeated generations",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > reports the quota as unlimited so the UI shows \u221e rather than a fake number",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > still validates the request body",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > rejects with the same 429 and the same error body when the week is spent",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > still generates normally while capacity remains",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > still reports finite numeric capacity to the UI",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > gives a different authenticated account no access to the owner's entitlement",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > ignores a spoofed owner userId on the Classic Planner body",
+      "__tests__/planner/classic-coexistence.test.ts > Classic Planner coexistence > leaves the Classic Planner as the default surface of the Planner tab",
+      "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > keeps every Planner Modes capability the phase before this one established",
+      "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > reports each surface it opens, and the return to Classic",
+      "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > returns to Classic from Advanced setup as well as from Quick Plan",
+      "__tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > uses both surfaces in one session with no configuration change",
+      "__tests__/planner/exam-entry.test.tsx > Planner surfaces > closes the chooser on Escape and returns focus to its trigger",
+      "__tests__/planner/exam-entry.test.tsx > Planner surfaces > enters the chosen mode directly, without asking again",
+      "__tests__/planner/exam-entry.test.tsx > Planner surfaces > offers Planner modes from the header and opens the chooser",
+      "__tests__/planner/exam-entry.test.tsx > Planner surfaces > routes each mode to its own surface"
+    ]
+  },
+  "typecheck": "passed",
+  "prismaGenerate": "passed",
+  "productionBuild": {
+    "webpack": "passed",
+    "defaultTurbopack": "stalled; stopped; completion not verified"
+  },
+  "mobile": {
+    "productionBuild": "passed",
+    "bundleVerification": "passed; no server-only symbols or secrets",
+    "generatedArtifactsRestored": true
+  },
+  "database": {
+    "disposablePostgres": "blocked before startup: Docker daemon HTTP 500",
+    "migration": "20261015130000_ai_dispatch_telemetry",
+    "schemaBuildVersion": 32
+  },
+  "modelAvailability": {
+    "checkedAt": "2026-10-15T07:48:40.847Z",
+    "method": "Authenticated model-list GET metadata only; no model execution or paid diagnostics.",
+    "providers": [
+      {
+        "provider": "deepseek",
+        "status": "network_unavailable"
+      },
+      {
+        "provider": "gemini",
+        "status": "verified_metadata",
+        "models": [
+          {
+            "model": "gemini-2.5-flash",
+            "listed": true,
+            "supportsGenerateContent": true
+          }
+        ]
+      },
+      {
+        "provider": "groq",
+        "status": "verified_metadata",
+        "models": [
+          {
+            "model": "openai/gpt-oss-120b",
+            "listed": true
+          },
+          {
+            "model": "openai/gpt-oss-20b",
+            "listed": true
+          },
+          {
+            "model": "qwen/qwen3.8-27b",
+            "listed": true
+          }
+        ]
+      }
+    ]
+  },
+  "ui": {
+    "fixture": "Synthetic actual active ConversationPanel; no production API calls",
+    "checks": [
+      {
+        "name": "chat-desktop-dark",
+        "width": 1440,
+        "height": 1000,
+        "scrollWidth": 1440,
+        "hasComposer": true,
+        "horizontalOverflow": false
+      },
+      {
+        "name": "chat-desktop-light",
+        "width": 1440,
+        "height": 1000,
+        "scrollWidth": 1440,
+        "hasComposer": true,
+        "horizontalOverflow": false
+      },
+      {
+        "name": "chat-desktop-custom",
+        "width": 1440,
+        "height": 1000,
+        "scrollWidth": 1440,
+        "hasComposer": true,
+        "horizontalOverflow": false
+      },
+      {
+        "name": "chat-mobile-dark",
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "hasComposer": true,
+        "horizontalOverflow": false
+      },
+      {
+        "name": "chat-mobile-light",
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "hasComposer": true,
+        "horizontalOverflow": false
+      },
+      {
+        "name": "chat-mobile-custom",
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 390,
+        "hasComposer": true,
+        "horizontalOverflow": false
+      }
+    ]
+  },
+  "measurements": {
+    "basis": "Controlled synthetic fixtures, not production averages, provider tokenizers, billed savings or model-quality tests.",
+    "toolContext": {
+      "fixtureRows": 50,
+      "beforeJsonChars": 20160,
+      "afterJsonChars": 5427,
+      "beforeApproxTokensCharsDiv4": 5040,
+      "afterApproxTokensCharsDiv4": 1357,
+      "truncationDisclosed": true
+    },
+    "defaults": {
+      "serverChatDeadlineMs": 120000,
+      "clientChatDeadlineMs": 125000,
+      "toolResultMaxChars": 8000,
+      "toolContextMaxCharsPerEngineAttempt": 24000
+    },
+    "costAndProviderLatency": "Not measured. No model dispatches were made."
+  },
+  "limitations": [
+    "No live semantic model-quality qualification",
+    "No production before/after cost or latency measurement",
+    "Telemetry persistence best effort during database outage",
+    "Grounding/search costs and credits need billing reconciliation",
+    "Planner V2 qualification remains separate"
+  ],
+  "lint": {
+    "changedFiles": {
+      "errors": 122,
+      "warnings": 31
+    },
+    "sameTrackedFilesOriginalHead": {
+      "errors": 129,
+      "warnings": 31
+    },
+    "increasedErrorsByFileAndRule": [],
+    "increasedWarningsByFileAndRule": [],
+    "newFiles": [
+      {
+        "file": "__tests__/ai/classic-efficiency.test.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "__tests__/ai/cost-summary.test.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "__tests__/ai/dispatch-telemetry.test.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "__tests__/ai/tool-context-budget.test.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "__tests__/ai/transport-cancellation.test.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "lib/ai/client-budget.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "lib/ai/providers/gemini-dispatch.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "lib/ai/providers/usage.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "lib/ai/sylvie/tool-context.ts",
+        "errors": 0,
+        "warnings": 0
+      },
+      {
+        "file": "lib/ai/telemetry.ts",
+        "errors": 0,
+        "warnings": 0
+      }
+    ]
+  },
+  "finalAccountingRecheck": {
+    "filesPassed": 2,
+    "testsPassed": 4,
+    "includesPendingLatencyNull": true
+  }
+}

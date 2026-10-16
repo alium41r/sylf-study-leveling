@@ -1,0 +1,30 @@
+[
+  {
+    "surface": "main",
+    "horizontalOverflow": false,
+    "previews": 4,
+    "composerControlsVisible": true,
+    "speechService": "Listening… · Browser speech service"
+  },
+  {
+    "surface": "popup",
+    "horizontalOverflow": false,
+    "previews": 4,
+    "composerControlsVisible": true,
+    "speechService": "Listening… · Browser speech service"
+  },
+  {
+    "surface": "focus",
+    "horizontalOverflow": false,
+    "previews": 4,
+    "composerControlsVisible": true,
+    "speechService": "Listening… · Browser speech service"
+  },
+  {
+    "surface": "planner",
+    "horizontalOverflow": false,
+    "previews": 4,
+    "composerControlsVisible": true,
+    "speechService": "Listening… · Browser speech service"
+  }
+]

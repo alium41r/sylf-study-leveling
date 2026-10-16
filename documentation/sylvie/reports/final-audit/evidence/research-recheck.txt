@@ -1,0 +1,16 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run __tests__/planner/quick-plan-research.test.tsx
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+(node:93267) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  10:13:17
+   Duration  3.07s (transform 502ms, setup 116ms, import 1.02s, tests 1.08s, environment 708ms)
+

@@ -1,3 +1,4 @@
+import { withAiRequest } from "@/lib/ai/telemetry";
 import { NextRequest, NextResponse } from "next/server";
 import { executionTransaction } from "@/lib/execution-coordination";
 import { prisma } from "@/lib/prisma";
@@ -9,12 +10,13 @@ import { calculateRecommendedDifficulty } from "@/lib/difficulty-engine";
 
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
-import { logAiUsage } from "@/lib/ai/usage-logger";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 120; // Extended execution window on Vercel for multi-agent reasoning
+// Allow the existing 180-second generation deadline plus persistence/telemetry.
+export const maxDuration = 240;
 
 export async function POST(req: NextRequest) {
+  let reservedFor: number | null = null;
   try {
     const session = await getSession(req);
     if (!session) {
@@ -26,6 +28,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "PLANNER_V2_REQUIRED", message: "Continue planning through your current Planner workspace." }, { status: 409 });
     }
 
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body.topic !== "string" || !body.topic.trim() || body.topic.length > 4000 ||
+        typeof body.effortHours !== "number" || !Number.isFinite(body.effortHours) || body.effortHours <= 0 || body.effortHours > 168 ||
+        (body.syllabus !== undefined && (typeof body.syllabus !== "string" || body.syllabus.length > 50_000)) ||
+        (body.targetDate != null && (typeof body.targetDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(body.targetDate) || !Number.isFinite(Date.parse(body.targetDate)))) ||
+        (body.sessionId != null && (!Number.isSafeInteger(body.sessionId) || body.sessionId <= 0))) {
+      return NextResponse.json({ error: "Invalid planning request" }, { status: 400 });
+    }
+    const { topic, syllabus, effortHours, targetDate, sessionId } = body;
+
     // ── Quota enforcement ─────────────────────────────────
     // S4: RESERVE before the (expensive, multi-agent) generation begins;
     // failures/aborts refund the unit.
@@ -33,6 +45,7 @@ export async function POST(req: NextRequest) {
     // reservation is bypassed (charged === false) and `unlimited` carries the
     // permission, so the gate must accept either signal.
     const quota = await reserveQuota(userId, "planner");
+    if (quota.charged) reservedFor = userId;
     if (!quota.charged && !quota.unlimited) {
       return NextResponse.json(
         { error: "quota_exceeded", feature: "planner", remaining: 0, limit: quota.limit, resetsAt: quota.resetsAt },
@@ -40,21 +53,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
-    const { topic, syllabus, effortHours, targetDate, sessionId } = body;
-
-    if (!topic || !effortHours) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
-
+    const streamAbort = new AbortController();
+    const requestSignal = AbortSignal.any([req.signal, streamAbort.signal]);
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
         const sendEvent = (type: string, data: any) => {
+          if (requestSignal.aborted) return;
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type, ...data })}\n\n`));
         };
 
         try {
+          requestSignal.throwIfAborted();
           // Resolve or create ChatSession for this study plan
           let targetSessionId = typeof sessionId === "number" ? sessionId : undefined;
           if (targetSessionId) {
@@ -104,10 +114,8 @@ export async function POST(req: NextRequest) {
           const abortController = new AbortController();
           let timedOut = false;
           const onClientAbort = () => abortController.abort();
-          if (req.signal) {
-            req.signal.addEventListener("abort", onClientAbort);
-            if (req.signal.aborted) abortController.abort();
-          }
+          requestSignal.addEventListener("abort", onClientAbort);
+          if (requestSignal.aborted) abortController.abort();
           const timeoutId = setTimeout(() => {
             timedOut = true;
             abortController.abort();
@@ -115,19 +123,20 @@ export async function POST(req: NextRequest) {
 
           let planResult;
           try {
-            planResult = await AiStudyOrchestrator.generatePlan(
-              topic, 
-              syllabus || "", 
-              effortHours, 
+            planResult = await withAiRequest({ userId, feature: "planner", workload: "classic_planner", signal: abortController.signal }, () => AiStudyOrchestrator.generatePlan(
+              topic,
+              syllabus || "",
+              effortHours,
               targetDate || null,
               pastSessions,
               onProgress,
               abortController.signal
-            );
+            ));
           } finally {
             clearTimeout(timeoutId);
-            if (req.signal) req.signal.removeEventListener("abort", onClientAbort);
+            requestSignal.removeEventListener("abort", onClientAbort);
           }
+          abortController.signal.throwIfAborted();
 
           if (!planResult) {
             throw new Error(timedOut ? "AI_TIMEOUT" : "AI_ABORTED");
@@ -150,6 +159,7 @@ export async function POST(req: NextRequest) {
           }
 
           const { goal, plannerModelName } = await executionTransaction(userId, async tx => {
+            requestSignal.throwIfAborted();
             if (await tx.plannerPlan.findFirst({ where: { userId, contractVersion: 2 }, select: { id: true } })) throw new Error("PLANNER_V2_REQUIRED");
           const goal = await tx.goal.create({
             data: {
@@ -200,7 +210,7 @@ export async function POST(req: NextRequest) {
             // Distribute quests across the timeline evenly
             let offsetDays = Math.floor((index / Math.max(1, planResult.quests.length)) * daysToDeadline);
             let scheduledFor = TimezoneService.getUserLocalDateOffset(tz, offsetDays);
-            
+
             // Skip fixed AND floating rest days by rolling forward to the nearest
             // active study day.
             let attempts = 0;
@@ -265,7 +275,7 @@ export async function POST(req: NextRequest) {
             .join("\n");
           const moreQuestsNote = questsToCreate.length > 5 ? `\n*...and ${questsToCreate.length - 5} more quests scheduled.*` : "";
 
-          const plannerModelName = planResult.modelUsed || "Gemini 3.7 Flash";
+          const plannerModelName = planResult.modelUsed || "Model unreported";
           const assistantContent = `### 🎓 Study Plan Generated: **${planResult.goalTitle}**\n\n- **Workload**: ${questsToCreate.length} quests · ~${Math.round(actualTotalMinutes / 60)} hours total\n- **Effort**: ${mappedEffortLevel} (${effortHours} hrs/week)${targetDate ? `\n- **Deadline**: ${targetDate}` : ""}\n\n#### Scheduled Quest Preview:\n${questsPreview}${moreQuestsNote}\n\nQuests are live on your calendar — ask me to modify, reschedule, or split any of them.`;
 
           await tx.systemMessage.create({
@@ -278,9 +288,10 @@ export async function POST(req: NextRequest) {
               modelUsed: plannerModelName,
             },
           });
-
             return { goal, plannerModelName };
           });
+          // Committed work keeps its quota charge even if result delivery fails.
+          reservedFor = null;
 
           // Final response with targetSessionId, modelUsed, and current quota
           sendEvent("result", {
@@ -298,21 +309,13 @@ export async function POST(req: NextRequest) {
           });
 
           // Request-level cost telemetry (best-effort — never blocks the result).
-          await logAiUsage({
-            userId,
-            feature: "planner",
-            workload: "planner",
-            provider: "deepseek",
-            model: planResult.modelUsed || "unknown",
-            promptTokens: planResult.usage?.promptTokens || 0,
-            completionTokens: planResult.usage?.completionTokens || 0,
-          });
+
 
           controller.close();
         } catch (err: any) {
-          console.error("Planner API Error:", err);
+          console.error("Planner API Error:");
           // S4: refund the reservation — the plan was never delivered.
-          await releaseQuota(userId, "planner").catch(() => {});
+          if (reservedFor !== null) { reservedFor = null; await releaseQuota(userId, "planner").catch(() => {}); }
           const errorMsg =
             err.message === "AI_TIMEOUT"
               ? "The AI took longer than expected to research your topics. Please try again with a slightly more concise topic or syllabus."
@@ -327,6 +330,7 @@ export async function POST(req: NextRequest) {
           } catch {}
         }
       },
+      cancel() { streamAbort.abort(); },
     });
 
     return new Response(stream, {
@@ -337,8 +341,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-  } catch (error: any) {
-    console.error("Planner API wrapper error:", error);
+  } catch {
+    if (reservedFor !== null) await releaseQuota(reservedFor, "planner").catch(() => {});
+    console.error("Planner API wrapper error:");
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

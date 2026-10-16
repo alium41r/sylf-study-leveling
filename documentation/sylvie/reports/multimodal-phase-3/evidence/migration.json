@@ -1,0 +1,17 @@
+{
+  "name": "20261015170000_chat_image_storage",
+  "sourceChecksumSha256": "974605061c86a6928d9ddda86402d841c13943f90ac8696ca79c890b8146cfa1",
+  "workflow": "npx prisma migrate deploy using existing DIRECT_URL",
+  "solePendingMigrationBeforeDeploy": true,
+  "applied": true,
+  "appliedMigrationCountAfter": 65,
+  "pendingAfter": 0,
+  "schemaFieldsChanged": false,
+  "prismaDiffApplied": false,
+  "scope": [
+    "ai-chat-attachments private bucket",
+    "restrictive client isolation policy for that bucket"
+  ],
+  "hostedStorageVerified": true,
+  "previousTelemetryMigrationUnchanged": true
+}

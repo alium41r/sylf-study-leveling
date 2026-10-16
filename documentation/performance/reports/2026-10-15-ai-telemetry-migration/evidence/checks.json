@@ -1,0 +1,68 @@
+{
+  "verifiedOn": "2026-10-15",
+  "project": "gjkwkdqdoekzllmnsejo.supabase.co",
+  "workflow": "npx prisma migrate deploy via existing DIRECT_URL Supabase session-pool configuration",
+  "migration": {
+    "name": "20261015130000_ai_dispatch_telemetry",
+    "checksum": "6943a6fee8a22cfb044e06eb43fb18e0e7be684feae83d136aa9652f122b5fed",
+    "applied": true,
+    "solePendingMigration": true,
+    "totalAppliedMigrations": 64,
+    "pending": 0,
+    "failed": 0,
+    "checksumMismatches": 0
+  },
+  "schema": {
+    "source": "Current Prisma schema scalar fields versus hosted information_schema; generated-client integration verified separately",
+    "expectedScalarFields": 29,
+    "actualColumns": 29,
+    "problems": [],
+    "indexesPreserved": true,
+    "constraintsPreserved": true,
+    "permissionsPreserved": true
+  },
+  "legacyCosts": {
+    "zeroEstimatesBefore": 63,
+    "zeroEstimatesAfter": 0,
+    "unknownAfter": 63,
+    "existingRowsBefore": 122,
+    "existingRowsAfter": 122
+  },
+  "hostedRuntime": {
+    "testsPassed": 2,
+    "realDatabase": true,
+    "realPrisma": true,
+    "realCookieAndRevocationCheck": true,
+    "realRouteHandlers": true,
+    "providerExecutionBlocked": true,
+    "externalFetchBlocked": true,
+    "allFixtureTransactionsRolledBack": true,
+    "noFixtureRowsPersisted": true,
+    "knownCostSubtotalFromSyntheticCountersUsd": 0.000915,
+    "providerCalls": 0,
+    "actualProviderGenerationSpendUsd": 0
+  },
+  "regression": {
+    "testsPassed": 47,
+    "filesPassed": 5,
+    "optInHostedTestsSkippedInNormalRun": 2
+  },
+  "prismaGenerate": "passed",
+  "typecheck": "passed",
+  "addedTestEslint": "passed",
+  "wholeDatabaseDiff": {
+    "exitCode": 2,
+    "telemetryDiff": false,
+    "unrelatedDifferencesRetained": true,
+    "sqlApplied": false
+  },
+  "applicationDeployed": false,
+  "unfinishedFeaturesActivated": false,
+  "paidAiCalls": 0,
+  "blockers": {
+    "telemetryMigration": [],
+    "fullDatabaseAlignment": [
+      "Unrelated pre-existing Prisma-versus-SQL differences remain; some are SQL-owned integrity constraints. Separate review required."
+    ]
+  }
+}

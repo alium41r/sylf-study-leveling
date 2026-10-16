@@ -88,9 +88,9 @@ export async function resolveCheapAnswer(
           confidence: 1,
         };
       }
-    } catch (e) {
+    } catch {
       // A handler bug must escalate, never crash the chat.
-      console.error(`[CheapAnswers] handler '${handler.id}' failed:`, e);
+      console.error("[CheapAnswers] handler unavailable");
     }
   }
 
@@ -105,8 +105,8 @@ export async function resolveCheapAnswer(
         confidence: 1,
       };
     }
-  } catch (e) {
-    console.error("[CheapAnswers] datetime handler failed:", e);
+  } catch {
+    console.error("[CheapAnswers] datetime unavailable");
   }
 
   const det = await matchDeterministic(userId, raw);
@@ -138,8 +138,8 @@ export async function resolveCheapAnswer(
         }
       }
     }
-  } catch (e) {
-    console.error("[CheapAnswers] continuation failed:", e);
+  } catch {
+    console.error("[CheapAnswers] continuation unavailable");
   }
 
   return null;

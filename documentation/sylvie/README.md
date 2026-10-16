@@ -2,6 +2,32 @@
 
 Sylvie's chat runtime is [the authenticated chat route](../../app/api/system-messages/chat/route.ts). Conversation, the quick overlay, and the Timer tutor use the same runtime, persona and provider adapters. Appearance and the existing conversation/session/attachment features retain their current owners.
 
+## Chat UI and delivery
+
+[Shared chat components](../../app/components/system/chat/) own the composer, memoized message/Markdown rendering and container scrolling. `useSylvieChat` owns requests, bounded history loading, cancellation, session adoption and stale-response guards for the workspace, quick popup and Focus assistant. It uses the existing API and conversation tables; it adds no parallel conversation persistence. The active Planner Designer/Copilot also uses the composer and text renderer while retaining its intake, proposal and application owners.
+
+A new session ID is adopted into the current conversation before notifying its parent. It does not trigger a history reload, loading overlay or message-key replacement. Genuine session switches cancel prior work, clear the old draft and load history. Failed sends restore the submitted prompt when the user has not started another draft; late failures cannot overwrite a new conversation. Replies follow the bottom only while the user is near it; reading earlier messages stays in place with an explicit jump to latest. Loading states never blur existing content. The popup retains focus trapping and page scroll locking; account changes remount the workspace/popup, and Focus retains its account-keyed route.
+
+The client requests SSE with `Accept: text/event-stream`. JSON remains the default for existing callers, including the formula tool. Stream events carry status, session adoption, visible text, fallback resets and a final authoritative result. The result follows message persistence and awaited telemetry settlement. One shared transport keeps the 125-second deadline active through body consumption; server cancellation and the existing 120-second deadline still reach providers.
+
+DeepSeek, Gemini and Groq GPT-OSS stream text-only turns through their existing metered adapters. Private reasoning and tool arguments are not forwarded. Tool-enabled generations, structured Planner replies and other custom Groq models remain buffered; there is no artificial reveal timer. Tool execution and signed confirmations retain their existing boundaries. DeepSeek thinking metadata is kept only within server memory for tool continuation; it is neither rendered nor persisted. No extra model call is added for streaming. Failed/aborted streams without usage retain unknown spend, and interrupted clients can refresh history rather than automatically resending a potentially completed request.
+
+The controlled composer supports native image inputs and editable browser dictation across the workspace, popup, Focus and active Planner. Planner retains its 600-character input cap; normal chat retains 4,000.
+
+[Phase 2 report and evidence](reports/chat-phase-2/report.md) records root causes, browser fixtures, regression results and live-provider limitations.
+
+## Images and dictation
+
+Images use the existing provider adapters and dispatch meter. Native `deepseek-flash` is the automatic vision primary, with Gemini fallback. Explicit Gemini is tried first and its existing image fallback is disclosed; unsupported Groq image requests ask the user to choose a compatible model. Four images can accompany text, with 5 MiB per file and 12 MiB total upload bounds. Server decoding rejects malformed/oversize inputs, corrects orientation, strips metadata and bounds dimensions without upscaling. GIFs use their first frame.
+
+Chat images live in the private `ai-chat-attachments` Supabase bucket, provisioned with restrictive client isolation by the related Storage migration and accessed through the existing server storage client. The existing message attachment field stores a versioned manifest; no Prisma/schema change is required. Browsers receive authenticated API references, and providers receive five-minute signed URLs. Inline data is loaded only when a Gemini attempt requires it; DeepSeek follow-ups do not download/base64-encode the stored image on the app server. General turns do not download old images. Explicit references and image follow-ups reuse only relevant images. Historical public upload URLs are rewritten through an ownership-checked route. Deleted chats and failed uploads trigger object cleanup.
+
+Planner images stay within its tab-local conversation and existing JSON interpretation/review flow. Image-derived commands are always proposal-only, enforced on the server. Full document/syllabus imports retain the existing scope workflow. Planner image files/previews are released when their turns expire or the interface closes.
+
+Dictation detects standard/prefixed browser recognition, prefers installed on-device language support when available, and otherwise discloses browser-service processing. It appends to the current draft, never sends automatically, and supports stop, cancel and explicit retry. Surface changes, cancellation and interruption release recognition; popup closure cancels before its exit animation. No audio recording, transcription endpoint, paid transcription provider or language-pack download is introduced. Unsupported environments show keyboard dictation as a fallback.
+
+[Phase 3 implementation and verification](reports/multimodal-phase-3/report.md) records browser limitations, operating-cost estimates and hosted/live-provider qualifications.
+
 ## Instructions and knowledge
 
 The runtime reads three independent files, cached per server process:
@@ -34,4 +60,8 @@ Replanning can forward to a restored intake with a bound plan. Advanced saved-pl
 
 ## Verification
 
+Chat now shares identical read results across fallback attempts and bounds tool-result context to 8,000 serialized characters per result and 24,000 per engine attempt, disclosing omitted data. Its server deadline is 120 seconds; clients allow 125 seconds and abort stale requests. [AI accounting](../performance/ai-accounting.md) describes per-dispatch receipts, unknown costs and deployment requirements. Persona, selective Archive retrieval and action confirmations retain the behavior described above.
+
 Behavior tests are in `__tests__/ai/sylvie-*`, [conversation E2E](../../__tests__/ai/e2e-conversation.test.ts), [Planner delegation](../../__tests__/planner/sylvie-planner-delegation.test.ts), and the affected UI suites. [Overhaul report](reports/overhaul/report.md) records this run, including build results, baseline failures and mock-browser evidence. Provider mocks verify consistent prompt assembly and execution boundaries, not live model wording or production latency. No live-provider or hosted-database qualification is implied.
+
+[Final cross-phase audit](reports/final-audit/report.md) records subsequent fixes, hosted telemetry qualification with synthetic rollback, current test results and remaining provider/device limits. Daily briefings now use task summaries and workload hints without the broad profile dump or forced gaming language. Deterministic follow-up context belongs to the adopted chat ID and never carries into a new conversation.

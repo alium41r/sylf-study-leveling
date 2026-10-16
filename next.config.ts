@@ -50,7 +50,7 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+    value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=()",
   },
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
 ];
@@ -62,7 +62,12 @@ const nextConfig: NextConfig = {
     "/api/system-messages/chat": ["./lib/ai/sylvie/{persona,knowledge,capabilities}.md"],
   },
   experimental: {
+    // Four images share a 12 MiB application cap, plus multipart framing.
+    proxyClientMaxBodySize: "13mb",
     optimizePackageImports: ["lucide-react"],
+  },
+  async rewrites() {
+    return { beforeFiles: [{ source: "/uploads/:filename", destination: "/api/system-messages/legacy-images/:filename" }] };
   },
   async headers() {
     return [

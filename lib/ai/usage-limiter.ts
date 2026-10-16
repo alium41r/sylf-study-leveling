@@ -217,8 +217,8 @@ export async function releaseQuota(userId: number, feature: QuotaFeature): Promi
       feature,
       dateKey
     );
-  } catch (err) {
-    console.warn(`[quota] releaseQuota failed for user ${userId} (${feature}):`, err);
+  } catch {
+    console.warn("[quota] release unavailable");
   }
 }
 

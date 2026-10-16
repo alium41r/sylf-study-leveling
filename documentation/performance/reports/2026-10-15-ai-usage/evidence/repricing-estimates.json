@@ -1,0 +1,25 @@
+{
+  "basis": "Counter-based repricing scenario at public rates checked 2026-10-15. Not an invoice. DeepSeek all-off-peak vs all-peak bounds; Gemini paid text/image tier assumed with no known cache discount; Groq unknown cache all-hit/all-miss input bounds. Free allowances, grounding/search fees, hidden attempts and six mixed Classic request rows excluded. Historical counters and adapter versions are not retrospectively certified.",
+  "features": [
+    {
+      "feature": "chat",
+      "single_model_log_rows": 14,
+      "input_tokens": 51467,
+      "output_tokens": 2320,
+      "list_price_estimate_lower_usd": 0.013097986,
+      "list_price_estimate_upper_usd": 0.016108972,
+      "mean_per_log_row_lower_usd": 0.00093557,
+      "mean_per_log_row_upper_usd": 0.001150641
+    },
+    {
+      "feature": "planner",
+      "single_model_log_rows": 22,
+      "input_tokens": 48988,
+      "output_tokens": 50691,
+      "list_price_estimate_lower_usd": 0.04215977,
+      "list_price_estimate_upper_usd": 0.07641374,
+      "mean_per_log_row_lower_usd": 0.001916353,
+      "mean_per_log_row_upper_usd": 0.003473352
+    }
+  ]
+}

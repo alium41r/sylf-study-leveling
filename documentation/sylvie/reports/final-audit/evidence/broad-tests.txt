@@ -1,0 +1,2202 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run --maxWorkers=2 __tests__/ai __tests__/system __tests__/planner __tests__/focus/focus-tools.test.tsx __tests__/components/system-overlay.test.tsx __tests__/security/s4-quota-upload-rate.test.ts
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+(node:93817) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93818) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ __tests__/planner/classic-coexistence.test.ts (5 tests | 1 failed) 635ms
+     × leaves the Classic Planner as the default surface of the Planner tab 8ms
+(node:93837) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | __tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > uses both surfaces in one session with no configuration change
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'CLASSIC'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+
+stdout | __tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > keeps every Planner Modes capability the phase before this one established
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'CLASSIC'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+
+ ❯ __tests__/planner/classic-modes-coexistence.test.tsx (4 tests | 4 failed) 1171ms
+     × uses both surfaces in one session with no configuration change 512ms
+     × keeps every Planner Modes capability the phase before this one established 387ms
+     × reports each surface it opens, and the return to Classic 178ms
+     × returns to Classic from Advanced setup as well as from Quick Plan 90ms
+stdout | __tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > returns to Classic from Advanced setup as well as from Quick Plan
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'CLASSIC'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+
+stdout | __tests__/planner/exam-entry.test.tsx > Planner surfaces > offers Planner modes from the header and opens the chooser
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'CLASSIC'
+}
+
+stdout | __tests__/planner/exam-entry.test.tsx > Planner surfaces > enters the chosen mode directly, without asking again
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'CLASSIC'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+
+stdout | __tests__/planner/exam-entry.test.tsx > Planner surfaces > routes each mode to its own surface
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'CLASSIC'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+
+stdout | __tests__/planner/exam-entry.test.tsx > Planner surfaces > closes the chooser on Escape and returns focus to its trigger
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'CLASSIC'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+[planner] {
+  event: 'planner_surface_opened',
+  mode: 'EXAM',
+  schemaVersion: 1,
+  surface: 'MODES'
+}
+
+ ❯ __tests__/planner/exam-entry.test.tsx (6 tests | 4 failed) 588ms
+     × offers Planner modes from the header and opens the chooser 374ms
+     × enters the chosen mode directly, without asking again 55ms
+     × routes each mode to its own surface 17ms
+     × closes the chooser on Escape and returns focus to its trigger 17ms
+(node:94042) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+(node:94051) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94052) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94068) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94067) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94072) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94080) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94081) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94082) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94083) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94084) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94085) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94086) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94087) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94099) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94100) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94150) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94160) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94220) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94374) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94376) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94378) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94379) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94385) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94386) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94395) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94397) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94400) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94401) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94403) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94404) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94407) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94412) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94416) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94415) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94421) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94422) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94424) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94427) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94434) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94439) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94448) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94449) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94459) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94460) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94462) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94464) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94467) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94468) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94469) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94473) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94480) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94481) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94488) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94492) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94495) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94504) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94505) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94518) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94521) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94523) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94532) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94546) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94545) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94547) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94548) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94549) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94551) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94552) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94553) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  __tests__/planner/classic-coexistence.test.ts > Classic Planner coexistence > leaves the Classic Planner as the default surface of the Planner tab
+AssertionError: expected '"use client";\n\nimport { useCallback…' to match /useState<View>\(\{ surface: "CLASSIC"…/
+
+- Expected:
+/useState<View>\(\{ surface: "CLASSIC" \}\)/
+
++ Received:
+"\"use client\";
+
+import { useCallback, useEffect, useState } from \"react\";
+import PlannerWorkspace from \"../../components/planner/PlannerWorkspace\";
+import type { PlannerSurfaceMode } from \"../../components/planner/PlannerModesChooser\";
+import { useExamCapabilities } from \"../../components/planner/useExamCapabilities\";
+import { Calendar, LayoutGrid } from \"lucide-react\";
+import AiPlannerPanel, { QuotaInfo } from \"../../components/AiPlannerPanel\";
+import { plannerTelemetry, type PlannerSurface } from \"@/lib/planner/telemetry\";
+import styles from \"../System.module.css\";
+import type { SylviePlannerHandoff } from \"@/lib/ai/sylvie/planner-bridge\";
+
+interface PlannerTabProps {
+  handoff?: SylviePlannerHandoff;
+  plannerQuota: QuotaInfo | null;
+  sessionId: number | null;
+  onQuotaRefresh: () => void;
+  /** Called when a plan finishes generating (result carries the thread id). */
+  onComplete: (result: any) => void;
+  /** Jump into the conversation that received the generated plan. */
+  onViewConversation: () => void;
+}
+
+/**
+ * The Planner as a minimalistic, focused workspace tab.
+ *
+ * Two planner surfaces coexist here, and the Classic Planner is the default one:
+ *
+ * - **Classic Planner** — the familiar panel, unchanged, always the first thing shown.
+ * - **Planner Modes** — the Exam / Roadmap / Mastery family, reached deliberately from
+ *   the header button. Quick Plan stays the default creation flow inside a mode.
+ *
+ * The view is client state rather than routes, because the Sylvie workspace is itself
+ * tab state: adding URLs here would be routing complexity with no navigation benefit.
+ * The consequence is deliberate and documented: a refresh returns to Classic, and
+ * nothing half-persisted is ever shown. Saved Planner Modes plans are reached by
+ * entering a mode, exactly as before.
+ */
+type View = { surface: \"CLASSIC\" } | { surface: \"MODES\"; mode?: PlannerSurfaceMode | null };
+
+export default function PlannerTab({
+  handoff,
+  plannerQuota,
+  sessionId,
+  onQuotaRefresh,
+  onComplete,
+  onViewConversation,
+}: PlannerTabProps) {
+  const capabilities = useExamCapabilities();
+  const [view, setView] = useState<View>(handoff ? { surface: \"MODES\", mode: handoff.mode } : { surface: \"CLASSIC\" });
+
+  // One event per surface actually opened, so Classic and Planner Modes usage can be
+  // compared without either being inferred from the other.
+  const opened = view.surface;
+  useEffect(() => {
+    plannerTelemetry(\"planner_surface_opened\", {
+      surface: opened as PlannerSurface,
+    });
+  }, [opened]);
+
+  const enterModes = useCallback((mode: PlannerSurfaceMode | null = null) => {
+    plannerTelemetry(\"planner_surface_opened\", { surface: \"MODES\" });
+    if (mode) {
+      plannerTelemetry(\"planner_mode_selected\", { mode });
+    }
+    setView({ surface: \"MODES\", mode });
+  }, []);
+
+  const backToClassic = useCallback(() => {
+    plannerTelemetry(\"planner_returned_to_classic\");
+    setView({ surface: \"CLASSIC\" });
+  }, []);
+
+  // An unlimited account is never exhausted (`remaining` is deliberately null).
+  const quotaExhausted =
+    plannerQuota !== null &&
+    !plannerQuota.unlimited &&
+    (plannerQuota.remaining === 0 || plannerQuota.allowed === false);
+
+  if (view.surface === \"MODES\") {
+    // The mode surface owns its own navigation bar, which carries \"← Classic Planner\"
+    // beside the mode switcher. A second bar here would be two ways to say one thing.
+    if (!capabilities)
+      return (
+        <div className=\"flex-1 min-h-0 overflow-y-auto chat-scroll p-6\">
+          <button
+            type=\"button\"
+            onClick={backToClassic}
+            className=\"min-h-11 inline-flex items-center gap-2 px-3 rounded-xl border border-border-subtle text-sm text-text-secondary hover:text-text-primary hover:bg-bg-shadow/60 transition-colors\"
+          >
+            ← Classic Planner
+          </button>
+          <p role=\"status\" className=\"mt-4 text-text-secondary\">
+            Loading planner modes…
+          </p>
+        </div>
+      );
+    return (
+      <div className=\"flex-1 min-h-0 overflow-y-auto chat-scroll\">
+        <PlannerWorkspace
+          key={handoff?.id ?? \"planner-workspace\"}
+          handoff={handoff}
+          capabilities={capabilities}
+          initialMode={view.mode ?? undefined}
+          onExitToClassic={backToClassic}
+          onQuotaRefresh={onQuotaRefresh}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className=\"flex-1 min-h-0 overflow-y-auto chat-scroll\">
+      <div className=\"max-w-2xl mx-auto px-4 sm:px-6 py-6\">
+        <div className={styles.plannerCard}>
+          {/* Ambient soft glow */}
+          <div className=\"absolute -top-24 -right-24 w-80 h-80 bg-accent-primary/10 rounded-full blur-3xl pointer-events-none\" />
+
+          {/* Minimalist Header */}
+          <div className=\"flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-border-subtle relative z-10\">
+            <div className=\"flex items-center gap-3 min-w-0\">
+              <div className=\"p-2.5 rounded-xl bg-accent-primary/10 border border-accent-primary/30 text-accent-text-light shrink-0 shadow-sm\">
+                <Calendar className=\"w-5 h-5\" />
+              </div>
+              <div className=\"min-w-0\">
+                <h2 className=\"text-base sm:text-lg font-bold font-['Rajdhani'] text-text-primary tracking-wide truncate\">
+                  AI Study Planner
+                </h2>
+                <p className=\"text-xs text-text-secondary font-['Rajdhani'] truncate\">
+                  Adaptive syllabus & quest generator
+                </p>
+              </div>
+            </div>
+
+            <div className=\"flex items-center gap-2 shrink-0\">
+              {plannerQuota && (
+                <span
+                  className={`text-[10px] uppercase tracking-wider font-mono px-2.5 py-1 rounded-full border ${
+                    quotaExhausted ? styles.tabBadgeLocked : styles.tabBadge
+                  }`}
+                >
+                  {plannerQuota.unlimited
+                    ? \"Unlimited Plans\"
+                    : `${plannerQuota.used} / ${plannerQuota.limit} Free Weekly Plan`}
+                </span>
+              )}
+              {/* The one deliberate way into the specialized workflows. Navigates directly
+                  to Planner Modes (Ask Sylf recommendation + Manual Chooser). */}
+              <button
+                type=\"button\"
+                onClick={() => enterModes(null)}
+                className=\"min-h-11 inline-flex items-center gap-2 px-3 rounded-xl border border-border-subtle text-xs sm:text-sm text-text-secondary hover:text-text-primary hover:border-accent-primary/40 hover:bg-bg-shadow/60 transition-colors\"
+              >
+                <LayoutGrid className=\"w-4 h-4\" />
+                Planner modes
+              </button>
+            </div>
+          </div>
+
+          {/* Form / generation / states — the Classic Planner, exactly as it was. */}
+          <AiPlannerPanel
+            quota={plannerQuota}
+            onQuotaRefresh={onQuotaRefresh}
+            sessionId={sessionId}
+            embedded
+            onViewConversation={onViewConversation}
+            onComplete={onComplete}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+"
+
+ ❯ __tests__/planner/classic-coexistence.test.ts:82:17
+     80|     // Classic is what opens, and it is not behind a capability check …
+     81|     expect(tab).toMatch(/<AiPlannerPanel/);
+     82|     expect(tab).toMatch(/useState<View>\(\{ surface: "CLASSIC" \}\)/);
+       |                 ^
+     83|     expect(tab).not.toMatch(/capabilities\?\.enabled|capabilities\.ena…
+     84|     // Planner Modes are reached deliberately, from a named button.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  __tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > uses both surfaces in one session with no configuration change
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/Exam Planner/`
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Planner Modes":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Planner Modes"[39m
+    [33mclass[39m=[32m"_root_a6631a"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "What are you planning?":
+  [36m<h2[39m
+    [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+  [36m/>[39m
+
+  Name "Or choose a planner manually":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Map a Course or Syllabus":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Master a Chapter or Unit":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "":
+  [36m<input[39m
+    [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+    [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+    [33mtype[39m=[32m"text"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Ask Sylf":
+  [36m<button[39m
+    [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  Name "Classic Planner →":
+  [36m<button[39m
+    [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Plan a Course":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Master a Unit":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex-1 min-h-0 overflow-y-auto chat-scroll"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Planner Modes"[39m
+        [33mclass[39m=[32m"_root_a6631a"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mb-5"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+          [36m>[39m
+            [0mWhat are you planning?[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-5 rounded-2xl border border-accent-primary/25 bg-accent-primary/[0.04] mb-6 shadow-sm"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center gap-2 mb-1.5"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-sparkles w-4 h-4 text-accent-text-light"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20 2v4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M22 4h-4"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"4"[39m
+                [33mcy[39m=[32m"20"[39m
+                [33mr[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-accent-text-light"[39m
+            [36m>[39m
+              [0mAsk Sylf · Plan Recommendation[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+          [36m>[39m
+            [0mTell Sylf what you're trying to accomplish and it will help choose and configure the right planner.[0m
+          [36m</p>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"flex flex-col sm:flex-row gap-2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+              [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+              [33mtype[39m=[32m"text"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mAsk Sylf[0m
+            [36m</button>[39m
+          [36m</form>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+            [36m>[39m
+              [0mOr choose a planner manually[0m
+            [36m</h3>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mClassic Planner →[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"grid grid-cols-1 md:grid-cols-3 gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-violet-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-target w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"10"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"6"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"2"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300"[39m
+                  [36m>[39m
+                    [0mSprint[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mPrepare for an Exam[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeadline-driven day-level sprint with coverage, recall, practice and exam readiness.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPrepare for an Exam[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-sky-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-book-open w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M12 5v16"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMap a Course or Syllabus[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mLong-horizon roadmap of months or weeks with milestones and covered units.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPlan a Course[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-graduation-cap w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M22 10v6"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M6 12.5V16a6 3 0 0 0 12 0v-3.5"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"[39m
+                  [36m>[39m
+                    [0mProgression[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMaster a Chapter or Unit[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeep progression for one bounded unit: understand, recall, practice, and mastery check.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mMaster a Unit[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ __tests__/planner/classic-modes-coexistence.test.tsx:129:28
+    127|     // 2. Exam, reached deliberately.
+    128|     fireEvent.click(screen.getByRole("button", { name: /Planner modes/…
+    129|     fireEvent.click(screen.getByRole("button", { name: /Exam Planner/ …
+       |                            ^
+    130|     expect(await screen.findByRole("heading", { name: MODE_HEADINGS.EX…
+    131|     // Quick Plan is still the default creation flow inside a mode.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  __tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > keeps every Planner Modes capability the phase before this one established
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/Exam Planner/`
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Planner Modes":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Planner Modes"[39m
+    [33mclass[39m=[32m"_root_a6631a"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "What are you planning?":
+  [36m<h2[39m
+    [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+  [36m/>[39m
+
+  Name "Or choose a planner manually":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Map a Course or Syllabus":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Master a Chapter or Unit":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "":
+  [36m<input[39m
+    [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+    [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+    [33mtype[39m=[32m"text"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Ask Sylf":
+  [36m<button[39m
+    [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  Name "Classic Planner →":
+  [36m<button[39m
+    [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Plan a Course":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Master a Unit":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex-1 min-h-0 overflow-y-auto chat-scroll"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Planner Modes"[39m
+        [33mclass[39m=[32m"_root_a6631a"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mb-5"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+          [36m>[39m
+            [0mWhat are you planning?[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-5 rounded-2xl border border-accent-primary/25 bg-accent-primary/[0.04] mb-6 shadow-sm"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center gap-2 mb-1.5"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-sparkles w-4 h-4 text-accent-text-light"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20 2v4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M22 4h-4"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"4"[39m
+                [33mcy[39m=[32m"20"[39m
+                [33mr[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-accent-text-light"[39m
+            [36m>[39m
+              [0mAsk Sylf · Plan Recommendation[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+          [36m>[39m
+            [0mTell Sylf what you're trying to accomplish and it will help choose and configure the right planner.[0m
+          [36m</p>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"flex flex-col sm:flex-row gap-2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+              [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+              [33mtype[39m=[32m"text"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mAsk Sylf[0m
+            [36m</button>[39m
+          [36m</form>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+            [36m>[39m
+              [0mOr choose a planner manually[0m
+            [36m</h3>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mClassic Planner →[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"grid grid-cols-1 md:grid-cols-3 gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-violet-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-target w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"10"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"6"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"2"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300"[39m
+                  [36m>[39m
+                    [0mSprint[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mPrepare for an Exam[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeadline-driven day-level sprint with coverage, recall, practice and exam readiness.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPrepare for an Exam[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-sky-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-book-open w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M12 5v16"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMap a Course or Syllabus[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mLong-horizon roadmap of months or weeks with milestones and covered units.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPlan a Course[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-graduation-cap w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M22 10v6"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M6 12.5V16a6 3 0 0 0 12 0v-3.5"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"[39m
+                  [36m>[39m
+                    [0mProgression[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMaster a Chapter or Unit[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeep progression for one bounded unit: understand, recall, practice, and mastery check.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mMaster a Unit[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ __tests__/planner/classic-modes-coexistence.test.tsx:159:28
+    157|     tab();
+    158|     fireEvent.click(screen.getByRole("button", { name: /Planner modes/…
+    159|     fireEvent.click(screen.getByRole("button", { name: /Exam Planner/ …
+       |                            ^
+    160|     await screen.findByRole("heading", { name: MODE_HEADINGS.EXAM }, {…
+    161|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  __tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > reports each surface it opens, and the return to Classic
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/Exam Planner/`
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Planner Modes":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Planner Modes"[39m
+    [33mclass[39m=[32m"_root_a6631a"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "What are you planning?":
+  [36m<h2[39m
+    [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+  [36m/>[39m
+
+  Name "Or choose a planner manually":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Map a Course or Syllabus":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Master a Chapter or Unit":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "":
+  [36m<input[39m
+    [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+    [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+    [33mtype[39m=[32m"text"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Ask Sylf":
+  [36m<button[39m
+    [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  Name "Classic Planner →":
+  [36m<button[39m
+    [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Plan a Course":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Master a Unit":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex-1 min-h-0 overflow-y-auto chat-scroll"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Planner Modes"[39m
+        [33mclass[39m=[32m"_root_a6631a"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mb-5"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+          [36m>[39m
+            [0mWhat are you planning?[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-5 rounded-2xl border border-accent-primary/25 bg-accent-primary/[0.04] mb-6 shadow-sm"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center gap-2 mb-1.5"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-sparkles w-4 h-4 text-accent-text-light"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20 2v4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M22 4h-4"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"4"[39m
+                [33mcy[39m=[32m"20"[39m
+                [33mr[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-accent-text-light"[39m
+            [36m>[39m
+              [0mAsk Sylf · Plan Recommendation[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+          [36m>[39m
+            [0mTell Sylf what you're trying to accomplish and it will help choose and configure the right planner.[0m
+          [36m</p>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"flex flex-col sm:flex-row gap-2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+              [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+              [33mtype[39m=[32m"text"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mAsk Sylf[0m
+            [36m</button>[39m
+          [36m</form>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+            [36m>[39m
+              [0mOr choose a planner manually[0m
+            [36m</h3>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mClassic Planner →[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"grid grid-cols-1 md:grid-cols-3 gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-violet-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-target w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"10"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"6"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"2"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300"[39m
+                  [36m>[39m
+                    [0mSprint[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mPrepare for an Exam[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeadline-driven day-level sprint with coverage, recall, practice and exam readiness.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPrepare for an Exam[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-sky-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-book-open w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M12 5v16"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMap a Course or Syllabus[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mLong-horizon roadmap of months or weeks with milestones and covered units.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPlan a Course[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-graduation-cap w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M22 10v6"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M6 12.5V16a6 3 0 0 0 12 0v-3.5"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"[39m
+                  [36m>[39m
+                    [0mProgression[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMaster a Chapter or Unit[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeep progression for one bounded unit: understand, recall, practice, and mastery check.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mMaster a Unit[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ __tests__/planner/classic-modes-coexistence.test.tsx:186:30
+    184|
+    185|       fireEvent.click(screen.getByRole("button", { name: /Planner mode…
+    186|       fireEvent.click(screen.getByRole("button", { name: /Exam Planner…
+       |                              ^
+    187|       await screen.findByRole("heading", { name: MODE_HEADINGS.EXAM },…
+    188|       // The choice is reported as a mode, and the surface as Planner …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  __tests__/planner/classic-modes-coexistence.test.tsx > Classic Planner and Planner Modes coexist > returns to Classic from Advanced setup as well as from Quick Plan
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/Mastery/`
+
+Here are the accessible roles:
+
+  region:
+
+  Name "Planner Modes":
+  [36m<section[39m
+    [33maria-label[39m=[32m"Planner Modes"[39m
+    [33mclass[39m=[32m"_root_a6631a"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  heading:
+
+  Name "What are you planning?":
+  [36m<h2[39m
+    [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+  [36m/>[39m
+
+  Name "Or choose a planner manually":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Map a Course or Syllabus":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  Name "Master a Chapter or Unit":
+  [36m<h3[39m
+    [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  Name "":
+  [36m<p[39m
+    [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "":
+  [36m<input[39m
+    [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+    [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+    [33mtype[39m=[32m"text"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  button:
+
+  Name "Ask Sylf":
+  [36m<button[39m
+    [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtype[39m=[32m"submit"[39m
+  [36m/>[39m
+
+  Name "Classic Planner →":
+  [36m<button[39m
+    [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "Prepare for an Exam":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Plan a Course":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  Name "Master a Unit":
+  [36m<button[39m
+    [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex-1 min-h-0 overflow-y-auto chat-scroll"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-label[39m=[32m"Planner Modes"[39m
+        [33mclass[39m=[32m"_root_a6631a"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mb-5"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-xl sm:text-2xl font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase"[39m
+          [36m>[39m
+            [0mWhat are you planning?[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-5 rounded-2xl border border-accent-primary/25 bg-accent-primary/[0.04] mb-6 shadow-sm"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center gap-2 mb-1.5"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-sparkles w-4 h-4 text-accent-text-light"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20 2v4"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M22 4h-4"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"4"[39m
+                [33mcy[39m=[32m"20"[39m
+                [33mr[39m=[32m"2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-accent-text-light"[39m
+            [36m>[39m
+              [0mAsk Sylf · Plan Recommendation[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-3"[39m
+          [36m>[39m
+            [0mTell Sylf what you're trying to accomplish and it will help choose and configure the right planner.[0m
+          [36m</p>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"flex flex-col sm:flex-row gap-2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33mclass[39m=[32m"flex-1 min-w-0 px-3.5 py-2 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none"[39m
+              [33mplaceholder[39m=[32m"e.g. I have A-level exams in May, Math and Physics, and 12 hours a week…"[39m
+              [33mtype[39m=[32m"text"[39m
+              [33mvalue[39m=[32m""[39m
+            [36m/>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"min-h-10 px-4 py-2 rounded-xl bg-accent-primary text-white text-xs font-bold font-['Rajdhani'] uppercase tracking-wider hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mAsk Sylf[0m
+            [36m</button>[39m
+          [36m</form>[39m
+        [36m</div>[39m
+        [36m<div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+          [36m>[39m
+            [36m<h3[39m
+              [33mclass[39m=[32m"text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-text-muted"[39m
+            [36m>[39m
+              [0mOr choose a planner manually[0m
+            [36m</h3>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"text-xs text-text-muted hover:text-text-primary transition-colors font-medium"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mClassic Planner →[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"grid grid-cols-1 md:grid-cols-3 gap-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-violet-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-target w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"10"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"6"[39m
+                      [36m/>[39m
+                      [36m<circle[39m
+                        [33mcx[39m=[32m"12"[39m
+                        [33mcy[39m=[32m"12"[39m
+                        [33mr[39m=[32m"2"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300"[39m
+                  [36m>[39m
+                    [0mSprint[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mPrepare for an Exam[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeadline-driven day-level sprint with coverage, recall, practice and exam readiness.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPrepare for an Exam[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-sky-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-book-open w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M12 5v16"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMap a Course or Syllabus[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mLong-horizon roadmap of months or weeks with milestones and covered units.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mPlan a Course[0m
+              [36m</button>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"group relative flex flex-col justify-between p-4 sm:p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:border-emerald-500/50 hover:bg-white/[0.04] transition-all duration-200"[39m
+            [36m>[39m
+              [36m<div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex items-center justify-between mb-3"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 group-hover:scale-105 transition-transform duration-200"[39m
+                  [36m>[39m
+                    [36m<svg[39m
+                      [33maria-hidden[39m=[32m"true"[39m
+                      [33mclass[39m=[32m"lucide lucide-graduation-cap w-5 h-5"[39m
+                      [33mfill[39m=[32m"none"[39m
+                      [33mheight[39m=[32m"24"[39m
+                      [33mstroke[39m=[32m"currentColor"[39m
+                      [33mstroke-linecap[39m=[32m"round"[39m
+                      [33mstroke-linejoin[39m=[32m"round"[39m
+                      [33mstroke-width[39m=[32m"2"[39m
+                      [33mviewBox[39m=[32m"0 0 24 24"[39m
+                      [33mwidth[39m=[32m"24"[39m
+                      [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                    [36m>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M22 10v6"[39m
+                      [36m/>[39m
+                      [36m<path[39m
+                        [33md[39m=[32m"M6 12.5V16a6 3 0 0 0 12 0v-3.5"[39m
+                      [36m/>[39m
+                    [36m</svg>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"[39m
+                  [36m>[39m
+                    [0mProgression[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"text-base font-bold font-['Rajdhani'] tracking-wide text-text-primary uppercase mb-1.5"[39m
+                [36m>[39m
+                  [0mMaster a Chapter or Unit[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-xs text-text-secondary leading-relaxed mb-4"[39m
+                [36m>[39m
+                  [0mDeep progression for one bounded unit: understand, recall, practice, and mastery check.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_primary_a6631a w-full"[39m
+              [36m>[39m
+                [0mMaster a Unit[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ __tests__/planner/classic-modes-coexistence.test.tsx:222:28
+    220|     tab();
+    221|     fireEvent.click(screen.getByRole("button", { name: /Planner modes/…
+    222|     fireEvent.click(screen.getByRole("button", { name: /Mastery/ }));
+       |                            ^
+    223|     await screen.findByRole("heading", { name: MODE_HEADINGS.MASTERY }…
+    224|     fireEvent.click(screen.getByRole("button", { name: "Fine-tune firs…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  __tests__/planner/exam-entry.test.tsx > Planner surfaces > offers Planner modes from the header and opens the chooser
+Error: expect(element).toHaveAttribute("aria-haspopup", "dialog") // element.getAttribute("aria-haspopup") === "dialog"
+
+Expected the element to have attribute:
+  aria-haspopup="dialog"
+Received:
+  null
+ ❯ __tests__/planner/exam-entry.test.tsx:58:21
+     56|     tab();
+     57|     const trigger = screen.getByRole("button", { name: /Planner modes/…
+     58|     expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
+       |                     ^
+     59|     fireEvent.click(trigger);
+     60|     const dialog = screen.getByRole("dialog", { name: "Planner modes" …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  __tests__/planner/exam-entry.test.tsx > Planner surfaces > enters the chosen mode directly, without asking again
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/Exam Planner/`
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex-1 min-h-0 overflow-y-auto chat-scroll"[39m
+    [36m>[39m
+      [36m<div>[39m
+        [0mPlanner Modes surface: [0m
+        [0mchooser[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ __tests__/planner/exam-entry.test.tsx:73:28
+     71|     tab();
+     72|     fireEvent.click(screen.getByRole("button", { name: /Planner modes/…
+     73|     fireEvent.click(screen.getByRole("button", { name: /Exam Planner/ …
+       |                            ^
+     74|     expect(screen.getByText("Planner Modes surface: EXAM")).toBeInTheD…
+     75|     // The Classic panel is not rendered underneath.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  __tests__/planner/exam-entry.test.tsx > Planner surfaces > routes each mode to its own surface
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name `/Course \/ Syllabus Roadmap/`
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex-1 min-h-0 overflow-y-auto chat-scroll"[39m
+    [36m>[39m
+      [36m<div>[39m
+        [0mPlanner Modes surface: [0m
+        [0mchooser[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ __tests__/planner/exam-entry.test.tsx:87:30
+     85|       tab();
+     86|       fireEvent.click(screen.getByRole("button", { name: /Planner mode…
+     87|       fireEvent.click(screen.getByRole("button", { name: label }));
+       |                              ^
+     88|       expect(screen.getByText(`Planner Modes surface: ${mode}`)).toBeI…
+     89|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  __tests__/planner/exam-entry.test.tsx > Planner surfaces > closes the chooser on Escape and returns focus to its trigger
+TestingLibraryElementError: Unable to find an accessible element with the role "dialog" and name "Planner modes"
+
+There are no accessible roles. But there might be some inaccessible roles. If you wish to access them, then set the `hidden` option to `true`. Learn more about this here: https://testing-library.com/docs/dom-testing-library/api-queries#byrole
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex-1 min-h-0 overflow-y-auto chat-scroll"[39m
+    [36m>[39m
+      [36m<div>[39m
+        [0mPlanner Modes surface: [0m
+        [0mchooser[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ __tests__/planner/exam-entry.test.tsx:99:19
+     97|     trigger.focus();
+     98|     fireEvent.click(trigger);
+     99|     expect(screen.getByRole("dialog", { name: "Planner modes" })).toBe…
+       |                   ^
+    100|     fireEvent.keyDown(document, { key: "Escape" });
+    101|     // The dialog leaves through an exit animation, so the state chang…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  3 failed | 156 passed | 30 skipped (189)
+      Tests  9 failed | 2156 passed | 257 skipped (2422)
+   Start at  10:15:20
+   Duration  124.55s (transform 10.76s, setup 21.89s, import 66.78s, tests 52.91s, environment 65.41s)
+

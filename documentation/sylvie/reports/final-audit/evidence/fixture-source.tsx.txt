@@ -1,0 +1,62 @@
+import React, { useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import ConversationPanel from '../../app/system/components/ConversationPanel';
+import SystemOverlay from '../../app/components/system/SystemOverlay';
+import AiAssistantTool from '../../app/focus/components/tools/AiAssistantTool';
+import { FocusToolsProvider } from '../../app/focus/components/FocusToolsContext';
+import plannerStyles from '../../app/components/planner/ExamPlanner.module.css';
+import PlannerCopilot from '../../app/components/planner/copilot/PlannerCopilot';
+import { emptyBrief } from '../../lib/planner/intake/brief';
+import { emptyComparisonView } from '../../lib/planner/intake/actions';
+import { resolvePresence } from '../../app/components/system/page-presence';
+import { getAccentTokens, getBackgroundTokens } from '../../lib/color-utils';
+import '../../app/globals.css';
+const query = new URLSearchParams(location.search), mode = query.get('mode') === 'light' ? 'light' : 'dark';
+const custom = query.has('custom'), surface = query.get('surface') || 'main';
+// Synthetic recognition only: no microphone, browser speech service or audio capture is used.
+if(query.has('voice')) {
+ class FixtureRecognition {
+  static async available(){return query.has('remote')?'unavailable':'available';}
+  lang='';continuous=true;interimResults=true;processLocally=false;
+  onstart=null;onend=null;onresult=null;onerror=null;onspeechend=null;
+  constructor(){window.__speech=this;}
+  start(){setTimeout(()=>this.onstart?.(),30);}
+  stop(){window.__voiceStopped=true;}
+  abort(){window.__voiceAborts=(window.__voiceAborts||0)+1;}
+  result(text,done=true){this.onresult?.({results:[{0:{transcript:text},isFinal:done}]});}
+ }
+ window.SpeechRecognition=FixtureRecognition; window.webkitSpeechRecognition=undefined;
+} else if(query.has('unsupported')){window.SpeechRecognition=window.webkitSpeechRecognition=undefined;}
+document.documentElement.setAttribute('data-mode', mode);document.documentElement.classList.toggle('dark',mode==='dark');
+const background=getBackgroundTokens(custom?(mode==='light'?'#eaf5ee':'#17251f'):(mode==='light'?'#f8fafc':'#07090e'),mode);
+for(const [key,value] of Object.entries({...background,...getAccentTokens(custom?'#289d91':'#7c3aed',background['--surface-1'])})) document.documentElement.style.setProperty(key,value);
+const stamp='2026-10-15T09:00:00Z';
+const reply='Energy moves between systems through **work** and **heat**.\n\nFor a closed system:\n\n$$\\Delta U = Q - W$$\n\n- **Heat** adds energy because of a temperature difference.\n- **Work** transfers energy through a force acting over a distance.\n\nFor example, a warm cup of tea transfers heat to the room. Its internal energy decreases as it cools.';
+const initial=[{id:1,type:'USER',content:'Explain energy transfer with a simple example.',createdAt:stamp},{id:2,type:'INFO',content:reply,createdAt:stamp,modelUsed:'DeepSeek'}];
+let calls=0;window.__fixtureCalls=[]; const encoder=new TextEncoder();
+const view={id:'fixture-intake',version:1,mode:'EXAM',planId:null,brief:emptyBrief('EXAM'),readiness:{state:'NEEDS_CORE_INFO',canGenerate:false,missing:['GOAL_MISSING','SCOPE_MISSING'],refinements:[],summary:'Add your goal'},limits:{weeklyLimitMinutes:null,sessionLimitMinutes:null,unavailableWeekdays:[]},comparison:emptyComparisonView(),scheduleWeeklyMinutes:null};
+// All network requests are intercepted. No real user/provider/database is reachable.
+globalThis.fetch=async (input,init={})=>{
+ const url=String(input);window.__fixtureCalls.push({url,body:init.body});
+ if(url.includes('/designer')&&query.has('error'))return Response.json({code:'MODEL_UNAVAILABLE'},{status:503});
+ if(url.includes('/designer'))return Response.json({outcome:'DESIGNER_PROPOSED',summary:'We can spread six hours across three study days.',proposal:{token:'fixture-token',summary:'Study for six hours each week',changes:[{command:'SET_WEEKLY_HOURS',consequence:'Use two hours on Monday, Wednesday and Friday.'}],requiresAcknowledgement:[]},designer:{summary:{readyToGenerate:false,missing:['SCOPE_MISSING']},mode:null,guidance:[],unresolved:[],question:null},view});
+ if(url.includes('/api/chats'))return Response.json({sessions:[{id:1,title:'Energy transfer',createdAt:stamp,updatedAt:stamp}]});
+ if(url.includes('/api/ai-quotas'))return Response.json({chat:quota,planner:{...quota,remaining:1,used:0,limit:1}});
+ if(url.includes('/api/skills'))return Response.json({unlockedSkills:[]});
+ if(url.includes('/api/system-messages?'))return Response.json({messages:query.has('filled')?initial:[]});
+ if(!url.includes('/api/system-messages/chat'))throw Error('SYNTHETIC_FIXTURE_NETWORK_BLOCKED');
+ calls++; if(query.has('error'))return Response.json({error:'Network unavailable. Please try again.'},{status:503});
+ let controller;let timer;const data=init.body instanceof FormData?String(init.body.get('message')):JSON.parse(String(init.body)).message;
+ const imageFiles=init.body instanceof FormData?init.body.getAll('images'):[];const imageRefs=init.body instanceof FormData?JSON.parse(String(init.body.get('imageReferences')||'[]')):JSON.parse(String(init.body)).imageReferences||[];const attachments=[...imageFiles,...imageRefs].map((item,index)=>({messageId:10+calls*2,index,url:`/api/system-messages/${10+calls*2}/images/${index}`,name:item.name||'Equation',mimeType:'image/png'}));
+ const text=data.toLowerCase().includes('introduction')?'Sylf helps you plan your studies, stay focused, and track your progress.':reply;
+ const body=new ReadableStream({start(c){controller=c;let offset=0;const send=(event,value)=>c.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(value)}\n\n`));send('session',{sessionId:1,session:{id:1,title:'Energy transfer'}});timer=setInterval(()=>{if(offset<text.length){send('delta',{text:text.slice(offset,offset+12)});offset+=12;}else{clearInterval(timer);send('result',{sessionId:1,session:{id:1,title:'Energy transfer'},userMessage:{id:10+calls*2,type:'USER',content:data,createdAt:stamp,attachments},aiMessage:{id:11+calls*2,type:'INFO',content:text,createdAt:stamp}});c.close();}},query.has('slow')?180:30);},cancel(){clearInterval(timer);}});
+ init.signal?.addEventListener('abort',()=>{clearInterval(timer);try{controller.error(new DOMException('Aborted','AbortError'));}catch{}});
+ return new Response(body,{headers:{'Content-Type':'text/event-stream'}});
+};
+const quota={allowed:true,remaining:9,used:1,limit:10,resetsAt:'2026-10-16T00:00:00Z'};
+function App(){const [id,setId]=useState(query.has('filled')?1:null);const [open,setOpen]=useState(true);
+ return <div style={{height:'100dvh',background:background['--bg-void'],display:'flex',flexDirection:'column'}}>
+ {surface==='main'?<><header style={{height:72,padding:'22px 28px',borderBottom:'1px solid var(--border-subtle)',fontSize:20,fontWeight:600}}>Sylvie</header><ConversationPanel sessionId={id} sessionTitle="Energy transfer" chatQuota={quota} modelPref="auto" isDevMode={false} onSessionCreated={session=>setId(session.id)} onQuotaRefresh={()=>{}} onOpenPlanner={()=>{}} /></>:surface==='popup'?<><p style={{margin:24,color:'var(--text-secondary)'}}>Dashboard · synthetic preview</p><SystemOverlay open={open} presence={resolvePresence('/goals','')} chatQuota={quota} sessionId={id} onSessionChange={setId} onQuotaRefresh={()=>{}} onOpenWorkspace={()=>{}} onOpenPlanner={()=>{}} onClose={()=>setOpen(false)} /></>:<div style={{height:'min(740px,100dvh)',width:'min(470px,100vw)',alignSelf:'center',margin:'auto',border:'1px solid var(--border-subtle)',borderRadius:20,overflow:'hidden',background:'var(--surface-1)'}}>{surface==='focus'?<FocusToolsProvider subjectName="Physics"><AiAssistantTool /></FocusToolsProvider>:<div className={plannerStyles.root} style={{height:"100%",display:"flex",minHeight:0}}><PlannerCopilot view={view as never} onView={()=>{}} onRoute={()=>{}} /></div>}</div>}
+ </div>;
+}
+createRoot(document.getElementById('root')!).render(<App />);

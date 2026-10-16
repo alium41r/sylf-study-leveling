@@ -31,6 +31,11 @@ import base from "../ExamPlanner.module.css";
 import s from "./copilot.module.css";
 import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 import { claimPlannerHandoff, releasePlannerHandoff } from "@/lib/ai/sylvie/planner-handoff-client";
+import ChatComposer from "@/app/components/system/chat/ChatComposer";
+import ChatImages from "@/app/components/system/chat/ChatImages";
+import { useComposerImages } from "@/app/components/system/chat/useComposerImages";
+import type { ComposerImage } from "@/lib/ai/sylvie/image-contract";
+import ChatText from "@/app/components/system/chat/ChatText";
 
 /**
  * Sylf Unified Assistant
@@ -101,7 +106,7 @@ export interface SylfAssistantProps {
   onSwitchMode?: (mode: "EXAM" | "ROADMAP" | "MASTERY") => void;
   isMobileSheet?: boolean;
   onCloseMobile?: () => void;
-  inputRef?: React.RefObject<HTMLInputElement | null>;
+  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 export default function PlannerCopilot({
@@ -119,14 +124,24 @@ export default function PlannerCopilot({
   onBusyChange,
 }: SylfAssistantProps) {
   const [message, setMessage] = useState("");
-  const [turns, setTurns] = useState<CopilotRecentTurn[]>([]);
+  const [turns, setTurns] = useState<Array<CopilotRecentTurn & { images?: ComposerImage[] }>>([]);
+  const media = useComposerImages(view.id);
+  const { images: draftImages, clear: clearImages } = media;
+  const turnImageUrls = useRef(new Set<string>());
+  useEffect(() => () => { for (const url of turnImageUrls.current) URL.revokeObjectURL(url); turnImageUrls.current.clear(); }, []);
+  useEffect(() => {
+    const retained = new Set(turns.flatMap(turn => turn.images?.map(image => image.url) ?? []));
+    for (const url of turnImageUrls.current) if (!retained.has(url)) { URL.revokeObjectURL(url); turnImageUrls.current.delete(url); }
+  }, [turns]);
   const [busy, setBusy] = useState(false);
   const [failedTransfer, setFailedTransfer] = useState<SylviePlannerHandoff | null>(null);
   const autoSent = useRef<string | null>(null);
   const activeTransfer = useRef<{ id: string; abort: AbortController } | null>(null);
+  const activeMessage = useRef<AbortController | null>(null);
 
   useEffect(() => { onBusyChange?.(busy); }, [busy, onBusyChange]);
   useEffect(() => () => {
+    activeMessage.current?.abort();
     const active = activeTransfer.current;
     if (active) {
       active.abort.abort();
@@ -150,8 +165,10 @@ export default function PlannerCopilot({
   const [designerSummary, setDesignerSummary] = useState<DesignerSummary | null>(null);
 
   const proposalRef = useRef<HTMLDivElement | null>(null);
-  const localInputRef = useRef<HTMLInputElement | null>(null);
+  const localInputRef = useRef<HTMLTextAreaElement | null>(null);
   const transcriptRef = useRef<HTMLDivElement | null>(null);
+  const transcriptPinned = useRef(true);
+  const sendingRef = useRef(false);
 
   const effectiveInputRef = inputRef ?? localInputRef;
 
@@ -159,7 +176,7 @@ export default function PlannerCopilot({
 
   // Auto-scroll transcript on new turns
   useEffect(() => {
-    if (transcriptRef.current) {
+    if (transcriptRef.current && transcriptPinned.current) {
       transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
     }
   }, [turns, busy, proposal, designerQuestion, researchRoute]);
@@ -224,9 +241,13 @@ export default function PlannerCopilot({
 
   const send = useCallback(
     async (text: string, clarificationAnswer?: string, transferred?: SylviePlannerHandoff) => {
-      const trimmed = text.trim();
-      if (!trimmed) return;
-      const transferAbort = transferred ? new AbortController() : undefined;
+      const files = transferred ? [] : draftImages.flatMap(image => image.file ? [image.file] : []);
+      const trimmed = text.trim() || (files.length ? "Use the attached images to help with this study plan." : "");
+      if (!trimmed || sendingRef.current) return;
+      sendingRef.current = true;
+      transcriptPinned.current = true;
+      const transferAbort = new AbortController();
+      activeMessage.current = transferAbort;
       if (transferred && transferAbort) activeTransfer.current = { id: transferred.id, abort: transferAbort };
       setBusy(true);
       setFailedTransfer(null);
@@ -239,15 +260,21 @@ export default function PlannerCopilot({
       setModeRecommendation(null);
 
       try {
+        const studentTurn = () => ({ role: "STUDENT" as const, text: trimmed, images: files.map(file => {
+          const url = URL.createObjectURL(file); turnImageUrls.current.add(url);
+          return { id: crypto.randomUUID(), url, name: file.name, mimeType: file.type, file };
+        }) });
         if (preGen) {
           // Pre-generation -> Plan Designer turn
           const payload: DesignerTurnPayload = await sendDesignerMessage(view.id, {
             expectedVersion: view.version,
             message: trimmed,
             recent: transferred?.recent ?? turns,
-            proposalOnly: Boolean(transferred),
+            proposalOnly: Boolean(transferred) || files.length > 0,
+            images: files,
             signal: transferAbort?.signal,
           });
+          if (transferAbort.signal.aborted) return;
 
           if (transferred && payload.outcome === "DESIGNER_REFUSED" && ["MODEL_UNAVAILABLE", "MODEL_TIMEOUT", "COPILOT_BAD_OUTPUT"].includes(payload.code)) {
             releasePlannerHandoff(transferred.id);
@@ -318,10 +345,11 @@ export default function PlannerCopilot({
             setDesignerQuestion(payload.designer.question);
           }
 
+          const student = studentTurn();
           setTurns((prev) =>
             [
               ...prev,
-              { role: "STUDENT" as const, text: trimmed },
+              student,
               { role: "SYLF" as const, text: sylfResponseText },
             ].slice(-8)
           );
@@ -331,10 +359,12 @@ export default function PlannerCopilot({
             expectedVersion: view.version,
             message: trimmed,
             recent: transferred?.recent ?? turns,
-            proposalOnly: Boolean(transferred),
+            proposalOnly: Boolean(transferred) || files.length > 0,
+            images: files,
             signal: transferAbort?.signal,
             clarificationAnswer: clarificationAnswer ?? null,
           });
+          if (transferAbort.signal.aborted) return;
 
           if (transferred && payload.outcome === "REFUSED" && ["MODEL_UNAVAILABLE", "MODEL_TIMEOUT", "COPILOT_BAD_OUTPUT"].includes(payload.code)) {
             releasePlannerHandoff(transferred.id);
@@ -348,10 +378,11 @@ export default function PlannerCopilot({
                 ? payload.phrasing ?? payload.summary
                 : payload.summary;
 
+          const student = studentTurn();
           setTurns((prev) =>
             [
               ...prev,
-              { role: "STUDENT" as const, text: trimmed },
+              student,
               { role: "SYLF" as const, text: said },
             ].slice(-8)
           );
@@ -374,24 +405,29 @@ export default function PlannerCopilot({
             setNotice(payload.message);
           }
         }
+        clearImages();
+        if (!transferred) setMessage(current => current.trim() === text.trim() ? "" : current);
       } catch (error) {
+        if (transferAbort.signal.aborted) return;
         if (transferred) {
           releasePlannerHandoff(transferred.id);
           setFailedTransfer(transferred);
         }
         const code = (error as { code?: string }).code ?? "";
+        const imageMessage = code === "INVALID_IMAGE" ? (error as { serverMessage?: string }).serverMessage : undefined;
         setNotice(
-          code === "COPILOT_PROPOSAL_STALE" || code === "INTAKE_STALE"
+          imageMessage ? imageMessage : code === "COPILOT_PROPOSAL_STALE" || code === "INTAKE_STALE"
             ? "The plan changed while I was reading that. Ask me again against the current plan."
             : "Sylf could not reach the planner assistant just now. The structured controls still work."
         );
       } finally {
+        if (activeMessage.current === transferAbort) activeMessage.current = null;
+        sendingRef.current = false;
         if (activeTransfer.current?.abort === transferAbort) activeTransfer.current = null;
         setBusy(false);
-        setMessage("");
       }
     },
-    [onPrerequisite, onRoute, onView, preGen, turns, view.id, view.version]
+    [onPrerequisite, onRoute, onView, preGen, turns, view.id, view.version, draftImages, clearImages]
   );
 
   useEffect(() => {
@@ -499,6 +535,7 @@ export default function PlannerCopilot({
           role="log"
           aria-label="Conversation with Sylf"
           aria-live="polite"
+          onScroll={() => { const element = transcriptRef.current; if (element) transcriptPinned.current = element.scrollHeight - element.scrollTop - element.clientHeight < 64; }}
           className={s.transcriptContainer}
         >
           {turns.length === 0 && (
@@ -515,7 +552,8 @@ export default function PlannerCopilot({
               key={`${turn.role}-${index}`}
               className={turn.role === "STUDENT" ? s.bubbleStudent : s.bubbleSylf}
             >
-              <strong>{turn.role === "STUDENT" ? "You" : "Sylf"}:</strong> {turn.text}
+              <strong>{turn.role === "STUDENT" ? "You" : "Sylf"}</strong><ChatText content={turn.text} compact />
+              {turn.images?.length ? <ChatImages images={turn.images} disabled={busy} onReuseLocal={file => media.addFiles([file])} /> : null}
             </div>
           ))}
 
@@ -733,36 +771,11 @@ export default function PlannerCopilot({
             ))}
           </div>
 
-          <form
-            className={s.pinnedComposer}
-            onSubmit={(event) => {
-              event.preventDefault();
-              void send(message);
-            }}
-          >
-            <label htmlFor="sylf-message-input" className="sr-only">
-              Ask Sylf about this plan
-            </label>
-            <input
-              id="sylf-message-input"
-              ref={effectiveInputRef}
-              className={s.composerInput}
-              type="text"
-              value={message}
-              maxLength={600}
-              disabled={busy}
-              placeholder={preGen ? "Describe your goal, deadline or hours…" : "Ask Sylf to adjust your plan…"}
-              onChange={(event) => setMessage(event.target.value)}
-            />
-            <button
-              type="submit"
-              className={s.composerSendBtn}
-              disabled={busy || !message.trim()}
-              aria-label="Send message to Sylf"
-            >
-              Send
-            </button>
-          </form>
+          <ChatComposer key={view.id} resetKey={view.id} value={message} onChange={setMessage} busy={busy} disabled={busy} inputRef={effectiveInputRef}
+            images={media.images} onFilesAdded={media.addFiles} onImageRemove={media.remove} imageError={media.error}
+            maxLength={600} inputLabel="Ask Sylf about this plan" sendLabel="Send message to Sylf"
+            placeholder={preGen ? "Describe your goal, deadline or hours…" : "Ask Sylf to adjust your plan…"}
+            onSend={() => { transcriptPinned.current = true; void send(message); }} />
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import type { NormalizedMessagePart } from "@/lib/ai/providers/types";
 import "server-only";
 import { CopilotModelError, ask } from "../copilot/model";
 import type { PlannerCopilotContextV1 } from "../copilot/contracts";
@@ -91,7 +92,7 @@ WHAT YOU MUST NEVER DO:
 - Never state a week target as a hard limit. "I have about 10 hours" is a target. "I cannot do more than 10 hours" is a limit.
 - Never set a date you were not given. If they say "February", you do not know the day: set questionCode to DATE and ask for it.
 - Never claim you have searched, will search, or have found anything. Research happens only when the student asks for it and the server runs it.
-- Never say you can read, open or switch to a file. You cannot: uploading and pasting happen on the scope step.
+- Attached images can supply visible facts for review. Full syllabus/document imports still use the scope step; never claim a document was imported.
 - Never answer a question about the world. This assistant designs study plans.
 - QUESTIONS: ask at most ONE question, and only about a missing essential — the goal, what the plan covers, the date, or how much time they have each week. Set "questionCode" to which one, and "question" to how you would ask it. Never ask about the board, level, background, preparedness, difficulty, priorities, session length or preferences — those are optional and the student can skip them.
 - explanationRefs: when the intent is EXPLAIN, list the ids of PLANNER FACTS your summary uses. Never invent an id.
@@ -111,6 +112,7 @@ export interface DesignerTurnInput {
   message: string;
   factIds: string[];
   signal?: AbortSignal;
+  images?: NormalizedMessagePart[];
 }
 
 export interface DesignerModel {
@@ -155,6 +157,7 @@ export function deepseekDesignerModel(): DesignerModel {
         user,
         maxChars: 24_000,
         signal: input.signal,
+        images: input.images,
       });
       const interpretation = PlannerDesignerInterpretationV1Schema.safeParse(parsed);
       if (!interpretation.success) throw new CopilotModelError("COPILOT_BAD_OUTPUT");

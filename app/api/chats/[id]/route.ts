@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { removeChatImages, storedImages } from "@/lib/ai/sylvie/image-storage";
 
 export const dynamic = "force-dynamic";
 
@@ -69,9 +70,12 @@ export async function DELETE(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    const attachments = await prisma.systemMessage.findMany({ where: { sessionId, userId: authSession.userId }, select: { attachmentUrl: true } });
     await prisma.chatSession.delete({
       where: { id: sessionId },
     });
+    const images = attachments.flatMap(message => storedImages(message.attachmentUrl)).filter(image => image.path.startsWith(`${authSession.userId}/${sessionId}/`));
+    await removeChatImages([...new Map(images.map(image => [image.path, image])).values()]).catch(() => { console.warn("[chat] private image cleanup unavailable"); });
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

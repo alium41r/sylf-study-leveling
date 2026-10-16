@@ -4,7 +4,7 @@ import ConversationPanel from "@/app/system/components/ConversationPanel";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 import type { QuotaInfo } from "@/app/components/AiPlannerModal";
 
-vi.mock("@/lib/client-data-cache", () => ({ fetchCachedJSON: vi.fn() }));
+vi.mock("@/lib/client-data-cache", () => ({ fetchCachedJSON: vi.fn(), invalidateClientCache: vi.fn() }));
 const props = () => ({
   sessionId: null, sessionTitle: "New chat", chatQuota: null,
   modelPref: "gemini" as const, isDevMode: false,

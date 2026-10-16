@@ -1,0 +1,477 @@
+[
+  {
+    "file": "__tests__/ai/telemetry-database.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/system/chat-interactions.test.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/system/chat/ChatConversation.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/system/chat/useSpeechDictation.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/system/chat/useSylvieChat.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/daily-briefing.test.ts",
+    "current": {
+      "errors": 3,
+      "warnings": 2,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 2,
+        "2:prefer-const": 1,
+        "2:@typescript-eslint/no-explicit-any": 2
+      }
+    },
+    "baseline": {
+      "errors": 3,
+      "warnings": 4,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 4,
+        "2:prefer-const": 1,
+        "2:@typescript-eslint/no-explicit-any": 2
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/e2e-conversation.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/planner-api.test.ts",
+    "current": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 4,
+        "2:prefer-const": 1
+      }
+    },
+    "baseline": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 4,
+        "2:prefer-const": 1
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/planning-engine.test.ts",
+    "current": {
+      "errors": 44,
+      "warnings": 2,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 44,
+        "1:@typescript-eslint/no-unused-vars": 2
+      }
+    },
+    "baseline": {
+      "errors": 44,
+      "warnings": 2,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 44,
+        "1:@typescript-eslint/no-unused-vars": 2
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/unlimited-ai-routes.test.ts",
+    "current": {
+      "errors": 27,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 27
+      }
+    },
+    "baseline": {
+      "errors": 27,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 27
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/planner/quick-plan.test.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/api/ai-planner/route.ts",
+    "current": {
+      "errors": 4,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 4
+      }
+    },
+    "baseline": {
+      "errors": 4,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 4
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "app/api/cron/daily-briefing/route.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 5,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 5
+      }
+    },
+    "baseline": {
+      "errors": 1,
+      "warnings": 5,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 5,
+        "2:@typescript-eslint/no-explicit-any": 1
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "app/api/system-messages/chat/route.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/api/system-messages/route.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/planner/copilot/PlannerCopilot.tsx",
+    "current": {
+      "errors": 3,
+      "warnings": 4,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 4,
+        "2:react-hooks/set-state-in-effect": 1,
+        "2:react/no-unescaped-entities": 2
+      }
+    },
+    "baseline": {
+      "errors": 3,
+      "warnings": 4,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 4,
+        "2:react-hooks/set-state-in-effect": 1,
+        "2:react/no-unescaped-entities": 2
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/system/SystemOverlay.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/focus/components/tools/AiAssistantTool.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "app/system/components/ConversationPanel.tsx",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/agent-router.ts",
+    "current": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 5
+      }
+    },
+    "baseline": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 5
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/cheap-answers/index.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/daily-briefing-service.ts",
+    "current": {
+      "errors": 4,
+      "warnings": 1,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 1,
+        "2:prefer-const": 1,
+        "2:@typescript-eslint/no-explicit-any": 3
+      }
+    },
+    "baseline": {
+      "errors": 4,
+      "warnings": 1,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 1,
+        "2:prefer-const": 1,
+        "2:@typescript-eslint/no-explicit-any": 3
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/deterministic-responder.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/providers/deepseek.ts",
+    "current": {
+      "errors": 9,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 9
+      }
+    },
+    "baseline": {
+      "errors": 9,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 9
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/ai/usage-limiter.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "lib/planner/import/storage.ts",
+    "current": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 5
+      }
+    },
+    "baseline": {
+      "errors": 5,
+      "warnings": 0,
+      "rules": {
+        "2:@typescript-eslint/no-explicit-any": 5
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "app/components/AiPlannerPanel.tsx",
+    "current": {
+      "errors": 4,
+      "warnings": 2,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 2,
+        "2:@typescript-eslint/no-explicit-any": 3,
+        "2:react-hooks/set-state-in-effect": 1
+      }
+    },
+    "baseline": {
+      "errors": 4,
+      "warnings": 2,
+      "rules": {
+        "1:@typescript-eslint/no-unused-vars": 2,
+        "2:@typescript-eslint/no-explicit-any": 3,
+        "2:react-hooks/set-state-in-effect": 1
+      }
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/message-api-security.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  },
+  {
+    "file": "__tests__/ai/deepseek-tool-continuity.test.ts",
+    "current": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "baseline": {
+      "errors": 0,
+      "warnings": 0,
+      "rules": {}
+    },
+    "increased": []
+  }
+]

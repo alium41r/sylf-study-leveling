@@ -1,0 +1,890 @@
+{
+  "measurement": "Exact source character counts and call-site inventory; chars/4 is a rough English/JSON token estimate, not a provider tokenizer or measured billing. Synthetic queries only; no network/model/database calls.",
+  "components": [
+    {
+      "name": "persona.md",
+      "chars": 1182,
+      "bytes": 1196,
+      "estimatedTokensCharsDiv4": 296
+    },
+    {
+      "name": "knowledge.md",
+      "chars": 1630,
+      "bytes": 1636,
+      "estimatedTokensCharsDiv4": 408
+    },
+    {
+      "name": "capabilities.md",
+      "chars": 1615,
+      "bytes": 1619,
+      "estimatedTokensCharsDiv4": 404
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "greeting",
+      "workload": "general_chat",
+      "systemChars": 4815,
+      "toolSchemaJsonChars": 2,
+      "userChars": 2,
+      "estimatedInputTokensCharsDiv4": 1205,
+      "toolNames": [],
+      "archiveIds": []
+    },
+    {
+      "name": "general_explanation",
+      "workload": "general_chat",
+      "systemChars": 4815,
+      "toolSchemaJsonChars": 2,
+      "userChars": 28,
+      "estimatedInputTokensCharsDiv4": 1212,
+      "toolNames": [],
+      "archiveIds": []
+    },
+    {
+      "name": "timer_documentation",
+      "workload": "focus_chat",
+      "systemChars": 5771,
+      "toolSchemaJsonChars": 2,
+      "userChars": 25,
+      "estimatedInputTokensCharsDiv4": 1450,
+      "toolNames": [],
+      "archiveIds": [
+        "focus_timer"
+      ]
+    },
+    {
+      "name": "statistics_read",
+      "workload": "coach",
+      "systemChars": 4866,
+      "toolSchemaJsonChars": 245,
+      "userChars": 13,
+      "estimatedInputTokensCharsDiv4": 1281,
+      "toolNames": [
+        "getUserStats"
+      ],
+      "archiveIds": []
+    },
+    {
+      "name": "task_move",
+      "workload": "simple",
+      "systemChars": 4839,
+      "toolSchemaJsonChars": 930,
+      "userChars": 32,
+      "estimatedInputTokensCharsDiv4": 1451,
+      "toolNames": [
+        "getQuests",
+        "moveQuest"
+      ],
+      "archiveIds": []
+    }
+  ],
+  "history": {
+    "maxMessages": 20,
+    "maxCharacters": 18000,
+    "approxTokensCharsDiv4": 4500
+  },
+  "calls": [
+    {
+      "file": "lib/ai/agent-router.ts",
+      "line": 584,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/agent-router.ts",
+      "line": 585,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/chat-tool-executor.ts",
+      "line": 1268,
+      "call": "ai.models.generateContent",
+      "arguments": [
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/daily-briefing-service.ts",
+      "line": 93,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "gemini"
+      ]
+    },
+    {
+      "file": "lib/ai/daily-briefing-service.ts",
+      "line": 95,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 200,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "deepseek",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 206,
+      "call": "deepseek.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 232,
+      "call": "ai.models.generateContent",
+      "arguments": [
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 253,
+      "call": "ai.models.generateContent",
+      "arguments": [
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 276,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "groq",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 277,
+      "call": "groqAdapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 324,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "deepseek",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 325,
+      "call": "deepseek.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "You are a concise study habits analyst."
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 353,
+      "call": "ai.models.generateContent",
+      "arguments": [
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 470,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "deepseek",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 471,
+      "call": "deepseek.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 496,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "gemini",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 497,
+      "call": "geminiAdapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 511,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "gemini",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 512,
+      "call": "geminiFlash.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 530,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "groq",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 531,
+      "call": "groqAdapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/planner/critic.ts",
+      "line": 163,
+      "call": "args.adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/planner/pipeline.ts",
+      "line": 129,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/planner/repair.ts",
+      "line": 229,
+      "call": "args.adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/providers/gemini.ts",
+      "line": 122,
+      "call": "this.ai.models.generateContent",
+      "arguments": [
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/providers/groq.ts",
+      "line": 118,
+      "call": "this.groq.chat.completions.create",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/scope-evaluator.ts",
+      "line": 300,
+      "call": "ai.models.generateContent",
+      "arguments": [
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/syllabus-compiler.ts",
+      "line": 351,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "gemini",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/syllabus-compiler.ts",
+      "line": 352,
+      "call": "geminiAdapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/syllabus-compiler.ts",
+      "line": 390,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "deepseek",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/ai/syllabus-compiler.ts",
+      "line": 391,
+      "call": "deepseekAdapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/copilot/model.ts",
+      "line": 67,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "deepseek",
+        "MODEL"
+      ]
+    },
+    {
+      "file": "lib/planner/copilot/model.ts",
+      "line": 70,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/import/vision.ts",
+      "line": 106,
+      "call": "ai.models.generateContent",
+      "arguments": [
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/research/deepseek.ts",
+      "line": 144,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "deepseek",
+        "MODEL"
+      ]
+    },
+    {
+      "file": "lib/planner/research/deepseek.ts",
+      "line": 147,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/server/expansion.ts",
+      "line": 192,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/server/generation.ts",
+      "line": 344,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/server/rebalance-run.ts",
+      "line": 435,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/v2/intelligence/provider.ts",
+      "line": 192,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "lib/planner/v2/intelligence/provider.ts",
+      "line": 231,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "app/api/system-messages/chat/route.ts",
+      "line": 460,
+      "call": "LLMFactory.getAdapter",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "app/api/system-messages/chat/route.ts",
+      "line": 478,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "app/api/system-messages/chat/route.ts",
+      "line": 530,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    },
+    {
+      "file": "app/api/system-messages/chat/route.ts",
+      "line": 543,
+      "call": "adapter.generateResponse",
+      "arguments": [
+        "<dynamic>",
+        "<dynamic>"
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 174,
+      "name": "synthesisSystemInstruction",
+      "staticLiteralChars": 467,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 117
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 177,
+      "name": "synthesisPrompt",
+      "staticLiteralChars": 1096,
+      "dynamicSlots": 4,
+      "estimatedStaticTokensCharsDiv4": 274
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 318,
+      "name": "prompt",
+      "staticLiteralChars": 155,
+      "dynamicSlots": 1,
+      "estimatedStaticTokensCharsDiv4": 39
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 406,
+      "name": "systemInstruction",
+      "staticLiteralChars": 2338,
+      "dynamicSlots": 1,
+      "estimatedStaticTokensCharsDiv4": 585
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "line": 446,
+      "name": "prompt",
+      "staticLiteralChars": 521,
+      "dynamicSlots": 7,
+      "estimatedStaticTokensCharsDiv4": 131
+    },
+    {
+      "file": "lib/ai/planner/critic.ts",
+      "line": 73,
+      "name": "CRITIC_SYSTEM",
+      "staticLiteralChars": 1250,
+      "dynamicSlots": 2,
+      "estimatedStaticTokensCharsDiv4": 313
+    },
+    {
+      "file": "lib/ai/planner/exam.ts",
+      "line": 67,
+      "name": "SYSTEM",
+      "staticLiteralChars": 3393,
+      "dynamicSlots": 1,
+      "estimatedStaticTokensCharsDiv4": 849
+    },
+    {
+      "file": "lib/ai/planner/expansion.ts",
+      "line": 55,
+      "name": "SYSTEM",
+      "staticLiteralChars": 1872,
+      "dynamicSlots": 2,
+      "estimatedStaticTokensCharsDiv4": 468
+    },
+    {
+      "file": "lib/ai/planner/expansion.ts",
+      "line": 64,
+      "name": "CRITIC_SYSTEM",
+      "staticLiteralChars": 1247,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 312
+    },
+    {
+      "file": "lib/ai/planner/expansion.ts",
+      "line": 70,
+      "name": "REPAIR_SYSTEM",
+      "staticLiteralChars": 1027,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 257
+    },
+    {
+      "file": "lib/ai/planner/mastery.ts",
+      "line": 83,
+      "name": "SYSTEM",
+      "staticLiteralChars": 5583,
+      "dynamicSlots": 3,
+      "estimatedStaticTokensCharsDiv4": 1396
+    },
+    {
+      "file": "lib/ai/planner/mastery.ts",
+      "line": 103,
+      "name": "CRITIC_SYSTEM",
+      "staticLiteralChars": 1609,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 403
+    },
+    {
+      "file": "lib/ai/planner/mastery.ts",
+      "line": 109,
+      "name": "REPAIR_SYSTEM",
+      "staticLiteralChars": 1389,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 348
+    },
+    {
+      "file": "lib/ai/planner/rebalance.ts",
+      "line": 123,
+      "name": "CRITIC_SYSTEM",
+      "staticLiteralChars": 1265,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 317
+    },
+    {
+      "file": "lib/ai/planner/rebalance.ts",
+      "line": 151,
+      "name": "REPAIR_SYSTEM",
+      "staticLiteralChars": 677,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 170
+    },
+    {
+      "file": "lib/ai/planner/repair.ts",
+      "line": 47,
+      "name": "REPAIR_SYSTEM",
+      "staticLiteralChars": 1251,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 313
+    },
+    {
+      "file": "lib/ai/planner/roadmap.ts",
+      "line": 63,
+      "name": "SYSTEM",
+      "staticLiteralChars": 2638,
+      "dynamicSlots": 2,
+      "estimatedStaticTokensCharsDiv4": 660
+    },
+    {
+      "file": "lib/ai/planner/roadmap.ts",
+      "line": 74,
+      "name": "CRITIC_SYSTEM",
+      "staticLiteralChars": 1376,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 344
+    },
+    {
+      "file": "lib/ai/planner/roadmap.ts",
+      "line": 80,
+      "name": "REPAIR_SYSTEM",
+      "staticLiteralChars": 983,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 246
+    },
+    {
+      "file": "lib/planner/copilot/model.ts",
+      "line": 116,
+      "name": "SYSTEM",
+      "staticLiteralChars": 4751,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 1188
+    },
+    {
+      "file": "lib/planner/copilot/model.ts",
+      "line": 208,
+      "name": "system",
+      "staticLiteralChars": 278,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 70
+    },
+    {
+      "file": "lib/planner/designer/model.ts",
+      "line": 44,
+      "name": "SYSTEM",
+      "staticLiteralChars": 6402,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 1601
+    },
+    {
+      "file": "lib/planner/research/deepseek.ts",
+      "line": 175,
+      "name": "PLAN_SYSTEM",
+      "staticLiteralChars": 1129,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 283
+    },
+    {
+      "file": "lib/planner/research/deepseek.ts",
+      "line": 433,
+      "name": "FOLLOWUP_SYSTEM",
+      "staticLiteralChars": 1253,
+      "dynamicSlots": 2,
+      "estimatedStaticTokensCharsDiv4": 314
+    },
+    {
+      "file": "lib/planner/research/deepseek.ts",
+      "line": 453,
+      "name": "EXTRACT_SYSTEM",
+      "staticLiteralChars": 2995,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 749
+    },
+    {
+      "file": "lib/planner/research/deepseek.ts",
+      "line": 536,
+      "name": "COMPARE_SYSTEM",
+      "staticLiteralChars": 1986,
+      "dynamicSlots": 0,
+      "estimatedStaticTokensCharsDiv4": 497
+    }
+  ],
+  "apiRoutes": [
+    {
+      "path": "/api/ai-costs",
+      "owner": "app/api/ai-costs/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/ai-planner",
+      "owner": "app/api/ai-planner/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/ai-usage",
+      "owner": "app/api/ai-usage/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/cron/daily-briefing",
+      "owner": "app/api/cron/daily-briefing/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/archive",
+      "owner": "app/api/planner/[id]/archive/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/assistant",
+      "owner": "app/api/planner/[id]/assistant/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/check-result",
+      "owner": "app/api/planner/[id]/check-result/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/commit",
+      "owner": "app/api/planner/[id]/commit/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/documents",
+      "owner": "app/api/planner/[id]/documents/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/friction",
+      "owner": "app/api/planner/[id]/friction/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/milestones/[itemKey]/expand",
+      "owner": "app/api/planner/[id]/milestones/[itemKey]/expand/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/operations/[key]",
+      "owner": "app/api/planner/[id]/operations/[key]/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/preferences",
+      "owner": "app/api/planner/[id]/preferences/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/rebalance/confirm",
+      "owner": "app/api/planner/[id]/rebalance/confirm/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/rebalance",
+      "owner": "app/api/planner/[id]/rebalance/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/reoffer",
+      "owner": "app/api/planner/[id]/reoffer/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/revisions",
+      "owner": "app/api/planner/[id]/revisions/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]",
+      "owner": "app/api/planner/[id]/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/[id]/stretch",
+      "owner": "app/api/planner/[id]/stretch/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/capabilities",
+      "owner": "app/api/planner/capabilities/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/generate",
+      "owner": "app/api/planner/generate/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/intake/[id]/action",
+      "owner": "app/api/planner/intake/[id]/action/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/intake/[id]/copilot/apply",
+      "owner": "app/api/planner/intake/[id]/copilot/apply/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/intake/[id]/copilot",
+      "owner": "app/api/planner/intake/[id]/copilot/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/intake/[id]/designer",
+      "owner": "app/api/planner/intake/[id]/designer/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/intake/[id]/import",
+      "owner": "app/api/planner/intake/[id]/import/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/intake/[id]",
+      "owner": "app/api/planner/intake/[id]/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/intake",
+      "owner": "app/api/planner/intake/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner/recover/[key]",
+      "owner": "app/api/planner/recover/[key]/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/planner",
+      "owner": "app/api/planner/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/quests/evaluate-scope",
+      "owner": "app/api/quests/evaluate-scope/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/quests",
+      "owner": "app/api/quests/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/subjects/[id]/compile",
+      "owner": "app/api/subjects/[id]/compile/route.ts",
+      "role": "execution or control; see report feature map"
+    },
+    {
+      "path": "/api/system-messages/chat",
+      "owner": "app/api/system-messages/chat/route.ts",
+      "role": "execution or control; see report feature map"
+    }
+  ],
+  "other_ai_prompt_owners": [
+    "lib/planner/v2/intelligence/assistant.ts",
+    "lib/planner/v2/intelligence/blueprint.ts",
+    "lib/planner/v2/intelligence/quality.ts",
+    "lib/planner/v2/intelligence/ocr.ts",
+    "lib/planner/v2/intelligence/research-reader.ts",
+    "lib/planner/v2/intelligence/context.ts",
+    "lib/planner/research/agent.ts",
+    "lib/planner/research/comparison.ts",
+    "lib/planner/copilot/context.ts",
+    "lib/ai/context-engine.ts"
+  ],
+  "inventory_note": "AST call sites include SDK dispatches and adapter factories, so their count is not the number of features or actual requests. Inline/function-built V2 prompts are indexed separately; template counts omit dynamic data and provider framing. API inventory includes deterministic control/read routes; /api/quests POST can invoke scope evaluation."
+}

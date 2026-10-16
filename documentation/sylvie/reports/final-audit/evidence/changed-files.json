@@ -1,0 +1,150 @@
+{
+  "baseline": "Task-start snapshot; previously clean AiPlannerPanel.tsx compared to HEAD",
+  "changedExistingFiles": [
+    {
+      "path": "__tests__/ai/telemetry-database.test.ts",
+      "before": "9fed1aa925837f464ea9a5afff6a0de91acb0d96e91379b3454a05794f486d1f",
+      "after": "4f07a529e3197aaa6175c919553bacb653900e84beeac1ba5b864f3f4f7ae2a8"
+    },
+    {
+      "path": "__tests__/system/chat-interactions.test.tsx",
+      "before": "5a32645aedb84a12e07ca587762e8fa04bc39195b7288973a649f9350fc53421",
+      "after": "4ecc56e5dd8772b2c95cc7f92799fd1b00572cba583b59153f2248419c8145fd"
+    },
+    {
+      "path": "app/components/system/chat/ChatConversation.tsx",
+      "before": "0449ce263b84f3fb44b7cf6265eccc7abb51f5449848010d74581f4f3d9fe4a2",
+      "after": "1c75aed81d3f8a4c3f89fbb1e9a0c28a7646af7d14c4197994b42ef2d7333036"
+    },
+    {
+      "path": "app/components/system/chat/useSpeechDictation.ts",
+      "before": "54ec6ee7ac3456cf43a1ddc24477eeff7899676e23604e782b5839c2adfcb7bc",
+      "after": "8070f3f516bc6ad0a9751c98eabd59cdaffd25440135e575cbdb221dcbf7aa05"
+    },
+    {
+      "path": "app/components/system/chat/useSylvieChat.ts",
+      "before": "adbfe82b62bce0a06ab429ca8e3255468b5813ed5aa30a7dabe2cac810436ca9",
+      "after": "43ebaa157a50dc9f8e38c4b6c11311804e88566c5061da401fd84707a6e616b8"
+    },
+    {
+      "path": "__tests__/ai/daily-briefing.test.ts",
+      "before": "da3893b4f82ade641ec89e7b71f1ef243d10304ca86383dbe3f3fbcbdd845ef7",
+      "after": "65527e6c7e30a88ed080d58e2692eb7d71b1f2479ed1a9bb2c3777c59f66cd1a"
+    },
+    {
+      "path": "__tests__/ai/e2e-conversation.test.ts",
+      "before": "17ea7602fbcb8138051824df6e5f00fedb3ddda94a334196acce3ce648cebc59",
+      "after": "2c6925cecb8ad48b415622ab5e4731bd5c7577ba21afc5ad1e7654516fa7acac"
+    },
+    {
+      "path": "__tests__/ai/planner-api.test.ts",
+      "before": "b2115149bf9c9a20676aa92ba4b4a81236b657cfe0415850b13771bc2a9e6821",
+      "after": "c3f348fca1f5d56f4d21f7d190d3d356d028905f3a5f5eb58757e263c713e007"
+    },
+    {
+      "path": "__tests__/ai/planning-engine.test.ts",
+      "before": "c66711989214d651066734d8b0a7068061f5717ad274917105966caa0df056e9",
+      "after": "f30b67128a90e4f58581a756c3e900321f14d38680d0713838f03b35bd60d32a"
+    },
+    {
+      "path": "__tests__/ai/unlimited-ai-routes.test.ts",
+      "before": "db3251183660f273086d45b79a52c7601e33efb14e1b6a18a7590fae2aad3734",
+      "after": "0ad03d1b55ceb5addd433e2bc3b1b95392797dd57d27a67a178c3441ebe8fef2"
+    },
+    {
+      "path": "__tests__/planner/quick-plan.test.tsx",
+      "before": "4e51cc0fefcf70d176add91b9c66058231ed9ab39d7b5102051cf407751d9b19",
+      "after": "e7c116246288fe0da4412cf7e73a73cb47cf56e3826ea31288436f129469743c"
+    },
+    {
+      "path": "app/api/ai-planner/route.ts",
+      "before": "3ccab00c75fa3a530056e692d8eef81b4e507213910cb05e44b957cb71b304b4",
+      "after": "f28c175c69b88ac73acf071c423ce202c87b0a608d267fe0d6b09267d94f612d"
+    },
+    {
+      "path": "app/api/cron/daily-briefing/route.ts",
+      "before": "94af48e60184d5d452fe4bf15617623a92dfab00754c3c843ec4b5adf3a35b53",
+      "after": "4adf0a114f39d830fa33ff923ecaa0b82df76de0f3d3aeec2f16371a8d55f98f"
+    },
+    {
+      "path": "app/api/system-messages/chat/route.ts",
+      "before": "37b1adeb7029e5dc732cee31d387be8750acbcf208e18e399b15bff75c39ab36",
+      "after": "84d1cfbe793607f67981728b45671a58e57ca2f4b0de3d883d3854ae490298a1"
+    },
+    {
+      "path": "app/api/system-messages/route.ts",
+      "before": "9d4e1a4996fbf959d828a309cf9198f4ae63e2fa586b6b18c57fb30e95e545cd",
+      "after": "faaeddb42bc5c79da1e1aaeac2058ee72db94f981b63a51a8e8d19ba814a6e8e"
+    },
+    {
+      "path": "app/components/planner/copilot/PlannerCopilot.tsx",
+      "before": "86f935e2a4f535aa958e56df85bdedc7ad2af3735c5254c219f829f7542ca568",
+      "after": "7d17e2dde913eb3facbea1e53d06c61b02165fee78a4360bc34a021a22012c81"
+    },
+    {
+      "path": "app/components/system/SystemOverlay.tsx",
+      "before": "e41020de1d966da0cfe03d8f548a56a06d84a06379d263557a3c819a25e136a3",
+      "after": "8d70e4ac1d1bd7e4cadcfb5c59f3c05bb6a1a6709854a1490ced2f72b3dc51da"
+    },
+    {
+      "path": "app/focus/components/tools/AiAssistantTool.tsx",
+      "before": "90627c8466edfcb464ad150826c9f41e60b59028b5ab6a19628c608df157ea67",
+      "after": "7144ba67430ef0ffcf58e65f286195fcc2b1f9449c3d8743bff99bb3bca1e363"
+    },
+    {
+      "path": "app/system/components/ConversationPanel.tsx",
+      "before": "828e83b95918207776cd01251156c62fce579167359958f9a549074a90522027",
+      "after": "11464c459ffe9ac30c0debe3379b639731ca98043c93e22a2d96d8b1859f4432"
+    },
+    {
+      "path": "documentation/sylvie/README.md",
+      "before": "37bd212a7fd3e18d9786291200dd7f005bf7243d14699b862c4df8bdddd0d5a0",
+      "after": "03b615885c7eb97afa991dcb07d5ac62d5a65549c6203b25b9cf1305e8122925"
+    },
+    {
+      "path": "lib/ai/agent-router.ts",
+      "before": "63a08a4a05bbc46d5d9d0724b97ddd0c469aa265466b8c7eaebbba9dda7ad180",
+      "after": "1530a5c776c1ae01c1fd9ea0deba79a8f07f7da1683c0efbf221e49739d0cc07"
+    },
+    {
+      "path": "lib/ai/cheap-answers/index.ts",
+      "before": "853aaee87bf2a5c49f8ec4c3f48b4ee7928bcc57354ac45421594c2627423953",
+      "after": "6a29b5593a5382648f7c5cae58c1b474eaab9594c982814df8866f0f99a8c1d6"
+    },
+    {
+      "path": "lib/ai/daily-briefing-service.ts",
+      "before": "d0ae8aa641842abed0ff6ff48b32dbcc8e2a931f43b9ace8baed2fafde1bd0a3",
+      "after": "956cfdc99d5aa0b09878f184457202b85acd3200229c9b96b1f4cc437323be5b"
+    },
+    {
+      "path": "lib/ai/deterministic-responder.ts",
+      "before": "81d4a17a1846c4946acdd6d7572e467c7d84ccef7c55c48e78aac53c4d0d46db",
+      "after": "e9293d59af58a5765f8e8dba33905da5580fe9403eab8146f31904de1c5c3239"
+    },
+    {
+      "path": "lib/ai/providers/deepseek.ts",
+      "before": "616d85271cb1375654a553b1df51488c34009315ed187b88a3121851cdf0ae66",
+      "after": "02af8918db90130681c32b2d50f5caa1d919aef647c0e3016028fab2e07d889f"
+    },
+    {
+      "path": "lib/ai/usage-limiter.ts",
+      "before": "7b25a43d4938cbaeea1690ede04fad09a1590cddc5349ce241d8d09777cfe6d3",
+      "after": "dbe92a791104497d94cd8a03799e7e8e4830539c3a8dbb3719dd0bb991452b94"
+    },
+    {
+      "path": "lib/planner/import/storage.ts",
+      "before": "f264e7df50bc0c80a0da82cbd7f8c10e8c2511bc559f18ee5436332e96c9e7b8",
+      "after": "78ef40b16bbd76b0929293b7a6891fc28c6e76961a36be9896b689371d36d557"
+    },
+    {
+      "path": "app/components/AiPlannerPanel.tsx",
+      "before": "7f165767e9666a511c01768d0d2df9b9ff5c8e3281b4987e8120fbdd105f0364",
+      "after": "6912ebbe2f5b04569b4d4fe90a4f13ec9a8ae594ca857bb7032bc248f784a764"
+    }
+  ],
+  "newRegressionFiles": [
+    "__tests__/ai/message-api-security.test.ts",
+    "__tests__/ai/deepseek-tool-continuity.test.ts"
+  ],
+  "noNewPlannerV2OrAbandonedNodeEdits": true
+}

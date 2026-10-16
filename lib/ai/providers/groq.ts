@@ -1,3 +1,6 @@
+import { aiSignal, observeAiDispatch } from "../telemetry";
+import { openAIUsage } from "./usage";
+import { collectTextChunks } from "./text-stream";
 import Groq from "groq-sdk";
 import { LLMAdapter, NormalizedMessage, NormalizedTool, LLMResponse, LLMProviderError, NormalizedToolCall } from "./types";
 import crypto from "crypto";
@@ -24,7 +27,7 @@ export class GroqAdapter implements LLMAdapter {
 
   private mapMessages(messages: NormalizedMessage[], systemInstruction: string): any[] {
     const groqMessages: any[] = [];
-    
+
     // Groq requires system instruction as the first message
     groqMessages.push({ role: "system", content: systemInstruction });
 
@@ -98,24 +101,23 @@ export class GroqAdapter implements LLMAdapter {
     const groqMessages = this.mapMessages(messages, systemInstruction);
     const groqTools = tools.length > 0 ? tools.map(this.mapTool) : undefined;
 
-    const candidateModels = options?.singleAttempt ? [this.model] : Array.from(
+    const candidateModels = options?.singleAttempt || messages.some(m => m.parts?.some(p => p.inlineData)) ? [this.model] : Array.from(
       new Set(
         [
           this.model,
           process.env.GROQ_MODEL,
           "openai/gpt-oss-120b",
           "openai/gpt-oss-20b",
-          "llama-3.3-70b-versatile",
-          "qwen/qwen3.8-27b",
         ].filter(Boolean) as string[]
       )
     );
 
     let lastError: any = null;
 
-    for (const modelToTry of candidateModels) {
+    for (const [retryIndex, modelToTry] of candidateModels.entries()) {
       try {
-        const completion = await this.groq.chat.completions.create({
+        const completion = await observeAiDispatch("groq", modelToTry, async () => {
+          const response = await this.groq.chat.completions.create({
           model: modelToTry,
           messages: groqMessages,
           tools: groqTools,
@@ -125,11 +127,16 @@ export class GroqAdapter implements LLMAdapter {
               ? { type: "json_object" }
               : undefined,
           temperature: options?.temperature,
-          max_tokens: options?.maxTokens,
+          max_tokens: options?.maxTokens ?? 16384,
+          stream: Boolean(options?.onTextDelta && modelToTry.startsWith("openai/gpt-oss-") && !tools.length && options.responseFormat !== "json_object"),
+          // GPT-OSS retains reasoning; its minimum supported effort is low.
+          ...(modelToTry.startsWith("openai/gpt-oss-") ? { reasoning_effort: options?.thinking === "disabled" ? "low" as const : options?.reasoningEffort === "max" ? "high" as const : options?.reasoningEffort } : {}),
         }, {
-          signal: options?.signal,
-          ...(options?.singleAttempt ? { maxRetries: 0 } : {}),
-        });
+          signal: aiSignal(options?.signal), maxRetries: 0,
+          });
+          return Symbol.asyncIterator in response
+            ? collectTextChunks(response, options!.onTextDelta!) : response;
+        }, completion => ({ model: completion.model, usage: openAIUsage(completion.usage as unknown as Record<string, unknown>), finishReason: completion.choices?.[0]?.finish_reason }), options?.telemetry !== false, { stage: options?.telemetryStage, retryIndex: (options?.retryIndex ?? 0) + retryIndex });
 
         const responseMessage = completion.choices[0].message;
         const normalizedToolCalls: NormalizedToolCall[] = [];
@@ -149,7 +156,7 @@ export class GroqAdapter implements LLMAdapter {
               args,
             });
           }
-        } 
+        }
         // 2. Llama-3 XML Recovery Logic
         else if (responseMessage.content && responseMessage.content.includes("<function")) {
           const matches = [...responseMessage.content.matchAll(/<function[=(](\w+)[=)>]*([\s\S]*?)<\/function>/gi)];
@@ -179,11 +186,7 @@ export class GroqAdapter implements LLMAdapter {
             ["stop", "tool_calls"].includes(completion.choices?.[0]?.finish_reason ?? "") ? "STOP" : "OTHER",
           text: cleanContent || undefined,
           toolCalls: normalizedToolCalls.length > 0 ? normalizedToolCalls : undefined,
-          usage: completion.usage ? {
-            promptTokens: completion.usage.prompt_tokens || 0,
-            completionTokens: completion.usage.completion_tokens || 0,
-            totalTokens: completion.usage.total_tokens || 0,
-          } : undefined,
+          usage: openAIUsage(completion.usage as unknown as Record<string, unknown>),
         };
       } catch (error: any) {
         lastError = error;

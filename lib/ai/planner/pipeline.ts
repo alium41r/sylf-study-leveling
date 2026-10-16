@@ -145,7 +145,7 @@ export async function runBoundedGeneration<P>(args: {
             maxTokens: GENERATION_MAX_TOKENS,
             thinking: "disabled",
             signal: args.signal,
-            singleAttempt: true,
+            singleAttempt: true, telemetryStage: "planner_generate",
           }
         ),
         args.signal

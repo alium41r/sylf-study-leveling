@@ -130,7 +130,7 @@ export default function QuickPlan({
   // Replanning must name an existing plan; a new empty brief cannot stand in for it.
   const handoffRequest = handoff && (handoff.kind === "NEW_PLAN" || view?.planId) ? handoff : undefined;
 
-  const sylfInputRef = useRef<HTMLInputElement | null>(null);
+  const sylfInputRef = useRef<HTMLTextAreaElement | null>(null);
   const hydrated = useRef(false);
   const prefillApplied = useRef(false);
 
@@ -175,13 +175,13 @@ export default function QuickPlan({
   useEffect(() => {
     if (!isAssistantOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && !assistantBusy) {
         setIsAssistantOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isAssistantOpen]);
+  }, [isAssistantOpen, assistantBusy]);
 
   const act = session.act;
   const commitGoal = () => {
@@ -921,7 +921,7 @@ export default function QuickPlan({
                 </div>
               ) : <div className={copilotStyles.sheetHandleBar} />}
               <div className="flex-1 min-h-0">
-                <PlannerCopilot
+                <PlannerCopilot key={view.id}
                   initialRequest={handoffRequest}
                   onBusyChange={setAssistantBusy}
                   view={view}

@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-15",
+  "timezone": "Asia/Karachi",
+  "production_build": {
+    "command": "npm run build -- --webpack",
+    "result": "passed",
+    "default_turbopack": "stalled without progress and was stopped",
+    "runtime_markdown_in_server_trace": [
+      "persona.md",
+      "knowledge.md",
+      "capabilities.md"
+    ]
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "result": "passed after correcting a test mock type"
+  },
+  "mobile": {
+    "build": "passed",
+    "bundle_verification": "passed; no server-only symbols or secrets"
+  },
+  "tests": {
+    "combined_run": {
+      "files": 39,
+      "passed": 632,
+      "failed": 16,
+      "failures": "All in pre-existing Classic Planner mocks, historical model-migration hash assertions, or planning-capacity expectations. Reproduced these categories in an export of pre-overhaul HEAD."
+    },
+    "final_followup_run": {
+      "files": 3,
+      "passed": 50,
+      "failed": 0,
+      "note": "Overlapping focused coverage; do not add to combined count."
+    },
+    "wrap_up_run": {
+      "files": 2,
+      "passed": 11,
+      "failed": 0,
+      "coverage": "Account-switch Planner handoff isolation and message/intro metadata regressions; overlaps prior runs."
+    }
+  },
+  "lint": {
+    "runtime_and_new_modules": "passed",
+    "new_tests": "passed",
+    "all_touched_source": "Has existing lint debt; comparison with pre-overhaul HEAD identified no newly introduced diagnostics after fixing the new dependency warning. Existing hook and explicit-any diagnostics were left out of scope."
+  },
+  "visual": {
+    "runtime": "Vite mobile mock preview",
+    "viewports": [
+      "1440x960",
+      "390x844"
+    ],
+    "appearance": [
+      "dark",
+      "light",
+      "custom accent/background"
+    ],
+    "evidence": "ui-verification.json",
+    "limits": "No live model or production DB calls. Planner intake unavailable in mock; captured destination and carried request only."
+  },
+  "not_qualified": [
+    "live provider response quality/latency",
+    "hosted database integration",
+    "unfinished Planner V2"
+  ],
+  "known_limit": "Advanced saved-plan screens lack a compatible free-text replanning interface; request stays available with copy and manual review controls."
+}

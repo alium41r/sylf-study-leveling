@@ -200,7 +200,7 @@ export default function AiPlannerPanel({
         const errData = await res.json().catch(() => ({}));
         if (res.status === 429 || errData.error === "quota_exceeded") {
           setLocalQuota((prev) => (prev ? { ...prev, remaining: 0, allowed: false } : null));
-          throw new Error("Daily limit reached. You have used your 1 free AI Study Plan for today.");
+          throw new Error("Weekly planning limit reached. Try again after your quota resets.");
         }
         throw new Error(errData.error || "Failed to generate plan");
       }

@@ -170,7 +170,7 @@ export async function runCriticCall(args: {
         maxTokens: CRITIC_MAX_TOKENS,
         thinking: "disabled",
         signal: args.signal,
-        singleAttempt: true,
+        singleAttempt: true, telemetryStage: "planner_critic",
       }
     );
     if (result.usage) args.onUsage?.(result);

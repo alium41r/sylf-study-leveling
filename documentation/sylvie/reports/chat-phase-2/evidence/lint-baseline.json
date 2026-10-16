@@ -1,0 +1,25 @@
+{
+  "checkedFiles": [
+    "app/api/system-messages/chat/route.ts",
+    "app/components/planner/copilot/PlannerCopilot.tsx",
+    "app/components/planner/quick-plan/QuickPlan.tsx",
+    "app/components/system/SystemAIProvider.tsx",
+    "app/system/components/SystemScreen.tsx",
+    "lib/ai/providers/deepseek.ts",
+    "lib/ai/providers/gemini-dispatch.ts",
+    "lib/ai/providers/gemini.ts",
+    "lib/ai/providers/groq.ts",
+    "lib/ai/providers/types.ts",
+    "lib/api-transport.ts"
+  ],
+  "changed": {
+    "errors": 45,
+    "warnings": 16
+  },
+  "beforeThisPhase": {
+    "errors": 45,
+    "warnings": 16
+  },
+  "increasedErrorOrWarningRuleCounts": [],
+  "newSharedFilesAndWrappers": "zero ESLint errors or warnings in targeted final run"
+}

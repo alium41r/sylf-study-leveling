@@ -47,11 +47,11 @@ describe("Multi-Engine AI Architecture & Dynamic Router Tests", () => {
       });
 
       expect(route.workload).toBe("multimodal_vision");
-      // Vision primary is Gemini (3.7 Flash), DeepSeek vision-exp is fallback.
-      expect(route.route.primary.provider).toBe("gemini");
-      expect(route.route.primary.model).toBe(GEMINI_MODELS.vision);
-      expect(route.route.fallback.provider).toBe("deepseek");
-      expect(route.route.fallback.model).toBe(DEEPSEEK_MODELS.vision);
+      // Native Flash images use DeepSeek first, retaining Gemini as fallback.
+      expect(route.route.primary.provider).toBe("deepseek");
+      expect(route.route.primary.model).toBe(DEEPSEEK_MODELS.vision);
+      expect(route.route.fallback.provider).toBe("gemini");
+      expect(route.route.fallback.model).toBe(GEMINI_MODELS.vision);
     });
 
     it("detects explicit hasMedia flag", () => {
@@ -61,8 +61,8 @@ describe("Multi-Engine AI Architecture & Dynamic Router Tests", () => {
 
       expect(route.workload).toBe("multimodal_vision");
       expect(route.hasMedia).toBe(true);
-      expect(route.route.primary.model).toBe(GEMINI_MODELS.vision);
-      expect(route.route.fallback.model).toBe(DEEPSEEK_MODELS.vision);
+      expect(route.route.primary.model).toBe(DEEPSEEK_MODELS.vision);
+      expect(route.route.fallback.model).toBe(GEMINI_MODELS.vision);
     });
   });
 

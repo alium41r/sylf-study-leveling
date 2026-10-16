@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import { aiRequestUser } from "./telemetry";
+import { generateGeminiContent } from "@/lib/ai/providers/gemini-dispatch";
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { LLMFactory } from "./providers/factory";
 import { DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "./config";
@@ -30,6 +33,8 @@ export interface StudyPlanResult {
   /** Summed token usage across all agent generations (telemetry). */
   usage?: { promptTokens: number; completionTokens: number };
 }
+
+const habitCache = new Map<string, { expires: number; data: string; model: string }>();
 
 export class AiStudyOrchestrator {
   /**
@@ -84,8 +89,8 @@ export class AiStudyOrchestrator {
   private static parsePlanPayload(rawText: string, topic: string): StudyPlanResult | null {
     try {
       return extractJson<StudyPlanResult>(rawText, this.buildPlanSchema(topic));
-    } catch (err: any) {
-      console.warn("[Master Planner] Payload rejected by extractJson:", err.message);
+    } catch {
+      console.warn("[Master Planner] Payload rejected by extractJson:");
       return null;
     }
   }
@@ -153,13 +158,13 @@ export class AiStudyOrchestrator {
       const searchResult = await executeGoogleSearch({
         query: topic,
         qualification: syllabus || undefined,
-      });
+      }, signal);
       if (searchResult?.summary) {
         groundedFindings = String(searchResult.summary);
         searchSource = searchResult.source || "grounded search";
       }
-    } catch (searchErr: any) {
-      console.warn("[Researcher Agent] Grounded search failed, continuing with model synthesis:", searchErr?.message);
+    } catch {
+      console.warn("[Researcher Agent] Grounded search failed, continuing with model synthesis:");
     }
 
     if (!groundedFindings.trim()) {
@@ -203,7 +208,7 @@ TASK — produce the exact curriculum breakdown:
         ];
 
         onProgress?.(`[Researcher • DeepSeek V4.1 Flash] Synthesizing grounded findings into the official chapter list...`);
-        const res = await deepseek.generateResponse(messages, synthesisSystemInstruction, [], { signal });
+        const res = await deepseek.generateResponse(messages, synthesisSystemInstruction, [], { signal, maxTokens: 16384, singleAttempt: true });
 
         if (res.text && res.text.trim().length > 50) {
           onProgress?.(`[Researcher • DeepSeek V4.1 Flash] Curriculum research finalized from live search findings.`);
@@ -215,7 +220,7 @@ TASK — produce the exact curriculum breakdown:
         }
       } catch (deepseekErr: any) {
         this.rethrowIfAborted(deepseekErr, signal);
-        console.warn("[Researcher Agent] DeepSeek synthesis failed. Falling back to Gemini research:", deepseekErr.message);
+        console.warn("[Researcher Agent] DeepSeek synthesis failed. Falling back to Gemini research:");
       }
     }
 
@@ -229,17 +234,18 @@ TASK — produce the exact curriculum breakdown:
     if (geminiKey) {
       try {
         const ai = new GoogleGenAI({ apiKey: geminiKey });
-        const response = await ai.models.generateContent({
+        const response = await generateGeminiContent(ai, {
           model: GEMINI_MODELS.research,
           contents: synthesisPrompt,
           config: {
             systemInstruction: synthesisSystemInstruction,
             tools: [{ googleSearch: {} }],
             abortSignal: signal,
+            maxOutputTokens: 16384,
           },
         });
 
-        onProgress?.(`[Researcher • Gemini 3.1 Pro] Gathered exact curriculum data via grounded findings + live search.`);
+        onProgress?.(`[Researcher • Gemini] Gathered exact curriculum data via grounded findings + live search.`);
         return {
           data: response.text || "No research data found.",
           model: `Gemini (${GEMINI_MODELS.research})`,
@@ -247,27 +253,7 @@ TASK — produce the exact curriculum breakdown:
         };
       } catch (geminiErr: any) {
         this.rethrowIfAborted(geminiErr, signal);
-        console.warn("[Researcher Agent] Gemini 3.1 Pro search failed, trying 3.7-flash:", geminiErr.message);
-        try {
-          const ai = new GoogleGenAI({ apiKey: geminiKey });
-          const response = await ai.models.generateContent({
-            model: "gemini-3.7-flash",
-            contents: synthesisPrompt,
-            config: {
-              systemInstruction: synthesisSystemInstruction,
-              tools: [{ googleSearch: {} }],
-              abortSignal: signal,
-            },
-          });
-          onProgress?.(`[Researcher • Gemini 3.7 Flash] Gathered curriculum research.`);
-          return {
-            data: response.text || "No research data found.",
-            model: "Gemini 3.7 Flash",
-            usage: this.geminiUsage(response),
-          };
-        } catch (e) {
-          console.warn("[Researcher Agent] Gemini 3.7 Flash fallback failed, trying Groq:", e);
-        }
+        console.warn("[Researcher Agent] Gemini research unavailable; trying Groq");
       }
     }
 
@@ -278,7 +264,7 @@ TASK — produce the exact curriculum breakdown:
         [{ role: "user", content: synthesisPrompt }],
         synthesisSystemInstruction,
         [],
-        { signal }
+        { signal, maxTokens: 16384, singleAttempt: true }
       );
       onProgress?.(`[Researcher • Groq (${GROQ_MODELS.default})] Synthesized curriculum data from grounded findings.`);
       return {
@@ -288,7 +274,7 @@ TASK — produce the exact curriculum breakdown:
       };
     } catch (groqErr: any) {
       this.rethrowIfAborted(groqErr, signal);
-      console.error("[Researcher Agent] Groq fallback failed:", groqErr);
+      console.error("[Researcher Agent] Groq fallback failed:");
       onProgress?.(`[Researcher] All engines unavailable. Proceeding with the grounded findings directly.`);
       return {
         data: groundedFindings,
@@ -306,6 +292,12 @@ TASK — produce the exact curriculum breakdown:
     onProgress?: (msg: string) => void,
     signal?: AbortSignal
   ): Promise<{ data: string; model: string; usage?: { promptTokens: number; completionTokens: number } }> {
+    signal?.throwIfAborted();
+    const owner = aiRequestUser();
+    const key = owner ? owner + ":" + createHash("sha256").update(JSON.stringify(pastSessions)).digest("hex") : undefined;
+    const cached = key ? habitCache.get(key) : undefined;
+    if (cached && cached.expires > Date.now()) return { data: cached.data, model: cached.model };
+    const result = await (async () => {
     onProgress?.(`[Analyst • DeepSeek & Gemini] Reviewing ${pastSessions.length} past study sessions...`);
     if (!pastSessions || pastSessions.length === 0) {
       onProgress?.(`[Analyst] No past history. Recommending standard 45-min Pomodoro sessions.`);
@@ -326,7 +318,7 @@ TASK — produce the exact curriculum breakdown:
           [{ role: "user", content: prompt }],
           "You are a concise study habits analyst.",
           [],
-          { signal }
+          { signal, maxTokens: 512, thinking: "disabled", singleAttempt: true }
         );
         if (res.text) {
           onProgress?.(`[Analyst • DeepSeek] Extracted ideal study durations and focus patterns.`);
@@ -338,7 +330,7 @@ TASK — produce the exact curriculum breakdown:
         }
       } catch (err) {
         this.rethrowIfAborted(err, signal);
-        console.warn("[Analyst Agent] DeepSeek failed, using fallback:", err);
+        console.warn("[Analyst Agent] DeepSeek failed, using fallback:");
       }
     }
 
@@ -350,11 +342,11 @@ TASK — produce the exact curriculum breakdown:
     if (geminiKey) {
       try {
         const ai = new GoogleGenAI({ apiKey: geminiKey });
-        const response = await ai.models.generateContent({
+        const response = await generateGeminiContent(ai, {
           model: GEMINI_MODELS.default,
           contents: prompt,
           config: {
-            abortSignal: signal,
+            abortSignal: signal, maxOutputTokens: 512, thinkingConfig: { thinkingBudget: 0 },
           },
         });
         onProgress?.(`[Analyst • Gemini] Extracted ideal study durations and focus patterns.`);
@@ -363,8 +355,8 @@ TASK — produce the exact curriculum breakdown:
           model: `Gemini (${GEMINI_MODELS.default})`,
           usage: this.geminiUsage(response),
         };
-      } catch (e) {
-        console.warn("[Analyst Agent] Gemini failed:", e);
+      } catch {
+        console.warn("[Analyst Agent] Gemini failed:");
       }
     }
 
@@ -372,6 +364,14 @@ TASK — produce the exact curriculum breakdown:
       data: "Assume standard 45-minute sessions.",
       model: "Standard Default",
     };
+
+    })();
+    signal?.throwIfAborted();
+    if (key && result.model !== "Standard Default") {
+      if (habitCache.size >= 500) habitCache.delete(habitCache.keys().next().value!);
+      habitCache.set(key, { data: result.data, model: result.model, expires: Date.now() + 10 * 60 * 1000 });
+    }
+    return result;
   }
 
   /**
@@ -470,7 +470,7 @@ Remember:
         const deepseek = LLMFactory.getAdapter("deepseek", DEEPSEEK_MODELS.planner);
         const res = await deepseek.generateResponse(messages, systemInstruction, [], {
           responseFormat: "json_object",
-          signal,
+          maxTokens: 32768, singleAttempt: true, signal,
         });
 
         const parsed = this.parsePlanPayload(res.text || "", topic);
@@ -481,7 +481,7 @@ Remember:
         }
       } catch (deepseekErr: any) {
         this.rethrowIfAborted(deepseekErr, signal);
-        console.warn("[Master Planner Agent] DeepSeek failed, attempting Gemini fallback:", deepseekErr.message);
+        console.warn("[Master Planner Agent] DeepSeek failed, attempting Gemini fallback:");
       }
     }
 
@@ -495,7 +495,7 @@ Remember:
       try {
         const geminiAdapter = LLMFactory.getAdapter("gemini", GEMINI_MODELS.research);
         const res = await geminiAdapter.generateResponse(messages, systemInstruction, [], {
-          signal,
+          signal, maxTokens: 32768, singleAttempt: true,
         });
 
         const parsed = this.parsePlanPayload(res.text || "", topic);
@@ -506,22 +506,7 @@ Remember:
         }
       } catch (geminiErr: any) {
         this.rethrowIfAborted(geminiErr, signal);
-        console.warn("[Master Planner Agent] Gemini research failed, trying default flash:", geminiErr.message);
-        try {
-          const geminiFlash = LLMFactory.getAdapter("gemini", GEMINI_MODELS.default);
-          const res = await geminiFlash.generateResponse(messages, systemInstruction, [], {
-            signal,
-          });
-
-          const parsed = this.parsePlanPayload(res.text || "", topic);
-          if (parsed && parsed.quests.length > 0) {
-            parsed.modelUsed = `Gemini (${GEMINI_MODELS.default})`;
-            parsed.usage = this.sumUsage(res.usage);
-            return parsed;
-          }
-        } catch (flashErr) {
-          console.warn("[Master Planner Agent] Gemini flash failed:", flashErr);
-        }
+        console.warn("[Master Planner Agent] Gemini plan unavailable; trying Groq");
       }
     }
 
@@ -529,7 +514,7 @@ Remember:
     try {
       const groqAdapter = LLMFactory.getAdapter("groq", GROQ_MODELS.default);
       const groqRes = await groqAdapter.generateResponse(messages, systemInstruction, [], {
-        signal,
+        signal, maxTokens: 32768, singleAttempt: true,
       });
 
       const parsed = this.parsePlanPayload(groqRes.text || "", topic);
@@ -541,8 +526,8 @@ Remember:
       throw new Error("Groq planner output failed schema validation");
     } catch (groqErr: any) {
       this.rethrowIfAborted(groqErr, signal);
-      console.error("[Master Planner Agent] Groq fallback failed:", groqErr);
-      throw new Error("Master Planner failed across all engines: " + groqErr.message);
+      console.error("[Master Planner Agent] Groq fallback failed:");
+      throw new Error("Master Planner failed across all engines");
     }
   }
 

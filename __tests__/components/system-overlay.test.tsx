@@ -3,10 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import SystemOverlay from "@/app/components/system/SystemOverlay";
 import { resolvePresence } from "@/app/components/system/page-presence";
 import type { QuotaInfo } from "@/app/components/AiPlannerModal";
+import { clearClientCache } from "@/lib/client-data-cache";
 
 vi.mock("framer-motion", async () => {
   const React = await import("react");
   return {
+    useReducedMotion: () => false,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
     motion: Object.fromEntries(["section", "div"].map(tag => [tag,
       React.forwardRef<HTMLElement, Record<string, unknown>>(function MotionElement(props, ref) {
@@ -32,7 +34,7 @@ const successfulReply = () => vi.fn(async () => ({
   ok: true, status: 200, json: async () => ({ sessionId: 42, reply: "A useful answer." }),
 }));
 beforeEach(() => vi.stubGlobal("fetch", successfulReply()));
-afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+afterEach(() => { cleanup(); clearClientCache(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("Minimal floating conversation", () => {
   it("sends through the existing API, continues the session and refreshes quota", async () => {
@@ -85,6 +87,7 @@ describe("Minimal floating conversation", () => {
   it("preserves the selected quests tab as minimal page context", async () => {
     const quests = resolvePresence("/goals", "tab=quests")!;
     render(<SystemOverlay {...props()} presence={quests} sessionId={42} />);
+    await waitFor(() => expect(input()).toBeEnabled());
     fireEvent.change(input(), { target: { value: "Help with this task" } });
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
@@ -113,7 +116,7 @@ describe("Minimal floating conversation", () => {
     fireEvent.keyDown(window, { key: "Tab" });
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "Conversation options" }));
     fireEvent.keyDown(window, { key: "Tab", shiftKey: true });
-    expect(document.activeElement).toBe(input());
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Attach file" }));
     fireEvent.click(screen.getByRole("button", { name: "Conversation options" }));
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.queryByRole("button", { name: "New conversation" })).not.toBeInTheDocument();
@@ -142,7 +145,7 @@ describe("Minimal floating conversation", () => {
     })));
     fireEvent.change(input(), { target: { value: "Explain quantum mechanics in detail" } });
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
-    await waitFor(() => expect(screen.getByText(/⚠️ Daily AI message limit reached/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Daily AI message limit reached"));
     expect(input()).toBeEnabled();
     fireEvent.change(input(), { target: { value: "Introduce Sylf briefly" } });
     expect(screen.getByRole("button", { name: "Send message" })).toBeEnabled();
@@ -157,10 +160,11 @@ describe("Minimal floating conversation", () => {
       }),
     })));
     const view = render(<SystemOverlay {...callbacks} sessionId={42} />);
+    await waitFor(() => expect(input()).toBeEnabled());
     fireEvent.change(input(), { target: { value: "Move my review" } });
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     await waitFor(() => expect(screen.getByRole("button", { name: "Confirm change" })).toBeEnabled());
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(fetch).mock.calls.filter(([, init]) => init?.method === "POST")).toHaveLength(1);
     view.rerender(<SystemOverlay {...callbacks} sessionId={42} chatQuota={{ remaining: 0, unlimited: false } as QuotaInfo} />);
     expect(input()).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Confirm change" }));
@@ -177,10 +181,10 @@ describe("Minimal floating conversation", () => {
     fireEvent.change(input(), { target: { value: "Question" } });
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     fireEvent.click(screen.getByRole("button", { name: "Conversation options" }));
-    expect(screen.getByRole("button", { name: "New conversation" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "New conversation" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Stop generation" }));
-    await waitFor(() => expect(screen.getByText("Generation stopped.")).toBeInTheDocument());
-    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false, status: 500 })));
+    await waitFor(() => expect(screen.getByText(/Stopped\. An incomplete reply/)).toBeInTheDocument());
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false, status: 500, json: async () => ({}) })));
     fireEvent.change(input(), { target: { value: "Retry" } });
     fireEvent.click(screen.getByRole("button", { name: "Send message" }));
     await waitFor(() => expect(screen.getByText(/temporarily unavailable/)).toBeInTheDocument());

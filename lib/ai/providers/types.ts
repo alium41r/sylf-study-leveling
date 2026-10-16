@@ -10,6 +10,8 @@ export interface NormalizedTool {
 
 export interface NormalizedMessagePart {
   text?: string;
+  /** Server-issued short-lived URL; inlineData remains available to other adapters. */
+  imageUrl?: string;
   inlineData?: {
     mimeType: string;
     data: string; // base64
@@ -42,12 +44,10 @@ export interface LLMUsage {
   promptTokens: number;
   completionTokens: number;
   totalTokens: number;
-  /**
-   * DeepSeek-only: portion of input tokens served from the automatic
-   * context cache — billed at ~10% of the normal input price. Leveraging
-   * this (stable system prompt prefix) is the biggest real cost lever.
-   */
+  /** Cached subset of input. Undefined means the provider did not report it. */
   cacheHitTokens?: number;
+  /** Subset of completionTokens, never an additional billed output count. */
+  reasoningTokens?: number;
 }
 
 export interface LLMResponse {
@@ -74,14 +74,17 @@ export class LLMProviderError extends Error {
 }
 
 export interface LLMGenerateOptions {
+  /** Visible answer deltas for text-only turns; tools/structured outputs remain buffered. */
+  onTextDelta?: (text: string) => void;
   responseFormat?: "json_object" | "text";
   temperature?: number;
   maxTokens?: number;
   /**
    * Control the reasoning/thinking mode for models that
    * support it. "disabled" skips generating (and billing) reasoning tokens
-   * — ideal for simple/fast tiers. The single-attempt Gemini 2.5 Flash path
-   * also supports disabled thinking; unsupported adapters/models ignore it.
+   * — ideal for simple/fast tiers. Gemini 2.5 Flash also
+   * supports disabled thinking; GPT-OSS uses its minimum low effort because it
+   * cannot disable reasoning. Other custom models retain their own defaults.
    */
   thinking?: "enabled" | "disabled";
   /** Optional DeepSeek effort control; omission preserves the provider default. */
@@ -90,6 +93,10 @@ export interface LLMGenerateOptions {
   signal?: AbortSignal;
   /** Caller owns the bounded repair/fallback budget. */
   singleAttempt?: boolean;
+  /** Durable Planner V2 owns its existing dispatch ledger. */
+  telemetry?: boolean;
+  telemetryStage?: string;
+  retryIndex?: number;
 }
 
 export interface LLMAdapter {

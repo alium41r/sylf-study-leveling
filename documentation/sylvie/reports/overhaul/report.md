@@ -18,7 +18,7 @@ Final command outcomes are recorded in `evidence/checks.json`. Relevant tests co
 
 Visual evidence uses the mobile Vite mock fixture, not production accounts or live provider output. See [UI verification](evidence/ui-verification.json) and adjacent screenshots. It covers 1440×960 and 390×844, light/dark modes and custom colors, greetings, confirmation and Planner review controls. Historical mock conversation text still contains the old Hunter greeting; new empty-state greetings use the new copy.
 
-The initial default Turbopack build stalled without progress and was stopped. The supported Webpack production build was used for a concrete compilation/route-trace check; see the final checks record for its outcome. Generated mobile build outputs were restored after verification.
+The initial default Turbopack build stalled without progress and was stopped. The supported Webpack production build was used for a concrete compilation/route-trace check; see the final checks record for its outcome. Mobile output passed the production bundle audit; build artifacts are not used as evidence of live model behavior.
 
 The broader AI suite contains pre-existing legacy failures in Classic Planner mocks, historical byte/hash assertions and planning-capacity expectations. A separate export of HEAD reproduced these categories without the overhaul. The old conversation E2E expectations for proactive writes and unconditional profile/memory injection were updated to the newly requested behavior, retaining authentication, ownership, tool execution/error, bounded history and provider fallback coverage.
 

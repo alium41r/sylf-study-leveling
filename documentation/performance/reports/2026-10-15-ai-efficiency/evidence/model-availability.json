@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-10-15T07:48:40.847Z",
+  "method": "Authenticated model-list GET metadata only; no model execution or paid diagnostics.",
+  "providers": [
+    {
+      "provider": "deepseek",
+      "status": "network_unavailable"
+    },
+    {
+      "provider": "gemini",
+      "status": "verified_metadata",
+      "models": [
+        {
+          "model": "gemini-2.5-flash",
+          "listed": true,
+          "supportsGenerateContent": true
+        }
+      ]
+    },
+    {
+      "provider": "groq",
+      "status": "verified_metadata",
+      "models": [
+        {
+          "model": "openai/gpt-oss-120b",
+          "listed": true
+        },
+        {
+          "model": "openai/gpt-oss-20b",
+          "listed": true
+        },
+        {
+          "model": "qwen/qwen3.8-27b",
+          "listed": true
+        }
+      ]
+    }
+  ]
+}

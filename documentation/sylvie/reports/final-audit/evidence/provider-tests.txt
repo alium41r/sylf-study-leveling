@@ -1,0 +1,14 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run --maxWorkers=2 __tests__/ai/e2e-conversation.test.ts __tests__/ai/deepseek-tool-continuity.test.ts __tests__/ai/provider-streaming.test.ts __tests__/ai/dispatch-telemetry.test.ts __tests__/ai/image-pipeline.test.ts
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+
+ Test Files  5 passed (5)
+      Tests  41 passed (41)
+   Start at  10:12:45
+   Duration  1.54s (transform 925ms, setup 406ms, import 1.50s, tests 413ms, environment 1ms)
+

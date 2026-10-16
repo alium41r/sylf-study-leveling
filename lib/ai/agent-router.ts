@@ -178,11 +178,9 @@ const QUEST_LOOKUP_QUESTION =
 export const WORKLOAD_ROUTING_TABLE: Record<WorkloadType, WorkloadRouteConfig> = {
   multimodal_vision: {
     workload: "multimodal_vision",
-    // Gemini 3.7 Flash is the dedicated primary vision model; DeepSeek's
-    // vision-exp tier is the fallback when Gemini fails (unavailable,
-    // rate-limited, network error — the chat route cascades automatically).
-    primary: { provider: "gemini", model: GEMINI_MODELS.vision },
-    fallback: { provider: "deepseek", model: DEEPSEEK_MODELS.vision },
+    // Flash natively understands images; reuse the same metered adapter.
+    primary: { provider: "deepseek", model: DEEPSEEK_MODELS.vision },
+    fallback: { provider: "gemini", model: GEMINI_MODELS.vision },
     description: "Multimodal Vision & Diagram Ingestion Engine",
     outputTokenCap: 1024,
   },
@@ -574,10 +572,14 @@ export async function dispatchWithFallback(
     ...(config.secondaryFallback ? [config.secondaryFallback] : []),
   ];
 
+  const seenModels = new Set<string>();
   const attempts: DispatchResult["attempts"] = [];
 
   for (let i = 0; i < candidates.length; i++) {
     const spec = candidates[i];
+    const key = `${spec.provider}:${spec.provider === "deepseek" ? process.env.DEEPSEEK_MODEL || spec.model : spec.model}`;
+    if (seenModels.has(key)) continue;
+    seenModels.add(key);
     options?.onAttempt?.({ provider: spec.provider, model: spec.model, attempt: i + 1 });
 
     try {
@@ -589,7 +591,7 @@ export async function dispatchWithFallback(
         {
           responseFormat: options?.responseFormat,
           signal: options?.signal,
-          maxTokens: config.outputTokenCap,
+          maxTokens: config.outputTokenCap, singleAttempt: true,
           thinking: config.thinking,
         }
       );
@@ -608,10 +610,7 @@ export async function dispatchWithFallback(
         attempts,
       };
     } catch (err: any) {
-      console.warn(
-        `[MultiEngineRouter] Model ${spec.provider}/${spec.model} failed on workload '${workload}':`,
-        err.message || err
-      );
+      console.warn("[MultiEngineRouter] provider unavailable");
 
       attempts.push({
         provider: spec.provider,

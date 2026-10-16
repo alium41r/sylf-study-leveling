@@ -68,14 +68,14 @@ describe("Phase 5C - Daily Briefing Tests", () => {
   test("generates briefing and enforces tools: []", async () => {
     const dateKey = "2026-08-08";
     const result = await DailyBriefingService.generateDailyBriefing(user.id, dateKey, user.timezone);
-    
+
     expect(result.success).toBe(true);
 
     // Verify SystemMessage was created
     const message = await prisma.systemMessage.findFirst({
       where: { userId: user.id, type: "DAILY_BRIEFING" },
     });
-    
+
     expect(message).toBeDefined();
     expect(message?.content).toContain("concise daily briefing");
     expect(message?.sessionId).toBeNull(); // Must not pollute chat history
@@ -85,8 +85,15 @@ describe("Phase 5C - Daily Briefing Tests", () => {
     expect(adapter.generateResponse).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
-      [] // STRICT ENFORCEMENT
+      [], // STRICT ENFORCEMENT
+      expect.objectContaining({ maxTokens: 512, thinking: "disabled", singleAttempt: true })
     );
+    expect(buildCoreContext).not.toHaveBeenCalled();
+    expect(formatCoreContext).not.toHaveBeenCalled();
+    const prompt = vi.mocked(adapter.generateResponse).mock.calls.at(-1)?.[1] as string;
+    expect(prompt).toContain("calm, friendly");
+    expect(prompt).not.toContain("for the Hunter");
+    expect(prompt).not.toContain("Core State");
   });
 
   test("enforces hard backend output limits", async () => {
@@ -100,7 +107,7 @@ describe("Phase 5C - Daily Briefing Tests", () => {
 
     const dateKey = "2026-08-09";
     const result = await DailyBriefingService.generateDailyBriefing(user.id, dateKey, user.timezone);
-    
+
     expect(result.success).toBe(false);
     expect(result.message).toContain("exceeded maximum allowed length");
   });

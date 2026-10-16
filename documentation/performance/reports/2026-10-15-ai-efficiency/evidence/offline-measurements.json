@@ -1,0 +1,18 @@
+{
+  "basis": "Controlled synthetic fixtures, not production averages, provider tokenizers, billed savings or model-quality tests.",
+  "toolContext": {
+    "fixtureRows": 50,
+    "beforeJsonChars": 20160,
+    "afterJsonChars": 5427,
+    "beforeApproxTokensCharsDiv4": 5040,
+    "afterApproxTokensCharsDiv4": 1357,
+    "truncationDisclosed": true
+  },
+  "defaults": {
+    "serverChatDeadlineMs": 120000,
+    "clientChatDeadlineMs": 125000,
+    "toolResultMaxChars": 8000,
+    "toolContextMaxCharsPerEngineAttempt": 24000
+  },
+  "costAndProviderLatency": "Not measured. No model dispatches were made."
+}

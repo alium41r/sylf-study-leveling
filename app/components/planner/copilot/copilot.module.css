@@ -561,3 +561,24 @@
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+
+/* Shared chat presentation; planning state and review cards retain their owners. */
+.sylfPanel { background:var(--surface-1); box-shadow:0 8px 28px color-mix(in srgb,var(--text-primary) 5%,transparent); }
+.sylfHeader { background:transparent; }
+.sylfIconBadge { color:var(--accent-text); background:var(--accent-primary-dim); border-color:var(--accent-primary-mid); }
+.sylfIconBadge :global(svg) { color:inherit; }
+.sylfTitle { font:600 14px/1.4 Inter,system-ui,sans-serif; text-transform:none; letter-spacing:-.02em; }
+.bubbleStudent { background:var(--accent-primary-dim); border-color:var(--accent-primary-mid); line-height:1.7; }
+.bubbleSylf { padding:6px 0; max-width:100%; border:0; border-radius:0; background:transparent; color:var(--text-primary); line-height:1.7; }
+.bubbleStudent > strong, .bubbleSylf > strong { display:block; font-size:11px; margin-bottom:7px; }
+.transcriptContainer { overscroll-behavior:contain; scrollbar-gutter:stable; overflow-anchor:none; }
+.sylfSubtitle { color:var(--text-secondary); }
+.sylfFooter { padding:10px 0 0; background:transparent; }
+.suggestionsBar { margin:0 16px; padding-bottom:8px; }
+.suggestionsBar .chipBtn { background:var(--surface-2); color:var(--text-secondary); border-color:var(--border-subtle); box-shadow:none; font:400 12px/1.5 Inter,system-ui,sans-serif; letter-spacing:0; text-transform:none; }
+.chipBtn:hover:not(:disabled) { color:var(--accent-text); border-color:var(--accent-primary-mid); background:var(--accent-primary-dim); }
+.proposal h4 { font:600 14px/1.5 Inter,system-ui,sans-serif; letter-spacing:0; text-transform:none; }
+.proposal button { padding:8px 12px; border:1px solid var(--border-strong); border-radius:9px; color:var(--text-primary); background:var(--surface-2); font:500 12px/1.4 Inter,system-ui,sans-serif; box-shadow:none; text-transform:none; letter-spacing:0; }
+.proposal button:first-child { color:var(--accent-foreground); background:var(--accent-primary); border-color:var(--accent-primary); }
+.statusReady, .statusMissing { color:var(--text-secondary); background:var(--surface-2); border-color:var(--border-strong); }
+.proposal button:first-child { background:var(--accent-primary)!important; color:var(--accent-foreground)!important; border-color:var(--accent-primary)!important; text-shadow:none!important; box-shadow:none!important; font-family:Inter,system-ui,sans-serif!important; }

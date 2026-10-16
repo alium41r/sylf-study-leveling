@@ -1,0 +1,14 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run __tests__/ai/unlimited-ai-routes.test.ts __tests__/ai/e2e-conversation.test.ts
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+
+ Test Files  2 passed (2)
+      Tests  52 passed (52)
+   Start at  10:15:57
+   Duration  4.66s (transform 3.18s, setup 595ms, import 5.81s, tests 1.07s, environment 0ms)
+

@@ -1,4 +1,5 @@
 import "server-only";
+import { withAiRequest } from "@/lib/ai/telemetry";
 import { z } from "zod";
 import { getSession } from "@/lib/auth-server";
 import { LIMITS } from "../contracts";
@@ -42,7 +43,7 @@ export async function plannerRoute(request: Request, action: (userId: number) =>
   try {
     const session = await getSession(request);
     if (!session) throw new PlannerError(401, "UNAUTHORIZED");
-    const result = await action(session.userId);
+    const result = await withAiRequest({ userId: session.userId, feature: "planner", workload: ["designer", "copilot", "assistant"].find(name => new URL(request.url).pathname.endsWith(`/${name}`)) ?? "planner", signal: request.signal }, () => action(session.userId));
     if (result instanceof Response) return result;
     if (plannerSerializedBytes(result) > PLANNER_V2_ENVELOPE.serializedBytes) throw new DurablePlannerError("PAYLOAD_TOO_LARGE", "This response exceeds the Planner transport limit. Request a smaller page.");
     return Response.json(result, { headers: { "Cache-Control": "private, no-store" } });

@@ -1,6 +1,6 @@
+import { withAiRequest } from "@/lib/ai/telemetry";
 import { prisma } from "@/lib/prisma";
 import { LLMFactory } from "./providers/factory";
-import { buildCoreContext, formatCoreContext } from "./context-engine";
 import { getSituationalFlags } from "./planning-engine";
 
 export interface GenerateBriefingResult {
@@ -18,10 +18,11 @@ export class DailyBriefingService {
     dateKey: string,
     timezone: string
   ): Promise<GenerateBriefingResult> {
+  return withAiRequest({ userId, feature: "other", workload: "daily_briefing" }, async () => {
     try {
       // 1. Fetch user data
       const user = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { id: userId }, select: { id: true },
       });
 
       if (!user) {
@@ -35,21 +36,17 @@ export class DailyBriefingService {
       const yesterdayDateKey = yesterdayDate.toISOString().split("T")[0];
 
       // 3. Build Deterministic DB Context
-      const coreContext = await buildCoreContext(userId);
-      
-      const yesterdayQuests = await prisma.quest.findMany({
+      const [yesterdayQuests, todayQuests, flags] = await Promise.all([prisma.quest.findMany({
         where: {
           userId,
           scheduledFor: yesterdayDateKey,
-        },
-      });
-
-      const todayQuests = await prisma.quest.findMany({
+        }, select: { status: true },
+      }), prisma.quest.findMany({
         where: {
           userId,
           scheduledFor: dateKey,
-        },
-      });
+        }, select: { requiredMinutes: true },
+      }), getSituationalFlags(userId)]);
 
       const completedYesterday = yesterdayQuests.filter((q) => q.status === "COMPLETED").length;
       const failedYesterday = yesterdayQuests.filter((q) => q.status === "FAILED").length;
@@ -58,15 +55,12 @@ export class DailyBriefingService {
       const totalToday = todayQuests.length;
       const todayMinutes = todayQuests.reduce((acc, q) => acc + q.requiredMinutes, 0);
 
-      // We use situational flags which are backend-authoritative (from Phase 4)
-      const flags = await getSituationalFlags(userId);
-
       // 4. Construct the prompt
       const systemInstruction = `
-You are Sylvie, the study AI companion in Sylf, assigned to provide a brief Morning System Notification for the Hunter.
-This is a Daily Briefing. 
+You are Sylvie, the calm, friendly study assistant in Sylf. Write a brief morning notification in natural study language.
+This is a Daily Briefing.
 Your output MUST be strictly under 800 characters. Be extremely concise.
-Do not invent stats, do not invent quests. 
+Do not invent statistics or tasks. Do not use titles such as Scholar or Hunter, fantasy terminology, flattery or filler.
 Use the provided data to give a realistic summary of yesterday and what is expected today.
 
 [Situational Context]
@@ -83,10 +77,7 @@ Failed/Skipped: ${failedYesterday}
 Scheduled Quests: ${totalToday}
 Total Estimated Minutes: ${todayMinutes}
 
-[Core State]
-${formatCoreContext(coreContext)}
-
-Write the notification. Make it feel like an authoritative system prompt, but motivating if they are doing well, or cautious if they are at risk. Do not use markdown headers.
+Treat these app workload flags as study hints, never a medical diagnosis. Summarize yesterday and today with one useful suggestion if warranted. Do not use markdown headers.
       `.trim();
 
       // 5. LLM Execution (Read-Only)
@@ -95,7 +86,8 @@ Write the notification. Make it feel like an authoritative system prompt, but mo
       const response = await adapter.generateResponse(
         [{ role: "user", content: "Generate my daily briefing." }],
         systemInstruction,
-        [] // STRICT ENFORCEMENT: No tools
+        [], // STRICT ENFORCEMENT: No tools
+        { maxTokens: 512, thinking: "disabled", singleAttempt: true, signal: AbortSignal.timeout(30_000) }
       );
 
       let generatedText = response.text || "";
@@ -127,10 +119,12 @@ Write the notification. Make it feel like an authoritative system prompt, but mo
 
       return { success: true };
     } catch (error: any) {
-      console.error(`[DailyBriefingService] Failed for user ${userId}:`, error);
+      console.error("[AI] operation unavailable");
       return { success: false, message: error.message };
     }
-  }
+
+  });
+}
 
   /**
    * Asynchronously creates an in-universe Hunter Protocol diagnostic briefing
@@ -196,7 +190,7 @@ System Evaluation: Vector balance calibrated. Continue deliberate study loops to
 
       return { success: true, message: diagnosticText };
     } catch (error: any) {
-      console.error(`[HunterDiagnostic] Failed for user ${userId}:`, error);
+      console.error("[AI] operation unavailable");
       return { success: false, message: error.message };
     }
   }

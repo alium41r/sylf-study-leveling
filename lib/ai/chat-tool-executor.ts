@@ -1,3 +1,5 @@
+import { aiSignal } from "./telemetry";
+import { generateGeminiContent } from "@/lib/ai/providers/gemini-dispatch";
 import { executionTransaction } from "@/lib/execution-coordination";
 // ============================================================
 // Chat Tool Executor — Runs AI tool calls against the database
@@ -131,7 +133,7 @@ export async function executeChatTool(
     }
   } catch (error: any) {
     if (isPlannerConflict(error)) return { error: "PLANNER_REVIEW_REQUIRED", requiresPlannerReview: true };
-    console.error(`Tool Execution Error [${toolName}]:`, error);
+    console.error("[AI] operation unavailable");
     return { error: `Internal tool error occurred while executing ${toolName}.`, details: error.message };
   }
 }
@@ -327,12 +329,12 @@ async function executeDeleteGoal(userId: number, args: Record<string, any>) {
   }
 
   const idsToDelete: number[] = [];
-  
+
   if (args.goalId) {
     const existing = await tx.goal.findFirst({ where: { id: Number(args.goalId), userId } });
     if (existing) idsToDelete.push(existing.id);
   }
-  
+
   if (args.searchTitle) {
     const existing = await tx.goal.findFirst({
       where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
@@ -348,11 +350,11 @@ async function executeDeleteGoal(userId: number, args: Record<string, any>) {
     });
     if (existing) idsToDelete.push(existing.id);
   }
-  
+
   if (idsToDelete.length === 0) {
     return { error: "No matching goals found to delete. Please verify the IDs or titles." };
   }
-  
+
   // Delete associated quests first since they are tied to these goals
   const guarded = await deleteUnlinkedGoals(userId, idsToDelete, false, tx);
   return { success: true, message: `Successfully deleted ${guarded.goals} goal(s) and their associated quests.` };
@@ -679,12 +681,12 @@ async function executeDeleteQuest(userId: number, args: Record<string, any>) {
   }
 
   const idsToDelete: number[] = [];
-  
+
   if (args.questId) {
     const existing = await tx.quest.findFirst({ where: { id: Number(args.questId), userId } });
     if (existing) idsToDelete.push(existing.id);
   }
-  
+
   if (args.searchTitle) {
     const existing = await tx.quest.findFirst({
       where: { userId, title: { contains: args.searchTitle, mode: "insensitive" } },
@@ -700,16 +702,16 @@ async function executeDeleteQuest(userId: number, args: Record<string, any>) {
     });
     if (existing) idsToDelete.push(existing.id);
   }
-  
+
   if (idsToDelete.length === 0) {
     return { error: "No matching quests found to delete. Please verify the IDs or titles." };
   }
-  
+
   await assertNoLinkedQuests(userId, { id: { in: idsToDelete } }, tx);
   const deleted = await tx.quest.deleteMany({
     where: { id: { in: idsToDelete } }
   });
-  
+
   return { success: true, message: `Successfully deleted ${deleted.count} quest(s).` };
   });
 }
@@ -866,12 +868,12 @@ async function executeMoveQuest(userId: number, args: Record<string, any>) {
 
   const effortLevel = await getHighestEffortLevel(userId, tx);
   const matrix = await calculateDailyCapacity(userId, effortLevel, targetDate, targetDate, tx);
-  
+
   if (matrix[targetDate] < quest.requiredMinutes) {
-    return { 
-      error: "Target date is overloaded.", 
-      capacityRemaining: matrix[targetDate], 
-      required: quest.requiredMinutes 
+    return {
+      error: "Target date is overloaded.",
+      capacityRemaining: matrix[targetDate],
+      required: quest.requiredMinutes
     };
   }
 
@@ -902,10 +904,10 @@ async function executeSwapQuests(userId: number, args: Record<string, any>) {
   ) {
     return { error: "Only PENDING or IN_PROGRESS quests can be swapped." };
   }
-  
+
   const dateA = questA.scheduledFor;
   const dateB = questB.scheduledFor;
-  
+
   if (dateA === dateB) return { error: "Quests are already on the same date." };
 
   // ─── REST-DAY ALLOCATION GUARDRAIL ─────────────────────────
@@ -919,7 +921,7 @@ async function executeSwapQuests(userId: number, args: Record<string, any>) {
   }
 
   const effortLevel = await getHighestEffortLevel(userId, tx);
-  
+
   // Calculate capacity for both dates
   const matrixA = await calculateDailyCapacity(userId, effortLevel, dateA, dateA, tx);
   const matrixB = await calculateDailyCapacity(userId, effortLevel, dateB, dateB, tx);
@@ -971,7 +973,7 @@ async function executeClearDay(userId: number, args: Record<string, any>) {
 
   const updates: { id: number; newDate: string }[] = [];
   const unplaced = [];
-  
+
   for (const q of pendingQuests) {
     let placed = false;
     for (const [day, cap] of Object.entries(matrix)) {
@@ -986,18 +988,18 @@ async function executeClearDay(userId: number, args: Record<string, any>) {
   }
 
   if (unplaced.length > 0) {
-    return { 
+    return {
       error: "Cannot clear day: Not enough capacity in the next 14 days to reschedule quests.",
-      unplacedQuests: unplaced 
+      unplacedQuests: unplaced
     };
   }
 
   await assertNoLinkedQuests(userId, { id: { in: updates.map(u => u.id) } }, tx);
   await Promise.all(updates.map(u => tx.quest.update({ where: { id: u.id }, data: { scheduledFor: u.newDate } })));
 
-  return { 
-    success: true, 
-    message: `Cleared ${dateStr}. Pushed ${updates.length} quests forward safely.` 
+  return {
+    success: true,
+    message: `Cleared ${dateStr}. Pushed ${updates.length} quests forward safely.`
   };
   });
 }
@@ -1019,7 +1021,7 @@ async function executeGetDailyPattern(userId: number) {
   const context = await buildRelevantContext(userId, "calendar" as any, ["trends"]);
   const trends = context.trends;
   if (!trends) return { error: "No pattern data available." };
-  
+
   return {
     bestDayOfWeek: trends.bestDayOfWeek || "Unknown",
     avgDailyMinutes: trends.avgDailyMinutes,
@@ -1033,7 +1035,7 @@ async function executeGetDailyPattern(userId: number) {
 async function executeSaveMemory(userId: number, args: Record<string, any>) {
   const { key, value, source, confidence } = args;
   if (!key || !value) return { error: "Missing key or value." };
-  
+
   let conf = Number(confidence) || 1.0;
   conf = Math.max(0, Math.min(1, conf)); // Clamp between 0 and 1
   const src = source === "user_stated" ? "user_stated" : "inferred";
@@ -1110,7 +1112,7 @@ export function calculateSemanticSimilarity(text1: string, text2: string): numbe
   const normalize = (t: string) => t.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 0 && !STOP_WORDS.has(w));
   const words1 = new Set(normalize(text1));
   const words2 = new Set(normalize(text2));
-  
+
   for (const pair of OPPOSING_PAIRS) {
     const arr = Array.from(pair);
     if ((words1.has(arr[0]) && words2.has(arr[1])) || (words1.has(arr[1]) && words2.has(arr[0]))) {
@@ -1120,19 +1122,19 @@ export function calculateSemanticSimilarity(text1: string, text2: string): numbe
 
   const intersection = new Set([...words1].filter(x => words2.has(x)));
   const union = new Set([...words1, ...words2]);
-  
+
   if (union.size === 0) return 0;
-  
+
   const jaccard = intersection.size / union.size;
   if (union.size < 4 && jaccard <= 0.66) return 0; // Safe-guard short strings
-  
+
   return jaccard;
 }
 
 async function executeGenerateInsight(userId: number, args: Record<string, any>) {
   const { category, content } = args;
   if (!category || !content) return { error: "Missing category or content." };
-  
+
   if (content.length > 200) return { error: "Content too long (max 200 chars)." };
 
   const validCategories = ["coaching", "trend", "recommendation", "warning"];
@@ -1141,7 +1143,7 @@ async function executeGenerateInsight(userId: number, args: Record<string, any>)
   }
 
   const now = new Date();
-  
+
   // 1. Cooldown check (60 minutes)
   const cooldownThreshold = new Date(now.getTime() - 60 * 60 * 1000);
   const recentInsight = await prisma.aiInsight.findFirst({
@@ -1185,7 +1187,7 @@ async function executeGenerateInsight(userId: number, args: Record<string, any>)
     if (past.content.trim().toLowerCase().replace(/[^\w\s]/g, "") === normalizedNew) {
       return { error: "An identical insight has already been saved previously." };
     }
-    
+
     // Check Jaccard similarity
     const similarity = calculateSemanticSimilarity(content, past.content);
     if (similarity > INSIGHT_SIMILARITY_THRESHOLD) {
@@ -1222,9 +1224,9 @@ async function executeGetAppState(userId: number) {
   ]);
 
   if (!user) return { error: "User not found." };
-  return { 
-    ...user, 
-    activeGoals: goals 
+  return {
+    ...user,
+    activeGoals: goals
   };
 }
 
@@ -1245,7 +1247,7 @@ async function executeGetShopInventory() {
 export async function executeGoogleSearch(args: {
   query?: string;
   qualification?: string;
-}): Promise<Record<string, any>> {
+}, signal?: AbortSignal): Promise<Record<string, any>> {
   const query = (args.query || "").trim();
   if (!query) {
     return { error: "Query parameter is required for googleSearch." };
@@ -1265,7 +1267,7 @@ export async function executeGoogleSearch(args: {
     try {
       const { GoogleGenAI } = await import("@google/genai");
       const ai = new GoogleGenAI({ apiKey: geminiKey });
-      const response = await ai.models.generateContent({
+      const response = await generateGeminiContent(ai, {
         // Model comes from the shared registry so a rename here never desyncs
         // from every other Gemini workload.
         model: GEMINI_MODELS.research,
@@ -1274,6 +1276,7 @@ export async function executeGoogleSearch(args: {
           systemInstruction:
             "You are an Academic Curriculum & Syllabus Search specialist. Return concise, structured curriculum findings including exact chapter titles, subtopics, exam board codes (CAIE, Edexcel, AP, IB), and difficulty ratings.",
           tools: [{ googleSearch: {} }],
+          maxOutputTokens: 8192, abortSignal: aiSignal(signal, 30_000),
         },
       });
 
@@ -1286,8 +1289,8 @@ export async function executeGoogleSearch(args: {
           summary: text,
         };
       }
-    } catch (err: any) {
-      console.warn("[chat-tool-executor] Gemini search grounding fallback:", err.message);
+    } catch {
+      console.warn("[chat-tool-executor] Gemini search grounding fallback:");
     }
   }
 

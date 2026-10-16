@@ -1,5 +1,6 @@
 "use client";
-import { plannerFetch, postJson } from "../transport";
+import { plannerChatBody } from "../copilot/image-client";
+import { plannerFetch } from "../transport";
 import type { IntakeView } from "../intake/actions";
 import type {
   DesignerTurnResult,
@@ -72,6 +73,7 @@ export const sendDesignerMessage = async (
   input: {
     expectedVersion: number;
     message: string;
+    images?: File[];
     recent: DesignerRecentTurn[];
     proposalOnly?: boolean;
     signal?: AbortSignal;
@@ -79,13 +81,13 @@ export const sendDesignerMessage = async (
 ): Promise<DesignerTurnPayload> =>
   plannerFetch<DesignerTurnPayload>(`/intake/${encodeURIComponent(sessionId)}/designer`, {
     signal: input.signal,
-    ...postJson({
+    ...plannerChatBody({
       schemaVersion: 1,
       expectedVersion: input.expectedVersion,
       message: input.message,
-      recent: input.recent.slice(-8),
+      recent: input.recent.slice(-8).map(({ role, text }) => ({ role, text })),
       ...(input.proposalOnly ? { proposalOnly: true } : {}),
-    }),
+    }, input.images),
   });
 
 /**

@@ -1,0 +1,37 @@
+{
+  "files": [
+    "app/api/system-messages/chat/route.ts",
+    "app/api/system-messages/route.ts",
+    "app/api/chats/[id]/route.ts",
+    "app/api/planner/intake/[id]/designer/route.ts",
+    "app/api/planner/intake/[id]/copilot/route.ts",
+    "app/components/planner/copilot/PlannerCopilot.tsx",
+    "app/components/planner/quick-plan/QuickPlan.tsx",
+    "app/components/system/SystemOverlay.tsx",
+    "app/system/components/ConversationPanel.tsx",
+    "app/system/components/SystemScreen.tsx",
+    "app/focus/components/tools/AiAssistantTool.tsx",
+    "lib/ai/agent-router.ts",
+    "lib/ai/providers/deepseek.ts",
+    "lib/ai/providers/types.ts",
+    "lib/ai/sylvie/chat-client.ts",
+    "lib/ai/sylvie/chat-stream-server.ts",
+    "lib/planner/copilot/client.ts",
+    "lib/planner/copilot/model.ts",
+    "lib/planner/copilot/run.ts",
+    "lib/planner/designer/client.ts",
+    "lib/planner/designer/model.ts",
+    "lib/planner/designer/run.ts",
+    "lib/planner/transport.ts",
+    "next.config.ts"
+  ],
+  "before": {
+    "errors": 34,
+    "warnings": 17
+  },
+  "after": {
+    "errors": 34,
+    "warnings": 17
+  },
+  "increasedRuleCounts": []
+}

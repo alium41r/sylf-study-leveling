@@ -1,13 +1,16 @@
+import { boundSylvieToolResult } from "@/lib/ai/sylvie/tool-context";
+import { SYLVIE_SERVER_TIMEOUT_MS } from "@/lib/ai/client-budget";
+import { withAiRequest, setAiUser, aiRequestSignal } from "@/lib/ai/telemetry";
+import { streamChat, type ChatStreamSink } from "@/lib/ai/sylvie/chat-stream-server";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import fs from "fs/promises";
-import path from "path";
+import { ChatImageError, prepareChatImages, inlineImageParts, readImageForm, formImages, parseImageReferences } from "@/lib/ai/sylvie/images-server";
+import { encodeStoredImages, storedImages, saveChatImages, readChatImage, signedChatImage, removeChatImages, exposeChatImages } from "@/lib/ai/sylvie/image-storage";
 import { executeChatTool } from "@/lib/ai/chat-tool-executor";
 import { LLMFactory } from "@/lib/ai/providers/factory";
 import { LLMProviderError, NormalizedMessage, LLMUsage } from "@/lib/ai/providers/types";
 import { reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
-import { validateUpload } from "@/lib/upload-security";
 import { AI_LIMITS, DEEPSEEK_MODELS, GEMINI_MODELS, GROQ_MODELS } from "@/lib/ai/config";
 import { resolveCheapAnswer } from "@/lib/ai/cheap-answers";
 import { logAiUsage } from "@/lib/ai/usage-logger";
@@ -26,7 +29,6 @@ import { signConfirmationToken } from "@/lib/ai/tool-confirmation";
 import type { ChatSession } from "@prisma/client";
 import type { IntentParams } from "@/lib/ai/intents/registry";
 
-const errorMessage = (error: unknown): string => error instanceof Error ? error.message : String(error);
 
 const MAX_TOOL_ITERATIONS = AI_LIMITS.maxToolIterations;
 
@@ -60,6 +62,7 @@ function rememberCheapContext(
 }
 
 function recallCheapContext(userId: number, sessionIdStr: string | null) {
+  if (!sessionIdStr) return null; // A new conversation has no prior context.
   const key = cheapContextKey(userId, sessionIdStr);
   const entry = cheapContextMemory.get(key);
   if (!entry) return null;
@@ -113,10 +116,17 @@ async function resolveChatSession(
 }
 
 export async function POST(req: NextRequest) {
+  if (req.headers.get("accept")?.includes("text/event-stream")) return streamChat(req, sink => respond(req, sink));
+  return respond(req);
+}
+
+async function respond(req: NextRequest, stream?: ChatStreamSink) {
+  return withAiRequest({ feature: "chat", workload: "sylvie", signal: AbortSignal.any([stream?.signal ?? req.signal, AbortSignal.timeout(SYLVIE_SERVER_TIMEOUT_MS)]) }, async () => {
   let sessionUserId: number | null = null;
   let quotaReserved = false;
   try {
     const session = await getSession(req);
+    if (session) setAiUser(session.userId);
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -127,7 +137,8 @@ export async function POST(req: NextRequest) {
     // ── Parse the request body (before quota so deterministic replies
     //    can be served without touching the LLM quota pool) ──
     let messageText = "";
-    let file: File | null = null;
+    let imageFiles: File[] = [];
+    let imageReferences: ReturnType<typeof parseImageReferences> = [];
     let sessionIdStr: string | null = null;
     let modelPreference = "auto";
     let contextOverride: Record<string, unknown> | null = null;
@@ -137,9 +148,10 @@ export async function POST(req: NextRequest) {
     const contentType = req.headers.get("content-type") || "";
 
     if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
-      const formData = await req.formData();
+      const formData = await readImageForm(req);
       messageText = (formData.get("message") as string) || "";
-      file = formData.get("file") as File | null;
+      imageFiles = formImages(formData);
+      imageReferences = parseImageReferences(formData.get("imageReferences"));
       sessionIdStr = formData.get("sessionId") as string | null;
       modelPreference = (formData.get("modelPreference") as string) || "auto";
       confirmationToken = formData.get("confirmationToken");
@@ -162,11 +174,16 @@ export async function POST(req: NextRequest) {
       contextOverride = body.contextOverride && typeof body.contextOverride === "object" && !Array.isArray(body.contextOverride) ? body.contextOverride : null;
       pageInput = body.pageContext;
       confirmationToken = body.confirmationToken;
+      imageReferences = parseImageReferences(body.imageReferences);
     }
 
     if (typeof messageText !== "string" || typeof modelPreference !== "string") {
       return NextResponse.json({ error: "Invalid message." }, { status: 400 });
     }
+    const imageFollowup = !imageFiles.length && !/\b(?:upload|attach|remove|delete)\b|\b(?:image|photo|picture)\s+(?:feature|support|limit|storage|privacy|attachment)s?\b/i.test(messageText) && /\b(?:this|that|the|previous|last|first|second)\s+(?:image|screenshot|diagram|photo|picture)\b/i.test(messageText);
+    const hasImageInput = imageFiles.length > 0 || imageReferences.length > 0 || imageFollowup;
+    if (imageFiles.length + imageReferences.length > 4) throw new ChatImageError("Attach up to 4 images at a time.");
+    if (hasImageInput && modelPreference === "groq") throw new ChatImageError("The selected Groq model does not support images. Choose Auto, DeepSeek or Gemini.");
     // Legacy focus clients may supply a subject, never a trusted instruction.
     const page = normalizeSylviePage(pageInput ?? (contextOverride?.mode === "focus"
       ? { path: "/focus", subject: contextOverride.subject } : undefined));
@@ -229,14 +246,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!messageText && !file) {
+    if (!messageText && !hasImageInput) {
       return NextResponse.json({ error: "Empty message" }, { status: 400 });
     }
 
     // ── Cheap-Answer Engine: easy low-reasoning questions from every genre
     //    are answered deterministically (math, units, dates, app stats…)
     //    before the LLM — no tokens, no quota, saved to the session. ──
-    if (!file && messageText && !contextOverride && modelPreference === "auto") {
+    if (!hasImageInput && messageText && !contextOverride && modelPreference === "auto") {
       const cheapContext = recallCheapContext(userId, sessionIdStr);
       const cheap = await resolveCheapAnswer(userId, messageText, cheapContext);
       if (cheap) {
@@ -245,6 +262,7 @@ export async function POST(req: NextRequest) {
             messageText.length > 30 ? messageText.slice(0, 30) + "..." : messageText;
           const { sessionId: detSessionId, newSession: detNewSession } =
             await resolveChatSession(sessionIdStr, userId, fallbackTitle);
+          stream?.session({ sessionId: detSessionId, session: detNewSession });
 
           const detUserMessage = await prisma.systemMessage.create({
             data: {
@@ -266,10 +284,7 @@ export async function POST(req: NextRequest) {
             },
           });
 
-          console.log(
-            `[CheapAnswer] "${messageText.slice(0, 40)}" → ${cheap.intentId} conf=${cheap.confidence} scope=${cheap.params?.timeScope ?? "-"} (no LLM, no quota)`
-          );
-          rememberCheapContext(userId, sessionIdStr, cheap.intentId, cheap.params);
+
           rememberCheapContext(userId, String(detSessionId), cheap.intentId, cheap.params);
           return NextResponse.json(
             {
@@ -289,7 +304,7 @@ export async function POST(req: NextRequest) {
           if (e instanceof RouteError) {
             return NextResponse.json({ error: e.message }, { status: e.status });
           }
-          console.error("[CheapAnswer] failed — falling through to AI:", e);
+          console.error("[CheapAnswer] request failed");
         }
       }
     }
@@ -303,6 +318,7 @@ export async function POST(req: NextRequest) {
       const resolved = await resolveChatSession(sessionIdStr, userId, fallbackTitle);
       sessionId = resolved.sessionId;
       newSession = resolved.newSession;
+      stream?.session({ sessionId, session: newSession });
     }
 
     // ── Context window: the 20 MOST RECENT messages (desc + reverse),
@@ -311,7 +327,7 @@ export async function POST(req: NextRequest) {
       where: { sessionId, userId },
       orderBy: { createdAt: "desc" },
       take: 20,
-      select: { id: true, type: true, content: true, createdAt: true },
+      select: { id: true, type: true, content: true, createdAt: true, attachmentUrl: imageReferences.length > 0 || imageFollowup },
     });
     const conversationHistory = rawHistory.reverse();
 
@@ -323,7 +339,7 @@ export async function POST(req: NextRequest) {
       }));
 
     // A tiny, stable answer for the explicit short-introduction regression.
-    const introduction = !file ? shortSylfIntroduction(messageText) : null;
+    const introduction = !hasImageInput ? shortSylfIntroduction(messageText) : null;
     if (introduction) {
       const reply = introduction;
       const userMessage = await prisma.systemMessage.create({ data: { userId, sessionId, content: messageText, type: "USER", read: true } });
@@ -332,7 +348,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Resolve planning before any general-chat model: the Planner owns its reasoning.
-    const planning = !file && isPlanningRequest(messageText, normalizedHistory);
+    const planning = !hasImageInput && isPlanningRequest(messageText, normalizedHistory);
     if (planning) {
       const userMessage = await prisma.systemMessage.create({ data: {
         userId, sessionId, content: messageText, type: "USER", read: true,
@@ -370,34 +386,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── Handle file upload ──────────────────────────────────
-    let attachmentUrl: string | null = null;
-    let base64Data: string | null = null;
-    let mimeType: string | null = null;
-
-    if (file && file.size > 0) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      // S4: size cap + magic-byte content sniffing + generated storage name.
-      // The client filename is never used as a path component.
-      const validation = validateUpload(file, buffer);
-      if (!validation.ok) {
-        if (quotaReserved) await releaseQuota(userId, "chat").catch(() => {});
-        return NextResponse.json({ error: validation.error }, { status: validation.status });
-      }
-      base64Data = buffer.toString("base64");
-      mimeType = validation.mime;
-      // Best-effort persistence (read-only filesystems simply skip the write —
-      // the attachment is still analyzed in this request, just not archived).
-      try {
-        const uploadDir = path.join(process.cwd(), "public/uploads");
-        await fs.mkdir(uploadDir, { recursive: true });
-        await fs.writeFile(path.join(uploadDir, validation.filename), buffer);
-        attachmentUrl = `/uploads/${validation.filename}`;
-      } catch (err) {
-        console.warn("[chat] attachment persistence skipped:", errorMessage(err));
-        attachmentUrl = null;
-      }
+    // Images are private objects. Follow-ups reuse only explicitly referenced images,
+    // never the entire visual history or an arbitrary client-supplied URL.
+    stream?.status(hasImageInput ? "uploading" : "thinking");
+    const signal = aiRequestSignal() ?? req.signal;
+    const prepared = await prepareChatImages(imageFiles, signal);
+    const referenced: ReturnType<typeof storedImages> = [];
+    if (!imageReferences.length && imageFollowup) {
+      const previous = [...conversationHistory].reverse().find(turn => turn.type === "USER" && storedImages(turn.attachmentUrl).length);
+      if (previous) imageReferences = storedImages(previous.attachmentUrl).map((_, index) => ({ messageId: previous.id, index }));
     }
+    const missingIds = [...new Set(imageReferences.map(reference => reference.messageId))].filter(id => !conversationHistory.some(turn => turn.id === id && turn.type === "USER"));
+    const sources = [...conversationHistory, ...missingIds.length ? await prisma.systemMessage.findMany({ where: { id: { in: missingIds }, userId, sessionId, type: "USER" }, take: 4, select: { id: true, type: true, content: true, createdAt: true, attachmentUrl: true } }) : []];
+    for (const reference of imageReferences) {
+      const source = sources.find(turn => turn.id === reference.messageId && turn.type === "USER");
+      const image = storedImages(source?.attachmentUrl)[reference.index];
+      if (!image) throw new ChatImageError("This image is unavailable in this conversation. Attach it again.", 404);
+      if (!referenced.some(existing => existing.path === image.path)) referenced.push(image);
+    }
+    if (imageFollowup && !referenced.length && !prepared.length) throw new ChatImageError("Attach the image you want to discuss. Older uploads can be attached again.");
+    const saved = await saveChatImages(userId, sessionId!, prepared, signal);
+    const images = [...saved, ...referenced];
+    const imageParts: NormalizedMessage["parts"] = [];
+    let inlineImagesLoaded = false;
+    try {
+      const urls = await Promise.all(images.map(image => signedChatImage(image, userId, sessionId!)));
+      urls.forEach(imageUrl => imageParts.push({ imageUrl }));
+    } catch (error) { await removeChatImages(saved).catch(() => {}); throw error; }
+    const attachmentUrl = images.length ? encodeStoredImages(images) : null;
+    stream?.status("thinking");
 
     // ── Save user message to DB ─────────────────────────────
     const userMessageContent = messageText || "Sent an attachment.";
@@ -410,14 +427,14 @@ export async function POST(req: NextRequest) {
         read: true,
         attachmentUrl,
       },
-    });
+    }).catch(async error => { await removeChatImages(saved).catch(() => {}); throw error; });
 
     // No profile/progression/memory queries by default. Only the local date is shared.
     const timezone = await getUserTimezone(userId);
     const localDate = TimezoneService.getUserLocalDate(timezone);
     const { classifyWorkload } = await import("@/lib/ai/agent-router");
     const workloadResult = classifyWorkload(messageText || "", undefined, {
-      hasMedia: !!(base64Data && mimeType), isFocusMode: page?.path === "/focus",
+      hasMedia: imageParts.length > 0, isFocusMode: page?.path === "/focus",
     });
     const currentAgent = workloadResult.agent;
     const knowledge = retrieveSylvieKnowledge({ message: messageText, page, recentUserMessages: normalizedHistory.filter((turn) => turn.role === "user").map((turn) => turn.content ?? "") });
@@ -430,7 +447,7 @@ export async function POST(req: NextRequest) {
     const currentUserMsg: NormalizedMessage = {
       role: "user",
       content: messageText || "Please analyze this attachment.",
-      parts: (base64Data && mimeType) ? [{ inlineData: { mimeType, data: base64Data } }] : undefined
+      parts: imageParts.length ? imageParts : undefined
     };
     normalizedHistory.push(currentUserMsg);
 
@@ -447,11 +464,14 @@ export async function POST(req: NextRequest) {
     // Per-workload generation budget: hard output cap + optional DeepSeek
     // thinking toggle (disabled tiers skip reasoning-token spend).
     const genOptions = {
+      singleAttempt: true, // The route owns provider fallbacks and the shared deadline.
       maxTokens: /\b(?:in detail|detailed|thorough|in depth|comprehensive|full explanation)\b/i.test(messageText)
         ? Math.max(workloadResult.route.outputTokenCap, 2048) : workloadResult.route.outputTokenCap,
       thinking: workloadResult.route.thinking,
     };
 
+    const readCache = new Map<string, unknown>();
+    let engineAttempt = -1;
     const executeAgentLoop = async (
       provider: "deepseek" | "gemini" | "groq",
       modelOverride?: string,
@@ -473,10 +493,12 @@ export async function POST(req: NextRequest) {
       };
 
       let iterations = 0;
-      const readCache = new Map<string, unknown>();
+      let toolContextRemaining = 24000;
+      const providedReads = new Set<string>();
       const allowedToolNames = new Set(tools.map((tool) => tool.name));
       let response = await adapter.generateResponse(runHistory, activeSystemInstruction, tools, {
-        ...genOptions,
+        ...genOptions, retryIndex: engineAttempt, telemetryStage: "sylvie",
+        onTextDelta: tools.length === 0 ? stream?.delta : undefined,
         signal,
       });
       addUsage(response.usage);
@@ -510,12 +532,16 @@ export async function POST(req: NextRequest) {
             }
           } else {
             const key = `${tc.name}:${JSON.stringify(tc.args)}`;
-            if (readCache.has(key)) result = readCache.get(key);
+            if (providedReads.has(key)) result = { alreadyProvided: true, instruction: "Use the earlier result for this exact read." };
+            else if (toolContextRemaining < 512) result = { contextTruncated: true, error: "Reference context limit reached. Ask for a narrower request." };
+            else if (readCache.has(key)) result = boundSylvieToolResult(readCache.get(key), Math.min(8000, toolContextRemaining));
             else {
-              try { result = await executeChatTool(tc.name, tc.args, userId); }
+              try { result = boundSylvieToolResult(await executeChatTool(tc.name, tc.args, userId), Math.min(8000, toolContextRemaining)); }
               catch { result = { error: "This information is temporarily unavailable." }; }
               readCache.set(key, result);
             }
+            providedReads.add(key);
+            toolContextRemaining -= JSON.stringify(result).length;
           }
           toolResultsMsg.toolResults!.push({ toolCallId: tc.id, name: tc.name, result });
         }
@@ -529,6 +555,7 @@ export async function POST(req: NextRequest) {
 
         response = await adapter.generateResponse(runHistory, activeSystemInstruction, tools, {
           ...genOptions,
+          retryIndex: engineAttempt, telemetryStage: "sylvie_tool_followup",
           signal,
         });
         addUsage(response.usage);
@@ -544,15 +571,12 @@ export async function POST(req: NextRequest) {
             runHistory,
             activeSystemInstruction,
             [],
-            { ...genOptions, signal }
+            { ...genOptions, retryIndex: engineAttempt, telemetryStage: "sylvie_final", signal, onTextDelta: stream?.delta }
           );
           addUsage(forced.usage);
           response = forced;
-        } catch (forcedErr: unknown) {
-          console.warn(
-            `[${provider.toUpperCase()}] Forced final response failed:`,
-            errorMessage(forcedErr)
-          );
+        } catch {
+          console.warn("[AI] operation unavailable");
         }
       }
 
@@ -591,10 +615,24 @@ export async function POST(req: NextRequest) {
     } = { controller: null, timeout: null };
     const onClientAbort = () => attemptRef.controller?.abort();
 
+    const attemptedModels = new Set<string>();
     const executeAttempt = async (
       provider: "deepseek" | "gemini" | "groq",
       model: string
     ) => {
+      aiRequestSignal()?.throwIfAborted();
+      const modelKey = `${provider}:${provider === "deepseek" ? process.env.DEEPSEEK_MODEL || model : model}`;
+      if (attemptedModels.has(modelKey)) throw new Error("MODEL_ALREADY_ATTEMPTED");
+      attemptedModels.add(modelKey);
+      engineAttempt++;
+      stream?.reset();
+      // DeepSeek reads the short-lived private URLs directly. Download/base64
+      // only when Gemini actually needs inline data, once across the cascade.
+      if (provider === "gemini" && images.length && !inlineImagesLoaded) {
+        const inline = inlineImageParts([...prepared, ...await Promise.all(referenced.map(image => readChatImage(image, userId, sessionId!)))]);
+        imageParts.forEach((part, index) => { part.inlineData = inline[index].inlineData; });
+        inlineImagesLoaded = true;
+      }
       attemptRef.controller = new AbortController();
       // Vision attempts get a tighter per-attempt budget so the DeepSeek
       // fallback engages quickly when Gemini stalls instead of waiting the
@@ -617,16 +655,6 @@ export async function POST(req: NextRequest) {
       if (req.signal.aborted) attemptRef.controller?.abort();
     }
 
-    // Groq has no vision-capable model on the current plans (its former
-    // llama-3.2-11b-vision-preview is decommissioned; the /models endpoint
-    // returns only text models). When the user prefers Groq but the request
-    // carries an image, Groq cannot fulfil it — defer to the proper vision
-    // cascade (Gemini primary → DeepSeek vision fallback) instead of calling a
-    // dead model that always errors "temporarily unavailable".
-    if (isVisionWorkload && modelPreference === "groq") {
-      modelPreference = "auto";
-    }
-
     try {
       if (modelPreference === "groq") {
         const groqModel = isVisionWorkload ? GROQ_MODELS.vision : GROQ_MODELS.default;
@@ -645,19 +673,13 @@ export async function POST(req: NextRequest) {
           const loopResult = await executeAttempt("gemini", geminiModel);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
-        } catch (geminiErr: unknown) {
-          // Gemini can stall on image workloads (SDK call hangs). Prefer the
-          // dedicated DeepSeek vision tier over surfacing "temporarily
-          // unavailable" when a working fallback exists.
-          if (!isVisionWorkload) throw geminiErr;
-          console.warn(
-            `[Chat Route] Gemini vision model failed (${errorMessage(geminiErr)}). Falling back to ${DEEPSEEK_MODELS.vision}.`
-          );
-          const fallbackModel = DEEPSEEK_MODELS.vision;
+        } catch (error) {
+          if (!isVisionWorkload) throw error;
+          // Preserve the working image fallback, with a persisted, visible disclosure.
           actualModelUsed = "DEEPSEEK";
-          actualModelDisplayName = `DeepSeek (${fallbackModel})`;
-          actualModelId = fallbackModel;
-          const loopResult = await executeAttempt("deepseek", fallbackModel);
+          actualModelDisplayName = `DeepSeek (${DEEPSEEK_MODELS.vision}) · Gemini unavailable`;
+          actualModelId = DEEPSEEK_MODELS.vision;
+          const loopResult = await executeAttempt("deepseek", DEEPSEEK_MODELS.vision);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
         }
@@ -679,11 +701,8 @@ export async function POST(req: NextRequest) {
           const loopResult = await executeAttempt(primarySpec.provider, primarySpec.model);
           aiResponseText = loopResult.text;
           totalUsage = loopResult.usage;
-        } catch (primaryErr: unknown) {
-          console.warn(
-            `[Chat Route] Primary model ${primarySpec.provider}/${primarySpec.model} failed. Trying fallback ${fallbackSpec.provider}/${fallbackSpec.model}:`,
-            errorMessage(primaryErr)
-          );
+        } catch {
+          console.warn("[AI] operation unavailable");
           actualModelUsed = fallbackSpec.provider.toUpperCase();
           actualModelDisplayName = `${fallbackSpec.provider.toUpperCase()} (${fallbackSpec.model})`;
           actualModelId = fallbackSpec.model;
@@ -694,10 +713,7 @@ export async function POST(req: NextRequest) {
             totalUsage = loopResult.usage;
           } catch (fallbackErr: unknown) {
             if (secondarySpec) {
-              console.warn(
-                `[Chat Route] Fallback model ${fallbackSpec.provider}/${fallbackSpec.model} failed. Trying secondary fallback ${secondarySpec.provider}/${secondarySpec.model}:`,
-                errorMessage(fallbackErr)
-              );
+              console.warn("[AI] operation unavailable");
               actualModelUsed = secondarySpec.provider.toUpperCase();
               actualModelDisplayName = `${secondarySpec.provider.toUpperCase()} (${secondarySpec.model})`;
               actualModelId = secondarySpec.model;
@@ -713,12 +729,13 @@ export async function POST(req: NextRequest) {
 
       generationSucceeded = true;
     } catch (apiError: unknown) {
-      console.error("API Error:", apiError);
+      console.error("[Chat] provider request failed");
       let friendlyError = "The AI service is temporarily unavailable. Please try again later.";
 
       if (apiError instanceof LLMProviderError) {
         const pErr = apiError;
-        if (pErr.originalError?.status === 429 || pErr.originalError?.status === 503 || pErr.code === "rate_limit_exceeded") {
+        if (pErr.code === "unsupported_media") friendlyError = pErr.message;
+        else if (pErr.originalError?.status === 429 || pErr.originalError?.status === 503 || pErr.code === "rate_limit_exceeded") {
           friendlyError = "The AI is currently overloaded with requests. Please wait a moment and try again.";
         }
       } else if ((apiError instanceof Error && apiError.name === "AbortError") || attemptRef.controller?.signal.aborted) {
@@ -778,7 +795,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      userMessage,
+      userMessage: exposeChatImages(userMessage),
       aiMessage: { ...aiMessage, content: aiResponseText, modelUsed: actualModelDisplayName, pendingAction },
       pendingAction,
       reply: aiResponseText,
@@ -789,15 +806,17 @@ export async function POST(req: NextRequest) {
       modelDisplayName: actualModelDisplayName,
     }, { status: 200 });
   } catch (error: unknown) {
-    console.error("Chat API Error:", error);
+    console.error("[Chat] request failed");
     // S4: refund any outstanding reservation when the request fails outside
     // the generation pipeline (the guarded decrement is safe to call once).
     try {
       if (sessionUserId !== null && quotaReserved) await releaseQuota(sessionUserId, "chat");
     } catch {}
     return NextResponse.json(
-      { error: error instanceof RouteError ? error.message : "Internal server error" },
-      { status: error instanceof RouteError ? error.status : 500 }
+      { error: error instanceof RouteError || error instanceof ChatImageError ? error.message : "Internal server error" },
+      { status: error instanceof RouteError || error instanceof ChatImageError ? error.status : 500 }
     );
   }
+
+  });
 }

@@ -4,6 +4,14 @@ import { getSession } from "@/lib/auth-server";
 import { parseSylvieAction } from "@/lib/ai/sylvie/action-server";
 import { stripSylvieAction } from "@/lib/ai/sylvie/action";
 import { parsePlannerHandoff } from "@/lib/ai/sylvie/planner-message";
+import { exposeChatImages } from "@/lib/ai/sylvie/image-storage";
+import { z } from "zod";
+
+const directMessage = z.object({
+  sessionId: z.number().int().positive().safe().optional(),
+  content: z.string().trim().min(1).max(20_000),
+  type: z.enum(["USER", "INFO", "SYSTEM"]).default("SYSTEM"),
+});
 
 /**
  * GET /api/system-messages
@@ -21,7 +29,8 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const unreadOnly = searchParams.get("unreadOnly") === "true";
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const requestedLimit = Number(searchParams.get("limit") ?? 50);
+    const limit = Number.isSafeInteger(requestedLimit) ? Math.min(100, Math.max(1, requestedLimit)) : 50;
     const sessionId = searchParams.get("sessionId");
     const type = searchParams.get("type");
 
@@ -35,7 +44,9 @@ export async function GET(req: NextRequest) {
       where.type = type;
     }
     if (sessionId) {
-      where.sessionId = parseInt(sessionId);
+      const id = Number(sessionId);
+      if (!Number.isSafeInteger(id) || id <= 0) return NextResponse.json({ error: "Invalid session id" }, { status: 400 });
+      where.sessionId = id;
     } else if (searchParams.has("global")) {
       where.sessionId = null;
     }
@@ -52,7 +63,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ messages: messages.map((message) => ({
-      ...message,
+      ...exposeChatImages(message),
       content: stripSylvieAction(message.content),
       pendingAction: message.type === "INFO"
         ? parseSylvieAction(message.content, session.userId, message.sessionId, message.id) : undefined,
@@ -109,9 +120,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    
+    const parsed = directMessage.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) return NextResponse.json({ error: "Invalid message" }, { status: 400 });
+    const body = parsed.data;
     let sessionId = body.sessionId;
+    if (sessionId && !await prisma.chatSession.findFirst({ where: { id: sessionId, userId: authSession.userId }, select: { id: true } })) {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
     if (!sessionId) {
       const chatSession = await prisma.chatSession.create({
         data: { 

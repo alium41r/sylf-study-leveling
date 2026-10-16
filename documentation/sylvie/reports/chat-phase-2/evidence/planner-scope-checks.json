@@ -1,0 +1,93 @@
+[
+  {
+    "name": "planner-desktop-dark",
+    "control": {
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(124, 58, 237)"
+    },
+    "composer": {
+      "fontSize": "14px",
+      "border": "0px",
+      "resize": "none"
+    },
+    "overflow": false
+  },
+  {
+    "name": "planner-desktop-light",
+    "control": {
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(124, 58, 237)"
+    },
+    "composer": {
+      "fontSize": "14px",
+      "border": "0px",
+      "resize": "none"
+    },
+    "overflow": false
+  },
+  {
+    "name": "planner-desktop-custom",
+    "control": {
+      "color": "rgb(0, 0, 0)",
+      "background": "rgb(40, 157, 145)"
+    },
+    "composer": {
+      "fontSize": "14px",
+      "border": "0px",
+      "resize": "none"
+    },
+    "overflow": false
+  },
+  {
+    "name": "planner-mobile-dark",
+    "control": {
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(124, 58, 237)"
+    },
+    "composer": {
+      "fontSize": "16px",
+      "border": "0px",
+      "resize": "none"
+    },
+    "overflow": false
+  },
+  {
+    "name": "planner-mobile-light",
+    "control": {
+      "color": "rgb(255, 255, 255)",
+      "background": "rgb(124, 58, 237)"
+    },
+    "composer": {
+      "fontSize": "16px",
+      "border": "0px",
+      "resize": "none"
+    },
+    "overflow": false
+  },
+  {
+    "name": "planner-mobile-custom",
+    "control": {
+      "color": "rgb(0, 0, 0)",
+      "background": "rgb(40, 157, 145)"
+    },
+    "composer": {
+      "fontSize": "16px",
+      "border": "0px",
+      "resize": "none"
+    },
+    "overflow": false
+  },
+  {
+    "name": "planner-narrow-custom-dark",
+    "control": {
+      "color": "rgb(0, 0, 0)",
+      "background": "rgb(40, 157, 145)"
+    },
+    "composer": {
+      "fontSize": "16px",
+      "border": "0px",
+      "resize": "none"
+    },
+    "overflow": false
+  }
+]

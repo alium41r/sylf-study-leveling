@@ -70,7 +70,7 @@ export async function plannerFetch<T>(
     throw new PlannerClientError(
       body?.error?.code ?? "PLANNER_UNAVAILABLE",
       body.feasibility,
-      undefined,
+      body?.error?.code === "INVALID_IMAGE" && typeof body.error.message === "string" ? body.error.message : undefined,
       body.findings
     );
   return body as T;

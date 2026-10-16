@@ -1,0 +1,203 @@
+{
+  "verifiedOn": "2026-10-15",
+  "phase": "Native images and editable browser dictation",
+  "paidAiCalls": 0,
+  "newPaidTranscriptionProvider": false,
+  "actualMicrophoneAccessDuringTests": false,
+  "hostedImageUploadDuringTests": true,
+  "databaseMigrationsApplied": [
+    "20261015170000_chat_image_storage"
+  ],
+  "deployed": false,
+  "finalFeatureTests": {
+    "filesPassed": 6,
+    "testsPassed": 82,
+    "command": "npm run test -- --run --maxWorkers=2 __tests__/security/s4-quota-upload-rate.test.ts __tests__/ai/image-pipeline.test.ts __tests__/system/chat-multimodal.test.tsx __tests__/ai/e2e-conversation.test.ts __tests__/components/system-overlay.test.tsx __tests__/planner/quick-plan.test.tsx"
+  },
+  "broaderSelectedSuite": {
+    "selection": "--run --maxWorkers=2 __tests__/ai __tests__/system __tests__/components/system-overlay.test.tsx __tests__/focus/focus-tools.test.tsx __tests__/planner/quick-plan.test.tsx __tests__/planner/sylvie-planner-delegation.test.ts __tests__/planner/exam-provider-options.test.ts __tests__/planner-v2/intelligence/provider.test.ts __tests__/planner/designer.test.ts __tests__/planner/copilot-contract.test.ts",
+    "testsPassed": 702,
+    "testsFailed": 14,
+    "testsSkipped": 2,
+    "filesPassed": 48,
+    "filesFailed": 3,
+    "filesSkipped": 1,
+    "failuresMatchPhase2Baseline": true,
+    "failureTitles": [
+      "__tests__/ai/planner-api.test.ts > Planner API Integration Test > should successfully generate a goal and quests",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > returns full budget when no quests exist",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > subtracts scheduled minutes from budget",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > floors capacity at 0 if overloaded",
+      "__tests__/ai/planning-engine.test.ts > Planning Engine > calculateDailyCapacity > does not silently stack burnout and overload reductions (prioritizes burnout 50%)",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > generates even though the weekly planner bucket is exhausted",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > reports the quota as unlimited so the UI shows \u221e rather than a fake number",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > never consumes capacity across repeated generations",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner (/api/ai-planner) \u2014 the owner is never blocked > still validates the request body",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > rejects with the same 429 and the same error body when the week is spent",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > still generates normally while capacity remains",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Classic Planner \u2014 an ordinary account is unchanged > still reports finite numeric capacity to the UI",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > ignores a spoofed owner userId on the Classic Planner body",
+      "__tests__/ai/unlimited-ai-routes.test.ts > Security: a client cannot grant itself the entitlement > gives a different authenticated account no access to the owner's entitlement"
+    ]
+  },
+  "verification": {
+    "typecheck": "passed: npx tsc --noEmit",
+    "webBuild": "passed: npx next build --webpack",
+    "mobileBuild": "passed: npm run mobile:build",
+    "mobileBoundaryAudit": "passed: npm run mobile:verify",
+    "generatedMobileArtifactsRestored": true,
+    "sharedFilesAndNewTestsLint": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "olderFilesLint": {
+      "files": [
+        "app/api/system-messages/chat/route.ts",
+        "app/api/system-messages/route.ts",
+        "app/api/chats/[id]/route.ts",
+        "app/api/planner/intake/[id]/designer/route.ts",
+        "app/api/planner/intake/[id]/copilot/route.ts",
+        "app/components/planner/copilot/PlannerCopilot.tsx",
+        "app/components/planner/quick-plan/QuickPlan.tsx",
+        "app/components/system/SystemOverlay.tsx",
+        "app/system/components/ConversationPanel.tsx",
+        "app/system/components/SystemScreen.tsx",
+        "app/focus/components/tools/AiAssistantTool.tsx",
+        "lib/ai/agent-router.ts",
+        "lib/ai/providers/deepseek.ts",
+        "lib/ai/providers/types.ts",
+        "lib/ai/sylvie/chat-client.ts",
+        "lib/ai/sylvie/chat-stream-server.ts",
+        "lib/planner/copilot/client.ts",
+        "lib/planner/copilot/model.ts",
+        "lib/planner/copilot/run.ts",
+        "lib/planner/designer/client.ts",
+        "lib/planner/designer/model.ts",
+        "lib/planner/designer/run.ts",
+        "lib/planner/transport.ts",
+        "next.config.ts"
+      ],
+      "before": {
+        "errors": 34,
+        "warnings": 17
+      },
+      "after": {
+        "errors": 34,
+        "warnings": 17
+      },
+      "increasedRuleCounts": []
+    },
+    "storageFinalLint": {
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "browser": {
+    "standardAppearanceCases": 24,
+    "narrowCases": 4,
+    "surfaces": [
+      "workspace",
+      "popup",
+      "Focus",
+      "Planner Designer/Copilot"
+    ],
+    "viewports": [
+      [
+        1440,
+        1000
+      ],
+      [
+        390,
+        844
+      ],
+      [
+        320,
+        740
+      ]
+    ],
+    "appearances": [
+      "dark",
+      "light",
+      "custom light",
+      "narrow custom dark"
+    ],
+    "speech": "Synthetic standard/prefixed on-device and browser-service events; no recording",
+    "noHorizontalOverflow": true,
+    "imageDeliveryAndReuseVerified": true,
+    "unsavedNewConversationReleasesRecognition": true,
+    "popupClosureReleasesRecognitionBeforeAnimation": true,
+    "productionHttp": "Explicit empty Cookie header verifies 401 new/legacy images and microphone=(self) policy"
+  },
+  "preserved": {
+    "tokenAndOutputBudgets": true,
+    "dispatchTelemetryAndQuotas": true,
+    "existingToolConfirmationAndPlannerReview": true,
+    "plannerV2NotModified": true,
+    "abandonedNodeSystemsNotModified": true,
+    "prismaSchemaNotModifiedInThisPhase": true
+  },
+  "operatingCosts": {
+    "transcriptionProviderAdded": false,
+    "browserSpeechApiChargeFromSylf": 0,
+    "imageBilling": "Existing provider-reported tokens and conservative peak-price estimator; no separate invented image count",
+    "illustrativeMaxUncachedImageInputUsdAtPeak": 0.0003072,
+    "illustrationNotMeasurement": true,
+    "storage": "Existing Supabase plan; costs not measured"
+  },
+  "limitations": [
+    "Live provider semantic quality, first-token latency and billing were not tested.",
+    "Real-device microphone/service behavior is not certified by simulated recognition tests; hosted Storage is independently verified.",
+    "Browser speech recognition and installed local language support vary; keyboard dictation is the fallback.",
+    "GIFs use the first frame; very large or unreadable images must be cropped/replaced.",
+    "Old public images remain viewable through ownership checks but must be attached again for a new image analysis.",
+    "Object cleanup is best-effort; crashes/storage failures can leave private orphan objects.",
+    "Existing baseline test failures and lint debt remain as listed."
+  ],
+  "hostedStorage": {
+    "syntheticOnly": true,
+    "providerCalls": 0,
+    "signaturesOrCredentialsLogged": false,
+    "checks": {
+      "restrictivePolicyInstalled": true,
+      "privateBucket": true,
+      "backendUpload": true,
+      "backendDownload": true,
+      "anonymous": {
+        "listDenied": true,
+        "downloadDenied": true,
+        "signingDenied": true,
+        "uploadDenied": true
+      },
+      "authenticated": {
+        "listDenied": true,
+        "downloadDenied": true,
+        "signingDenied": true,
+        "uploadDenied": true
+      },
+      "shortLivedProviderAccess": true
+    },
+    "cleanupComplete": true
+  },
+  "migration": {
+    "name": "20261015170000_chat_image_storage",
+    "sourceChecksumSha256": "974605061c86a6928d9ddda86402d841c13943f90ac8696ca79c890b8146cfa1",
+    "workflow": "npx prisma migrate deploy using existing DIRECT_URL",
+    "solePendingMigrationBeforeDeploy": true,
+    "applied": true,
+    "appliedMigrationCountAfter": 65,
+    "pendingAfter": 0,
+    "schemaFieldsChanged": false,
+    "prismaDiffApplied": false,
+    "scope": [
+      "ai-chat-attachments private bucket",
+      "restrictive client isolation policy for that bucket"
+    ],
+    "hostedStorageVerified": true,
+    "previousTelemetryMigrationUnchanged": true
+  },
+  "finalStorageRegression": {
+    "filesPassed": 4,
+    "testsPassed": 54,
+    "result": "passed after restrictive Storage migration/runtime configuration change"
+  }
+}

@@ -152,6 +152,8 @@ async function ask(input: {
         signal,
         responseFormat: "json_object",
         temperature: 0.1,
+        maxTokens: input.thinking === "disabled" ? 2048 : 32768,
+        singleAttempt: true, telemetryStage: input.thinking === "disabled" ? "research_queries" : "research_extract",
         ...(input.thinking ? { thinking: input.thinking } : {}),
       } as never
     )) as never;
@@ -290,7 +292,7 @@ export function deepseekModel(options: { thinking?: "enabled" | "disabled" } = {
         authorityHosts.length ? `Verified authority hosts you may use as site: filters: ${authorityHosts.join(", ")}` : null,
         removedLabels.length ? `The student already removed these units, do not search for them again: ${removedLabels.join(", ")}` : null,
       ].filter(Boolean);
-      const { parsed, usage } = await ask({ system: PLAN_SYSTEM, user: facts.join("\n"), signal });
+      const { parsed, usage } = await ask({ system: PLAN_SYSTEM, user: facts.join("\n"), signal, thinking: "disabled" });
       const plan = ResearchQueryPlanSchema.safeParse(parsed);
       if (!plan.success) throw new DeepSeekResearchError("RESEARCH_MODEL_BAD_OUTPUT");
       return { plan: plan.data as ResearchQueryPlan, usage };
@@ -525,7 +527,7 @@ export function deepseekComparisonModel(): ComparisonModel {
       ]
         .filter((line) => line !== null)
         .join("\n");
-      const { parsed, usage } = await ask({ system: COMPARE_SYSTEM, user, signal });
+      const { parsed, usage } = await ask({ system: COMPARE_SYSTEM, user, signal, thinking: "enabled" });
       const comparison = ComparisonExtractionSchema.safeParse(parsed);
       if (!comparison.success) throw new DeepSeekResearchError("RESEARCH_MODEL_BAD_OUTPUT");
       return { comparison: comparison.data as ComparisonExtraction, usage };

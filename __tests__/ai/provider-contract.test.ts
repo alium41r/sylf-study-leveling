@@ -130,6 +130,6 @@ describe("Gemini generated-token accounting",()=>{
     const adapter=new GeminiAdapter("dummy-key","gemini-2.5-flash");
     Object.assign(adapter,{ai:{models:{generateContent:vi.fn().mockResolvedValue({text:'{"ok":true}',candidates:[{finishReason:"STOP",content:{parts:[{text:'{"ok":true}'}]}}],usageMetadata:{promptTokenCount:10,candidatesTokenCount:5,thoughtsTokenCount:40,totalTokenCount:55}})}}});
     const result=await adapter.generateResponse([{role:"user",content:"Return JSON"}],"Return JSON",[],{singleAttempt:true});
-    expect(result.usage).toEqual({promptTokens:10,completionTokens:45,totalTokens:55});
+    expect(result.usage).toMatchObject({promptTokens:10,completionTokens:45,totalTokens:55});
   });
 });

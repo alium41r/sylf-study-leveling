@@ -95,7 +95,7 @@ const SECTIONS = [
   },
   {
     id: "backgrounds",
-    title: "Focus backgrounds",
+    title: "Backdrops",
     icon: ImageIcon,
     href: "/settings/focus-backgrounds",
     action: "Open gallery",

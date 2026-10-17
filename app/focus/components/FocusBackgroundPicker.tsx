@@ -301,7 +301,7 @@ export const FocusBackgroundPicker = memo(function FocusBackgroundPicker({
                     className="text-lg sm:text-xl font-bold tracking-wider text-text-primary uppercase leading-tight"
                     style={{ fontFamily: "'Rajdhani', sans-serif" }}
                   >
-                    Focus Environment
+                    Backdrops
                   </h2>
                   <p className="text-xs text-text-muted">
                     Choose an atmosphere for your study session • Press{" "}
@@ -333,7 +333,7 @@ export const FocusBackgroundPicker = memo(function FocusBackgroundPicker({
             {/* Category Pill Tabs with ARIA Tablist Pattern */}
             <div
               role="tablist"
-              aria-label="Focus environment categories"
+              aria-label="Backdrop categories"
               className="px-6 py-3 border-b border-white/5 flex items-center gap-2 overflow-x-auto no-scrollbar"
             >
               {/* Official Catalog Tabs */}

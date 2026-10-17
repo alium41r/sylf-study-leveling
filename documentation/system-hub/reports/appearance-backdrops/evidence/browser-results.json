@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "name": "appearance-desktop-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-desktop-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "appearance-tablet-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-tablet-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "appearance-mobile-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-mobile-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "appearance-small-mobile-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-small-mobile-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "appearance-light",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-light",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "appearance-custom-dark-in-light",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-custom-dark-in-light",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "appearance-custom-light-in-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-custom-light-in-dark",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "desktop edit dialog fits",
+      "pass": true
+    },
+    {
+      "name": "mobile edit dialog fits",
+      "pass": true
+    },
+    {
+      "name": "small-mobile edit dialog fits",
+      "pass": true
+    },
+    {
+      "name": "Edit writes original metadata contract",
+      "pass": true
+    },
+    {
+      "name": "Escape restores keyboard focus",
+      "pass": true
+    },
+    {
+      "name": "Native dialog traps focus",
+      "pass": true
+    },
+    {
+      "name": "No page exceptions",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "fixtureOnly": true,
+  "apiWritesSentToServer": 0
+}

@@ -8,7 +8,9 @@ import {
   normalizeHex,
   isValidHex,
 } from "@/lib/color-utils";
-import { RotateCcw } from "lucide-react";
+import { Check, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { getAccentForeground } from "@/lib/color-utils";
+import styles from "./AppearanceSettingsScreen.module.css";
 
 interface ColorPickerBoardProps {
   value: string;
@@ -29,6 +31,7 @@ export function ColorPickerBoard({
   recentColors = [],
   presets = [],
 }: ColorPickerBoardProps) {
+  const [expanded, setExpanded] = useState(false);
   const normValue = normalizeHex(value, defaultValue);
 
   // Maintain internal HSV state for smooth dragging
@@ -223,223 +226,140 @@ export function ColorPickerBoard({
   const pureHueHex = hsvToHex(hsv.h, 100, 100);
 
   return (
-    <div className="relative overflow-hidden flex flex-col gap-4 p-5 sm:p-6 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-1)] text-[var(--text-primary)] backdrop-blur-xl shadow-lg transition-all">
-      {/* Top subtle highlight */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[var(--accent-primary-dim)] to-transparent opacity-60 pointer-events-none"
-        aria-hidden="true"
-      />
-
-      {/* Header with Title and Reset */}
-      <div className="flex items-start justify-between gap-4">
+    <div className={styles.colorPicker}>
+      <div className={styles.colorHeading}>
         <div>
-          <h3 className="text-base sm:text-lg font-bold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-primary)]">
-            {label}
-          </h3>
-          {description && (
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-0.5 leading-relaxed font-sans">
-              {description}
-            </p>
-          )}
+          <h2>{label}</h2>
+          {description && <p>{description}</p>}
         </div>
         <button
           type="button"
+          className={styles.iconButton}
           onClick={handleReset}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary-dim)] text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all shrink-0 cursor-pointer shadow-xs"
-          title="Reset to default color"
+          aria-label={`Reset ${label}`}
+          title={`Reset ${label}`}
         >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Reset</span>
+          <RotateCcw size={14} />
         </button>
       </div>
-
-      {/* 2D Saturation / Value Board: Multi-layered architecture with pure black base */}
-      <div
-        ref={satValRef}
-        tabIndex={0}
-        onPointerDown={handleSatValPointerDown}
-        onPointerMove={handleSatValPointerMove}
-        onPointerUp={handleSatValPointerUp}
-        onKeyDown={handleSatValKeyDown}
-        className="relative w-full h-44 sm:h-48 rounded-xl cursor-crosshair select-none touch-none shadow-inner border border-[var(--border-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] bg-black"
-        aria-label={`${label} saturation and brightness board`}
-        role="slider"
-        aria-valuenow={Math.round(hsv.v)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuetext={`Saturation ${Math.round(hsv.s)}%, Brightness ${Math.round(hsv.v)}%`}
-      >
-        {/* Isolated gradient canvas layer with internal clipping */}
-        <div className="absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none">
-          {/* Base pure hue layer */}
-          <div
-            className="absolute inset-0"
-            style={{ backgroundColor: pureHueHex }}
-          />
-          {/* Horizontal white saturation gradient */}
-          <div
-            className="absolute inset-0"
+      <div className={styles.swatches} aria-label={`${label} presets`}>
+        {presets.map((preset) => (
+          <button
+            key={preset.name}
+            type="button"
+            aria-label={preset.name}
+            title={preset.name}
+            aria-pressed={normValue.toLowerCase() === preset.hex.toLowerCase()}
+            onClick={() => onChange(normalizeHex(preset.hex))}
             style={{
-              background: "linear-gradient(to right, #ffffff 0%, rgba(255, 255, 255, 0) 100%)",
+              background: preset.hex,
+              color: getAccentForeground(preset.hex),
             }}
-          />
-          {/* Vertical black brightness gradient with seamless 0% anchor */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to top, #000000 0%, #000000 0.5%, rgba(0, 0, 0, 0) 100%)",
-            }}
-          />
-        </div>
-
-        {/* Thumb indicator — padded coordinate mapping to ensure full edge visibility without clipping */}
-        <div
-          className="absolute w-5 h-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_4px_rgba(0,0,0,0.9),0_2px_8px_rgba(0,0,0,0.6)] pointer-events-none transition-transform"
-          style={{
-            left: `calc(10px + ${(Math.max(0, Math.min(100, hsv.s)) / 100)} * (100% - 20px))`,
-            top: `calc(10px + ${(1 - Math.max(0, Math.min(100, hsv.v)) / 100)} * (100% - 20px))`,
-            backgroundColor: normValue,
-          }}
+          >
+            {normValue.toLowerCase() === preset.hex.toLowerCase() && (
+              <Check size={16} aria-hidden="true" />
+            )}
+          </button>
+        ))}
+      </div>
+      <div className={styles.hexRow}>
+        <span
+          className={styles.currentSwatch}
+          style={{ background: normValue }}
+          aria-hidden="true"
         />
-      </div>
-
-      {/* 1D Hue Spectrum Slider */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs uppercase tracking-wider font-semibold text-[var(--text-muted)] font-['Rajdhani']">
-          Hue Spectrum
-        </label>
-        <div
-          ref={hueRef}
-          tabIndex={0}
-          onPointerDown={handleHuePointerDown}
-          onPointerMove={handleHuePointerMove}
-          onPointerUp={handleHuePointerUp}
-          onKeyDown={handleHueKeyDown}
-          className="relative w-full h-7 rounded-lg cursor-pointer select-none touch-none shadow-inner border border-[var(--border-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] bg-black"
-          aria-label={`${label} hue slider`}
-          role="slider"
-          aria-valuenow={Math.round(hsv.h)}
-          aria-valuemin={0}
-          aria-valuemax={360}
+        <input
+          type="text"
+          value={hexInput}
+          onChange={handleHexChange}
+          onFocus={() => setIsFocusedHex(true)}
+          onBlur={handleHexBlur}
+          maxLength={7}
+          aria-label={`${label} hex code`}
+          spellCheck={false}
+        />
+        <button
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          aria-expanded={expanded}
+          aria-label={`Custom ${label}`}
         >
-          {/* Continuous gradient spectrum layer */}
-          <div
-            className="absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%)",
-            }}
-          />
-
-          {/* Hue Thumb indicator — mapped so it never gets cut off at 0° or 360° */}
-          <div
-            className="absolute top-0 bottom-0 w-3.5 -translate-x-1/2 rounded-full border-2 border-white shadow-[0_0_4px_rgba(0,0,0,0.8)] pointer-events-none"
-            style={{
-              left: `calc(7px + ${(Math.max(0, Math.min(360, hsv.h)) / 360)} * (100% - 14px))`,
-              backgroundColor: pureHueHex,
-            }}
-          />
-        </div>
+          <SlidersHorizontal size={14} aria-hidden="true" />
+          Custom
+        </button>
       </div>
-
-      {/* Controls Bar: Current Swatch + HEX Input */}
-      <div className="flex items-center gap-3 pt-1">
-        {/* Visible preview swatch */}
-        <div className="relative group shrink-0">
+      {expanded && (
+        <div className={styles.customPicker}>
           <div
-            className="w-11 h-11 rounded-xl border border-[var(--border-subtle)] shadow-sm transition-transform group-hover:scale-105"
-            style={{ backgroundColor: normValue }}
-            title={`Active Color: ${normValue}`}
-          />
-        </div>
-
-        {/* HEX Input */}
-        <div className="relative flex-1">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-[var(--text-muted)] pointer-events-none">
-            HEX
-          </span>
-          <input
-            type="text"
-            value={hexInput}
-            onChange={handleHexChange}
-            onFocus={() => setIsFocusedHex(true)}
-            onBlur={handleHexBlur}
-            maxLength={7}
-            placeholder="#000000"
-            className="w-full pl-12 pr-3 py-2 rounded-xl border border-[var(--border-subtle)] focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] bg-[var(--surface-2,var(--bg-shadow))] text-[var(--text-primary)] font-mono text-sm font-semibold uppercase tracking-wider outline-none transition-all shadow-inner"
-            aria-label={`${label} hex code`}
-          />
-        </div>
-      </div>
-
-      {/* Curated Presets / Quick-picks if provided */}
-      {presets.length > 0 && (
-        <div className="flex flex-col gap-2 pt-2 border-t border-[var(--border-subtle)]/50">
-          <span className="text-xs uppercase tracking-wider font-semibold text-[var(--text-muted)] font-['Rajdhani']">
-            Curated Swatches
-          </span>
-          <div className="flex flex-wrap items-center gap-2">
-            {presets.map((preset) => {
-              const isSelected = normValue.toLowerCase() === preset.hex.toLowerCase();
-              return (
-                <button
-                  key={preset.name}
-                  type="button"
-                  onClick={() => {
-                    const norm = normalizeHex(preset.hex);
-                    const rgb = hexToRgb(norm);
-                    if (rgb) {
-                      setHsv(rgbToHsv(rgb.r, rgb.g, rgb.b, hsv.h));
-                      setHexInput(norm.toUpperCase());
-                      onChange(norm);
-                    }
-                  }}
-                  className={`group relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer shadow-xs ${
-                    isSelected
-                      ? "border-[var(--accent-primary)] bg-[var(--accent-primary-dim)] text-[var(--text-primary)] font-bold ring-1 ring-[var(--accent-primary)]"
-                      : "border-[var(--border-subtle)] bg-[var(--surface-2,var(--bg-shadow))] hover:border-[var(--accent-primary-mid)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                  }`}
-                  title={`${preset.name} (${preset.hex})`}
-                >
-                  <span
-                    className="w-3.5 h-3.5 rounded-full border border-black/20 shrink-0 shadow-xs"
-                    style={{ backgroundColor: preset.hex }}
-                  />
-                  <span>{preset.name}</span>
-                </button>
-              );
-            })}
+            ref={satValRef}
+            tabIndex={0}
+            onPointerDown={handleSatValPointerDown}
+            onPointerMove={handleSatValPointerMove}
+            onPointerUp={handleSatValPointerUp}
+            onKeyDown={handleSatValKeyDown}
+            className={styles.saturation}
+            aria-label={`${label} saturation and brightness board`}
+            role="slider"
+            aria-valuenow={Math.round(hsv.v)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuetext={`Saturation ${Math.round(hsv.s)}%, Brightness ${Math.round(hsv.v)}%`}
+          >
+            <div
+              className={styles.gradientClip}
+              aria-hidden="true"
+              style={{
+                background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent), ${pureHueHex}`,
+              }}
+            />
+            <span
+              className={styles.colorThumb}
+              style={{
+                left: `calc(10px + ${hsv.s / 100} * (100% - 20px))`,
+                top: `calc(10px + ${1 - hsv.v / 100} * (100% - 20px))`,
+                background: normValue,
+              }}
+            />
           </div>
+          <div
+            ref={hueRef}
+            tabIndex={0}
+            onPointerDown={handleHuePointerDown}
+            onPointerMove={handleHuePointerMove}
+            onPointerUp={handleHuePointerUp}
+            onKeyDown={handleHueKeyDown}
+            className={styles.hue}
+            aria-label={`${label} hue slider`}
+            role="slider"
+            aria-valuenow={Math.round(hsv.h)}
+            aria-valuemin={0}
+            aria-valuemax={360}
+          >
+            <span
+              style={{
+                left: `calc(7px + ${hsv.h / 360} * (100% - 14px))`,
+                background: pureHueHex,
+              }}
+            />
+          </div>
+          <p className={styles.pickerHint}>
+            Arrow keys adjust color. Hold Shift for larger steps.
+          </p>
         </div>
       )}
-
-      {/* Recent Colors if provided */}
       {recentColors.length > 0 && (
-        <div className="flex items-center gap-2 pt-1">
-          <span className="text-xs font-mono text-[var(--text-muted)] shrink-0 font-['Rajdhani'] uppercase tracking-wider">
-            Recent:
-          </span>
-          <div className="flex items-center gap-1.5 overflow-x-auto py-1">
-            {recentColors.map((color, idx) => (
-              <button
-                key={`${color}-${idx}`}
-                type="button"
-                onClick={() => {
-                  const norm = normalizeHex(color);
-                  const rgb = hexToRgb(norm);
-                  if (rgb) {
-                    setHsv(rgbToHsv(rgb.r, rgb.g, rgb.b, hsv.h));
-                    setHexInput(norm.toUpperCase());
-                    onChange(norm);
-                  }
-                }}
-                className="w-6 h-6 rounded-md border border-[var(--border-subtle)] hover:scale-110 hover:border-white transition-all cursor-pointer shrink-0 shadow-xs"
-                style={{ backgroundColor: color }}
-                title={`Recent color: ${color}`}
-              />
-            ))}
-          </div>
+        <div className={styles.recents}>
+          <span>Recent</span>
+          {recentColors.map((color, i) => (
+            <button
+              key={`${color}-${i}`}
+              type="button"
+              aria-label={`Recent ${label} ${color}`}
+              title={color}
+              style={{ background: color }}
+              onClick={() => onChange(normalizeHex(color))}
+            />
+          ))}
         </div>
       )}
     </div>

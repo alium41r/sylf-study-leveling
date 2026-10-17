@@ -144,7 +144,7 @@ describe("Focus Backgrounds — Phase 6: Production Polish & Accessibility", () 
       );
 
       // Tablist container
-      const tablist = screen.getByRole("tablist", { name: "Focus environment categories" });
+      const tablist = screen.getByRole("tablist", { name: "Backdrop categories" });
       expect(tablist).toBeInTheDocument();
 
       // Tabs

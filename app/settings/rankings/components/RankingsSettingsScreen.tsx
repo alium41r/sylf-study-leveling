@@ -1,13 +1,28 @@
 "use client";
 
-import BackToSettings from "@/app/components/BackToSettings";
-import { useAuth } from "@/app/components/AuthProvider";
 import { useEffect, useState } from "react";
-import { Globe, Users, Trophy, Flame, Target, Clock, Shield, Sparkles, CircleAlert } from "lucide-react";
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  ChevronDown,
+  Clock,
+  Flame,
+  Globe,
+  Shield,
+  Target,
+  TrendingUp,
+  Trophy,
+  Users,
+} from "lucide-react";
+import { useAuth } from "@/app/components/AuthProvider";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
-import styles from "../../components/SystemHubPage.module.css";
-
-/* ─── Types ────────────────────────────────────────────────── */
+import {
+  MainHubLayout,
+  HubLink,
+  HubState,
+} from "../../components/MainHubLayout";
+import hub from "../../components/MainHub.module.css";
+import styles from "./RankingsSettingsScreen.module.css";
 
 interface RankedUser {
   id: number;
@@ -34,351 +49,363 @@ interface RankingsData {
 type SortOption = "level" | "studyHours" | "streak" | "quests";
 type TabOption = "global" | "friends";
 
-/* ─── Rank Insignia Style ───────────────────────────────────── */
+const metrics = [
+  { key: "level", label: "Level", icon: Shield },
+  { key: "studyHours", label: "Focus hours", icon: Clock },
+  { key: "streak", label: "Weekly streak", icon: Flame },
+  { key: "quests", label: "Quests", icon: Target },
+] as const;
 
-function getRankBadgeStyles(rank: string) {
-  switch (rank?.toUpperCase()) {
-    case "S":
-      return "border-2 border-[var(--accent-strong)] text-[var(--accent-text)] bg-[var(--accent-dim)] shadow-[0_0_12px_var(--accent-dim)]";
-    case "A":
-      return "border border-[var(--accent-mid)] text-[var(--accent-text)] bg-[var(--accent-dim)]/50";
-    case "B":
-      return "border border-[var(--subtle-line)] text-[var(--text-primary)] bg-[var(--sub-surface)]";
-    case "C":
-      return "border border-[var(--sub-border)] text-[var(--text-secondary)] bg-[var(--sub-surface)]";
-    case "D":
-      return "border border-[var(--sub-border)] text-[var(--text-secondary)] bg-[var(--sub-surface)]";
-    case "E":
+function score(entry: RankedUser, sort: SortOption) {
+  switch (sort) {
+    case "studyHours":
+      return `${entry.studyHours.toLocaleString()}h`;
+    case "streak":
+      return `${entry.streakDays} ${entry.streakDays === 1 ? "week" : "weeks"}`;
+    case "quests":
+      return entry.questsCompleted.toLocaleString();
     default:
-      return "border border-[var(--sub-border)]/60 text-[var(--text-muted)] bg-[var(--chip-bg)]";
+      return `Lv. ${entry.level}`;
   }
 }
 
-/* ─── Rank Position Medal ───────────────────────────────────── */
-
-function RankMedal({ position }: { position: number }) {
-  if (position === 1) {
-    return (
-      <div className={styles.medal1} title="Rank 1 — Champion">
-        <Trophy className="w-4 h-4 text-white shrink-0" />
-      </div>
-    );
-  }
-  if (position === 2) {
-    return (
-      <div className={styles.medal2} title="Rank 2 — Contender">
-        <span>2</span>
-      </div>
-    );
-  }
-  if (position === 3) {
-    return (
-      <div className={styles.medal3} title="Rank 3 — Vanguard">
-        <span>3</span>
-      </div>
-    );
-  }
-  return (
-    <div className={styles.medalNormal}>
-      <span>{position}</span>
-    </div>
-  );
-}
-
-/* ─── Leaderboard Row ───────────────────────────────────────── */
-
-function LeaderboardRow({
+function LadderRow({
   entry,
-  sortBy,
-  delay,
+  sort,
+  scope,
 }: {
   entry: RankedUser;
-  sortBy: SortOption;
-  delay: number;
+  sort: SortOption;
+  scope: TabOption;
 }) {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), Math.min(delay, 400));
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  const renderSortMetric = () => {
-    switch (sortBy) {
-      case "studyHours":
-        return (
-          <span className="inline-flex items-center gap-1.5 font-['Rajdhani'] font-extrabold text-sm sm:text-base text-[var(--accent-text)]">
-            <Clock className="w-3.5 h-3.5 shrink-0 opacity-85" />
-            <span>{entry.studyHours}h</span>
-          </span>
-        );
-      case "streak":
-        return (
-          <span className="inline-flex items-center gap-1.5 font-['Rajdhani'] font-extrabold text-sm sm:text-base text-[var(--accent-text)]">
-            <Flame className="w-3.5 h-3.5 shrink-0 opacity-85" />
-            <span>{entry.streakDays} wks</span>
-          </span>
-        );
-      case "quests":
-        return (
-          <span className="inline-flex items-center gap-1.5 font-['Rajdhani'] font-extrabold text-sm sm:text-base text-[var(--accent-text)]">
-            <Target className="w-3.5 h-3.5 shrink-0 opacity-85" />
-            <span>{entry.questsCompleted} done</span>
-          </span>
-        );
-      case "level":
-      default:
-        return (
-          <span className="inline-flex items-center gap-1.5 font-['Rajdhani'] font-extrabold text-sm sm:text-base text-[var(--accent-text)]">
-            <Shield className="w-3.5 h-3.5 shrink-0 opacity-85" />
-            <span>Lv. {entry.level}</span>
-          </span>
-        );
-    }
-  };
-
-  const pos = entry.friendRank ?? entry.rank;
-
+  const position =
+    scope === "friends" ? (entry.friendRank ?? entry.rank) : entry.rank;
   return (
-    <div
-      className={`flex items-center gap-3 sm:gap-4 px-3.5 sm:px-5 py-3 rounded-2xl border transition-all duration-300 ${
-        entry.isCurrentUser
-          ? "bg-[var(--accent-dim)] border-[var(--accent-mid)] shadow-[0_0_20px_var(--accent-dim)] scale-[1.008]"
-          : styles.subRow
-      }`}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(8px)",
-      }}
+    <tr
+      className={`${entry.isCurrentUser ? styles.currentRow : ""} ${position <= 3 ? styles.leadingRow : ""}`}
+      aria-current={entry.isCurrentUser ? "true" : undefined}
     >
-      {/* Position Badge */}
-      <RankMedal position={pos} />
-
-      {/* Hunter Rank Insignia */}
-      <div
-        className={`w-8 h-8 rounded-xl flex items-center justify-center font-['Rajdhani'] font-extrabold text-xs sm:text-sm shrink-0 transition-colors ${getRankBadgeStyles(
-          entry.hunterRank
-        )}`}
-      >
-        {entry.hunterRank}
-      </div>
-
-      {/* User Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p
-            className={`font-['Rajdhani'] font-bold text-sm sm:text-base truncate leading-tight ${
-              entry.isCurrentUser ? "text-[var(--accent-text)]" : "text-[var(--text-primary)]"
-            }`}
-          >
-            {entry.name || entry.username}
-          </p>
-          {entry.isCurrentUser && (
-            <span className="px-2 py-0.5 rounded-full text-[9px] font-['Rajdhani'] font-extrabold uppercase tracking-widest bg-[var(--accent-strong)] text-white shadow-sm">
-              YOU
-            </span>
-          )}
+      <td className={styles.position}>
+        {position === 1 ? (
+          <Trophy size={17} aria-label="1st place" />
+        ) : (
+          String(position).padStart(2, "0")
+        )}
+      </td>
+      <td>
+        <div className={styles.scholar}>
+          <span className={styles.avatar} aria-hidden="true">
+            {(entry.name || entry.username).slice(0, 1).toUpperCase()}
+          </span>
+          <div>
+            <div className={styles.name}>
+              <strong>{entry.name || entry.username}</strong>
+              {entry.isCurrentUser && <span>You</span>}
+            </div>
+            <p>
+              @{entry.username}
+              <span className={styles.mobileGrade}>
+                {" "}
+                · {entry.hunterRank} rank
+              </span>
+            </p>
+          </div>
         </div>
-        <p className="text-[11px] text-[var(--text-muted)] font-['Rajdhani'] font-medium truncate mt-0.5">
-          @{entry.username}
-        </p>
-      </div>
-
-      {/* Primary Value Readout */}
-      <div className="text-right shrink-0 min-w-[70px]">
-        {renderSortMetric()}
-      </div>
-    </div>
+      </td>
+      <td className={styles.grade}>
+        <span>
+          {entry.hunterRank}
+          <small> Rank</small>
+        </span>
+      </td>
+      <td className={styles.score}>{score(entry, sort)}</td>
+    </tr>
   );
 }
 
-/* ─── Main Screen Component ─────────────────────────────────── */
-
 export function RankingsSettingsScreen() {
-  const { user } = useAuth();
-  const [data, setData] = useState<RankingsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading: authLoading } = useAuth();
+  const userId = user?.id;
+  const [response, setResponse] = useState<{
+    key: string;
+    data: RankingsData | null;
+    error: boolean;
+  } | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("level");
   const [tab, setTab] = useState<TabOption>("global");
+  const [attempt, setAttempt] = useState(0);
+
+  const requestKey = `${userId}:${sortBy}:${attempt}`;
+  const isLoading = response?.key !== requestKey;
+  const data = response?.key === requestKey ? response.data : null;
+  const error = response?.key === requestKey && response.error;
 
   useEffect(() => {
-    if (!user) return;
-    setIsLoading(true);
-
+    if (!userId) return;
+    let active = true;
     fetchCachedJSON<RankingsData>(
       `/api/user/rankings?sortBy=${sortBy}`,
       {},
-      { ttlMs: 30_000, staleMs: 120_000, storageKey: `rankings:${sortBy}` }
+      {
+        ttlMs: 30_000,
+        staleMs: 120_000,
+        storageKey: `rankings:${sortBy}`,
+        forceFresh: attempt > 0,
+      }
     )
-      .then((d) => {
-        if (d) setData(d);
+      .then((result) => {
+        if (active)
+          setResponse({ key: requestKey, data: result, error: !result });
       })
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
-  }, [user?.id, sortBy]);
+      .catch(() => {
+        if (active) setResponse({ key: requestKey, data: null, error: true });
+      });
+    return () => {
+      active = false;
+    };
+  }, [userId, sortBy, attempt, requestKey]);
 
   const entries = data ? (tab === "friends" ? data.friends : data.global) : [];
-
-  const sortOptions: { key: SortOption; label: string; icon: React.ReactNode }[] = [
-    { key: "level", label: "Level", icon: <Shield className="w-3 h-3" /> },
-    { key: "studyHours", label: "Hours", icon: <Clock className="w-3 h-3" /> },
-    { key: "streak", label: "Streak", icon: <Flame className="w-3 h-3" /> },
-    { key: "quests", label: "Quests", icon: <Target className="w-3 h-3" /> },
-  ];
-
+  const current =
+    data?.friends.find((entry) => entry.isCurrentUser) ??
+    data?.global.find((entry) => entry.isCurrentUser);
+  const position =
+    tab === "friends"
+      ? (current?.friendRank ?? 0)
+      : (data?.currentUserRank ?? 0);
+  const population =
+    tab === "friends" ? (data?.friends.length ?? 0) : (data?.totalPlayers ?? 0);
   const percentile =
-    data && data.totalPlayers > 0
-      ? Math.max(1, Math.round((data.currentUserRank / data.totalPlayers) * 100))
-      : 0;
+    position > 0 && population > 0
+      ? Math.min(100, Math.max(1, Math.ceil((position / population) * 100)))
+      : null;
+  const metric = metrics.find((item) => item.key === sortBy)!;
+  const currentIndex = entries.findIndex((entry) => entry.isCurrentUser);
+  const ahead = currentIndex > 0 ? entries[currentIndex - 1] : null;
+  const soloFriends =
+    tab === "friends" && entries.length === 1 && entries[0].isCurrentUser;
+  const pending = authLoading || (Boolean(user) && isLoading);
 
   return (
-    <div className={styles.hubContainer}>
-      <div className={styles.topGlow} aria-hidden="true" />
-
-      <div className={styles.contentWrapper}>
-        {/* Navigation & Header */}
-        <div>
-          <BackToSettings />
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
-            <div>
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-['Rajdhani'] font-bold tracking-widest text-[var(--accent-text)] uppercase mb-2 ${styles.chip}`}>
-                <Trophy className="w-3.5 h-3.5 text-[var(--accent-text)]" />
-                <span>System Hub &rarr; Rankings</span>
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-primary)]">
-                Leaderboard & Standing
-              </h1>
-              <p className="text-sm text-[var(--text-secondary)] mt-1 max-w-xl">
-                Competitive ladder across the entire global Scholar network and your personal friends circle.
-              </p>
-            </div>
-          </div>
+    <MainHubLayout title="Rankings">
+      <div className={styles.toolbar}>
+        <div className={hub.segmented} aria-label="Leaderboard scope">
+          <button
+            onClick={() => setTab("global")}
+            aria-pressed={tab === "global"}
+          >
+            <Globe size={14} aria-hidden="true" />
+            Global
+          </button>
+          <button
+            onClick={() => setTab("friends")}
+            aria-pressed={tab === "friends"}
+          >
+            <Users size={14} aria-hidden="true" />
+            Friends
+          </button>
         </div>
-
-        {/* ─── Current User Hero Standing Banner ─────────────────── */}
-        {data && (
-          <div className={`${styles.glassCard} p-5 sm:p-6 lg:p-7 mt-6 relative overflow-hidden`}>
-            {/* Radiant Corner Accent */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[var(--accent-strong)]/15 via-[var(--accent-dim)] to-transparent pointer-events-none rounded-full blur-3xl -mr-16 -mt-16" />
-
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-              <div className="flex items-center gap-4 sm:gap-6">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 bg-[var(--accent-dim)] border border-[var(--accent-mid)] text-[var(--accent-text)] shadow-[0_0_20px_var(--accent-dim)]">
-                  <Trophy className="w-7 h-7 sm:w-8 sm:h-8" />
-                </div>
-
-                <div>
-                  <p className="text-xs font-['Rajdhani'] font-bold uppercase tracking-widest text-[var(--accent-text)] mb-0.5">
-                    Your Global Standing
-                  </p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-['Rajdhani'] font-extrabold text-3xl sm:text-4xl text-[var(--text-primary)] leading-none">
-                      #{data.currentUserRank}
-                    </span>
-                    <span className="text-xs sm:text-sm font-['Rajdhani'] font-bold text-[var(--text-muted)]">
-                      of {data.totalPlayers} Scholars
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Percentile Pill */}
-              <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--subtle-line)]">
-                <span className="text-xs font-['Rajdhani'] font-bold uppercase tracking-wider text-[var(--text-muted)]">
-                  Top Bracket
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs sm:text-sm font-['Rajdhani'] font-extrabold uppercase tracking-wider shadow-sm bg-[var(--accent-dim)] border border-[var(--accent-mid)] text-[var(--accent-text)]">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Top {percentile}% Overall</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ─── Filter & Scope Toolbar ────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
-          {/* Global vs Friends Segmented Control */}
-          <div className={styles.segmentedControl}>
-            <button
-              type="button"
-              onClick={() => setTab("global")}
-              className={`${styles.segmentedItem} ${tab === "global" ? styles.segmentedItemActive : ""}`}
-            >
-              <Globe className="w-3.5 h-3.5 shrink-0" />
-              <span>Global Ladder</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("friends")}
-              className={`${styles.segmentedItem} ${tab === "friends" ? styles.segmentedItemActive : ""}`}
-            >
-              <Users className="w-3.5 h-3.5 shrink-0" />
-              <span>Friends Circle</span>
-            </button>
-          </div>
-
-          {/* Sort Selector Pills */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[11px] font-['Rajdhani'] font-bold uppercase tracking-widest text-[var(--text-muted)] mr-1">
-              Order By:
-            </span>
-            {sortOptions.map((opt) => (
-              <button
-                key={opt.key}
-                type="button"
-                onClick={() => setSortBy(opt.key)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-['Rajdhani'] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
-                  sortBy === opt.key
-                    ? "bg-[var(--accent-strong)] text-white shadow-[0_0_12px_var(--accent-dim)] scale-105"
-                    : `${styles.subRow} text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-mid)]`
-                }`}
-              >
-                {opt.icon}
-                <span>{opt.label}</span>
-              </button>
+        <label className={styles.sortLabel}>
+          <span>Rank by</span>
+          <select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value as SortOption)}
+            aria-label="Rank by"
+          >
+            {metrics.map((item) => (
+              <option key={item.key} value={item.key}>
+                {item.label}
+              </option>
             ))}
-          </div>
-        </div>
-
-        {/* ─── Leaderboard Roster Card ───────────────────────────── */}
-        <div className={`${styles.glassCard} p-4 sm:p-6 lg:p-7 mt-6`}>
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-3">
-              <div className="w-8 h-8 rounded-full border-2 border-[var(--accent-strong)] border-t-transparent animate-spin" />
-              <p className="text-xs font-['Rajdhani'] font-bold uppercase tracking-widest text-[var(--text-muted)]">
-                Recalculating Ladder Standings…
-              </p>
+          </select>
+          <ChevronDown size={13} aria-hidden="true" />
+        </label>
+      </div>
+      {pending ? (
+        <HubState loading title="Loading the ladder…" />
+      ) : !user ? (
+        <HubState title="Sign in to find your place">
+          <HubLink href="/login">Sign in</HubLink>
+        </HubState>
+      ) : error || !data ? (
+        <HubState
+          title="Rankings are temporarily unavailable"
+          onRetry={() => setAttempt((n) => n + 1)}
+        >
+          Please reconnect to see the latest standings.
+        </HubState>
+      ) : (
+        <div className={styles.layout}>
+          <aside className={styles.standing} aria-label="Your standing">
+            <div className={styles.standingTop}>
+              <span>
+                Your {tab === "friends" ? "friends" : "global"} standing
+              </span>
+              <metric.icon size={16} aria-hidden="true" />
             </div>
-          ) : entries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-              <CircleAlert className="w-8 h-8 text-[var(--text-muted)]" />
-              <p className="text-sm font-['Rajdhani'] font-bold uppercase tracking-wider text-[var(--text-primary)]">
-                {tab === "friends"
-                  ? "No friends recorded in your circle yet."
-                  : "No Scholars found on this leaderboard."}
-              </p>
-              {tab === "friends" && (
-                <p className="text-xs text-[var(--text-secondary)] max-w-sm">
-                  Add friends from the Social hub to compare daily focus hours and climb the private circle ladder together.
-                </p>
+            <div className={styles.rankNumber}>
+              {position > 0 ? (
+                <>
+                  <span>#</span>
+                  {position.toLocaleString()}
+                </>
+              ) : (
+                "—"
               )}
             </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {entries.map((entry, i) => (
-                <LeaderboardRow
-                  key={entry.id}
-                  entry={entry}
-                  sortBy={sortBy}
-                  delay={i * 35}
-                />
-              ))}
+            <p className={styles.rankContext}>
+              {position > 0
+                ? `of ${population.toLocaleString()} ${population === 1 ? "scholar" : "scholars"} · ${metric.label.toLowerCase()}`
+                : "Your place is still taking shape"}
+            </p>
+            {percentile !== null && (
+              <div className={styles.percentile}>
+                <div>
+                  <span>Top {percentile}%</span>
+                  <span>
+                    {tab === "friends" ? "In your circle" : "Across Sylf"}
+                  </span>
+                </div>
+                <div className={styles.positionTrack}>
+                  <span
+                    style={{
+                      width: `${Math.max(2, ((population - position + 1) / population) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+            <div className={styles.personalMetric}>
+              <metric.icon size={18} aria-hidden="true" />
+              <div>
+                <strong>{current ? score(current, sortBy) : "—"}</strong>
+                <span>Your {metric.label.toLowerCase()}</span>
+              </div>
             </div>
-          )}
+            <div className={styles.standingNote}>
+              <span className={styles.noteIcon}>
+                <TrendingUp size={17} aria-hidden="true" />
+              </span>
+              <div>
+                <h2>
+                  {position === 1 && !soloFriends
+                    ? "Setting the pace"
+                    : ahead
+                      ? "Your next place"
+                      : "Progress worth showing up for"}
+                </h2>
+                <p>
+                  {position === 1 && !soloFriends
+                    ? "Every focused session builds on what you’ve earned."
+                    : ahead
+                      ? `${ahead.name || ahead.username} is just ahead at ${score(ahead, sortBy)}. Keep your own rhythm.`
+                      : "Study consistently, complete quests, and let your progress add up."}
+                </p>
+              </div>
+            </div>
+            <Link href="/timer" className={hub.primaryButton}>
+              Keep studying <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+            <p className={styles.standingFoot}>
+              All-time achievements. Updated as scholars progress.
+            </p>
+          </aside>
+          <section
+            className={styles.board}
+            aria-label={`${tab === "friends" ? "Friends" : "Global"} leaderboard`}
+          >
+            <div className={hub.sectionHeading}>
+              <div>
+                <h2>
+                  {tab === "friends" ? "Your circle" : "The global ladder"}
+                </h2>
+                <p>
+                  {tab === "friends"
+                    ? "A little friendly motivation."
+                    : "Built one focused session at a time."}
+                </p>
+              </div>
+              <span className={hub.pill}>
+                {tab === "friends"
+                  ? `${population} ${population === 1 ? "scholar" : "scholars"}`
+                  : `Top ${entries.length}`}
+              </span>
+            </div>
+            {entries.length ? (
+              <>
+                <table className={styles.table}>
+                  <caption className="sr-only">
+                    {tab === "friends" ? "Friends" : "Global"} rankings ordered
+                    by {metric.label.toLowerCase()}
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Place</th>
+                      <th scope="col">Scholar</th>
+                      <th scope="col" className={styles.grade}>
+                        Rank
+                      </th>
+                      <th scope="col">{metric.label}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entries.map((entry) => (
+                      <LadderRow
+                        key={entry.id}
+                        entry={entry}
+                        sort={sortBy}
+                        scope={tab}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+                {soloFriends && (
+                  <div className={styles.friendsNote}>
+                    <Users size={23} aria-hidden="true" />
+                    <div>
+                      <h3>Better with a study circle</h3>
+                      <p>Add friends to share a little motivation.</p>
+                    </div>
+                    <HubLink href="/social">Find friends</HubLink>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className={styles.empty}>
+                <Trophy size={30} aria-hidden="true" />
+                <h3>
+                  {tab === "friends"
+                    ? "Your circle starts here"
+                    : "A new ladder is taking shape"}
+                </h3>
+                <p>
+                  {tab === "friends"
+                    ? "Find friends on Social to compare your progress."
+                    : "Come back after your next study session."}
+                </p>
+                <HubLink href={tab === "friends" ? "/social" : "/timer"}>
+                  {tab === "friends" ? "Find friends" : "Start studying"}
+                </HubLink>
+              </div>
+            )}
+            <div className={styles.boardFoot}>
+              <span>
+                <Shield size={12} aria-hidden="true" />
+                {sortBy === "level"
+                  ? "Levels are ordered by XP when tied."
+                  : `${metric.label} ranked from highest to lowest.`}
+              </span>
+              {tab === "global" && data.totalPlayers > entries.length && (
+                <span>
+                  Showing {entries.length} of{" "}
+                  {data.totalPlayers.toLocaleString()}
+                </span>
+              )}
+            </div>
+          </section>
         </div>
-      </div>
-    </div>
+      )}
+    </MainHubLayout>
   );
 }
 

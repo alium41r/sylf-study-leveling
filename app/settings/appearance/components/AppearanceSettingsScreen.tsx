@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Moon, Sun, Check, Save, Undo2, Sparkles } from "lucide-react";
-import BackToSettings from "@/app/components/BackToSettings";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { Check, Moon, Sun, Undo2 } from "lucide-react";
+import { AppearanceHubLayout } from "../../components/AppearanceHubLayout";
 import {
   applyAppMode,
   applyGlobalTheme,
@@ -15,11 +15,12 @@ import {
   DEFAULT_ACCENT_HEX,
   DEFAULT_DARK_BG_HEX,
   DEFAULT_LIGHT_BG_HEX,
+  isValidHex,
 } from "@/lib/color-utils";
 import { ColorPickerBoard } from "./ColorPickerBoard";
 import { MiniDashboardPreview } from "./MiniDashboardPreview";
-import styles from "../../components/SystemHubPage.module.css";
-
+import hub from "../../components/MainHub.module.css";
+import styles from "./AppearanceSettingsScreen.module.css";
 const ACCENT_PRESETS = [
   { name: "System Purple", hex: "#7c3aed" },
   { name: "Electric Cyan", hex: "#06b6d4" },
@@ -46,365 +47,359 @@ const LIGHT_BG_PRESETS = [
   { name: "Cool Zinc", hex: "#e2e8f0" },
 ];
 
+interface Preference {
+  mode: "light" | "dark";
+  accent: string;
+  background: string;
+}
+const subscribe = () => () => {};
+const clientReady = () => true;
+const serverReady = () => false;
+function readLocal(key: string): string | null {
+  try {
+    return typeof window === "undefined" ? null : localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+function readPreference(theme?: string, background?: string): Preference {
+  const mode = readLocal("app_mode") === "light" ? "light" : "dark";
+  return {
+    mode,
+    accent: resolveLegacyTheme(theme || readLocal("app_theme")),
+    background: resolveLegacyBackground(
+      background || readLocal("app_background"),
+      mode
+    ),
+  };
+}
+function readRecent(key: string): string[] {
+  try {
+    const value =
+      typeof window === "undefined"
+        ? []
+        : JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(value)
+      ? value
+          .filter(
+            (item): item is string =>
+              typeof item === "string" && isValidHex(item)
+          )
+          .slice(0, 6)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 export function AppearanceSettingsScreen() {
   const { user, mutateUser } = useAuth();
-
-  // Canonical applied state (currently active in app)
-  // Server-safe initial states ensuring byte-identical SSR and initial client hydration
-  const [appliedMode, setAppliedMode] = useState<"light" | "dark">("dark");
-  const [appliedAccent, setAppliedAccent] = useState<string>(() => resolveLegacyTheme(user?.activeTheme));
-  const [appliedBackground, setAppliedBackground] = useState<string>(() =>
-    resolveLegacyBackground(user?.activeBackground, "dark")
+  const ready = useSyncExternalStore(subscribe, clientReady, serverReady);
+  const source = `${user?.id}:${user?.activeTheme}:${user?.activeBackground}`;
+  const [state, setState] = useState(() => {
+    const preference = readPreference(
+      user?.activeTheme,
+      user?.activeBackground
+    );
+    return { source, applied: preference, draft: preference };
+  });
+  if (state.source !== source) {
+    const preference = readPreference(
+      user?.activeTheme,
+      user?.activeBackground
+    );
+    setState({ source, applied: preference, draft: preference });
+  }
+  const { draft, applied } = state;
+  const [recentAccents, setRecentAccents] = useState(() =>
+    readRecent("sylf_recent_accents")
   );
-
-  // Working draft state (edited on the page, committed ONLY when user clicks Save)
-  const [draftMode, setDraftMode] = useState<"light" | "dark">("dark");
-  const [draftAccent, setDraftAccent] = useState<string>(() => resolveLegacyTheme(user?.activeTheme));
-  const [draftBackground, setDraftBackground] = useState<string>(() =>
-    resolveLegacyBackground(user?.activeBackground, "dark")
+  const [recentBgs, setRecentBgs] = useState(() =>
+    readRecent("sylf_recent_bgs")
   );
-
-  const [recentAccents, setRecentAccents] = useState<string[]>([]);
-  const [recentBgs, setRecentBgs] = useState<string[]>([]);
-
   const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<string | null>(null);
-
-  // Mount sync: load user preferences from localStorage on client after hydration
+  const [syncFailed, setSyncFailed] = useState(false);
+  const [status, setStatus] = useState("");
   useEffect(() => {
-    const curMode = (localStorage.getItem("app_mode") as "light" | "dark") || "dark";
-    const rawTheme = user?.activeTheme || localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
-    const resolvedTheme = resolveLegacyTheme(rawTheme);
-    const rawBg =
-      user?.activeBackground ||
-      localStorage.getItem("app_background") ||
-      (curMode === "light" ? DEFAULT_LIGHT_BG_HEX : DEFAULT_DARK_BG_HEX);
-    const resolvedBg = resolveLegacyBackground(rawBg, curMode);
-
-    setAppliedMode(curMode);
-    setDraftMode(curMode);
-    setAppliedAccent(resolvedTheme);
-    setDraftAccent(resolvedTheme);
-    setAppliedBackground(resolvedBg);
-    setDraftBackground(resolvedBg);
-
-    try {
-      const storedAccents = JSON.parse(localStorage.getItem("sylf_recent_accents") || "[]");
-      if (Array.isArray(storedAccents)) setRecentAccents(storedAccents);
-    } catch {}
-
-    try {
-      const storedBgs = JSON.parse(localStorage.getItem("sylf_recent_bgs") || "[]");
-      if (Array.isArray(storedBgs)) setRecentBgs(storedBgs);
-    } catch {}
-  }, [user?.activeTheme, user?.activeBackground]);
-
-  // Listen for storage events from other tabs
-  useEffect(() => {
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === "app_mode" && (e.newValue === "light" || e.newValue === "dark")) {
-        setAppliedMode(e.newValue);
-        setDraftMode(e.newValue);
-      } else if (e.key === "app_theme" && e.newValue) {
-        const resolved = resolveLegacyTheme(e.newValue);
-        setAppliedAccent(resolved);
-        setDraftAccent(resolved);
-      } else if (e.key === "app_background" && e.newValue) {
-        const curMode = (localStorage.getItem("app_mode") as "light" | "dark") || "dark";
-        const resolved = resolveLegacyBackground(e.newValue, curMode);
-        setAppliedBackground(resolved);
-        setDraftBackground(resolved);
-      }
+    const onStorage = (event: StorageEvent) => {
+      if (
+        !event.newValue ||
+        !["app_mode", "app_theme", "app_background"].includes(event.key || "")
+      )
+        return;
+      setState((current) => {
+        const next = { ...current.applied };
+        if (
+          event.key === "app_mode" &&
+          (event.newValue === "light" || event.newValue === "dark")
+        )
+          next.mode = event.newValue;
+        if (event.key === "app_theme")
+          next.accent = resolveLegacyTheme(event.newValue);
+        if (event.key === "app_background")
+          next.background = resolveLegacyBackground(event.newValue, next.mode);
+        return { ...current, applied: next, draft: next };
+      });
+      setSyncFailed(false);
+      setStatus("");
     };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
-
   const hasChanges =
-    draftMode !== appliedMode ||
-    draftAccent.toLowerCase() !== appliedAccent.toLowerCase() ||
-    draftBackground.toLowerCase() !== appliedBackground.toLowerCase();
-
-  // Handle draft mode change
-  const handleDraftModeChange = (newMode: "light" | "dark") => {
-    if (newMode === draftMode) return;
-    setDraftMode(newMode);
-
-    const isDarkPreset =
-      DARK_BG_PRESETS.some((p) => p.hex.toLowerCase() === draftBackground.toLowerCase()) ||
-      draftBackground.toLowerCase() === DEFAULT_DARK_BG_HEX.toLowerCase();
-
-    const isLightPreset =
-      LIGHT_BG_PRESETS.some((p) => p.hex.toLowerCase() === draftBackground.toLowerCase()) ||
-      draftBackground.toLowerCase() === DEFAULT_LIGHT_BG_HEX.toLowerCase();
-
-    if (newMode === "light" && isDarkPreset) {
-      setDraftBackground(DEFAULT_LIGHT_BG_HEX);
-    } else if (newMode === "dark" && isLightPreset) {
-      setDraftBackground(DEFAULT_DARK_BG_HEX);
-    }
+    draft.mode !== applied.mode ||
+    draft.accent.toLowerCase() !== applied.accent.toLowerCase() ||
+    draft.background.toLowerCase() !== applied.background.toLowerCase();
+  const edit = (patch: Partial<Preference>) => {
+    setState((current) => ({
+      ...current,
+      draft: { ...current.draft, ...patch },
+    }));
+    setStatus("");
   };
-
-  // Revert all draft changes to currently applied state
-  const handleDiscard = () => {
-    setDraftMode(appliedMode);
-    setDraftAccent(appliedAccent);
-    setDraftBackground(appliedBackground);
+  const changeMode = (mode: Preference["mode"]) => {
+    if (mode === draft.mode) return;
+    const presets =
+      mode === "light"
+        ? [...DARK_BG_PRESETS, { hex: DEFAULT_DARK_BG_HEX }]
+        : [...LIGHT_BG_PRESETS, { hex: DEFAULT_LIGHT_BG_HEX }];
+    edit({
+      mode,
+      ...(presets.some(
+        (preset) => preset.hex.toLowerCase() === draft.background.toLowerCase()
+      )
+        ? {
+            background:
+              mode === "light" ? DEFAULT_LIGHT_BG_HEX : DEFAULT_DARK_BG_HEX,
+          }
+        : {}),
+    });
   };
-
-  // Save & Apply Changes to the entire app and database
-  const handleSaveAndApply = async () => {
+  const save = async () => {
     if (isSaving) return;
     setIsSaving(true);
-
+    setStatus("");
+    const next = { ...draft };
+    let locallyApplied = false;
     try {
-      // 1. Commit to localStorage
-      localStorage.setItem("app_mode", draftMode);
-      localStorage.setItem("app_theme", draftAccent);
-      localStorage.setItem("app_background", draftBackground);
-
-      // 2. Apply globally across the application DOM
-      applyAppMode(draftMode);
-      applyGlobalTheme(draftAccent);
-      applyGlobalBackground(draftBackground, draftMode);
-
-      // 3. Dispatch events to sync active UI components
-      window.dispatchEvent(new Event("mode-updated"));
-      window.dispatchEvent(new Event("theme-updated"));
-      window.dispatchEvent(new Event("background-updated"));
-
-      // 4. Update applied state
-      setAppliedMode(draftMode);
-      setAppliedAccent(draftAccent);
-      setAppliedBackground(draftBackground);
-
-      // 5. Update recents lists
-      setRecentAccents((prev) => {
-        const filtered = prev.filter((c) => c.toLowerCase() !== draftAccent.toLowerCase());
-        const next = [draftAccent, ...filtered].slice(0, 6);
-        localStorage.setItem("sylf_recent_accents", JSON.stringify(next));
-        return next;
-      });
-
-      setRecentBgs((prev) => {
-        const filtered = prev.filter((c) => c.toLowerCase() !== draftBackground.toLowerCase());
-        const next = [draftBackground, ...filtered].slice(0, 6);
-        localStorage.setItem("sylf_recent_bgs", JSON.stringify(next));
-        return next;
-      });
-
-      // 6. Persist to API
-      await Promise.all([
-        fetch("/api/cosmetics", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ category: "THEME", itemKey: draftAccent }),
-        }),
-        fetch("/api/cosmetics", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ category: "BACKGROUND", itemKey: draftBackground }),
-        }),
+      localStorage.setItem("app_mode", next.mode);
+      localStorage.setItem("app_theme", next.accent);
+      localStorage.setItem("app_background", next.background);
+      applyAppMode(next.mode);
+      applyGlobalTheme(next.accent);
+      applyGlobalBackground(next.background, next.mode);
+      for (const name of [
+        "mode-updated",
+        "theme-updated",
+        "background-updated",
       ])
-        .then(async ([resTheme, resBackground]) => {
-          if (resTheme.ok && resBackground.ok) {
-            const data = await resTheme.json().catch(() => ({}));
-            if (data.user) mutateUser({ ...data.user, activeTheme: draftAccent, activeBackground: draftBackground });
-          }
-        })
-        .catch(console.error);
-
-      setSaveStatus("Appearance saved & applied successfully");
-      setTimeout(() => setSaveStatus(null), 3500);
-    } catch (err) {
-      console.error("Failed to apply appearance:", err);
+        window.dispatchEvent(new Event(name));
+      setState((current) => ({ ...current, applied: next }));
+      locallyApplied = true;
+      const accents = [
+        next.accent,
+        ...recentAccents.filter(
+          (color) => color.toLowerCase() !== next.accent.toLowerCase()
+        ),
+      ].slice(0, 6);
+      const backgrounds = [
+        next.background,
+        ...recentBgs.filter(
+          (color) => color.toLowerCase() !== next.background.toLowerCase()
+        ),
+      ].slice(0, 6);
+      setRecentAccents(accents);
+      setRecentBgs(backgrounds);
+      try {
+        localStorage.setItem("sylf_recent_accents", JSON.stringify(accents));
+        localStorage.setItem("sylf_recent_bgs", JSON.stringify(backgrounds));
+      } catch {
+        /* Recents are optional; the appearance itself is already saved. */
+      }
+      const responses = await Promise.all([
+        fetch("/api/cosmetics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category: "THEME", itemKey: next.accent }),
+        }),
+        fetch("/api/cosmetics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category: "BACKGROUND",
+            itemKey: next.background,
+          }),
+        }),
+      ]);
+      if (responses.some((response) => !response.ok))
+        throw new Error("Account sync failed");
+      mutateUser({
+        activeTheme: next.accent,
+        activeBackground: next.background,
+      });
+      setSyncFailed(false);
+      setStatus("Appearance saved");
+    } catch {
+      setSyncFailed(true);
+      setStatus(
+        locallyApplied
+          ? "Applied on this device. Account sync failed—please try again."
+          : "Couldn’t save your appearance. Please try again."
+      );
     } finally {
       setIsSaving(false);
     }
   };
-
   return (
-    <div className={styles.hubContainer}>
-      <div className={styles.topGlow} aria-hidden="true" />
-      <div className={`${styles.contentWrapper} flex flex-col gap-8 pb-32`}>
-        {/* ─── Header & Breadcrumb ─────────────────────────────────── */}
-        <div>
-          <BackToSettings />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
-          <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[var(--border-subtle)] bg-[var(--surface-1,var(--bg-abyss))]/60 text-xs font-['Rajdhani'] font-bold tracking-widest text-[var(--accent-text,var(--accent-primary))] uppercase mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>System Settings &rarr; Appearance</span>
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-primary)]">
-              Appearance
-            </h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-1 max-w-xl">
-              Customize your application mode, accent color, and canvas background.
-              Changes preview below in real-time and apply across the entire system when saved.
-            </p>
-          </div>
-
-          {/* Quick save status feedback */}
-          {saveStatus && (
-            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--accent-primary-dim)] border border-[var(--accent-primary-mid)] text-[var(--text-primary)] text-xs font-semibold shadow-md animate-fadeIn self-start sm:self-auto">
-              <Check className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-              <span>{saveStatus}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ─── Live HUD Preview ────────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span
-              className="w-2 h-2 rounded-full animate-pulse shrink-0"
-              style={{
-                backgroundColor: draftAccent,
-                boxShadow: `0 0 8px ${draftAccent}`,
-              }}
-            />
-            <h2 className="text-xs sm:text-sm font-bold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-muted)]">
-              Live HUD Preview
-            </h2>
-          </div>
-          <span className="text-xs font-mono text-[var(--text-secondary)]">
-            {hasChanges ? "Previewing unsaved draft" : "Reflecting active system"}
-          </span>
-        </div>
-
-        <MiniDashboardPreview
-          mode={draftMode}
-          accentHex={draftAccent}
-          canvasHex={draftBackground}
-        />
-      </section>
-
-      {/* ─── 1. App Mode ─────────────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-bold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-muted)]">
-          1. App Mode
-        </h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-md">
-          <button
-            type="button"
-            onClick={() => handleDraftModeChange("dark")}
-            className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
-              draftMode === "dark"
-                ? "border-[var(--accent-primary)] bg-[var(--accent-primary-dim)] text-[var(--text-primary)] shadow-sm ring-1 ring-[var(--accent-primary)]"
-                : "border-[var(--border-subtle)] bg-[var(--surface-1,var(--bg-abyss))]/80 text-[var(--text-secondary)] hover:border-[var(--accent-primary-mid)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            <Moon className="w-4 h-4" />
-            <span>Dark</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleDraftModeChange("light")}
-            className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
-              draftMode === "light"
-                ? "border-[var(--accent-primary)] bg-[var(--accent-primary-dim)] text-[var(--text-primary)] shadow-sm ring-1 ring-[var(--accent-primary)]"
-                : "border-[var(--border-subtle)] bg-[var(--surface-1,var(--bg-abyss))]/80 text-[var(--text-secondary)] hover:border-[var(--accent-primary-mid)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            <Sun className="w-4 h-4" />
-            <span>Light</span>
-          </button>
-        </div>
-      </section>
-
-      {/* ─── 2. Accent Color ─────────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-bold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-muted)]">
-          2. Accent Color
-        </h2>
-        <ColorPickerBoard
-          label="Accent Color"
-          description="Controls primary actions, active navigation, progress indicators, selected borders, and glow highlights."
-          value={draftAccent}
-          defaultValue={DEFAULT_ACCENT_HEX}
-          onChange={(hex) => setDraftAccent(hex)}
-          presets={ACCENT_PRESETS}
-          recentColors={recentAccents}
-        />
-      </section>
-
-      {/* ─── 3. Background Color ─────────────────────────────────── */}
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-bold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-muted)]">
-          3. Background Color
-        </h2>
-        <ColorPickerBoard
-          label="Background Color"
-          description="Sets the solid canvas backdrop. Surface cards and text adapt automatically to preserve readability and contrast."
-          value={draftBackground}
-          defaultValue={draftMode === "light" ? DEFAULT_LIGHT_BG_HEX : DEFAULT_DARK_BG_HEX}
-          onChange={(hex) => setDraftBackground(hex)}
-          presets={draftMode === "light" ? LIGHT_BG_PRESETS : DARK_BG_PRESETS}
-          recentColors={recentBgs}
-        />
-      </section>
-
-      {/* ─── Sticky Bottom Action Bar ────────────────────────────── */}
-      <div className="sticky bottom-6 z-30 p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-1,var(--bg-abyss))]/95 text-[var(--text-primary)] backdrop-blur-xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 transition-all">
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-3 h-3 rounded-full ${
-              hasChanges ? "bg-[var(--accent-primary)] animate-pulse" : "bg-emerald-500"
-            }`}
-          />
-          <div>
-            <p className="text-xs sm:text-sm font-bold font-['Rajdhani'] uppercase tracking-wider text-[var(--text-primary)]">
-              {hasChanges ? "Unsaved Appearance Changes" : "Canonical Appearance Active"}
-            </p>
-            <p className="text-xs text-[var(--text-muted)] hidden sm:block">
-              {hasChanges
-                ? "Click Apply Changes to update the entire application and persist your settings."
-                : "All current theme, accent, and canvas preferences are applied."}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-          {hasChanges && (
-            <button
-              type="button"
-              onClick={handleDiscard}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] hover:border-red-500/50 hover:bg-red-500/10 text-xs font-semibold text-[var(--text-secondary)] hover:text-red-400 transition-all cursor-pointer"
+    <AppearanceHubLayout title="Appearance">
+      {ready && (
+        <>
+          <div className={styles.editor}>
+            <fieldset className={styles.controls} disabled={isSaving}>
+              <section className={styles.modeSection}>
+                <div className={styles.sectionTitle}>
+                  <h2>App mode</h2>
+                  <p>Choose your starting atmosphere.</p>
+                </div>
+                <div className={styles.modes}>
+                  {(["light", "dark"] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      aria-pressed={draft.mode === mode}
+                      onClick={() => changeMode(mode)}
+                    >
+                      <span
+                        className={`${styles.modeSample} ${mode === "dark" ? styles.darkSample : styles.lightSample}`}
+                        aria-hidden="true"
+                      >
+                        <i />
+                        <span>
+                          <b />
+                          <b />
+                          <b />
+                        </span>
+                      </span>
+                      <span>
+                        {mode === "light" ? (
+                          <Sun size={14} />
+                        ) : (
+                          <Moon size={14} />
+                        )}
+                        {mode === "light" ? "Light" : "Dark"}
+                        {draft.mode === mode && (
+                          <Check size={13} className={styles.modeCheck} />
+                        )}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+              <section className={styles.colorSection}>
+                <ColorPickerBoard
+                  label="Accent Color"
+                  description="A signature color for actions and highlights."
+                  value={draft.accent}
+                  defaultValue={DEFAULT_ACCENT_HEX}
+                  onChange={(accent) => edit({ accent })}
+                  presets={ACCENT_PRESETS}
+                  recentColors={recentAccents}
+                />
+              </section>
+              <section className={styles.colorSection}>
+                <ColorPickerBoard
+                  label="Background Color"
+                  description="Your canvas. Text and surfaces adapt to it."
+                  value={draft.background}
+                  defaultValue={
+                    draft.mode === "light"
+                      ? DEFAULT_LIGHT_BG_HEX
+                      : DEFAULT_DARK_BG_HEX
+                  }
+                  onChange={(background) => edit({ background })}
+                  presets={
+                    draft.mode === "light" ? LIGHT_BG_PRESETS : DARK_BG_PRESETS
+                  }
+                  recentColors={recentBgs}
+                />
+              </section>
+            </fieldset>
+            <section
+              className={styles.previewSection}
+              aria-label="Appearance preview"
             >
-              <Undo2 className="w-3.5 h-3.5" />
-              <span>Discard</span>
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={handleSaveAndApply}
-            disabled={!hasChanges || isSaving}
-            className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all shadow-md cursor-pointer ${
-              hasChanges && !isSaving
-                ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--accent-foreground,#ffffff)] shadow-[0_0_20px_var(--accent-muted)] active:scale-98"
-                : "bg-[var(--surface-2,var(--bg-shadow))] border border-[var(--border-subtle)] text-[var(--text-muted)] cursor-not-allowed opacity-60"
-            }`}
+              <div className={styles.previewTitle}>
+                <span>
+                  <i />
+                  Live preview
+                </span>
+                <small>
+                  {hasChanges ? "Unsaved draft" : "Current appearance"}
+                </small>
+              </div>
+              <MiniDashboardPreview
+                mode={draft.mode}
+                accentHex={draft.accent}
+                canvasHex={draft.background}
+              />
+              <div className={styles.previewCaption}>
+                <span style={{ background: draft.accent }} />
+                <p>
+                  Your color, carried through Sylf.
+                  <small>
+                    Changes stay in this preview until you apply them.
+                  </small>
+                </p>
+              </div>
+            </section>
+          </div>
+          <div
+            className={`${styles.actionBar} ${hasChanges || syncFailed ? styles.pendingBar : ""}`}
           >
-            {isSaving ? (
-              <>
-                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Applying...</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-3.5 h-3.5" />
-                <span>Save & Apply Changes</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-    </div>
+            <div className={styles.status}>
+              <span className={styles.statusDot} />
+              <p role="status">
+                {status ||
+                  (hasChanges
+                    ? "Unsaved changes"
+                    : "Your appearance is up to date")}
+              </p>
+            </div>
+            <div className={styles.actions}>
+              {hasChanges && (
+                <button
+                  className={hub.secondaryButton}
+                  disabled={isSaving}
+                  onClick={() => {
+                    setState((current) => ({
+                      ...current,
+                      draft: current.applied,
+                    }));
+                    setStatus("");
+                  }}
+                >
+                  <Undo2 size={14} />
+                  Discard
+                </button>
+              )}
+              <button
+                className={hub.primaryButton}
+                disabled={(!hasChanges && !syncFailed) || isSaving}
+                onClick={() => {
+                  void save();
+                }}
+              >
+                {isSaving
+                  ? "Applying…"
+                  : syncFailed && !hasChanges
+                    ? "Retry sync"
+                    : "Apply changes"}
+                {!isSaving && <Check size={14} />}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </AppearanceHubLayout>
   );
 }

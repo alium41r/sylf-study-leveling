@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "name": "Draft changes stay inside preview",
+      "pass": true
+    },
+    {
+      "name": "appearance-mobile-color-editor",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "Existing cosmetics API receives both colors",
+      "pass": true
+    },
+    {
+      "name": "Applied appearance survives reload",
+      "pass": true
+    },
+    {
+      "name": "appearance-mobile-sync-error",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "Account sync can be retried",
+      "pass": true
+    },
+    {
+      "name": "Browsing does not change timer preference",
+      "pass": true
+    },
+    {
+      "name": "Backdrop selection survives reload",
+      "pass": true
+    },
+    {
+      "name": "Expired private preview recovers through canonical refresh",
+      "pass": true
+    },
+    {
+      "name": "backdrops-mobile-library-recovered",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "Invalid formats rejected without upload",
+      "pass": true
+    },
+    {
+      "name": "Images below minimum resolution are rejected",
+      "pass": true
+    },
+    {
+      "name": "Upload refreshes canonical library",
+      "pass": true
+    },
+    {
+      "name": "Deleting active image selects Classic and preserves other uploads",
+      "pass": true
+    },
+    {
+      "name": "backdrops-mobile-library-error",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "Library request retries recover",
+      "pass": true
+    },
+    {
+      "name": "API quota prevents uploads when full",
+      "pass": true
+    },
+    {
+      "name": "backdrops-mobile-library-full",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "backdrops-mobile-library-empty",
+      "pass": true,
+      "overflow": 0
+    },
+    {
+      "name": "desktop upload dialog fits",
+      "pass": true
+    },
+    {
+      "name": "mobile upload dialog fits",
+      "pass": true
+    },
+    {
+      "name": "small-mobile upload dialog fits",
+      "pass": true
+    },
+    {
+      "name": "No runtime exceptions",
+      "pass": true,
+      "errors": []
+    }
+  ],
+  "fixtureOnly": true,
+  "apiWritesSentToServer": 0
+}

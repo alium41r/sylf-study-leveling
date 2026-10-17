@@ -42,18 +42,22 @@ describe("Appearance Settings Screen", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders with App Mode, Live HUD Preview, Accent Color, and Background Color sections", async () => {
+  it("renders with App Mode, Live preview, Accent Color, and Background Color sections", async () => {
     render(
       <SettingsProvider>
         <AppearanceSettingsScreen />
       </SettingsProvider>
     );
 
-    expect(screen.getByText("Appearance")).toBeDefined();
-    expect(screen.getByText("Live HUD Preview")).toBeDefined();
-    expect(screen.getByText("1. App Mode")).toBeDefined();
-    expect(screen.getByText("2. Accent Color")).toBeDefined();
-    expect(screen.getByText("3. Background Color")).toBeDefined();
+    expect(
+      screen.getByRole("heading", { name: "Appearance", level: 1 })
+    ).toBeDefined();
+    expect(
+      screen.getByRole("region", { name: "Appearance preview" })
+    ).toBeDefined();
+    expect(screen.getByText("App mode")).toBeDefined();
+    expect(screen.getByText("Accent Color")).toBeDefined();
+    expect(screen.getByText("Background Color")).toBeDefined();
     expect(screen.getByText(/Back to System Hub/i)).toBeDefined();
   });
 
@@ -65,15 +69,19 @@ describe("Appearance Settings Screen", () => {
     );
 
     // Accent Hex input should display #7C3AED (canonical resolved hex for cyberpunk)
-    const accentInput = screen.getByLabelText("Accent Color hex code") as HTMLInputElement;
+    const accentInput = screen.getByLabelText(
+      "Accent Color hex code"
+    ) as HTMLInputElement;
     expect(accentInput.value.toLowerCase()).toBe("#7c3aed");
 
     // Background Hex input should display #090D16 (canonical dark void)
-    const bgInput = screen.getByLabelText("Background Color hex code") as HTMLInputElement;
+    const bgInput = screen.getByLabelText(
+      "Background Color hex code"
+    ) as HTMLInputElement;
     expect(bgInput.value.toLowerCase()).toBe(DEFAULT_DARK_BG_HEX.toLowerCase());
   });
 
-  it("allows tweaking draft mode and applies upon clicking Save & Apply Changes", async () => {
+  it("allows tweaking draft mode and applies upon clicking Apply changes", async () => {
     const modeListener = vi.fn();
     window.addEventListener("mode-updated", modeListener);
 
@@ -87,12 +95,12 @@ describe("Appearance Settings Screen", () => {
     fireEvent.click(lightBtn);
 
     // Unsaved changes banner appears
-    expect(screen.getByText("Unsaved Appearance Changes")).toBeDefined();
+    expect(screen.getByText("Unsaved changes")).toBeDefined();
     // Has not committed to storage before clicking Save
     expect(localStorage.getItem("app_mode")).toBeNull();
 
-    // Click Save & Apply Changes
-    const saveBtn = screen.getByRole("button", { name: /save & apply changes/i });
+    // Click Apply changes
+    const saveBtn = screen.getByRole("button", { name: /apply changes/i });
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
@@ -122,13 +130,13 @@ describe("Appearance Settings Screen", () => {
     const bgInput = screen.getByLabelText("Background Color hex code");
     fireEvent.change(bgInput, { target: { value: "#000000" } });
 
-    expect(screen.getByText("Unsaved Appearance Changes")).toBeDefined();
+    expect(screen.getByText("Unsaved changes")).toBeDefined();
     // Not committed yet
     expect(localStorage.getItem("app_theme")).toBeNull();
     expect(localStorage.getItem("app_background")).toBeNull();
 
-    // Click Save & Apply Changes
-    const saveBtn = screen.getByRole("button", { name: /save & apply changes/i });
+    // Click Apply changes
+    const saveBtn = screen.getByRole("button", { name: /apply changes/i });
     fireEvent.click(saveBtn);
 
     await waitFor(() => {
@@ -166,7 +174,9 @@ describe("Appearance Settings Screen", () => {
       </SettingsProvider>
     );
 
-    const accentInput = screen.getByLabelText("Accent Color hex code") as HTMLInputElement;
+    const accentInput = screen.getByLabelText(
+      "Accent Color hex code"
+    ) as HTMLInputElement;
     fireEvent.change(accentInput, { target: { value: "#ef4444" } });
     expect(accentInput.value).toBe("#EF4444");
 
@@ -184,7 +194,9 @@ describe("Appearance Settings Screen", () => {
       </SettingsProvider>
     );
 
-    const accentInput = screen.getByLabelText("Accent Color hex code") as HTMLInputElement;
+    const accentInput = screen.getByLabelText(
+      "Accent Color hex code"
+    ) as HTMLInputElement;
     fireEvent.change(accentInput, { target: { value: "#ef4444" } });
 
     // Click Reset for Accent
@@ -192,5 +204,73 @@ describe("Appearance Settings Screen", () => {
     fireEvent.click(resetButtons[0]);
 
     expect(accentInput.value.toLowerCase()).toBe(DEFAULT_ACCENT_HEX);
+  });
+
+  it("keeps custom canvas colors when changing mode and supports keyboard color editing", () => {
+    render(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+    const background = screen.getByLabelText(
+      "Background Color hex code"
+    ) as HTMLInputElement;
+    fireEvent.change(background, { target: { value: "#123d3c" } });
+    fireEvent.click(screen.getByRole("button", { name: "Light" }));
+    expect(background.value.toLowerCase()).toBe("#123d3c");
+    expect(screen.queryByRole("slider")).toBeNull();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Custom Accent Color" })
+    );
+    const hue = screen.getByRole("slider", { name: "Accent Color hue slider" });
+    const before = hue.getAttribute("aria-valuenow");
+    fireEvent.keyDown(hue, { key: "ArrowRight", shiftKey: true });
+    expect(hue.getAttribute("aria-valuenow")).not.toBe(before);
+    expect(localStorage.getItem("app_theme")).toBeNull();
+  });
+
+  it("reverts invalid hex input on blur and receives preference changes from other tabs", () => {
+    render(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+    const accent = screen.getByLabelText(
+      "Accent Color hex code"
+    ) as HTMLInputElement;
+    fireEvent.change(accent, { target: { value: "#12" } });
+    fireEvent.blur(accent);
+    expect(accent.value.toLowerCase()).toBe("#7c3aed");
+    fireEvent(
+      window,
+      new StorageEvent("storage", { key: "app_theme", newValue: "#345678" })
+    );
+    expect(accent.value.toLowerCase()).toBe("#345678");
+    expect(screen.queryByText("Unsaved changes")).toBeNull();
+  });
+
+  it("reports failed account sync honestly and retries while retaining the local preference", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce({ ok: false } as Response);
+    render(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+    fireEvent.change(screen.getByLabelText("Accent Color hex code"), {
+      target: { value: "#123456" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /apply changes/i }));
+    await screen.findByText(/Applied on this device. Account sync failed/);
+    expect(localStorage.getItem("app_theme")).toBe("#123456");
+    expect(mockMutateUser).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /retry sync/i }));
+    await screen.findByText("Appearance saved");
+    expect(mockMutateUser).toHaveBeenCalledWith({
+      activeTheme: "#123456",
+      activeBackground: DEFAULT_DARK_BG_HEX,
+    });
+    expect(JSON.parse(localStorage.getItem("sylf_recent_accents")!)[0]).toBe(
+      "#123456"
+    );
   });
 });

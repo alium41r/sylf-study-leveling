@@ -65,9 +65,9 @@ export const FocusSessionBar = memo(function FocusSessionBar({
         className={styles.environment}
         onClick={onOpenBackgroundPicker}
         disabled={!onOpenBackgroundPicker}
-        aria-label={`Change Focus Environment: ${environment}`}
+        aria-label={`Change backdrop: ${environment}`}
         aria-haspopup="dialog"
-        title={`Change Focus Environment: ${environment} (Alt+B)`}
+        title={`Change backdrop: ${environment} (Alt+B)`}
       >
         <Compass size={14} aria-hidden="true" />
         <span className={styles.environmentName}>{environment}</span>

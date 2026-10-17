@@ -84,7 +84,7 @@ describe("Shared focus session bar", () => {
       expect(within(bar).getByText("FOCUS")).toBeInTheDocument();
       expect(within(bar).getByText("Pomodoro")).toBeInTheDocument();
       expect(within(bar).getByText("Study Session")).toBeInTheDocument();
-      fireEvent.click(within(bar).getByRole("button", { name: "Change Focus Environment: Sakura Lake" }));
+      fireEvent.click(within(bar).getByRole("button", { name: "Change backdrop: Sakura Lake" }));
       expect(onOpenBackgroundPicker).toHaveBeenCalledTimes(1);
     }
   );
@@ -100,7 +100,7 @@ describe("Shared focus session bar", () => {
     const bar = screen.getByRole("group", { name: "Focus session" });
     expect(within(bar).getByText("Paused")).toBeInTheDocument();
     expect(within(bar).getByText(props.questData!.title)).toHaveAttribute("title", `${props.questData!.title} · Physics`);
-    expect(within(bar).getByRole("button", { name: "Change Focus Environment: Classic Sylf" })).toBeDisabled();
+    expect(within(bar).getByRole("button", { name: "Change backdrop: Classic Sylf" })).toBeDisabled();
     rerender(<FocusTimerLayoutRouter {...props} isPaused={false} isBreak phase="short-break" phaseLabel="SHORT BREAK" />);
     expect(within(bar).getByText("SHORT BREAK")).toBeInTheDocument();
   });

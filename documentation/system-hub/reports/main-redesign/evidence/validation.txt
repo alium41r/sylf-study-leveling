@@ -1,0 +1,41 @@
+16 October 2026 — System Hub Main redesign
+All listed commands exited successfully.
+
+Focused regression tests
+npm notice run vitest --run __tests__/settings/main-pages.test.tsx __tests__/settings/system-hub-navigation.test.tsx __tests__/timer/study-modes-transitions.test.ts
+ Test Files  3 passed (3)
+      Tests  22 passed (22)
+   Duration  6.53s (transform 977ms, setup 721ms, import 2.47s, tests 3.96s, environment 4.82s)
+
+Mobile Modes route
+npm notice run vitest --run __tests__/mobile/settings-navigation.test.tsx -t renders ModesSettingsScreen
+ Test Files  1 passed (1)
+      Tests  1 passed | 17 skipped (18)
+   Duration  4.23s (transform 1.45s, setup 148ms, import 632ms, tests 1.53s, environment 1.39s)
+
+TypeScript
+npm notice run sylf@0.1.0 npx
+npm notice run 'tsc' --noEmit
+
+ESLint
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/settings/components/MainHubLayout.tsx app/settings/stats/components/StatsSettingsScreen.tsx app/settings/stats/components/CognitiveAttributes.tsx app/settings/rankings/components/RankingsSettingsScreen.tsx app/settings/modes/components/ModesSettingsScreen.tsx __tests__/settings/main-pages.test.tsx
+
+Production build
+npm notice run next build
+✓ Compiled successfully in 18.9s
+  Running TypeScript ...
+  Finished TypeScript in 52s ...
+  Generating static pages using 7 workers (0/89) ...
+  Generating static pages using 7 workers (22/89) 
+  Generating static pages using 7 workers (44/89) 
+  Generating static pages using 7 workers (66/89) 
+✓ Generating static pages using 7 workers (89/89) in 959ms
+
+Mobile build
+npm notice run vite build mobile
+✓ built in 5.33s
+
+Mobile bundle verification
+Mock Mode Status: FAIL-CLOSED (Mocks Disabled, Production-Ready)
+verify-mobile-bundle: PASSED. Zero server-only symbols or secrets found in mobile/dist.

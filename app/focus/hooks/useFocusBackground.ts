@@ -50,6 +50,8 @@ export interface UseFocusBackgroundReturn {
   activeCustomBackground: UserFocusBackgroundClient | null;
   customBackgrounds: UserFocusBackgroundClient[];
   isLoadingCustomBackgrounds: boolean;
+  customBackgroundQuota: { used: number; max: number } | null;
+  customBackgroundsError: string | null;
   isClassic: boolean;
   layoutKey: string;
 
@@ -94,6 +96,8 @@ export function useFocusBackground(): UseFocusBackgroundReturn {
   const [activeCustomBackground, setActiveCustomBackground] = useState<UserFocusBackgroundClient | null>(null);
   const [customBackgrounds, setCustomBackgrounds] = useState<UserFocusBackgroundClient[]>([]);
   const [isLoadingCustomBackgrounds, setIsLoadingCustomBackgrounds] = useState(false);
+  const [customBackgroundQuota, setCustomBackgroundQuota] = useState<{ used: number; max: number } | null>(null);
+  const [customBackgroundsError, setCustomBackgroundsError] = useState<string | null>(null);
   const [isClassic, setIsClassic] = useState(true);
 
   // Synchronous refs for race condition guards & background lifecycle
@@ -127,10 +131,13 @@ export function useFocusBackground(): UseFocusBackgroundReturn {
   const fetchCustomBackgroundsList = useCallback(async () => {
     if (!user) {
       setCustomBackgrounds([]);
+      setCustomBackgroundQuota(null);
+      setCustomBackgroundsError(null);
       return;
     }
 
     setIsLoadingCustomBackgrounds(true);
+    setCustomBackgroundsError(null);
     try {
       const res = await fetch("/api/user/focus-backgrounds", {
         method: "GET",
@@ -139,8 +146,12 @@ export function useFocusBackground(): UseFocusBackgroundReturn {
       if (res.ok) {
         const data = await res.json();
         setCustomBackgrounds(data.backgrounds || []);
+        setCustomBackgroundQuota(data.quota ?? null);
+      } else {
+        throw new Error("Your personal backdrops couldn’t be loaded.");
       }
     } catch (err) {
+      setCustomBackgroundsError(err instanceof Error ? err.message : "Your personal backdrops couldn’t be loaded.");
       console.warn("[useFocusBackground] Failed to fetch custom backgrounds:", err);
     } finally {
       setIsLoadingCustomBackgrounds(false);
@@ -744,6 +755,8 @@ export function useFocusBackground(): UseFocusBackgroundReturn {
     activeCustomBackground,
     customBackgrounds,
     isLoadingCustomBackgrounds,
+    customBackgroundQuota,
+    customBackgroundsError,
     isClassic,
     // Custom backgrounds map to their configured layoutKey (or "classic"); official uses category layoutKey
     layoutKey:

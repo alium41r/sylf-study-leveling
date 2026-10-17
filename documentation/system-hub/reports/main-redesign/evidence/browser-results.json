@@ -1,0 +1,280 @@
+{
+  "checks": 45,
+  "passed": 45,
+  "results": [
+    {
+      "name": "stats-desktop-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "rankings-desktop-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "modes-desktop-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "stats-tablet-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "rankings-tablet-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "modes-tablet-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "stats-mobile-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "rankings-mobile-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "modes-mobile-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "stats-small-mobile-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "rankings-small-mobile-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "modes-small-mobile-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#111715"
+    },
+    {
+      "name": "stats-light",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#ffffff"
+    },
+    {
+      "name": "rankings-light",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#ffffff"
+    },
+    {
+      "name": "modes-light",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#ffffff"
+    },
+    {
+      "name": "stats-custom-dark-in-light",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#123d3c"
+    },
+    {
+      "name": "rankings-custom-dark-in-light",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#123d3c"
+    },
+    {
+      "name": "modes-custom-dark-in-light",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#123d3c"
+    },
+    {
+      "name": "stats-custom-light-in-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "rankings-custom-light-in-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "modes-custom-light-in-dark",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "Sprint settings and activation persist",
+      "pass": true
+    },
+    {
+      "name": "Active mode survives reload",
+      "pass": true
+    },
+    {
+      "name": "modes-mobile-sprint",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "Free Flow has no unrelated controls",
+      "pass": true
+    },
+    {
+      "name": "modes-mobile-freeflow",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "modes-mobile-flowtime",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "7-day chart updates",
+      "pass": true
+    },
+    {
+      "name": "Session history expands",
+      "pass": true
+    },
+    {
+      "name": "Investment uses existing API payload",
+      "pass": true
+    },
+    {
+      "name": "stats-mobile-attributes",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "Weekly units retained",
+      "pass": true
+    },
+    {
+      "name": "rankings-mobile-friends",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "rankings-solo-friends",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "stats-mobile-empty",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "stats-mobile-error",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "Stats retries recover",
+      "pass": true
+    },
+    {
+      "name": "rankings-mobile-error",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "Rankings retries recover",
+      "pass": true
+    },
+    {
+      "name": "stats-mobile-loading",
+      "pass": true,
+      "overflow": 0,
+      "headingFont": "Inter, -apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "background": "#e6eadf"
+    },
+    {
+      "name": "Direct Main navigation works",
+      "pass": true
+    },
+    {
+      "name": "Back reopens System Hub",
+      "pass": true
+    },
+    {
+      "name": "Compact ranking decoration and sort fit 320",
+      "pass": true
+    },
+    {
+      "name": "Compact ranking decoration and sort fit 390",
+      "pass": true
+    },
+    {
+      "name": "Compact ranking decoration and sort fit 768",
+      "pass": true
+    }
+  ],
+  "apiWritesSentToServer": 0
+}

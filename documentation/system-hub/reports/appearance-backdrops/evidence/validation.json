@@ -1,0 +1,12 @@
+{
+  "focused_tests": true,
+  "mobile_routes": true,
+  "web_build": true,
+  "mobile_build": true,
+  "mobile_verify": true,
+  "typecheck": true,
+  "new_ui_lint_clean": true,
+  "main_preserved": true,
+  "calendar_unchanged": true,
+  "generated_mobile_outputs_restored": true
+}

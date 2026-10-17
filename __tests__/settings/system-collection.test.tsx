@@ -141,7 +141,7 @@ describe("Current System collection", () => {
       screen.queryByRole("heading", { name: "Scholar" })
     ).not.toBeInTheDocument();
     fireEvent.click(
-      within(index).getByRole("button", { name: /Focus backgrounds/ })
+      within(index).getByRole("button", { name: /Backdrops/ })
     );
     expect(
       screen.getByRole("heading", { name: "My study space" })

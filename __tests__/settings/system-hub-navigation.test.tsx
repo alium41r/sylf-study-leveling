@@ -171,7 +171,7 @@ describe("System Hub Navigation & SettingsContext", () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it("renders balanced Appearance category with Focus Environments wide tile", () => {
+  it("renders balanced Appearance category with Backdrops wide tile", () => {
     render(
       <SettingsProvider>
         <TestConsumer />
@@ -193,10 +193,10 @@ describe("System Hub Navigation & SettingsContext", () => {
     // Verify Appearance tiles
     expect(screen.getByText("Appearance")).toBeDefined();
     expect(screen.getByText("Calendar")).toBeDefined();
-    const focusEnvBtn = screen.getByText("Focus Environments");
+    const focusEnvBtn = screen.getByText("Backdrops");
     expect(focusEnvBtn).toBeDefined();
 
-    // Click Focus Environments
+    // Click Backdrops
     fireEvent.click(focusEnvBtn);
     expect(mockPush).toHaveBeenCalledWith("/settings/focus-backgrounds");
   });

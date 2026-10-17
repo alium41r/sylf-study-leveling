@@ -95,10 +95,10 @@ describe("Phase 1D-G: Canonical Settings & System Hub Family Navigation", () => 
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Appearance")).toBeDefined();
-      expect(screen.getByText("1. App Mode")).toBeDefined();
-      expect(screen.getByText("2. Accent Color")).toBeDefined();
-      expect(screen.getByText("3. Background Color")).toBeDefined();
+      expect(screen.getByRole("heading", { name: "Appearance", level: 1 })).toBeDefined();
+      expect(screen.getByText("App mode")).toBeDefined();
+      expect(screen.getByText("Accent Color")).toBeDefined();
+      expect(screen.getByText("Background Color")).toBeDefined();
       expect(screen.getByText(/Back to System Hub/i)).toBeDefined();
     }, { timeout: 8000 });
   });
@@ -115,10 +115,10 @@ describe("Phase 1D-G: Canonical Settings & System Hub Family Navigation", () => 
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Appearance")).toBeDefined();
-      expect(screen.getByText("1. App Mode")).toBeDefined();
-      expect(screen.getByText("2. Accent Color")).toBeDefined();
-      expect(screen.getByText("3. Background Color")).toBeDefined();
+      expect(screen.getByRole("heading", { name: "Appearance", level: 1 })).toBeDefined();
+      expect(screen.getByText("App mode")).toBeDefined();
+      expect(screen.getByText("Accent Color")).toBeDefined();
+      expect(screen.getByText("Background Color")).toBeDefined();
       expect(screen.getByText(/Back to System Hub/i)).toBeDefined();
     }, { timeout: 8000 });
   });
@@ -135,10 +135,10 @@ describe("Phase 1D-G: Canonical Settings & System Hub Family Navigation", () => 
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Appearance")).toBeDefined();
-      expect(screen.getByText("1. App Mode")).toBeDefined();
-      expect(screen.getByText("2. Accent Color")).toBeDefined();
-      expect(screen.getByText("3. Background Color")).toBeDefined();
+      expect(screen.getByRole("heading", { name: "Appearance", level: 1 })).toBeDefined();
+      expect(screen.getByText("App mode")).toBeDefined();
+      expect(screen.getByText("Accent Color")).toBeDefined();
+      expect(screen.getByText("Background Color")).toBeDefined();
       expect(screen.getByText(/Back to System Hub/i)).toBeDefined();
     }, { timeout: 8000 });
   });
@@ -172,9 +172,9 @@ describe("Phase 1D-G: Canonical Settings & System Hub Family Navigation", () => 
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Study Modes")).toBeDefined();
+      expect(screen.getByRole("heading", { name: "Modes", level: 1 })).toBeDefined();
       expect(screen.getByText("Free Flow")).toBeDefined();
-      expect(screen.getByText("Pomodoro")).toBeDefined();
+      expect(screen.getByRole("region", { name: "Pomodoro settings" })).toBeDefined();
     }, { timeout: 3000 });
   });
 
@@ -191,6 +191,21 @@ describe("Phase 1D-G: Canonical Settings & System Hub Family Navigation", () => 
 
     await waitFor(() => {
       expect(screen.getAllByText("Calendar Customization").length).toBeGreaterThan(0);
+    }, { timeout: 3000 });
+  });
+
+  it("renders Backdrops at the existing focus-backgrounds route", async () => {
+    window.location.hash = "#/settings/focus-backgrounds";
+    render(
+      <NavigationProvider initialPath="/settings/focus-backgrounds">
+        <SettingsProvider>
+          <MobileRouteOutlet />
+        </SettingsProvider>
+      </NavigationProvider>
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "Backdrops", level: 1 })).toBeDefined();
+      expect(screen.getByRole("navigation", { name: "System Hub Appearance" })).toBeDefined();
     }, { timeout: 3000 });
   });
 

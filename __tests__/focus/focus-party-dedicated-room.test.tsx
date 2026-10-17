@@ -452,7 +452,7 @@ describe("Unified Focus Party Focus Room — Background System & Timer Architect
 
       // Reuses FocusBackgroundPicker dialog
       expect(screen.getByRole("dialog")).toBeInTheDocument();
-      expect(screen.getByText("Focus Environment")).toBeInTheDocument();
+      expect(screen.getByText("Backdrops")).toBeInTheDocument();
       expect(screen.getByRole("tab", { name: /Classic Sylf/i })).toBeInTheDocument();
       expect(screen.getByRole("tab", { name: /My Backgrounds/i })).toBeInTheDocument();
     });

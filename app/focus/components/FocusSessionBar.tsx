@@ -2,6 +2,7 @@
 
 import { memo } from "react";
 import { Compass } from "lucide-react";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 import type { FocusTimerLayoutProps } from "./FocusTimerLayoutProps";
 import styles from "./FocusSessionBar.module.css";
 
@@ -72,6 +73,7 @@ export const FocusSessionBar = memo(function FocusSessionBar({
         <Compass size={14} aria-hidden="true" />
         <span className={styles.environmentName}>{environment}</span>
       </button>
+      <ImmersiveModeButton variant="focus-bar" />
     </div>
   );
 });

@@ -9,6 +9,7 @@ import UserAvatar from "./UserAvatar";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { useProfileModal } from "./ProfileModalContext";
+import { ImmersiveModeButton } from "./ImmersiveModeButton";
 import { lockPageScroll } from "../../lib/scroll-lock";
 import { MOTION_SPRING } from "../../lib/motion";
 
@@ -147,6 +148,8 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
       className="w-full flex items-center justify-between gap-2 px-3 md:hidden border-b border-border-subtle bg-background/80 backdrop-blur-md sticky top-0 z-30 shrink-0"
       style={{
         paddingTop: "env(safe-area-inset-top, 0px)",
+        paddingLeft: "max(0.75rem, env(safe-area-inset-left, 0px))",
+        paddingRight: "max(0.75rem, env(safe-area-inset-right, 0px))",
         height: "calc(3.5rem + env(safe-area-inset-top, 0px))",
       }}
     >
@@ -191,7 +194,7 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
         </button>
       </div>
 
-      {/* Right: quick status (streak / HP / Sylph) */}
+      {/* Right: quick status (streak / HP / Sylph) + immersive toggle */}
       <div className="flex items-center gap-1.5 shrink-0">
         <span
           className="flex items-center gap-1 px-2 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-500 text-[10px] font-['Rajdhani'] font-bold"
@@ -224,6 +227,8 @@ function MobileTopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
           </svg>
           <span>{sylph}</span>
         </span>
+
+        <ImmersiveModeButton variant="mobile-bar" />
       </div>
     </header>
   );

@@ -36,6 +36,9 @@ export function SylfAppShell({ children }: SylfAppShellProps) {
   const isStatic = isStaticViewportRoute(pathname);
   const isFocusScreen = pathname === "/focus" || pathname?.startsWith("/focus/");
 
+  const isSettingsScreen =
+    pathname === "/settings" || Boolean(pathname?.startsWith("/settings/"));
+
   // Lock <html> and <body> while on static viewport routes
   useEffect(() => {
     if (!isStatic) return;
@@ -54,7 +57,7 @@ export function SylfAppShell({ children }: SylfAppShellProps) {
       className={
         isStatic
           ? "h-[100dvh] max-h-[100dvh] w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-hidden overscroll-none"
-          : "min-h-screen w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-x-clip"
+          : "min-h-screen min-h-[100dvh] w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-x-clip"
       }
     >
       <SidebarWrapper />
@@ -65,8 +68,11 @@ export function SylfAppShell({ children }: SylfAppShellProps) {
             : "flex-1 w-full min-w-0 flex flex-col"
         }
         style={{
-          // Focus screen handles its own fullscreen padding; other static/normal pages respect safe area bottom
+          // Focus screen handles its own fullscreen padding; other static/normal pages respect safe area insets
+          paddingTop: isSettingsScreen ? "env(safe-area-inset-top, 0px)" : "0px",
           paddingBottom: isFocusScreen ? "0px" : "env(safe-area-inset-bottom, 0px)",
+          paddingLeft: isFocusScreen ? "0px" : "env(safe-area-inset-left, 0px)",
+          paddingRight: isFocusScreen ? "0px" : "env(safe-area-inset-right, 0px)",
         }}
       >
         {children}

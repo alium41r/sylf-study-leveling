@@ -447,7 +447,15 @@ export default function ModernChatPage({
     : otherParticipant?.name || otherParticipant?.username || "Scholar";
 
   return (
-    <div className="fixed inset-0 z-20 md:relative md:inset-auto md:z-auto flex flex-col w-full h-[100dvh] md:h-[calc(100dvh-2rem)] max-w-7xl mx-auto p-2 sm:px-6 sm:py-4 gap-2 sm:gap-3 overflow-hidden bg-background md:bg-transparent">
+    <div
+      className="fixed inset-0 z-20 md:relative md:inset-auto md:z-auto flex flex-col w-full h-[100dvh] md:h-[calc(100dvh-2rem)] max-w-7xl mx-auto p-2 sm:px-6 sm:py-4 gap-2 sm:gap-3 overflow-hidden bg-background md:bg-transparent"
+      style={{
+        paddingTop: "max(0.5rem, env(safe-area-inset-top, 0px))",
+        paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0px))",
+        paddingLeft: "max(0.5rem, env(safe-area-inset-left, 0px))",
+        paddingRight: "max(0.5rem, env(safe-area-inset-right, 0px))",
+      }}
+    >
       {/* Floating Error Toast */}
       {errorToast && (
         <div className="fixed top-4 right-4 z-50 p-3.5 rounded-xl bg-rose-950/90 border border-rose-500/50 text-rose-200 text-xs font-['Rajdhani'] flex items-center gap-2 shadow-2xl backdrop-blur-md animate-fade-in-down">

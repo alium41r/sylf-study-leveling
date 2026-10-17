@@ -80,7 +80,6 @@
   border: 0;
   border-left: 1px solid
     color-mix(in srgb, var(--text-primary) 12%, transparent);
-  border-radius: 0 999px 999px 0;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -88,6 +87,10 @@
   transition:
     background-color 150ms,
     color 150ms;
+}
+
+.environment:last-child {
+  border-radius: 0 999px 999px 0;
 }
 
 .environment svg {

@@ -31,6 +31,7 @@ import {
   Compass,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 import { useFocusParty } from "./FocusPartyContext";
 import { formatFocusTime } from "./focus-party-utils";
 import { useAuth } from "@/app/components/AuthProvider";
@@ -199,7 +200,14 @@ export function FocusPartyRoom() {
       />
 
       {/* ─── 1. Lightweight Minimal Header Bar (z-30) ────────────────────── */}
-      <header className="w-full px-4 sm:px-6 py-2.5 border-b border-border-subtle bg-white/95 dark:bg-bg-panel/95 backdrop-blur-md relative z-30 flex items-center justify-between min-h-[54px] shadow-sm">
+      <header
+        className="w-full px-4 sm:px-6 py-2.5 border-b border-border-subtle bg-white/95 dark:bg-bg-panel/95 backdrop-blur-md relative z-30 flex items-center justify-between min-h-[54px] shadow-sm"
+        style={{
+          paddingTop: "max(0.625rem, env(safe-area-inset-top, 0px))",
+          paddingLeft: "max(1rem, env(safe-area-inset-left, 0px))",
+          paddingRight: "max(1rem, env(safe-area-inset-right, 0px))",
+        }}
+      >
         {/* Left: Quiet Navigation Back to Lobby */}
         <div className="flex items-center z-10">
           <button
@@ -259,6 +267,8 @@ export function FocusPartyRoom() {
             <Compass className="w-3.5 h-3.5 text-accent-light" />
             <span className="hidden md:inline">{activeEnvName}</span>
           </button>
+
+          <ImmersiveModeButton variant="focus-party" />
 
           <button
             type="button"

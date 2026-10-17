@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Search, Info, X, Users, Shield, Circle } from "lucide-react";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 
 export interface ParticipantProfile {
   id: number;
@@ -200,6 +201,8 @@ export function ChatHeader({
           >
             <Info className="w-4 h-4" />
           </button>
+
+          <ImmersiveModeButton variant="chat-header" />
         </div>
       </div>
 

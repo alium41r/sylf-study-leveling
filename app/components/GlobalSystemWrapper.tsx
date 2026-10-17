@@ -213,6 +213,7 @@ import { PublicProfileModal } from "./PublicProfileModal";
 import { useAuth } from "./AuthProvider";
 import { SystemAIProvider } from "./system/SystemAIProvider";
 import { LevelUpProvider } from "./LevelUpProvider";
+import { ImmersiveModeProvider } from "./ImmersiveModeContext";
 import TimerSyncWorker from "./TimerSyncWorker";
 import {
   resolveLegacyTheme,
@@ -373,42 +374,44 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
 
   return (
     <MotionConfig reducedMotion="user">
-      <TimerSyncWorker />
-      <AcousticsProvider>
-        <CustomAudioProvider>
-        <SettingsProvider>
-          <ProfileModalProvider>
-            <SystemAIProvider>
-              {/* Wallpaper layer: in-flow, absolutely positioned against this
-                  relative wrapper so it spans the full document height and
-                  scrolls with the content — see applyGlobalBackground. */}
-              <LevelUpProvider>
-                <div className="relative isolate min-h-screen w-full">
-                  <div
-                    id="app-bg-layer"
-                    aria-hidden="true"
-                    style={{
-                      position: "fixed",
-                      inset: 0,
-                      zIndex: -10,
-                      pointerEvents: "none",
-                      transition: "background 0.3s ease",
-                    }}
-                  />
-                  {children}
-                </div>
-              </LevelUpProvider>
-            </SystemAIProvider>
-            <PublicProfileModal />
-            <AcousticsDynamicIsland />
-            <SessionInviteToast />
-            <SessionEndToast />
-            <TopRightBar />
-            <SettingsPanel />
-          </ProfileModalProvider>
-        </SettingsProvider>
-        </CustomAudioProvider>
-      </AcousticsProvider>
+      <ImmersiveModeProvider>
+        <TimerSyncWorker />
+        <AcousticsProvider>
+          <CustomAudioProvider>
+          <SettingsProvider>
+            <ProfileModalProvider>
+              <SystemAIProvider>
+                {/* Wallpaper layer: in-flow, absolutely positioned against this
+                    relative wrapper so it spans the full document height and
+                    scrolls with the content — see applyGlobalBackground. */}
+                <LevelUpProvider>
+                  <div className="relative isolate min-h-screen w-full">
+                    <div
+                      id="app-bg-layer"
+                      aria-hidden="true"
+                      style={{
+                        position: "fixed",
+                        inset: 0,
+                        zIndex: -10,
+                        pointerEvents: "none",
+                        transition: "background 0.3s ease",
+                      }}
+                    />
+                    {children}
+                  </div>
+                </LevelUpProvider>
+              </SystemAIProvider>
+              <PublicProfileModal />
+              <AcousticsDynamicIsland />
+              <SessionInviteToast />
+              <SessionEndToast />
+              <TopRightBar />
+              <SettingsPanel />
+            </ProfileModalProvider>
+          </SettingsProvider>
+          </CustomAudioProvider>
+        </AcousticsProvider>
+      </ImmersiveModeProvider>
     </MotionConfig>
   );
 }

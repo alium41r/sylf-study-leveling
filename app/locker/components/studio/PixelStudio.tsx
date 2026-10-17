@@ -14,6 +14,7 @@ import type { CharacterConfig } from '@/lib/character-traits';
 import { createDraft, creationToDraft, draftToCreation, newCreationId, STUDIO_TOOLS, ZOOM_LEVELS, addFrame, duplicateFrame, deleteFrame, moveFrame, choosePaintColor, usedColors, DEFAULT_PALETTE, paintCells, fillRegion, setFrameDuration, totalDurationMs, type Draft, type StudioTool, type CellPoint } from './pixel-studio-model';
 import { studioReducer, type StudioSnapshot } from './studio-history';
 import { EditorCanvas } from './EditorCanvas';
+import { ImmersiveModeButton } from '@/app/components/ImmersiveModeButton';
 import styles from './PixelStudio.module.css';
 export interface PixelStudioProps { characterConfig: CharacterConfig; onEquip: (patch: Partial<CharacterConfig>) => void | Promise<void>; saving?: boolean; onBack: () => void; creationId?: string | null; onSaved?: (id: string) => void }
 export type StoredCreation = StoredPixelCreation;
@@ -58,6 +59,12 @@ export function PixelStudio({ characterConfig, onEquip, onBack, creationId, onSa
  const recoveryKey = `pixel_studio:${user?.id}`;
  const [sessionEpoch] = useState(getClientSessionEpoch);
  const latestRecovery = useRef<{ dirty: boolean; pending: boolean; value: Recovery } | null>(null);
+ useEffect(() => {
+   window.document.documentElement.setAttribute('data-pixel-studio', 'true');
+   return () => {
+     window.document.documentElement.removeAttribute('data-pixel-studio');
+   };
+ }, []);
  useEffect(() => { latestRecovery.current = { dirty, pending: !!recovery, value: { document, revision, baseline, selected, displayBorder: border, pixelGap } }; }, [dirty, recovery, document, revision, baseline, selected, border, pixelGap]);
  useEffect(() => () => {
    const latest = latestRecovery.current;
@@ -220,6 +227,7 @@ export function PixelStudio({ characterConfig, onEquip, onBack, creationId, onSa
     <div className={styles.saveActions}>
      <button className={styles.button} aria-label="Save" title="Save drawing" disabled={!!busy} onClick={() => void save()}><Save size={16} /><span>Save</span></button>
      <button className={styles.primary} aria-label="Save & equip" title="Save and use this companion" disabled={!!busy || !occupied} onClick={() => void save(true)}><Check size={16} /><span>Save & equip</span></button>
+     <ImmersiveModeButton variant="header-pill" className="hidden md:inline-flex" />
     </div>
    </header>
 

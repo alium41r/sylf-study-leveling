@@ -38,6 +38,7 @@ import {
   Plus,
 } from "lucide-react";
 import { StreakFlameIcon } from "@/app/components/icons";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 
 const getRankColorStyles = (rank: string) => {
   switch (rank?.toUpperCase()) {
@@ -636,6 +637,8 @@ function SocialContent() {
               <UserPlus className="w-4 h-4" />
               <span>Add Friend</span>
             </button>
+
+            <ImmersiveModeButton variant="header-pill" className="hidden md:inline-flex" />
           </div>
         </div>
 

@@ -10,6 +10,7 @@ import { QuotaInfo } from "../../components/AiPlannerPanel";
 import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import { motion } from "framer-motion";
 import { SylvieIcon } from "@/app/components/icons";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 import { consumePlannerHandoff, discardPlannerHandoff, PLANNER_HANDOFF_EVENT } from "@/lib/ai/sylvie/planner-handoff-client";
 
@@ -414,6 +415,7 @@ export function SystemScreen() {
                   }`}
                 />
               </button>
+              <ImmersiveModeButton variant="header-pill" className="hidden md:inline-flex" />
             </div>
           </div>
         </header>

@@ -32,6 +32,7 @@ import {
   Eye,
   User,
 } from "lucide-react";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 import styles from "../Shop.module.css";
 
 // ─── Types ──────────────────────────────────────────────────────
@@ -518,6 +519,8 @@ export function ShopScreen() {
                 </span>
               </div>
             </div>
+
+            <ImmersiveModeButton variant="header-pill" className="hidden md:inline-flex" />
           </div>
         </div>
 

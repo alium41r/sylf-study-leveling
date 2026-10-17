@@ -741,7 +741,10 @@ function FocusContent() {
     ) {
       try {
         if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
+          document.documentElement.setAttribute("data-focus-autofullscreen", "true");
+          document.documentElement.requestFullscreen().catch(() => {
+            document.documentElement.removeAttribute("data-focus-autofullscreen");
+          });
         }
       } catch {
         // ignore if not allowed by browser
@@ -1262,7 +1265,13 @@ function FocusContent() {
       const cached = raw ? JSON.parse(raw) : null;
       if (cached?.ownerId === user?.id && cached.sessionId === sessionIdRef.current) localStorage.removeItem(legacyCacheKey);
     } catch { /* Legacy recovery data remains available. */ }
-    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    if (
+      document.fullscreenElement &&
+      document.documentElement.getAttribute("data-focus-autofullscreen") === "true"
+    ) {
+      document.documentElement.removeAttribute("data-focus-autofullscreen");
+      void document.exitFullscreen().catch(() => {});
+    }
     releaseLeadership(); announceSessionEnd(); if (navigator.onLine !== false) router.replace("/timer");
   };
   const handleEndSession = () => finishSession(false);

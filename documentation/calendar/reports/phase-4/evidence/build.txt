@@ -1,0 +1,209 @@
+npm notice run sylf@0.1.0 build
+npm notice run next build
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local, .env
+- Experiments (use with caution):
+  · optimizePackageImports
+  · proxyClientMaxBodySize: "13mb"
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 43s
+  Running TypeScript ...
+  Finished TypeScript in 47s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/90) ...
+  Generating static pages using 7 workers (22/90) 
+  Generating static pages using 7 workers (44/90) 
+  Generating static pages using 7 workers (67/90) 
+✓ Generating static pages using 7 workers (90/90) in 1150ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /admin/background-studio
+├ ƒ /api/achievements
+├ ƒ /api/acoustics
+├ ƒ /api/admin/focus-background-categories
+├ ƒ /api/admin/focus-background-categories/[id]
+├ ƒ /api/admin/focus-backgrounds
+├ ƒ /api/admin/focus-backgrounds/[id]
+├ ƒ /api/admin/focus-backgrounds/[id]/replace
+├ ƒ /api/admin/focus-backgrounds/reorder
+├ ƒ /api/admin/focus-backgrounds/upload
+├ ƒ /api/ai-costs
+├ ƒ /api/ai-planner
+├ ƒ /api/ai-usage
+├ ƒ /api/auth/callback/[provider]
+├ ƒ /api/auth/check-username
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/logout-all
+├ ƒ /api/auth/oauth/[provider]
+├ ƒ /api/auth/register
+├ ƒ /api/auth/verify-email/confirm
+├ ƒ /api/auth/verify-email/send
+├ ƒ /api/calendar/month
+├ ƒ /api/calendar/personal
+├ ƒ /api/calendar/preferences
+├ ƒ /api/calendar/reminders
+├ ƒ /api/chats
+├ ƒ /api/chats/[id]
+├ ƒ /api/cognitive-stats/invest
+├ ƒ /api/conversations
+├ ƒ /api/conversations/[id]
+├ ƒ /api/conversations/[id]/messages
+├ ƒ /api/conversations/[id]/messages/[messageId]
+├ ƒ /api/cosmetics
+├ ƒ /api/cron/daily-briefing
+├ ƒ /api/currency/stats
+├ ƒ /api/focus-backgrounds
+├ ƒ /api/focus-backgrounds/preference
+├ ƒ /api/focus-backgrounds/preference/refresh-signed-url
+├ ƒ /api/focus-party
+├ ƒ /api/focus-party/[id]
+├ ƒ /api/focus-party/[id]/invite
+├ ƒ /api/focus-party/[id]/join
+├ ƒ /api/focus-party/[id]/members/[memberId]
+├ ƒ /api/focus-party/[id]/session
+├ ƒ /api/focus-party/[id]/session/timer
+├ ƒ /api/focus-party/invites/[id]
+├ ƒ /api/friends
+├ ƒ /api/friends/[id]
+├ ƒ /api/friends/block
+├ ƒ /api/friends/remove
+├ ƒ /api/friends/requests
+├ ƒ /api/friends/requests/[id]
+├ ƒ /api/friends/unblock
+├ ƒ /api/goals
+├ ƒ /api/goals/[id]
+├ ƒ /api/goals/[id]/adjust
+├ ƒ /api/insights
+├ ƒ /api/inventory
+├ ƒ /api/inventory/equip
+├ ƒ /api/invites
+├ ƒ /api/invites/[id]
+├ ƒ /api/notifications
+├ ƒ /api/notifications/preferences
+├ ƒ /api/pixel-creations
+├ ƒ /api/planner
+├ ƒ /api/planner/[id]
+├ ƒ /api/planner/[id]/archive
+├ ƒ /api/planner/[id]/assistant
+├ ƒ /api/planner/[id]/check-result
+├ ƒ /api/planner/[id]/commit
+├ ƒ /api/planner/[id]/documents
+├ ƒ /api/planner/[id]/friction
+├ ƒ /api/planner/[id]/milestones/[itemKey]/expand
+├ ƒ /api/planner/[id]/operations/[key]
+├ ƒ /api/planner/[id]/preferences
+├ ƒ /api/planner/[id]/rebalance
+├ ƒ /api/planner/[id]/rebalance/confirm
+├ ƒ /api/planner/[id]/reoffer
+├ ƒ /api/planner/[id]/revisions
+├ ƒ /api/planner/[id]/stretch
+├ ƒ /api/planner/capabilities
+├ ƒ /api/planner/generate
+├ ƒ /api/planner/intake
+├ ƒ /api/planner/intake/[id]
+├ ƒ /api/planner/intake/[id]/action
+├ ƒ /api/planner/intake/[id]/copilot
+├ ƒ /api/planner/intake/[id]/copilot/apply
+├ ƒ /api/planner/intake/[id]/designer
+├ ƒ /api/planner/intake/[id]/import
+├ ƒ /api/planner/recover/[key]
+├ ƒ /api/profile/[username]
+├ ƒ /api/profile/customization
+├ ƒ /api/profile/stats
+├ ƒ /api/quests
+├ ƒ /api/quests/[id]
+├ ƒ /api/quests/check-deadlines
+├ ƒ /api/quests/evaluate-scope
+├ ƒ /api/quests/weekly
+├ ƒ /api/realtime/token
+├ ƒ /api/sessions
+├ ƒ /api/shop
+├ ƒ /api/shop/purchase
+├ ƒ /api/skills
+├ ƒ /api/skills/unlock
+├ ƒ /api/subjects
+├ ƒ /api/subjects/[id]
+├ ƒ /api/subjects/[id]/compile
+├ ƒ /api/subjects/[id]/forge-apex
+├ ƒ /api/subjects/[id]/nodes
+├ ƒ /api/subjects/[id]/restore
+├ ƒ /api/system-messages
+├ ƒ /api/system-messages/[id]/images/[index]
+├ ƒ /api/system-messages/chat
+├ ƒ /api/system-messages/legacy-images/[filename]
+├ ƒ /api/user/[username]
+├ ƒ /api/user/account
+├ ƒ /api/user/account/delete
+├ ƒ /api/user/connections
+├ ƒ /api/user/connections/[provider]
+├ ƒ /api/user/connections/[provider]/link
+├ ƒ /api/user/detailed-stats
+├ ƒ /api/user/focus-backgrounds
+├ ƒ /api/user/focus-backgrounds/[id]
+├ ƒ /api/user/heartbeat
+├ ƒ /api/user/onboarding
+├ ƒ /api/user/privacy
+├ ƒ /api/user/rankings
+├ ƒ /api/user/reset-progress
+├ ƒ /api/user/security
+├ ƒ /api/user/security/send-code
+├ ƒ /api/user/sessions
+├ ƒ /api/user/stats
+├ ƒ /api/user/study-schedule
+├ ƒ /api/user/study-schedule/floating-rest-day
+├ ƒ /api/users/search
+├ ƒ /api/waitlist
+├ ○ /calendar
+├ ○ /companion-prototype
+├ ○ /dashboard
+├ ○ /dashboard-design
+├ ƒ /dev/pixel-display
+├ ○ /focus
+├ ƒ /focus-party/[id]
+├ ƒ /focus-party/[id]/focus
+├ ○ /goals
+├ ○ /inventory
+├ ○ /locker
+├ ○ /login
+├ ○ /manifest.webmanifest
+├ ○ /onboarding
+├ ƒ /profile/[username]
+├ ○ /quests
+├ ○ /register
+├ ○ /settings
+├ ○ /settings/account
+├ ○ /settings/achievements
+├ ○ /settings/appearance
+├ ○ /settings/archive
+├ ○ /settings/backgrounds
+├ ○ /settings/badges
+├ ○ /settings/calendar
+├ ○ /settings/collection
+├ ○ /settings/focus-backgrounds
+├ ○ /settings/logout
+├ ○ /settings/modes
+├ ○ /settings/notifications
+├ ○ /settings/profile
+├ ○ /settings/rankings
+├ ○ /settings/stats
+├ ○ /settings/sync
+├ ○ /settings/themes
+├ ○ /shop
+├ ○ /social
+├ ƒ /social/chat/[conversationId]
+├ ○ /studio/backgrounds
+├ ○ /sylv-preview
+├ ○ /system
+└ ○ /timer
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

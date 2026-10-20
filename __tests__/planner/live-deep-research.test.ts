@@ -21,7 +21,7 @@ import { RESEARCH_DEPTH_BUDGETS } from "@/lib/planner/research/search/contracts"
  *
  * Opt-in, because it spends real quota and real money:
  *
- *     PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test-planner-postgres.mjs \
+ *     PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test/test-planner-postgres.mjs \
  *       __tests__/planner/live-deep-research.test.ts
  */
 

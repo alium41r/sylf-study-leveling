@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Keep the documented, secret-free template in version control.
+!.env.example
 
 # vercel
 .vercel
@@ -60,6 +62,14 @@ scratch/
 # CodeGraph local index (see codegraph.json)
 /.cg/
 
+# Local agent harness state and cached presets (not project source).
+/.dsh-presets/
+/.playwright-mcp/
+
+# Generated build output (rebuild with npm scripts; never commit).
+/dist/
+/mobile/dist/
+
 # Android / Capacitor native builds
 android/.gradle/
 android/build/
@@ -74,3 +84,6 @@ android/.idea/
 android/*.iml
 android/app/*.iml
 android/captures/
+
+# Reproducible optional handwriting worker/WASM assets.
+/public/calendar-recognition/

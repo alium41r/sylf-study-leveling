@@ -21,7 +21,10 @@ export default function CalendarScreen() {
     return (
       <div className={styles.calendarContainer}>
         <div className={styles.topGlow} aria-hidden="true" />
-        <div className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-20 text-center font-['Rajdhani'] text-lg" style={{ color: "var(--muted)" }}>
+        <div
+          className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 py-20 text-center font-['Rajdhani'] text-lg"
+          style={{ color: "var(--muted)" }}
+        >
           Loading Calendar...
         </div>
       </div>
@@ -33,9 +36,9 @@ export default function CalendarScreen() {
       {/* Ambient Starlight Canvas Glow (Synchronized Dark / Light Mode) */}
       <div className={styles.topGlow} aria-hidden="true" />
 
-      <div className="w-full min-w-0 max-w-6xl mx-auto px-4 sm:px-8 py-6 pb-20 relative z-10 animate-fade-in">
+      <div className="w-full min-w-0 max-w-[1600px] mx-auto px-4 sm:px-8 py-6 pb-20 relative z-10 animate-fade-in">
         {/* Page Heading */}
-        <div className="flex flex-col justify-between items-start mb-8 gap-2 mt-2 w-full min-w-0">
+        <div className="flex flex-col justify-between items-start mb-6 gap-2 mt-2 w-full min-w-0">
           <h1 className={styles.title}>
             <Calendar size={28} className="text-accent-primary shrink-0" />
             <span>Calendar</span>

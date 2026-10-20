@@ -1,0 +1,2 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' app/calendar/components app/components/Calendar/StudyCalendar.tsx app/api/calendar/personal/route.ts lib/calendar __tests__/calendar/personal-api.test.ts __tests__/calendar/personal-contracts.test.ts __tests__/calendar/personal-postgres.test.ts __tests__/calendar/personal-workspace.test.tsx scripts/test-calendar-postgres.mjs

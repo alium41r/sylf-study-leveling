@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-20T05:50:46.226583+00:00",
+  "hashes": {
+    "prisma/schema.prisma": "6b95778a5e4cec64e3c6d0c00730863ca3985c7f23f1bfb0daabd4ee30589dee",
+    "lib/prisma.ts": "f7fc7c4af54335a4cd185b75841cc10d3490732550b8b3d1ef5d8faf3f635dc4",
+    "app/components/Sidebar.tsx": "7c48c0fed8455cfdac92b4e4785f6db1d7d0ebe2b7cadd16602117379df3505f",
+    "app/components/SylfAppShell.tsx": "a6034c71a0d575bfbf52213396027a00e0a99661a01fb0e0ae2cf5406b0db694",
+    "mobile/src/components/MobileRouteOutlet.tsx": "08166ecd484d1917b340c841e03e115128339010b2ae94b1109abb16cb6a353a",
+    "public/sw.js": "2ff35f9fd2c5c5d0962bbd27c0ba2fb9c1781fd4df8941d604de993484e1209c",
+    ".env.example": "bc880e9f54d20cba9cd40410c64478fc1016c368b7ffba1315954f000a45433c",
+    "lib/notes/repository.ts": "7caced2477e2c7ef29fcb4949e53875a405c006c843ec384e0aa0369568a4ba9",
+    "lib/notes/blocknote-adapter.ts": "c1abea90ca7d3fb896fc2350fa176cccd596140a7390aa120ec7862fe3a9eb6c"
+  },
+  "scopeNote": "Captured during Phase 3 after the first repository cipher hook edit; the repository hash is an intermediate snapshot, not a clean Phase 2 baseline. Other listed integration files were captured before their Phase 3 edits. Historical Phase 2 evidence retains its own source hashes. This snapshot is not proof that unrelated working-tree files were clean."
+}

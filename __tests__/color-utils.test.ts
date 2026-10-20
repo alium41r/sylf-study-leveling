@@ -10,6 +10,8 @@ import {
   getRelativeLuminance,
   getContrastRatio,
   isDarkColor,
+  getSurfacePolarity,
+  getRecommendedModeForBackground,
   resolveLegacyTheme,
   resolveLegacyBackground,
   getAccentTokens,
@@ -19,6 +21,8 @@ import {
   DEFAULT_ACCENT_HEX,
   DEFAULT_DARK_BG_HEX,
   DEFAULT_LIGHT_BG_HEX,
+  LEGACY_THEME_FALLBACKS,
+  LEGACY_BG_FALLBACKS,
 } from "@/lib/color-utils";
 
 describe("color-utils", () => {
@@ -133,6 +137,7 @@ describe("color-utils", () => {
       expect(tokens["--accent-primary-dim"]).toContain("rgba(124, 58, 237,");
       expect(tokens["--accent-primary-mid"]).toContain("rgba(124, 58, 237,");
       expect(tokens["--accent-primary-dark"]).toBeDefined();
+      expect(tokens["--focus-ring"]).toMatch(/^rgba\(\d+,\s*\d+,\s*\d+,\s*[\d.]+\)$/);
     });
 
     it("generates adaptive background tokens with deterministic contrast", () => {
@@ -222,6 +227,86 @@ describe("color-utils", () => {
             const safeText = getSafeAccentText(accent, surface);
             const ratio = getContrastRatio(safeText, surface);
             expect(ratio).toBeGreaterThanOrEqual(4.5);
+          }
+        }
+      });
+
+      it("satisfies WCAG AA contrast across the full preset + custom extremes compatibility matrix", () => {
+        const allAccents = [
+          ...Object.values(LEGACY_THEME_FALLBACKS),
+          ...Object.keys(LEGACY_THEME_FALLBACKS),
+          "#2563eb",
+          "#64748b",
+          "#ffffff",
+          "#000000",
+          "#facc15",
+          "#00f0ff",
+          "#ff00aa",
+        ];
+        const allBackgrounds = [
+          ...Object.keys(LEGACY_BG_FALLBACKS),
+          "#000000",
+          "#090d16",
+          "#0a1224",
+          "#130d26",
+          "#061c17",
+          "#1c0a0a",
+          "#1A7775",
+          "#334155",
+          "#64748b",
+          "#94a3b8",
+          "#e2e8f0",
+          "#f8fafc",
+          "#ffffff",
+          "#f1f5f9",
+          "#fafaf9",
+          "#f0fdf4",
+          "#eff6ff",
+        ];
+        const modes = ["dark", "light"] as const;
+
+        for (const mode of modes) {
+          for (const bg of allBackgrounds) {
+            const bgTokens = getBackgroundTokens(bg, mode);
+            const surface1 = bgTokens["--surface-1"];
+            const surface2 = bgTokens["--surface-2"];
+
+            // Primary & secondary text must meet WCAG AA >= 4.5:1 on both surface-1 and surface-2
+            expect(getContrastRatio(bgTokens["--text-primary"], surface1)).toBeGreaterThanOrEqual(4.5);
+            expect(getContrastRatio(bgTokens["--text-primary"], surface2)).toBeGreaterThanOrEqual(4.5);
+            expect(getContrastRatio(bgTokens["--text-secondary"], surface1)).toBeGreaterThanOrEqual(4.5);
+
+            // Muted text must meet >= 3.0:1 on surface-1
+            expect(getContrastRatio(bgTokens["--text-muted"], surface1)).toBeGreaterThanOrEqual(3.0);
+
+            // Polarity and recommended mode must be consistent with canvas darkness
+            expect(bgTokens["--surface-polarity"]).toBe(
+              isDarkColor(bgTokens["--app-canvas"]) ? "dark" : "light"
+            );
+            expect(getSurfacePolarity(bgTokens["--app-canvas"], mode)).toBe(
+              bgTokens["--surface-polarity"]
+            );
+            expect(getRecommendedModeForBackground(bg, mode)).toBe(
+              bgTokens["--surface-polarity"]
+            );
+
+            for (const accent of allAccents) {
+              const accentTokens = getAccentTokens(accent, surface1);
+              const resolvedAccent = accentTokens["--accent-primary"];
+
+              // Button foreground must contrast >= 4.5:1 against accent fill
+              expect(
+                getContrastRatio(accentTokens["--accent-foreground"], resolvedAccent)
+              ).toBeGreaterThanOrEqual(4.5);
+
+              // Both --accent-text and --accent-text-light must contrast >= 4.5:1 against surface-1
+              expect(
+                getContrastRatio(accentTokens["--accent-text"], surface1)
+              ).toBeGreaterThanOrEqual(4.5);
+              expect(
+                getContrastRatio(accentTokens["--accent-text-light"], surface1)
+              ).toBeGreaterThanOrEqual(4.5);
+            }
           }
         }
       });

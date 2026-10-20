@@ -29,7 +29,7 @@ its findings describe the pre-consolidation application.
 | Authorized target-user descriptors | [pixel-companion-service](../../lib/pixel-companion-service.ts) |
 | Customizer and Hub | [identity](../../app/locker/components/identity/) |
 | Drawing/history/timeline/recovery | [Studio](../../app/locker/components/studio/) |
-| Database integration | [disposable harness](../../scripts/test-pixel-postgres.mjs) |
+| Database integration | [disposable harness](../../scripts/test/test-pixel-postgres.mjs) |
 | Regressions/boundaries | [Pixel tests](../../__tests__/pixel-display/), [dashboard tests](../../__tests__/dashboard/), `npm run typecheck:engine` |
 
 Use explicit target-user descriptors on foreign-user surfaces. Never substitute
@@ -54,6 +54,8 @@ of both built-in characters, empty-display onboarding, selection behavior and QA
 tests and the current contract resolve discrepancies.
 
 The older [layered PNG contract](../pixel-companion/README.md) is historical.
+The [pre-implementation product vision](archive/sylf-pixel-display-vision.md) is
+retained as design history; the current contract supersedes it.
 The [landing companion contract](../landing-companion/README.md) remains a separate
 active system. Keep reports/evidence under `reports/<task-or-phase>/`; preserve
 historical writer paths rather than revising old measurements.

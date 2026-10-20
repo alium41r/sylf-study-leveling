@@ -1,0 +1,823 @@
+.quickAdd {
+  margin: 18px 0 6px;
+}
+.quickAdd form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 15px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-1);
+  color: var(--text-secondary);
+}
+.quickAdd input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  padding: 10px 0;
+  font-size: 13px;
+  outline: none;
+}
+.quickAdd form:focus-within {
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 2px var(--accent-primary-dim);
+}
+.quickAdd button {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 9px;
+  background: var(--accent-primary);
+  color: var(--accent-foreground);
+  cursor: pointer;
+}
+.quickAdd button:disabled {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: default;
+}
+.quickAdd p,
+.hint {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.scope,
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 8px 0;
+}
+.scope {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.scope label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.scope select,
+.recurrence select,
+.advancedFields select {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 9px;
+  border-radius: 8px;
+  max-width: 100%;
+  font: inherit;
+}
+.advancedDisclosure {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  width: 100%;
+  border-top: 1px solid var(--border-subtle);
+  padding: 16px 0 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+}
+.advancedDisclosure[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+.advancedFields {
+  display: grid;
+  gap: 18px;
+  padding: 12px 0 0;
+}
+.recurrence,
+.reminders {
+  display: grid;
+  gap: 12px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.recurrence legend,
+.reminders legend,
+.colorChoices legend {
+  font-size: 12px;
+  font-weight: 600;
+  padding-bottom: 8px;
+}
+.recurrence > label,
+.reminders > div,
+.reminders label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+}
+.recurrence input,
+.reminders input {
+  max-width: 170px;
+  padding: 9px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  background: var(--surface-1);
+  font: inherit;
+}
+.recurrence input[type="number"],
+.reminders input {
+  width: 80px;
+}
+.weekdays {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.weekdays button {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+}
+.weekdays button[aria-pressed="true"] {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
+  background: var(--accent-primary-dim);
+}
+.colorChoices {
+  border: 0;
+  display: flex;
+  gap: 10px;
+  padding: 0;
+}
+.colorChoices button {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--surface-1);
+  outline: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.colorChoices button svg {
+  stroke: var(--surface-1);
+  stroke-width: 3;
+}
+.colorChoices button[aria-pressed="true"] {
+  outline: 2px solid var(--text-primary);
+}
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  background: var(--surface-2);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.confirm p {
+  flex-basis: 100%;
+}
+.settingsBody {
+  display: grid;
+  gap: 20px;
+  padding: 8px 0 22px;
+}
+.settingsBody h3 {
+  font-size: 14px;
+  font-weight: 650;
+}
+.settingsBody p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 8px 0 12px;
+}
+.settingsBody section > a {
+  margin-top: 8px;
+}
+.advancedDisclosure small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 400;
+}
+.settingRow {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+}
+.settingRow strong {
+  display: block;
+  font-size: 13px;
+}
+.settingRow small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+.settingRow input {
+  appearance: none;
+  flex-shrink: 0;
+  width: 36px;
+  height: 22px;
+  padding: 2px;
+  border-radius: 30px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-3);
+  cursor: pointer;
+}
+.settingRow input::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: transform 150ms ease;
+}
+.settingRow input:checked {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+.settingRow input:checked::after {
+  background: var(--accent-foreground);
+  transform: translateX(13px);
+}
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px 0;
+}
+.filters button,
+.filters select {
+  padding: 7px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+}
+.filters button[aria-pressed="true"] {
+  color: var(--accent-text);
+  border-color: color-mix(
+    in srgb,
+    var(--accent-text) 35%,
+    var(--border-subtle)
+  );
+  background: var(--accent-primary-dim);
+}
+.workload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  margin: 10px 0 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.workload strong {
+  color: var(--text-primary);
+}
+.workload progress {
+  height: 4px;
+  width: 70px;
+  accent-color: var(--accent-primary);
+}
+.workload button {
+  color: var(--accent-text);
+  cursor: pointer;
+}
+.timeline {
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--surface-1);
+  margin-bottom: 18px;
+}
+.timelineIntro {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.timelineIntro span {
+  font-weight: 600;
+  font-size: 13px;
+}
+.timelineIntro small,
+.timelineFoot {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+.timeScroll {
+  max-height: 660px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  position: relative;
+}
+.timeGrid {
+  min-width: calc(48px + var(--day-count) * 128px);
+}
+.timeHeader {
+  display: grid;
+  grid-template-columns: 48px repeat(var(--day-count), minmax(0, 1fr));
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.timeDayHeader {
+  border-left: 1px solid var(--border-subtle);
+  min-width: 0;
+  padding: 10px 7px;
+}
+.timeDayHeader[data-selected="true"] {
+  background: color-mix(in srgb, var(--accent-primary) 5%, var(--surface-1));
+}
+.timeDayHeader > button {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.timeDayHeader b {
+  font-size: 18px;
+  color: var(--text-primary);
+}
+.timeDayHeader > small {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+.allDayEvents {
+  max-height: 100px;
+  overflow: auto;
+  display: grid;
+  gap: 3px;
+  margin-top: 6px;
+}
+.allDayEvents button {
+  text-align: left;
+  font-size: 11px;
+  padding: 4px 6px;
+  border-left: 2px solid;
+  border-radius: 4px;
+  background: var(--surface-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.allDayEvents small {
+  font-size: 9px;
+  color: var(--text-secondary);
+  margin-left: 4px;
+}
+.timeBody {
+  display: grid;
+  grid-template-columns: 48px repeat(var(--day-count), minmax(0, 1fr));
+  height: 1440px;
+}
+.hourLabels {
+  position: relative;
+  background: var(--surface-1);
+  z-index: 3;
+}
+.hourLabels span {
+  position: absolute;
+  left: 5px;
+  font-size: 9px;
+  color: var(--text-secondary);
+  transform: translateY(2px);
+}
+.timeColumn {
+  position: relative;
+  border-left: 1px solid var(--border-subtle);
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 59px,
+    var(--border-subtle) 59px,
+    var(--border-subtle) 60px
+  );
+}
+.timeSlot {
+  display: block;
+  width: 100%;
+  height: 30px;
+  background: transparent;
+  cursor: crosshair;
+  border: 0;
+}
+.timeSlot:hover {
+  background: var(--accent-primary-dim);
+}
+.timeEvent {
+  position: absolute;
+  border-left: 3px solid var(--event-color);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--event-color) 12%, var(--surface-1));
+  z-index: 4;
+  min-height: 22px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+.timeEvent[data-overlap="true"] {
+  outline: 1px solid
+    color-mix(in srgb, var(--event-color) 28%, var(--border-subtle));
+}
+.timeEvent[data-dragging="true"] {
+  z-index: 7;
+  box-shadow: 0 8px 24px
+    color-mix(in srgb, var(--text-primary) 20%, transparent);
+  opacity: 0.88;
+}
+.timeEventContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 2px;
+  padding: 5px 20px 6px 6px;
+  overflow: hidden;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.timeEventContent strong {
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  font-weight: 600;
+}
+.timeEventContent small {
+  font-size: 9px;
+  display: flex;
+  gap: 4px;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+.moveHandle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  min-height: 22px;
+  height: min(100%, 38px);
+  width: 22px;
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  cursor: grab;
+  touch-action: none;
+}
+.moveHandle:active {
+  cursor: grabbing;
+}
+.resizeHandle {
+  position: absolute;
+  bottom: -3px;
+  height: 10px;
+  left: 22px;
+  right: 22px;
+  cursor: ns-resize;
+  touch-action: none;
+  z-index: 5;
+}
+.resizeHandle::after {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 4px;
+  background: var(--text-secondary);
+  opacity: 0.5;
+  margin: 4px auto;
+}
+.nowLine {
+  position: absolute;
+  height: 1px;
+  background: var(--accent-text);
+  left: 0;
+  right: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+.nowLine::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-text);
+}
+.timelineFoot {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
+  line-height: 1.6;
+}
+.reminderToast {
+  position: fixed;
+  z-index: 1000;
+  right: 20px;
+  bottom: 24px;
+  display: flex;
+  gap: 12px;
+  max-width: min(400px, calc(100vw - 32px));
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 12px 50px
+    color-mix(in srgb, var(--text-primary) 18%, transparent);
+  font-size: 13px;
+}
+.reminderToast > svg {
+  color: var(--accent-text);
+  flex-shrink: 0;
+}
+.reminderToast p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 5px 0;
+}
+.reminderToast a {
+  font-size: 12px;
+  color: var(--accent-text);
+  text-decoration: underline;
+}
+.reminderToast button {
+  align-self: flex-start;
+  padding: 3px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+  .settingRow input::after {
+    transition: none;
+  }
+}
+@media (max-width: 600px) {
+  .timeScroll {
+    max-height: 600px;
+  }
+  .timelineIntro small {
+    font-size: 10px;
+  }
+  .moveHandle {
+    width: 26px;
+  }
+  .timeEventContent {
+    padding-right: 26px;
+  }
+  .quickAdd input {
+    font-size: 12px;
+  }
+}
+.studyRecord {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.studyRecord strong {
+  display: block;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.studyRecord small {
+  display: block;
+  margin-top: 3px;
+}
+.recordedBlock {
+  position: absolute;
+  left: 2px;
+  right: 4px;
+  pointer-events: none;
+  border: 1px dashed var(--border-subtle);
+  background: repeating-linear-gradient(
+    135deg,
+    var(--surface-2),
+    var(--surface-2) 3px,
+    var(--surface-1) 3px,
+    var(--surface-1) 7px
+  );
+  z-index: 2;
+  color: var(--text-secondary);
+  overflow: hidden;
+  font-size: 9px;
+  padding: 3px;
+}
+.recordedBlock span {
+  background: var(--surface-1);
+}
+.monthHandle {
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  min-height: 24px;
+  margin: -3px -4px -3px auto;
+  color: var(--text-secondary);
+  touch-action: none;
+  cursor: grab;
+}
+.repeatTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+.quickAdd input:focus-visible {
+  outline: none;
+}
+.filters button[aria-pressed="true"],
+.weekdays button[aria-pressed="true"] {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.connectionSection {
+  min-width: 0;
+}
+.connectionSection strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.connectionBody {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+.connectionActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.connectionAccount {
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-2);
+  border-radius: 16px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.connectionHeading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.connectionHeading > span,
+.connectionCalendar label > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.connectionHeading small,
+.connectionCalendar small {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.connectionCalendar {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
+}
+.connectionCalendar label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.connectionCalendar input {
+  accent-color: var(--accent-primary);
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+}
+.planningChoice {
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding-left: 27px;
+}
+.connectionFeed {
+  display: grid;
+  gap: 12px;
+}
+
+.connectionAccount > button {
+  color: var(--text-primary);
+}
+
+.sharedCreate,
+.sharedInvite,
+.sharedMember {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.sharedCreate > label,
+.sharedInvite > label:first-child {
+  flex: 1;
+  min-width: 160px;
+}
+.sharedMember {
+  align-items: center;
+}
+.sharedMember > span {
+  flex: 1;
+  min-width: 100px;
+  overflow-wrap: anywhere;
+}
+.sharedMember small {
+  display: block;
+  color: var(--text-secondary);
+}
+.sharedMember select,
+.sharedCreate > input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  color: var(--text-primary);
+}
+.noteResults {
+  display: grid;
+  gap: 10px;
+  max-height: 50dvh;
+  overflow: auto;
+}
+.noteResult {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  text-align: left;
+}
+.noteResult > span {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.noteResult small,
+.noteResult > span > span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}

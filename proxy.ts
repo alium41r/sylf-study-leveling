@@ -65,6 +65,8 @@ export async function proxy(request: NextRequest) {
   // Prelaunch exposes only the landing page, including for existing sessions.
   // Preserve API handlers (especially /api/waitlist) and public/Next assets.
   const isResourceRequest =
+    pathname === "/notes-offline.html" ||
+    pathname.startsWith("/notes-licenses/") ||
     pathname === "/api" ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||

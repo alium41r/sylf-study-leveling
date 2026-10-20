@@ -24,6 +24,7 @@ function serverGuardPlugin(): Plugin {
     /\/lib\/ai\/orchestrator/,
     /\/lib\/ai\/syllabus-compiler/,
     /(?:@|\.)?\/lib\/planner\/server\//,
+    /(?:@|\.)?\/lib\/notes\/server\//,
     /bcryptjs/,
     /server-only/,
   ];

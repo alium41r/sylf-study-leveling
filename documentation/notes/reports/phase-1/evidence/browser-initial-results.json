@@ -1,0 +1,328 @@
+{
+  "browser": "151.0.7922.34",
+  "platform": "darwin",
+  "runtime": "v24.19.0",
+  "results": [
+    {
+      "name": "browser capability and real OPFS write/read",
+      "pass": true,
+      "elapsedMs": 15.97566699999993,
+      "detail": {
+        "indexedDB": true,
+        "estimate": {
+          "quota": 2147491311,
+          "usage": 7663,
+          "usageDetails": {
+            "indexedDB": 7663
+          }
+        },
+        "opfs": true,
+        "persisted": false,
+        "locks": true,
+        "coalesced": true,
+        "opfsRead": true
+      }
+    },
+    {
+      "name": "real BlockNote peer edits merge through Yjs",
+      "pass": true,
+      "elapsedMs": 14.66858400000001,
+      "detail": {
+        "blocks": 3
+      }
+    },
+    {
+      "name": "keyboard formatting and Unicode insertion",
+      "pass": true,
+      "elapsedMs": 254.38495799999987,
+      "detail": {
+        "unicode": true,
+        "bold": true,
+        "realOSIME": false
+      }
+    },
+    {
+      "name": "real IndexedDB reload recovery",
+      "pass": true,
+      "elapsedMs": 72.63820899999996,
+      "detail": {
+        "restoredBlocks": 3
+      }
+    },
+    {
+      "name": "PDF.js worker renders and extracts text",
+      "pass": false,
+      "error": "page.evaluate: TypeError: e.destroy is not a function\n    at Object.pdfProbe (http://127.0.0.1:4387/assets/index-Ckb-VfeI.js:241:102509)\n    at async <anonymous>:337:30\n    at /private/tmp/sylf-notes-phase1/browser-tests.mjs:29:26\n    at check (/private/tmp/sylf-notes-phase1/browser-tests.mjs:10:84)\n    at /private/tmp/sylf-notes-phase1/browser-tests.mjs:28:7",
+      "elapsedMs": 167.45291700000007
+    },
+    {
+      "name": "ink geometry timings",
+      "pass": true,
+      "elapsedMs": 13.274667000000136,
+      "detail": {
+        "samples": [
+          1.1000001430511475,
+          0.5,
+          0.2999999523162842,
+          0.09999990463256836,
+          0.20000004768371582,
+          0.09999990463256836,
+          0.09999990463256836,
+          0.3000001907348633,
+          0.09999990463256836,
+          0.20000004768371582,
+          0.20000004768371582,
+          0.09999990463256836,
+          0.20000004768371582,
+          0.09999990463256836,
+          0.20000004768371582,
+          0.5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0,
+          0.20000004768371582,
+          0,
+          0,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0,
+          0,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.2999999523162842,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0,
+          0,
+          0.10000014305114746,
+          0,
+          0,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0,
+          0,
+          0.09999990463256836,
+          0,
+          0,
+          0,
+          0.09999990463256836,
+          0,
+          0.20000004768371582
+        ],
+        "total": 11.400000095367432,
+        "pointsPerStroke": 256,
+        "iterations": 100
+      }
+    },
+    {
+      "name": "10,000 entry IndexedDB catalog paging",
+      "pass": true,
+      "elapsedMs": 418.13641600000005,
+      "detail": {
+        "count": 10000,
+        "pageSize": 30,
+        "samples": [
+          0.5999999046325684,
+          2.4000000953674316,
+          1,
+          1,
+          1.2000000476837158,
+          1,
+          1.1999998092651367,
+          1.1000001430511475,
+          1.0999999046325684,
+          1.2999999523162842,
+          1.2000000476837158,
+          1.2000000476837158,
+          1.5,
+          1.2999999523162842,
+          1.2999999523162842,
+          1.2000000476837158,
+          1.1000001430511475,
+          1.1999998092651367,
+          1.3000001907348633,
+          1.1999998092651367,
+          1.3000001907348633,
+          1.1999998092651367,
+          1.3000001907348633,
+          1.2999999523162842,
+          1.2999999523162842,
+          1.2999999523162842,
+          1.2999999523162842,
+          1.4000000953674316,
+          1.2999999523162842,
+          1.4000000953674316,
+          1.2999999523162842,
+          1.4000000953674316,
+          1.2999999523162842,
+          1.5,
+          1.3999998569488525,
+          1.5,
+          1.4000000953674316,
+          1.5,
+          1.5,
+          1.5,
+          1.5,
+          1.5,
+          1.5999999046325684,
+          1.5,
+          1.6000001430511475,
+          1.5999999046325684,
+          1.6000001430511475,
+          1.5999999046325684,
+          1.7000000476837158,
+          1.7000000476837158
+        ]
+      }
+    },
+    {
+      "name": "appearance desktop-light",
+      "pass": true,
+      "elapsedMs": 79.78020900000001,
+      "detail": {
+        "theme": {
+          "surface": "#ffffff",
+          "text": "#0f172a",
+          "contrast": 17.85253496299567
+        },
+        "layout": {
+          "viewport": 1440,
+          "scrollWidth": 1440,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "appearance desktop-dark",
+      "pass": true,
+      "elapsedMs": 62.76570899999979,
+      "detail": {
+        "theme": {
+          "surface": "#121212",
+          "text": "#e2e8f0",
+          "contrast": 15.196256986079039
+        },
+        "layout": {
+          "viewport": 1440,
+          "scrollWidth": 1440,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "appearance tablet-custom-light",
+      "pass": true,
+      "elapsedMs": 59.21158299999979,
+      "detail": {
+        "theme": {
+          "surface": "#ffffff",
+          "text": "#0f172a",
+          "contrast": 17.85253496299567
+        },
+        "layout": {
+          "viewport": 820,
+          "scrollWidth": 820,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "appearance phone-custom-dark",
+      "pass": true,
+      "elapsedMs": 46.781167000000096,
+      "detail": {
+        "theme": {
+          "surface": "#0e171b",
+          "text": "#e2e8f0",
+          "contrast": 14.722391063592934
+        },
+        "layout": {
+          "viewport": 390,
+          "scrollWidth": 390,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "generic static shell precache excludes authenticated APIs",
+      "pass": true,
+      "elapsedMs": 171.42458299999998,
+      "detail": {
+        "controlled": true,
+        "apiCached": false
+      }
+    },
+    {
+      "name": "offline edit and offline cold reload in isolated shell",
+      "pass": false,
+      "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at /private/tmp/sylf-notes-phase1/browser-tests.mjs:54:33\n    at async check (/private/tmp/sylf-notes-phase1/browser-tests.mjs:10:78)\n    at async file:///private/tmp/sylf-notes-phase1/browser-tests.mjs:51:1",
+      "elapsedMs": 30019.449708
+    },
+    {
+      "name": "real transaction rollback leaves no partial outbox",
+      "pass": false,
+      "error": "page.evaluate: TypeError: Cannot read properties of undefined (reading 'db')\n    at eval (eval at evaluate (:311:30), <anonymous>:1:33)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at /private/tmp/sylf-notes-phase1/browser-tests.mjs:59:26\n    at async check (/private/tmp/sylf-notes-phase1/browser-tests.mjs:10:78)\n    at async file:///private/tmp/sylf-notes-phase1/browser-tests.mjs:56:1",
+      "elapsedMs": 7.19958399999814
+    },
+    {
+      "name": "production Next.js client-only load without hydration error",
+      "pass": false,
+      "error": "page.goto: net::ERR_INTERNET_DISCONNECTED at http://127.0.0.1:4388/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4388/\", waiting until \"load\"\u001b[22m\n\n    at /private/tmp/sylf-notes-phase1/browser-tests.mjs:64:17\n    at async check (/private/tmp/sylf-notes-phase1/browser-tests.mjs:10:78)\n    at async file:///private/tmp/sylf-notes-phase1/browser-tests.mjs:62:1",
+      "elapsedMs": 57.61112499999945
+    }
+  ],
+  "pageErrors": []
+}

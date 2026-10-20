@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "browser": "151.0.7922.34",
+  "scope": "synthetic BlockNote journal and binary archive; not production import implementation",
+  "archiveBytes": 3849,
+  "archiveSha256": "a3dd15f49af80140326e45464e2d15aba50084d4840d14bcf56c21b31d5fc5d6",
+  "sourceUpdateCount": 4,
+  "normalizedRichTextRestored": true,
+  "assetBytesHashVerified": true,
+  "freshBrowserProfile": true,
+  "postImportSameLineageBranchesMerged": true,
+  "pageErrors": []
+}

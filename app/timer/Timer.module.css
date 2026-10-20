@@ -17,14 +17,14 @@
   --accent-mid: var(--accent-primary-mid, rgba(134, 170, 244, 0.32));
   --line: var(--border-strong, #263247);
   --subtle-line: var(--border-subtle, #1a2435);
-  --gold: #d9b67b;
-  --gold-dim: rgba(217, 182, 123, 0.12);
+  --gold: var(--status-gold, #d9b67b);
+  --gold-dim: var(--status-gold-dim, rgba(217, 182, 123, 0.12));
   --gold-border: rgba(217, 182, 123, 0.32);
-  --green: #a4d5bb;
-  --green-dim: rgba(164, 213, 187, 0.12);
+  --green: var(--status-green, #a4d5bb);
+  --green-dim: var(--status-green-dim, rgba(164, 213, 187, 0.12));
   --green-border: rgba(164, 213, 187, 0.32);
-  --red: #e07a7a;
-  --red-dim: rgba(224, 122, 122, 0.12);
+  --red: var(--status-red, #e07a7a);
+  --red-dim: var(--status-red-dim, rgba(224, 122, 122, 0.12));
   --red-border: rgba(224, 122, 122, 0.32);
 
   position: relative;
@@ -40,8 +40,8 @@
   container-type: inline-size;
 }
 
-:global(html[data-mode="light"]) .timerContainer,
-:global(html[data-mode="light"]) .modalOverlay {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .timerContainer,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .modalOverlay {
   --page: var(--app-canvas, #f1f4fa);
   --surface: var(--surface-1, #ffffff);
   --elevated: var(--surface-2, #e5ebf5);
@@ -54,14 +54,14 @@
   --accent-mid: var(--accent-primary-mid, rgba(57, 93, 159, 0.28));
   --line: var(--border-strong, #bdcbe0);
   --subtle-line: var(--border-subtle, #d6dfed);
-  --gold: #8a642f;
-  --gold-dim: rgba(138, 100, 47, 0.1);
+  --gold: var(--status-gold, #8a642f);
+  --gold-dim: var(--status-gold-dim, rgba(138, 100, 47, 0.1));
   --gold-border: rgba(138, 100, 47, 0.28);
-  --green: #2d6a4f;
-  --green-dim: rgba(45, 106, 79, 0.1);
+  --green: var(--status-green, #2d6a4f);
+  --green-dim: var(--status-green-dim, rgba(45, 106, 79, 0.1));
   --green-border: rgba(45, 106, 79, 0.28);
-  --red: #b91c1c;
-  --red-dim: rgba(185, 28, 28, 0.1);
+  --red: var(--status-red, #b91c1c);
+  --red-dim: var(--status-red-dim, rgba(185, 28, 28, 0.1));
   --red-border: rgba(185, 28, 28, 0.28);
   color-scheme: light;
 }
@@ -92,13 +92,13 @@
   mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
 }
 
-:global(html[data-mode="light"]) .topGlow {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow {
   background:
     radial-gradient(ellipse 60% 35% at 50% -5%, rgba(180, 200, 235, 0.15), transparent 70%),
     radial-gradient(ellipse 40% 25% at 85% 10%, rgba(195, 215, 245, 0.1), transparent 70%);
 }
 
-:global(html[data-mode="light"]) .topGlow::before {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow::before {
   opacity: 0.08;
 }
 
@@ -195,7 +195,7 @@
   border-color: var(--line);
 }
 
-:global(html[data-mode="light"]) .card {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .card {
   border-color: var(--subtle-line);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.02);
 }
@@ -544,7 +544,7 @@
   cursor: pointer;
 }
 
-:global(html[data-mode="light"]) .modalBackdrop {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .modalBackdrop {
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -582,7 +582,7 @@
   }
 }
 
-:global(html[data-mode="light"]) .floatingLiquidModal {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .floatingLiquidModal {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.97) 0%, rgba(246, 249, 255, 0.99) 100%);
   border: 1px solid rgba(15, 23, 42, 0.16);
   box-shadow:
@@ -609,7 +609,7 @@
   pointer-events: none;
 }
 
-:global(html[data-mode="light"]) .specularTopRim {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .specularTopRim {
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -652,7 +652,7 @@
   }
 }
 
-:global(html[data-mode="light"]) .modalHeader {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .modalHeader {
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
@@ -747,12 +747,12 @@
   border-color: rgba(255, 255, 255, 0.22);
 }
 
-:global(html[data-mode="light"]) .modalCloseBtn {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .modalCloseBtn {
   background: rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-:global(html[data-mode="light"]) .modalCloseBtn:hover {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .modalCloseBtn:hover {
   background: rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 0, 0, 0.16);
   color: var(--ink);
@@ -845,9 +845,9 @@
   }
 }
 
-:global(html[data-mode="light"]) .textInput,
-:global(html[data-mode="light"]) .selectInput,
-:global(html[data-mode="light"]) .textareaInput {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .textInput,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .selectInput,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .textareaInput {
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.16);
   color: #0f172a;
@@ -862,9 +862,9 @@
   box-shadow: 0 0 0 3px var(--accent-dim), 0 0 16px -2px var(--accent-dim);
 }
 
-:global(html[data-mode="light"]) .textInput:focus,
-:global(html[data-mode="light"]) .selectInput:focus,
-:global(html[data-mode="light"]) .textareaInput:focus {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .textInput:focus,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .selectInput:focus,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .textareaInput:focus {
   background: #ffffff;
   border-color: var(--accent-strong);
   box-shadow: 0 0 0 3px var(--accent-dim), 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -875,7 +875,7 @@
   color: #eef1f8;
 }
 
-:global(html[data-mode="light"]) .selectInput option {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .selectInput option {
   background: #ffffff;
   color: #0f172a;
 }
@@ -977,7 +977,7 @@
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.55);
 }
 
-:global(html[data-mode="light"]) .colorSwatchActive {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .colorSwatchActive {
   border-color: #0f172a;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.35);
 }
@@ -999,7 +999,7 @@
   }
 }
 
-:global(html[data-mode="light"]) .formActions {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .formActions {
   border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 
@@ -1029,12 +1029,12 @@
   border-color: rgba(255, 255, 255, 0.18);
 }
 
-:global(html[data-mode="light"]) .btnCancel {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .btnCancel {
   background: rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-:global(html[data-mode="light"]) .btnCancel:hover {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .btnCancel:hover {
   background: rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 0, 0, 0.16);
   color: var(--ink);
@@ -1067,15 +1067,15 @@
 
 .btnSubmit:hover:not(:disabled) {
   background: var(--accent, #b7cbf7);
-  color: #ffffff !important;
+  color: var(--accent-fg, var(--accent-foreground, #ffffff)) !important;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px -2px var(--accent-mid);
   filter: brightness(1.08);
 }
 
-:global(html[data-mode="light"]) .btnSubmit {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .btnSubmit {
   background: var(--accent-strong, #2b4982);
-  color: #ffffff !important;
+  color: var(--accent-fg, var(--accent-foreground, #ffffff)) !important;
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 

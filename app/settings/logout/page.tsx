@@ -18,7 +18,8 @@ export default function LogoutSettingsPage() {
       await logout();
       router.push("/login");
     } catch {
-      router.push("/login");
+      // A rejected Notes flush must keep the authenticated tab and recovery data alive.
+      setIsLoggingOut(false);
     }
   };
 

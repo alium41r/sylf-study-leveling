@@ -28,7 +28,7 @@ import { randomUUID } from "node:crypto";
  *
  * Opt-in, because it spends real quota:
  *
- *     PLANNER_LIVE_DESIGNER_CORPUS=true node scripts/test-planner-postgres.mjs \
+ *     PLANNER_LIVE_DESIGNER_CORPUS=true node scripts/test/test-planner-postgres.mjs \
  *       __tests__/planner/designer-corpus.test.ts
  */
 

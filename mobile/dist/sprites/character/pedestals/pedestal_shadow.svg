@@ -1,4 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40" width="100%" height="100%">
-  <!-- Floor Shadow -->
-  <ellipse cx="70" cy="24" rx="45" ry="8" fill="#000000" opacity="0.4" filter="blur(3px)"/>
-</svg>

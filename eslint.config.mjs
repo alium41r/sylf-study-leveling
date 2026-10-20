@@ -14,6 +14,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated or vendored output, and the independent development package.
+    "dist/**",
+    "mobile/dist/**",
+    "tools/**",
+    ".dsh-presets/**",
+    ".playwright-mcp/**",
   ]),
 ]);
 

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-19",
+  "runtime": "Node 24.19.0",
+  "browser": "headless Chromium 151.0.7922.34",
+  "browserLibrary": "Playwright 1.62.1",
+  "sourceColorUtilitySha256": "b1c32103acc2d6dc816fff9aecd854675d3dc6611460dd6646fd0b13c5f1c605",
+  "sources": {
+    "index.html": "4c5a19110c42670bff1fafb8843a9113cc02c2be3e481287ea199cf8907a0096",
+    "archive-browser-test.mjs": "4dba506b92aa51b5ac9dbd984273b4cdc5059e66ece6e0cb5e2e9c67b54a2fd8",
+    "vite.config.mjs": "e6e7314432a60cc23b61bbfd111a38758826ad8df47d2feff010dd5f89a85b2d",
+    "tsconfig.json.fixture": "ac9a500d9841fe0b99bc2e2879b1d14706072b738f068ea155f00fa9491a9a9a",
+    "next.config.mjs": "c215f0d9b79659aea8f407c8c39afe557177e3e563d47a7c3bf44b6b7bdf3061",
+    "README.md": "c0375b13df9382328628846d6700362da4b156780d6a6394b1e707261f897615",
+    "package-lock.json": "225ade65d174347aafe9ead5892d3ea30fd430fed57e59440e5b4b96f3093ba9",
+    "package.json": "d1dcaa3a1050dd3788b7cea9bab0b55210cc1736f944a86f6069577f72ed8c9c",
+    "browser-tests.mjs": "bd0a7645199eaa432eb7bbc7c270348df2f7bcb2ef6117e39939116c1c57ee56",
+    "prepare-fixtures.mjs": "6174f8c45bc9571b2dc59661918231554c46a65041b9b5c99d1f9739af81ab28",
+    "app/layout.jsx": "60bcf0c632add0da614f2f380ff604c8c6c7fa3eef628d7ffde9a30f49ca039f",
+    "app/page.jsx": "dbfb80203602fce4a99915e4b674e8521a9650991128180c6ecd652f6d3b38b0",
+    "app/client.jsx": "217f1335f3444edc993b03a1839897832d2ff0e8b7a44a70fe2fb7d243ddbce9",
+    "tests/contracts.test.mjs": "1bf19546e77d677c19c155d861a29dcd0cf2538e9966ea5ec4b9178876f4cd79",
+    "src/types-probe.ts.fixture": "b86cf392045e98c78e20a931d68263882919c053647a211e56b689c1d0c60de4",
+    "src/lab.css": "727e3de581077880853b75f5dfb1d1ce09c3ab4e51b68586c437a2df2e795bd8",
+    "src/main.jsx": "3433b195f15aabcfcf437c35488e3604d7624e5bc66def4e539748a0c48ed5c7",
+    "src/Lab.jsx": "5b0a85c1f327ec8db8539e6114415c1ba71402c60c19609be7db701f628a26fb",
+    "src/contract-probe.mjs": "220b85dc5cb7f8ba1f329e046fff20a9828543fb928ac58ab4dc821d94eada37"
+  }
+}

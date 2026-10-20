@@ -207,6 +207,15 @@ model User {
   verificationTokens    VerificationToken[]
   authSessions          AuthSession[]
   floatingRestDays      FloatingRestDay[]
+  calendarConnections CalendarConnection[]
+  calendarOAuthStates CalendarOAuthState[]
+  notesConnection NotesConnection?
+  notesOAuthStates NotesOAuthState[]
+  ownedSharedCalendars SharedCalendar[]
+  sharedCalendarMemberships SharedCalendarMember[]
+  calendarEvents        CalendarEvent[]
+  calendarNotes         CalendarNote[]
+  calendarPreferences   CalendarPreference?
   plannerPlans          PlannerPlan[]
   plannerIntentVersions PlannerIntentVersion[]
   plannerAttempts       PlannerAttempt[]
@@ -1344,4 +1353,267 @@ model PlannerAttempt {
   @@index([state, createdAt])
   @@index([state, leaseExpiresAt])
   @@index([userId, kind, state])
+}
+
+// Personal planning content is independent of Planner-owned Quest/Goal schedules.
+// All-day ranges use civil dates [startDate, endDate); timed ranges use UTC instants.
+model CalendarEvent {
+  sharedCalendarId String?
+  sharedCalendar SharedCalendar? @relation(fields: [sharedCalendarId], references: [id], onDelete: Cascade)
+  id          String   @id
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @default("")
+  color       String   @default("VIOLET")
+  allDay      Boolean  @default(false)
+  startDate   String
+  endDate     String
+  startsAt    DateTime? @db.Timestamptz(3)
+  endsAt      DateTime? @db.Timestamptz(3)
+  timezone    String
+  category    String   @default("personal")
+  recurrence  Json?
+  recurrenceThrough String?
+  reminders   Int[]    @default([])
+  lastMutationId String?
+  lastMutationHash String?
+  exceptions CalendarEventException[]
+  reminderReceipts CalendarReminderReceipt[]
+  revision    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, startDate, endDate])
+  @@index([userId, startsAt, endsAt])
+  @@index([userId, recurrenceThrough, startDate])
+  @@index([sharedCalendarId, startDate, endDate])
+  @@index([sharedCalendarId, recurrenceThrough, startDate])
+}
+
+// Sparse occurrence overrides, not materialized future copies. Series revision
+// serializes all exception writes, including cancellations.
+model CalendarEventException {
+  eventId String
+  event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  originalDate String
+  cancelled Boolean @default(false)
+  data Json?
+  startDate String
+  endDate String
+  @@id([eventId, originalDate])
+  @@index([startDate, endDate])
+}
+
+// Delivery claims survive inbox dismissal and coordinate tabs/devices.
+model CalendarReminderReceipt {
+  eventId String
+  event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  key String
+  createdAt DateTime @default(now())
+  @@id([eventId, key])
+  @@index([createdAt])
+}
+
+model CalendarPreference {
+  userId Int @id
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  settings Json
+  revision Int @default(1)
+}
+
+model CalendarNote {
+  previewText String @default(dbgenerated())
+  hasInk Boolean @default(dbgenerated())
+  documentMode String @default(dbgenerated())
+  searchVector Unsupported("tsvector")?
+  recognitions CalendarNoteRecognition[]
+  id        String   @id
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateKey   String
+  title     String   @default("")
+  // Versioned document: legacy v1 text; v2 mixed text/vector ink or semantic
+  // calendar annotations. The calendar contract owns validation and upgrades.
+  document  Json
+  revision  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, dateKey, createdAt])
+}
+
+// External credentials and projections are separate from user-owned Sylf events.
+model CalendarConnection {
+  id String @id
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider String
+  accountId String
+  label String
+  credentials String
+  status String @default("ACTIVE")
+  credentialRevision Int @default(1)
+  refreshLeaseUntil DateTime?
+  createdAt DateTime @default(now())
+  calendars ConnectedCalendar[]
+  @@unique([userId, provider, accountId])
+}
+model CalendarOAuthState {
+  id String @id
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider String
+  sessionHash String
+  verifier String
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+model ConnectedCalendar {
+  incremental Boolean @default(false)
+  id String @id
+  connectionId String
+  connection CalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  remoteId String
+  name String
+  color String @default("CYAN")
+  writable Boolean @default(false)
+  visible Boolean @default(true)
+  planning Boolean @default(true)
+  error String?
+  leaseId String?
+  leaseUntil DateTime?
+  watchId String? @unique
+  watchSecret String?
+  watchResource String?
+  watchExpiresAt DateTime?
+  nextMaintenanceAt DateTime @default(now())
+  windows CalendarSyncWindow[]
+  events ExternalCalendarEvent[]
+  mutations ExternalCalendarMutation[]
+  @@unique([connectionId, remoteId])
+  @@index([nextMaintenanceAt])
+}
+model CalendarSyncWindow {
+  id String @id
+  calendarId String
+  calendar ConnectedCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+  month String
+  cursor String?
+  nextPage String?
+  scanId String?
+  lastSuccessAt DateTime?
+  requestedAt DateTime @default(now())
+  nextRunAt DateTime @default(now())
+  attempts Int @default(0)
+  members CalendarSyncMember[]
+  @@unique([calendarId, month])
+  @@index([nextRunAt])
+}
+model ExternalCalendarEvent {
+  id String @id
+  calendarId String
+  calendar ConnectedCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+  remoteId String
+  etag String
+  data Json
+  startDate String
+  endDate String
+  startsAt DateTime? @db.Timestamptz(3)
+  endsAt DateTime? @db.Timestamptz(3)
+  revision Int @default(1)
+  updatedAt DateTime @updatedAt
+  members CalendarSyncMember[]
+  @@unique([calendarId, remoteId])
+  @@index([calendarId, startDate, endDate])
+}
+model CalendarSyncMember {
+  windowId String
+  window CalendarSyncWindow @relation(fields: [windowId], references: [id], onDelete: Cascade)
+  eventId String
+  event ExternalCalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  scanId String
+  @@id([windowId, eventId])
+  @@index([eventId])
+}
+model ExternalCalendarMutation {
+  id String @id
+  calendarId String
+  calendar ConnectedCalendar @relation(fields: [calendarId], references: [id], onDelete: Cascade)
+  payload Json
+  hash String
+  state String @default("PENDING")
+  result Json?
+  error String?
+  attempts Int @default(0)
+  nextRunAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  @@index([state, nextRunAt])
+}
+
+// Optional collaboration contains native calendar events only. Personal notes,
+// provider connections and study records have no shared-calendar relation.
+model SharedCalendar {
+  id String @id
+  ownerId Int
+  owner User @relation(fields:[ownerId],references:[id],onDelete:Cascade)
+  name String
+  revision Int @default(1)
+  createdAt DateTime @default(now())
+  members SharedCalendarMember[]
+  events CalendarEvent[]
+  @@index([ownerId])
+}
+model SharedCalendarMember {
+  calendarId String
+  calendar SharedCalendar @relation(fields:[calendarId],references:[id],onDelete:Cascade)
+  userId Int
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  role String @default("VIEWER")
+  status String @default("PENDING")
+  @@id([calendarId,userId])
+  @@index([userId,status])
+}
+// Reviewed, bounded derivatives only; the vector document stays on CalendarNote.
+model CalendarNoteRecognition {
+  id String @id
+  noteId String
+  note CalendarNote @relation(fields:[noteId],references:[id],onDelete:Cascade)
+  selectionKey String
+  sourceHash String
+  strokeIds Json
+  text String
+  engine String
+  revision Int @default(1)
+  updatedAt DateTime @updatedAt
+  @@unique([noteId,selectionKey])
+}
+
+// Notes stores connection/key metadata only. Documents and previews never enter this database.
+model NotesConnection {
+  id String @id
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  libraryId String @unique
+  accountId String
+  rootId String?
+  label String
+  credentials String
+  vaultKey String
+  status String @default("PROVISIONING")
+  bindingGeneration Int @default(1)
+  credentialRevision Int @default(1)
+  refreshLeaseUntil DateTime?
+  verifiedAt DateTime?
+  probeHash String?
+  createdAt DateTime @default(now())
+}
+model NotesOAuthState {
+  id String @id
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionHash String
+  verifier String
+  expiresAt DateTime
+  @@index([expiresAt])
 }

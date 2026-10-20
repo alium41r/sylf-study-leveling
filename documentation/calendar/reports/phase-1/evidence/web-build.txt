@@ -1,0 +1,66 @@
+npm notice run sylf@0.1.0 build
+npm notice run next build
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local, .env
+- Experiments (use with caution):
+  · optimizePackageImports
+  · proxyClientMaxBodySize: "13mb"
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./app/onboarding/components/AppearanceStep.tsx:6:1
+Export getContrastForeground doesn't exist in target module
+  [90m4 |[0m [36mimport[0m [33mCompanion[0m [36mfrom[0m [32m"@/app/components/landing/companion/Companion"[0m;
+  [90m5 |[0m [36mimport[0m { [33mMoon[0m, [33mSun[0m, [33mCheck[0m, [33mArrowRight[0m, [33mArrowLeft[0m } [36mfrom[0m [32m"lucide-react"[0m;
+[31m[1m>[0m [90m6 |[0m [36mimport[0m { getContrastForeground } [36mfrom[0m [32m"@/lib/color-utils"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m7 |[0m [36mimport[0m styles [36mfrom[0m [32m"../Onboarding.module.css"[0m;
+  [90m8 |[0m
+  [90m9 |[0m [36minterface[0m [33mAppearanceStepProps[0m {
+
+The export getContrastForeground was not found in module [project]/lib/color-utils.ts [app-client] (ecmascript).
+Did you mean to import getContrastRatio?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/onboarding/components/AppearanceStep.tsx [Client Component Browser]
+    ./app/onboarding/page.tsx [Client Component Browser]
+    ./app/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/onboarding/components/AppearanceStep.tsx [Client Component SSR]
+    ./app/onboarding/page.tsx [Client Component SSR]
+    ./app/onboarding/page.tsx [Server Component]
+
+
+./app/onboarding/components/AppearanceStep.tsx:6:1
+Export getContrastForeground doesn't exist in target module
+  [90m4 |[0m [36mimport[0m [33mCompanion[0m [36mfrom[0m [32m"@/app/components/landing/companion/Companion"[0m;
+  [90m5 |[0m [36mimport[0m { [33mMoon[0m, [33mSun[0m, [33mCheck[0m, [33mArrowRight[0m, [33mArrowLeft[0m } [36mfrom[0m [32m"lucide-react"[0m;
+[31m[1m>[0m [90m6 |[0m [36mimport[0m { getContrastForeground } [36mfrom[0m [32m"@/lib/color-utils"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m7 |[0m [36mimport[0m styles [36mfrom[0m [32m"../Onboarding.module.css"[0m;
+  [90m8 |[0m
+  [90m9 |[0m [36minterface[0m [33mAppearanceStepProps[0m {
+
+The export getContrastForeground was not found in module [project]/lib/color-utils.ts [app-ssr] (ecmascript).
+Did you mean to import getContrastRatio?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./app/onboarding/components/AppearanceStep.tsx [Client Component Browser]
+    ./app/onboarding/page.tsx [Client Component Browser]
+    ./app/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/onboarding/components/AppearanceStep.tsx [Client Component SSR]
+    ./app/onboarding/page.tsx [Client Component SSR]
+    ./app/onboarding/page.tsx [Server Component]
+
+
+    at <unknown> (./app/onboarding/components/AppearanceStep.tsx:6:1)
+    at <unknown> (./app/onboarding/components/AppearanceStep.tsx:6:1)

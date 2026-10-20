@@ -7,6 +7,7 @@ import type { PendingSylvieAction } from "@/lib/ai/sylvie/action";
 import type { SylviePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 import type { ChatImage, ComposerImage } from "@/lib/ai/sylvie/image-contract";
 import { useComposerImages } from "./useComposerImages";
+import { currentCalendarPage } from "@/lib/ai/sylvie/calendar-page-context";
 
 export interface ChatMessage {
   id: string; serverId?: number; role: "user" | "assistant"; content: string; createdAt?: string;
@@ -126,8 +127,9 @@ export function useSylvieChat(options: Options) {
     ]);
     const current = () => epoch.current === revision && request.current === controller && !controller.signal.aborted;
     try {
+      const page = latest.current.pageContext;
       const reply = await requestSylvieChat({ message: text, file, images, sessionId: session.current, confirmationToken,
-        pageContext: latest.current.pageContext, modelPreference: latest.current.modelPreference, multipart: latest.current.multipart,
+        pageContext: page?.path === "/calendar" ? { ...page, calendar: currentCalendarPage() } : page, modelPreference: latest.current.modelPreference, multipart: latest.current.multipart,
         signal: controller.signal,
         onStatus: phase => { if (current()) setUploading(phase === "uploading"); },
         onSession: value => { if (current()) adoptSession(value); },
@@ -146,6 +148,10 @@ export function useSylvieChat(options: Options) {
           modelUsed: reply.aiMessage?.modelUsed || reply.modelUsed,
           pendingAction: reply.aiMessage?.pendingAction ?? reply.pendingAction, plannerHandoff: reply.aiMessage?.plannerHandoff ?? reply.plannerHandoff } : message));
       invalidateClientCache("/api/system-messages"); invalidateClientCache("/api/chats");
+      if (reply.calendarChanged) {
+        invalidateClientCache("/api/calendar/personal");
+        window.dispatchEvent(new Event("calendar-content-updated"));
+      }
       latest.current.onQuotaRefresh?.();
       return true;
     } catch (error) {

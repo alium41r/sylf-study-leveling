@@ -1,5 +1,0 @@
-- generic [active] [ref=e1]:
-  - main [ref=e5]:
-    - generic [ref=e6]: Accessing Scholar Identity Hub...
-  - button "Open Next.js Dev Tools" [ref=e15] [cursor=pointer]
-  - alert [ref=e19]

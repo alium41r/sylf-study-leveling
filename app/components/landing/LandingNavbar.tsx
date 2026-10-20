@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Sun, Moon, Sparkles, LogIn } from "lucide-react";
+import { applyAppMode, applyGlobalBackground } from "@/app/components/GlobalSystemWrapper";
 
 interface LandingNavbarProps {
   /** When a fixed logged-in banner sits above the navbar, shift it down. */
@@ -13,18 +14,30 @@ export default function LandingNavbar({ hasBanner = false }: LandingNavbarProps)
   const [isLightMode, setIsLightMode] = useState(false);
 
   useEffect(() => {
-    const mode =
-      document.documentElement.getAttribute("data-mode") ||
-      localStorage.getItem("app_mode") ||
-      "dark";
-    setIsLightMode(mode === "light");
+    const syncMode = () => {
+      const mode =
+        document.documentElement.getAttribute("data-surface-polarity") ||
+        document.documentElement.getAttribute("data-mode") ||
+        localStorage.getItem("app_mode") ||
+        "dark";
+      setIsLightMode(mode === "light");
+    };
+    syncMode();
+    const observer = new MutationObserver(syncMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-mode", "data-surface-polarity"],
+    });
+    return () => observer.disconnect();
   }, []);
 
   const toggleTheme = () => {
     const newMode = isLightMode ? "dark" : "light";
     setIsLightMode(!isLightMode);
-    document.documentElement.setAttribute("data-mode", newMode);
     localStorage.setItem("app_mode", newMode);
+    applyAppMode(newMode);
+    applyGlobalBackground(undefined, newMode);
+    window.dispatchEvent(new Event("mode-updated"));
     window.dispatchEvent(new Event("storage"));
   };
 

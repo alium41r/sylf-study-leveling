@@ -1,0 +1,230 @@
+npm notice run sylf@0.1.0 mobile:build
+npm notice run vite build mobile
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vite.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.0 building client environment for production...
+transforming...
+
+fonts/KaTeX_AMS-Regular.woff2 referenced in fonts/KaTeX_AMS-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Bold.woff2 referenced in fonts/KaTeX_Caligraphic-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Regular.woff2 referenced in fonts/KaTeX_Caligraphic-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Bold.woff2 referenced in fonts/KaTeX_Fraktur-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Regular.woff2 referenced in fonts/KaTeX_Fraktur-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Bold.woff2 referenced in fonts/KaTeX_Main-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-BoldItalic.woff2 referenced in fonts/KaTeX_Main-BoldItalic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Italic.woff2 referenced in fonts/KaTeX_Main-Italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Regular.woff2 referenced in fonts/KaTeX_Main-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-BoldItalic.woff2 referenced in fonts/KaTeX_Math-BoldItalic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-Italic.woff2 referenced in fonts/KaTeX_Math-Italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Bold.woff2 referenced in fonts/KaTeX_SansSerif-Bold.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Italic.woff2 referenced in fonts/KaTeX_SansSerif-Italic.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Regular.woff2 referenced in fonts/KaTeX_SansSerif-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Script-Regular.woff2 referenced in fonts/KaTeX_Script-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size1-Regular.woff2 referenced in fonts/KaTeX_Size1-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size2-Regular.woff2 referenced in fonts/KaTeX_Size2-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size3-Regular.woff2 referenced in fonts/KaTeX_Size3-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size4-Regular.woff2 referenced in fonts/KaTeX_Size4-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Typewriter-Regular.woff2 referenced in fonts/KaTeX_Typewriter-Regular.woff2 didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_AMS-Regular.woff referenced in fonts/KaTeX_AMS-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Bold.woff referenced in fonts/KaTeX_Caligraphic-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Regular.woff referenced in fonts/KaTeX_Caligraphic-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Bold.woff referenced in fonts/KaTeX_Fraktur-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Regular.woff referenced in fonts/KaTeX_Fraktur-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Bold.woff referenced in fonts/KaTeX_Main-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-BoldItalic.woff referenced in fonts/KaTeX_Main-BoldItalic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Italic.woff referenced in fonts/KaTeX_Main-Italic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Regular.woff referenced in fonts/KaTeX_Main-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-BoldItalic.woff referenced in fonts/KaTeX_Math-BoldItalic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-Italic.woff referenced in fonts/KaTeX_Math-Italic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Bold.woff referenced in fonts/KaTeX_SansSerif-Bold.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Italic.woff referenced in fonts/KaTeX_SansSerif-Italic.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Regular.woff referenced in fonts/KaTeX_SansSerif-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Script-Regular.woff referenced in fonts/KaTeX_Script-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size1-Regular.woff referenced in fonts/KaTeX_Size1-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size2-Regular.woff referenced in fonts/KaTeX_Size2-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size3-Regular.woff referenced in fonts/KaTeX_Size3-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size4-Regular.woff referenced in fonts/KaTeX_Size4-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Typewriter-Regular.woff referenced in fonts/KaTeX_Typewriter-Regular.woff didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_AMS-Regular.ttf referenced in fonts/KaTeX_AMS-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Bold.ttf referenced in fonts/KaTeX_Caligraphic-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Caligraphic-Regular.ttf referenced in fonts/KaTeX_Caligraphic-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Bold.ttf referenced in fonts/KaTeX_Fraktur-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Fraktur-Regular.ttf referenced in fonts/KaTeX_Fraktur-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Bold.ttf referenced in fonts/KaTeX_Main-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-BoldItalic.ttf referenced in fonts/KaTeX_Main-BoldItalic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Italic.ttf referenced in fonts/KaTeX_Main-Italic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Main-Regular.ttf referenced in fonts/KaTeX_Main-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-BoldItalic.ttf referenced in fonts/KaTeX_Math-BoldItalic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Math-Italic.ttf referenced in fonts/KaTeX_Math-Italic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Bold.ttf referenced in fonts/KaTeX_SansSerif-Bold.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Italic.ttf referenced in fonts/KaTeX_SansSerif-Italic.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_SansSerif-Regular.ttf referenced in fonts/KaTeX_SansSerif-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Script-Regular.ttf referenced in fonts/KaTeX_Script-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size1-Regular.ttf referenced in fonts/KaTeX_Size1-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size2-Regular.ttf referenced in fonts/KaTeX_Size2-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size3-Regular.ttf referenced in fonts/KaTeX_Size3-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Size4-Regular.ttf referenced in fonts/KaTeX_Size4-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+fonts/KaTeX_Typewriter-Regular.ttf referenced in fonts/KaTeX_Typewriter-Regular.ttf didn't resolve at build time, it will remain unchanged to be resolved at runtime
+✓ 2997 modules transformed.
+rendering chunks...
+computing gzip size...
+mobile/dist/.mock-manifest.json                                   0.10 kB │ gzip:   0.10 kB
+mobile/dist/index.html                                            3.20 kB │ gzip:   1.03 kB
+mobile/dist/assets/AppearanceHubLayout-BljU-uTW.css               1.67 kB │ gzip:   0.78 kB
+mobile/dist/assets/FocusTimerLayoutRouter-BS8bI0jV.css            2.37 kB │ gzip:   0.85 kB
+mobile/dist/assets/PixelCompanion-CSwG4Q57.css                    3.24 kB │ gzip:   1.11 kB
+mobile/dist/assets/MainHub-BazZzgjy.css                           5.41 kB │ gzip:   1.55 kB
+mobile/dist/assets/RankingsSettingsScreen-CLviE2K4.css            9.45 kB │ gzip:   2.22 kB
+mobile/dist/assets/CustomAudioTab-CfUX1wbe.css                   10.39 kB │ gzip:   2.49 kB
+mobile/dist/assets/ModesSettingsScreen-DsOopw38.css              11.23 kB │ gzip:   2.57 kB
+mobile/dist/assets/ShopScreen-FrFkUt84.css                       11.26 kB │ gzip:   2.58 kB
+mobile/dist/assets/AppearanceSettingsScreen-xYZYG7fK.css         12.43 kB │ gzip:   2.90 kB
+mobile/dist/assets/SystemLibrary-ChneleLc.css                    13.13 kB │ gzip:   3.22 kB
+mobile/dist/assets/GoalsScreen-IwZ0Buww.css                      13.45 kB │ gzip:   3.04 kB
+mobile/dist/assets/StatsSettingsScreen-DP993KkI.css              13.58 kB │ gzip:   2.98 kB
+mobile/dist/assets/FocusBackgroundsSettingsScreen-DXwhlHhx.css   13.76 kB │ gzip:   3.13 kB
+mobile/dist/assets/SocialScreen-ozQC5Qh3.css                     16.11 kB │ gzip:   3.51 kB
+mobile/dist/assets/ArchiveSettingsScreen-Cv69qS35.css            24.24 kB │ gzip:   5.39 kB
+mobile/dist/assets/SystemHubPage-C9Oav4gT.css                    28.23 kB │ gzip:   5.31 kB
+mobile/dist/assets/TimerScreen-CiS2Epke.css                      28.35 kB │ gzip:   6.07 kB
+mobile/dist/assets/DashboardScreen-CnxTT9zS.css                  28.42 kB │ gzip:   6.00 kB
+mobile/dist/assets/LockerScreen-CPu7j03a.css                     29.45 kB │ gzip:   5.56 kB
+mobile/dist/assets/CalendarScreen-5sIOPEDG.css                   48.11 kB │ gzip:   9.34 kB
+mobile/dist/assets/SystemScreen-BjzvFQaf.css                     56.26 kB │ gzip:  10.71 kB
+mobile/dist/assets/index-D8yM7x2D.css                           449.61 kB │ gzip:  58.62 kB
+mobile/dist/assets/ThemesSettingsScreen-C3ZW3uS1.js               0.22 kB │ gzip:   0.17 kB
+mobile/dist/assets/BackgroundsSettingsScreen-CCP5wLW2.js          0.22 kB │ gzip:   0.17 kB
+mobile/dist/assets/SyncRedirectController-DoYjYJ9n.js             0.29 kB │ gzip:   0.24 kB
+mobile/dist/assets/BadgesRedirectController-h4LYL7UC.js           0.46 kB │ gzip:   0.33 kB
+mobile/dist/assets/ProfileRedirectController-LNUt9wFS.js          0.48 kB │ gzip:   0.34 kB
+mobile/dist/assets/MainHub.module-VSpy_ThC.js                     0.57 kB │ gzip:   0.28 kB
+mobile/dist/assets/BackToSettings-mS2TOp5s.js                     0.59 kB │ gzip:   0.41 kB
+mobile/dist/assets/notification-preferences-8XIX9-X7.js           0.61 kB │ gzip:   0.27 kB
+mobile/dist/assets/QuestsScreen-W3zN8oSW.js                       0.75 kB │ gzip:   0.44 kB
+mobile/dist/assets/next-link-CWW7VLqo.js                          0.82 kB │ gzip:   0.53 kB
+mobile/dist/assets/game-engine-BqysJqqr.js                        0.85 kB │ gzip:   0.39 kB
+mobile/dist/assets/rolldown-runtime-B0Z9INg1.js                   0.90 kB │ gzip:   0.51 kB
+mobile/dist/assets/SettingsIndexController-CRaV-EmA.js            0.93 kB │ gzip:   0.56 kB
+mobile/dist/assets/next-image-Clz7tXzr.js                         1.01 kB │ gzip:   0.59 kB
+mobile/dist/assets/useSystemAppearance-qAIQJOUq.js                1.08 kB │ gzip:   0.53 kB
+mobile/dist/assets/AppearanceHubLayout-BoIjOI22.js                1.13 kB │ gzip:   0.56 kB
+mobile/dist/assets/preload-helper-BZ1Pz5am.js                     1.21 kB │ gzip:   0.69 kB
+mobile/dist/assets/MainHubLayout-pkp6xKAp.js                      1.53 kB │ gzip:   0.65 kB
+mobile/dist/assets/OwnCompanionPreview-ILbjdiib.js                1.57 kB │ gzip:   0.87 kB
+mobile/dist/assets/motion-9Q1_ne53.js                             1.74 kB │ gzip:   0.56 kB
+mobile/dist/assets/study-systems-B70xCxGN.js                      1.77 kB │ gzip:   0.69 kB
+mobile/dist/assets/icons-CZCjKw1G.js                              1.78 kB │ gzip:   0.91 kB
+mobile/dist/assets/goal-theme-Dx0woI-7.js                         1.81 kB │ gzip:   0.85 kB
+mobile/dist/assets/CalendarSettingsScreen-D-PSENR8.js             2.05 kB │ gzip:   0.98 kB
+mobile/dist/assets/FocusTimerLayoutRouter-D_ZQrnm9.js             2.13 kB │ gzip:   1.00 kB
+mobile/dist/assets/next-navigation-D-32BiG2.js                    2.13 kB │ gzip:   0.76 kB
+mobile/dist/assets/cognitive-stats-CqI71WZb.js                    2.50 kB │ gzip:   1.19 kB
+mobile/dist/assets/SystemLibrary-nkA18wSp.js                      2.70 kB │ gzip:   1.06 kB
+mobile/dist/assets/SystemHubPage.module-Bimnvsed.js               3.12 kB │ gzip:   0.97 kB
+mobile/dist/assets/achievements-catalog-DsqAcgqH.js               3.43 kB │ gzip:   1.38 kB
+mobile/dist/assets/client-data-cache-BIdwE0ra.js                  3.43 kB │ gzip:   1.53 kB
+mobile/dist/assets/custom-audio-store-Dav7lbX7.js                 4.28 kB │ gzip:   1.80 kB
+mobile/dist/assets/SystemIcons-BnBhbzCg.js                        5.07 kB │ gzip:   1.04 kB
+mobile/dist/assets/timezone-service-QfVII2oV.js                   6.59 kB │ gzip:   2.17 kB
+mobile/dist/assets/CustomDatePicker-DdaQmtM0.js                   8.50 kB │ gzip:   3.00 kB
+mobile/dist/assets/AchievementsSettingsScreen-Dblhc4TP.js         8.74 kB │ gzip:   3.16 kB
+mobile/dist/assets/RankingsSettingsScreen-89TUHj0I.js             9.05 kB │ gzip:   3.18 kB
+mobile/dist/assets/CustomAudioContext-MyEXVm9t.js                10.59 kB │ gzip:   3.32 kB
+mobile/dist/assets/NotificationsSettingsScreen-CpmhmUJQ.js       11.20 kB │ gzip:   3.37 kB
+mobile/dist/assets/AuthProvider-Cj-fKHA_.js                      13.93 kB │ gzip:   5.50 kB
+mobile/dist/assets/CollectionSettingsScreen-Bxmq10lB.js          14.64 kB │ gzip:   4.77 kB
+mobile/dist/assets/ModesSettingsScreen-Bqh15KC3.js               15.09 kB │ gzip:   4.62 kB
+mobile/dist/assets/CustomAudioTab-DFMRyM6l.js                    15.64 kB │ gzip:   4.38 kB
+mobile/dist/assets/AppearanceSettingsScreen-BBt0KEn7.js          16.41 kB │ gzip:   5.44 kB
+mobile/dist/assets/shop-items-D-oQ9OhV.js                        18.77 kB │ gzip:   4.35 kB
+mobile/dist/assets/FocusBackgroundPicker-BSfHAhNj.js             18.96 kB │ gzip:   4.84 kB
+mobile/dist/assets/StatsSettingsScreen-DRs9kLkK.js               18.96 kB │ gzip:   5.87 kB
+mobile/dist/assets/FocusBackgroundsSettingsScreen-C36e9Uq2.js    22.71 kB │ gzip:   7.77 kB
+mobile/dist/assets/ShopScreen-BUUlgbI8.js                        23.05 kB │ gzip:   6.36 kB
+mobile/dist/assets/TimerScreen-Idaiee-h.js                       24.53 kB │ gzip:   6.74 kB
+mobile/dist/assets/DashboardScreen-Dg47V8e0.js                   28.65 kB │ gzip:   8.39 kB
+mobile/dist/assets/GoalsScreen-CI7Lv66G.js                       36.56 kB │ gzip:   8.72 kB
+mobile/dist/assets/ArchiveSettingsScreen-DqLPXYea.js             39.76 kB │ gzip:  13.55 kB
+mobile/dist/assets/PixelCompanion-DP9GKRT_.js                    40.43 kB │ gzip:  13.37 kB
+mobile/dist/assets/vendor-icons-Dmw7aCGA.js                      49.96 kB │ gzip:  16.49 kB
+mobile/dist/assets/AccountSettingsScreen-DuZsbAxu.js             57.10 kB │ gzip:  13.67 kB
+mobile/dist/assets/FantasyTimerLayout-D9Um58Wp.js                67.67 kB │ gzip:  14.80 kB
+mobile/dist/assets/schemas-M1Fw8rg9.js                           72.63 kB │ gzip:  19.37 kB
+mobile/dist/assets/LockerScreen-BtID5rql.js                     125.27 kB │ gzip:  30.96 kB
+mobile/dist/assets/vendor-motion-DiW7M3r_.js                    125.74 kB │ gzip:  41.03 kB
+mobile/dist/assets/CalendarScreen-0qYh7Fw_.js                   138.66 kB │ gzip:  40.12 kB
+mobile/dist/assets/FocusScreen-D3aENvwx.js                      165.15 kB │ gzip:  44.31 kB
+mobile/dist/assets/vendor-react-lDxava51.js                     181.75 kB │ gzip:  57.16 kB
+mobile/dist/assets/SystemScreen-sL7-ErOy.js                     295.42 kB │ gzip:  81.56 kB
+mobile/dist/assets/SocialScreen-3YJIcLRA.js                     315.71 kB │ gzip:  76.86 kB
+mobile/dist/assets/index-DzhkwyLU.js                            813.26 kB │ gzip: 233.66 kB
+
+✓ built in 18.91s
+[33m[PLUGIN_TIMINGS] [0mPlugin hooks ran for 17.0s of this 18.9s build (90%).
+The slowest hooks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+  - vite:prepare-out-dir renderStart (28%, 5.3s, 1 call)
+Additional hook time came from the hooks below and from hooks under 1s.
+1 hook is listed without a time. Its calls overlapped, so the time inside one call includes work from other calls. To find its cost, profile the build with `node --cpu-prof`:
+  - vite:css transform (42 calls)
+See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
+

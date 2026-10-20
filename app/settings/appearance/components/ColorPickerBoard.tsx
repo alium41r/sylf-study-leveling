@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   hexToRgb,
   rgbToHsv,
@@ -50,7 +50,7 @@ export function ColorPickerBoard({
     if (!isFocusedHex) {
       const rgb = hexToRgb(normValue);
       if (rgb) {
-        setHsv(rgbToHsv(rgb.r, rgb.g, rgb.b));
+        setHsv(rgbToHsv(rgb.r, rgb.g, rgb.b, hsv.h));
         setHexInput(normValue.toUpperCase());
       }
     }
@@ -58,44 +58,37 @@ export function ColorPickerBoard({
 
   const satValRef = useRef<HTMLDivElement>(null);
   const hueRef = useRef<HTMLDivElement>(null);
-  const satValRafRef = useRef<number | null>(null);
-  const hueRafRef = useRef<number | null>(null);
 
-  // Clean up animation frames on unmount
-  useEffect(() => {
-    return () => {
-      if (satValRafRef.current) cancelAnimationFrame(satValRafRef.current);
-      if (hueRafRef.current) cancelAnimationFrame(hueRafRef.current);
-    };
-  }, []);
-
-  // Handle 2D Saturation / Value board interaction with 60fps RAF throttling
+  // Handle 2D Saturation / Value board interaction
   const updateSatVal = useCallback(
     (clientX: number, clientY: number) => {
       if (!satValRef.current) return;
-      if (satValRafRef.current) cancelAnimationFrame(satValRafRef.current);
+      const rect = satValRef.current.getBoundingClientRect();
+      const width = rect.width || 1;
+      const height = rect.height || 1;
+      const x = Math.max(0, Math.min(width, clientX - rect.left));
+      const y = Math.max(0, Math.min(height, clientY - rect.top));
 
-      satValRafRef.current = requestAnimationFrame(() => {
-        if (!satValRef.current) return;
-        const rect = satValRef.current.getBoundingClientRect();
-        const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
-        const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
+      const s = (x / width) * 100;
+      const v = (1 - y / height) * 100;
 
-        const s = (x / rect.width) * 100;
-        const v = (1 - y / rect.height) * 100;
-
-        const nextHsv = { h: hsv.h, s, v };
-        setHsv(nextHsv);
-        const newHex = hsvToHex(nextHsv.h, nextHsv.s, nextHsv.v);
-        setHexInput(newHex.toUpperCase());
-        onChange(newHex);
-      });
+      const nextHsv = { h: hsv.h, s, v };
+      setHsv(nextHsv);
+      const newHex = hsvToHex(nextHsv.h, nextHsv.s, nextHsv.v);
+      setHexInput(newHex.toUpperCase());
+      onChange(newHex);
     },
     [hsv.h, onChange]
   );
 
   const handleSatValPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
+    if (typeof e.currentTarget.setPointerCapture === "function") {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore synthetic pointer events in tests */
+      }
+    }
     updateSatVal(e.clientX, e.clientY);
   };
 
@@ -106,35 +99,43 @@ export function ColorPickerBoard({
   };
 
   const handleSatValPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+    if (
+      typeof e.currentTarget.hasPointerCapture === "function" &&
+      e.currentTarget.hasPointerCapture(e.pointerId)
+    ) {
       e.currentTarget.releasePointerCapture(e.pointerId);
     }
   };
 
-  // Handle 1D Hue bar interaction with 60fps RAF throttling
+  // Handle 1D Hue bar interaction
   const updateHue = useCallback(
     (clientX: number) => {
       if (!hueRef.current) return;
-      if (hueRafRef.current) cancelAnimationFrame(hueRafRef.current);
+      const rect = hueRef.current.getBoundingClientRect();
+      const width = rect.width || 1;
+      const x = Math.max(0, Math.min(width, clientX - rect.left));
+      const h = (x / width) * 360;
 
-      hueRafRef.current = requestAnimationFrame(() => {
-        if (!hueRef.current) return;
-        const rect = hueRef.current.getBoundingClientRect();
-        const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
-        const h = (x / rect.width) * 360;
-
-        const nextHsv = { ...hsv, h };
-        setHsv(nextHsv);
-        const newHex = hsvToHex(nextHsv.h, nextHsv.s, nextHsv.v);
-        setHexInput(newHex.toUpperCase());
-        onChange(newHex);
-      });
+      // If starting from achromatic black/white/gray, lift saturation & value so hue change is immediately effective
+      const nextS = hsv.s < 5 ? 75 : hsv.s;
+      const nextV = hsv.v < 5 ? 85 : hsv.v;
+      const nextHsv = { h, s: nextS, v: nextV };
+      setHsv(nextHsv);
+      const newHex = hsvToHex(nextHsv.h, nextHsv.s, nextHsv.v);
+      setHexInput(newHex.toUpperCase());
+      onChange(newHex);
     },
     [hsv, onChange]
   );
 
   const handleHuePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
+    if (typeof e.currentTarget.setPointerCapture === "function") {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore synthetic pointer events in tests */
+      }
+    }
     updateHue(e.clientX);
   };
 
@@ -145,7 +146,10 @@ export function ColorPickerBoard({
   };
 
   const handleHuePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+    if (
+      typeof e.currentTarget.hasPointerCapture === "function" &&
+      e.currentTarget.hasPointerCapture(e.pointerId)
+    ) {
       e.currentTarget.releasePointerCapture(e.pointerId);
     }
   };
@@ -216,7 +220,9 @@ export function ColorPickerBoard({
 
     e.preventDefault();
     const nextH = (hsv.h + deltaH + 360) % 360;
-    const nextHsv = { ...hsv, h: nextH };
+    const nextS = hsv.s < 5 ? 75 : hsv.s;
+    const nextV = hsv.v < 5 ? 85 : hsv.v;
+    const nextHsv = { h: nextH, s: nextS, v: nextV };
     setHsv(nextHsv);
     const newHex = hsvToHex(nextHsv.h, nextHsv.s, nextHsv.v);
     setHexInput(newHex.toUpperCase());

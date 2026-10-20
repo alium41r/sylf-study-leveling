@@ -1,0 +1,46 @@
+{
+  "recordedAt": "2026-10-20T05:43:41.073052+00:00",
+  "scope": "Phase 2 only",
+  "intentionalFiles": {
+    "__tests__/notes/auth-boundary.test.tsx": "6a70be00381173c2edabdb43bcab6b6bc1f8bf358e915b1880a903b3f5aeed3f",
+    "__tests__/notes/foundation.test.ts": "d9cbcb53d2fb1ebc433e68a31f8770858828aebbde3e85018c9f627cb8860b25",
+    "app/components/AuthProvider.tsx": "eff2306ce7f65a68812e8062c45783ebb1f7f4c35e8084054acf4b76ecd51950",
+    "documentation/README.md": "334d848a7f5efea0513007e17a0cecc7587bc98de34f061adc70c66a41d07f2f",
+    "documentation/notes/README.md": "bea33a016e851312b676a6af6998c032df9132c6d4df3b653efd860470f04839",
+    "documentation/notes/architecture-contract.md": "2db3e7a4421811b4d72ada0574df5cb3bff857b837a0c06ce485d65e9238f51c",
+    "documentation/notes/foundation.md": "875743d26fabdb1cbd8213c541e6d241ab6d08c2c199e646387fbe56f665bf10",
+    "documentation/notes/reports/phase-2/evidence/README.md": "e550132f5f666653d443e2ed03c2f9e1e89cb204a2ab83906e0ebafc1b3c9930",
+    "documentation/notes/reports/phase-2/phase-3-handoff.md": "f972415a3da809915a1311b9ba61e2d93d706c314d8e4cbf562982c34a463920",
+    "documentation/notes/reports/phase-2/report.md": "faafec0daf1545440fdf81f3381e3d9835e69e2e05185e94be5c1bda926df2ee",
+    "lib/client-data-cache.ts": "0b7a682c280066bef6db842ccea14b81252721caecaa8cbc161a6c690352807a",
+    "lib/notes/blocknote-adapter.ts": "c1abea90ca7d3fb896fc2350fa176cccd596140a7390aa120ec7862fe3a9eb6c",
+    "lib/notes/bytes.ts": "4a1a3f98d4f5b1ef018cd393226414ce4ad0fbbcb1bbd96b8700bc3a557ace57",
+    "lib/notes/contracts.ts": "ad42c5f04a1ac1ccce52fdaf59f71127176c10c60a96e640719b034a6d5d7392",
+    "lib/notes/engine.ts": "0fc2cde16ef5d2fe09f303ba32cfc9cba45c24b71b57418d2d1850e79c1bedd4",
+    "lib/notes/errors.ts": "1a9246176841140a36c318452ce3da305d4c3ee553a54c7a91b25f672c1ea309",
+    "lib/notes/graph.ts": "ec83641fda89bf3366fcd490307c0c34016b0dda83b2af840c9c9a1cfd09865a",
+    "lib/notes/interchange.ts": "ae9cd4c811a7b4168f190eeab56249bb5a516884bff72478e13def42aab05b8b",
+    "lib/notes/portable.ts": "98442156ddc462fddbfb8d7aff127a6b4edbb5e35bca7a716a62828a09d9f732",
+    "lib/notes/repository.ts": "34c071d4751b384b8b31275557c9dfe9ae401e0fc2eb01aa8535a145321be2d3",
+    "lib/notes/session.ts": "35de39713da3612c19441fdbbae98069843900a59246b711006d244c423691c1",
+    "lib/notes/sync.ts": "7ced1ad198c0cc6952313768d9b9c26a372ad19dc34a57a61cde94d938f36720",
+    "package-lock.json": "5675dcf597ad16a760c4431875da914beb60c30f65ba11a7f6db72f135fc6784",
+    "package.json": "df64a1e4f0db62ca95403d4174da0e47bb28a0194a28fb95df4f56eb49e4367b",
+    "scripts/qa/notes-qualification/README.md": "5d784ec025f7f4802ab3d7bce2512f9e0f6eb3f96c9598c860f76a8ce52c9abb",
+    "scripts/qa/notes-qualification/browser.mjs": "2f2637df2649f189f6c783b40c996e07506328f9585ce82cf31f264c90d8d340",
+    "scripts/qa/notes-qualification/index.html": "371d49a46d76910a0b45b9aa17bad5bf51d05ef433fbbd989624212206ba13a0",
+    "scripts/qa/notes-qualification/main.tsx": "b324e6dc81f15921570700cfc68d601791ec283d1f8819f2546097c2eabda07e",
+    "scripts/qa/notes-qualification/vite.config.mjs": "4b474b3546fb7afd8cfcfb0099c60eba27ed1ffced8e316d8c60dc04f7f96f9c"
+  },
+  "existingFilesSharedWithOtherChanges": [
+    "lib/client-data-cache.ts",
+    "package.json",
+    "package-lock.json",
+    "documentation/README.md"
+  ],
+  "notes": [
+    "Unrelated repository reorganization and pre-existing dirty files were preserved. Baseline hashes are not a claim that every existing file stayed unchanged.",
+    "No Prisma schema/migration, production Notes route, live provider grant or agent configuration was changed by Phase 2.",
+    "The internal harness was moved by repository reorganization to scripts/qa/notes-qualification; its current path is retained."
+  ]
+}

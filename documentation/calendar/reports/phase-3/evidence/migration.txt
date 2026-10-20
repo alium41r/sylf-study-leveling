@@ -1,0 +1,1 @@
+✅ Migration applied successfully: migration.sql

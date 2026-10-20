@@ -26,7 +26,7 @@ import { buildLedger } from "@/lib/planner/research/evidence";
  * the disabled pass finds materially the same evidence.
  *
  * Opt-in, two model calls:
- *   PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test-planner-postgres.mjs \
+ *   PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test/test-planner-postgres.mjs \
  *     __tests__/planner/live-thinking-cost.test.ts
  */
 

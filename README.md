@@ -1,85 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sylf
 
-## Repository documentation
+Sylf is a study, focus, and progression application. The web app is a Next.js 16
+App Router project with a Prisma/PostgreSQL backend; a Vite/Capacitor client in
+`mobile/` reuses shared screens for Android.
 
-Start at the [documentation index](documentation/README.md) for current contracts, feature entry points, development reports, and evidence. Historical reports record their own task state; check the linked implementation before using them as current guidance. New reports belong under `documentation/<feature>/reports/<task-or-phase>/`, with evidence beside the report.
+## Stack
 
-## Getting Started
+- Next.js 16 (App Router), React 19, strict TypeScript
+- Tailwind CSS 4 and CSS Modules
+- Prisma 7 with ordered PostgreSQL migrations
+- Optional Supabase Realtime and Upstash Redis layers with graceful fallbacks
+- Vite + Capacitor Android client (`mobile/`, `android/`)
 
-Use Node.js 24.x for local development and Vercel builds. The package's
-`engines.node` selects this major version on Vercel; `.node-version` pins a
-compatible local release. Install dependencies with `npm ci`.
+## Repository map
 
-First, run the development server:
+| Path | Contents |
+| --- | --- |
+| `app/` | Routes, route-local UI, and API handlers. |
+| `lib/` | Shared engines, contracts, services, and catalogs. |
+| `__tests__/` | Vitest suites grouped by feature area. |
+| `prisma/` | `schema.prisma` and ordered migration history (including RPCs/RLS). |
+| `public/` | Runtime static assets. |
+| `assets/` | Source/design artwork and reference screenshots, not served at runtime. |
+| `scripts/` | Build, asset, database, test, verify, security, and QA utilities. See [`scripts/README.md`](scripts/README.md). |
+| `config/` | Alternate TypeScript/Vitest/SVGO configuration. See [`config/README.md`](config/README.md). |
+| `documentation/` | Current contracts, feature indexes, reports/evidence, security audits, research, specifications, and the design-system reference set. |
+| `mobile/`, `android/` | Capacitor client and native Android project; `mobile/dist/` is generated. |
+| `tools/ai-agent/` | Independent development agent package, not part of the app build. |
+| `archive/` | Dormant source and historical source assets. |
+
+Agent-specific rules live in [`AGENTS.md`](AGENTS.md).
+
+## Getting started
+
+Use Node.js 24.x. `engines.node` selects that major version on Vercel and
+`.node-version` pins a compatible local release. Install with `npm ci`.
 
 ```bash
+cp .env.example .env.local   # fill in the values you need
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>. `.env.example` documents every supported variable;
+the app runs with a PostgreSQL `DATABASE_URL`/`DIRECT_URL` and `JWT_SECRET`.
+`npm run dev` and `npm run build` regenerate the optional calendar recognition
+worker assets before starting.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-## Performance layers (optional, graceful fallback)
+| Purpose | Command |
+| --- | --- |
+| Development | `npm run dev` |
+| Production build / serve | `npm run build` / `npm run start` |
+| Tests | `npm run test -- --run [path-filter]` (`npm test` watches) |
+| Typecheck | `npx tsc --noEmit`; run `npx next typegen` first on a fresh checkout or after route changes |
+| Lint | `npx eslint <changed-files>` |
+| Mobile | `npm run mobile:build` / `npm run mobile:verify` |
+| Android | `npm run android:sync` / `npm run android:build` |
+| Security audit | `npm run audit:secrets` / `npm run audit:models` |
+| Planner worker | `npm run planner:worker:build` |
+| Disposable PostgreSQL checks | `node scripts/test/test-*.mjs` (Docker required) |
 
-### 1. Supabase Realtime — presence & push updates
+`npm run lint` still invokes the removed `next lint`; use ESLint directly.
 
-Replaces heartbeat/polling with live websocket updates:
+## Optional performance layers
 
-- **Presence** — online/offline dots for friends come from a Realtime presence
-  channel (instant) instead of the 60s `lastSeenAt` heartbeat window.
-- **postgres_changes** — new chat messages, friendship changes and
-  conversation updates are pushed to the browser instead of 1s–15s REST polls.
+Both layers degrade automatically when unconfigured.
 
-Setup:
+### Supabase Realtime — presence and push updates
 
-1. Add to `.env` (Supabase Dashboard → Settings → API):
+Presence powers online indicators and `postgres_changes` pushes chat, friendship,
+and conversation updates instead of REST polling.
+
+1. Add to `.env.local` (Supabase Dashboard → Settings → API):
    ```
    NEXT_PUBLIC_SUPABASE_URL="https://YOUR-PROJECT-REF.supabase.co"
    NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
-   SUPABASE_JWT_SECRET="..."   # the "JWT secret" on the same page
+   SUPABASE_JWT_SECRET="..."
    ```
-2. Run `scripts/supabase-realtime-setup.sql` in the Supabase SQL editor
-   (adds the tables to the `supabase_realtime` publication + RLS policies).
-3. Make sure Realtime is enabled: Dashboard → Database → Replication.
+2. Run [`scripts/db/supabase-realtime-setup.sql`](scripts/db/supabase-realtime-setup.sql)
+   in the Supabase SQL editor.
+3. Enable Realtime: Dashboard → Database → Replication.
 
 The app mints a Supabase-format JWT per user via `GET /api/realtime/token`
-(sub = the app's integer user id), so Realtime authorizes as `authenticated`
+(`sub` = the app's integer user id), so Realtime authorizes as `authenticated`
 even though the app uses its own auth system.
 
-**Without these env vars nothing changes** — the app keeps using REST polling
-and DB heartbeats automatically.
+### Upstash Redis — hot-read cache
 
-### 2. Upstash Redis — hot-read cache
-
-Absorbs repeated hot reads across serverless instances (global rankings,
-profile dossiers, shop catalog) with short TTLs:
+Absorbs repeated hot reads (rankings, profile dossiers, shop catalog) with short
+TTLs:
 
 ```
 UPSTASH_REDIS_REST_URL="https://your-region.upstash.io"
 UPSTASH_REDIS_REST_TOKEN="..."
 ```
 
-Without these, `lib/redis.ts` falls back to a small in-process LRU cache, so
-local development needs zero setup.
+Without these, `lib/redis.ts` falls back to a small in-process LRU cache, so local
+development needs no setup.
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Start at the [documentation index](documentation/README.md). Current contracts and
+feature indexes describe present behavior; dated reports and evidence describe
+their own run. Put new reports in
+`documentation/<feature>/reports/<task-or-phase>/` with evidence beside them.

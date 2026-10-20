@@ -73,7 +73,7 @@
 
 /* A near-opaque pale scrim shows the same bloom as a heavy wash, so light mode
    gets a gentler version of the same light. */
-:global(html[data-mode="light"]) .bloom {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .bloom {
   background:
     radial-gradient(
       ellipse 46% 40% at 50% 44%,

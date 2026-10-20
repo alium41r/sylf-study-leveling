@@ -4,6 +4,7 @@ import { readEventStream } from "./event-stream";
 import type { PendingSylvieAction } from "./action";
 import type { SylviePlannerHandoff } from "./planner-bridge";
 import type { ChatImage, ComposerImage } from "./image-contract";
+import type { CalendarPageHint } from "./calendar-page-context";
 
 export interface StoredChatMessage {
   id: number; content: string; type: string; createdAt: string; attachmentUrl?: string;
@@ -15,6 +16,7 @@ export interface ChatSessionSummary { id: number; title: string; createdAt?: str
 export interface ChatReply {
   sessionId?: number; session?: ChatSessionSummary | null; userMessage?: StoredChatMessage; aiMessage?: StoredChatMessage;
   reply?: string; message?: string; modelUsed?: string; pendingAction?: PendingSylvieAction; plannerHandoff?: SylviePlannerHandoff;
+  calendarChanged?: boolean;
 }
 export class ChatRequestError extends Error {
   constructor(message: string, public status = 503) { super(message); }
@@ -22,7 +24,7 @@ export class ChatRequestError extends Error {
 export interface ChatRequest {
   message: string; file?: File | null; sessionId?: number | null; modelPreference?: string;
   images?: ComposerImage[]; onStatus?: (phase: "uploading" | "thinking") => void;
-  pageContext?: { path: string; subject?: string }; confirmationToken?: string; multipart?: boolean;
+  pageContext?: { path: string; subject?: string; calendar?: CalendarPageHint }; confirmationToken?: string; multipart?: boolean;
   signal: AbortSignal; onDelta: (text: string) => void; onReset: () => void;
   onSession: (value: ChatReply) => void;
 }

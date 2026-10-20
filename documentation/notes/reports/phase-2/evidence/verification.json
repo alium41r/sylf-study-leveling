@@ -1,0 +1,67 @@
+{
+  "recordedAt": "2026-10-20T05:44:20.928138+00:00",
+  "environment": {
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "architecture": "arm64",
+    "node": "24.19.0",
+    "chromium": "151.0.7922.34"
+  },
+  "checks": {
+    "regressionTests": {
+      "exitCode": 0,
+      "files": 6,
+      "passed": 86,
+      "log": "tests.log"
+    },
+    "typecheck": {
+      "exitCode": 0,
+      "command": "tsc --noEmit --incremental false",
+      "log": "typecheck.log"
+    },
+    "lint": {
+      "exitCode": 0,
+      "log": "lint.log",
+      "command": "eslint lib/notes __tests__/notes scripts/qa/notes-qualification app/components/AuthProvider.tsx lib/client-data-cache.ts"
+    },
+    "webBuild": {
+      "exitCode": 0,
+      "log": "web-build.log"
+    },
+    "mobileBuild": {
+      "exitCode": 0,
+      "log": "mobile-build.log"
+    },
+    "mobileVerify": {
+      "exitCode": 0,
+      "log": "mobile-verify.log"
+    },
+    "productionBrowser": {
+      "exitCode": 0,
+      "passed": 12,
+      "total": 12
+    },
+    "developmentStrictMode": {
+      "exitCode": 0,
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "performance": {
+    "saves": 200,
+    "p95Ms": 5.599999999627471,
+    "objectByteGrowth": 176039,
+    "warmStreamReopenMs": 6.299999998882413,
+    "coldLoadMeasured": false,
+    "physicalMobileMeasured": false
+  },
+  "notRun": [
+    "Live Google Drive or OneDrive OAuth/API/CORS/CSP",
+    "Actual disk-full or browser quota exhaustion",
+    "Power failure",
+    "Browser storage deletion survival (not guaranteed)",
+    "Offline cold launch",
+    "Native SQLite/files and real mobile/WebView device tests",
+    "New production Notes UI visual QA (no production UI added)"
+  ],
+  "temporaryServersStopped": true
+}

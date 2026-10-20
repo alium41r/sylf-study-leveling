@@ -1,6 +1,7 @@
+import { geminiToolSchema } from "./tool-schema";
 import { generateGeminiContent } from "./gemini-dispatch";
 import { geminiUsage } from "./usage";
-import { GoogleGenAI, Type, FunctionDeclaration, Content, Part } from "@google/genai";
+import { GoogleGenAI, FunctionDeclaration, Content, Part } from "@google/genai";
 import { LLMAdapter, NormalizedMessage, NormalizedTool, LLMResponse, LLMProviderError, NormalizedToolCall } from "./types";
 import crypto from "crypto";
 
@@ -15,37 +16,10 @@ export class GeminiAdapter implements LLMAdapter {
 
   // Convert normalized tool to Gemini FunctionDeclaration
   private mapTool(tool: NormalizedTool): FunctionDeclaration {
-    const mapType = (t: string): Type => {
-      switch (t.toLowerCase()) {
-        case "string": return Type.STRING;
-        case "number": return Type.NUMBER;
-        case "integer": return Type.INTEGER;
-        case "boolean": return Type.BOOLEAN;
-        case "array": return Type.ARRAY;
-        case "object": return Type.OBJECT;
-        default: return Type.STRING;
-      }
-    };
-
-    const mapSchema = (schema: any): any => {
-      if (!schema) return schema;
-      const res: any = { type: mapType(schema.type) };
-      if (schema.properties) {
-        res.properties = {};
-        for (const k in schema.properties) {
-          res.properties[k] = mapSchema(schema.properties[k]);
-        }
-      }
-      if (schema.items) res.items = mapSchema(schema.items);
-      if (schema.required) res.required = schema.required;
-      if (schema.description) res.description = schema.description;
-      return res;
-    };
-
     return {
       name: tool.name,
       description: tool.description,
-      parameters: tool.parameters ? mapSchema(tool.parameters) : undefined,
+      parameters: tool.parameters ? geminiToolSchema(tool.parameters) : undefined,
     };
   }
 

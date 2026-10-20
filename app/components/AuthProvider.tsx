@@ -12,6 +12,7 @@ import {
 import { clearPixelCreations } from "@/lib/pixel-creations-client";
 import { clearClientCache } from "@/lib/client-data-cache";
 import { resolveApiUrl, fetchWithTimeout } from "@/lib/api-transport";
+import { invalidateNotesAccess, prepareNotesLogout } from "@/lib/notes/session";
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -79,6 +80,8 @@ export function AuthProvider({
   initialUser?: UserStats | null;
 }) {
   const [user, setUser] = useState<UserStats | null>(initialUser ?? null);
+  const [notesLogoutError,setNotesLogoutError] = useState(false);
+  const [logoutError,setLogoutError] = useState(false);
   const [isLoading, setIsLoading] = useState(initialUser === undefined);
   const updateEpoch = useRef(0);
   const refreshSequence = useRef(0);
@@ -146,6 +149,10 @@ export function AuthProvider({
   }, [refreshStats]);
 
   const login = useCallback((userData: UserStats) => {
+    setNotesLogoutError(false);
+    setLogoutError(false);
+    // A login in a previously anonymous tab can replace another tab's cookie owner.
+    invalidateNotesAccess();
     needsRetry.current = false;
     updateEpoch.current++;
     if (owner.current !== null && owner.current !== userData.id) { clearClientCache(); clearPixelCreations(); }
@@ -155,12 +162,20 @@ export function AuthProvider({
   }, []);
 
   const logout = useCallback(async () => {
+    setLogoutError(false);
+    // Do not navigate away from unacknowledged Notes work on an explicit logout.
+    // Storage failure rejects logout; the Notes consumer retains its recovery bytes.
+    try { await prepareNotesLogout(owner.current === null ? null : String(owner.current)); setNotesLogoutError(false); }
+    catch(error) { setNotesLogoutError(true); throw error; }
+    invalidateNotesAccess();
     needsRetry.current = false;
     updateEpoch.current++;
     try {
-      await fetch(resolveApiUrl("/api/auth/logout"), { method: "POST", credentials: "include" });
-    } catch (e) {
-      console.error("Logout API error:", e);
+      const response = await fetch(resolveApiUrl("/api/auth/logout"), { method: "POST", credentials: "include" });
+      if (!response.ok) throw new Error("Sign out was not confirmed.");
+    } catch {
+      setLogoutError(true);
+      throw new Error("Sign out could not be confirmed. Reconnect and try again; Notes access is locked in this tab.");
     }
     // S3: clear cached API payloads and scratchpad drafts so the next user
     // on a shared device cannot replay this session's data.
@@ -175,6 +190,7 @@ export function AuthProvider({
       value={{ user, isLoading, login, logout, refreshStats, mutateUser }}
     >
       {children}
+      {(notesLogoutError || logoutError) && user && <div role="alert" style={{ position:"fixed",bottom:"max(16px, env(safe-area-inset-bottom))",left:"50%",transform:"translateX(-50%)",zIndex:150,width:"min(92vw, 520px)",padding:"16px",borderRadius:14,border:"1px solid var(--border-strong)",background:"var(--surface-raised)",color:"var(--text-primary)",fontSize:13,boxShadow:"0 12px 50px #0003" }}>{notesLogoutError ? "Sign out paused because Notes has unsaved changes. Keep this tab open and use Notes recovery to export or retry them." : "Sign out could not be confirmed. Reconnect and try again. Notes is locked in this tab."}<button type="button" onClick={()=>{setNotesLogoutError(false);setLogoutError(false);}} style={{ display:"block",marginTop:10,minHeight:44,color:"var(--accent-text)",background:"transparent",border:0 }}>Keep working</button></div>}
     </AuthContext.Provider>
   );
 }

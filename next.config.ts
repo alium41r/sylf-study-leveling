@@ -24,7 +24,7 @@ const connectSrc = [
 // does. Keep 'unsafe-eval' OUT of the production CSP (verified on the prod
 // build) and only add it for `next dev`.
 const isDev = process.env.NODE_ENV !== "production";
-const scriptSrc = ["'self'", "'unsafe-inline'", ...(isDev ? ["'unsafe-eval'"] : [])].join(" ");
+const scriptSrc = ["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'", ...(isDev ? ["'unsafe-eval'"] : [])].join(" ");
 
 const securityHeaders = [
   {
@@ -38,7 +38,8 @@ const securityHeaders = [
       "img-src 'self' data: blob: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "media-src 'self' data: blob:",
-      `connect-src ${connectSrc} https://fonts.googleapis.com https://fonts.gstatic.com`,
+      `connect-src ${connectSrc} https://fonts.googleapis.com https://fonts.gstatic.com https://huggingface.co https://*.hf.co https://*.huggingface.co`,
+      "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

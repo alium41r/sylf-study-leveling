@@ -1,0 +1,81 @@
+{
+  "results": [
+    "Mandatory cloud onboarding",
+    "Create rich text; encrypted IndexedDB save; verified synthetic cloud transfer"
+  ],
+  "errors": [],
+  "summary": {
+    "notes": [
+      {
+        "id": "17e380e7-6a87-4fa7-a91d-75cc23f8fc7c",
+        "title": "Untitled note"
+      }
+    ],
+    "stats": {
+      "notes": [
+        {
+          "id": "17e380e7-6a87-4fa7-a91d-75cc23f8fc7c",
+          "view": {
+            "descriptor": {
+              "format": "sylf-notes",
+              "formatVersion": 1,
+              "minimumReaderVersion": 1,
+              "libraryId": "cb8128a8-b44c-4f1d-953c-083bd3f36f5d",
+              "documentId": "17e380e7-6a87-4fa7-a91d-75cc23f8fc7c",
+              "kind": "flow",
+              "title": "Untitled note",
+              "schemaVersion": 1,
+              "folderId": null,
+              "subjectId": null,
+              "streams": [
+                {
+                  "streamId": "aa0aa2d1-4f1a-4c7c-b838-c904de203579",
+                  "epoch": 1,
+                  "codec": "yjs13-update-v1",
+                  "adapter": "blocknote/0.56.0",
+                  "schemaVersion": 1,
+                  "projection": {
+                    "root": "body",
+                    "type": "xml"
+                  }
+                }
+              ],
+              "pages": [],
+              "assets": [],
+              "requiredFeatures": [
+                "rich-text-v1"
+              ],
+              "extensions": {}
+            },
+            "descriptorRef": {
+              "hash": "31efd60599545e3664bdf869f880c311b5d8472e7cd53bc66bb313fb4900e54f",
+              "size": 522
+            },
+            "heads": [
+              "69125ffd9be00eea2772c80ac8f7b7388a6b50fbd35142e2f588e8fe317b419e"
+            ],
+            "state": "active",
+            "alternatives": [
+              {
+                "hash": "31efd60599545e3664bdf869f880c311b5d8472e7cd53bc66bb313fb4900e54f",
+                "size": 522
+              }
+            ]
+          },
+          "updatedAt": "2026-10-20T06:45:29.275Z",
+          "preview": " Complex numbers lecture — durable body marker ",
+          "searchText": " complex numbers lecture — durable body marker "
+        }
+      ],
+      "folders": [],
+      "ready": true,
+      "syncing": false,
+      "pending": 0,
+      "searchIndexed": 1,
+      "searchTotal": 1,
+      "verifiedAt": "2026-10-20T06:45:30.163Z",
+      "memoryPending": 0,
+      "searchLimited": false
+    }
+  }
+}

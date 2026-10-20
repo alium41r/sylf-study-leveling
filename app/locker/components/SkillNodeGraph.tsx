@@ -141,14 +141,15 @@ export function SkillNodeGraph({
 
   useEffect(() => {
     const checkMode = () => {
+      const polarity = document.documentElement.getAttribute("data-surface-polarity");
       const mode = document.documentElement.getAttribute("data-mode");
-      setIsLightMode(mode === "light");
+      setIsLightMode(polarity ? polarity === "light" : mode === "light");
     };
     checkMode();
     const observer = new MutationObserver(checkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["data-mode"],
+      attributeFilter: ["data-mode", "data-surface-polarity"],
     });
     return () => observer.disconnect();
   }, []);

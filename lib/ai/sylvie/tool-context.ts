@@ -2,7 +2,7 @@
  * identifiers and counts; explicitly disclose omitted rows/text to the assistant. */
 export function boundSylvieToolResult(value: unknown, maxChars = 8000): unknown {
   let remaining = Math.max(256, maxChars - 512), truncated = false;
-  const priority = ["id", "title", "name", "status", "scheduledFor", "targetDate", "requiredMinutes", "error", "totalQuests", "totalGoals", "summary"];
+  const priority = ["id", "title", "name", "status", "scheduledFor", "targetDate", "requiredMinutes", "error", "totalQuests", "totalGoals", "summary", "timezone", "range", "totalMatches", "eventsTruncated", "slotsTruncated", "slots", "deadlines", "conflicts"];
   function visit(item: unknown, depth: number): unknown {
     if (remaining < 64 || depth > 6) { truncated = true; return "[omitted: narrow the request]"; }
     if (typeof item === "string") {

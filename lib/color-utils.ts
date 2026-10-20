@@ -330,8 +330,10 @@ export interface AccentTokens {
   "--accent-blue": string;
 }
 
+export type SurfacePolarity = "dark" | "light";
+
 export function getAccentForeground(rawHex: string): string {
-  const norm = normalizeHex(rawHex, DEFAULT_ACCENT_HEX);
+  const norm = resolveLegacyTheme(rawHex);
   const crWhite = getContrastRatio(norm, "#ffffff");
   const crBlack = getContrastRatio(norm, "#000000");
 
@@ -341,7 +343,7 @@ export function getAccentForeground(rawHex: string): string {
 }
 
 export function getSafeAccentText(accentHex: string, surfaceHex: string): string {
-  const normAccent = normalizeHex(accentHex, DEFAULT_ACCENT_HEX);
+  const normAccent = resolveLegacyTheme(accentHex);
   const normSurface = normalizeHex(surfaceHex, DEFAULT_DARK_BG_HEX);
 
   if (getContrastRatio(normAccent, normSurface) >= 4.5) {
@@ -359,7 +361,7 @@ export function getSafeAccentText(accentHex: string, surfaceHex: string): string
   let currentS = hsl.s;
   let safeHex = normAccent;
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 25; i++) {
     if (preferLight) {
       currentL = Math.min(98, currentL + 4);
       currentS = Math.max(10, currentS - 4);
@@ -379,7 +381,7 @@ export function getSafeAccentText(accentHex: string, surfaceHex: string): string
 }
 
 export function getAccentTokens(rawHex: string, targetSurfaceHex = "#000000"): AccentTokens {
-  const primaryHex = normalizeHex(rawHex, DEFAULT_ACCENT_HEX);
+  const primaryHex = resolveLegacyTheme(rawHex);
   const rgb = hexToRgb(primaryHex) || hexToRgb(DEFAULT_ACCENT_HEX)!;
   const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
 
@@ -401,7 +403,12 @@ export function getAccentTokens(rawHex: string, targetSurfaceHex = "#000000"): A
   const hoverHex = rgbToHex(hoverRgb.r, hoverRgb.g, hoverRgb.b);
 
   const fgColor = getAccentForeground(primaryHex);
-  const safeText = getSafeAccentText(primaryHex, targetSurfaceHex);
+  const normSurface = normalizeHex(targetSurfaceHex, DEFAULT_DARK_BG_HEX);
+  const safeText = getSafeAccentText(primaryHex, normSurface);
+  const preferDarkSurface = isDarkColor(normSurface);
+  const safeTextLight = preferDarkSurface
+    ? getSafeAccentText(lightHex, normSurface)
+    : getSafeAccentText(darkHex, normSurface);
 
   return {
     "--accent": primaryHex,
@@ -415,8 +422,8 @@ export function getAccentTokens(rawHex: string, targetSurfaceHex = "#000000"): A
     "--accent-foreground": fgColor,
     "--accent-contrast": fgColor,
     "--accent-text": safeText,
-    "--accent-text-light": lightHex,
-    "--focus-ring": `0 0 0 2px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`,
+    "--accent-text-light": safeTextLight,
+    "--focus-ring": `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)`,
     "--accent-purple": primaryHex,
     "--accent-cyan": lightHex,
     "--accent-blue": primaryHex,
@@ -424,6 +431,7 @@ export function getAccentTokens(rawHex: string, targetSurfaceHex = "#000000"): A
 }
 
 export interface BackgroundTokens {
+  "--surface-polarity": SurfacePolarity;
   "--app-canvas": string;
   "--bg-void": string;
   "--surface-1": string;
@@ -432,6 +440,9 @@ export interface BackgroundTokens {
   "--bg-shadow": string;
   "--surface-raised": string;
   "--bg-panel": string;
+  "--bg-surface-dark": string;
+  "--bg-surface-elevated": string;
+  "--bg-card": string;
   "--overlay-bg": string;
   "--bg-overlay": string;
   "--text-primary": string;
@@ -440,6 +451,23 @@ export interface BackgroundTokens {
   "--border-subtle": string;
   "--border-strong": string;
   "--border-active": string;
+  "--sub-surface": string;
+  "--sub-border": string;
+  "--input-bg": string;
+  "--input-border": string;
+  "--dialog-bg": string;
+  "--dialog-border": string;
+  "--tab-bar-bg": string;
+  "--tab-bar-border": string;
+  "--chip-bg": string;
+  "--chip-border": string;
+  "--track-bg": string;
+  "--status-gold": string;
+  "--status-gold-dim": string;
+  "--status-green": string;
+  "--status-green-dim": string;
+  "--status-red": string;
+  "--status-red-dim": string;
   "--sidebar-bg": string;
   "--sidebar-fg": string;
   "--sidebar-border": string;
@@ -448,10 +476,41 @@ export interface BackgroundTokens {
   "--card-shadow": string;
 }
 
+export function getSurfacePolarity(
+  rawBg?: string | null,
+  mode: "dark" | "light" = "dark"
+): SurfacePolarity {
+  const resolved = rawBg && isValidHex(rawBg)
+    ? normalizeHex(rawBg)
+    : resolveLegacyBackground(rawBg, mode);
+  const rgb = hexToRgb(resolved) || hexToRgb(DEFAULT_DARK_BG_HEX)!;
+  const lum = getRelativeLuminance(rgb);
+  const crWhite = getContrastRatio(resolved, "#ffffff");
+  const crDark = getContrastRatio(resolved, "#0f172a");
+  return crWhite >= crDark || lum < 0.42 ? "dark" : "light";
+}
+
+export function getRecommendedModeForBackground(
+  rawBg?: string | null,
+  fallbackMode: "dark" | "light" = "dark"
+): "dark" | "light" {
+  if (!rawBg) return fallbackMode;
+  const trimmed = rawBg.trim();
+  const withHash = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+  if (!isValidHex(withHash)) {
+    return fallbackMode;
+  }
+  return getSurfacePolarity(withHash, fallbackMode);
+}
+
 export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "dark"): BackgroundTokens {
-  const userCanvasHex = isValidHex(rawHex)
-    ? (rawHex.trim().startsWith("#") ? rawHex.trim() : `#${rawHex.trim()}`)
-    : (mode === "light" ? DEFAULT_LIGHT_BG_HEX : DEFAULT_DARK_BG_HEX);
+  const trimmed = rawHex ? rawHex.trim() : "";
+  const candidateHex = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+  const userCanvasHex = isValidHex(trimmed)
+    ? trimmed
+    : isValidHex(candidateHex)
+      ? candidateHex
+      : resolveLegacyBackground(rawHex, mode);
   const normBg = userCanvasHex.toLowerCase();
   const rgb = hexToRgb(normBg) || hexToRgb(DEFAULT_DARK_BG_HEX)!;
   const lum = getRelativeLuminance(rgb);
@@ -464,11 +523,6 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
 
   if (isDarkCanvas) {
     // ── Dark or Saturated Deep Canvas ──────────────────────────────────────────
-    // Foreground text MUST be light to satisfy WCAG AA >= 4.5:1
-    const textPrimary = "#e2e8f0";
-    const textSecondary = lum < 0.1 ? "#94a3b8" : "#cbd5e1";
-    const textMuted = lum < 0.1 ? "#64748b" : "#94a3b8";
-
     let surface1Hex: string;
     let surface2Hex: string;
     let surfaceRaisedHex: string;
@@ -503,11 +557,29 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
       sidebarHex = rgbToHex(sbRgb.r, sbRgb.g, sbRgb.b);
     }
 
+    // Foreground text MUST satisfy WCAG AA >= 4.5:1 for primary/secondary and >= 3.0:1 for muted
+    const textPrimary = "#e2e8f0";
+    let textSecondary = hsl.l < 10 ? "#94a3b8" : "#cbd5e1";
+    if (
+      getContrastRatio(textSecondary, surface1Hex) < 4.5 ||
+      getContrastRatio(textSecondary, surface2Hex) < 4.5
+    ) {
+      textSecondary = "#cbd5e1";
+    }
+    let textMuted = hsl.l < 10 ? "#64748b" : "#94a3b8";
+    if (
+      getContrastRatio(textMuted, surface1Hex) < 3.0 ||
+      getContrastRatio(textMuted, surface2Hex) < 3.0
+    ) {
+      textMuted = "#94a3b8";
+    }
+
     const overlayR = Math.max(0, rgb.r - 12);
     const overlayG = Math.max(0, rgb.g - 12);
     const overlayB = Math.max(0, rgb.b - 12);
 
     return {
+      "--surface-polarity": "dark",
       "--app-canvas": userCanvasHex,
       "--bg-void": userCanvasHex,
       "--surface-1": surface1Hex,
@@ -516,6 +588,9 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
       "--bg-shadow": surface2Hex,
       "--surface-raised": surfaceRaisedHex,
       "--bg-panel": surfaceRaisedHex,
+      "--bg-surface-dark": surface1Hex,
+      "--bg-surface-elevated": surfaceRaisedHex,
+      "--bg-card": surface1Hex,
       "--overlay-bg": `rgba(${overlayR}, ${overlayG}, ${overlayB}, 0.92)`,
       "--bg-overlay": `rgba(${overlayR}, ${overlayG}, ${overlayB}, 0.92)`,
       "--text-primary": textPrimary,
@@ -524,6 +599,23 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
       "--border-subtle": "rgba(255, 255, 255, 0.12)",
       "--border-strong": "rgba(255, 255, 255, 0.22)",
       "--border-active": "rgba(255, 255, 255, 0.35)",
+      "--sub-surface": "rgba(255, 255, 255, 0.03)",
+      "--sub-border": "rgba(255, 255, 255, 0.07)",
+      "--input-bg": surface2Hex,
+      "--input-border": "rgba(255, 255, 255, 0.12)",
+      "--dialog-bg": surface1Hex,
+      "--dialog-border": "rgba(255, 255, 255, 0.12)",
+      "--tab-bar-bg": "rgba(255, 255, 255, 0.03)",
+      "--tab-bar-border": "rgba(255, 255, 255, 0.08)",
+      "--chip-bg": "rgba(255, 255, 255, 0.04)",
+      "--chip-border": "rgba(255, 255, 255, 0.08)",
+      "--track-bg": "rgba(255, 255, 255, 0.06)",
+      "--status-gold": "#f59e0b",
+      "--status-gold-dim": "rgba(245, 158, 11, 0.12)",
+      "--status-green": "#10b981",
+      "--status-green-dim": "rgba(16, 185, 129, 0.12)",
+      "--status-red": "#ef4444",
+      "--status-red-dim": "rgba(239, 68, 68, 0.12)",
       "--sidebar-bg": sidebarHex,
       "--sidebar-fg": textPrimary,
       "--sidebar-border": "rgba(255, 255, 255, 0.12)",
@@ -541,13 +633,10 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
     let surface1Hex: string;
     let surface2Hex: string;
     let surfaceRaisedHex: string;
+    const sidebarRgb = hslToRgb(hsl.h, Math.min(15, hsl.s * 0.3), 97);
     const sidebarHex = hsl.l > 94
       ? "#ffffff"
-      : rgbToHex(
-          hslToRgb(hsl.h, Math.min(15, hsl.s * 0.3), 97).r,
-          hslToRgb(hsl.h, Math.min(15, hsl.s * 0.3), 97).g,
-          hslToRgb(hsl.h, Math.min(15, hsl.s * 0.3), 97).b
-        );
+      : rgbToHex(sidebarRgb.r, sidebarRgb.g, sidebarRgb.b);
 
     if (hsl.l > 94) {
       // Near-white canvas (e.g. #ffffff, #f8fafc)
@@ -564,6 +653,7 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
     }
 
     return {
+      "--surface-polarity": "light",
       "--app-canvas": userCanvasHex,
       "--bg-void": userCanvasHex,
       "--surface-1": surface1Hex,
@@ -572,6 +662,9 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
       "--bg-shadow": surface2Hex,
       "--surface-raised": surfaceRaisedHex,
       "--bg-panel": surfaceRaisedHex,
+      "--bg-surface-dark": surface1Hex,
+      "--bg-surface-elevated": surface2Hex,
+      "--bg-card": surface1Hex,
       "--overlay-bg": "rgba(241, 245, 249, 0.88)",
       "--bg-overlay": "rgba(241, 245, 249, 0.88)",
       "--text-primary": textPrimary,
@@ -580,6 +673,23 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
       "--border-subtle": "rgba(15, 23, 42, 0.12)",
       "--border-strong": "rgba(15, 23, 42, 0.22)",
       "--border-active": "rgba(15, 23, 42, 0.35)",
+      "--sub-surface": "rgba(15, 23, 42, 0.03)",
+      "--sub-border": "rgba(15, 23, 42, 0.08)",
+      "--input-bg": "#f8fafc",
+      "--input-border": "rgba(15, 23, 42, 0.14)",
+      "--dialog-bg": surface1Hex,
+      "--dialog-border": "rgba(15, 23, 42, 0.12)",
+      "--tab-bar-bg": "rgba(15, 23, 42, 0.04)",
+      "--tab-bar-border": "rgba(15, 23, 42, 0.08)",
+      "--chip-bg": "rgba(15, 23, 42, 0.04)",
+      "--chip-border": "rgba(15, 23, 42, 0.10)",
+      "--track-bg": "rgba(15, 23, 42, 0.08)",
+      "--status-gold": "#b45309",
+      "--status-gold-dim": "rgba(180, 83, 9, 0.10)",
+      "--status-green": "#047857",
+      "--status-green-dim": "rgba(4, 120, 87, 0.10)",
+      "--status-red": "#b91c1c",
+      "--status-red-dim": "rgba(185, 28, 28, 0.10)",
       "--sidebar-bg": sidebarHex,
       "--sidebar-fg": textPrimary,
       "--sidebar-border": "rgba(15, 23, 42, 0.12)",
@@ -589,4 +699,5 @@ export function getBackgroundTokens(rawHex: string, mode: "dark" | "light" = "da
     };
   }
 }
+
 

@@ -19,7 +19,8 @@ export function isStaticViewportRoute(pathname: string | null | undefined): bool
     pathname.startsWith("/focus/") ||
     pathname === "/system" ||
     pathname.startsWith("/system/") ||
-    pathname.startsWith("/social/chat")
+    pathname.startsWith("/social/chat") ||
+    pathname === "/notes"
   );
 }
 

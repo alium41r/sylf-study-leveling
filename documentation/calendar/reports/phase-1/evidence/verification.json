@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-18",
+  "phase": 1,
+  "targetedTestsPassed": 56,
+  "postgresTestsPassed": 4,
+  "migrationApplied": "20261018000000_personal_calendar",
+  "schemaStatus": "up to date",
+  "lint": "passed",
+  "mobileBuild": "passed",
+  "mobileBundleVerification": "passed",
+  "webTypecheckAndBuild": "blocked by pre-existing missing getContrastForeground export used by AppearanceStep.tsx:6",
+  "viewports": [
+    [
+      360,
+      780
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1440,
+      1000
+    ]
+  ],
+  "appearanceChecks": [
+    "light / plain / violet",
+    "dark / plain / violet",
+    "dark mode / light custom surface / yellow",
+    "light mode / dark custom surface / mint",
+    "original light custom background / yellow"
+  ],
+  "axe": {
+    "scope": "calendar workspace and event/note dialogs",
+    "tags": [
+      "wcag2a",
+      "wcag2aa",
+      "wcag21aa"
+    ],
+    "finalViolations": 0
+  },
+  "keyboard": {
+    "consecutiveTabsContained": 25,
+    "escapeDirtyConfirmation": true,
+    "initialEditorAutofocus": true
+  },
+  "reducedMotionDialogAnimationDuration": "0s",
+  "temporaryQaEntriesRemaining": 0,
+  "appearanceRestored": true,
+  "studyFixtureScreenshots": "read-only network projections; no fixture quests or goals persisted"
+}

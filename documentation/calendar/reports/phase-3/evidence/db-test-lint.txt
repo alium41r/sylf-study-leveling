@@ -1,0 +1,2 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' --rule {"@typescript-eslint/no-explicit-any":"off"} __tests__/calendar/personal-postgres.test.ts __tests__/calendar/floating-rest-day.test.ts

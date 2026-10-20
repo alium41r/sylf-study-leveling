@@ -1,0 +1,14 @@
+{
+  "path": "public/notes-licenses/blocknote-0.56.0-source.zip",
+  "sha256": "3d2a64c03b23ae65a0d3d65109c6a7ea5b3ea2c941a1e2ddacde590503586343",
+  "bytes": 1552171,
+  "sourceFiles": 690,
+  "byteExact": true,
+  "packages": [
+    "@blocknote/core@0.56.0",
+    "@blocknote/react@0.56.0"
+  ],
+  "license": "MPL-2.0",
+  "dependencyNoticeCount": 56,
+  "sourceModifiedByPhase": false
+}

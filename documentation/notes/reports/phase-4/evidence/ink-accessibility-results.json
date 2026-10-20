@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "touchControls": [
+    {
+      "label": "Pen",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Highlighter",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Stroke eraser",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Lasso selection",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Pan",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Ink color and thickness",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Undo handwriting",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Redo handwriting",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Zoom out",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Fit paper width",
+      "width": 58,
+      "height": 44
+    },
+    {
+      "label": "Zoom in",
+      "width": 44,
+      "height": 44
+    }
+  ],
+  "fullScreenReaderAudit": false
+}

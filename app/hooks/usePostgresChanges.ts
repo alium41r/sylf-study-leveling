@@ -8,7 +8,7 @@
 //   • NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY env
 //   • SUPABASE_JWT_SECRET server-side (minted authenticated JWT)
 //   • The tables added to the `supabase_realtime` publication and RLS SELECT
-//     policies for `authenticated` — see scripts/supabase-realtime-setup.sql
+//     policies for `authenticated` — see scripts/db/supabase-realtime-setup.sql
 //
 // Until all of that is in place the hook simply stays disconnected and the
 // pages keep their (slower) REST fallback polling.

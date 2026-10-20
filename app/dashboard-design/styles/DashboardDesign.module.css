@@ -16,7 +16,7 @@
   user-select: none;
 }
 
-:global(html[data-mode="light"]) .devLabBar {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .devLabBar {
   background: #e2e8f0;
   border-bottom: 1px solid #cbd5e1;
   color: #475569;
@@ -127,12 +127,12 @@
   border-color: var(--accent-mid, rgba(134, 170, 244, 0.3));
 }
 
-:global(html[data-mode="light"]) .devLabPillGroup {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .devLabPillGroup {
   background: #cbd5e1;
   border-color: #94a3b8;
 }
 
-:global(html[data-mode="light"]) .devLabPillActive {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .devLabPillActive {
   background: #ffffff;
   color: var(--accent-strong, #2563eb);
   border-color: var(--accent-mid, #93c5fd);
@@ -210,7 +210,7 @@
   color-scheme: dark;
 }
 
-:global(html[data-mode="light"]) .dashboardContainer {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .dashboardContainer {
   --page: #f1f4fa;
   --surface: #ffffff;
   --elevated: #e5ebf5;
@@ -266,13 +266,13 @@
   mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
 }
 
-:global(html[data-mode="light"]) .topGlow {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow {
   background:
     radial-gradient(ellipse 60% 35% at 50% -5%, rgba(180, 200, 235, 0.15), transparent 70%),
     radial-gradient(ellipse 40% 25% at 85% 10%, rgba(195, 215, 245, 0.1), transparent 70%);
 }
 
-:global(html[data-mode="light"]) .topGlow::before {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow::before {
   opacity: 0.08;
 }
 
@@ -382,14 +382,14 @@
   position: relative;
 }
 
-:global(html[data-mode="light"]) .card,
-:global(html[data-mode="light"]) .characterCard,
-:global(html[data-mode="light"]) .statCard,
-:global(html[data-mode="light"]) .briefingCard,
-:global(html[data-mode="light"]) .insightsContainer,
-:global(html[data-mode="light"]) .questsCard,
-:global(html[data-mode="light"]) .streakCard,
-:global(html[data-mode="light"]) .friendsCard {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .card,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .characterCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .statCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .briefingCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .insightsContainer,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .questsCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .streakCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .friendsCard {
   border-color: var(--subtle-line);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.02);
 }
@@ -450,7 +450,7 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-:global(html[data-mode="light"]) .avatarFrame {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .avatarFrame {
   box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.08);
 }
 
@@ -628,7 +628,7 @@
   position: relative;
 }
 
-:global(html[data-mode="light"]) .progressWell {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .progressWell {
   background: #e2e8f0;
 }
 
@@ -1155,7 +1155,7 @@
   gap: 6px;
 }
 
-:global(html[data-mode="light"]) .btnPrimary {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .btnPrimary {
   color: #ffffff;
 }
 

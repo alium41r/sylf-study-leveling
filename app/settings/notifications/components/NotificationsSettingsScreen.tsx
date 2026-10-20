@@ -133,7 +133,8 @@ export function NotificationsSettingsScreen() {
   }, []);
 
   useEffect(() => {
-    fetchPreferences();
+    const frame = requestAnimationFrame(() => void fetchPreferences());
+    return () => cancelAnimationFrame(frame);
   }, [fetchPreferences]);
 
   // Show transient toast notification
@@ -170,9 +171,9 @@ export function NotificationsSettingsScreen() {
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("notification-preferences-updated"));
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e);
-      setErrorMessage(e.message || "Failed to save changes. Please try again.");
+      setErrorMessage(e instanceof Error ? e.message : "Failed to save changes. Please try again.");
       fetchPreferences();
     } finally {
       setIsSaving(false);
@@ -411,8 +412,8 @@ export function NotificationsSettingsScreen() {
               />
               <ToggleItem
                 id="scheduledFocusReminders"
-                title="Scheduled Focus Reminders"
-                description="Gentle notifications for planned Pomodoro blocks and daily focus intervals."
+                title="Calendar & Focus Reminders"
+                description="Personal calendar reminders and planned focus intervals while Sylf is running."
                 icon={<Clock className="w-4 h-4" />}
                 checked={preferences.scheduledFocusReminders}
                 disabled={!isMasterOn || isLoading}

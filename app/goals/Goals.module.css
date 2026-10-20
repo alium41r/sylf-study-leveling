@@ -18,30 +18,30 @@
   --accent-mid: var(--accent-primary-mid, rgba(134, 170, 244, 0.32));
   --line: var(--border-strong, #263247);
   --subtle-line: var(--border-subtle, #1a2435);
-  --card-shadow: 0 0 22px -4px var(--accent-dim), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --card-shadow: var(--shadow-card, 0 0 22px -4px var(--accent-dim), 0 4px 16px rgba(0, 0, 0, 0.3));
   --card-shadow-hover: 0 0 28px -2px var(--accent-dim), 0 6px 20px rgba(0, 0, 0, 0.4);
   --top-highlight-opacity: 0.6;
-  --chip-bg: rgba(255, 255, 255, 0.03);
-  --chip-border: rgba(255, 255, 255, 0.06);
-  --btn-ghost-bg: rgba(255, 255, 255, 0.04);
-  --btn-ghost-border: rgba(255, 255, 255, 0.1);
-  --btn-ghost-hover: rgba(255, 255, 255, 0.08);
-  --tab-bar-bg: rgba(14, 21, 34, 0.88);
-  --tab-bar-border: #1a2435;
+  --chip-bg: color-mix(in srgb, var(--text-primary, #eef1f8) 4%, transparent);
+  --chip-border: color-mix(in srgb, var(--text-primary, #eef1f8) 8%, transparent);
+  --btn-ghost-bg: color-mix(in srgb, var(--text-primary, #eef1f8) 4%, transparent);
+  --btn-ghost-border: color-mix(in srgb, var(--text-primary, #eef1f8) 10%, transparent);
+  --btn-ghost-hover: color-mix(in srgb, var(--text-primary, #eef1f8) 8%, transparent);
+  --tab-bar-bg: color-mix(in srgb, var(--surface-1, #0e1522) 92%, transparent);
+  --tab-bar-border: var(--border-subtle, #1a2435);
   --tab-bar-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  --track-bg: #080d17;
-  --track-border: rgba(255, 255, 255, 0.1);
-  --input-bg: #080d17;
-  --input-border: #1a2435;
-  --dialog-bg: #0e1522;
-  --dialog-border: #1a2435;
-  --dialog-backdrop: rgba(0, 0, 0, 0.75);
-  --badge-completed-bg: rgba(16, 185, 129, 0.12);
+  --track-bg: var(--surface-2, #080d17);
+  --track-border: var(--border-subtle, rgba(255, 255, 255, 0.1));
+  --input-bg: var(--bg-void, #080d17);
+  --input-border: var(--border-subtle, #1a2435);
+  --dialog-bg: var(--surface-1, #0e1522);
+  --dialog-border: var(--border-subtle, #1a2435);
+  --dialog-backdrop: var(--overlay-bg, rgba(0, 0, 0, 0.75));
+  --badge-completed-bg: var(--status-green-dim, rgba(16, 185, 129, 0.12));
   --badge-completed-border: rgba(16, 185, 129, 0.3);
-  --badge-completed-text: #34d399;
-  --badge-failed-bg: rgba(239, 68, 68, 0.12);
+  --badge-completed-text: var(--status-green, #34d399);
+  --badge-failed-bg: var(--status-red-dim, rgba(239, 68, 68, 0.12));
   --badge-failed-border: rgba(239, 68, 68, 0.3);
-  --badge-failed-text: #f87171;
+  --badge-failed-text: var(--status-red, #f87171);
 
   position: relative;
   isolation: isolate;
@@ -51,7 +51,7 @@
   color-scheme: dark;
 }
 
-:global(html[data-mode="light"]) .goalsContainer {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .goalsContainer {
   --page: var(--app-canvas, #f1f4fa);
   --surface: var(--surface-1, #ffffff);
   --surface-hover: var(--surface-raised, #f8fafc);
@@ -68,27 +68,27 @@
   --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
   --card-shadow-hover: 0 8px 24px -4px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
   --top-highlight-opacity: 0.35;
-  --chip-bg: rgba(15, 23, 42, 0.04);
-  --chip-border: rgba(15, 23, 42, 0.08);
-  --btn-ghost-bg: rgba(15, 23, 42, 0.04);
-  --btn-ghost-border: rgba(15, 23, 42, 0.12);
-  --btn-ghost-hover: rgba(15, 23, 42, 0.08);
-  --tab-bar-bg: rgba(255, 255, 255, 0.94);
-  --tab-bar-border: #d6dfed;
+  --chip-bg: color-mix(in srgb, var(--text-primary, #0f172a) 4%, transparent);
+  --chip-border: color-mix(in srgb, var(--text-primary, #0f172a) 10%, transparent);
+  --btn-ghost-bg: color-mix(in srgb, var(--text-primary, #0f172a) 4%, transparent);
+  --btn-ghost-border: color-mix(in srgb, var(--text-primary, #0f172a) 12%, transparent);
+  --btn-ghost-hover: color-mix(in srgb, var(--text-primary, #0f172a) 8%, transparent);
+  --tab-bar-bg: color-mix(in srgb, var(--surface-1, #ffffff) 94%, transparent);
+  --tab-bar-border: var(--border-subtle, #d6dfed);
   --tab-bar-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
-  --track-bg: #e2e8f0;
-  --track-border: #cbd5e1;
-  --input-bg: #f8fafc;
-  --input-border: #cbd5e1;
-  --dialog-bg: #ffffff;
-  --dialog-border: #d6dfed;
-  --dialog-backdrop: rgba(15, 23, 42, 0.45);
-  --badge-completed-bg: rgba(16, 185, 129, 0.1);
+  --track-bg: var(--surface-2, #e2e8f0);
+  --track-border: var(--border-default, #cbd5e1);
+  --input-bg: var(--surface-raised, #f8fafc);
+  --input-border: var(--border-default, #cbd5e1);
+  --dialog-bg: var(--surface-1, #ffffff);
+  --dialog-border: var(--border-subtle, #d6dfed);
+  --dialog-backdrop: var(--overlay-bg, rgba(15, 23, 42, 0.45));
+  --badge-completed-bg: var(--status-green-dim, rgba(16, 185, 129, 0.1));
   --badge-completed-border: rgba(16, 185, 129, 0.3);
-  --badge-completed-text: #059669;
-  --badge-failed-bg: rgba(239, 68, 68, 0.1);
+  --badge-completed-text: var(--status-green, #059669);
+  --badge-failed-bg: var(--status-red-dim, rgba(239, 68, 68, 0.1));
   --badge-failed-border: rgba(239, 68, 68, 0.3);
-  --badge-failed-text: #dc2626;
+  --badge-failed-text: var(--status-red, #dc2626);
 
   color-scheme: light;
 }
@@ -119,13 +119,13 @@
   mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
 }
 
-:global(html[data-mode="light"]) .topGlow {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow {
   background:
     radial-gradient(ellipse 65% 40% at 50% -5%, rgba(180, 200, 235, 0.18), transparent 70%),
     radial-gradient(ellipse 45% 30% at 85% 10%, rgba(195, 215, 245, 0.12), transparent 70%);
 }
 
-:global(html[data-mode="light"]) .topGlow::before {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow::before {
   opacity: 0.08;
 }
 
@@ -344,7 +344,7 @@
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-:global(html[data-mode="light"]) .diffEasy {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .diffEasy {
   color: #047857;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.28);
@@ -362,7 +362,7 @@
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-:global(html[data-mode="light"]) .diffHard {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .diffHard {
   color: #b45309;
   background: rgba(245, 158, 11, 0.1);
   border: 1px solid rgba(245, 158, 11, 0.28);
@@ -374,7 +374,7 @@
   border: 1px solid rgba(168, 85, 247, 0.3);
 }
 
-:global(html[data-mode="light"]) .diffExpert {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .diffExpert {
   color: #7e22ce;
   background: rgba(168, 85, 247, 0.1);
   border: 1px solid rgba(168, 85, 247, 0.28);
@@ -410,7 +410,7 @@
   box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5), 0 0 24px var(--accent-dim);
 }
 
-:global(html[data-mode="light"]) .modalContent {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .modalContent {
   box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px var(--dialog-border);
 }
 
@@ -569,7 +569,7 @@
   box-shadow: 0 0 24px -4px var(--accent-dim), 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
-:global(html[data-mode="light"]) .streakCard {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .streakCard {
   background: #ffffff;
   border-color: var(--accent-mid);
   box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);

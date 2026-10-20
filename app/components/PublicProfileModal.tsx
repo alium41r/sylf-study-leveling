@@ -124,23 +124,23 @@ function AttributeRadar({ values }: { values: Record<CognitiveStatKey, number> }
   return (
     <svg viewBox="0 0 300 300" className="w-full max-w-[340px] mx-auto select-none">
       {/* Center marker */}
-      <circle cx={CX} cy={CY} r={3.5} fill="#a855f7" opacity={0.9} />
+      <circle cx={CX} cy={CY} r={3.5} fill="var(--accent-primary)" opacity={0.9} />
       {/* Grid rings */}
       {rings.map((pts, k) => (
-        <polygon key={k} points={pts} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} />
+        <polygon key={k} points={pts} fill="none" stroke="var(--border-subtle)" strokeWidth={1} />
       ))}
       {/* Axis spokes */}
       {axes.map((l, i) => (
-        <line key={i} {...l} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
+        <line key={i} {...l} stroke="var(--border-subtle)" strokeWidth={1} />
       ))}
       {/* Value polygon */}
       <polygon
         points={valuePts.map((p) => p.join(",")).join(" ")}
-        fill="rgba(168,85,247,0.18)"
-        stroke="#a855f7"
+        fill="var(--accent-primary-dim)"
+        stroke="var(--accent-primary)"
         strokeWidth={1.6}
         strokeLinejoin="round"
-        style={{ filter: "drop-shadow(0 0 6px rgba(168,85,247,0.45))" }}
+        style={{ filter: "drop-shadow(0 0 6px var(--accent-primary-dim))" }}
       />
       {/* Vertex dots + axis labels */}
       {ORDER.map((o, i) => {
@@ -149,12 +149,12 @@ function AttributeRadar({ values }: { values: Record<CognitiveStatKey, number> }
         const value = Math.min(100, values[o.key] ?? 0);
         return (
           <g key={o.key}>
-            <circle cx={vx} cy={vy} r={3} fill="#c084fc" />
+            <circle cx={vx} cy={vy} r={3} fill="var(--accent-primary-light)" />
             <text
               x={lx}
               y={ly}
               textAnchor="middle"
-              fill="#e9d5ff"
+              fill="var(--text-primary)"
               fontSize="10"
               fontWeight={700}
               style={{ fontFamily: "'Rajdhani', sans-serif", letterSpacing: "0.12em" }}
@@ -165,7 +165,7 @@ function AttributeRadar({ values }: { values: Record<CognitiveStatKey, number> }
               x={lx}
               y={ly + 13}
               textAnchor="middle"
-              fill="#a78bfa"
+              fill="var(--accent-text-light)"
               fontSize="10"
               fontWeight={700}
               style={{ fontFamily: "'Rajdhani', sans-serif" }}
@@ -725,7 +725,7 @@ export function PublicProfileModal() {
                       style={{
                         background:
                           "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-                        color: "var(--text-primary)",
+                        color: "var(--accent-foreground)",
                         border: "none",
                       }}
                     >
@@ -873,7 +873,7 @@ export function PublicProfileModal() {
                             style={{
                               background:
                                 "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-                              color: "var(--text-primary)",
+                              color: "var(--accent-foreground)",
                               border: "none",
                             }}
                           >
@@ -1005,7 +1005,7 @@ export function PublicProfileModal() {
                         style={{
                           background:
                             "linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-light) 100%)",
-                          color: "var(--text-primary)",
+                          color: "var(--accent-foreground)",
                           border: "none",
                         }}
                       >
@@ -1049,7 +1049,7 @@ export function PublicProfileModal() {
                             onClick={() => setActiveTab(tab.id)}
                             className={`px-4 py-2 rounded-xl text-xs font-['Rajdhani'] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                               activeTab === tab.id
-                                ? "bg-accent-primary text-text-primary shadow-md"
+                                ? "bg-accent-primary text-accent-foreground shadow-md"
                                 : "text-text-muted hover:text-text-primary hover:bg-bg-abyss/60"
                             }`}
                           >
@@ -1089,7 +1089,7 @@ export function PublicProfileModal() {
                                   rel="noopener noreferrer"
                                   className="px-3 py-1.5 rounded-lg bg-bg-abyss/80 hover:bg-bg-shadow border border-border-subtle hover:border-accent-primary text-xs text-text-primary flex items-center gap-2 transition-all font-mono shadow-sm"
                                 >
-                                  <svg className="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24">
+                                  <svg className="w-3.5 h-3.5 fill-current text-text-primary" viewBox="0 0 24 24">
                                     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.304 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                                   </svg>
                                   <span>{dossier.connectedAccounts.github}</span>
@@ -1257,8 +1257,8 @@ export function PublicProfileModal() {
                                   <button
                                     onClick={() => setShowTrain(!showTrain)}
                                     title={showTrain ? "Close training" : "Train attributes"}
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-lg leading-none transition-all duration-200 hover:scale-110 active:scale-95 ${
-                                      showTrain ? "bg-bg-panel border border-border-subtle text-text-primary" : "bg-accent-primary shadow-[0_0_16px_var(--accent-primary-dim)]"
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg leading-none transition-all duration-200 hover:scale-110 active:scale-95 ${
+                                      showTrain ? "bg-bg-panel border border-border-subtle text-text-primary" : "bg-accent-primary text-accent-foreground shadow-[0_0_16px_var(--accent-primary-dim)]"
                                     }`}
                                   >
                                     {showTrain ? "−" : "+"}
@@ -1363,7 +1363,7 @@ export function PublicProfileModal() {
                                         onClick={() => setCogCurrency(c)}
                                         className={`px-3 py-1 text-[10px] font-bold font-['Rajdhani'] uppercase tracking-wider transition-colors ${
                                           cogCurrency === c
-                                            ? "bg-accent-primary text-white"
+                                            ? "bg-accent-primary text-accent-foreground"
                                             : "text-text-muted hover:text-text-primary"
                                         }`}
                                       >

@@ -1,0 +1,15 @@
+{
+  "browser": "151.0.7922.34",
+  "results": [
+    {
+      "name": "repeated StrictMode editor mount and teardown does not duplicate journal writes",
+      "pass": true,
+      "elapsedMs": 1455.0765830000003,
+      "detail": {
+        "remounts": 5,
+        "revisionsAdded": 1,
+        "harnessUrl": "http://127.0.0.1:4390/"
+      }
+    }
+  ]
+}

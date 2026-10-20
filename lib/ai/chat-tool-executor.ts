@@ -1,4 +1,5 @@
 import { aiSignal } from "./telemetry";
+import { CALENDAR_READ_TOOLS, CALENDAR_MUTATION_TOOLS } from "./sylvie/calendar-contracts";
 import { generateGeminiContent } from "@/lib/ai/providers/gemini-dispatch";
 import { executionTransaction } from "@/lib/execution-coordination";
 // ============================================================
@@ -73,6 +74,11 @@ export async function executeChatTool(
   userId: number
 ): Promise<Record<string, any>> {
   try {
+    if (CALENDAR_READ_TOOLS.has(toolName) || CALENDAR_MUTATION_TOOLS.has(toolName)) {
+      const calendar = await import("./sylvie/calendar-tools");
+      try { return CALENDAR_READ_TOOLS.has(toolName) ? await calendar.executeCalendarRead(toolName, args, userId) : await calendar.executeCalendarMutation(args, userId); }
+      catch (error) { return calendar.calendarToolFailure(error); }
+    }
     switch (toolName) {
       case "getUserStats":
         return await executeGetUserStats(userId);

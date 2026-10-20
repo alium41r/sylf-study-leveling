@@ -1,0 +1,390 @@
+{
+  "checks": [
+    {
+      "state": "notebook-title",
+      "theme": 0,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 0,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 0,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 1,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 1,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 1,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 2,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 2,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 2,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 3,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 3,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-title",
+      "theme": 3,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 0,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 0,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 0,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 1,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 1,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 1,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 2,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 2,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 2,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 3,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 3,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "calendar-settings-title",
+      "theme": 3,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 0,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 0,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 0,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 1,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 1,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 1,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 2,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 2,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 2,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 3,
+      "width": 390,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 3,
+      "width": 820,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "notebook-search-title",
+      "theme": 3,
+      "width": 1440,
+      "violations": [],
+      "overflow": false,
+      "dialogOverflow": false
+    },
+    {
+      "state": "Month",
+      "width": 390,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Month",
+      "width": 820,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Month",
+      "width": 1440,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Week",
+      "width": 390,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Week",
+      "width": 820,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Week",
+      "width": 1440,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Day",
+      "width": 390,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Day",
+      "width": 820,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "Day",
+      "width": 1440,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "advanced-Week",
+      "width": 320,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "advanced-Day",
+      "width": 320,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "state": "advanced-Month",
+      "width": 320,
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "recognition": {
+    "reference": "Mr. Brown commented icily.",
+    "referenceElapsedMs": 16528,
+    "drawnVector": "HELLO",
+    "actualResult": "Hello",
+    "reviewedResult": "Hello electromagnetism",
+    "sourceStrokeCount": 8,
+    "selectionCount": 8,
+    "searchMatched": true,
+    "searchOpenedFullInk": true
+  },
+  "conditions": {
+    "browser": "Chromium",
+    "themes": [
+      "light/mint/yellow",
+      "dark/navy/lavender",
+      "light/navy/yellow",
+      "dark/pink/rose"
+    ],
+    "widths": [
+      320,
+      390,
+      820,
+      1440
+    ]
+  }
+}

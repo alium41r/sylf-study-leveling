@@ -1,7 +1,7 @@
 /**
  * Platform globals the Pixel Display engine is allowed to use.
  *
- * `tsconfig.pixel-engine.json` typechecks `engine/**` against `lib: ["esnext"]`
+ * `config/tsconfig.pixel-engine.json` typechecks `engine/**` against `lib: ["esnext"]`
  * with no DOM lib, so a DOM type becomes a compile error. That is the boundary
  * the roadmap asks for (B2: the engine must stay DOM-free) made mechanical.
  *

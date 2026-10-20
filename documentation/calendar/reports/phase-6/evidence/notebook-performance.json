@@ -1,0 +1,22 @@
+{
+  "notes": 1000,
+  "pointsPerNote": 500,
+  "searchMs": 87,
+  "rawBytes": 7216001,
+  "previewBytes": 300894,
+  "sizes": [
+    {
+      "averageDocumentBytes": 4165,
+      "averageSearchBytes": 109,
+      "ginBytes": 180224
+    }
+  ],
+  "plan": [
+    {
+      "QUERY PLAN": "Seq Scan on \"CalendarNote\"  (cost=0.00..51.77 rows=22 width=32)"
+    },
+    {
+      "QUERY PLAN": "  Filter: (\"searchVector\" @@ '''electromag'':*'::tsquery)"
+    }
+  ]
+}

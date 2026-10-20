@@ -1,0 +1,184 @@
+{
+  "date": "2026-10-19",
+  "timezone": "Asia/Karachi",
+  "purpose": "Phase 0 read-only architecture research; hashes identify the inspected working-copy state, including pre-existing uncommitted work. Tests were read, not executed.",
+  "git_head": "68f72f0de9b87a0a177a11efa5589b42f3b9874a",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "05890467c8b4b938ad8cb0f4df481b794ff9b61dd2da76ee2460d9b991924c64"
+    },
+    {
+      "path": "package.json",
+      "sha256": "7efe53d80fa3543875cf43226481536272a7cfc92da0fe56a1075d826859ac18"
+    },
+    {
+      "path": "app/layout.tsx",
+      "sha256": "66eef1e821af97274f9cc84a3a3925ae84d49306f2d5b12bda8fabfcd6a0b58c"
+    },
+    {
+      "path": "app/components/GlobalSystemWrapper.tsx",
+      "sha256": "b47afa40ef8772f951dc9cbf07f962d8a0754643fb0217e7dd9ed7575d367482"
+    },
+    {
+      "path": "app/components/SylfAppShell.tsx",
+      "sha256": "a6034c71a0d575bfbf52213396027a00e0a99661a01fb0e0ae2cf5406b0db694"
+    },
+    {
+      "path": "app/components/Sidebar.tsx",
+      "sha256": "7c48c0fed8455cfdac92b4e4785f6db1d7d0ebe2b7cadd16602117379df3505f"
+    },
+    {
+      "path": "app/components/AuthProvider.tsx",
+      "sha256": "3ddc9636ab69ca40379d84e122a926ac53cf3d6ae3effd5873f4ed6de9a80b69"
+    },
+    {
+      "path": "lib/auth-server.ts",
+      "sha256": "f38b580620c248211462f165f651283ae7dc3fc8031c33907b53ca1ae00e800f"
+    },
+    {
+      "path": "lib/oauth.ts",
+      "sha256": "ada2bc7bad72b4afe132277e9a2b8c507ea181e1301b031d2f0c03fc74070915"
+    },
+    {
+      "path": "proxy.ts",
+      "sha256": "a5f13969e0bd7046e21ded8bedfd085cd417da73006bdc02dac690677f6a74d7"
+    },
+    {
+      "path": "lib/prisma.ts",
+      "sha256": "f7fc7c4af54335a4cd185b75841cc10d3490732550b8b3d1ef5d8faf3f635dc4"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "sha256": "6b95778a5e4cec64e3c6d0c00730863ca3985c7f23f1bfb0daabd4ee30589dee"
+    },
+    {
+      "path": "lib/api-transport.ts",
+      "sha256": "4cd962afaa32c66b145ecc93b8b4ce5dba1953df353553f41c783e24d21f989a"
+    },
+    {
+      "path": "lib/client-data-cache.ts",
+      "sha256": "191fb1fe8ef23325ae5228898317af1e19177d127353bb49ac31510eb66dedfc"
+    },
+    {
+      "path": "lib/supabase-browser.ts",
+      "sha256": "a5cdbaf60b1369c60ddba045ccae5873ae416dea6cc274a4217b6ab32b3145d2"
+    },
+    {
+      "path": "lib/supabase-storage.ts",
+      "sha256": "4ff4bd0225a3d497d0a87f28c00fa40d8ef57a219b5fb58ab570c3dc85f2e6d7"
+    },
+    {
+      "path": "lib/subject-service.ts",
+      "sha256": "b3ce7361e4c5f045d96fd1082739a779bdf0c3c81b9f3605befd9300b778720c"
+    },
+    {
+      "path": "lib/color-utils.ts",
+      "sha256": "b1c32103acc2d6dc816fff9aecd854675d3dc6611460dd6646fd0b13c5f1c605"
+    },
+    {
+      "path": "app/globals.css",
+      "sha256": "ad1efcdf756948e089f1ab5c3296d935d719d36d5db3df527924400c5e685ecc"
+    },
+    {
+      "path": "app/calendar/components/InkSurface.tsx",
+      "sha256": "72af815cdf7a34766068911a2dc5d82e79eac99b32d422816852b37d010d17fb"
+    },
+    {
+      "path": "lib/calendar/ink.ts",
+      "sha256": "a467a06156b458eae0550a2622bac71e395f44b9f2c41afd2a64b5f0ce8194ed"
+    },
+    {
+      "path": "lib/calendar/note-autosave.ts",
+      "sha256": "99d7a28bc26d35faf4bcbec26233655fb4df4db4d8c23ee93576dc21b928705c"
+    },
+    {
+      "path": "lib/calendar/personal-service.ts",
+      "sha256": "1c57ca1b4c671b74a918c5ed90400b8f5a4c9ef8bc75ece13ebae009032a9d69"
+    },
+    {
+      "path": "lib/calendar/notebook-service.ts",
+      "sha256": "14327c1095b06b1308ada59a1a4c47e65e616c5b66964f1073df3082e2cfd4c0"
+    },
+    {
+      "path": "lib/calendar/recognition-client.ts",
+      "sha256": "8e85c48c34b01a1b34d96565a03a4425437f24f27a3a35e7239e1351194c56eb"
+    },
+    {
+      "path": "lib/calendar/recognition.worker.ts",
+      "sha256": "4e9c5e9915ad3aba45ab98615ea62bf3171d9c34bd6377d14d7d76f4a37a9696"
+    },
+    {
+      "path": "lib/calendar/external/connections.ts",
+      "sha256": "8384e6fe5af0cafbd2ff301de094a2a8742295b2a0fc7e6876bd4660d28d6760"
+    },
+    {
+      "path": "lib/calendar/external/security.ts",
+      "sha256": "4481cb488b7c63405d46c9ca9521c8aa409675ff852e470b2c6956f70a9ce0c7"
+    },
+    {
+      "path": "lib/calendar/external/http.ts",
+      "sha256": "953506fca2057d504f3c648946602e2e2b07da0fbcbb10e2d5af9f1df2aa95c4"
+    },
+    {
+      "path": "lib/calendar/external/providers.ts",
+      "sha256": "082c5e003cdfccab6003f887dc3717e7f3caa856d55aa5a84b58441786a0b6bd"
+    },
+    {
+      "path": "lib/calendar/external/worker.ts",
+      "sha256": "120c93d9f65a1510df59dedd2b6d56664eee2c8b57f9d8c2abc5fcb33d5720d6"
+    },
+    {
+      "path": "app/api/calendar/connections/route.ts",
+      "sha256": "fd1775a494dfd0f5bf0634b72d55c3c0b34d9e8b26183c65040ed5a7f997b049"
+    },
+    {
+      "path": "app/api/calendar/personal/route.ts",
+      "sha256": "a11e9e7873335364dbbb4b976a8bcaf0b2154479bba30a297a08553a70c551d1"
+    },
+    {
+      "path": "mobile/src/MobileApp.tsx",
+      "sha256": "937ee905a1b159d1c0591c3d8a091a4c8d7e237daab5c02e74e92c5e13ae595e"
+    },
+    {
+      "path": "mobile/src/main.tsx",
+      "sha256": "5d4f068193df17c2947513a0ef76484cb23e6ff6679e1dfd3bd3f1fb8f0f5e21"
+    },
+    {
+      "path": "mobile/src/components/MobileRouteOutlet.tsx",
+      "sha256": "08166ecd484d1917b340c841e03e115128339010b2ae94b1109abb16cb6a353a"
+    },
+    {
+      "path": "public/sw.js",
+      "sha256": "2ff35f9fd2c5c5d0962bbd27c0ba2fb9c1781fd4df8941d604de993484e1209c"
+    },
+    {
+      "path": "documentation/README.md",
+      "sha256": "3ed65eaf1510a8998c02a563d2f4dd2a5ec34e7ce0372239441969f7d93bddc1"
+    },
+    {
+      "path": "documentation/design/README.md",
+      "sha256": "406624d8d78494a433eadf0734d75361a47e372aae313a7582a5ef0b5d841c8d"
+    },
+    {
+      "path": "documentation/calendar/README.md",
+      "sha256": "5211b7bef4671169928ee25ccf8d3d7ad477b603f13c4c52861c0d8298f72118"
+    },
+    {
+      "path": "documentation/sylvie/README.md",
+      "sha256": "4ec84c3c9c4ac2f8e2c5a8b7c8f4449ed3cd4b539ecfb5276e9ea07fcd069d78"
+    },
+    {
+      "path": "__tests__/calendar/note-autosave.test.ts",
+      "sha256": "3908347db3852b2a96db13c81a9f8337ea1c85b8ec218907f88157ae2deb2682"
+    },
+    {
+      "path": "__tests__/calendar/ink-input.test.tsx",
+      "sha256": "be80083fb4ddda48e18bfb70bec8563102596741288d546a41dae40c9e2fa49f"
+    },
+    {
+      "path": "__tests__/calendar/recognition.test.ts",
+      "sha256": "9d402fe16384c9f6d1fb752b4755ff6f060699d5f71b05356459776b1b6adfc0"
+    }
+  ]
+}

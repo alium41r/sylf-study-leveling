@@ -39,9 +39,9 @@
   color-scheme: dark;
 }
 
-:global(html[data-mode="light"]) .archive,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .archive,
 :global(html.light) .archive,
-:global([data-mode="light"]) .archive {
+:global([data-mode="light"]:not([data-surface-polarity="dark"])) .archive {
   --paper: color-mix(in srgb, var(--surface-1) 96%, var(--accent-primary));
   --paper-light: var(--surface-1);
   --paper-ink: var(--text-primary);
@@ -998,9 +998,9 @@
   padding: 0 7px;
   opacity: 0.5;
 }
-:global(html[data-mode="light"]) .pageTurns,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .pageTurns,
 :global(html.light) .pageTurns,
-:global([data-mode="light"]) .pageTurns {
+:global([data-mode="light"]:not([data-surface-polarity="dark"])) .pageTurns {
   background: var(--paper);
   border-top: 1px solid var(--gilt-line);
   border-radius: 0 0 9px 9px;

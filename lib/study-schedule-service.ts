@@ -119,9 +119,9 @@ export class StudyScheduleService {
   static async cascadeQuestShifts(
     userId: number,
     dateKey: string,
-    opts?: { tx?: any }
+    opts?: { tx?: Prisma.TransactionClient }
   ): Promise<QuestShift[]> {
-    const runner = async (client: any) => {
+    const runner = async (client: Prisma.TransactionClient) => {
       const user = await client.user.findUnique({
           where: { id: userId },
           select: { restDays: true },
@@ -243,7 +243,8 @@ export class StudyScheduleService {
   static async getMonthCalendarData(
     userId: number,
     year: number,
-    monthIndex: number
+    monthIndex: number,
+    options: { strict?: boolean } = {}
   ): Promise<MonthCalendarData> {
     let user: {
       id: number;
@@ -265,9 +266,11 @@ export class StudyScheduleService {
         },
       });
     } catch (userErr) {
+      if (options.strict) throw userErr;
       console.warn("StudyScheduleService user query fallback:", userErr);
     }
 
+    if (options.strict && !user) throw new Error("Study schedule unavailable.");
     const timezone = user?.timezone || "UTC";
     const dailyGoalMinutes = Math.max(10, user?.dailyGoalMinutes ?? 120);
     const restDays = user?.restDays ?? [0];
@@ -314,6 +317,7 @@ export class StudyScheduleService {
           },
         },
         include: {
+          plannerLink: { select: { questId: true } },
           goal: {
             select: { id: true, title: true, color: true },
           },
@@ -337,6 +341,7 @@ export class StudyScheduleService {
           orderBy: { targetDate: "asc" },
         })
         .catch((err) => {
+          if (options.strict) throw err;
           console.warn("StudyScheduleService goal milestone query fallback:", err);
           return [];
         }),
@@ -352,6 +357,7 @@ export class StudyScheduleService {
           select: { dateKey: true },
         })
         .catch((err) => {
+          if (options.strict) throw err;
           console.warn("StudyScheduleService floating rest day query fallback:", err);
           return [];
         }),
@@ -505,6 +511,7 @@ export class StudyScheduleService {
         completionPercentage,
         goalMet,
         sessionsCount: daySessions.length,
+        sessions: daySessions.map(session => ({ id: session.id, title: session.quest?.title || session.subject?.name || "Study session", startedAt: session.startedAt.toISOString(), endedAt: session.endedAt?.toISOString() || null, minutes: Math.round((session.durationSeconds || session.durationMinutes * 60) / 60) })),
         questsCount: dayQuests.length,
         questsCompleted: questsCompletedCount,
         xpGained: totalDayXp,
@@ -516,6 +523,8 @@ export class StudyScheduleService {
           status: q.status,
           difficulty: q.difficulty,
           requiredMinutes: q.requiredMinutes,
+          plannedMinutes: q.plannedMinutes,
+          plannerOwned: !!q.plannerLink,
           elapsedSeconds: q.elapsedSeconds,
           xpReward: q.xpReward,
           sylphReward: q.sylphReward,

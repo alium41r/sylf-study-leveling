@@ -1,0 +1,535 @@
+.editor {
+  position: relative;
+  --ink-chrome: var(--surface-1);
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px 8px;
+  min-width: 0;
+}
+.header h2 {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.saveStatus {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: right;
+  max-width: 140px;
+}
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 16px 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 4;
+}
+.tools button,
+.pageControls button,
+.pageRail button,
+.selectionBar button {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 9px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 7px;
+  font-size: 12px;
+}
+.tools button:hover,
+.pageControls button:hover,
+.pageRail button:hover,
+.selectionBar button:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+.tools button[aria-pressed="true"] {
+  background: var(--accent-muted);
+  color: var(--accent-text);
+}
+.tools button:disabled,
+.pageControls button:disabled,
+.pageRail button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.tools button span {
+  font-size: 11px;
+}
+.tools .zoom {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.divider {
+  height: 20px;
+  width: 1px;
+  background: var(--border-subtle);
+  margin: 0 4px;
+}
+.spacer {
+  flex: 1;
+}
+.options {
+  position: relative;
+}
+.options summary {
+  list-style: none;
+  cursor: pointer;
+  border-radius: 9px;
+  min-width: 44px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.options summary::-webkit-details-marker {
+  display: none;
+}
+.options summary:hover {
+  background: var(--surface-2);
+}
+.currentColor {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border-subtle);
+  box-shadow: 0 0 0 2px var(--surface-1);
+}
+.optionsPanel {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  width: 246px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-1);
+  box-shadow: 0 14px 40px #0003;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 20;
+}
+.optionsPanel strong {
+  font-size: 13px;
+}
+.optionsPanel label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.optionsPanel input[type="color"] {
+  width: 44px;
+  height: 36px;
+  padding: 4px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.optionsPanel input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent-primary);
+}
+.optionsPanel input[type="checkbox"] {
+  accent-color: var(--accent-primary);
+  width: 18px;
+  height: 18px;
+}
+.optionsPanel select {
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border-radius: 7px;
+  min-height: 36px;
+  padding: 4px 8px;
+}
+.optionsPanel p {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+.optionsPanel .check {
+  justify-content: flex-start;
+}
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  justify-content: space-between;
+  gap: 5px;
+}
+.swatches button {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+.swatches button[aria-pressed="true"] {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+.selectionBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.selectionBar strong {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.pageControls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 3;
+}
+.paperOptions .optionsPanel {
+  right: 0;
+  left: auto;
+}
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+.pageRail {
+  width: 150px;
+  min-width: 150px;
+  overflow-y: auto;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--surface-1);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.railHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.railHeader button {
+  display: none;
+}
+.removedToggle {
+  font-size: 10px !important;
+  min-height: 30px !important;
+  justify-content: flex-start !important;
+  text-align: left;
+}
+.pageList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pageItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pageRail .pageOpen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid transparent;
+  font-size: 11px;
+}
+.pageOpen[aria-current="page"] {
+  border-color: var(--accent-primary);
+  background: var(--accent-muted);
+  color: var(--accent-text);
+}
+.thumbnail {
+  display: flex;
+  width: 96px;
+  height: 132px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 3px;
+  background: #fffdf7;
+  box-shadow: 0 1px 5px #0002;
+}
+.thumbnail canvas {
+  object-fit: contain;
+}
+.thumbnail small {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  font-size: 10px;
+  padding: 8px;
+  color: #333;
+  background: #fffdf7;
+}
+.pageRail .restore {
+  font-size: 10px;
+}
+.pageActions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
+  padding-top: 7px;
+  position: sticky;
+  bottom: 0;
+  background: var(--surface-1);
+}
+.canvasHost {
+  flex: 1;
+  min-width: 0;
+  min-height: 160px;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: contain;
+  background: var(--surface-2);
+  outline-offset: -3px !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.canvasHost canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+.opening {
+  position: absolute;
+  inset: 40px 10px auto;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 16px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+.footer span:last-child {
+  text-align: right;
+}
+.archived {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text-secondary);
+  padding: 24px;
+  text-align: center;
+}
+.archived h3 {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.railDismiss {
+  display: none;
+}
+.editor[data-focus="true"] .pageRail,
+.editor[data-focus="true"] .header,
+.editor[data-focus="true"] .footer {
+  display: none;
+}
+@media (max-width: 1100px) {
+  .tools button span {
+    display: none;
+  }
+  .tools {
+    padding-inline: 10px;
+  }
+  .footer span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .header {
+    padding: 8px 9px 2px;
+  }
+  .header h2 {
+    font-size: 15px;
+  }
+  .saveStatus {
+    font-size: 9px;
+    max-width: 100px;
+  }
+  .tools {
+    gap: 0;
+    padding: 3px 6px 5px;
+  }
+  .tools button {
+    min-width: 38px;
+    min-height: 40px;
+  }
+  .divider {
+    display: none;
+  }
+  .tools .zoom {
+    font-size: 10px;
+    min-width: 58px;
+  }
+  .tools > .spacer {
+    display: none;
+  }
+  .tools .optionsPanel {
+    position: fixed;
+    left: calc(50% - 123px);
+    top: auto;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    max-height: min(55dvh, 440px);
+    overflow: auto;
+  }
+  .pageControls {
+    padding: 2px 6px;
+  }
+  .pageControls button {
+    min-width: 36px;
+  }
+  .pageControls button span {
+    display: none;
+  }
+  .pageRail {
+    display: none;
+  }
+  .pageRail[data-open="true"] {
+    display: flex;
+    position: absolute;
+    z-index: 6;
+    inset: 0 auto 0 0;
+    width: 180px;
+    box-shadow: 10px 0 30px #0002;
+  }
+  .railHeader button {
+    display: inline-flex;
+  }
+  .railDismiss {
+    display: block;
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: #0003;
+    z-index: 5;
+  }
+  .footer {
+    padding: 5px 10px;
+    font-size: 9px;
+  }
+  .selectionBar {
+    padding: 3px 6px;
+    gap: 2px;
+  }
+  .selectionBar button {
+    font-size: 10px;
+  }
+  .paperOptions .optionsPanel {
+    position: fixed;
+    left: calc(50% - 123px);
+    right: auto;
+    top: auto;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    max-height: min(55dvh, 440px);
+    overflow: auto;
+  }
+}
+@media (pointer: coarse) {
+  .tools button,
+  .tools summary,
+  .pageControls button,
+  .pageRail button,
+  .selectionBar button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .swatches button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .tools {
+    row-gap: 1px;
+  }
+}
+
+.editor[data-focus="true"] .pageRail[data-open="true"] {
+  display: flex;
+}
+
+.editor summary:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  .optionsPanel input[type="color"],
+  .optionsPanel select {
+    min-height: 44px;
+  }
+  .optionsPanel label {
+    min-height: 44px;
+  }
+}
+
+.optionsHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.optionsHeading button {
+  min-width: 32px;
+  min-height: 32px;
+}
+@media (pointer: coarse) {
+  .optionsHeading button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

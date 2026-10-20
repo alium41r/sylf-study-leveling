@@ -447,8 +447,8 @@
   padding: 0.5rem 0.85rem;
   border-radius: 0.75rem;
   background: var(--accent-primary, #7c3aed);
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  color: #ffffff;
+  border: 1px solid var(--accent-primary-mid, rgba(139, 92, 246, 0.4));
+  color: var(--accent-foreground, #ffffff);
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
@@ -456,7 +456,7 @@
 }
 
 .composerSendBtn:hover:not(:disabled) {
-  background: #6d28d9;
+  background: var(--accent-hover, #6d28d9);
 }
 
 .composerSendBtn:disabled {
@@ -478,22 +478,22 @@
   gap: 0.5rem;
   padding: 0.75rem 1.15rem;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #7c3aed, #6366f1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--accent-primary, #7c3aed), var(--accent-primary-light, #6366f1));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.2));
+  color: var(--accent-foreground, #ffffff);
   font-family: "Rajdhani", sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px var(--accent-primary-dim, rgba(124, 58, 237, 0.4)), 0 2px 6px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mobileFab:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 12px 28px var(--accent-primary-mid, rgba(124, 58, 237, 0.5));
 }
 
 .mobileFab:active {
@@ -504,7 +504,7 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.7));
   backdrop-filter: blur(4px);
   animation: fadeIn 200ms ease;
 }
@@ -529,7 +529,7 @@
 .sheetHandleBar {
   width: 2.5rem;
   height: 4px;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--border-strong, rgba(255, 255, 255, 0.25));
   border-radius: 9999px;
   margin: 0.5rem auto 0.2rem auto;
 }
@@ -548,7 +548,7 @@
 }
 
 .closeBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--chip-bg, rgba(255, 255, 255, 0.08));
   color: var(--text-primary, #ffffff);
 }
 

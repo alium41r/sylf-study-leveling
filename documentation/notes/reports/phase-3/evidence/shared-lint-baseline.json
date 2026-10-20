@@ -1,0 +1,43 @@
+[
+  {
+    "path": "app/components/Sidebar.tsx",
+    "indexBaseline": true,
+    "errors": 0,
+    "warnings": 3,
+    "messages": [
+      {
+        "ruleId": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "message": "React Hook useEffect has a missing dependency: 'refreshStats'. Either include it or remove the dependency array."
+      },
+      {
+        "ruleId": "@next/next/no-img-element",
+        "severity": 1,
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element"
+      },
+      {
+        "ruleId": "@next/next/no-img-element",
+        "severity": 1,
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element"
+      }
+    ]
+  },
+  {
+    "path": "mobile/src/components/MobileRouteOutlet.tsx",
+    "indexBaseline": true,
+    "errors": 0,
+    "warnings": 2,
+    "messages": [
+      {
+        "ruleId": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "message": "'ThemesSettingsScreen' is assigned a value but never used."
+      },
+      {
+        "ruleId": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "message": "'BackgroundsSettingsScreen' is assigned a value but never used."
+      }
+    ]
+  }
+]

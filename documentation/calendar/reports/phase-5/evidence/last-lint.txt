@@ -1,0 +1,2 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' lib/ai/sylvie/calendar-tools.ts __tests__/ai/sylvie-calendar-tools.test.ts

@@ -4,6 +4,7 @@ import SystemOverlay from "@/app/components/system/SystemOverlay";
 import { resolvePresence } from "@/app/components/system/page-presence";
 import type { QuotaInfo } from "@/app/components/AiPlannerModal";
 import { clearClientCache } from "@/lib/client-data-cache";
+import { publishCalendarPage, currentCalendarPage } from "@/lib/ai/sylvie/calendar-page-context";
 
 vi.mock("framer-motion", async () => {
   const React = await import("react");
@@ -37,6 +38,20 @@ beforeEach(() => vi.stubGlobal("fetch", successfulReply()));
 afterEach(() => { cleanup(); clearClientCache(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("Minimal floating conversation", () => {
+  it("shares selected-date context with the existing floating chat and refreshes after acknowledged calendar changes", async () => {
+    const hint = { selectedDate: "2026-10-19", start: "2026-10-18", end: "2026-10-25", view: "week" as const };
+    const unpublish = publishCalendarPage(hint);
+    const updated = vi.fn(); window.addEventListener("calendar-content-updated", updated);
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ sessionId: 42, reply: "Updated the personal calendar event.", calendarChanged: true }) })));
+    render(<SystemOverlay {...props()} presence={calendar} />);
+    fireEvent.change(input(), { target: { value: "Move my appointment" } });
+    fireEvent.keyDown(input(), { key: "Enter" });
+    await waitFor(() => expect(screen.getByText("Updated the personal calendar event.")).toBeInTheDocument());
+    expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ body: JSON.stringify({ message: "Move my appointment", pageContext: { path: "/calendar", calendar: hint } }) }));
+    expect(updated).toHaveBeenCalledTimes(1);
+    unpublish(); window.removeEventListener("calendar-content-updated", updated);
+    expect(currentCalendarPage()).toBeUndefined();
+  });
   it("sends through the existing API, continues the session and refreshes quota", async () => {
     const callbacks = props();
     render(<SystemOverlay {...callbacks} />);

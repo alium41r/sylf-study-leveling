@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "errors": [],
+  "touchToolbar": [
+    {
+      "label": "Block style",
+      "width": 100,
+      "height": 44
+    },
+    {
+      "label": "Bold",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Italic",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Underline",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Bullet list",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Numbered list",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Checklist",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Insert link",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Insert image",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Undo",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Redo",
+      "width": 44,
+      "height": 44
+    }
+  ],
+  "nativeDialogInitialFocus": true,
+  "escapeDismissal": true,
+  "accountDeletionWarningVisible": true,
+  "fullAccessibilityAudit": false
+}

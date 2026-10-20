@@ -27,9 +27,11 @@ export function MiniDashboardPreview({
   const { user } = useAuth();
   const background = getBackgroundTokens(canvasHex, mode);
   const accent = getAccentTokens(accentHex, background["--surface-1"]);
+  const effectivePolarity = background["--surface-polarity"];
   return (
     <div
       className={styles.workspacePreview}
+      data-surface-polarity={effectivePolarity}
       style={
         { ...background, ...accent, background: canvasHex } as CSSProperties
       }
@@ -40,7 +42,7 @@ export function MiniDashboardPreview({
           <i />
           sylf
         </span>
-        <span>{mode === "light" ? "Light" : "Dark"}</span>
+        <span>{effectivePolarity === "light" ? "Light" : "Dark"}</span>
       </div>
       <div className={styles.previewApp}>
         <aside aria-hidden="true">

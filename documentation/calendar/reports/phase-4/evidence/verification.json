@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-18",
+  "phase": 4,
+  "schemaBuildVersion": 34,
+  "newMigration": false,
+  "targetedTests": {
+    "passed": 281,
+    "databaseSkippedInOrdinaryRun": 12
+  },
+  "isolatedPostgres": {
+    "engine": "PGlite PostgreSQL with real SQL calendar migrations; strict study projection fixture only",
+    "tests": 12
+  },
+  "visual": {
+    "sizes": [
+      [
+        390,
+        844
+      ],
+      [
+        820,
+        1180
+      ],
+      [
+        1440,
+        1000
+      ]
+    ],
+    "themes": [
+      {
+        "mode": "light",
+        "background": "#d9eee7",
+        "accent": "#facc15"
+      },
+      {
+        "mode": "dark",
+        "background": "#111827",
+        "accent": "#a78bfa"
+      },
+      {
+        "mode": "light",
+        "background": "#101b31",
+        "accent": "#facc15"
+      },
+      {
+        "mode": "dark",
+        "background": "#ffe4f0",
+        "accent": "#bc2166"
+      }
+    ],
+    "axeTags": [
+      "wcag2a",
+      "wcag2aa",
+      "wcag21aa"
+    ],
+    "combinations": 12,
+    "violations": 0,
+    "pageHorizontalOverflow": false,
+    "keyboardFocusContained": true
+  },
+  "liveQA": {
+    "configuredProviderRoute": true,
+    "selectedDateRead": true,
+    "recurringBlockProposal": true,
+    "clockOnlyRefinement": true,
+    "confirmedCreate": true,
+    "canonicalProjectionVerified": true,
+    "confirmedSeriesDeletion": true,
+    "temporaryOccurrencesRemaining": 0,
+    "temporaryChatRemoved": true,
+    "appearancePreferencesUnchanged": true,
+    "eventId": "37371c91-9a5e-45b1-8664-5982ada26103",
+    "chatId": 197
+  },
+  "typeGeneration": "passed",
+  "typecheck": "passed",
+  "changedSourceLint": "passed; existing legacy rule exceptions/warnings recorded in legacy-lint.txt",
+  "webProductionBuild": "passed",
+  "mobileProductionBuild": "passed",
+  "mobileBundleVerification": "passed",
+  "generatedMobileDistributionRestored": true
+}

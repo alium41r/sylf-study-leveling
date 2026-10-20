@@ -1,0 +1,3 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'tsc' --noEmit
+app/onboarding/components/AppearanceStep.tsx(6,10): error TS2724: '"@/lib/color-utils"' has no exported member named 'getContrastForeground'. Did you mean 'getAccentForeground'?

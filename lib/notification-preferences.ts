@@ -107,6 +107,8 @@ export function isNotificationAllowed(
     return false;
   }
 
+  if ((lowerContent.includes("[calendar_reminder]") || lowerContent.startsWith("calendar reminder ·"))) return prefs.scheduledFocusReminders;
+
   // 1. Level & Rank Promotions
   if (
     upperType === "LEVEL_UP" ||

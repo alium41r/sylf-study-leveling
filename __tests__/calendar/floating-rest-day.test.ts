@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { prisma } from "../../lib/prisma";
 import { StudyScheduleService } from "../../lib/study-schedule-service";
@@ -141,7 +142,7 @@ describe("Floating Rest Day Engine (Service)", () => {
 
       // Designate 2026-08-25 (Tue) as a floating rest day; 26 (Wed) is also
       // floating -> both quests land on 2026-08-27 (Thu).
-      const shifts = await StudyScheduleService.cascadeQuestShifts(1, "2026-08-25", { tx });
+      const shifts = await StudyScheduleService.cascadeQuestShifts(1, "2026-08-25", { tx: tx as unknown as Prisma.TransactionClient });
 
       expect(shifts).toHaveLength(2);
       expect(shifts[0]).toMatchObject({
@@ -167,7 +168,7 @@ describe("Floating Rest Day Engine (Service)", () => {
         plannerQuestLink: { findFirst: vi.fn().mockResolvedValue(null) },
       };
 
-      const shifts = await StudyScheduleService.cascadeQuestShifts(1, "2026-08-25", { tx });
+      const shifts = await StudyScheduleService.cascadeQuestShifts(1, "2026-08-25", { tx: tx as unknown as Prisma.TransactionClient });
 
       expect(shifts).toEqual([]);
       expect(tx.quest.update).not.toHaveBeenCalled();

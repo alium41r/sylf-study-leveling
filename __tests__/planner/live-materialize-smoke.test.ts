@@ -41,7 +41,7 @@ import type { ExamInput } from "@/lib/planner/exam-policy";
  *
  * It creates one throwaway user, does its work, and deletes that user — every Planner table
  * cascades from `User` or from `PlannerPlan`, so the cleanup is a single delete and leaves no
- * residue. It deliberately does not run under `scripts/test-planner-postgres.mjs`, which
+ * residue. It deliberately does not run under `scripts/test/test-planner-postgres.mjs`, which
  * overwrites `DATABASE_URL` with the disposable instance that cannot reproduce the defect.
  */
 

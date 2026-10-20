@@ -756,7 +756,7 @@ export default function BackgroundStudioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-void dark:bg-bg-abyss text-text-primary pb-24">
+    <div className="min-h-screen bg-app-canvas text-text-primary pb-24">
       {/* Toast Notification */}
       {successToast && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-950/90 border border-emerald-500/30 text-emerald-300 shadow-2xl backdrop-blur-md text-sm animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -766,7 +766,7 @@ export default function BackgroundStudioPage() {
       )}
 
       {/* Top Banner & Header */}
-      <div className="border-b border-border-subtle bg-white/95 dark:bg-bg-panel/95 backdrop-blur-xl sticky top-0 z-30 shadow-sm">
+      <div className="border-b border-border-subtle bg-surface-1/95 backdrop-blur-xl sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -779,7 +779,7 @@ export default function BackgroundStudioPage() {
             <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={() => openCategoryModal()}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/[0.09] text-text-primary border border-border-subtle text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-2 hover:bg-surface-raised text-text-primary border border-border-subtle text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-sm"
               >
                 <FolderPlus className="w-4 h-4 text-text-muted" />
                 New Category
@@ -799,19 +799,19 @@ export default function BackgroundStudioPage() {
 
           {/* Quick Telemetry Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-border-subtle">
-            <div className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-bg-panel/60 border border-border-subtle shadow-sm">
+            <div className="px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle shadow-sm">
               <div className="text-[11px] uppercase tracking-wider text-text-muted font-bold">Categories</div>
               <div className="text-lg font-bold text-text-primary mt-0.5">{stats.totalCategories}</div>
             </div>
-            <div className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-bg-panel/60 border border-border-subtle shadow-sm">
+            <div className="px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle shadow-sm">
               <div className="text-[11px] uppercase tracking-wider text-text-muted font-bold">Total Wallpapers</div>
               <div className="text-lg font-bold text-text-primary mt-0.5">{stats.totalBgs}</div>
             </div>
-            <div className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-bg-panel/60 border border-border-subtle shadow-sm">
+            <div className="px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle shadow-sm">
               <div className="text-[11px] uppercase tracking-wider text-text-muted font-bold">Active in Catalog</div>
               <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{stats.activeBgs}</div>
             </div>
-            <div className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-bg-panel/60 border border-border-subtle flex items-center justify-between shadow-sm">
+            <div className="px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle flex items-center justify-between shadow-sm">
               <div>
                 <div className="text-[11px] uppercase tracking-wider text-text-muted font-bold">Storage Bucket</div>
                 <div className="text-xs font-mono font-semibold text-amber-700 dark:text-amber-300 mt-0.5">focus-backgrounds</div>
@@ -833,7 +833,7 @@ export default function BackgroundStudioPage() {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 cursor-pointer shadow-sm ${
                 selectedCategorySlug === "all"
                   ? "bg-amber-500 text-black shadow-md shadow-amber-500/20 font-semibold border border-amber-400"
-                  : "bg-white dark:bg-bg-panel/60 text-text-secondary hover:text-text-primary border border-border-subtle hover:border-amber-500/40"
+                  : "bg-surface-1 text-text-secondary hover:text-text-primary border border-border-subtle hover:border-amber-500/40"
               }`}
             >
               All Categories ({stats.totalBgs})
@@ -847,13 +847,13 @@ export default function BackgroundStudioPage() {
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 flex items-center gap-2 cursor-pointer shadow-sm ${
                     isSelected
                       ? "bg-amber-500 text-black shadow-md shadow-amber-500/20 font-semibold border border-amber-400"
-                      : "bg-white dark:bg-bg-panel/60 text-text-secondary hover:text-text-primary border border-border-subtle hover:border-amber-500/40"
+                      : "bg-surface-1 text-text-secondary hover:text-text-primary border border-border-subtle hover:border-amber-500/40"
                   }`}
                 >
                   <span>{cat.name}</span>
                   <span
                     className={`text-[10px] px-1.5 py-0.2 rounded-md ${
-                      isSelected ? "bg-black/20 text-black font-bold" : "bg-slate-100 dark:bg-white/10 text-text-muted"
+                      isSelected ? "bg-black/20 text-black font-bold" : "bg-surface-2 text-text-muted"
                     }`}
                   >
                     {cat.backgrounds.length}
@@ -878,7 +878,7 @@ export default function BackgroundStudioPage() {
                     </div>
                     <button
                       onClick={() => openCategoryModal(currentCat)}
-                      className="px-2.5 py-1 text-xs rounded-lg bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-text-secondary hover:text-text-primary border border-border-subtle flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                      className="px-2.5 py-1 text-xs rounded-lg bg-surface-2 hover:bg-surface-raised text-text-secondary hover:text-text-primary border border-border-subtle flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                       Edit Category
@@ -908,16 +908,16 @@ export default function BackgroundStudioPage() {
               placeholder="Search backgrounds or layout..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white dark:bg-bg-panel/60 border border-border-subtle text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50 shadow-sm"
+              className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-surface-1 border border-border-subtle text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50 shadow-sm"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <div className="flex items-center bg-slate-100 dark:bg-white/[0.04] border border-border-subtle rounded-xl p-1 text-xs text-text-secondary shadow-sm">
+            <div className="flex items-center bg-surface-2 border border-border-subtle rounded-xl p-1 text-xs text-text-secondary shadow-sm">
               <button
                 onClick={() => setFilterActiveState("all")}
                 className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                  filterActiveState === "all" ? "bg-white dark:bg-white/10 text-text-primary font-semibold shadow-sm" : "text-text-muted hover:text-text-primary"
+                  filterActiveState === "all" ? "bg-surface-1 text-text-primary font-semibold shadow-sm" : "text-text-muted hover:text-text-primary"
                 }`}
               >
                 All ({displayedBackgrounds.length})
@@ -949,7 +949,7 @@ export default function BackgroundStudioPage() {
             <p className="text-sm text-text-muted">Loading background catalog...</p>
           </div>
         ) : displayedBackgrounds.length === 0 ? (
-          <div className="py-20 text-center rounded-2xl bg-white dark:bg-[#0e1017]/60 border border-border-subtle p-8 max-w-xl mx-auto shadow-card dark:shadow-none">
+          <div className="py-20 text-center rounded-2xl bg-surface-1 border border-border-subtle p-8 max-w-xl mx-auto shadow-card">
             <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400 mx-auto mb-4">
               <ImageIcon className="w-7 h-7" />
             </div>
@@ -977,12 +977,12 @@ export default function BackgroundStudioPage() {
               return (
                 <div
                   key={bg.id}
-                  className={`group relative rounded-2xl bg-white dark:bg-[#0e1017]/90 border border-border-subtle overflow-hidden transition-all duration-200 hover:border-amber-500/40 shadow-card dark:shadow-none hover:shadow-lg dark:hover:shadow-xl dark:hover:shadow-black/60 flex flex-col ${
+                  className={`group relative rounded-2xl bg-surface-1 border border-border-subtle overflow-hidden transition-all duration-200 hover:border-amber-500/40 shadow-card hover:shadow-lg flex flex-col ${
                     !bg.isActive ? "opacity-60" : ""
                   }`}
                 >
                   {/* Image 16:9 Canvas */}
-                  <div className="relative aspect-video w-full bg-slate-900/10 dark:bg-black/50 overflow-hidden select-none">
+                  <div className="relative aspect-video w-full bg-surface-2 overflow-hidden select-none">
                     <img
                       src={bg.publicUrl}
                       alt={bg.name}
@@ -1039,7 +1039,7 @@ export default function BackgroundStudioPage() {
                   </div>
 
                   {/* Body Info */}
-                  <div className="p-4 flex-1 flex flex-col justify-between bg-white dark:bg-transparent">
+                  <div className="p-4 flex-1 flex flex-col justify-between bg-surface-1">
                     <div>
                       <div className="flex items-start justify-between gap-2 mb-1.5">
                         <h4 className="text-sm font-semibold text-text-primary tracking-wide truncate" title={bg.name}>
@@ -1071,7 +1071,7 @@ export default function BackgroundStudioPage() {
                         className={`text-xs px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
                           bg.isActive
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
-                            : "bg-slate-900/5 dark:bg-white/5 text-text-muted border-border-subtle hover:bg-slate-900/10 dark:hover:bg-white/10 hover:text-text-primary"
+                            : "bg-surface-2 text-text-muted border-border-subtle hover:bg-surface-raised hover:text-text-primary"
                         }`}
                       >
                         <Check className={`w-3.5 h-3.5 ${bg.isActive ? "opacity-100" : "opacity-40"}`} />
@@ -1082,7 +1082,7 @@ export default function BackgroundStudioPage() {
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => openEditBackgroundModal(bg)}
-                          className="p-1.5 rounded-lg bg-slate-900/5 dark:bg-white/5 hover:bg-slate-900/10 dark:hover:bg-white/10 text-text-secondary hover:text-text-primary border border-border-subtle transition-all cursor-pointer shadow-sm"
+                          className="p-1.5 rounded-lg bg-surface-2 hover:bg-surface-raised text-text-secondary hover:text-text-primary border border-border-subtle transition-all cursor-pointer shadow-sm"
                           title="Edit Details & Timer Placement"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -1095,7 +1095,7 @@ export default function BackgroundStudioPage() {
                             setReplaceTelemetry(null);
                             setReplaceError(null);
                           }}
-                          className="p-1.5 rounded-lg bg-slate-900/5 dark:bg-white/5 hover:bg-slate-900/10 dark:hover:bg-white/10 text-text-secondary hover:text-text-primary border border-border-subtle transition-all cursor-pointer shadow-sm"
+                          className="p-1.5 rounded-lg bg-surface-2 hover:bg-surface-raised text-text-secondary hover:text-text-primary border border-border-subtle transition-all cursor-pointer shadow-sm"
                           title="Replace Image Asset"
                         >
                           <RefreshCw className="w-3.5 h-3.5" />
@@ -1121,7 +1121,7 @@ export default function BackgroundStudioPage() {
       {/* ─── UPLOAD MODAL ─────────────────────────────────────────── */}
       {isUploadModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0f1118] border border-border-subtle rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card dark:shadow-2xl p-6 relative">
+          <div className="bg-surface-1 border border-border-subtle rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card p-6 relative">
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-border-subtle">
               <div>
                 <h3 className="text-lg font-bold text-text-primary">Upload Focus Background</h3>
@@ -1131,7 +1131,7 @@ export default function BackgroundStudioPage() {
               </div>
               <button
                 onClick={() => setIsUploadModalOpen(false)}
-                className="p-1.5 rounded-lg bg-slate-900/5 dark:bg-white/5 text-text-muted hover:text-text-primary hover:bg-slate-900/10 dark:hover:bg-white/10 cursor-pointer"
+                className="p-1.5 rounded-lg bg-surface-2 text-text-muted hover:text-text-primary hover:bg-surface-raised cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1147,7 +1147,7 @@ export default function BackgroundStudioPage() {
             <form onSubmit={handleUploadSubmit} className="space-y-4">
               {/* File Dropzone / Selector */}
               {!uploadPreviewUrl ? (
-                <label className="border-2 border-dashed border-border-subtle hover:border-amber-500/50 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer bg-slate-900/[0.01] hover:bg-slate-900/[0.03] dark:bg-white/[0.01] dark:hover:bg-white/[0.03] transition-all group">
+                <label className="border-2 border-dashed border-border-subtle hover:border-amber-500/50 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer bg-surface-2/50 hover:bg-surface-2 transition-all group">
                   <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                     <Upload className="w-6 h-6" />
                   </div>
@@ -1222,7 +1222,7 @@ export default function BackgroundStudioPage() {
                   {/* Telemetry Pills */}
                   {uploadTelemetry && (
                     <div className="flex flex-wrap items-center gap-2 text-xs">
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-900/5 dark:bg-white/5 border border-border-subtle text-text-primary font-mono">
+                      <span className="px-2.5 py-1 rounded-lg bg-surface-2 border border-border-subtle text-text-primary font-mono">
                         {uploadTelemetry.width} × {uploadTelemetry.height}
                       </span>
                       <span
@@ -1251,7 +1251,7 @@ export default function BackgroundStudioPage() {
                           <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-500" /> Low Resolution (&lt;720p)</span>
                         )}
                       </span>
-                      <span className="px-2.5 py-1 rounded-lg bg-slate-900/5 dark:bg-white/5 border border-border-subtle text-text-muted font-mono">
+                      <span className="px-2.5 py-1 rounded-lg bg-surface-2 border border-border-subtle text-text-muted font-mono">
                         {(uploadTelemetry.sizeBytes / 1024 / 1024).toFixed(2)} MB
                       </span>
                     </div>
@@ -1273,7 +1273,7 @@ export default function BackgroundStudioPage() {
                   placeholder="e.g. Midnight Scholar Sanctum"
                   value={uploadName}
                   onChange={(e) => setUploadName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.03] dark:bg-white/[0.04] border border-border-subtle text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
                   required
                 />
                 {isDuplicateUploadName && (
@@ -1292,7 +1292,7 @@ export default function BackgroundStudioPage() {
                 <select
                   value={uploadCategoryId}
                   onChange={(e) => setUploadCategoryId(parseInt(e.target.value, 10))}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.03] dark:bg-[#141722] border border-border-subtle text-sm text-text-primary focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle text-sm text-text-primary focus:outline-none focus:border-amber-500/50"
                   required
                 >
                   {categories.map((c) => (
@@ -1315,7 +1315,7 @@ export default function BackgroundStudioPage() {
                       setUploadTimerPosition(e.target.value);
                     }
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.03] dark:bg-[#141722] border border-border-subtle text-sm text-text-primary focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle text-sm text-text-primary focus:outline-none focus:border-amber-500/50"
                 >
                   {VALID_TIMER_POSITIONS.map((pos) => {
                     const item = TIMER_POSITION_REGISTRY[pos];
@@ -1336,7 +1336,7 @@ export default function BackgroundStudioPage() {
                 <button
                   type="button"
                   onClick={() => setIsUploadModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-text-muted hover:text-text-primary hover:bg-slate-900/5 dark:hover:bg-white/5 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-text-muted hover:text-text-primary hover:bg-surface-2 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1366,7 +1366,7 @@ export default function BackgroundStudioPage() {
       {/* ─── REPLACE IMAGE MODAL ──────────────────────────────────── */}
       {replacingBackground && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0f1118] border border-border-subtle rounded-2xl w-full max-w-lg p-6 relative shadow-card dark:shadow-2xl">
+          <div className="bg-surface-1 border border-border-subtle rounded-2xl w-full max-w-lg p-6 relative shadow-card">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-border-subtle">
               <div>
                 <h3 className="text-base font-bold text-text-primary">Replace Image Asset</h3>
@@ -1394,7 +1394,7 @@ export default function BackgroundStudioPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <span className="text-[11px] text-text-muted uppercase font-semibold block mb-1">Current</span>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-black/40 border border-border-subtle">
+                  <div className="aspect-video rounded-lg overflow-hidden bg-surface-2 border border-border-subtle">
                     <img
                       src={replacingBackground.publicUrl}
                       alt="Current"
@@ -1404,7 +1404,7 @@ export default function BackgroundStudioPage() {
                 </div>
                 <div>
                   <span className="text-[11px] text-text-muted uppercase font-semibold block mb-1">New Replacement</span>
-                  <div className="aspect-video rounded-lg overflow-hidden bg-slate-900/5 dark:bg-black/40 border border-dashed border-border-subtle flex items-center justify-center">
+                  <div className="aspect-video rounded-lg overflow-hidden bg-surface-2 border border-dashed border-border-subtle flex items-center justify-center">
                     {replacePreviewUrl ? (
                       <img
                         src={replacePreviewUrl}
@@ -1428,7 +1428,7 @@ export default function BackgroundStudioPage() {
               />
 
               {replaceTelemetry && (
-                <div className="p-2.5 rounded-lg bg-slate-900/[0.03] dark:bg-white/[0.02] border border-border-subtle text-xs text-text-secondary space-y-1">
+                <div className="p-2.5 rounded-lg bg-surface-2 border border-border-subtle text-xs text-text-secondary space-y-1">
                   <div>Detected: <span className="font-mono text-text-primary">{replaceTelemetry.width}×{replaceTelemetry.height}</span> ({replaceTelemetry.aspectRatio}:1)</div>
                   <div className={replaceTelemetry.isRecommended16x9 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}>
                     {replaceTelemetry.isRecommended16x9 ? (
@@ -1465,7 +1465,7 @@ export default function BackgroundStudioPage() {
       {/* ─── EDIT BACKGROUND MODAL ─────────────────────────────────── */}
       {editingBackground && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0f1118] border border-border-subtle rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card dark:shadow-2xl p-6 relative">
+          <div className="bg-surface-1 border border-border-subtle rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-card p-6 relative">
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-border-subtle">
               <div>
                 <h3 className="text-lg font-bold text-text-primary">Edit Focus Background Settings</h3>
@@ -1475,7 +1475,7 @@ export default function BackgroundStudioPage() {
               </div>
               <button
                 onClick={() => setEditingBackground(null)}
-                className="p-1.5 rounded-lg bg-slate-900/5 dark:bg-white/5 text-text-muted hover:text-text-primary hover:bg-slate-900/10 dark:hover:bg-white/10 cursor-pointer"
+                className="p-1.5 rounded-lg bg-surface-2 text-text-muted hover:text-text-primary hover:bg-surface-raised cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1543,7 +1543,7 @@ export default function BackgroundStudioPage() {
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.03] dark:bg-white/[0.04] border border-border-subtle text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
                   required
                 />
               </div>
@@ -1560,7 +1560,7 @@ export default function BackgroundStudioPage() {
                       setEditTimerPosition(e.target.value);
                     }
                   }}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.03] dark:bg-[#141722] border border-border-subtle text-sm text-text-primary focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-2 border border-border-subtle text-sm text-text-primary focus:outline-none focus:border-amber-500/50"
                 >
                   {VALID_TIMER_POSITIONS.map((pos) => {
                     const item = TIMER_POSITION_REGISTRY[pos];
@@ -1581,7 +1581,7 @@ export default function BackgroundStudioPage() {
                 <button
                   type="button"
                   onClick={() => setEditingBackground(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-text-muted hover:text-text-primary hover:bg-slate-900/5 dark:hover:bg-white/5 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-text-muted hover:text-text-primary hover:bg-surface-2 cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -1611,7 +1611,7 @@ export default function BackgroundStudioPage() {
       {/* ─── CATEGORY CREATE / EDIT MODAL ─────────────────────────── */}
       {isCategoryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0f1118] border border-border-subtle rounded-2xl w-full max-w-md p-6 relative shadow-card dark:shadow-2xl">
+          <div className="bg-surface-1 border border-border-subtle rounded-2xl w-full max-w-md p-6 relative shadow-card">
             <div className="flex items-center justify-between pb-3 mb-4 border-b border-border-subtle">
               <div>
                 <h3 className="text-base font-bold text-text-primary">
@@ -1651,7 +1651,7 @@ export default function BackgroundStudioPage() {
                       setCategorySlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""));
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.03] dark:bg-white/[0.04] border border-border-subtle text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-border-subtle text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
                   required
                 />
               </div>
@@ -1665,7 +1665,7 @@ export default function BackgroundStudioPage() {
                   placeholder="e.g. fantasy"
                   value={categorySlug}
                   onChange={(e) => setCategorySlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]+/g, "-"))}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.03] dark:bg-white/[0.04] border border-border-subtle text-xs font-mono text-amber-600 dark:text-amber-300 placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-border-subtle text-xs font-mono text-amber-600 dark:text-amber-300 placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
                   required
                 />
               </div>
@@ -1681,7 +1681,7 @@ export default function BackgroundStudioPage() {
                       setCategoryLayoutKey(e.target.value);
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.03] dark:bg-[#141722] border border-border-subtle text-xs text-text-primary focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-border-subtle text-xs text-text-primary focus:outline-none focus:border-amber-500/50"
                 >
                   {VALID_LAYOUT_KEYS.map((key) => {
                     const reg = LAYOUT_KEY_REGISTRY[key];
@@ -1706,7 +1706,7 @@ export default function BackgroundStudioPage() {
                   placeholder="Atmospheric summary of this collection..."
                   value={categoryDescription}
                   onChange={(e) => setCategoryDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.03] dark:bg-white/[0.04] border border-border-subtle text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
+                  className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-border-subtle text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-amber-500/50"
                 />
               </div>
 

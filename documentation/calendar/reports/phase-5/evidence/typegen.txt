@@ -1,0 +1,4 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'next' typegen
+Generating route types...
+✓ Types generated successfully

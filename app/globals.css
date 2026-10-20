@@ -2,7 +2,7 @@
 @import "katex/dist/katex.min.css";
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *, .dark, .dark *));
+@custom-variant dark (&:where([data-surface-polarity="dark"], [data-surface-polarity="dark"] *, html:not([data-surface-polarity="light"])[data-mode="dark"] *, html:not([data-surface-polarity="light"])[data-mode="dark"], html:not([data-surface-polarity="light"]).dark *, html:not([data-surface-polarity="light"]).dark));
 
 /* ============================================================
    THE SYSTEM — Solo Leveling Design System
@@ -14,11 +14,15 @@
 /* ─── CSS Custom Properties (Design Tokens) ─────────────────── */
 :root {
   color-scheme: dark;
+  --surface-polarity: dark;
   /* Core backgrounds */
   --bg-void: #000000;        /* Deepest canvas — page background (uniform solid black default) */
   --bg-abyss: #070707;      /* Card backgrounds */
   --bg-shadow: #0e0e0e;     /* Elevated surfaces */
   --bg-panel: #0a0a0a;       /* Panel/sidebar background */
+  --bg-surface-dark: var(--surface-1);
+  --bg-surface-elevated: var(--surface-raised);
+  --bg-card: var(--surface-1);
   --bg-overlay: rgba(0, 0, 0, 0.92); /* Modal overlays */
 
   /* ─── Unified Theme Accent ─────────────────────────────
@@ -40,11 +44,17 @@
   --accent-gold: #f59e0b;    /* Gold/XP/rewards */
   --accent-red: #ef4444;     /* HP loss / danger / failed */
   --accent-green: #22c55e;   /* Success / completed / HP high */
+  --status-gold: #f59e0b;
+  --status-gold-dim: rgba(245, 158, 11, 0.12);
+  --status-green: #10b981;
+  --status-green-dim: rgba(16, 185, 129, 0.12);
+  --status-red: #ef4444;
+  --status-red-dim: rgba(239, 68, 68, 0.12);
 
   /* Text */
   --text-primary: #e2e8f0;   /* Main text */
   --text-secondary: #94a3b8; /* Muted text */
-  --text-muted: #475569;     /* Very subtle text */
+  --text-muted: #64748b;     /* Very subtle text (WCAG >= 3.0:1 on dark surfaces) */
   --text-system: var(--accent-primary-light); /* System message text */
   --accent-text-light: var(--accent-primary-light); /* Accent text (glows in dark, sharp in light) */
   --accent-text: var(--accent-primary-light);
@@ -55,12 +65,23 @@
   --surface-2: var(--bg-shadow);
   --surface-raised: var(--bg-panel);
   --border-strong: var(--border-active);
+  --sub-surface: rgba(255, 255, 255, 0.03);
+  --sub-border: rgba(255, 255, 255, 0.07);
+  --input-bg: var(--surface-2);
+  --input-border: rgba(255, 255, 255, 0.12);
+  --dialog-bg: var(--surface-1);
+  --dialog-border: rgba(255, 255, 255, 0.12);
+  --tab-bar-bg: rgba(255, 255, 255, 0.03);
+  --tab-bar-border: rgba(255, 255, 255, 0.08);
+  --chip-bg: rgba(255, 255, 255, 0.04);
+  --chip-border: rgba(255, 255, 255, 0.08);
+  --track-bg: rgba(255, 255, 255, 0.06);
   --accent: var(--accent-primary);
   --accent-hover: var(--accent-primary-light);
   --accent-muted: var(--accent-primary-dim);
   --accent-foreground: #ffffff;
   --accent-contrast: #ffffff;
-  --focus-ring: 0 0 0 2px var(--accent-primary-mid);
+  --focus-ring: var(--accent-primary-mid);
   --sidebar-bg: var(--glass-liquid-bg);
   --sidebar-fg: var(--text-primary);
   --sidebar-border: var(--border-subtle);
@@ -104,12 +125,16 @@
 }
 
 /* ─── Light Mode Theme ──────────────────────────────────────── */
-html[data-mode="light"] {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) {
   color-scheme: light;
+  --surface-polarity: light;
   --bg-void: #f8fafc;
   --bg-abyss: #ffffff;
   --bg-shadow: #f1f5f9;
   --bg-panel: #ffffff;
+  --bg-surface-dark: var(--surface-1);
+  --bg-surface-elevated: var(--surface-2);
+  --bg-card: var(--surface-1);
   --bg-overlay: rgba(255, 255, 255, 0.88);
 
   --text-primary: #0f172a;
@@ -119,18 +144,36 @@ html[data-mode="light"] {
   --accent-text-light: var(--accent-primary-dark);
   --accent-text: var(--accent-primary-dark);
 
+  --status-gold: #b45309;
+  --status-gold-dim: rgba(180, 83, 9, 0.10);
+  --status-green: #047857;
+  --status-green-dim: rgba(4, 120, 87, 0.10);
+  --status-red: #b91c1c;
+  --status-red-dim: rgba(185, 28, 28, 0.10);
+
   /* Canonical Semantic Application Tokens */
   --app-canvas: var(--bg-void);
   --surface-1: var(--bg-abyss);
   --surface-2: var(--bg-shadow);
   --surface-raised: var(--bg-panel);
   --border-strong: rgba(15, 23, 42, 0.28);
+  --sub-surface: rgba(15, 23, 42, 0.03);
+  --sub-border: rgba(15, 23, 42, 0.08);
+  --input-bg: #f8fafc;
+  --input-border: rgba(15, 23, 42, 0.14);
+  --dialog-bg: var(--surface-1);
+  --dialog-border: rgba(15, 23, 42, 0.12);
+  --tab-bar-bg: rgba(15, 23, 42, 0.04);
+  --tab-bar-border: rgba(15, 23, 42, 0.08);
+  --chip-bg: rgba(15, 23, 42, 0.04);
+  --chip-border: rgba(15, 23, 42, 0.10);
+  --track-bg: rgba(15, 23, 42, 0.08);
   --accent: var(--accent-primary);
   --accent-hover: var(--accent-primary-dark);
   --accent-muted: var(--accent-primary-dim);
   --accent-foreground: #ffffff;
   --accent-contrast: #ffffff;
-  --focus-ring: 0 0 0 2px var(--accent-primary-mid);
+  --focus-ring: var(--accent-primary-mid);
   --sidebar-bg: rgba(255, 255, 255, 0.88);
   --sidebar-fg: var(--text-primary);
   --sidebar-border: rgba(15, 23, 42, 0.16);
@@ -164,7 +207,7 @@ html[data-mode="light"] {
   color: var(--sidebar-fg, var(--text-primary));
 }
 
-html[data-mode="light"] .liquid-glass-sidebar {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .liquid-glass-sidebar {
   border-right: 1px solid var(--border-subtle);
   box-shadow: 1px 0 0 0 var(--border-subtle), 4px 0 20px rgba(15, 23, 42, 0.03);
 }
@@ -200,7 +243,7 @@ html[data-mode="light"] .liquid-glass-sidebar {
   color: var(--text-primary);
 }
 
-html[data-mode="light"] .liquid-glass-dock {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .liquid-glass-dock {
   background: rgba(255, 255, 255, 0.68);
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.12),
@@ -208,25 +251,25 @@ html[data-mode="light"] .liquid-glass-dock {
               0 1px 1px 0 rgba(255, 255, 255, 1) inset;
 }
 
-html[data-mode="light"] .liquid-glass-dock-btn {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .liquid-glass-dock-btn {
   background: rgba(0, 0, 0, 0.035);
   border: 1px solid rgba(0, 0, 0, 0.07);
   color: var(--text-secondary);
 }
 
-html[data-mode="light"] .liquid-glass-dock-btn:hover {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .liquid-glass-dock-btn:hover {
   background: rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 0, 0, 0.15);
   color: var(--text-primary);
 }
 
-html[data-mode="light"] body {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) body {
   background-color: transparent;
   color: var(--text-primary);
 }
 
 /* ─── Simple Background Scoped Semantic Tokens ────────────────── */
-html[data-mode="light"][data-app-background="simple"] {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))[data-app-background="simple"] {
   --bg-void: #ffffff;
   --bg-abyss: #ffffff;
   --bg-shadow: #f8fafc;
@@ -235,7 +278,7 @@ html[data-mode="light"][data-app-background="simple"] {
   --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
 }
 
-html[data-mode="dark"][data-app-background="simple"] {
+html:where([data-surface-polarity="dark"], [data-mode="dark"]:not([data-surface-polarity="light"]))[data-app-background="simple"] {
   --bg-void: #000000;
   --bg-abyss: #070707;
   --bg-shadow: #0e0e0e;
@@ -588,7 +631,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ─── Buttons ────────────────────────────────────────────────── */
 .btn-primary {
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim));
-  color: white;
+  color: var(--accent-foreground, #ffffff);
   padding: 10px 24px;
   border-radius: 4px;
   font-family: 'Rajdhani', sans-serif;
@@ -847,7 +890,7 @@ input[type="search"]::-webkit-search-results-decoration {
   position: relative;
 }
 
-html[data-mode="light"] .settings-category-card {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .settings-category-card {
   background: var(--surface-1, var(--bg-panel));
   border: 1px solid var(--border-subtle);
   box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
@@ -892,7 +935,7 @@ html[data-mode="light"] .settings-category-card {
   animation: settings-tile-in 0.4s ease forwards;
 }
 
-html[data-mode="light"] .settings-tile {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .settings-tile {
   background: var(--surface-2, var(--bg-shadow));
   border: 1px solid var(--border-subtle);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
@@ -905,7 +948,7 @@ html[data-mode="light"] .settings-tile {
   transform: translateY(-2px);
 }
 
-html[data-mode="light"] .settings-tile:hover {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .settings-tile:hover {
   background: var(--surface-raised, var(--bg-panel));
   border-color: var(--accent-primary);
   box-shadow: 0 4px 14px var(--accent-primary-dim);
@@ -1036,7 +1079,7 @@ html[data-mode="light"] .settings-tile:hover {
   background: var(--surface-raised, var(--accent-primary-dim));
 }
 
-html[data-mode="light"] .settings-page-back {
+html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"])) .settings-page-back {
   background: var(--surface-1);
 }
 

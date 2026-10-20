@@ -30,7 +30,8 @@ import type { CopilotModel } from "@/lib/planner/copilot/model";
  *
  * Opt-in, because it spends real quota: `PLANNER_INTERPRETATION_CORPUS=true`, run through the
  * disposable database harness. It writes its measurements to
- * `planner-phase5-corpus-results.json` so the report cites numbers rather than impressions, and
+ * `documentation/planner/corpus/planner-phase5-corpus-results.json` so the report cites
+ * numbers rather than impressions, and
  * it never prints a secret. The phrases are synthetic; no student text is involved.
  */
 
@@ -672,7 +673,8 @@ describe.skipIf(!database || !LIVE)("real DeepSeek interpretation corpus", () =>
 
   afterAll(() => {
     if (measured.length) {
-      const path = "planner-phase5-corpus-results.json";
+      const path = "documentation/planner/corpus/planner-phase5-corpus-results.json";
+      mkdirSync("documentation/planner/corpus", { recursive: true });
       writeFileSync(path, JSON.stringify(measured, null, 1));
       // eslint-disable-next-line no-console
       console.log(`CORPUS_RESULTS ${path} cases=${measured.length}`);

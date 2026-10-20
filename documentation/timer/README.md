@@ -60,8 +60,8 @@ Relevant commands:
 ```sh
 npm run test -- --run __tests__/timer __tests__/planner-v2/session-client.test.ts __tests__/focus --exclude '**/focus-backgrounds-cascade-triggers.test.ts'
 npx tsc --noEmit
-node scripts/test-timer-postgres.mjs
-node scripts/verify-timer-build.mjs
+node scripts/test/test-timer-postgres.mjs
+node scripts/verify/verify-timer-build.mjs
 npm run mobile:build
 npm run mobile:verify
 ```

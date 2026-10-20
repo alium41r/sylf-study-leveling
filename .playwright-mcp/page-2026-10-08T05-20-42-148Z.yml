@@ -1,4 +1,0 @@
-- generic [active] [ref=e1]:
-  - main [ref=e5]:
-    - paragraph [ref=e9]: Entering the Sanctuary...
-  - button "Open Next.js Dev Tools" [ref=e15] [cursor=pointer]

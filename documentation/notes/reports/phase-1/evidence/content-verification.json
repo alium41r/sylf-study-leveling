@@ -1,0 +1,11 @@
+{
+  "markdownFilesChecked": 7,
+  "jsonFilesParsed": 10,
+  "prototypeSourcesHashed": 19,
+  "localReferenceAndWhitespaceErrors": [],
+  "browserSuitePassed": 18,
+  "archivePortabilityPassed": true,
+  "contractTestsPassed": 19,
+  "fixtureLintPassed": true,
+  "applicationScopeCheck": "scope-verification.json"
+}

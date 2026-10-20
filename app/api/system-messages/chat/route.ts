@@ -17,7 +17,9 @@ import { logAiUsage } from "@/lib/ai/usage-logger";
 import { TimezoneService } from "@/lib/timezone-service";
 import { getUserTimezone } from "@/lib/timezone-server";
 import { buildSystemInstruction, buildVerbosityDirective } from "@/lib/ai/prompts";
-import { normalizeSylviePage, formatSylviePage, boundSylvieHistory, selectSylvieTools } from "@/lib/ai/sylvie/turn-context";
+import { normalizeSylviePage, formatSylviePage, boundSylvieHistory, selectSylvieTools, isSylvieCalendarRequest } from "@/lib/ai/sylvie/turn-context";
+import { CALENDAR_MUTATION_TOOLS } from "@/lib/ai/sylvie/calendar-contracts";
+import { prepareCalendarOperation, validateCalendarProposal, reviewCalendarBatch, withCalendarReadScope, calendarToolFailure } from "@/lib/ai/sylvie/calendar-tools";
 import { retrieveSylvieKnowledge, formatSylvieKnowledge } from "@/lib/ai/sylvie/knowledge";
 import { isPlanningRequest, preparePlannerHandoff } from "@/lib/ai/sylvie/planner-bridge";
 import { MUTATION_TOOLS, stageSylvieAction, readSylvieAction, attachSylvieAction, parseSylvieAction, type SylvieOperation } from "@/lib/ai/sylvie/action-server";
@@ -125,7 +127,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function respond(req: NextRequest, stream?: ChatStreamSink) {
-  return withAiRequest({ feature: "chat", workload: "sylvie", signal: AbortSignal.any([stream?.signal ?? req.signal, AbortSignal.timeout(SYLVIE_SERVER_TIMEOUT_MS)]) }, async () => {
+  return withCalendarReadScope(() => withAiRequest({ feature: "chat", workload: "sylvie", signal: AbortSignal.any([stream?.signal ?? req.signal, AbortSignal.timeout(SYLVIE_SERVER_TIMEOUT_MS)]) }, async () => {
   let sessionUserId: number | null = null;
   let quotaReserved = false;
   try {
@@ -137,6 +139,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
 
     const userId = session.userId;
     sessionUserId = userId;
+    if (req.headers.get("sec-fetch-site") === "cross-site") return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
 
     // ── Parse the request body (before quota so deterministic replies
     //    can be served without touching the LLM quota pool) ──
@@ -202,6 +205,13 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       });
       const pending = proposal && parseSylvieAction(proposal.content, userId, resolved.sessionId, proposal.id);
       if (!pending || pending.token !== confirmationToken) throw new RouteError("This change was already confirmed or is no longer available.", 409);
+      const calendarOperations = action.operations.filter(o => CALENDAR_MUTATION_TOOLS.has(o.name));
+      if (calendarOperations.length) {
+        const newerTurn = await prisma.systemMessage.findFirst({ where: { userId, sessionId: resolved.sessionId, type: "USER", id: { gt: proposal.id } }, select: { id: true } });
+        if (newerTurn) throw new RouteError("This preview was superseded by a later message. Review the latest proposal.", 409);
+        try { for (const operation of calendarOperations) await validateCalendarProposal(operation.args, userId); }
+        catch { throw new RouteError("The calendar changed or could not be checked. Refresh the calendar and request a new proposal; nothing was changed.", 409); }
+      }
       // Claim the stored proposal once BEFORE executing; concurrent/retried clicks cannot replay it.
       const claimed = await prisma.systemMessage.updateMany({
         where: { id: proposal.id, userId, sessionId: resolved.sessionId, content: proposal.content },
@@ -209,6 +219,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       });
       if (claimed.count !== 1) throw new RouteError("This change was already confirmed.", 409);
       const outcomes: string[] = [];
+      let calendarChanged = false;
       for (const operation of action.operations) {
         const args = { ...operation.args };
         // Preserve the existing executor's bulk-deletion handshake behind the signed exact preview.
@@ -222,7 +233,9 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
         let result;
         try { result = await executeChatTool(operation.name, args, userId); }
         catch { result = { error: "The change could not be completed. Please check the current data before trying again." }; }
-        outcomes.push(result.error ? `Couldn’t apply ${operation.name}: ${String(result.error)}`
+        if (result.calendarChanged) calendarChanged = true;
+        outcomes.push(result.requiresPlannerReview ? "This task belongs to a saved study plan. Review the adjustment in [Planner](/system?tab=planner); its schedule was not changed."
+          : result.error ? `Couldn’t apply ${operation.name}: ${String(result.error)}`
           : result.status === "REQUIRES_CONFIRMATION" ? String(result.message)
           : typeof result.message === "string" ? result.message
           : `Applied ${operation.name}.`);
@@ -238,7 +251,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       const aiMessage = await prisma.systemMessage.create({ data: {
         userId, sessionId: resolved.sessionId, content: reply, type: "INFO", read: false, modelUsed: "Confirmed action (no LLM)",
       } });
-      return NextResponse.json({ userMessage, aiMessage, reply, message: reply, sessionId: resolved.sessionId, modelUsed: "DETERMINISTIC", modelDisplayName: "Confirmed action (no LLM)" });
+      return NextResponse.json({ userMessage, aiMessage, reply, message: reply, calendarChanged, sessionId: resolved.sessionId, modelUsed: "DETERMINISTIC", modelDisplayName: "Confirmed action (no LLM)" });
     }
 
     // S4: bounded prompt input — prevents multi-MB messages being injected
@@ -257,7 +270,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
     // ── Cheap-Answer Engine: easy low-reasoning questions from every genre
     //    are answered deterministically (math, units, dates, app stats…)
     //    before the LLM — no tokens, no quota, saved to the session. ──
-    if (!hasImageInput && messageText && !contextOverride && modelPreference === "auto") {
+    if (!hasImageInput && messageText && !contextOverride && modelPreference === "auto" && !isSylvieCalendarRequest(messageText, [], page)) {
       const cheapContext = recallCheapContext(userId, sessionIdStr);
       const cheap = await resolveCheapAnswer(userId, messageText, cheapContext);
       if (cheap) {
@@ -339,7 +352,10 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
     const normalizedHistory: NormalizedMessage[] = conversationHistory
       .map((m) => ({
         role: m.type === "USER" ? "user" : "assistant",
-        content: stripModelMarkers(m.content),
+        content: stripModelMarkers(m.content) + (m.type !== "USER" ? (() => {
+          const pending = parseSylvieAction(m.content, userId, sessionId, m.id);
+          return pending ? `\n[Earlier proposed change, not executed; use as reference for refinements only]\n${pending.summary}` : "";
+        })() : ""),
       }));
 
     // A tiny, stable answer for the explicit short-introduction regression.
@@ -353,7 +369,8 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
 
     // Resolve planning before any general-chat model: the Planner owns its reasoning.
     const planning = !hasImageInput && isPlanningRequest(messageText, normalizedHistory);
-    if (planning) {
+    const calendarPlanning = planning && (page?.path === "/calendar" || /\b(appointments?|personal events?|time blocks?|conflicts?|dentist|meetings?)\b/i.test(messageText));
+    const handoffReply = async () => {
       const userMessage = await prisma.systemMessage.create({ data: {
         userId, sessionId, content: messageText, type: "USER", read: true,
       } });
@@ -371,6 +388,8 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
       return NextResponse.json({ userMessage, aiMessage: { ...aiMessage, content: stripSylvieAction(aiMessage.content), plannerHandoff }, plannerHandoff, reply, message: reply, sessionId, session: newSession, modelUsed: "DETERMINISTIC", modelDisplayName: "Planner handoff (no LLM)" });
     }
 
+    if (planning && !calendarPlanning) return handoffReply();
+
     // ── Quota enforcement (shared 10-prompt daily pool for General Chat + Focus Drawer) ──
     // S4: RESERVE the unit atomically BEFORE any LLM call; release on failure.
     // A configured owner account is entitled to unlimited chat: the reservation
@@ -378,6 +397,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
     const quota = await reserveQuota(userId, "chat");
     quotaReserved = quota.charged;
     if (!quota.charged && !quota.unlimited) {
+      if (planning) return handoffReply();
       return NextResponse.json(
         {
           error: "DAILY_QUOTA_EXHAUSTED",
@@ -443,10 +463,11 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
     const currentAgent = workloadResult.agent;
     const knowledge = retrieveSylvieKnowledge({ message: messageText, page, recentUserMessages: normalizedHistory.filter((turn) => turn.role === "user").map((turn) => turn.content ?? "") });
     const reference = [formatSylviePage(page), formatSylvieKnowledge(knowledge)].filter(Boolean).join("\n\n");
-    const toolsForTurn = selectSylvieTools(currentAgent, messageText, normalizedHistory);
+    const toolsForTurn = selectSylvieTools(currentAgent, messageText, normalizedHistory, page);
     const verbosityDirective = buildVerbosityDirective(workloadResult.workload, messageText);
     const systemInstruction = buildSystemInstruction(currentAgent, `Local timezone: ${timezone}`, localDate, reference) + `\n\n${verbosityDirective}`;
     const pendingOperations: SylvieOperation[] = [];
+    const calendarProposalCache = new Map<string, Awaited<ReturnType<typeof prepareCalendarOperation>>>();
     // ── Build the user's current message ──────────────
     const currentUserMsg: NormalizedMessage = {
       role: "user",
@@ -529,10 +550,21 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
           if (!allowedToolNames.has(tc.name)) {
             result = { error: "This tool is not available for the current request." };
           } else if (MUTATION_TOOLS.has(tc.name)) {
-            const args = { ...tc.args };
+            let args = { ...tc.args };
             delete args.confirmationToken; // A model can never authorize its own proposal.
             if (pendingOperations.length >= 8) result = { error: "Please request fewer changes at a time." };
             else {
+              if (CALENDAR_MUTATION_TOOLS.has(tc.name)) {
+                try {
+                  const key = `${tc.name}:${JSON.stringify(args)}`;
+                  let prepared = calendarProposalCache.get(key);
+                  if (!prepared) { prepared = await prepareCalendarOperation(tc.name, args, userId); calendarProposalCache.set(key, prepared); }
+                  args = prepared;
+                } catch (error) {
+                  toolResultsMsg.toolResults!.push({ toolCallId: tc.id, name: tc.name, result: calendarToolFailure(error) });
+                  continue;
+                }
+              }
               const operation = { name: tc.name, args };
               if (!pendingOperations.some((item) => JSON.stringify(item) === JSON.stringify(operation))) pendingOperations.push(operation);
               result = { status: "REQUIRES_CONFIRMATION", message: "Proposed only. The user must confirm the exact preview before any change is applied." };
@@ -785,6 +817,7 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
     let pendingAction;
     if (pendingOperations.length > 0) {
       try {
+        if (pendingOperations.some(o => CALENDAR_MUTATION_TOOLS.has(o.name))) await reviewCalendarBatch(pendingOperations, userId);
         pendingAction = stageSylvieAction(userId, sessionId!, aiMessage.id, pendingOperations);
         await prisma.systemMessage.update({ where: { id: aiMessage.id }, data: { content: attachSylvieAction(aiMessage.content, pendingAction) } });
       } catch {
@@ -793,6 +826,9 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
         await prisma.systemMessage.update({ where: { id: aiMessage.id }, data: { content: aiResponseText } });
       }
     }
+    const plannerHandoff = calendarPlanning && !pendingAction && generationSucceeded
+      ? preparePlannerHandoff({ message: messageText, history: normalizedHistory }) : undefined;
+    if (plannerHandoff) await prisma.systemMessage.update({ where: { id: aiMessage.id }, data: { content: attachPlannerHandoff(aiResponseText, plannerHandoff) } });
 
     // ── S4 reservation lifecycle: reserved BEFORE generation, refunded on
     //    failure/timeout/abort. Successful generations keep the charge. ──
@@ -812,8 +848,9 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
 
     return NextResponse.json({
       userMessage: exposeChatImages(userMessage),
-      aiMessage: { ...aiMessage, content: aiResponseText, modelUsed: actualModelDisplayName, pendingAction, truncated: responseTruncated },
+      aiMessage: { ...aiMessage, content: aiResponseText, modelUsed: actualModelDisplayName, pendingAction, plannerHandoff, truncated: responseTruncated },
       pendingAction,
+      plannerHandoff,
       reply: aiResponseText,
       message: aiResponseText,
       sessionId,
@@ -834,5 +871,5 @@ async function respond(req: NextRequest, stream?: ChatStreamSink) {
     );
   }
 
-  });
+  }));
 }

@@ -1,0 +1,14 @@
+npm notice run sylf@0.1.0 test
+npm notice run vitest --run __tests__/ai/sylvie-calendar-tools.test.ts
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.9 /Users/aliumair/Desktop/sylf
+
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  18:57:50
+   Duration  745ms (transform 160ms, setup 126ms, import 257ms, tests 198ms, environment 0ms)
+

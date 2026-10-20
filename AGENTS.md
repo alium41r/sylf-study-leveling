@@ -17,6 +17,24 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Web composition starts at `app/layout.tsx`, `app/components/GlobalSystemWrapper.tsx`, and `app/components/SylfAppShell.tsx`. `mobile/` is a Vite/Capacitor client reusing screens/providers through navigation/API adapters. Preserve shared boundaries; keep database/server-only code and provider credentials out of client imports.
 - Scope changes to the request, follow nearby conventions, and preserve unrelated working-tree changes. Avoid unrelated refactors and cleanup.
 
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| `app/` | Next.js App Router routes, route-local components, and API handlers. |
+| `lib/` | Shared engines, contracts, services, and catalogs; no route components. |
+| `__tests__/` | Vitest suites grouped by app/lib/feature area. |
+| `prisma/` | Schema and ordered migration history. |
+| `public/` | Runtime static assets served by the app. |
+| `assets/` | Source/design artwork and reference screenshots; never served at runtime. |
+| `scripts/` | Build, asset, database, test, verify, security, and QA utilities; see `scripts/README.md`. |
+| `config/` | Auxiliary TypeScript/Vitest/SVGO configuration; framework configs stay at the root. |
+| `mobile/` | Vite/Capacitor client; `mobile/dist/` is generated and ignored. |
+| `tools/ai-agent/` | Independent development agent package; not part of the web build. |
+| `documentation/` | Current contracts, indexes, reports, evidence, security, research, specifications, and the design-system reference set. |
+| `archive/` | Dormant source and historical source assets. |
+| `android/` | Capacitor Android project. |
+
 ## Existing authorities
 
 Inspect these owners and their callers before changing behavior:
@@ -41,7 +59,7 @@ Preserve polling fallbacks for Supabase Realtime and in-process fallbacks for Re
 ## Documentation
 
 - Start at the [documentation index](documentation/README.md) and relevant feature index/current contract. Source, tests, schema, and configuration resolve discrepancies. Reports/audits and QA evidence describe their own run; phase specs are design inputs, not proof of current behavior. `FINAL`/`ARCHITECTURE` filenames do not establish current requirements.
-- Consult the [design index](documentation/design/README.md) before using `design-system/`: its generic master and older landing guidance have explicit limitations. `archive/` holds dormant material; `antigravity project template/` is a starter, not Sylf's architecture specification.
+- Consult the [design index](documentation/design/README.md) before using the `documentation/design/design-system/` reference set: its generic master and older landing guidance have explicit limitations. `archive/` holds dormant material; `antigravity project template/` is a starter, not Sylf's architecture specification.
 - Update current docs when behavior changes. Put new reports in `documentation/<feature>/reports/<task-or-phase>/`, with evidence beside them; preserve established evidence/writer paths described by the indexes. Link detailed contracts instead of copying them here.
 - Load only documentation relevant to the current task. Do not exhaustively read historical reports, evidence, or unrelated feature documentation unless the task requires it.
 
@@ -57,7 +75,7 @@ Check `package.json` and tool configuration when commands change.
 | Typecheck | `npx tsc --noEmit`; run `npx next typegen` first on a fresh checkout or after route changes |
 | Lint | `npx eslint <changed-files>`; `npx eslint .` for a full audit |
 | Mobile build / bundle checks | `npm run mobile:build` and `npm run mobile:verify` |
-| Planner database integration | `node scripts/test-planner-postgres.mjs [path-filter]` (disposable PostgreSQL; Docker required) |
+| Planner database integration | `node scripts/test/test-planner-postgres.mjs [path-filter]` (disposable PostgreSQL; Docker required) |
 
 `npm run lint` currently invokes the removed `next lint`; use ESLint directly. Next.js builds do not run linting.
 

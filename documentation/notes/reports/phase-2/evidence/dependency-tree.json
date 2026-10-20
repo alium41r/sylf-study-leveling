@@ -1,0 +1,75 @@
+{
+  "version": "0.1.0",
+  "name": "sylf",
+  "dependencies": {
+    "@blocknote/core": {
+      "version": "0.56.0",
+      "resolved": "https://registry.npmjs.org/@blocknote/core/-/core-0.56.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "y-prosemirror": {
+          "version": "1.3.7"
+        },
+        "y-protocols": {
+          "version": "1.0.6"
+        },
+        "yjs": {
+          "version": "13.6.33"
+        }
+      }
+    },
+    "@blocknote/react": {
+      "version": "0.56.0",
+      "resolved": "https://registry.npmjs.org/@blocknote/react/-/react-0.56.0.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@blocknote/core": {
+          "version": "0.56.0"
+        }
+      }
+    },
+    "dexie": {
+      "version": "4.4.6",
+      "resolved": "https://registry.npmjs.org/dexie/-/dexie-4.4.6.tgz",
+      "overridden": false
+    },
+    "fake-indexeddb": {
+      "version": "6.2.5",
+      "resolved": "https://registry.npmjs.org/fake-indexeddb/-/fake-indexeddb-6.2.5.tgz",
+      "overridden": false
+    },
+    "fflate": {
+      "version": "0.8.2",
+      "resolved": "https://registry.npmjs.org/fflate/-/fflate-0.8.2.tgz",
+      "overridden": false
+    },
+    "y-prosemirror": {
+      "version": "1.3.7",
+      "resolved": "https://registry.npmjs.org/y-prosemirror/-/y-prosemirror-1.3.7.tgz",
+      "overridden": false,
+      "dependencies": {
+        "y-protocols": {
+          "version": "1.0.6"
+        },
+        "yjs": {
+          "version": "13.6.33"
+        }
+      }
+    },
+    "y-protocols": {
+      "version": "1.0.6",
+      "resolved": "https://registry.npmjs.org/y-protocols/-/y-protocols-1.0.6.tgz",
+      "overridden": false,
+      "dependencies": {
+        "yjs": {
+          "version": "13.6.33"
+        }
+      }
+    },
+    "yjs": {
+      "version": "13.6.33",
+      "resolved": "https://registry.npmjs.org/yjs/-/yjs-13.6.33.tgz",
+      "overridden": false
+    }
+  }
+}

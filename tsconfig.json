@@ -38,7 +38,7 @@
   ],
   "exclude": [
     "node_modules",
-    "ai-agent",
+    "tools",
     "archive",
     "scratch"
   ]

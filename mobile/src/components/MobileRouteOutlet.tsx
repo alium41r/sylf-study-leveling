@@ -54,6 +54,7 @@ const GoalsScreen = React.lazy(() => import("@/app/goals/components/GoalsScreen"
 
 const QuestsScreen = React.lazy(() => import("@/app/quests/components/QuestsScreen"));
 
+const NotesScreen = React.lazy(() => import("@/app/notes/components/NotesScreen"));
 const CalendarScreen = React.lazy(() => import("@/app/calendar/components/CalendarScreen"));
 
 const ShopScreen = React.lazy(() => import("@/app/shop/components/ShopScreen"));
@@ -191,6 +192,7 @@ const MIGRATED_EXACT_ROUTES: Record<string, () => React.ReactNode> = {
   "/goals": () => <GoalsScreen />,
   "/quests": () => <QuestsScreen />,
   "/calendar": () => <CalendarScreen />,
+  "/notes": () => <NotesScreen />,
   "/shop": () => <ShopScreen />,
   "/inventory": () => <ShopScreen />,
   "/settings": () => <SettingsIndexController />,

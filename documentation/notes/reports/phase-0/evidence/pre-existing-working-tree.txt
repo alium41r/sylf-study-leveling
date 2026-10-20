@@ -1,0 +1,139 @@
+ M .gitignore
+ M __tests__/ai/sylvie-runtime.test.ts
+ M __tests__/ai/sylvie-turn-context.test.ts
+ M __tests__/calendar/floating-rest-day.test.ts
+ M __tests__/color-utils.test.ts
+ M __tests__/components/system-overlay.test.tsx
+ M __tests__/settings/appearance.test.tsx
+ M app/admin/background-studio/page.tsx
+ M app/api/system-messages/chat/route.ts
+ M app/calendar/Calendar.module.css
+ M app/calendar/components/CalendarScreen.tsx
+ M app/calendar/components/DayInspectionPanel.tsx
+ M app/calendar/components/StudyScheduleModal.tsx
+ M app/components/Calendar/StudyCalendar.tsx
+ M app/components/GlobalSystemWrapper.tsx
+ M app/components/LevelUpOverlay.module.css
+ M app/components/PublicProfileModal.tsx
+ M app/components/SettingsPanel.module.css
+ M app/components/landing/LandingNavbar.tsx
+ M app/components/landing/journey/JourneyLanding.tsx
+ M app/components/planner/ExamPlanner.module.css
+ M app/components/planner/copilot/copilot.module.css
+ M app/components/planner/quick-plan/quick-plan.module.css
+ M app/components/system/SylvieResponseActions.module.css
+ M app/components/system/chat/Chat.module.css
+ M app/components/system/chat/useSylvieChat.ts
+ M app/components/system/page-presence.ts
+ M app/dashboard-design/styles/DashboardDesign.module.css
+ M app/dashboard/Dashboard.module.css
+ M app/focus/hooks/useFocusEyeComfort.ts
+ M app/globals.css
+ M app/goals/Goals.module.css
+ M app/layout.tsx
+ M app/locker/Locker.module.css
+ M app/locker/components/SkillNodeGraph.tsx
+ M app/locker/components/SubjectConstellationCanvas.tsx
+ M app/onboarding/Onboarding.module.css
+ M app/onboarding/components/AppearanceStep.tsx
+ M app/profile/[username]/PublicProfileClient.tsx
+ M app/settings/appearance/components/AppearanceSettingsScreen.tsx
+ M app/settings/appearance/components/ColorPickerBoard.tsx
+ M app/settings/appearance/components/MiniDashboardPreview.tsx
+ M app/settings/archive/components/ArchiveSettingsScreen.module.css
+ M app/settings/components/SystemHubPage.module.css
+ M app/settings/components/useSystemAppearance.ts
+ M app/settings/notifications/components/NotificationsSettingsScreen.tsx
+ M app/shop/Shop.module.css
+ M app/social/Social.module.css
+ M app/system/System.module.css
+ M app/timer/Timer.module.css
+ M documentation/README.md
+ M documentation/sylvie/README.md
+ M lib/ai/chat-tool-executor.ts
+ M lib/ai/chat-tools.ts
+ M lib/ai/providers/gemini.ts
+ M lib/ai/sylvie/action-server.ts
+ M lib/ai/sylvie/capabilities.md
+ M lib/ai/sylvie/chat-client.ts
+ M lib/ai/sylvie/tool-context.ts
+ M lib/ai/sylvie/turn-context.ts
+ M lib/client-data-cache.ts
+ M lib/color-utils.ts
+ M lib/notification-preferences.ts
+ M lib/prisma.ts
+ M lib/study-schedule-service.ts
+ M lib/study-schedule-types.ts
+ M next.config.ts
+ M package-lock.json
+ M package.json
+ M prisma/schema.prisma
+ M public/sw.js
+?? .playwright-mcp/TRANSFORMERS-LICENSE
+?? .playwright-mcp/page-2026-10-18T15-10-59-509Z.yml
+?? .playwright-mcp/page-2026-10-18T15-13-06-327Z.yml
+?? .playwright-mcp/page-2026-10-18T15-15-28-349Z.yml
+?? __tests__/ai/calendar-provider-schema.test.ts
+?? __tests__/ai/sylvie-calendar-tools.test.ts
+?? __tests__/calendar/advanced-ui.test.tsx
+?? __tests__/calendar/completion-api.test.ts
+?? __tests__/calendar/completion-postgres.test.ts
+?? __tests__/calendar/connections-api.test.ts
+?? __tests__/calendar/event-operations.test.ts
+?? __tests__/calendar/external-postgres.test.ts
+?? __tests__/calendar/external-providers.test.ts
+?? __tests__/calendar/ink-input.test.tsx
+?? __tests__/calendar/ink.test.ts
+?? __tests__/calendar/intelligence.test.ts
+?? __tests__/calendar/note-autosave.test.ts
+?? __tests__/calendar/personal-api.test.ts
+?? __tests__/calendar/personal-contracts.test.ts
+?? __tests__/calendar/personal-postgres.test.ts
+?? __tests__/calendar/personal-workspace.test.tsx
+?? __tests__/calendar/preferences-api.test.ts
+?? __tests__/calendar/recognition.test.ts
+?? __tests__/calendar/reminder-agent.test.tsx
+?? __tests__/calendar/scheduling.test.ts
+?? app/api/calendar/connections/
+?? app/api/calendar/notebooks/
+?? app/api/calendar/personal/
+?? app/api/calendar/preferences/
+?? app/api/calendar/reminders/
+?? app/api/calendar/shared/
+?? app/api/cron/calendar-sync/
+?? app/calendar/Notebook.module.css
+?? app/calendar/Scheduling.module.css
+?? app/calendar/Workspace.module.css
+?? app/calendar/components/CalendarAnnotations.tsx
+?? app/calendar/components/CalendarConnections.tsx
+?? app/calendar/components/CalendarDialog.tsx
+?? app/calendar/components/CalendarEditor.tsx
+?? app/calendar/components/CalendarReminderAgent.tsx
+?? app/calendar/components/CalendarSettings.tsx
+?? app/calendar/components/CalendarTimeline.tsx
+?? app/calendar/components/CalendarWorkspace.tsx
+?? app/calendar/components/EventEditor.tsx
+?? app/calendar/components/InkSurface.tsx
+?? app/calendar/components/InkToolbar.tsx
+?? app/calendar/components/MonthEventHandle.tsx
+?? app/calendar/components/NotebookEditor.tsx
+?? app/calendar/components/NotebookRecognition.tsx
+?? app/calendar/components/NotebookSearch.tsx
+?? app/calendar/components/QuickAdd.tsx
+?? app/calendar/components/SharedCalendars.tsx
+?? app/calendar/components/useCalendarPreferences.ts
+?? app/calendar/components/useCalendarWorkspace.ts
+?? documentation/calendar/
+?? documentation/notes/
+?? lib/ai/providers/tool-schema.ts
+?? lib/ai/sylvie/calendar-contracts.ts
+?? lib/ai/sylvie/calendar-page-context.ts
+?? lib/ai/sylvie/calendar-tools.ts
+?? lib/calendar/
+?? prisma/migrations/20261018000000_personal_calendar/
+?? prisma/migrations/20261018010000_calendar_scheduling/
+?? prisma/migrations/20261018020000_external_calendars/
+?? prisma/migrations/20261018030000_calendar_completion/
+?? scripts/build-calendar-recognition.mjs
+?? scripts/run-calendar-sync.mjs
+?? scripts/test-calendar-postgres.mjs

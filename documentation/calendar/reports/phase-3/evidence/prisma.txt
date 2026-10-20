@@ -1,0 +1,6 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'prisma' validate
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+The schema at prisma/schema.prisma is valid 🚀

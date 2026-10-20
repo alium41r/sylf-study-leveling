@@ -18,9 +18,9 @@
   --accent-mid: var(--accent-primary-mid, rgba(124, 58, 237, 0.4));
   --line: var(--border-strong, #263247);
   --subtle-line: var(--border-subtle, #1a2435);
-  --gold: #d9b67b;
-  --green: #a4d5bb;
-  --red: #e07a7a;
+  --gold: var(--status-gold, #d9b67b);
+  --green: var(--status-green, #a4d5bb);
+  --red: var(--status-red, #e07a7a);
 
   position: relative;
   isolation: isolate;
@@ -39,7 +39,7 @@
   overflow-y: auto;
 }
 
-:global(html[data-mode="light"]) .onboardingContainer {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .onboardingContainer {
   --page: var(--app-canvas, #f1f4fa);
   --surface: var(--surface-1, #ffffff);
   --elevated: var(--surface-2, #e5ebf5);
@@ -53,6 +53,9 @@
   --accent-mid: var(--accent-primary-mid, rgba(124, 58, 237, 0.28));
   --line: var(--border-strong, #bdcbe0);
   --subtle-line: var(--border-subtle, #d6dfed);
+  --gold: var(--status-gold, #b45309);
+  --green: var(--status-green, #15803d);
+  --red: var(--status-red, #b91c1c);
   color-scheme: light;
 }
 
@@ -82,13 +85,13 @@
   mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
 }
 
-:global(html[data-mode="light"]) .topGlow {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow {
   background:
     radial-gradient(ellipse 65% 40% at 50% -5%, rgba(195, 180, 245, 0.25), transparent 70%),
     radial-gradient(ellipse 45% 30% at 85% 10%, rgba(210, 225, 255, 0.2), transparent 70%);
 }
 
-:global(html[data-mode="light"]) .topGlow::before {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow::before {
   opacity: 0.1;
 }
 
@@ -123,7 +126,7 @@
   }
 }
 
-:global(html[data-mode="light"]) .stepCard {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .stepCard {
   box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.08);
 }
 

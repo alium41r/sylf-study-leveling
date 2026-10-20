@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-18",
+  "phase": 3,
+  "targetedTests": {
+    "passed": 140,
+    "databaseSkippedInOrdinaryRun": 9
+  },
+  "isolatedPostgres": {
+    "engine": "PGlite PostgreSQL",
+    "passed": 9,
+    "dockerRun": false
+  },
+  "typeGeneration": "passed",
+  "typecheck": "passed",
+  "changedSourceLint": "passed",
+  "webProductionBuild": "passed",
+  "mobileProductionBuild": "passed",
+  "mobileBundleVerification": "passed",
+  "prismaValidation": "passed",
+  "migrationApplied": "20261018010000_calendar_scheduling",
+  "schemaBuildVersion": 34,
+  "axe": {
+    "tags": [
+      "wcag2a",
+      "wcag2aa",
+      "wcag21aa"
+    ],
+    "viewAppearanceCombinations": 12,
+    "violations": 0,
+    "appearanceCombinations": [
+      {
+        "mode": "light",
+        "background": "#d9eee7",
+        "accent": "#facc15"
+      },
+      {
+        "mode": "dark",
+        "background": "#111827",
+        "accent": "#a78bfa"
+      },
+      {
+        "mode": "light",
+        "background": "#101b31",
+        "accent": "#facc15"
+      },
+      {
+        "mode": "dark",
+        "background": "#ffe4f0",
+        "accent": "#bc2166"
+      }
+    ]
+  },
+  "viewports": [
+    [
+      360,
+      780
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      820,
+      1180
+    ],
+    [
+      1440,
+      1000
+    ]
+  ],
+  "qaCleanup": {
+    "temporaryEventsRemaining": 0,
+    "temporaryNotesRemaining": 0,
+    "pendingDeviceDrafts": 0,
+    "appearanceRestored": true,
+    "simplePreferencesRestored": true
+  },
+  "limitations": [
+    "No guaranteed delivery with suspended or closed browsers; no push/OS alarm worker.",
+    "Physical stylus and OS notification delivery require target-device qualification."
+  ]
+}

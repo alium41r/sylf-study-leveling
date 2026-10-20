@@ -1,0 +1,15 @@
+{
+  "browser": "151.0.7922.34",
+  "results": [
+    {
+      "name": "acknowledged disk-backed IndexedDB survives a full browser process crash",
+      "pass": true,
+      "elapsedMs": 1169.409209,
+      "detail": {
+        "browserProcessCrash": true,
+        "persistentProfile": true,
+        "powerLoss": false
+      }
+    }
+  ]
+}

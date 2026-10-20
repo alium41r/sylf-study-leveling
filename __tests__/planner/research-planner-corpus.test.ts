@@ -24,7 +24,7 @@ import { resolveAuthorities } from "@/lib/planner/research/authority";
  * attempt is not a valid plan, and a corpus that hid that behind a retry would be measuring the retry.
  *
  * Opt-in, real DeepSeek, ~20 small planning calls:
- *   PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test-planner-postgres.mjs \
+ *   PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test/test-planner-postgres.mjs \
  *     __tests__/planner/research-planner-corpus.test.ts
  */
 

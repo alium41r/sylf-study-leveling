@@ -18,17 +18,17 @@
   --stage-rim: var(--accent-primary-mid, rgba(134, 170, 244, 0.28));
   --line: var(--border-strong, #263247);
   --subtle-line: var(--border-subtle, #1a2435);
-  --gold: #d9b67b;
-  --gold-dim: rgba(217, 182, 123, 0.12);
+  --gold: var(--status-gold, #d9b67b);
+  --gold-dim: var(--status-gold-dim, rgba(217, 182, 123, 0.12));
   --gold-border: rgba(217, 182, 123, 0.32);
-  --green: #a4d5bb;
-  --green-dim: rgba(164, 213, 187, 0.12);
+  --green: var(--status-green, #a4d5bb);
+  --green-dim: var(--status-green-dim, rgba(164, 213, 187, 0.12));
   --green-border: rgba(164, 213, 187, 0.32);
-  --red: #e07a7a;
-  --red-dim: rgba(224, 122, 122, 0.12);
+  --red: var(--status-red, #e07a7a);
+  --red-dim: var(--status-red-dim, rgba(224, 122, 122, 0.12));
   --red-border: rgba(224, 122, 122, 0.32);
-  --warning: #fbbf24;
-  --warning-dim: rgba(251, 191, 36, 0.12);
+  --warning: var(--status-gold, #fbbf24);
+  --warning-dim: var(--status-gold-dim, rgba(251, 191, 36, 0.12));
   --warning-border: rgba(251, 191, 36, 0.28);
 
   position: relative;
@@ -41,7 +41,7 @@
   color-scheme: dark;
 }
 
-:global(html[data-mode="light"]) .dashboardContainer {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .dashboardContainer {
   --page: var(--app-canvas, #f1f4fa);
   --surface: var(--surface-1, #ffffff);
   --elevated: var(--surface-2, #e5ebf5);
@@ -56,17 +56,17 @@
   --stage-rim: var(--accent-primary-mid, rgba(57, 93, 159, 0.24));
   --line: var(--border-strong, #bdcbe0);
   --subtle-line: var(--border-subtle, #d6dfed);
-  --gold: #8a642f;
-  --gold-dim: rgba(138, 100, 47, 0.1);
+  --gold: var(--status-gold, #8a642f);
+  --gold-dim: var(--status-gold-dim, rgba(138, 100, 47, 0.1));
   --gold-border: rgba(138, 100, 47, 0.28);
-  --green: #2d6a4f;
-  --green-dim: rgba(45, 106, 79, 0.1);
+  --green: var(--status-green, #2d6a4f);
+  --green-dim: var(--status-green-dim, rgba(45, 106, 79, 0.1));
   --green-border: rgba(45, 106, 79, 0.28);
-  --red: #b91c1c;
-  --red-dim: rgba(185, 28, 28, 0.1);
+  --red: var(--status-red, #b91c1c);
+  --red-dim: var(--status-red-dim, rgba(185, 28, 28, 0.1));
   --red-border: rgba(185, 28, 28, 0.28);
-  --warning: #b45309;
-  --warning-dim: rgba(180, 83, 9, 0.1);
+  --warning: var(--status-gold, #b45309);
+  --warning-dim: var(--status-gold-dim, rgba(180, 83, 9, 0.1));
   --warning-border: rgba(180, 83, 9, 0.28);
   color-scheme: light;
 }
@@ -97,13 +97,13 @@
   mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.5) 40%, transparent 95%);
 }
 
-:global(html[data-mode="light"]) .topGlow {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow {
   background:
     radial-gradient(ellipse 60% 35% at 50% -5%, rgba(180, 200, 235, 0.15), transparent 70%),
     radial-gradient(ellipse 40% 25% at 85% 10%, rgba(195, 215, 245, 0.1), transparent 70%);
 }
 
-:global(html[data-mode="light"]) .topGlow::before {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .topGlow::before {
   opacity: 0.08;
 }
 
@@ -214,14 +214,14 @@
   position: relative;
 }
 
-:global(html[data-mode="light"]) .card,
-:global(html[data-mode="light"]) .characterCard,
-:global(html[data-mode="light"]) .statCard,
-:global(html[data-mode="light"]) .briefingCard,
-:global(html[data-mode="light"]) .insightsContainer,
-:global(html[data-mode="light"]) .questsCard,
-:global(html[data-mode="light"]) .streakCard,
-:global(html[data-mode="light"]) .friendsCard {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .card,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .characterCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .statCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .briefingCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .insightsContainer,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .questsCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .streakCard,
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .friendsCard {
   border-color: var(--subtle-line);
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.02);
 }
@@ -347,7 +347,7 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-:global(html[data-mode="light"]) .avatarFrame {
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .avatarFrame {
   box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.08);
 }
 
@@ -1033,7 +1033,7 @@
   border-radius: 7px;
   background: var(--accent-strong);
   border: 1px solid var(--accent-strong);
-  color: #080d17;
+  color: var(--accent-fg, var(--accent-foreground, #ffffff));
   cursor: pointer;
   transition: background 150ms ease, opacity 150ms ease;
   display: inline-flex;
@@ -1041,8 +1041,8 @@
   gap: 6px;
 }
 
-:global(html[data-mode="light"]) .btnPrimary {
-  color: #ffffff;
+:global(html:is([data-surface-polarity="light"], [data-mode="light"]:not([data-surface-polarity="dark"]))) .btnPrimary {
+  color: var(--accent-fg, var(--accent-foreground, #ffffff));
 }
 
 .btnPrimary:hover {

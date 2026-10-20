@@ -264,11 +264,11 @@ describe("engine boundary", () => {
     // `npm run typecheck:engine` is the mechanical counterpart to the scans
     // above: it makes a DOM type a compile error rather than a naming slip.
     const config = JSON.parse(
-      readFileSync(join(ROOT, "tsconfig.pixel-engine.json"), "utf8"),
+      readFileSync(join(ROOT, "config/tsconfig.pixel-engine.json"), "utf8"),
     );
     expect(config.compilerOptions.lib).toEqual(["esnext"]);
     expect(config.compilerOptions.lib).not.toContain("dom");
-    expect(config.include).toEqual(["lib/pixel-display/engine/**/*.ts"]);
+    expect(config.include).toEqual(["../lib/pixel-display/engine/**/*.ts"]);
   });
 });
 

@@ -1,0 +1,70 @@
+{
+  "completedAt": "2026-10-20T12:37:30.639052+00:00",
+  "scope": "Local Phase 3 acceptance only; all provider/user data synthetic. No deployment, hosted migration or live Google consent.",
+  "regression": {
+    "exitCode": 0,
+    "filesPassed": 10,
+    "testsPassed": 171,
+    "evidence": "regression.log"
+  },
+  "browser": {
+    "exitCode": 0,
+    "scenarioGroups": 15,
+    "pageErrors": 0,
+    "evidence": "browser-results.json"
+  },
+  "accessibility": {
+    "exitCode": 0,
+    "focusedChecksOnly": true,
+    "evidence": "accessibility-results.json"
+  },
+  "offlineWorker": {
+    "exitCode": 0,
+    "authenticatedResponsesCached": false,
+    "evidence": "offline-results.json"
+  },
+  "performance": {
+    "exitCode": 0,
+    "documents": 1000,
+    "evidence": "performance-results.json"
+  },
+  "typescript": {
+    "exitCode": 0,
+    "evidence": "typecheck.log"
+  },
+  "notesLint": {
+    "exitCode": 0,
+    "evidence": "lint.log"
+  },
+  "sharedLint": {
+    "exitCode": 0,
+    "errors": 0,
+    "existingWarnings": 5,
+    "evidence": "shared-lint.log"
+  },
+  "webBuild": {
+    "exitCode": 0,
+    "evidence": "web-build.log"
+  },
+  "mobileBuild": {
+    "exitCode": 0,
+    "evidence": "mobile-build.log"
+  },
+  "mobileBoundaryVerification": {
+    "exitCode": 0,
+    "evidence": "mobile-verify.log"
+  },
+  "metadataMigration": {
+    "passed": true,
+    "disposablePostgresOnly": true,
+    "evidence": "postgres.log"
+  },
+  "trackedScopeWhitespaceCheck": {
+    "exitCode": 0
+  },
+  "runtime": {
+    "node": "24.19.0",
+    "browser": "Chromium 151.0.7922.34",
+    "platform": "macOS arm64"
+  }
+}

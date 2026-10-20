@@ -10,6 +10,7 @@
 // ============================================================================
 
 import { resolveApiUrl } from "./api-transport";
+import { invalidateNotesAccess } from "./notes/session";
 
 interface CacheEntry {
   data: unknown;
@@ -37,7 +38,9 @@ let sessionEpoch = 0;
 export function getClientSessionEpoch(): number { return sessionEpoch; }
 export function clearClientCache(): void {
   sessionEpoch++;
+  invalidateNotesAccess();
   if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event("calendar-session-ended"));
   try {
     const doomed: string[] = [];
     for (let i = 0; i < window.localStorage.length; i++) {
@@ -47,7 +50,8 @@ export function clearClientCache(): void {
         (key.startsWith("sylf_cache:") ||
           key.startsWith("focus_scratchpad") ||
           key.startsWith("focus_notes") ||
-          key.startsWith("pixel_studio:"))
+          key.startsWith("pixel_studio:") ||
+          key.startsWith("sylf_calendar_recognition_draft:") || key.startsWith("sylf_calendar_draft:") || key.startsWith("sylf_calendar_event:"))
       ) {
         doomed.push(key);
       }

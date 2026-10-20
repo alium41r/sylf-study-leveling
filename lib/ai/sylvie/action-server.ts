@@ -2,8 +2,10 @@ import "server-only";
 import { z } from "zod";
 import { signConfirmationToken, verifyConfirmationToken } from "../tool-confirmation";
 import { stripSylvieAction, type PendingSylvieAction } from "./action";
+import { CALENDAR_MUTATION_TOOLS } from "./calendar-contracts";
 
 export const MUTATION_TOOLS = new Set([
+  ...CALENDAR_MUTATION_TOOLS,
   "createGoal", "updateGoal", "deleteGoal", "deleteAllTasks", "createQuest",
   "updateQuest", "deleteQuest", "moveQuest", "swapQuests", "clearDay",
   "completeQuest", "saveMemory", "forgetMemory", "generateInsight",
@@ -59,6 +61,7 @@ export function parseSylvieAction(content: string, userId: number, sessionId: nu
 }
 
 function summarizeOperation({ name, args }: SylvieOperation): string {
+  if (CALENDAR_MUTATION_TOOLS.has(name) && typeof args.summary === "string") return args.summary;
   const labels: Record<string, string> = {
     createGoal: "Add goal", updateGoal: "Update goal", deleteGoal: "Delete goal",
     deleteAllTasks: "Delete all goals and tasks", createQuest: "Add task", updateQuest: "Update task",

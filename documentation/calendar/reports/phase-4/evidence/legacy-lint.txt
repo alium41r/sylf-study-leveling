@@ -1,0 +1,11 @@
+npm notice run sylf@0.1.0 npx
+npm notice run 'eslint' lib/ai/chat-tools.ts lib/ai/chat-tool-executor.ts lib/ai/providers/gemini.ts __tests__/calendar/personal-postgres.test.ts --rule @typescript-eslint/no-explicit-any: off --rule @typescript-eslint/ban-ts-comment: off
+
+/Users/aliumair/Desktop/sylf/lib/ai/chat-tool-executor.ts
+  14:65  warning  'QuestDifficulty' is defined but never used                  @typescript-eslint/no-unused-vars
+  18:3   warning  'normalizeDifficulty' is defined but never used              @typescript-eslint/no-unused-vars
+  19:3   warning  'scheduleQuestsDeterministically' is defined but never used  @typescript-eslint/no-unused-vars
+  23:10  warning  'EffortLevel' is defined but never used                      @typescript-eslint/no-unused-vars
+
+✖ 4 problems (0 errors, 4 warnings)
+

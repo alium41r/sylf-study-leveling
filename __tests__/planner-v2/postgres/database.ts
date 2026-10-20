@@ -4,7 +4,7 @@ import pg, { type Client } from "pg";
 const connection = process.env.PLANNER_TEST_DATABASE_URL;
 const marker = process.env.PLANNER_PHASE0_DATABASE_MARKER;
 if (!connection || !marker || process.env.PLANNER_PHASE0_REQUIRED !== "true") {
-  throw new Error("Required genuine PostgreSQL suite: use scripts/test-planner-v2-phase0-postgres.mjs; missing disposable harness identity.");
+  throw new Error("Required genuine PostgreSQL suite: use scripts/test/test-planner-v2-phase0-postgres.mjs; missing disposable harness identity.");
 }
 const parsed = new URL(connection);
 if (parsed.hostname !== "127.0.0.1" || !/^\/sylf_planner_phase[01]_[a-f0-9]{16}$/.test(parsed.pathname)

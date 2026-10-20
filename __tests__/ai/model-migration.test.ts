@@ -8,7 +8,7 @@ import { DEEPSEEK_MODELS, HISTORICAL_MODEL_COST_USD_PER_1M } from "@/lib/ai/conf
  * invariant is: deterministically, against the working tree, with the historical
  * record explicitly allowed to disagree.
  *
- * The scan itself lives in `scripts/check-model-migration.mjs` because the goal asks
+ * The scan itself lives in `scripts/security/check-model-migration.mjs` because the goal asks
  * for a repository check that can also be run by hand; this suite drives that exact
  * program rather than a second copy of its rules, so the check and the test cannot
  * drift apart.
@@ -33,7 +33,7 @@ function runCheck(): { status: number; report: MigrationReport } {
   try {
     const stdout = execFileSync(
       process.execPath,
-      ["scripts/check-model-migration.mjs", "--json"],
+      ["scripts/security/check-model-migration.mjs", "--json"],
       { encoding: "utf8", cwd: process.cwd() }
     );
     return { status: 0, report: JSON.parse(stdout) as MigrationReport };

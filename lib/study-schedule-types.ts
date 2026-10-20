@@ -60,6 +60,8 @@ export interface DayStudySummary {
     seconds: number;
     percentage: number;
   }>;
+  /** Read-only session history; study service remains the sole owner. */
+  sessions?: Array<{ id: number; title: string; startedAt: string; endedAt: string | null; minutes: number }>;
   quests: Array<{
     id: number;
     title: string;
@@ -67,6 +69,8 @@ export interface DayStudySummary {
     status: string;
     difficulty: string;
     requiredMinutes: number;
+    plannedMinutes?: number | null;
+    plannerOwned?: boolean;
     elapsedSeconds: number;
     xpReward: number;
     sylphReward: number;

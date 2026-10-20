@@ -1,0 +1,21 @@
+{
+  "recognitionDraftReopened": true,
+  "sourceStrokesPreserved": 8,
+  "storageFailure": {
+    "closeBlocked": true,
+    "explained": true,
+    "closedAfterSave": true
+  },
+  "compactWidth": 320,
+  "settingsBounds": {
+    "x": 264,
+    "width": 40
+  },
+  "settingsClickableAfterFix": true,
+  "qaNotesRemoved": true,
+  "qaSharedCalendarRemoved": true,
+  "preferencesRestored": {
+    "advanced": false,
+    "view": "month"
+  }
+}

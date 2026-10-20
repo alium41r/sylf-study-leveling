@@ -102,7 +102,7 @@
   border-color: var(--accent-primary);
   background: linear-gradient(135deg, var(--accent-primary-dim) 0%, var(--accent-primary-mid, rgba(124, 58, 237, 0.28)) 100%);
   font-weight: 700;
-  color: var(--text-on-accent, #ffffff);
+  color: var(--text-primary);
   box-shadow: 0 0 16px -2px var(--accent-primary-dim);
 }
 
@@ -257,7 +257,7 @@
 .compactEditBtn:hover {
   background: var(--accent-primary-dim, rgba(124, 58, 237, 0.1));
   border-color: var(--accent-primary-mid, rgba(124, 58, 237, 0.3));
-  color: var(--accent-primary-light);
+  color: var(--accent-text-light);
 }
 
 .compactContextualRows {
@@ -367,7 +367,7 @@ details[open] > .reviewDetailsSummary .reviewChevron {
   border-radius: 9999px;
   background: var(--accent-primary-dim, rgba(124, 58, 237, 0.08));
   border: 1px solid var(--border-subtle);
-  color: var(--accent-primary-light);
+  color: var(--accent-text-light);
   cursor: pointer;
   transition: all 180ms ease;
 }
@@ -375,7 +375,7 @@ details[open] > .reviewDetailsSummary .reviewChevron {
 .briefEdit:hover {
   background: var(--accent-primary-dim, rgba(124, 58, 237, 0.18));
   border-color: var(--accent-primary);
-  color: var(--text-on-accent, #ffffff);
+  color: var(--text-primary);
 }
 
 @media (max-width: 600px) {
@@ -992,7 +992,7 @@ details[open] > .reviewDetailsSummary .reviewChevron {
   border-color: var(--accent-primary);
   background: linear-gradient(135deg, var(--accent-primary-dim) 0%, var(--accent-primary-mid, rgba(124, 58, 237, 0.25)) 100%);
   font-weight: 700;
-  color: var(--text-on-accent, #ffffff);
+  color: var(--text-primary);
   box-shadow: 0 0 12px -2px var(--accent-primary-dim);
 }
 
@@ -1342,7 +1342,7 @@ details[open] > .reviewDetailsSummary .reviewChevron {
 .secondaryActionBtn {
   background: transparent;
   border: none;
-  color: var(--accent-primary-light, #a78bfa);
+  color: var(--accent-text-light, #a78bfa);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 500;

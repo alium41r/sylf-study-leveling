@@ -1,0 +1,9 @@
+{
+  "result": {
+    "type": "result",
+    "text": "Mr. Brown commented icily.",
+    "elapsedMs": 23016
+  },
+  "cspAllowsWasm": true,
+  "cspAllowsJsEval": false
+}

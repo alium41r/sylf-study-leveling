@@ -1,0 +1,402 @@
+{
+  "browser": "151.0.7922.34",
+  "platform": "darwin",
+  "runtime": "v24.19.0",
+  "results": [
+    {
+      "name": "browser capability and real OPFS write/read",
+      "pass": true,
+      "elapsedMs": 46.623917000000006,
+      "detail": {
+        "indexedDB": true,
+        "estimate": {
+          "quota": 2147491311,
+          "usage": 7663,
+          "usageDetails": {
+            "indexedDB": 7663
+          }
+        },
+        "opfs": true,
+        "persisted": false,
+        "locks": true,
+        "coalesced": true,
+        "opfsRead": true,
+        "firstNavigationBootMs": 232.59999990463257
+      }
+    },
+    {
+      "name": "real BlockNote peer edits merge through Yjs",
+      "pass": true,
+      "elapsedMs": 14.998540999999932,
+      "detail": {
+        "blocks": 3
+      }
+    },
+    {
+      "name": "keyboard formatting and Unicode insertion",
+      "pass": true,
+      "elapsedMs": 142.53866700000015,
+      "detail": {
+        "unicode": true,
+        "bold": true,
+        "realOSIME": false,
+        "updateToJournalAckMs": [
+          6.3999998569488525,
+          5.299999952316284,
+          39.5,
+          1.9000000953674316
+        ]
+      }
+    },
+    {
+      "name": "real IndexedDB reload recovery",
+      "pass": true,
+      "elapsedMs": 72.98458299999993,
+      "detail": {
+        "restoredBlocks": 3
+      }
+    },
+    {
+      "name": "two independent tabs preserve both offline update branches on reopen",
+      "pass": true,
+      "elapsedMs": 310.89158299999986,
+      "detail": {
+        "bothBranchesRestored": true,
+        "liveTabBroadcast": false
+      }
+    },
+    {
+      "name": "PDF.js worker renders and extracts text",
+      "pass": true,
+      "elapsedMs": 174.64433400000007,
+      "detail": {
+        "pages": 1,
+        "width": 300,
+        "height": 400,
+        "text": "Notes Phase 1 PDF worker",
+        "workerVersion": "6.4.299"
+      }
+    },
+    {
+      "name": "ink geometry timings",
+      "pass": true,
+      "elapsedMs": 13.833750000000009,
+      "detail": {
+        "samples": [
+          1.0999999046325684,
+          0.40000009536743164,
+          0.20000004768371582,
+          0.20000004768371582,
+          0.09999990463256836,
+          0.20000004768371582,
+          0.10000014305114746,
+          0.20000004768371582,
+          0.19999980926513672,
+          0.10000014305114746,
+          0.20000004768371582,
+          0.09999990463256836,
+          0.3000001907348633,
+          0.09999990463256836,
+          0.20000004768371582,
+          0,
+          0,
+          0.20000004768371582,
+          0,
+          0,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0.09999990463256836,
+          0.5,
+          0.20000004768371582,
+          0,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.09999990463256836,
+          0,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0,
+          0.20000004768371582,
+          0,
+          0,
+          0,
+          0.20000004768371582,
+          0,
+          0.10000014305114746,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.10000014305114746,
+          0,
+          0,
+          0.09999990463256836,
+          0,
+          0.20000004768371582,
+          0,
+          0.10000014305114746,
+          0,
+          0.19999980926513672,
+          0,
+          0.10000014305114746,
+          0,
+          0.09999990463256836,
+          0.10000014305114746,
+          0
+        ],
+        "total": 11.700000047683716,
+        "pointsPerStroke": 256,
+        "iterations": 100
+      }
+    },
+    {
+      "name": "10,000 entry IndexedDB catalog paging",
+      "pass": true,
+      "elapsedMs": 420.29429200000004,
+      "detail": {
+        "count": 10000,
+        "pageSize": 30,
+        "samples": [
+          0.5,
+          2.5,
+          1,
+          1.1000001430511475,
+          1.0999999046325684,
+          1.0999999046325684,
+          1.1000001430511475,
+          1.0999999046325684,
+          1.1000001430511475,
+          1.1999998092651367,
+          1.3000001907348633,
+          1.0999999046325684,
+          1.2000000476837158,
+          1,
+          1.2000000476837158,
+          1.0999999046325684,
+          1.2000000476837158,
+          1.2999999523162842,
+          1.2999999523162842,
+          1.1000001430511475,
+          1.2999999523162842,
+          1.2999999523162842,
+          1.4000000953674316,
+          1.3999998569488525,
+          1.2999999523162842,
+          1.4000000953674316,
+          1.4000000953674316,
+          1.2999999523162842,
+          1.3999998569488525,
+          1.4000000953674316,
+          1.5,
+          1.4000000953674316,
+          1.5,
+          1.3999998569488525,
+          1.6000001430511475,
+          1.5,
+          1.5,
+          1.5,
+          1.5999999046325684,
+          1.5,
+          1.5,
+          1.6000001430511475,
+          1.7000000476837158,
+          1.6999998092651367,
+          1.7000000476837158,
+          1.6000001430511475,
+          1.6999998092651367,
+          1.7000000476837158,
+          1.7999999523162842,
+          1.7000000476837158
+        ]
+      }
+    },
+    {
+      "name": "appearance desktop-light",
+      "pass": true,
+      "elapsedMs": 77.86316600000009,
+      "detail": {
+        "theme": {
+          "surface": "#ffffff",
+          "text": "#0f172a",
+          "contrast": 17.85253496299567
+        },
+        "rendered": {
+          "bodyContrast": 17.85253496299567,
+          "editorContrast": 17.85253496299567,
+          "bodyBackground": "rgb(255, 255, 255)",
+          "editorBackground": "rgb(255, 255, 255)"
+        },
+        "layout": {
+          "viewport": 1440,
+          "scrollWidth": 1440,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "appearance desktop-dark",
+      "pass": true,
+      "elapsedMs": 63.91416600000002,
+      "detail": {
+        "theme": {
+          "surface": "#121212",
+          "text": "#e2e8f0",
+          "contrast": 15.196256986079039
+        },
+        "rendered": {
+          "bodyContrast": 17.03464940770338,
+          "editorContrast": 15.196256986079039,
+          "bodyBackground": "rgb(0, 0, 0)",
+          "editorBackground": "rgb(18, 18, 18)"
+        },
+        "layout": {
+          "viewport": 1440,
+          "scrollWidth": 1440,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "appearance tablet-custom-light",
+      "pass": true,
+      "elapsedMs": 58.05737500000032,
+      "detail": {
+        "theme": {
+          "surface": "#ffffff",
+          "text": "#0f172a",
+          "contrast": 17.85253496299567
+        },
+        "rendered": {
+          "bodyContrast": 14.387652232855288,
+          "editorContrast": 17.85253496299567,
+          "bodyBackground": "rgb(245, 229, 200)",
+          "editorBackground": "rgb(255, 255, 255)"
+        },
+        "layout": {
+          "viewport": 820,
+          "scrollWidth": 820,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "appearance phone-custom-dark",
+      "pass": true,
+      "elapsedMs": 49.018125000000055,
+      "detail": {
+        "theme": {
+          "surface": "#0e171b",
+          "text": "#e2e8f0",
+          "contrast": 14.722391063592934
+        },
+        "rendered": {
+          "bodyContrast": 11.511541894457537,
+          "editorContrast": 14.722391063592934,
+          "bodyBackground": "rgb(21, 46, 56)",
+          "editorBackground": "rgb(14, 23, 27)"
+        },
+        "layout": {
+          "viewport": 390,
+          "scrollWidth": 390,
+          "editorVisible": true
+        }
+      }
+    },
+    {
+      "name": "generic static shell precache excludes authenticated APIs",
+      "pass": true,
+      "elapsedMs": 185.76333399999976,
+      "detail": {
+        "controlled": true,
+        "apiCached": false
+      }
+    },
+    {
+      "name": "offline edit and offline cold reload in isolated shell",
+      "pass": true,
+      "elapsedMs": 190.45149999999967,
+      "detail": {
+        "offlineReload": true,
+        "productionSylfShell": false
+      }
+    },
+    {
+      "name": "real transaction rollback leaves no partial outbox",
+      "pass": true,
+      "elapsedMs": 2.8375409999998737,
+      "detail": {
+        "before": 8,
+        "after": 8,
+        "partial": false
+      }
+    },
+    {
+      "name": "production Next.js client-only load without hydration error",
+      "pass": true,
+      "elapsedMs": 419.66966699999966,
+      "detail": {
+        "editors": 2,
+        "reactReady": true
+      }
+    },
+    {
+      "name": "acknowledged edit survives isolated renderer crash",
+      "pass": true,
+      "elapsedMs": 2695.9249160000004,
+      "detail": {
+        "rendererCrash": true,
+        "powerFailure": false
+      }
+    },
+    {
+      "name": "explicit database clearing removes local-only data (negative control)",
+      "pass": true,
+      "elapsedMs": 4.046374999999898,
+      "detail": {
+        "before": 8,
+        "after": 0
+      }
+    }
+  ],
+  "pageErrors": []
+}

@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-18",
+  "providers": "Browser response fixtures; no real provider accounts connected",
+  "results": [
+    {
+      "state": "connections",
+      "theme": 0,
+      "width": 390,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 0,
+      "width": 820,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 0,
+      "width": 1440,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 1,
+      "width": 390,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 1,
+      "width": 820,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 1,
+      "width": 1440,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 2,
+      "width": 390,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 2,
+      "width": 820,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 2,
+      "width": 1440,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 3,
+      "width": 390,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 3,
+      "width": 820,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "connections",
+      "theme": 3,
+      "width": 1440,
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "Week",
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "Day",
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "Month",
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "provider-editor",
+      "violations": [],
+      "overflow": false
+    },
+    {
+      "state": "readonly-editor",
+      "violations": [],
+      "overflow": false,
+      "hasSave": 0,
+      "titleDisabled": true
+    },
+    {
+      "state": "destination",
+      "violations": [],
+      "overflow": false,
+      "value": ""
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import { AcousticsProvider } from "./AcousticsContext";
 import { CustomAudioProvider } from "./CustomAudioContext";
 import { AcousticsDynamicIsland } from "./AcousticsDynamicIsland";
 import TopRightBar from "./TopRightBar";
+import CalendarReminderAgent from "../calendar/components/CalendarReminderAgent";
 
 /* ─── Theme & Background Definitions ─────────────────────────── */
 // Kept in sync with the themes/backgrounds pages so GlobalWrapper
@@ -220,11 +221,18 @@ import {
   resolveLegacyBackground,
   getAccentTokens,
   getBackgroundTokens,
+  getRecommendedModeForBackground,
   DEFAULT_ACCENT_HEX,
   DEFAULT_DARK_BG_HEX,
   DEFAULT_LIGHT_BG_HEX,
   isValidHex,
 } from "@/lib/color-utils";
+
+let lastLocalAppearanceWriteAt = 0;
+
+export function markLocalAppearanceWrite() {
+  lastLocalAppearanceWriteAt = Date.now();
+}
 
 export function applyAppMode(mode?: string | null) {
   if (typeof window === "undefined") return;
@@ -268,8 +276,10 @@ export function applyGlobalBackground(bgIdOrHex?: string | null, mode?: string |
     if (val) document.documentElement.style.setProperty(prop, val);
   }
 
-  // Set semantic attribute on root for clean theme-token targeting
+  // Set semantic attributes on root for clean theme-token and polarity targeting
   document.documentElement.setAttribute("data-app-background", semanticBg);
+  document.documentElement.setAttribute("data-surface-polarity", bgTokens["--surface-polarity"]);
+  document.documentElement.style.colorScheme = bgTokens["--surface-polarity"];
 
   // Directly set canvas background on root elements
   document.documentElement.style.backgroundColor = baseHex;
@@ -283,8 +293,9 @@ export function applyGlobalBackground(bgIdOrHex?: string | null, mode?: string |
     layer.style.backgroundRepeat = bgRepeat;
   }
 
-  // Re-sync accent text tokens against the freshly derived surface
-  const activeAccent = localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
+  // Re-sync accent text tokens against the freshly derived surface (resolving any legacy theme IDs)
+  const rawActiveAccent = localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
+  const activeAccent = resolveLegacyTheme(rawActiveAccent);
   const accentTokens = getAccentTokens(activeAccent, bgTokens["--surface-1"]);
   for (const [prop, val] of Object.entries(accentTokens)) {
     if (val) document.documentElement.style.setProperty(prop, val);
@@ -295,11 +306,39 @@ export function applyGlobalTheme(themeIdOrHex?: string | null) {
   if (typeof window === "undefined") return;
   const rawTheme = themeIdOrHex || localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
   const accentHex = resolveLegacyTheme(rawTheme);
-  const targetSurface = document.documentElement.style.getPropertyValue("--surface-1") || "#090d16";
+  const currentMode = (document.documentElement.getAttribute("data-mode") || localStorage.getItem("app_mode") || "dark") as "dark" | "light";
+  const inlineSurface = document.documentElement.style.getPropertyValue("--surface-1").trim();
+  const targetSurface = inlineSurface || (currentMode === "light" ? "#ffffff" : "#090d16");
   const vars = getAccentTokens(accentHex, targetSurface);
   for (const [prop, val] of Object.entries(vars)) {
     document.documentElement.style.setProperty(prop, val);
   }
+  document.documentElement.setAttribute("data-app-theme", accentHex);
+}
+
+export function applyAppearance(options: {
+  accent?: string | null;
+  background?: string | null;
+  mode?: "dark" | "light" | string | null;
+  persistLocal?: boolean;
+}) {
+  if (typeof window === "undefined") return;
+  const candidateBg = options.background || localStorage.getItem("app_background");
+  const rawMode = options.mode || localStorage.getItem("app_mode") || getRecommendedModeForBackground(candidateBg, "dark");
+  const resolvedMode = rawMode === "light" ? "light" : "dark";
+  const resolvedBg = candidateBg || (resolvedMode === "light" ? DEFAULT_LIGHT_BG_HEX : DEFAULT_DARK_BG_HEX);
+  const resolvedAccent = resolveLegacyTheme(options.accent || localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX);
+
+  if (options.persistLocal) {
+    markLocalAppearanceWrite();
+    localStorage.setItem("app_mode", resolvedMode);
+    localStorage.setItem("app_background", resolvedBg);
+    localStorage.setItem("app_theme", resolvedAccent);
+  }
+
+  applyAppMode(resolvedMode);
+  applyGlobalBackground(resolvedBg, resolvedMode);
+  applyGlobalTheme(resolvedAccent);
 }
 
 export function GlobalSystemWrapper({ children }: { children: React.ReactNode }) {
@@ -308,23 +347,38 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
 
   // Apply saved theme + background on mount & sync when user or storage updates
   useEffect(() => {
+    const recentlyWrittenLocally = Date.now() - lastLocalAppearanceWriteAt < 5000;
+
+    // Background (resolved first so mode can adapt when app_mode is unset)
+    const localBg = localStorage.getItem("app_background");
+    const rawBg = (recentlyWrittenLocally && localBg)
+      ? localBg
+      : (user?.activeBackground || localBg || "simple");
+    if (!recentlyWrittenLocally && user?.activeBackground && user.activeBackground !== localBg) {
+      localStorage.setItem("app_background", user.activeBackground);
+    }
+
     // Mode
-    const savedMode = localStorage.getItem("app_mode") || "dark";
+    const storedMode = localStorage.getItem("app_mode");
+    const savedMode =
+      storedMode === "light" || storedMode === "dark"
+        ? storedMode
+        : getRecommendedModeForBackground(rawBg, "dark");
+    if (!storedMode && user?.activeBackground) {
+      localStorage.setItem("app_mode", savedMode);
+    }
     applyAppMode(savedMode);
+    applyGlobalBackground(rawBg, savedMode);
 
     // Theme
-    const activeTheme = user?.activeTheme || localStorage.getItem("app_theme") || DEFAULT_ACCENT_HEX;
-    if (user?.activeTheme && user.activeTheme !== localStorage.getItem("app_theme")) {
+    const localTheme = localStorage.getItem("app_theme");
+    const activeTheme = (recentlyWrittenLocally && localTheme)
+      ? localTheme
+      : (user?.activeTheme || localTheme || DEFAULT_ACCENT_HEX);
+    if (!recentlyWrittenLocally && user?.activeTheme && user.activeTheme !== localTheme) {
       localStorage.setItem("app_theme", user.activeTheme);
     }
     applyGlobalTheme(activeTheme);
-
-    // Background
-    const rawBg = user?.activeBackground || localStorage.getItem("app_background") || "simple";
-    if (user?.activeBackground && user.activeBackground !== localStorage.getItem("app_background")) {
-      localStorage.setItem("app_background", user.activeBackground);
-    }
-    applyGlobalBackground(rawBg, savedMode);
 
     const handleBgUpdate = () => {
       const latestBg = localStorage.getItem("app_background") || "simple";
@@ -376,6 +430,7 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
     <MotionConfig reducedMotion="user">
       <ImmersiveModeProvider>
         <TimerSyncWorker />
+        <CalendarReminderAgent />
         <AcousticsProvider>
           <CustomAudioProvider>
           <SettingsProvider>

@@ -18,7 +18,7 @@ import { RESEARCH_BOUNDS } from "@/lib/planner/research/search/contracts";
  * clocks are compared. Nothing else differs — same pages, same fetcher, same protections.
  *
  * Opt-in, one search plus two passes over a handful of pages:
- *   PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test-planner-postgres.mjs \
+ *   PLANNER_LIVE_RESEARCH_SMOKE=true node scripts/test/test-planner-postgres.mjs \
  *     __tests__/planner/live-fetch-concurrency.test.ts
  */
 

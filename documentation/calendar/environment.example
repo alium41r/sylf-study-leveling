@@ -1,0 +1,12 @@
+# Server-only calendar integration settings. Never use NEXT_PUBLIC_.
+# See reports/phase-5/setup.md for console registration and qualification.
+# Use the verified deployment origin until sylf.app has a valid certificate.
+CALENDAR_PUBLIC_URL="https://sylf-alium41rs-projects.vercel.app"
+CALENDAR_ENCRYPTION_KEY="<32-random-bytes-as-base64>"
+# Dedicated Google overrides; existing GOOGLE_CLIENT_ID/SECRET are a fallback.
+GOOGLE_CALENDAR_CLIENT_ID="<web-client-id>"
+GOOGLE_CALENDAR_CLIENT_SECRET="<web-client-secret>"
+MICROSOFT_CALENDAR_CLIENT_ID="<application-client-id>"
+MICROSOFT_CALENDAR_CLIENT_SECRET="<secret-value>"
+# Existing scheduler secret, also used by GET /api/cron/calendar-sync.
+CRON_SECRET="<independent-random-secret>"

@@ -6,6 +6,7 @@ import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, AlertTriangle, X } from "lucide-react";
+import { prepareNotesLogout, cancelNotesLogout } from "@/lib/notes/session";
 import { getAccountCapability } from "./services/account-capability";
 import styles from "../components/SystemHubPage.module.css";
 
@@ -78,15 +79,10 @@ export default function DangerZone() {
 
   // 1. Log Out (This device)
   const handleLogout = async () => {
-    setIsSubmitting(true);
-    try {
-      await getAccountCapability().logoutThisDevice();
-    } catch {
-      // Proceed with local logout regardless
-    } finally {
-      logout();
-      router.push("/login");
-    }
+    setIsSubmitting(true);setFeedback(null);
+    try { await logout(); router.push("/login"); }
+    catch(error) { setFeedback({type:"error",message:error instanceof Error?error.message:"Sign out could not finish. Keep this tab open and try again."}); }
+    finally {setIsSubmitting(false);}
   };
 
   // 2. Log Out All Devices (Password Gated)
@@ -96,16 +92,19 @@ export default function DangerZone() {
     setFeedback(null);
 
     try {
+      await prepareNotesLogout(user ? String(user.id) : null);
       const result = await getAccountCapability().logoutAllDevices(password);
 
       if (result.ok) {
-        logout();
+        await logout();
         router.push("/login");
       } else {
+        cancelNotesLogout(user ? String(user.id) : null);
         setFeedback({ type: "error", message: result.error || "Failed to revoke all sessions." });
       }
-    } catch {
-      setFeedback({ type: "error", message: "Network error. Could not revoke sessions." });
+    } catch (error) {
+      cancelNotesLogout(user ? String(user.id) : null);
+      setFeedback({ type: "error", message: error instanceof Error ? error.message : "Could not revoke sessions. Keep this tab open and try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -225,6 +224,7 @@ export default function DangerZone() {
             <p className="text-[var(--muted)] text-sm">
               Are you sure you want to sign out of your account on this device?
             </p>
+            {feedback?.type === "error" && <p role="alert" className="text-sm text-red-500">{feedback.message}</p>}
             <div className="flex justify-end gap-3 pt-4 border-t border-[var(--subtle-line)]">
               <button onClick={handleCloseModal} className={styles.btnSecondary}>
                 Cancel
@@ -385,6 +385,7 @@ export default function DangerZone() {
               <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
               <span>
                 <strong>WARNING:</strong> This action permanently deletes your Scholar account, all study history, quests, level progression, and social records. <strong>This action CANNOT be undone.</strong>
+                <span className="block mt-3">Account deletion also removes your Notes unlock key. Export unsynchronized Notes from every device before deleting your account. Retained encrypted browser copies alone cannot replace that key.</span>
               </span>
             </div>
 

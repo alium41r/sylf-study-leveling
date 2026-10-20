@@ -3,6 +3,7 @@
 import React from "react";
 import Companion from "@/app/components/landing/companion/Companion";
 import { Moon, Sun, Check, ArrowRight, ArrowLeft } from "lucide-react";
+import { getAccentForeground as getContrastForeground } from "@/lib/color-utils";
 import styles from "../Onboarding.module.css";
 
 interface AppearanceStepProps {
@@ -88,7 +89,7 @@ export function AppearanceStep({
             </div>
             <div
               className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                selectedMode === "dark" ? "border-accent bg-accent-strong text-white" : "border-[var(--subtle-line)]"
+                selectedMode === "dark" ? "border-accent bg-accent-strong text-accent-fg" : "border-[var(--subtle-line)]"
               }`}
             >
               {selectedMode === "dark" && <Check className="w-3 h-3 stroke-[3]" />}
@@ -113,7 +114,7 @@ export function AppearanceStep({
             </div>
             <div
               className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                selectedMode === "light" ? "border-accent bg-accent-strong text-white" : "border-[var(--subtle-line)]"
+                selectedMode === "light" ? "border-accent bg-accent-strong text-accent-fg" : "border-[var(--subtle-line)]"
               }`}
             >
               {selectedMode === "light" && <Check className="w-3 h-3 stroke-[3]" />}
@@ -140,7 +141,10 @@ export function AppearanceStep({
                 title={preset.name}
                 onClick={() => onSelectAccent(preset.hex)}
                 className={`${styles.swatchBtn} ${isSelected ? styles.swatchBtnSelected : ""}`}
-                style={{ backgroundColor: preset.hex }}
+                style={{
+                  backgroundColor: preset.hex,
+                  color: getContrastForeground(preset.hex),
+                }}
               >
                 {isSelected && <Check className="w-4 h-4 stroke-[3]" aria-hidden="true" />}
               </button>
@@ -172,7 +176,7 @@ export function AppearanceStep({
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                    isSelected ? "border-accent bg-accent-strong text-white" : "border-[var(--subtle-line)]"
+                    isSelected ? "border-accent bg-accent-strong text-accent-fg" : "border-[var(--subtle-line)]"
                   }`}
                 >
                   {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
@@ -186,8 +190,11 @@ export function AppearanceStep({
       {/* ─── Live Mini Preview ─── */}
       <div className={styles.previewBox} aria-hidden="true">
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm"
-          style={{ backgroundColor: selectedAccent }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-accent-fg shrink-0 shadow-sm"
+          style={{
+            backgroundColor: selectedAccent,
+            color: "var(--accent-foreground, #ffffff)",
+          }}
         >
           <span className="font-['Rajdhani'] font-bold text-sm">Lv.1</span>
         </div>
@@ -200,7 +207,7 @@ export function AppearanceStep({
               className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold uppercase"
               style={{
                 backgroundColor: `${selectedAccent}25`,
-                color: selectedAccent,
+                color: `var(--accent-text, ${selectedAccent})`,
                 border: `1px solid ${selectedAccent}40`,
               }}
             >

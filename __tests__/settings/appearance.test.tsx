@@ -16,14 +16,20 @@ vi.mock("next/navigation", () => ({
 
 // Mock AuthProvider
 const mockMutateUser = vi.fn();
+let mockUser: {
+  id: number;
+  username: string;
+  activeTheme?: string;
+  activeBackground?: string;
+} | null = {
+  id: 1,
+  username: "SungJinwoo",
+  activeTheme: "cyberpunk", // Legacy ID
+  activeBackground: "void", // Legacy ID
+};
 vi.mock("@/app/components/AuthProvider", () => ({
   useAuth: () => ({
-    user: {
-      id: 1,
-      username: "SungJinwoo",
-      activeTheme: "cyberpunk", // Legacy ID
-      activeBackground: "void", // Legacy ID
-    },
+    user: mockUser,
     mutateUser: mockMutateUser,
   }),
 }));
@@ -32,10 +38,16 @@ describe("Appearance Settings Screen", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+    mockUser = {
+      id: 1,
+      username: "SungJinwoo",
+      activeTheme: "cyberpunk",
+      activeBackground: "void",
+    };
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ success: true, user: {} }),
-    } as any);
+    } as unknown as Response);
   });
 
   afterEach(() => {
@@ -272,5 +284,146 @@ describe("Appearance Settings Screen", () => {
     expect(JSON.parse(localStorage.getItem("sylf_recent_accents")!)[0]).toBe(
       "#123456"
     );
+  });
+
+  it("preserves unsaved user drafts and saved preferences when AuthProvider re-renders with stale user state", async () => {
+    // Start before user profile finishes loading
+    mockUser = null;
+    const { rerender } = render(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+
+    const accentInput = screen.getByLabelText(
+      "Accent Color hex code"
+    ) as HTMLInputElement;
+    fireEvent.change(accentInput, { target: { value: "#e11d48" } });
+    expect(accentInput.value.toLowerCase()).toBe("#e11d48");
+
+    // Simulate delayed AuthProvider profile resolution with older server values
+    mockUser = {
+      id: 1,
+      username: "SungJinwoo",
+      activeTheme: "#2563eb",
+      activeBackground: "#090d16",
+    };
+    rerender(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+
+    // User's active draft must NOT be clobbered by delayed user load
+    expect(accentInput.value.toLowerCase()).toBe("#e11d48");
+
+    // Apply with a single click
+    fireEvent.click(screen.getByRole("button", { name: /apply changes/i }));
+    await screen.findByText("Appearance saved");
+    expect(localStorage.getItem("app_theme")).toBe("#e11d48");
+    expect(
+      document.documentElement.style.getPropertyValue("--accent-primary")
+    ).toBe("#e11d48");
+
+    // Simulate another background refresh returning stale user state
+    mockUser = {
+      id: 1,
+      username: "SungJinwoo",
+      activeTheme: "#2563eb",
+      activeBackground: "#090d16",
+    };
+    rerender(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+
+    // Saved preference must remain intact without requiring a second click
+    expect(accentInput.value.toLowerCase()).toBe("#e11d48");
+    expect(screen.queryByText("Unsaved changes")).toBeNull();
+  });
+
+  it("produces a chromatic color on the first hue slider interaction even when starting from pure black (#000000)", () => {
+    render(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+
+    const bgInput = screen.getByLabelText(
+      "Background Color hex code"
+    ) as HTMLInputElement;
+    fireEvent.change(bgInput, { target: { value: "#000000" } });
+    expect(bgInput.value.toLowerCase()).toBe("#000000");
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Custom Background Color" })
+    );
+    const bgHue = screen.getByRole("slider", {
+      name: "Background Color hue slider",
+    });
+    fireEvent.keyDown(bgHue, { key: "ArrowRight", shiftKey: true });
+
+    // Adjusting hue from pure black lifts saturation/brightness so the first interaction visibly changes the color
+    expect(bgInput.value.toLowerCase()).not.toBe("#000000");
+  });
+
+  it("infers light mode automatically when app_mode is unset and server activeBackground is light", () => {
+    localStorage.removeItem("app_mode");
+    mockUser = {
+      id: 1,
+      username: "SungJinwoo",
+      activeTheme: "#06b6d4",
+      activeBackground: "#f8fafc",
+    };
+
+    render(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+
+    const lightModeBtn = screen.getByRole("button", { name: /^Light$/i });
+    expect(lightModeBtn).toHaveAttribute("aria-pressed", "true");
+    const preview = screen.getByLabelText("Preview of your Sylf workspace");
+    expect(preview).toHaveAttribute("data-surface-polarity", "light");
+  });
+
+  it("resets locallySaved state and loads new preferences when user account switches", async () => {
+    const { rerender } = render(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+
+    const emeraldSwatch = screen.getByRole("button", { name: "Emerald" });
+    fireEvent.click(emeraldSwatch);
+    fireEvent.click(screen.getByRole("button", { name: /Apply changes/i }));
+
+    await waitFor(() => {
+      expect(localStorage.getItem("app_theme")).toBe("#10b981");
+    });
+
+    // Switch to another user account with a different server theme/background
+    localStorage.clear();
+    mockUser = {
+      id: 2,
+      username: "ChaHaeIn",
+      activeTheme: "#ec4899",
+      activeBackground: "#f8fafc",
+    };
+
+    rerender(
+      <SettingsProvider>
+        <AppearanceSettingsScreen />
+      </SettingsProvider>
+    );
+
+    const accentInput = screen.getByLabelText(
+      "Accent Color hex code"
+    ) as HTMLInputElement;
+    expect(accentInput.value.toLowerCase()).toBe("#ec4899");
+    const lightModeBtn = screen.getByRole("button", { name: /^Light$/i });
+    expect(lightModeBtn).toHaveAttribute("aria-pressed", "true");
   });
 });

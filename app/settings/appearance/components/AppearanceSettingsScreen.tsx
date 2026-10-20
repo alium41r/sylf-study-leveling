@@ -7,11 +7,13 @@ import {
   applyAppMode,
   applyGlobalTheme,
   applyGlobalBackground,
+  markLocalAppearanceWrite,
 } from "@/app/components/GlobalSystemWrapper";
 import { useAuth } from "@/app/components/AuthProvider";
 import {
   resolveLegacyTheme,
   resolveLegacyBackground,
+  getRecommendedModeForBackground,
   DEFAULT_ACCENT_HEX,
   DEFAULT_DARK_BG_HEX,
   DEFAULT_LIGHT_BG_HEX,
@@ -63,14 +65,16 @@ function readLocal(key: string): string | null {
   }
 }
 function readPreference(theme?: string, background?: string): Preference {
-  const mode = readLocal("app_mode") === "light" ? "light" : "dark";
+  const rawBackground = background || readLocal("app_background");
+  const storedMode = readLocal("app_mode");
+  const mode =
+    storedMode === "light" || storedMode === "dark"
+      ? storedMode
+      : getRecommendedModeForBackground(rawBackground, "dark");
   return {
     mode,
     accent: resolveLegacyTheme(theme || readLocal("app_theme")),
-    background: resolveLegacyBackground(
-      background || readLocal("app_background"),
-      mode
-    ),
+    background: resolveLegacyBackground(rawBackground, mode),
   };
 }
 function readRecent(key: string): string[] {
@@ -101,14 +105,49 @@ export function AppearanceSettingsScreen() {
       user?.activeTheme,
       user?.activeBackground
     );
-    return { source, applied: preference, draft: preference };
+    return {
+      source,
+      userId: user?.id,
+      applied: preference,
+      draft: preference,
+      userEdited: false,
+      locallySaved: false,
+    };
   });
   if (state.source !== source) {
     const preference = readPreference(
       user?.activeTheme,
       user?.activeBackground
     );
-    setState({ source, applied: preference, draft: preference });
+    const isAccountSwitch =
+      state.userId !== undefined && user?.id !== state.userId;
+    if (state.locallySaved && !isAccountSwitch) {
+      const serverCaughtUp =
+        preference.accent === state.applied.accent &&
+        preference.background === state.applied.background;
+      setState({
+        ...state,
+        source,
+        userId: user?.id,
+        locallySaved: !serverCaughtUp,
+      });
+    } else if (state.userEdited && !isAccountSwitch) {
+      setState({
+        ...state,
+        source,
+        userId: user?.id,
+        applied: preference,
+      });
+    } else {
+      setState({
+        source,
+        userId: user?.id,
+        applied: preference,
+        draft: preference,
+        userEdited: false,
+        locallySaved: false,
+      });
+    }
   }
   const { draft, applied } = state;
   const [recentAccents, setRecentAccents] = useState(() =>
@@ -138,7 +177,12 @@ export function AppearanceSettingsScreen() {
           next.accent = resolveLegacyTheme(event.newValue);
         if (event.key === "app_background")
           next.background = resolveLegacyBackground(event.newValue, next.mode);
-        return { ...current, applied: next, draft: next };
+        return {
+          ...current,
+          applied: next,
+          draft: next,
+          userEdited: false,
+        };
       });
       setSyncFailed(false);
       setStatus("");
@@ -154,6 +198,7 @@ export function AppearanceSettingsScreen() {
     setState((current) => ({
       ...current,
       draft: { ...current.draft, ...patch },
+      userEdited: true,
     }));
     setStatus("");
   };
@@ -182,19 +227,26 @@ export function AppearanceSettingsScreen() {
     const next = { ...draft };
     let locallyApplied = false;
     try {
+      markLocalAppearanceWrite();
       localStorage.setItem("app_mode", next.mode);
       localStorage.setItem("app_theme", next.accent);
       localStorage.setItem("app_background", next.background);
       applyAppMode(next.mode);
-      applyGlobalTheme(next.accent);
       applyGlobalBackground(next.background, next.mode);
+      applyGlobalTheme(next.accent);
       for (const name of [
         "mode-updated",
-        "theme-updated",
         "background-updated",
+        "theme-updated",
       ])
         window.dispatchEvent(new Event(name));
-      setState((current) => ({ ...current, applied: next }));
+      setState((current) => ({
+        ...current,
+        applied: next,
+        draft: next,
+        userEdited: false,
+        locallySaved: true,
+      }));
       locallyApplied = true;
       const accents = [
         next.accent,
@@ -374,6 +426,7 @@ export function AppearanceSettingsScreen() {
                     setState((current) => ({
                       ...current,
                       draft: current.applied,
+                      userEdited: false,
                     }));
                     setStatus("");
                   }}

@@ -23,6 +23,7 @@ const mocks = vi.hoisted(() => ({
   release: vi.fn(),
   usage: vi.fn(),
   cheap: vi.fn(),
+  calendarPrepare: vi.fn(), calendarValidate: vi.fn(), calendarBatch: vi.fn(),
   messages: [] as StoredMessage[],
   prisma: {
     user: { findUnique: vi.fn(), update: vi.fn() },
@@ -45,6 +46,7 @@ vi.mock("@/lib/auth-server", () => ({ getSession: mocks.session }));
 vi.mock("@/lib/prisma", () => ({ prisma: mocks.prisma }));
 vi.mock("@/lib/ai/providers/factory", () => ({ LLMFactory: { getAdapter: () => ({ generateResponse: mocks.generate }) } }));
 vi.mock("@/lib/ai/chat-tool-executor", () => ({ executeChatTool: mocks.execute }));
+vi.mock("@/lib/ai/sylvie/calendar-tools", async importOriginal => ({ ...await importOriginal<typeof import("@/lib/ai/sylvie/calendar-tools")>(), prepareCalendarOperation: mocks.calendarPrepare, validateCalendarProposal: mocks.calendarValidate, reviewCalendarBatch: mocks.calendarBatch }));
 vi.mock("@/lib/ai/cheap-answers", () => ({ resolveCheapAnswer: mocks.cheap }));
 vi.mock("@/lib/ai/usage-limiter", () => ({ reserveQuota: mocks.reserve, releaseQuota: mocks.release }));
 vi.mock("@/lib/ai/usage-logger", () => ({ logAiUsage: mocks.usage }));
@@ -79,6 +81,7 @@ function matchesWhere(message: StoredMessage, where: Record<string, unknown> = {
     if (value && typeof value === "object" && "startsWith" in value) return String(message[key]).startsWith(String(value.startsWith));
     if (value && typeof value === "object" && "contains" in value) return String(message[key]).includes(String(value.contains));
     if (value && typeof value === "object" && "in" in value) return (value.in as unknown[]).includes(message[key]);
+    if (value && typeof value === "object" && "gt" in value) return Number(message[key]) > Number(value.gt);
     return message[key] === value;
   });
 }
@@ -91,6 +94,8 @@ beforeEach(() => {
   mocks.generate.mockReset().mockResolvedValue({ text: "Here is the answer.", usage: { promptTokens: 10, completionTokens: 5, totalTokens: 15 } });
   mocks.execute.mockReset().mockResolvedValue({ success: true, result: "authorized user data" });
   mocks.cheap.mockResolvedValue(null);
+  mocks.calendarPrepare.mockReset().mockResolvedValue({ summary: "Update Physics · one event · 7 PM Asia/Karachi", command: { id: "owned-event", revision: 3 } });
+  mocks.calendarValidate.mockReset().mockResolvedValue(undefined); mocks.calendarBatch.mockReset().mockResolvedValue(undefined);
   mocks.reserve.mockResolvedValue({ charged: true, allowed: true, unlimited: false, used: 1, limit: 10, remaining: 9, resetsAt: "2026-10-16T00:00:00.000Z" });
   mocks.release.mockResolvedValue(undefined);
   mocks.usage.mockResolvedValue(undefined);
@@ -372,5 +377,62 @@ describe("Sylvie HTTP mutation confirmation", () => {
     ]);
     expect(responses.map((response) => response.status).sort()).toEqual([200, 409]);
     expect(mocks.execute).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("Sylvie calendar HTTP integration", () => {
+  const pageContext = { path: "/calendar", calendar: { selectedDate: "2026-10-19", start: "2026-10-18", end: "2026-10-25", view: "week" } };
+  it("passes only validated navigation, exposes real tools, and skips old quest-only cheap summaries", async () => {
+    await POST(request("What do I have planned tomorrow?", { pageContext, modelPreference: "auto" }));
+    expect(mocks.cheap).not.toHaveBeenCalled();
+    expect(firstPrompt()).toContain('"selectedDate":"2026-10-19"');
+    expect(advertisedNames()).toContain("readCalendar");
+    expect(advertisedNames()).not.toContain("createQuest");
+  });
+  it("stages an exact calendar proposal and confirms it without model/quota work", async () => {
+    mocks.generate.mockResolvedValueOnce(toolCall("updateCalendarEvent", { id: "owned-event", revision: 3, scope: "event", changes: { startTime: "19:00" } }));
+    const body = await (await POST(request("Move my appointment to tomorrow at 7 PM", { pageContext }))).json();
+    expect(body.pendingAction.summary).toContain("7 PM");
+    expect(mocks.execute).not.toHaveBeenCalled();
+    mocks.execute.mockResolvedValueOnce({ calendarChanged: true, message: "Updated the personal calendar event." });
+    const modelCalls = mocks.generate.mock.calls.length, quotaCalls = mocks.reserve.mock.calls.length;
+    const confirmed = await (await POST(request("Confirm change", { confirmationToken: body.pendingAction.token }))).json();
+    expect(confirmed).toMatchObject({ calendarChanged: true, reply: "Updated the personal calendar event." });
+    expect(mocks.calendarValidate).toHaveBeenCalled();
+    expect(mocks.execute).toHaveBeenCalledWith("updateCalendarEvent", expect.objectContaining({ summary: expect.stringContaining("7 PM") }), 7);
+    expect(mocks.generate).toHaveBeenCalledTimes(modelCalls);
+    expect(mocks.reserve).toHaveBeenCalledTimes(quotaCalls);
+    expect((await POST(request("Confirm change", { confirmationToken: body.pendingAction.token }))).status).toBe(409);
+  });
+  it("preserves proposal details for a clock-only refinement and rejects the superseded preview", async () => {
+    mocks.generate.mockResolvedValueOnce(toolCall("updateCalendarEvent", { changes: { startTime: "18:00" } }));
+    const first = await (await POST(request("Move my appointment to tomorrow evening", { pageContext }))).json();
+    mocks.generate.mockResolvedValueOnce({ text: "I can propose 7 PM." });
+    await POST(request("Make it 7 PM", { pageContext }));
+    const lastCall = mocks.generate.mock.calls.at(-1)!;
+    expect(JSON.stringify(lastCall[0])).toContain("Earlier proposed change, not executed");
+    expect((lastCall[2] as NormalizedTool[]).map(t => t.name)).toContain("updateCalendarEvent");
+    expect((await POST(request("Confirm change", { confirmationToken: first.pendingAction.token }))).status).toBe(409);
+    expect(mocks.execute).not.toHaveBeenCalled();
+  });
+  it("fails closed when the schedule changed or the service cannot validate a preview", async () => {
+    mocks.generate.mockResolvedValueOnce(toolCall("deleteCalendarEvent", { id: "owned-event", revision: 3, scope: "series" }));
+    const first = await (await POST(request("Delete my recurring appointment", { pageContext }))).json();
+    mocks.calendarValidate.mockRejectedValueOnce(new Error("Changed"));
+    const response = await POST(request("Confirm change", { confirmationToken: first.pendingAction.token }));
+    expect(response.status).toBe(409);
+    expect(mocks.execute).not.toHaveBeenCalled();
+  });
+  it("keeps calendar exam recommendations in chat with the existing Planner review action", async () => {
+    const response = await POST(request("I have a physics exam next Friday. Help me prepare.", { pageContext }));
+    const body = await response.json();
+    expect(mocks.generate).toHaveBeenCalled();
+    expect(body.plannerHandoff).toMatchObject({ mode: "EXAM" });
+    expect(advertisedNames()).toContain("findCalendarAvailability");
+    expect(mocks.execute).not.toHaveBeenCalled();
+  });
+  it("rejects cross-site confirmations before executing tools", async () => {
+    const response = await POST(new NextRequest("http://localhost:3000/api/system-messages/chat", { method: "POST", headers: { "content-type": "application/json", "sec-fetch-site": "cross-site" }, body: JSON.stringify({ message: "Delete my appointment" }) }));
+    expect(response.status).toBe(403); expect(mocks.execute).not.toHaveBeenCalled();
   });
 });

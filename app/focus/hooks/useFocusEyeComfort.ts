@@ -33,6 +33,10 @@ export function getStoredDim(): boolean {
  */
 export function isLightModeActive(): boolean {
   if (typeof document === "undefined") return false;
+  const polarity = document.documentElement.getAttribute("data-surface-polarity");
+  if (polarity === "light" || polarity === "dark") {
+    return polarity === "light";
+  }
   const mode = document.documentElement.getAttribute("data-mode");
   if (mode) return mode === "light";
   try {
@@ -63,8 +67,8 @@ export function useFocusEyeComfort(): FocusEyeComfortState {
     setIsLightMode(isLightModeActive());
   }, []);
 
-  // Watch `html[data-mode]` changes → the effect auto-deactivates the moment
-  // the user switches to Dark Mode (no stale dim layer left behind).
+  // Watch `html[data-mode]` / `html[data-surface-polarity]` changes → the effect
+  // auto-deactivates the moment the user switches to a dark surface.
   useEffect(() => {
     if (typeof MutationObserver === "undefined") return;
     const observer = new MutationObserver(() => {
@@ -72,7 +76,7 @@ export function useFocusEyeComfort(): FocusEyeComfortState {
     });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["data-mode"],
+      attributeFilter: ["data-mode", "data-surface-polarity"],
     });
     return () => observer.disconnect();
   }, []);

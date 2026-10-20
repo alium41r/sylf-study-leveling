@@ -6,6 +6,7 @@
 // ============================================================
 
 import { NormalizedTool } from "./providers/types";
+import { sylvieCalendarTools } from "./sylvie/calendar-contracts";
 
 /**
  * Tool: createGoal
@@ -607,7 +608,7 @@ export const googleSearchTool: NormalizedTool = {
 
 const GENERAL_TOOLS = [getUserStatsTool, getGoalsTool, getQuestsTool, getStudySessionsTool, getWeeklySummaryTool, completeQuestTool, getAppStateTool, getShopInventoryTool];
 const PLANNER_TOOLS = [createGoalTool, createQuestTool, createMultipleQuestsTool, updateQuestTool, deleteQuestTool, updateGoalTool, deleteGoalTool, deleteAllTasksTool, googleSearchTool];
-const CALENDAR_TOOLS = [moveQuestTool, swapQuestsTool, clearDayTool];
+const CALENDAR_TOOLS = [moveQuestTool, swapQuestsTool, clearDayTool, ...sylvieCalendarTools];
 const ANALYTICS_TOOLS = [getSubjectAnalyticsTool, getPerformanceTrendsTool, getDailyPatternTool, generateInsightTool];
 const MEMORY_TOOLS = [saveMemoryTool, getMemoryTool, forgetMemoryTool];
 

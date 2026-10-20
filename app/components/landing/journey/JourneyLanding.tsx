@@ -204,7 +204,7 @@ function subscribeTheme(onChange: () => void) {
   const observer = new MutationObserver(onChange);
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ["data-mode"],
+    attributeFilter: ["data-mode", "data-surface-polarity"],
   });
   return () => observer.disconnect();
 }
@@ -217,17 +217,26 @@ export default function JourneyLanding() {
   const [paused, setPaused] = useState(false);
   const light = useSyncExternalStore(
     subscribeTheme,
-    () => document.documentElement.getAttribute("data-mode") === "light",
+    () =>
+      (document.documentElement.getAttribute("data-surface-polarity") ||
+        document.documentElement.getAttribute("data-mode")) === "light",
     () => false
   );
   const toggleTheme = () => {
     const mode = light ? "dark" : "light";
     document.documentElement.setAttribute("data-mode", mode);
+    document.documentElement.setAttribute("data-surface-polarity", mode);
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
     try {
       localStorage.setItem("app_mode", mode);
     } catch {
       /* Preview remains usable without storage. */
     }
+    window.dispatchEvent(new Event("mode-updated"));
     window.dispatchEvent(new Event("storage"));
   };
   return (

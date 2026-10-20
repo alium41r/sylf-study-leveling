@@ -1,7 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { DayStudySummary, GoalMilestone, FloatingRestDayStatus } from "@/lib/study-schedule-types";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  DayStudySummary,
+  GoalMilestone,
+  FloatingRestDayStatus,
+} from "@/lib/study-schedule-types";
 import { resolveGoalColor, formatGoalDeadline } from "@/lib/goal-theme";
 import { QuestEmblemIcon } from "@/app/components/icons";
 import { X } from "lucide-react";
@@ -14,6 +18,7 @@ interface DayInspectionPanelProps {
   onToggleFloatingRest?: () => void;
   isTogglingFloatingRest?: boolean;
   onClose: () => void;
+  embedded?: boolean;
 }
 
 function formatDuration(totalSeconds: number, totalMinutes: number): string {
@@ -33,7 +38,9 @@ export default function DayInspectionPanel({
   onToggleFloatingRest,
   isTogglingFloatingRest = false,
   onClose,
+  embedded = false,
 }: DayInspectionPanelProps) {
+  const reducedMotion = useReducedMotion();
   if (!dayData) return null;
 
   const dateObj = new Date(`${dayData.date}T12:00:00Z`);
@@ -42,9 +49,13 @@ export default function DayInspectionPanel({
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   });
 
-  const formattedStudyTime = formatDuration(dayData.totalSeconds, dayData.totalMinutes);
+  const formattedStudyTime = formatDuration(
+    dayData.totalSeconds,
+    dayData.totalMinutes
+  );
   const formattedGoalTime = formatDuration(0, dayData.dailyGoalMinutes);
 
   const hasActivity =
@@ -54,14 +65,21 @@ export default function DayInspectionPanel({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24, scale: 0.98 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 24, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 24, scale: 0.98 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      className={`${styles.card} p-4 sm:p-6 md:p-8 mt-6 relative overflow-y-auto border border-border-subtle shadow-2xl z-50 fixed inset-x-0 bottom-0 max-h-[80vh] rounded-t-2xl pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:inset-x-auto md:bottom-auto md:max-h-none md:rounded-2xl md:overflow-hidden md:pb-8`}
+      transition={{ duration: reducedMotion ? 0 : 0.25, ease: "easeOut" }}
+      className={
+        embedded
+          ? "p-0 relative"
+          : `${styles.card} p-4 sm:p-6 md:p-8 mt-6 relative overflow-y-auto border border-border-subtle shadow-2xl z-50 fixed inset-x-0 bottom-0 max-h-[80vh] rounded-t-2xl pb-[calc(1rem+env(safe-area-inset-bottom))] md:static md:inset-x-auto md:bottom-auto md:max-h-none md:rounded-2xl md:overflow-hidden md:pb-8`
+      }
     >
       {/* Mobile grab handle */}
-      <div className="md:hidden mx-auto mb-3 h-1 w-10 rounded-full bg-border-subtle shrink-0" />
+      <div
+        hidden={embedded}
+        className="md:hidden mx-auto mb-3 h-1 w-10 rounded-full bg-border-subtle shrink-0"
+      />
       {/* Top Accent Line */}
       <div
         className="absolute top-0 left-0 right-0 h-1"
@@ -69,8 +87,8 @@ export default function DayInspectionPanel({
           background: dayData.goalMet
             ? "linear-gradient(90deg, var(--accent-gold), var(--accent-primary))"
             : dayData.isRestDay
-            ? "linear-gradient(90deg, var(--accent-green), var(--accent-primary-dim))"
-            : "linear-gradient(90deg, var(--accent-primary-dim), var(--accent-primary-mid))",
+              ? "linear-gradient(90deg, var(--accent-green), var(--accent-primary-dim))"
+              : "linear-gradient(90deg, var(--accent-primary-dim), var(--accent-primary-mid))",
         }}
       />
 
@@ -85,8 +103,18 @@ export default function DayInspectionPanel({
             {/* Status Badges */}
             {dayData.isRestDay && (
               <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider bg-accent-green-dim text-accent-green border border-accent-green/30">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                  />
                 </svg>
                 Rest Day (Protected)
               </span>
@@ -94,8 +122,19 @@ export default function DayInspectionPanel({
 
             {floatingRestStatus?.isFloatingRest && !dayData.isRestDay && (
               <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider bg-[var(--goal-amber-dim)] text-[var(--goal-amber-light)] border border-[var(--goal-amber-mid)]">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-2.21 0-4-.95-4-2s1.79-2 4-2 4 .95 4 2-1.79 2-4 2zm0 0v6m0 0a4 4 0 11-8 0 4 4 0 018 0zm8-6a4 4 0 11-8 0 4 4 0 018 0z" opacity="0.9" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8c-2.21 0-4-.95-4-2s1.79-2 4-2 4 .95 4 2-1.79 2-4 2zm0 0v6m0 0a4 4 0 11-8 0 4 4 0 018 0zm8-6a4 4 0 11-8 0 4 4 0 018 0z"
+                    opacity="0.9"
+                  />
                 </svg>
                 Floating Rest (Protected)
               </span>
@@ -103,7 +142,12 @@ export default function DayInspectionPanel({
 
             {dayData.goalMet && (
               <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider bg-accent-primary-dim text-accent-text-light border border-accent-primary-mid/40">
-                <svg className="w-3.5 h-3.5 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-3.5 h-3.5 text-accent-light"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <circle cx="12" cy="12" r="10" strokeWidth={2} />
                   <circle cx="12" cy="12" r="6" strokeWidth={2} />
                   <circle cx="12" cy="12" r="2" strokeWidth={2} />
@@ -112,15 +156,22 @@ export default function DayInspectionPanel({
               </span>
             )}
 
-            {!dayData.isRestDay && !dayData.goalMet && dayData.totalMinutes > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider bg-bg-shadow text-text-secondary border border-border-subtle">
-                <svg className="w-3.5 h-3.5 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" strokeWidth={2} />
-                  <polyline points="12 6 12 12 16 14" strokeWidth={2} />
-                </svg>
-                {dayData.completionPercentage}% of Target
-              </span>
-            )}
+            {!dayData.isRestDay &&
+              !dayData.goalMet &&
+              dayData.totalMinutes > 0 && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold font-['Rajdhani'] uppercase tracking-wider bg-bg-shadow text-text-secondary border border-border-subtle">
+                  <svg
+                    className="w-3.5 h-3.5 text-accent-light"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                    <polyline points="12 6 12 12 16 14" strokeWidth={2} />
+                  </svg>
+                  {dayData.completionPercentage}% of Target
+                </span>
+              )}
           </div>
           <p className="text-xs text-text-muted font-mono mt-1">
             Day inspection retrospective and academic focus logs
@@ -128,6 +179,8 @@ export default function DayInspectionPanel({
         </div>
 
         <button
+          hidden={embedded}
+          aria-label="Close study details"
           onClick={onClose}
           className="self-start sm:self-center w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors cursor-pointer text-text-muted hover:text-text-primary"
         >
@@ -154,24 +207,43 @@ export default function DayInspectionPanel({
                     className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-white"
                     style={{ background: theme.base }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zm12-2a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9a3 3 0 116 0" opacity="0.5" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 18V5l12-2v13M9 18a3 3 0 11-6 0 3 3 0 016 0zm12-2a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 9a3 3 0 116 0"
+                        opacity="0.5"
+                      />
                     </svg>
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-bold font-['Rajdhani'] truncate" style={{ color: theme.light }}>
+                    <p
+                      className="text-sm font-bold font-['Rajdhani'] truncate"
+                      style={{ color: "var(--text-primary)" }}
+                    >
                       Milestone — {m.title}
                     </p>
                     <p className="text-xs text-text-muted font-['Rajdhani']">
-                      Objective deadline lands today · {formatGoalDeadline(m.targetDate)}
+                      Objective deadline lands today ·{" "}
+                      {formatGoalDeadline(m.targetDate)}
                     </p>
                   </div>
                 </div>
                 <span
                   className="text-[0.65rem] font-mono font-bold px-2.5 py-1 rounded-full border shrink-0 bg-slate-900/5 dark:bg-black/30"
                   style={{
-                    color: theme.base,
+                    color: "var(--text-secondary)",
                     borderColor: theme.mid,
                   }}
                 >
@@ -198,7 +270,12 @@ export default function DayInspectionPanel({
         <div className="p-4 rounded-xl bg-bg-abyss border border-border-subtle/80 flex flex-col justify-between">
           <div className="flex items-center justify-between text-text-muted text-xs uppercase font-bold tracking-wider font-['Rajdhani']">
             <span>Study Time</span>
-            <svg className="w-4 h-4 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4 text-accent-light"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <circle cx="12" cy="12" r="10" strokeWidth={2} />
               <polyline points="12 6 12 12 16 14" strokeWidth={2} />
             </svg>
@@ -217,7 +294,12 @@ export default function DayInspectionPanel({
         <div className="p-4 rounded-xl bg-bg-abyss border border-border-subtle/80 flex flex-col justify-between">
           <div className="flex items-center justify-between text-text-muted text-xs uppercase font-bold tracking-wider font-['Rajdhani']">
             <span>Sessions</span>
-            <svg className="w-4 h-4 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4 text-accent-light"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth={2} />
               <line x1="16" y1="2" x2="16" y2="6" strokeWidth={2} />
               <line x1="8" y1="2" x2="8" y2="6" strokeWidth={2} />
@@ -237,8 +319,18 @@ export default function DayInspectionPanel({
         <div className="p-4 rounded-xl bg-bg-abyss border border-border-subtle/80 flex flex-col justify-between">
           <div className="flex items-center justify-between text-text-muted text-xs uppercase font-bold tracking-wider font-['Rajdhani']">
             <span>XP Gained</span>
-            <svg className="w-4 h-4 text-accent-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <svg
+              className="w-4 h-4 text-accent-gold"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
             </svg>
           </div>
           <div className="mt-2">
@@ -255,8 +347,18 @@ export default function DayInspectionPanel({
         <div className="p-4 rounded-xl bg-bg-abyss border border-border-subtle/80 flex flex-col justify-between">
           <div className="flex items-center justify-between text-text-muted text-xs uppercase font-bold tracking-wider font-['Rajdhani']">
             <span>Quests Cleared</span>
-            <svg className="w-4 h-4 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4 text-accent-green"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div className="mt-2">
@@ -266,7 +368,9 @@ export default function DayInspectionPanel({
             <span className="text-xs text-text-muted ml-2 font-mono">
               / {dayData.questsCount} (
               {dayData.questsCount > 0
-                ? Math.round((dayData.questsCompleted / dayData.questsCount) * 100)
+                ? Math.round(
+                    (dayData.questsCompleted / dayData.questsCount) * 100
+                  )
                 : 0}
               %)
             </span>
@@ -279,8 +383,20 @@ export default function DayInspectionPanel({
         <div className="mt-6 p-5 rounded-xl bg-bg-abyss border border-border-subtle">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-sm font-bold uppercase tracking-wider text-text-primary font-['Rajdhani'] flex items-center gap-2">
-              <svg className="w-4 h-4 text-accent-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <rect x="2" y="3" width="20" height="14" rx="2" strokeWidth={2} />
+              <svg
+                className="w-4 h-4 text-accent-light"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <rect
+                  x="2"
+                  y="3"
+                  width="20"
+                  height="14"
+                  rx="2"
+                  strokeWidth={2}
+                />
                 <line x1="8" y1="21" x2="16" y2="21" strokeWidth={2} />
                 <line x1="12" y1="17" x2="12" y2="21" strokeWidth={2} />
               </svg>
@@ -339,15 +455,26 @@ export default function DayInspectionPanel({
             {dayData.isRestDay ? (
               <div className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-accent-green-dim flex items-center justify-center text-accent-green">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                    />
                   </svg>
                 </div>
                 <p className="text-sm font-bold text-text-primary font-['Rajdhani']">
                   Designated Rest Day
                 </p>
                 <p className="text-xs text-text-muted max-w-sm">
-                  No quests or milestones were assigned. Your weekly streak and HP are fully protected.
+                  No quests or milestones were assigned. Your weekly streak and
+                  HP are fully protected.
                 </p>
               </div>
             ) : (
@@ -355,8 +482,8 @@ export default function DayInspectionPanel({
                 {floatingRestStatus?.isFloatingRest
                   ? "This is a floating rest day — scheduled quests were automatically shifted to the next active study day."
                   : milestones.length > 0
-                  ? "No quests were scheduled on this calendar date — but an objective deadline lands today."
-                  : "No quests were scheduled on this calendar date."}
+                    ? "No quests were scheduled on this calendar date — but an objective deadline lands today."
+                    : "No quests were scheduled on this calendar date."}
               </p>
             )}
           </div>
@@ -368,13 +495,15 @@ export default function DayInspectionPanel({
               return (
                 <div
                   key={q.id}
-                  className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
+                  className={`p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-3 transition-colors ${
                     isDone
                       ? "bg-accent-green-dim/20 border-accent-green/30"
                       : "bg-bg-abyss border-border-subtle"
                   }`}
                   style={{
-                    ...(goalTheme ? { borderLeft: `4px solid ${goalTheme.base}` } : {}),
+                    ...(goalTheme
+                      ? { borderLeft: `4px solid ${goalTheme.base}` }
+                      : {}),
                   }}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -383,17 +512,37 @@ export default function DayInspectionPanel({
                         isDone
                           ? "bg-accent-green text-white"
                           : goalTheme
-                          ? "text-white"
-                          : "bg-bg-shadow text-text-muted"
+                            ? "text-white"
+                            : "bg-bg-shadow text-text-muted"
                       }`}
-                      style={!isDone && goalTheme ? { background: goalTheme.base } : undefined}
+                      style={
+                        !isDone && goalTheme
+                          ? { background: goalTheme.base }
+                          : undefined
+                      }
                     >
                       {isDone ? (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       ) : (
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          viewBox="0 0 24 24"
+                        >
                           <circle cx="12" cy="12" r="10" />
                         </svg>
                       )}
@@ -414,7 +563,7 @@ export default function DayInspectionPanel({
                           <span
                             className="inline-flex items-center gap-1.5 mr-2 px-2 py-0.5 rounded-full text-[0.6rem] font-['Rajdhani'] font-bold uppercase tracking-wider border"
                             style={{
-                              color: goalTheme?.light,
+                              color: "var(--text-secondary)",
                               background: goalTheme?.dim,
                               borderColor: goalTheme?.mid,
                             }}
@@ -426,7 +575,8 @@ export default function DayInspectionPanel({
                             {q.goal.title}
                           </span>
                         )}
-                        Target: {q.requiredMinutes}m • Difficulty: {q.difficulty}
+                        Target: {q.requiredMinutes}m • Difficulty:{" "}
+                        {q.difficulty}
                       </p>
                     </div>
                   </div>
@@ -434,7 +584,7 @@ export default function DayInspectionPanel({
                   <div className="flex items-center gap-3 shrink-0">
                     <span
                       className="text-xs font-mono font-bold"
-                      style={{ color: goalTheme ? goalTheme.light : "var(--accent-gold)" }}
+                      style={{ color: "var(--text-secondary)" }}
                     >
                       +{q.xpReward} XP
                     </span>
@@ -443,14 +593,18 @@ export default function DayInspectionPanel({
                         isDone
                           ? "bg-accent-green text-white"
                           : q.status === "IN_PROGRESS"
-                          ? "bg-accent-primary text-white"
-                          : goalTheme
-                          ? ""
-                          : "bg-bg-shadow text-text-muted border border-border-subtle"
+                            ? "bg-accent-primary text-[var(--accent-foreground)]"
+                            : goalTheme
+                              ? ""
+                              : "bg-bg-shadow text-text-muted border border-border-subtle"
                       }`}
                       style={
                         !isDone && q.status !== "IN_PROGRESS" && goalTheme
-                          ? { background: goalTheme.dim, color: goalTheme.light, border: `1px solid ${goalTheme.mid}` }
+                          ? {
+                              background: goalTheme.dim,
+                              color: "var(--text-secondary)",
+                              border: `1px solid ${goalTheme.mid}`,
+                            }
                           : undefined
                       }
                     >
@@ -465,13 +619,15 @@ export default function DayInspectionPanel({
       </div>
 
       {/* Global Empty State (If zero activity and not a rest day) */}
-      {!hasActivity && !dayData.isRestDay && !floatingRestStatus?.isFloatingRest && (
-        <div className="mt-4 p-4 rounded-xl bg-bg-abyss/40 border border-border-subtle/50 text-center">
-          <p className="text-xs text-text-muted">
-            No study sessions or quests were recorded on this date.
-          </p>
-        </div>
-      )}
+      {!hasActivity &&
+        !dayData.isRestDay &&
+        !floatingRestStatus?.isFloatingRest && (
+          <div className="mt-4 p-4 rounded-xl bg-bg-abyss/40 border border-border-subtle/50 text-center">
+            <p className="text-xs text-text-muted">
+              No study sessions or quests were recorded on this date.
+            </p>
+          </div>
+        )}
     </motion.div>
   );
 }
@@ -527,23 +683,34 @@ function FloatingRestDayControl({
       }`}
     >
       <div className="flex items-center gap-3 min-w-0">
-        <div
-          className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4-.95-4-2s1.79-2 4-2 4 .95 4 2-1.79 2-4 2zm0 0v6m0 0a4 4 0 11-8 0 4 4 0 018 0zm8-6a4 4 0 11-8 0 4 4 0 018 0z" opacity="0.9" />
+        <div className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400">
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 8c-2.21 0-4-.95-4-2s1.79-2 4-2 4 .95 4 2-1.79 2-4 2zm0 0v6m0 0a4 4 0 11-8 0 4 4 0 018 0zm8-6a4 4 0 11-8 0 4 4 0 018 0z"
+              opacity="0.9"
+            />
           </svg>
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold font-['Rajdhani'] truncate text-amber-700 dark:text-amber-300">
-            {isActive ? "Floating Rest Day Active" : "Ad-hoc Rest Day Designation"}
+            {isActive
+              ? "Floating Rest Day Active"
+              : "Ad-hoc Rest Day Designation"}
           </p>
           <p className="text-xs text-text-muted">
             {isActive
               ? `Rescued by the auto-cascade: quests shifted off ${status.dateKey}.`
               : isQuotaExhausted && !status.isFixedRest
-              ? quotaLabel
-              : "Unplanned events, family dinners, or sickness — exempt from HP penalties and daily targets."}
+                ? quotaLabel
+                : "Unplanned events, family dinners, or sickness — exempt from HP penalties and daily targets."}
           </p>
         </div>
       </div>
@@ -559,8 +726,8 @@ function FloatingRestDayControl({
           tone === "cancel"
             ? "bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white border border-amber-600 dark:border-amber-400 shadow-sm"
             : tone === "add"
-            ? "bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-dashed border-amber-500/40 hover:border-amber-500/70"
-            : "bg-bg-shadow text-text-muted border border-border-subtle cursor-not-allowed"
+              ? "bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-dashed border-amber-500/40 hover:border-amber-500/70"
+              : "bg-bg-shadow text-text-muted border border-border-subtle cursor-not-allowed"
         }`}
       >
         {isToggling ? "Updating..." : buttonLabel}

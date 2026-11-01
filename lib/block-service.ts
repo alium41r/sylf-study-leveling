@@ -36,6 +36,30 @@ export async function areUsersBlocked(userA: number, userB: number): Promise<boo
 }
 
 /**
+ * Batched check: returns true if a block exists in either direction between
+ * `userId` and ANY user in `otherUserIds` in a single database query.
+ */
+export async function areAnyUsersBlocked(
+  userId: number,
+  otherUserIds: number[]
+): Promise<boolean> {
+  if (otherUserIds.length === 0) return false;
+  if (otherUserIds.length === 1) return areUsersBlocked(userId, otherUserIds[0]);
+  try {
+    const rows = await prisma.$queryRaw<Array<{ id: number }>>`
+      SELECT id FROM "BlockedUser"
+      WHERE ("userId" = ${userId} AND "blockedId" = ANY(${otherUserIds}::int[]))
+         OR ("userId" = ANY(${otherUserIds}::int[]) AND "blockedId" = ${userId})
+      LIMIT 1
+    `;
+    return Boolean(rows && rows.length > 0);
+  } catch (err) {
+    console.error("areAnyUsersBlocked query error:", err);
+    return false;
+  }
+}
+
+/**
  * Whether `actorId` may put `targetId` into a conversation. A group is a way of reaching someone,
  * so it answers to the same rules as a direct message: no block in either direction, the person's
  * allowDirectMessages setting, and friendship unless they accept messages from everyone. Fails

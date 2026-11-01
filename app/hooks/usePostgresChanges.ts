@@ -13,12 +13,12 @@
 // Until all of that is in place the hook simply stays disconnected and the
 // pages keep their (slower) REST fallback polling.
 // ============================================================================
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   RealtimeChannel,
   RealtimePostgresChangesPayload,
 } from "@supabase/supabase-js";
-import { attachRealtimeAuth, isRealtimeConfigured } from "@/lib/supabase-browser";
+import { attachRealtimeAuth, getSupabaseBrowser, isRealtimeConfigured } from "@/lib/supabase-browser";
 
 export interface PostgresChangeFilter {
   event: "INSERT" | "UPDATE" | "DELETE";
@@ -27,28 +27,36 @@ export interface PostgresChangeFilter {
   filter?: string;
 }
 
+let nextChannelInstanceId = 0;
+
 export function usePostgresChanges(
   filters: PostgresChangeFilter[],
-  onEvent: (payload: RealtimePostgresChangesPayload<any>) => void
+  onEvent: (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => void
 ): { enabled: boolean; connected: boolean } {
   const [connected, setConnected] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const onEventRef = useRef(onEvent);
+  useEffect(() => {
+    onEventRef.current = onEvent;
+  }, [onEvent]);
+
+  const filterKey = JSON.stringify(filters);
 
   useEffect(() => {
     if (!isRealtimeConfigured() || filters.length === 0) {
-      setConnected(false);
       return;
     }
 
     let cancelled = false;
     let channel: RealtimeChannel | null = null;
+    const channelName = `db-changes-${++nextChannelInstanceId}`;
 
     (async () => {
       const sb = await attachRealtimeAuth();
       if (!sb || cancelled) return;
       setEnabled(true);
 
-      channel = sb.channel("db-changes");
+      channel = sb.channel(channelName);
       for (const filter of filters) {
         channel = channel.on(
           "postgres_changes",
@@ -59,7 +67,7 @@ export function usePostgresChanges(
             ...(filter.filter ? { filter: filter.filter } : {}),
           },
           (payload) => {
-            if (!cancelled) onEvent(payload);
+            if (!cancelled) onEventRef.current(payload);
           }
         );
       }
@@ -74,15 +82,22 @@ export function usePostgresChanges(
 
     return () => {
       cancelled = true;
-      try {
-        channel?.unsubscribe();
-      } catch {
-        // Already torn down.
+      if (channel) {
+        try {
+          const sb = getSupabaseBrowser();
+          if (sb && typeof sb.removeChannel === "function") {
+            void sb.removeChannel(channel);
+          } else {
+            void channel.unsubscribe();
+          }
+        } catch {
+          // Already torn down.
+        }
       }
       setConnected(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(filters)]);
+  }, [filterKey]);
 
   return { enabled, connected };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, use, useMemo } from "react";
+import { useState, useEffect, useRef, use, useMemo, useCallback } from "react";
 import { useAuth } from "../../../components/AuthProvider";
 import { useProfileModal } from "@/app/components/ProfileModalContext";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ import { ChatEmptyState } from "../../components/ChatEmptyState";
 import { AlertCircle, X } from "lucide-react";
 import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import { usePostgresChanges } from "@/app/hooks/usePostgresChanges";
+import { lockPageScroll } from "@/lib/scroll-lock";
 
 export default function ModernChatPage({
   params,
@@ -25,9 +26,11 @@ export default function ModernChatPage({
 
   const [conversation, setConversation] = useState<ConversationDetail | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  const [errorToast, setErrorToast] = useState<string | null>(null);
+  const [errorToast, setErrorToast] = useState(null as string | null);
 
   // In-Chat Search
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -38,6 +41,7 @@ export default function ModernChatPage({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
   const hasInitialScrolledRef = useRef(false);
+  const hasInitialLoadedRef = useRef(false);
   const justSentMessageRef = useRef(false);
   const lastServerIdRef = useRef(0);
 
@@ -71,10 +75,11 @@ export default function ModernChatPage({
   // Instead of the 1s incremental poll. Falls back to polling when
   // Realtime isn't configured or the subscription drops.
   const conversationRef = useRef<ConversationDetail | null>(null);
-  conversationRef.current = conversation;
-
   const mergeRef = useRef(mergeServerMessages);
-  mergeRef.current = mergeServerMessages;
+  useEffect(() => {
+    conversationRef.current = conversation;
+    mergeRef.current = mergeServerMessages;
+  });
 
   const { connected: pushConnected } = usePostgresChanges(
     [{ event: "INSERT", table: "Message", filter: `conversationId=eq.${conversationId}` }],
@@ -110,11 +115,7 @@ export default function ModernChatPage({
 
   // Prevent outer body rubber-banding / double scrolling on mobile devices while in chat
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
+    return lockPageScroll();
   }, []);
 
   // Full load: conversation detail + recent messages
@@ -123,19 +124,28 @@ export default function ModernChatPage({
     if (!user) return;
     try {
       const url = `/api/conversations/${conversationId}${refresh ? "?refresh=1" : ""}`;
+      const apply = (
+        data: {
+          conversation: ConversationDetail;
+          messages: ChatMessage[];
+          hasMore?: boolean;
+        } | null
+      ) => {
+        if (data && data.conversation) {
+          setConversation(data.conversation);
+          if (typeof data.hasMore === "boolean") setHasMore(data.hasMore);
+          hasInitialLoadedRef.current = true;
+          // Ingest server messages (merge so newer messages from Realtime/send are preserved)
+          mergeServerMessages(data.messages || []);
+        }
+      };
       const data = await fetchCachedJSON<{
         conversation: ConversationDetail;
         messages: ChatMessage[];
         hasMore?: boolean;
-      }>(
-        url,
-        {},
-        { ttlMs: 3000, staleMs: 45000 }
-      );
+      }>(url, {}, { ttlMs: 3000, staleMs: 45000, onUpdate: apply });
       if (data && data.conversation) {
-        setConversation(data.conversation);
-        // Ingest server messages (merge so newer messages from Realtime/send are preserved)
-        mergeServerMessages(data.messages || []);
+        apply(data);
       } else if (!silent) {
         router.push("/social");
       }
@@ -144,10 +154,34 @@ export default function ModernChatPage({
     }
   };
 
+  // Load older message page via cursor (`?before=<oldestId>`)
+  const handleLoadOlderMessages = async () => {
+    if (isLoadingOlder || !hasMore) return;
+    const oldestNonOptimistic = messages.find((m) => !m.isOptimistic && m.id > 0);
+    if (!oldestNonOptimistic) return;
+    setIsLoadingOlder(true);
+    try {
+      const res = await fetch(
+        `/api/conversations/${conversationId}?before=${oldestNonOptimistic.id}`,
+        { credentials: "include" }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setHasMore(Boolean(data.hasMore));
+        mergeServerMessages(data.messages || []);
+      }
+    } catch (err) {
+      console.error("Failed to load older messages", err);
+    } finally {
+      setIsLoadingOlder(false);
+    }
+  };
+
   // Lightweight incremental poll — only fetches messages newer than we have.
-  // No-ops until the initial full load has established the baseline id.
+  // Works even when the conversation started empty (after=0) once initial load finishes.
   const fetchNewMessages = async () => {
-    if (lastServerIdRef.current === 0) return;
+    if (!hasInitialLoadedRef.current) return;
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
     try {
       const res = await fetch(
         `/api/conversations/${conversationId}/messages?after=${lastServerIdRef.current}`
@@ -164,6 +198,7 @@ export default function ModernChatPage({
   useEffect(() => {
     lastServerIdRef.current = 0;
     hasInitialScrolledRef.current = false;
+    hasInitialLoadedRef.current = false;
   }, [conversationId]);
 
   useEffect(() => {
@@ -171,12 +206,23 @@ export default function ModernChatPage({
       // Initial full load, incremental poll for new messages, and a slower
       // full refresh for presence dots. With Realtime push connected the
       // polls become slow safety nets instead of the live path.
-      fetchChat();
-      const lightInterval = setInterval(() => fetchNewMessages(), pushConnected ? 15000 : 1000);
-      const refreshInterval = setInterval(() => fetchChat(true, true), pushConnected ? 60000 : 30000);
+      void fetchChat();
+      const lightInterval = setInterval(() => void fetchNewMessages(), pushConnected ? 15000 : 1000);
+      const refreshInterval = setInterval(() => {
+        if (typeof document === "undefined" || document.visibilityState === "visible") {
+          void fetchChat(true, true);
+        }
+      }, pushConnected ? 60000 : 30000);
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === "visible") {
+          void fetchNewMessages();
+        }
+      };
+      document.addEventListener("visibilitychange", handleVisibilityChange);
       return () => {
         clearInterval(lightInterval);
         clearInterval(refreshInterval);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
       };
     }
   }, [user?.id, conversationId, pushConnected]);
@@ -260,62 +306,92 @@ export default function ModernChatPage({
     }
   };
 
-  // Edit Message with Optimistic Rollback
-  const handleEditMessage = async (messageId: number, newContent: string) => {
-    const prevMessages = [...messages];
+  // Edit Message with Targeted Optimistic Rollback
+  const handleEditMessage = useCallback(
+    async (messageId: number, newContent: string) => {
+      let previousContent: string | undefined;
 
-    // Optimistically update
-    setMessages((prev) =>
-      prev.map((m) => (m.id === messageId ? { ...m, content: newContent } : m))
-    );
+      // Optimistically update only the target message
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m.id === messageId) {
+            previousContent = m.content;
+            return { ...m, content: newContent };
+          }
+          return m;
+        })
+      );
 
-    try {
-      const res = await fetch(`/api/conversations/${conversationId}/messages/${messageId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: newContent }),
+      try {
+        const res = await fetch(`/api/conversations/${conversationId}/messages/${messageId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: newContent }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to edit message");
+        }
+
+        const updatedMsg = await res.json();
+        setMessages((prev) => prev.map((m) => (m.id === messageId ? updatedMsg : m)));
+        invalidateClientCache(`/api/conversations/${conversationId}`);
+        invalidateClientCache("/api/conversations");
+      } catch (err: any) {
+        console.error("Edit message error:", err);
+        if (previousContent !== undefined) {
+          const restored = previousContent;
+          setMessages((prev) =>
+            prev.map((m) => (m.id === messageId ? { ...m, content: restored } : m))
+          );
+        }
+        setErrorToast("Unable to edit message. Reverting changes.");
+      }
+    },
+    [conversationId]
+  );
+
+  // Delete Message with Targeted Optimistic Rollback
+  const handleDeleteMessage = useCallback(
+    async (messageId: number) => {
+      let deletedMessage: ChatMessage | undefined;
+
+      // Optimistically remove only the target message
+      setMessages((prev) => {
+        deletedMessage = prev.find((m) => m.id === messageId);
+        return prev.filter((m) => m.id !== messageId);
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to edit message");
+      try {
+        const res = await fetch(`/api/conversations/${conversationId}/messages/${messageId}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to delete message");
+        }
+        invalidateClientCache(`/api/conversations/${conversationId}`);
+        invalidateClientCache("/api/conversations");
+      } catch (err: any) {
+        console.error("Delete message error:", err);
+        if (deletedMessage) {
+          const restored = deletedMessage;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === restored.id)) return prev;
+            const pendingOptimistic = prev.filter((m) => m.isOptimistic);
+            const serverMsgs = [...prev.filter((m) => !m.isOptimistic), restored].sort(
+              (a, b) => a.id - b.id
+            );
+            return [...serverMsgs, ...pendingOptimistic];
+          });
+        }
+        setErrorToast("Unable to delete message. Reverting.");
       }
-
-      const updatedMsg = await res.json();
-      setMessages((prev) => prev.map((m) => (m.id === messageId ? updatedMsg : m)));
-      invalidateClientCache(`/api/conversations/${conversationId}`);
-      invalidateClientCache("/api/conversations");
-    } catch (err: any) {
-      console.error("Edit message error:", err);
-      setMessages(prevMessages); // Rollback
-      setErrorToast("Unable to edit message. Reverting changes.");
-    }
-  };
-
-  // Delete Message with Optimistic Rollback
-  const handleDeleteMessage = async (messageId: number) => {
-    const prevMessages = [...messages];
-
-    // Optimistically remove
-    setMessages((prev) => prev.filter((m) => m.id !== messageId));
-
-    try {
-      const res = await fetch(`/api/conversations/${conversationId}/messages/${messageId}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete message");
-      }
-      invalidateClientCache(`/api/conversations/${conversationId}`);
-      invalidateClientCache("/api/conversations");
-    } catch (err: any) {
-      console.error("Delete message error:", err);
-      setMessages(prevMessages); // Rollback
-      setErrorToast("Unable to delete message. Reverting.");
-    }
-  };
+    },
+    [conversationId]
+  );
 
   // Group Management Actions
   const handleAddMember = async (memberId: number) => {
@@ -508,6 +584,18 @@ export default function ModernChatPage({
           className="flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar p-3 sm:p-5 space-y-0.5"
           style={{ overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" }}
         >
+          {hasMore && !searchQuery && (
+            <div className="flex justify-center py-2">
+              <button
+                type="button"
+                onClick={handleLoadOlderMessages}
+                disabled={isLoadingOlder}
+                className="px-3.5 py-1.5 rounded-full text-[11px] font-bold font-['Rajdhani'] uppercase tracking-wider text-text-secondary hover:text-text-primary bg-bg-abyss/80 hover:bg-bg-abyss border border-border-subtle transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                {isLoadingOlder ? "Loading older messages..." : "Load older messages"}
+              </button>
+            </div>
+          )}
           {filteredMessages.length === 0 ? (
             searchQuery ? (
               <div className="h-full flex items-center justify-center text-center p-8">

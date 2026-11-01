@@ -3,7 +3,7 @@ import { TargetPixelCompanion } from "@/app/components/companion/TargetPixelComp
 import type { SelectedPixelCompanion } from "@/lib/pixel-companion-contract";
 import { OwnCompanionPreview } from "@/app/components/companion/OwnCompanionPreview";
 
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect, react-hooks/purity, react-hooks/refs */
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect, react-hooks/refs */
 
 import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from "react";
 import { useAuth } from "@/app/components/AuthProvider";
@@ -149,7 +149,11 @@ function formatHHMMSS(totalSeconds: number): string {
  * last /api/friends response; elapsed time is computed locally so the clock
  * runs smoothly between server refreshes.
  */
-function FriendStudyTimer({ friend }: { friend: Friend }) {
+function FriendStudyTimer({
+  friend,
+}: {
+  friend: Pick<Friend, "isStudying" | "todaySeconds" | "completedTodaySeconds" | "activeSessionStartedAt">;
+}) {
   const isStudying = friend.isStudying;
   const [now, setNow] = useState(() => Date.now());
 
@@ -227,9 +231,6 @@ function SocialContent() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
-  // Live second ticker for active sessions
-  const [tick, setTick] = useState(0);
-
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState("");
   const [messagesSearchQuery, setMessagesSearchQuery] = useState("");
@@ -284,25 +285,40 @@ function SocialContent() {
 
   // ─── Data Loaders (stale-while-revalidate + storage-backed) ──
   // Repeat visits paint instantly; background refresh keeps data current.
-  const loadFriends = useCallback(async () => {
-    const data = await fetchCachedJSON<Friend[]>("/api/friends",
+  const loadFriends = useCallback(async (forceFresh = false) => {
+    const apply = (data: Friend[] | null) => {
+      if (data) setFriends(Array.isArray(data) ? data : []);
+    };
+    const data = await fetchCachedJSON<Friend[]>(
+      "/api/friends",
       {},
-      { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:friends:${user?.id ?? 0}` });
-    if (data) setFriends(Array.isArray(data) ? data : []);
+      { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:friends:${user?.id ?? 0}`, forceFresh, onUpdate: apply }
+    );
+    apply(data);
   }, [user?.id]);
 
-  const loadRequests = useCallback(async () => {
-    const data = await fetchCachedJSON<FriendRequest[]>("/api/friends/requests",
+  const loadRequests = useCallback(async (forceFresh = false) => {
+    const apply = (data: FriendRequest[] | null) => {
+      if (data) setRequests(Array.isArray(data) ? data : []);
+    };
+    const data = await fetchCachedJSON<FriendRequest[]>(
+      "/api/friends/requests",
       {},
-      { ttlMs: 20_000, staleMs: 120_000, storageKey: `social:requests:${user?.id ?? 0}` });
-    if (data) setRequests(Array.isArray(data) ? data : []);
+      { ttlMs: 20_000, staleMs: 120_000, storageKey: `social:requests:${user?.id ?? 0}`, forceFresh, onUpdate: apply }
+    );
+    apply(data);
   }, [user?.id]);
 
-  const loadConversations = useCallback(async () => {
-    const data = await fetchCachedJSON<Conversation[]>("/api/conversations",
+  const loadConversations = useCallback(async (forceFresh = false) => {
+    const apply = (data: Conversation[] | null) => {
+      if (data) setConversations(Array.isArray(data) ? data : []);
+    };
+    const data = await fetchCachedJSON<Conversation[]>(
+      "/api/conversations",
       {},
-      { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:convos:${user?.id ?? 0}` });
-    if (data) setConversations(Array.isArray(data) ? data : []);
+      { ttlMs: 10_000, staleMs: 120_000, storageKey: `social:convos:${user?.id ?? 0}`, forceFresh, onUpdate: apply }
+    );
+    apply(data);
   }, [user?.id]);
 
   // ─── Supabase Realtime: presence + postgres_changes push ────
@@ -336,24 +352,22 @@ function SocialContent() {
       case "Message":
       case "Conversation":
       case "ConversationParticipant":
-        loadersRef.current.loadConversations();
+        void loadersRef.current.loadConversations(true);
         break;
       case "Friendship":
-        loadersRef.current.loadFriends();
-        loadersRef.current.loadConversations();
+        void loadersRef.current.loadFriends(true);
+        void loadersRef.current.loadConversations(true);
         break;
       case "FriendRequest":
-        loadersRef.current.loadRequests();
+        void loadersRef.current.loadRequests(true);
         break;
       case "StudySession":
-        loadersRef.current.loadFriends();
+        void loadersRef.current.loadFriends(true);
         break;
     }
   });
 
-  // ─── Data Fetching & Polling ─────────────────────────────
-  // With Realtime push connected the intervals become slow safety nets;
-  // without it they carry the live updates as before.
+  // ─── Initial Data Load ───────────────────────────────────
   useEffect(() => {
     if (!user) return;
 
@@ -368,21 +382,29 @@ function SocialContent() {
       }
     };
     initial();
-
-    const realtimeActive = pushConnected || presence.connected;
-    const rosterMs = realtimeActive ? 60_000 : 15_000;
-    const requestsMs = realtimeActive ? 120_000 : 30_000;
-
-    const friendsInterval = setInterval(loadFriends, rosterMs);
-    const requestsInterval = setInterval(loadRequests, requestsMs);
-    const convosInterval = setInterval(loadConversations, rosterMs);
     return () => {
       cancelled = true;
+    };
+  }, [user?.id, loadFriends, loadRequests, loadConversations]);
+
+  // ─── Background Polling ──────────────────────────────────
+  // With Realtime postgres_changes push connected the intervals become slow
+  // safety nets; without it they carry the live updates as before.
+  useEffect(() => {
+    if (!user) return;
+
+    const rosterMs = pushConnected ? 60_000 : 15_000;
+    const requestsMs = pushConnected ? 120_000 : 30_000;
+
+    const friendsInterval = setInterval(() => void loadFriends(), rosterMs);
+    const requestsInterval = setInterval(() => void loadRequests(), requestsMs);
+    const convosInterval = setInterval(() => void loadConversations(), rosterMs);
+    return () => {
       clearInterval(friendsInterval);
       clearInterval(requestsInterval);
       clearInterval(convosInterval);
     };
-  }, [user?.id, pushConnected, presence.connected, loadFriends, loadRequests, loadConversations]);
+  }, [user?.id, pushConnected, loadFriends, loadRequests, loadConversations]);
 
   // ─── Presence overlay for online dots ─────────────────────
   // When the presence channel is live, a friend is online if EITHER the
@@ -406,17 +428,7 @@ function SocialContent() {
     }));
   }, [conversations, presence.enabled, presence.onlineUserIds]);
 
-  // ─── Live Second Clock Ticker ─────────────────────────────
-  // Only ticks while the current user has an active study session —
-  // previously this re-rendered the entire page every second for everyone.
   const isUserStudying = Boolean(user?.activeSessionStartedAt);
-  useEffect(() => {
-    if (!isUserStudying) return;
-    const timer = setInterval(() => {
-      setTick((t) => (t + 1) % 1000000);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [isUserStudying]);
 
   // ─── Action Handlers ─────────────────────────────────────
   const handleRequestAction = async (requestId: number, action: "ACCEPT" | "REJECT") => {
@@ -544,16 +556,6 @@ function SocialContent() {
 
     return list;
   }, [friendsLive, statusFilter, searchQuery, sortBy]);
-
-  // Current user's daily study time (accurate for today + live ticking if studying)
-  const userTodaySeconds = useMemo(() => {
-    if (user?.activeSessionStartedAt) {
-      const started = new Date(user.activeSessionStartedAt).getTime();
-      const activeElapsed = Math.max(0, Math.floor((Date.now() - started) / 1000));
-      return (user.completedTodaySeconds ?? user.todayStudySeconds ?? 0) + activeElapsed;
-    }
-    return user?.todayStudySeconds ?? (user?.completedTodaySeconds ?? 0);
-  }, [user, tick]);
 
   const shouldShowUserCard = useMemo(() => {
     if (!user) return false;
@@ -881,17 +883,14 @@ function SocialContent() {
                       <span className={styles.studyTimerLabel}>
                         Today&apos;s Study Time
                       </span>
-                      <span
-                        className={`${styles.studyTimerClock} ${
-                          isUserStudying
-                            ? styles.studyTimerClockActive
-                            : userTodaySeconds > 0
-                            ? ""
-                            : "opacity-40"
-                        }`}
-                      >
-                        {formatHHMMSS(userTodaySeconds)}
-                      </span>
+                      <FriendStudyTimer
+                        friend={{
+                          isStudying: isUserStudying,
+                          todaySeconds: user?.todayStudySeconds ?? (user?.completedTodaySeconds ?? 0),
+                          completedTodaySeconds: user?.completedTodaySeconds ?? user?.todayStudySeconds ?? 0,
+                          activeSessionStartedAt: user?.activeSessionStartedAt ?? null,
+                        }}
+                      />
                     </div>
 
                     {/* Action Buttons: View Profile & Start Timer */}

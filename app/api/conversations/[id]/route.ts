@@ -84,7 +84,7 @@ export async function GET(
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { id: "desc" },
         take: limit,
       }),
     ]);

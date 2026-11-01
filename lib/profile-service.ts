@@ -143,7 +143,7 @@ export async function getCachedUserData(username: string) {
       async () => fetchTargetUserData(normalized),
       [`user-${normalized}`, `profile-stats-${normalized}`],
       {
-        revalidate: 3600,
+        revalidate: 60,
         tags: [`user-${normalized}`, `profile-stats-${normalized}`],
       }
     );

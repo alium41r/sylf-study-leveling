@@ -22,7 +22,17 @@ let client: SupabaseClient | null = null;
 // In-memory minted-JWT cache (module scope). Survives client-side navigations
 // but NOT page reloads — a reload simply re-mints through the cookie session.
 let cachedJwt: { token: string; expiresAt: number } | null = null;
+let inflightJwt: Promise<string | null> | null = null;
 const JWT_CACHE_MS = 25 * 60 * 1000; // minted tokens live 30min; refresh at 25min
+
+export function clearRealtimeJwt(): void {
+  cachedJwt = null;
+  inflightJwt = null;
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("calendar-session-ended", clearRealtimeJwt);
+}
 
 export function isRealtimeConfigured(): boolean {
   if (
@@ -69,21 +79,28 @@ export async function getRealtimeJwt(): Promise<string | null> {
   if (cachedJwt && cachedJwt.expiresAt > Date.now() && cachedJwt.token) {
     return cachedJwt.token;
   }
+  if (inflightJwt) return inflightJwt;
 
-  try {
-    const res = await fetch("/api/realtime/token", {
-      credentials: "include",
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { enabled?: boolean; token?: string };
-    if (!data?.enabled || !data?.token) return null;
-    cachedJwt = { token: data.token, expiresAt: Date.now() + JWT_CACHE_MS };
-    return data.token;
-  } catch (err) {
-    console.warn("[realtime] failed to fetch minted JWT — staying on polling:", err);
-    return null;
-  }
+  inflightJwt = (async () => {
+    try {
+      const res = await fetch("/api/realtime/token", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      if (!res.ok) return null;
+      const data = (await res.json()) as { enabled?: boolean; token?: string };
+      if (!data?.enabled || !data?.token) return null;
+      cachedJwt = { token: data.token, expiresAt: Date.now() + JWT_CACHE_MS };
+      return data.token;
+    } catch (err) {
+      console.warn("[realtime] failed to fetch minted JWT — staying on polling:", err);
+      return null;
+    } finally {
+      inflightJwt = null;
+    }
+  })();
+
+  return inflightJwt;
 }
 
 /** Attach the minted JWT to the client so Realtime authenticates as the user. */

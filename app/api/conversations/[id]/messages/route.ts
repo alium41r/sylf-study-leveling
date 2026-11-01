@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { messageRefusal, MESSAGES_PER_MINUTE } from "@/lib/message-limits";
 import { rateLimit } from "@/lib/rate-limit";
-import { areUsersBlocked } from "@/lib/block-service";
+import { areAnyUsersBlocked } from "@/lib/block-service";
 
 const SENDER_SELECT = {
   id: true,
@@ -100,17 +100,22 @@ export async function POST(
 
     // S3 block enforcement: a blocked participant (either direction) cannot
     // send into a shared conversation — even if a stale membership row exists.
+    // Batched into a single query instead of an N+1 loop across group members.
     const otherParticipants = await prisma.conversationParticipant.findMany({
       where: { conversationId, userId: { not: userId } },
       select: { userId: true },
     });
-    for (const p of otherParticipants) {
-      if (await areUsersBlocked(userId, p.userId)) {
-        return NextResponse.json(
-          { error: "You cannot message this conversation." },
-          { status: 403 }
-        );
-      }
+    if (
+      otherParticipants.length > 0 &&
+      (await areAnyUsersBlocked(
+        userId,
+        otherParticipants.map((p) => p.userId)
+      ))
+    ) {
+      return NextResponse.json(
+        { error: "You cannot message this conversation." },
+        { status: 403 }
+      );
     }
 
     const [message] = await prisma.$transaction([

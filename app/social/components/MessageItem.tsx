@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, memo, lazy, Suspense } from "react";
 import { Edit2, Trash2, Check, X, Clock, Shield } from "lucide-react";
-import MarkdownRenderer from "@/app/components/MarkdownRenderer";
+
+const MarkdownRenderer = lazy(() => import("@/app/components/MarkdownRenderer"));
 
 export interface MessageSender {
   id: number;
@@ -56,7 +57,7 @@ const getRankColorStyles = (rank: string) => {
   }
 };
 
-export function MessageItem({
+export const MessageItem = memo(function MessageItem({
   message,
   isMe,
   showHeader,
@@ -219,12 +220,14 @@ export function MessageItem({
                   : "bg-bg-panel/90 text-text-primary rounded-bl-md border border-border-subtle shadow-md backdrop-blur-md hover:border-accent-primary/40"
               }`}
             >
-              <MarkdownRenderer
-                content={message.content}
-                className={`[&_*]:[overflow-wrap:anywhere] ${
-                  isMe ? "[&_*]:text-white prose-p:my-0.5" : "prose-p:my-0.5 text-text-primary"
-                }`}
-              />
+              <Suspense fallback={<span>{message.content}</span>}>
+                <MarkdownRenderer
+                  content={message.content}
+                  className={`[&_*]:[overflow-wrap:anywhere] ${
+                    isMe ? "[&_*]:text-white prose-p:my-0.5" : "prose-p:my-0.5 text-text-primary"
+                  }`}
+                />
+              </Suspense>
 
               {/* Single Precise Timestamp & Delivery State inside bubble */}
               <div
@@ -331,4 +334,4 @@ export function MessageItem({
       </div>
     </div>
   );
-}
+});

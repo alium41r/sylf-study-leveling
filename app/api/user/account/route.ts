@@ -7,6 +7,10 @@ import { attachReissuedSession } from "@/lib/auth-session-service";
 import { formatScholarId } from "@/lib/scholar-id";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { TimezoneService } from "@/lib/timezone-service";
+import bcrypt from "bcryptjs";
+import { sendEmailChangedNotice } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limit";
+import { checkSecurityCode } from "@/lib/security-code";
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -18,6 +22,8 @@ export async function PATCH(req: NextRequest) {
     const userId = session.userId;
     const body = await req.json();
     let { username, name, email, timezone } = body;
+    const { currentPassword, code } = body;
+    let usedEmailCode: number | null = null;
 
     // Sanitize inputs
     username = username?.trim().toLowerCase();
@@ -92,6 +98,18 @@ export async function PATCH(req: NextRequest) {
       if (existingEmail) {
         return NextResponse.json({ error: "This email address is already registered." }, { status: 409 });
       }
+      // A session alone is not enough, because the address is where security codes and resets go. A password if there is one, otherwise a code
+      // sent to the address being replaced.
+      const attempts = await rateLimit(`email-change:${userId}`, { limit: 5, windowMs: 10 * 60_000 });
+      if (!attempts.allowed) return NextResponse.json({ error: "Too many attempts. Try again in a few minutes." }, { status: 429, headers: { "Retry-After": String(attempts.retryAfterSeconds) } });
+      if (currentUser.password) {
+        if (typeof currentPassword !== "string" || !currentPassword) return NextResponse.json({ error: "Enter your password to change your email.", code: "password_required" }, { status: 403 });
+        if (!(await bcrypt.compare(currentPassword, currentUser.password))) return NextResponse.json({ error: "That password isn't right.", code: "password_incorrect" }, { status: 401 });
+      } else {
+        const check = typeof code === "string" && code.trim().length === 6 ? await checkSecurityCode(userId, "CHANGE_EMAIL", code.trim()) : { valid: false as const };
+        if (!check.valid) return NextResponse.json({ error: "Enter the code sent to your current email.", code: "code_required" }, { status: 403 });
+        usedEmailCode = check.tokenId;
+      }
       updates.email = email;
       // Requirement 3: Reset verificationStatus to UNVERIFIED if email changes
       updates.verificationStatus = "UNVERIFIED";
@@ -115,6 +133,11 @@ export async function PATCH(req: NextRequest) {
       where: { id: userId },
       data: updates,
     }));
+
+    if (updates.email) {
+      if (usedEmailCode !== null) await prisma.verificationToken.deleteMany({ where: { id: usedEmailCode } });
+      await sendEmailChangedNotice({ to: currentUser.email, name: currentUser.name, newEmail: updatedUser.email }).catch(() => undefined);
+    }
 
     const scholarId = updatedUser.scholarId || formatScholarId(updatedUser.id);
 

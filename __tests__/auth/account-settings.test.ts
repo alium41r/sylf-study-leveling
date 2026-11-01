@@ -5,10 +5,12 @@ import { POST as sendVerification } from "@/app/api/auth/verify-email/send/route
 import { POST as confirmVerification } from "@/app/api/auth/verify-email/confirm/route";
 import { GET as getConnections } from "@/app/api/user/connections/route";
 import { DELETE as deleteConnection } from "@/app/api/user/connections/[provider]/route";
+import bcrypt from "bcryptjs";
 import { signToken, verifyToken } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
+vi.mock("@/lib/email", async (original) => ({ ...(await original<typeof import("@/lib/email")>()), sendEmailChangedNotice: async () => ({ sent: true, provider: "test" }) }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
@@ -152,7 +154,8 @@ describe("Phase 3: Account Settings Data Binding & Profile Management", () => {
       });
 
       (prisma.user.findUnique as any)
-        .mockResolvedValueOnce({ id: 1, email: "old_email@system.dev", username: "scholar_1", verificationStatus: "VERIFIED" }) // current
+        .mockResolvedValueOnce({ id: 1, password: bcrypt.hashSync("right-password", 4),
+        email: "old_email@system.dev", username: "scholar_1", verificationStatus: "VERIFIED" }) // current
         .mockResolvedValueOnce(null); // email duplicate check free
 
       (prisma.user.update as any).mockResolvedValueOnce({
@@ -182,6 +185,7 @@ describe("Phase 3: Account Settings Data Binding & Profile Management", () => {
         },
         body: JSON.stringify({
           email: "new_email@system.dev",
+          currentPassword: "right-password",
         }),
       });
 

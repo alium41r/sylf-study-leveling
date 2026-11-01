@@ -1,0 +1,148 @@
+{
+ "label": "repairs-before-fix",
+ "passed": 7,
+ "failed": 17,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-11-01T14:51:07.739Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "cosmetics are checked against what a person may use refuses a frame nobody owns, on either route, and leaves the old value",
+   "status": "failed",
+   "failure": "AssertionError: expected 200 to be 403 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:52:27     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "cosmetics are checked against what a person may use refuses a title that is free text, which could read as a staff role",
+   "status": "failed",
+   "failure": "AssertionError: expected 200 to be 403 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:61:29     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "cosmetics are checked against what a person may use allows what is owned, what is unlocked and what is free",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "cosmetics are checked against what a person may use keeps a level gate",
+   "status": "failed",
+   "failure": "AssertionError: expected 200 to be 403 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:78:168     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "cosmetics are checked against what a person may use lets a person save what they already wear, so nobody loses a value from before this check",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "cosmetics are checked against what a person may use leaves appearance alone, because web stores a person's own colors there",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "social writes have limits refuses an oversized message and an oversized edit",
+   "status": "failed",
+   "failure": "AssertionError: expected 201 to be 400 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:99:24     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "social writes have limits slows a burst of messages from one account",
+   "status": "failed",
+   "failure": "AssertionError: expected 201 to be 429 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:112:29     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "social writes have limits slows a burst of friend requests",
+   "status": "failed",
+   "failure": "AssertionError: expected 404 to be 429 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:118:29     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "stored image addresses refuses a script address and a plain http address",
+   "status": "failed",
+   "failure": "AssertionError: expected 200 to be 400 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:125:149     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "stored image addresses keeps what web's editor produces: https, an uploaded image, and clearing it",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "stored image addresses refuses a hostile group image, at creation and later",
+   "status": "failed",
+   "failure": "AssertionError: expected 201 to be 400 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:139:205     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "changing an email needs proof, and tells the old address refuses a change with no password, and with a wrong one",
+   "status": "failed",
+   "failure": "AssertionError: expected 200 to be 403 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:151:126     at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "changing an email needs proof, and tells the old address changes it with the password, and notifies the old address",
+   "status": "failed",
+   "failure": "AssertionError: expected [] to deeply equal [ 'u560029f929@local.test' ]     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:163:53     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "changing an email needs proof, and tells the old address asks an account with no password for a code sent to the current address",
+   "status": "failed",
+   "failure": "AssertionError: expected 200 to be 403 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:168:123     at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "changing an email needs proof, and tells the old address asks for nothing when the email did not change",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native deducts for a missed day when the penalty is on, as web has always done",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native honors the setting: a person who turned it off loses nothing",
+   "status": "failed",
+   "failure": "AssertionError: expected 55 to be 100 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:199:36     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native a heartbeat from a native session never reconciles, even on an account with the penalty on",
+   "status": "failed",
+   "failure": "AssertionError: expected 55 to be 100 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:206:36     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native a month read from a native session never reconciles",
+   "status": "failed",
+   "failure": "AssertionError: expected 55 to be 100 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:213:36     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native web's own heartbeat still reconciles",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native an account created on Native starts with the penalty off",
+   "status": "failed",
+   "failure": "AssertionError: expected true to be false // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:226:134     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native the overdue-quest job still fails the quest, and takes no HP with the penalty off",
+   "status": "failed",
+   "failure": "AssertionError: expected 80 to be 100 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:234:35     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/expansion-repairs.postgres.ts",
+   "name": "HP penalties and Native ticking a late quest takes no HP with the penalty off",
+   "status": "failed",
+   "failure": "AssertionError: expected 80 to be 100 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/expansion-repairs.postgres.ts:244:36     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  }
+ ]
+}

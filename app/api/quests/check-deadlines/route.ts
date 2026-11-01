@@ -20,12 +20,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find all quests that are still PENDING, ACTIVE, or IN_PROGRESS
+    // Quests that are still open and dated before the latest calendar day anywhere on Earth, which is the most any timezone can be ahead by.
+    // Only what the filter needs is read here, in a bounded batch. The next run takes up whatever this one leaves.
+    const latestDate = new Date(Date.now() + 14 * 60 * 60 * 1000).toISOString().slice(0, 10);
     const pendingQuests = await prisma.quest.findMany({
       where: {
         status: { in: ["PENDING", "ACTIVE", "IN_PROGRESS"] },
+        scheduledFor: { not: "", lt: latestDate },
       },
-      include: { user: true }
+      orderBy: { scheduledFor: "asc" },
+      take: 2000,
+      select: { id: true, userId: true, scheduledFor: true, user: { select: { timezone: true } } },
     });
 
     // Filter quests that are overdue in the user's specific local timezone
@@ -55,7 +60,7 @@ export async function GET(req: NextRequest) {
         const user = quest.user;
         let penalty: number = DIFFICULTY_CONFIG[quest.difficulty].hpPenalty;
         if (quest.isGateKeyApplied) penalty *= 3;
-        if (quest.isKamishWardActive) penalty = 0;
+        if (quest.isKamishWardActive || user.enableHpPenalty === false) penalty = 0;
         const newHp = Math.max(0, user.hp - penalty);
         await tx.quest.update({ where: { id: quest.id }, data: { status: "FAILED",
           ...(quest.plannedMinutes !== null ? { executionVersion: { increment: 1 } } : {}) } });

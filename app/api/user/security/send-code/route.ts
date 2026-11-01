@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (action !== "RESET_PROGRESS" && action !== "DELETE_ACCOUNT") {
+    if (action !== "RESET_PROGRESS" && action !== "DELETE_ACCOUNT" && action !== "CHANGE_EMAIL") {
       return NextResponse.json(
-        { error: "Invalid action. Supported: RESET_PROGRESS, DELETE_ACCOUNT" },
+        { error: "Invalid action. Supported: RESET_PROGRESS, DELETE_ACCOUNT, CHANGE_EMAIL" },
         { status: 400 }
       );
     }

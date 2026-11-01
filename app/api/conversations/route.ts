@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { isClearOrSafeImageAddress } from "@/lib/image-address";
+import { rateLimit } from "@/lib/rate-limit";
 import { areUsersBlocked, mayAddToConversation } from "@/lib/block-service";
 
 /**
@@ -133,6 +135,10 @@ export async function POST(req: NextRequest) {
     const userId = session.userId;
     const body = await req.json();
     const { participantIds, name, isGroup, avatarUrl } = body;
+
+    if (!isClearOrSafeImageAddress(avatarUrl)) return NextResponse.json({ error: "Use an https image address." }, { status: 400 });
+    const limit = await rateLimit(`conversations:${userId}`, { limit: 10, windowMs: 60_000 });
+    if (!limit.allowed) return NextResponse.json({ error: "Too many new conversations. Wait a moment." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
 
     if (!participantIds || !Array.isArray(participantIds) || participantIds.length === 0) {
       return NextResponse.json({ error: "At least one participant is required" }, { status: 400 });

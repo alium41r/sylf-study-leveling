@@ -147,7 +147,7 @@ export interface SendSecurityOtpParams {
   to: string;
   name?: string | null;
   code: string;
-  action: "RESET_PROGRESS" | "DELETE_ACCOUNT";
+  action: "RESET_PROGRESS" | "DELETE_ACCOUNT" | "CHANGE_EMAIL";
 }
 
 export async function sendSecurityOtpEmail({
@@ -158,12 +158,17 @@ export async function sendSecurityOtpEmail({
 }: SendSecurityOtpParams): Promise<{ sent: boolean; provider: string; error?: string }> {
   const recipientName = name || "Scholar";
   const isDelete = action === "DELETE_ACCOUNT";
-  const actionTitle = isDelete ? "Permanent Account Deletion" : "Reset Hunter Progress";
-  const actionDesc = isDelete
+  const isEmailChange = action === "CHANGE_EMAIL";
+  const actionTitle = isEmailChange ? "Change Your Email Address" : isDelete ? "Permanent Account Deletion" : "Reset Hunter Progress";
+  const actionDesc = isEmailChange
+    ? "A request has been made to change the email address on your Sylf account. Only use this code if it was you."
+    : isDelete
     ? "A request has been initialized to PERMANENTLY ERASE your Scholar account and all associated study logs, quests, and rankings."
     : "A request has been initialized to reset your Hunter level, rank, and study progression back to Level 1.";
 
-  const subject = isDelete
+  const subject = isEmailChange
+    ? "Email Change Security Code - Sylf"
+    : isDelete
     ? "Account Deletion Security Code - Sylf"
     : "Reset Progress Security Code - Sylf";
 
@@ -377,4 +382,40 @@ export async function sendWaitlistWelcomeEmail(
   } catch (error: unknown) {
     return { sent: false, provider, error: error instanceof Error ? error.message : "Email dispatch failed." };
   }
+}
+
+/** Sends one plain security message through whichever provider is configured. With neither, it says so in the server log and keeps the link or address out of it. */
+async function sendSecurityNotice({ to, subject, text }: { to: string; subject: string; text: string }): Promise<{ sent: boolean; provider: string; error?: string }> {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
+  const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
+  const fromEmail = process.env.EMAIL_FROM || (smtpUser ? `"Sylf Security" <${smtpUser}>` : "Sylf Security <onboarding@resend.dev>");
+  const html = text.split("\n\n").map((part) => `<p>${part.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`).join("");
+  try {
+    if (smtpUser && smtpPass) {
+      const smtpPort = Number(process.env.SMTP_PORT) || 465;
+      const transporter = nodemailer.createTransport({ host: process.env.SMTP_HOST || "smtp.gmail.com", port: smtpPort, secure: smtpPort === 465, auth: { user: smtpUser, pass: smtpPass } });
+      await transporter.sendMail({ from: fromEmail, to, subject, text, html });
+      return { sent: true, provider: "smtp" };
+    }
+    if (resendApiKey) {
+      const response = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${resendApiKey}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: fromEmail, to: [to], subject, html }) });
+      return response.ok ? { sent: true, provider: "resend" } : { sent: false, provider: "resend", error: "Provider refused the message." };
+    }
+  } catch (error) {
+    return { sent: false, provider: "smtp", error: error instanceof Error ? error.message : "Send failed." };
+  }
+  console.log(`[EMAIL DISPATCH - SYLF] No provider is configured, so "${subject}" was not sent.`);
+  return { sent: false, provider: "console_dev" };
+}
+
+const maskEmail = (email: string) => { const [name, domain] = email.split("@"); return `${name.slice(0, 1)}***@${domain}`; };
+
+/** Goes to the old address, after a change, so a stolen session cannot move an account quietly. */
+export async function sendEmailChangedNotice({ to, name, newEmail }: { to: string; name?: string | null; newEmail: string }) {
+  return sendSecurityNotice({ to, subject: "Your Sylf email address was changed", text: `Hello ${name || "Scholar"},\n\nThe email address on your Sylf account was changed to ${maskEmail(newEmail)}.\n\nIf this was you, there is nothing to do. If it wasn't, sign in and change your password now, then contact support.` });
+}
+
+export async function sendPasswordResetEmail({ to, name, url }: { to: string; name?: string | null; url: string }) {
+  return sendSecurityNotice({ to, subject: "Reset your Sylf password", text: `Hello ${name || "Scholar"},\n\nUse this link to choose a new password. It works once, for 30 minutes:\n\n${url}\n\nIf you didn't ask for this, you can ignore this message. Your password has not changed.` });
 }

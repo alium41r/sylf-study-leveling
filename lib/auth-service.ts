@@ -18,6 +18,8 @@ export interface RegisterParams {
   provider?: string;
   providerAccountId?: string;
   timezone?: string;
+  /** False for an account made on Sylf Native, which has no HP. Everywhere else takes the schema's default. */
+  enableHpPenalty?: boolean;
   /** Whether the OAuth provider vouched for the address. Password sign-ups prove it by link instead. */
   emailVerified?: boolean;
   /** The request that is signing in, so the first token is tied to a device session. */
@@ -57,7 +59,7 @@ export async function generateUniqueUsername(baseUsername: string): Promise<stri
  * Initializes a new user profile with Solo Leveling baseline RPG metrics.
  */
 export async function initializeUserProfile(params: RegisterParams) {
-  const { email, name, password, avatarUrl, isOAuth, provider, providerAccountId, timezone } = params;
+  const { email, name, password, avatarUrl, isOAuth, provider, providerAccountId, timezone, enableHpPenalty } = params;
 
   // 0. Validate & sanitize timezone
   const safeTimezone = timezone && TimezoneService.validateTimezone(timezone) ? timezone : "UTC";
@@ -132,6 +134,7 @@ export async function initializeUserProfile(params: RegisterParams) {
         activeTitle: "Novice",
         activeNameColor: "default",
         timezone: safeTimezone,
+        ...(enableHpPenalty === undefined ? {} : { enableHpPenalty }),
         hasCompletedOnboarding: false,
         privacy: {
           create: {},
@@ -241,7 +244,7 @@ export async function linkOAuthAccountToUser(userId: number, oauthUser: Normaliz
  * 2. If User with email exists -> Link ConnectedAccount & Login.
  * 3. Otherwise -> Initialize new user profile & Login.
  */
-export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser, request?: Request) {
+export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser, request?: Request, created: { enableHpPenalty?: boolean } = {}) {
   const providerUpper = oauthUser.provider.toUpperCase();
 
   // 1. Check existing connected account
@@ -372,6 +375,7 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
     provider: providerUpper,
     providerAccountId: oauthUser.providerAccountId,
     providerUsername: oauthUser.providerUsername || null,
+    ...created,
     // With no address from the provider, the placeholder below has nothing to prove.
     emailVerified: oauthUser.email ? oauthUser.emailVerified : true,
     request,

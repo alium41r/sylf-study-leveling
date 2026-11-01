@@ -58,6 +58,8 @@ function minimalEnvironment() {
   return Object.fromEntries(BASE_ENV.filter(key => process.env[key] !== undefined).map(key => [key, process.env[key]]));
 }
 
+const REPLACES_RETRIED_FUNCTIONS = ["20261101120000_quest_penalty_honors_setting"];
+
 function migrationDirectories() {
   const directory = join(root, "prisma/migrations");
   return readdirSync(directory, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => entry.name).sort()
@@ -137,6 +139,8 @@ export async function buildSchemaFromMigrations(url, { log = () => {} } = {}) {
       Object.assign(result, { recovered: true, statementsApplied: applied, alreadyPresent: already, remaining });
     }
     const secondRepair = await repairDrift(url, client, temporary);
+    // Those retries run out of order here and never on a real database, so a later replacement of the same function runs again to stay the last word.
+    for (const name of REPLACES_RETRIED_FUNCTIONS) await client.query(readFileSync(join(root, "prisma/migrations", name, "migration.sql"), "utf8"));
     return { migrations: results, gaps: { tables: gaps.tableNames, types: gaps.typeNames }, repair, secondRepair };
   } finally {
     await client.end().catch(() => {});

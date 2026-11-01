@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { rateLimit } from "@/lib/rate-limit";
 import { selectedCompanionsForUsers } from "@/lib/pixel-companion-service";
 import { areUsersBlocked } from "@/lib/block-service";
 
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
     const userId = session.userId;
     const body = await req.json();
     const { username, receiverId } = body;
+
+    const limit = await rateLimit(`friend-requests:${userId}`, { limit: 20, windowMs: 60_000 });
+    if (!limit.allowed) return NextResponse.json({ error: "Too many requests. Wait a moment." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
 
     if (!username && !receiverId) {
       return NextResponse.json({ error: "Username is required" }, { status: 400 });

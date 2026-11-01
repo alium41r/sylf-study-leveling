@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { normalizeAppBackgroundId } from "@/lib/cosmetics-catalog";
+import { assertMayWear, CosmeticNotAllowedError, WEARER_SELECT, type WornField } from "@/lib/cosmetic-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { category, itemKey } = body;
     
-    if (!category || !itemKey) {
+    if (!category || typeof itemKey !== "string" || !itemKey || itemKey.length > 120) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -76,6 +77,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
 
+    const worn = Object.keys(updateData).find((field) => field !== "activeTheme" && field !== "activeBackground") as WornField | undefined;
+    if (worn) {
+      const wearer = await prisma.user.findUnique({ where: { id: session.userId }, select: WEARER_SELECT });
+      if (!wearer) return NextResponse.json({ error: "User not found" }, { status: 404 });
+      await assertMayWear(prisma, wearer, worn, itemKey);
+    }
+
     const user = await prisma.user.update({
       where: { id: session.userId },
       data: updateData,
@@ -84,6 +92,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, user: safeUser }, { status: 200 });
   } catch (error) {
+    if (error instanceof CosmeticNotAllowedError) return NextResponse.json({ error: error.message, code: error.code }, { status: 403 });
     console.error("POST /api/cosmetics error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

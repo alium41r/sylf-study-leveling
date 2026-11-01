@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { isNativeSession } from "@/lib/auth";
 
 // ────────────────────────────────────────────────────────────────
 // Process-level throttle for the lazy daily HP penalty evaluation.
@@ -44,8 +45,8 @@ export async function POST(req: NextRequest) {
       data: { lastSeenAt: new Date() },
     });
 
-    // Lazily evaluate day transition penalty (throttled per process)
-    if (shouldRunPenalty(payload.userId as number)) {
+    // Lazily evaluate day transition penalty (throttled per process). Sylf Native has no HP, so its presence never charges anyone.
+    if (!isNativeSession(payload) && shouldRunPenalty(payload.userId as number)) {
       try {
         const { HpPenaltyService } = await import("@/lib/hp-penalty-service");
         await HpPenaltyService.reconcileDailyHpPenalty(payload.userId as number);

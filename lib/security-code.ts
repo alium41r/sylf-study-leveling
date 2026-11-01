@@ -11,7 +11,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 
-export type SecurityAction = "RESET_PROGRESS" | "DELETE_ACCOUNT";
+export type SecurityAction = "RESET_PROGRESS" | "DELETE_ACCOUNT" | "CHANGE_EMAIL";
 
 const CODE_LIFETIME_MS = 10 * 60 * 1000;
 const WRONG_ATTEMPTS = 5;

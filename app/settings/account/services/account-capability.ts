@@ -32,6 +32,8 @@ export interface AccountCapability {
     name?: string;
     email?: string;
     timezone?: string;
+    currentPassword?: string;
+    code?: string;
   }) => Promise<AccountActionResult>;
 
   sendEmailVerification: () => Promise<AccountActionResult>;
@@ -42,7 +44,7 @@ export interface AccountCapability {
     confirmPassword: string;
   }) => Promise<AccountActionResult>;
 
-  sendSecurityCode: (action: "RESET_PROGRESS" | "DELETE_ACCOUNT") => Promise<AccountActionResult>;
+  sendSecurityCode: (action: "RESET_PROGRESS" | "DELETE_ACCOUNT" | "CHANGE_EMAIL") => Promise<AccountActionResult>;
 
   resetProgress: (payload: { code?: string; password?: string }) => Promise<AccountActionResult>;
 
@@ -66,6 +68,8 @@ class WebProductionAccountCapability implements AccountCapability {
     name?: string;
     email?: string;
     timezone?: string;
+    currentPassword?: string;
+    code?: string;
   }): Promise<AccountActionResult> {
     try {
       const res = await fetch("/api/user/account", {
@@ -108,7 +112,7 @@ class WebProductionAccountCapability implements AccountCapability {
     }
   }
 
-  async sendSecurityCode(action: "RESET_PROGRESS" | "DELETE_ACCOUNT"): Promise<AccountActionResult> {
+  async sendSecurityCode(action: "RESET_PROGRESS" | "DELETE_ACCOUNT" | "CHANGE_EMAIL"): Promise<AccountActionResult> {
     try {
       const res = await fetch("/api/user/security/send-code", {
         method: "POST",

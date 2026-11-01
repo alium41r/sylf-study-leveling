@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { isClearOrSafeImageAddress } from "@/lib/image-address";
 import { mayAddToConversation } from "@/lib/block-service";
 
 /**
@@ -212,6 +213,7 @@ export async function PATCH(
     if (body.name !== undefined) {
       updateData.name = body.name ? body.name.trim() : null;
     }
+    if (!isClearOrSafeImageAddress(body.avatarUrl)) return NextResponse.json({ error: "Use an https image address." }, { status: 400 });
     if (body.avatarUrl !== undefined) {
       updateData.avatarUrl = body.avatarUrl ? (typeof body.avatarUrl === "string" ? body.avatarUrl.trim() : body.avatarUrl) : null;
     }

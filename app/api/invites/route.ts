@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { rateLimit } from "@/lib/rate-limit";
 
 /**
  * GET /api/invites
@@ -60,6 +61,9 @@ export async function POST(req: NextRequest) {
 
     const userId = payload.userId as number;
     const { receiverId, subjectId } = await req.json();
+
+    const limit = await rateLimit(`session-invites:${userId}`, { limit: 20, windowMs: 60_000 });
+    if (!limit.allowed) return NextResponse.json({ error: "Too many invitations. Wait a moment." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
 
     if (!receiverId) {
       return NextResponse.json({ error: "receiverId is required" }, { status: 400 });

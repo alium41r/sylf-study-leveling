@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { messageRefusal, MESSAGES_PER_MINUTE } from "@/lib/message-limits";
+import { rateLimit } from "@/lib/rate-limit";
 import { areUsersBlocked } from "@/lib/block-service";
 
 const SENDER_SELECT = {
@@ -80,8 +82,12 @@ export async function POST(
     const userId = session.userId;
     const body = await req.json();
 
-    if (!body.content || !body.content.trim()) {
-      return NextResponse.json({ error: "Message content is required" }, { status: 400 });
+    const refusal = messageRefusal(body.content);
+    if (refusal) return NextResponse.json({ error: refusal }, { status: 400 });
+
+    const limit = await rateLimit(`messages:${userId}`, { limit: MESSAGES_PER_MINUTE, windowMs: 60_000 });
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "You're sending messages quickly. Wait a moment." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
     }
 
     // Verify user is a participant

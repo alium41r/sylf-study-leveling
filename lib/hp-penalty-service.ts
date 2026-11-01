@@ -137,6 +137,12 @@ export class HpPenaltyService {
       };
     }
 
+    // The person's own setting. Days pass without being judged, so turning it back on starts from today and charges nothing for the gap.
+    if (user.enableHpPenalty === false) {
+      await tx.user.update({ where: { id: userId }, data: { lastDailyPenaltyEvaluatedDate: yesterdayStr } });
+      return { penaltiesApplied: 0, totalHpDeducted: 0, newHp: user.hp, evaluatedDays: [], restExemptDays: [] };
+    }
+
     // Determine start evaluation date
     let evalStartDateStr: string;
     if (user.lastDailyPenaltyEvaluatedDate) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
+import { isNativeSession } from "@/lib/auth";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
 import { HpPenaltyService } from "@/lib/hp-penalty-service";
 
@@ -35,11 +36,13 @@ export async function GET(req: NextRequest) {
       month = now.getMonth();
     }
 
-    // 1. Trigger lazy HP penalty reconciliation
-    try {
-      await HpPenaltyService.reconcileDailyHpPenalty(userId);
-    } catch (penaltyError) {
-      console.warn("Lazy HP penalty reconciliation blip in calendar API:", penaltyError);
+    // 1. Trigger lazy HP penalty reconciliation. Sylf Native has no HP, so reading its calendar never charges anyone.
+    if (!isNativeSession(payload)) {
+      try {
+        await HpPenaltyService.reconcileDailyHpPenalty(userId);
+      } catch (penaltyError) {
+        console.warn("Lazy HP penalty reconciliation blip in calendar API:", penaltyError);
+      }
     }
 
     // 2. Fetch enriched calendar month data

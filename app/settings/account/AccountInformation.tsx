@@ -19,6 +19,9 @@ export default function AccountInformation() {
 
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // Changing the address needs proof: the password, or for an account with none, a code sent to the current address.
+  const [emailProof, setEmailProof] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
   const [status, setStatus] = useState<{
     type: "success" | "error" | null;
     message: string | null;
@@ -195,6 +198,12 @@ export default function AccountInformation() {
       return;
     }
 
+    const emailChanged = formData.email !== (user?.email || "");
+    if (emailChanged && !emailProof) {
+      setStatus({ type: "error", message: user?.hasPassword === false ? "Enter the code sent to your current email." : "Enter your password to change your email." });
+      return;
+    }
+
     setIsSaving(true);
     setStatus({ type: null, message: null });
 
@@ -213,9 +222,12 @@ export default function AccountInformation() {
         name: formData.name,
         email: formData.email,
         timezone: formData.timezone,
+        ...(emailChanged ? (user?.hasPassword === false ? { code: emailProof.trim() } : { currentPassword: emailProof }) : {}),
       });
 
       if (result.ok) {
+        setEmailProof("");
+        setCodeSent(false);
         if (result.data?.user) {
           login(result.data.user);
         }
@@ -346,6 +358,35 @@ export default function AccountInformation() {
           <p className={styles.configHelper}>
             Changing your email address will reset your status to Unverified and require re-verification.
           </p>
+          {formData.email !== (user?.email || "") ? (
+            <div className="mt-3">
+              <label className={styles.configLabel}>
+                {user?.hasPassword === false ? "Code sent to your current email" : "Your password"}
+              </label>
+              <input
+                type={user?.hasPassword === false ? "text" : "password"}
+                autoComplete={user?.hasPassword === false ? "one-time-code" : "current-password"}
+                value={emailProof}
+                onChange={(event) => setEmailProof(event.target.value)}
+                className={styles.configInput}
+                disabled={isSaving}
+              />
+              {user?.hasPassword === false ? (
+                <button
+                  type="button"
+                  className={styles.configHelper}
+                  disabled={isSaving || codeSent}
+                  onClick={async () => {
+                    const result = await getAccountCapability().sendSecurityCode("CHANGE_EMAIL");
+                    setCodeSent(result.ok);
+                    setStatus({ type: result.ok ? "success" : "error", message: result.message || result.error || null });
+                  }}
+                >
+                  {codeSent ? "Code sent" : "Send a code"}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
 

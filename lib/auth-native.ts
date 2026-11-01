@@ -89,7 +89,8 @@ export async function completeNativeOAuth(flow: NativeOAuthFlow, origin: string,
   if (providerError || !code) return back({ error: "cancelled" });
   try {
     const profile = await exchangeOAuthCode(flow.provider, code, `${origin}/api/auth/callback/${flow.provider}`);
-    const { user } = await handleOAuthSignInOrRegister(profile);
+    // An account first made here has no HP, as with registration.
+    const { user } = await handleOAuthSignInOrRegister(profile, undefined, { enableHpPenalty: false });
     return back({ code: await issueNativeOAuthCode(user.id, flow.challenge) });
   } catch (error) {
     console.error("[auth-native] OAuth sign-in failed:", error instanceof Error ? error.message : "unknown");

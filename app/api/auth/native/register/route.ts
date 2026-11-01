@@ -15,7 +15,8 @@ export async function POST(req: NextRequest) {
     const parsed = nativeRegisterRequestSchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) return nativeError(400, "invalid_request", parsed.error.issues[0]?.message ?? "Invalid data");
     const { clientName, ...profile } = parsed.data;
-    const { user } = await initializeUserProfile({ ...profile, isOAuth: false });
+    // Sylf Native has no HP, so an account made here starts with the penalty off. It stays the person's own setting.
+    const { user } = await initializeUserProfile({ ...profile, isOAuth: false, enableHpPenalty: false });
     const session = await openNativeSession(user, req, clientName);
     return nativeJson({ session, user: nativeUser(user) }, 201);
   } catch (error) {

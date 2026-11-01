@@ -11,6 +11,8 @@ export class MockAccountCapability implements AccountCapability {
     name?: string;
     email?: string;
     timezone?: string;
+    currentPassword?: string;
+    code?: string;
   }): Promise<AccountActionResult> {
     const studentUser = MOCK_STUDENT_USER as unknown as Record<string, unknown>;
     if (payload.username) studentUser.username = payload.username;
@@ -45,7 +47,7 @@ export class MockAccountCapability implements AccountCapability {
     };
   }
 
-  async sendSecurityCode(_action: "RESET_PROGRESS" | "DELETE_ACCOUNT"): Promise<AccountActionResult> {
+  async sendSecurityCode(_action: "RESET_PROGRESS" | "DELETE_ACCOUNT" | "CHANGE_EMAIL"): Promise<AccountActionResult> {
     return {
       ok: true,
       message: "Verification code sent to your email (Mock: 123456).",
@@ -109,6 +111,8 @@ export class PreAuthMobileAccountCapability implements AccountCapability {
     name?: string;
     email?: string;
     timezone?: string;
+    currentPassword?: string;
+    code?: string;
   }): Promise<AccountActionResult> {
     return { ok: false, error: PreAuthMobileAccountCapability.DEFERRED_ERROR };
   }
@@ -125,7 +129,7 @@ export class PreAuthMobileAccountCapability implements AccountCapability {
     return { ok: false, error: PreAuthMobileAccountCapability.DEFERRED_ERROR };
   }
 
-  async sendSecurityCode(_action: "RESET_PROGRESS" | "DELETE_ACCOUNT"): Promise<AccountActionResult> {
+  async sendSecurityCode(_action: "RESET_PROGRESS" | "DELETE_ACCOUNT" | "CHANGE_EMAIL"): Promise<AccountActionResult> {
     return { ok: false, error: PreAuthMobileAccountCapability.DEFERRED_ERROR };
   }
 

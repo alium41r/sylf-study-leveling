@@ -4,6 +4,9 @@ import { getSession } from "@/lib/auth-server";
 import { revalidateTag } from "next/cache";
 import { lockCompanionOwner, validateCompanionSelection, PixelCreationError } from "@/lib/pixel-creation-service";
 import { z } from "zod";
+import { assertMayWear, CosmeticNotAllowedError, WEARER_SELECT, WORN_FIELDS } from "@/lib/cosmetic-policy";
+import { isClearOrSafeImageAddress } from "@/lib/image-address";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +32,8 @@ const CustomizationSchema = z.object({
     .nullable(),
 });
 
+const IMAGE_MESSAGE = "Use an https image address.";
+
 async function handleCustomizationUpdate(req: NextRequest) {
   try {
     const session = await getSession(req);
@@ -48,6 +53,12 @@ async function handleCustomizationUpdate(req: NextRequest) {
     }
 
     const data = parseResult.data;
+
+    if (!isClearOrSafeImageAddress(data.bannerUrl) || !isClearOrSafeImageAddress(data.avatarUrl)) {
+      return NextResponse.json({ error: IMAGE_MESSAGE, code: "IMAGE_ADDRESS_REFUSED" }, { status: 400 });
+    }
+    const limit = await rateLimit(`profile-write:${userId}`, { limit: 30, windowMs: 60_000 });
+    if (!limit.allowed) return NextResponse.json({ error: "Too many changes. Please wait a moment." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
 
     const updateData: Record<string, any> = {};
     if (data.bannerUrl !== undefined) {
@@ -88,6 +99,12 @@ async function handleCustomizationUpdate(req: NextRequest) {
     const updatedUser = await prisma.$transaction(async tx => {
       await lockCompanionOwner(tx, userId);
       await validateCompanionSelection(tx, userId, data.characterConfig);
+      const chosen = WORN_FIELDS.filter((field) => data[field] !== undefined);
+      if (chosen.length) {
+        const wearer = await tx.user.findUnique({ where: { id: userId }, select: WEARER_SELECT });
+        if (!wearer) throw new CosmeticNotAllowedError(chosen[0]);
+        for (const field of chosen) await assertMayWear(tx, wearer, field, data[field]!);
+      }
       return tx.user.update({
         where: { id: userId },
         data: updateData,
@@ -111,6 +128,7 @@ async function handleCustomizationUpdate(req: NextRequest) {
       user: updatedUser,
     });
   } catch (error: any) {
+    if (error instanceof CosmeticNotAllowedError) return NextResponse.json({ error: error.message, code: error.code }, { status: 403 });
     if (error instanceof PixelCreationError) return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
     console.error("Customization Route Error:", error);
     return NextResponse.json({ error: "Failed to update profile customization." }, { status: 500 });

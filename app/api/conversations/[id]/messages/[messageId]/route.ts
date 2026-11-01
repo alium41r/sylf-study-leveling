@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { messageRefusal } from "@/lib/message-limits";
 
 /**
  * PATCH /api/conversations/[id]/messages/[messageId]
@@ -23,9 +24,8 @@ export async function PATCH(
     const userId = session.userId;
     const body = await req.json();
 
-    if (!body.content || !body.content.trim()) {
-      return NextResponse.json({ error: "Message content cannot be empty" }, { status: 400 });
-    }
+    const refusal = messageRefusal(body.content);
+    if (refusal) return NextResponse.json({ error: refusal }, { status: 400 });
 
     // S3: current membership is required at mutation time, not just at fetch.
     const participant = await prisma.conversationParticipant.findUnique({
